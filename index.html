@@ -1,54 +1,59 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PIXORO LIVE</title>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-// 👇 ITHULA UN REAL FIREBASE CONFIG AH PASTE PANNU DA GIRI! xxx ELLAM REAL AH MAATHU DA!
 const firebaseConfig = {
-  apiKey: "PASTE YOUR REAL API KEY HERE - AIzaSy...",
-  authDomain: "PASTE YOUR REAL AUTH DOMAIN HERE",
-  projectId: "PASTE YOUR REAL PROJECT ID HERE",
-  storageBucket: "PASTE YOUR REAL STORAGE BUCKET HERE",
-  messagingSenderId: "PASTE YOUR REAL SENDER ID HERE",
-  appId: "PASTE YOUR REAL APP ID HERE"
+  apiKey: "AIzaSy_YOUR_REAL_KEY_HERE",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "1234567890",
+  appId: "1:1234567890:web:abcdef"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
-window._fb = {db, storage, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, increment, ref, uploadString, getDownloadURL};
+window._fb = {db, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, increment};
 </script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#000;color:#fff}
-.top{position:sticky;top:0;z-index:10;background:#000;padding:10px;border-bottom:1px solid #222;display:flex;justify-content:space-between}
-.card{margin:8px;background:#111;border:1px solid #333;border-radius:12px;padding:10px}
-.post{margin:8px;background:#111;border:1px solid #222;border-radius:12px;overflow:hidden}
-.btn{padding:10px;border-radius:20px;border:none;font-weight:bold;width:100%;margin-top:6px}.gold{background:#FFD700;color:#000}.blue{background:#0095f6;color:#fff}
-.btm{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:10px 0;font-size:11px}
-</style></head><body>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#000;color:#fff}
+.top{position:sticky;top:0;z-index:10;background:#000;padding:12px;border-bottom:1px solid #222;display:flex;justify-content:space-between}
+.card{margin:10px;background:#111;border:1px solid #333;border-radius:12px;padding:12px}
+.post{margin:10px;background:#111;border:1px solid #222;border-radius:12px;overflow:hidden}
+.btn{padding:12px;border-radius:20px;border:none;font-weight:bold;width:100%;margin-top:8px}
+.gold{background:#FFD700;color:#000}
+.blue{background:#0095f6;color:#fff}
+.btm{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:12px}
+</style>
+</head>
+<body>
 <div style="padding-bottom:80px">
-<div class="top"><b style="color:#FFD700">PIXORO LIVE 👑</b><span id="coins" style="background:#222;padding:5px 12px;border-radius:15px">🪙 19040</span></div>
+<div class="top"><b style="color:#FFD700">PIXORO LIVE 👑</b><span id="coins" style="color:#FFD700">🪙 0</span></div>
 
 <div class="card" style="border-color:#FFD700">
-<b>📷 Instagram Mari - Save Aagum da!</b>
+<b>📸 PIXORO UPLOAD - BILLING ILLA DA!</b>
 <input type="file" id="file" accept="image/*" style="display:none">
-<button class="btn gold" onclick="document.getElementById('file').click()">📷 Photo / Reel Select</button>
-<input id="cap" placeholder="Caption @mention #tag 👥collab 💚close" style="width:100%;margin-top:6px;padding:8px;background:#222;border:1px solid #333;border-radius:20px;color:#fff">
-<select id="type" style="width:100%;margin-top:6px;padding:8px;background:#222;border:1px solid #333;border-radius:20px;color:#fff"><option value="public">🌍 Public Account</option><option value="close">💚 Close Friends Only</option><option value="private">🔒 Private</option></select>
-<div id="preview" style="display:none;margin-top:8px"><img id="pImg" style="width:100%;border-radius:10px"><small id="status" style="color:#0f0"></small></div>
-<button id="upBtn" class="btn blue" onclick="upload()">Upload to Firebase - Save Aagum ✅</button>
-<small style="color:#888">✓ Public ID • Mention • Tag • Collab • Reposed • Notes • Crowns • Follow Count • Background Free • Free Data • Views=Coins</small>
+<button class="btn gold" onclick="document.getElementById('file').click()">📷 Photo Select Pannu Da Giri</button>
+<input id="cap" placeholder="Caption @mention #tag #collab" style="width:100%;margin-top:8px;padding:10px;background:#222;border:1px solid #333;color:#fff;border-radius:8px">
+<div id="preview" style="display:none;margin-top:10px"><img id="pImg" style="width:100%;border-radius:10px"><div id="status" style="margin-top:5px;color:#0f0"></div></div>
+<button id="upBtn" class="btn blue" onclick="upload()">🚀 Upload Pannu Da - Free da!</button>
 </div>
 
-<div id="feed"><div class="card">⏳ Firebase la irunthu loading da Giri...</div></div>
+<div id="feed"><div class="card">⏳ Loading da Giri...</div></div>
 </div>
-<div class="btm"><span>🏠 Feed</span><span>🎬 Reels</span><span>💬 Public/Private Chat</span><span>👤 Profile Edit</span><span>⚙️ Settings</span></div>
+
+<div class="btm"><span>🏠 Feed</span><span>🎥 Reels</span><span>💬 Chat</span></div>
 
 <script>
-let selData=null; let coins=19040;
+let selData=null;
+let coins=0;
 document.getElementById('file').addEventListener('change', e=>{
 let f=e.target.files[0]; let r=new FileReader();
 r.onload=ev=>{
@@ -56,49 +61,23 @@ let img=new Image(); img.onload=()=>{
 let c=document.createElement('canvas'); c.width=800; c.height=img.height*(800/img.width);
 c.getContext('2d').drawImage(img,0,0,c.width,c.height);
 selData=c.toDataURL('image/jpeg',0.7);
-document.getElementById('pImg').src=selData; document.getElementById('preview').style.display='block';
-document.getElementById('status').innerText='✅ Ready - Glitch varathu da - Upload pannu!';
+document.getElementById('pImg').src=selData;
+document.getElementById('preview').style.display='block';
+document.getElementById('status').innerText='✅ Ready da Giri - Upload pannu da!';
 }; img.src=ev.target.result;
 }; r.readAsDataURL(f);
 });
 
 async function upload(){
-if(!selData){alert('Photo select pannu da!');return}
-let cap=document.getElementById('cap').value||'Public reel da 👑';
-let type=document.getElementById('type').value;
-document.getElementById('upBtn').innerText='Uploading...'; document.getElementById('status').innerText='⏳ Firebase ku poguthu...';
+if(!selData){alert('Photo select pannu da Giri!');return}
+let cap=document.getElementById('cap').value||'PIXORO First Post da 👑';
+document.getElementById('upBtn').innerText='Uploading to Cloudinary...';
+document.getElementById('upBtn').disabled=true;
 try{
-let fb=window._fb; let sRef=fb.ref(fb.storage,'pixoro/'+Date.now()+'.jpg');
-await fb.uploadString(sRef, selData, 'data_url'); let url=await fb.getDownloadURL(sRef);
-await fb.addDoc(fb.collection(fb.db,'posts'),{
-user:'pixoro_owner', owner:true, caption:cap, imageUrl:url, type:type,
-mention: cap.match(/@\w+/g)||[], tags: cap.match(/#\w+/g)||[], collab:'captain_giri',
-views:1, likes:0, shares:0, reposted:0, crowns:19040, followers:10100, notes:'On your mind', public:true, createdAt:Date.now()
-});
-document.getElementById('upBtn').innerText='Upload to Firebase ✅'; document.getElementById('status').innerText='✅ Saved! Feed la varum da!';
-document.getElementById('cap').value=''; selData=null; document.getElementById('preview').style.display='none';
-coins+=10; document.getElementById('coins').innerText='🪙 '+coins;
-alert('👑 Save aaiduchu da Giri! Instagram maadhiri Firebase la save aayiduchu!');
-}catch(e){alert('Error da Giri - Real config paste panniya? Error: '+e.message); document.getElementById('upBtn').innerText='Upload to Firebase ✅';}
-}
+let fb=window._fb;
 
-setTimeout(async()=>{
-try{
-let fb=window._fb; let q=fb.query(fb.collection(fb.db,'posts'), fb.orderBy('createdAt','desc'));
-fb.onSnapshot(q,snap=>{
-let h=''; if(snap.empty) h='<div class=card>First post neeye podu da Giri! Mela photo select pannu da! 👑</div>';
-snap.forEach(d=>{
-let p=d.data();
-h+=`<div class=post><div style="padding:8px"><b>${p.user} 👑 ${p.type=='public'?'🌍 PUBLIC':''}</b> ${p.type=='close'?'💚 Close Friends':''}<br><small>📅 ${new Date(p.createdAt).toLocaleDateString()} • 👁️ ${p.views} Views = 🪙 ${p.views} = ₹${Math.floor(p.views/100)} • 📣 ${p.mention} • 🏷️ ${p.tags} • 👥 ${p.collab}</small></div><img src="${p.imageUrl}" style="width:100%"><div style="padding:8px;font-size:11px">❤️ ${p.likes} Like Count • 💬 Comment • ✈️ ${p.shares} Share • 🔖 ${p.reposted} Reposed • 👑 ${p.crowns} Crowns • 👥 ${p.followers} Followers<br><b>${p.caption}</b><br><small>✓ Notes: ${p.notes} • I List • Profile Edit • Public ID Create • Public/Private Chat • Background Free • Free Data Free Reels • Settings All ON</small><br><button style="background:#0095f6;color:#fff;border:none;padding:6px 12px;border-radius:20px;margin-top:6px" onclick="like('${d.id}')">❤️ Like +2 Coins</button></div></div>`;
-});
-document.getElementById('feed').innerHTML=h;
-});
-}catch(e){document.getElementById('feed').innerHTML='<div class=card>❌ Config thappu da Giri - Real config ah paste pannu da! Sample xxx venda da!<br>Error: '+e.message+'</div>';}
-},1500);
-
-window.like=async(id)=>{
-let fb=window._fb; await fb.updateDoc(fb.doc(fb.db,'posts',id),{likes:fb.increment(1), views:fb.increment(5)});
-coins+=2; document.getElementById('coins').innerText='🪙 '+coins;
-}
-</script>
-</body></html>
+// CLOUDINARY - 100% FREE DA GIRI - BILLING ILLA
+let formData = new FormData();
+formData.append('file', selData);
+formData.append('upload_preset', 'pixoro_preset');
+let cloudRes = await fetch('https://api.cloudinary.com/v1_1/vi4etpob/image/upload
