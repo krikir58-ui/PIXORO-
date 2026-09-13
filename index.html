@@ -1,19 +1,47 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PIXORO</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PIXORO - ONE APP</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#fff;font-family:Arial}
-.top{padding:12px;display:flex;gap:10px;align-items:center;position:sticky;top:0;background:#000;border-bottom:1px solid #222;z-index:99}
-.logo{font-size:26px;font-weight:900;font-style:italic;background:linear-gradient(90deg,#ff9a00,#ff0080,#7b00ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.top input{flex:1;background:#151515;border:1px solid #333;padding:11px 16px;border-radius:25px;color:#fff;outline:none}
-.stories{display:flex;gap:14px;padding:14px;overflow-x:auto;border-bottom:1px solid #222}
-.st{min-width:64px;text-align:center}.st img{width:62px;height:62px;border-radius:50%;border:3px solid #ff0080}
-.create{padding:15px;border-bottom:8px solid #111}
-.create textarea{width:100%;background:#111;border:1px solid #333;border-radius:12px;padding:12px;color:#fff;outline:none}
-.create button{width:100%;margin-top:10px;background:linear-gradient(90deg,#ff7a00,#ff006a);border:none;padding:14px;border-radius:12px;color:#fff;font-weight:bold;font-size:16px}
-.post{border-bottom:1px solid #222}.head{padding:12px;display:flex;gap:10px;align-items:center}.head img{width:35px;height:35px;border-radius:50%}
-.post img.main{width:100%} .actions{padding:10px 
+*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:Arial}
+.top{padding:12px;display:flex;gap:10px;align-items:center;position:sticky;top:0;background:#000;border-bottom:1px solid #222;z-index:10}
+.logo{font-size:24px;font-weight:900;background:linear-gradient(90deg,#ff9a00,#ff0080);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.top input{flex:1;background:#111;border:1px solid #333;padding:10px 15px;border-radius:20px;color:#fff;outline:none}
+.nav{display:flex;justify-content:space-around;padding:10px;border-bottom:1px solid #222;background:#000;position:sticky;top:53px;z-index:9}
+.nav b{padding:8px 15px;border-radius:20px;background:#111;cursor:pointer}.nav b.active{background:linear-gradient(90deg,#ff7a00,#ff006a)}
+.sec{display:none;padding:15px}.sec.active{display:block}
+.card{background:#111;border:1px solid #222;border-radius:15px;padding:12px;margin-bottom:12px}
+.card img{width:100%;border-radius:12px;margin-top:8px}
+.btn{width:100%;background:linear-gradient(90deg,#ff7a00,#ff006a);border:none;padding:13px;border-radius:12px;color:#fff;font-weight:bold;margin-top:10px}
+input,textarea{width:100%;background:#000;border:1px solid #333;padding:12px;border-radius:10px;color:#fff;outline:none;margin-top:8px}
+#prev{width:100%;border-radius:12px;display:none;margin-top:10px}
+</style></head>
+<body>
+<div class="top"><div class="logo">PIXORO</div><input id="s" placeholder="🔍 Search" onkeyup="doSearch()"></div>
+<div class="nav"><b id="b1" class="active" onclick="showSec(1)">📸 Feed</b><b id="b2" onclick="showSec(2)">🎨 Editor</b><b id="b3" onclick="showSec(3)">👤 Profile</b></div>
+
+<div id="s1" class="sec active">
+<div style="display:flex;gap:12px;overflow-x:auto;padding-bottom:10px"><div style="text-align:center"><img src="https://i.pravatar.cc/150?img=5" style="width:55px;height:55px;border-radius:50%;border:2px solid #ff0080"><p style="font-size:11px">You</p></div><div style="text-align:center"><img src="https://i.pravatar.cc/150?img=8" style="width:55px;height:55px;border-radius:50%"><p style="font-size:11px">giri</p></div></div>
+<div id="feed">
+<div class="card" data-name="giri"><b>giri_official</b><img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600"><p style="margin-top:8px">My first PIXORO post da 🔥</p></div>
+</div>
+<div class="card"><input type="file" id="file" accept="image/*"><img id="prev"><textarea id="cap" placeholder="Caption..."></textarea><button class="btn" onclick="postIt()">POST TO PIXORO 🚀</button></div>
+</div>
+
+<div id="s2" class="sec">
+<div class="card"><h3>🎨 Photo Editor</h3><input type="file" id="file2" accept="image/*"><canvas id="can" style="width:100%;border-radius:12px;margin-top:10px;background:#000"></canvas><input type="range" id="bright" min="0" max="200" value="100" oninput="edit()"><p>Brightness</p><button class="btn" onclick="download()">Download Photo</button></div>
+</div>
+
+<div id="s3" class="sec"><div class="card" style="text-align:center"><img src="https://i.pravatar.cc/150?img=5" style="width:80px;height:80px;border-radius:50%"><h2 style="margin-top:10px">captain_giri</h2><p>PIXORO Founder da 🔥</p><p style="margin-top:10px">Posts: 12 | Followers: 1K | Following: 10</p></div></div>
+
+<script>
+function showSec(n){[1,2,3].forEach(i=>{document.getElementById('s'+i).classList.remove('active');document.getElementById('b'+i).classList.remove('active');});document.getElementById('s'+n).classList.add('active');document.getElementById('b'+n).classList.add('active');}
+let imgD='';
+document.getElementById('file').onchange=e=>{let r=new FileReader();r.onload=ev=>{imgD=ev.target.result;let p=document.getElementById('prev');p.src=imgD;p.style.display='block';};r.readAsDataURL(e.target.files[0]);};
+function postIt(){let c=document.getElementById('cap').value;if(!imgD){alert('Photo choose pannu da!');return;}let d=document.createElement('div');d.className='card';d.setAttribute('data-name','you');d.innerHTML=`<b>you</b><img src="${imgD}"><p style="margin-top:8px">${c}</p>`;document.getElementById('feed').prepend(d);imgD='';document.getElementById('prev').style.display='none';document.getElementById('cap').value='';}
+function doSearch(){let v=document.getElementById('s').value.toLowerCase();showSec(1);document.querySelectorAll('#feed.card').forEach(c=>{c.style.display=c.innerText.toLowerCase().includes(v)?'block':'none';});}
+// Editor
+let ctx=document.getElementById('can').getContext('2d'),img=new Image();
+document.getElementById('file2').onchange=e=>{let r=new FileReader();r.onload=ev=>{img.src=ev.target.result;img.onload=()=>{document.getElementById('can').width=img.width;document.getElementById('can').height=img.height;edit();};};r.readAsDataURL(e.target.files[0]);};
+function edit(){if(!img.src)return;let b=document.getElementById('bright').value;ctx.filter=`brightness(${b}%)`;ctx.drawImage(img,0,0);}
+function download(){let a=document.createElement('a');a.download='pixoro.jpg';a.href=document.getElementById('can').toDataURL();a.click();}
+</script>
+</body></html>
