@@ -1,121 +1,83 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>PIXORO</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#000;color:#fff}
-.top{position:sticky;top:0;z-index:10;background:#000;display:flex;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #222;align-items:center}
-.top b{font-size:20px;letter-spacing:1px}
-.story{display:flex;gap:10px;padding:10px;overflow-x:auto;border-bottom:1px solid #222}
-.s{flex-shrink:0;text-align:center;width:62px}
-.ring{width:62px;height:62px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)}
-.ring div{width:100%;height:100%;border-radius:50%;background:#000;border:2px solid #000;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.s small{font-size:10px;display:block;margin-top:4px;white-space:nowrap;overflow:hidden}
-.post{border-bottom:1px solid #222}
-.p-head{display:flex;align-items:center;gap:8px;padding:8px 10px}
-.p-head b{font-size:13px}
-.p-head span{font-size:11px;color:#aaa}
-.p-img{width:100%;aspect-ratio:4/5;background:#111;display:flex;align-items:center;justify-content:center;font-size:22px}
-.p-act{display:flex;gap:14px;padding:8px 10px;font-size:20px;align-items:center}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}
-.grid div{aspect-ratio:1;background:#111;display:flex;align-items:center;justify-content:center;font-size:12px;position:relative}
-.tab{display:none}.tab.active{display:block}
-.btm{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:10px 0;font-size:22px}
-.sec{padding-bottom:60px}
-.noti{position:absolute;top:8px;right:10px;background:#ff3040;padding:2px 6px;border-radius:10px;font-size:11px}
-.dm-row{display:flex;gap:10px;padding:10px;border-bottom:1px solid #111;align-items:center}
-.search{margin:8px;background:#111;padding:8px 12px;border-radius:20px;color:#888;font-size:14px}
-</style>
-</head>
-<body>
-<!-- ONBOARDING 5 SCREENS FIRST TIME ONLY -->
-<div id="onboard" style="position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column">
-<div id="s0" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center"><h2 style="font-size:28px">Engage with your<br><span style="border:1px solid #fff;border-radius:20px;padding:2px 10px">favorite creators</span></h2><div style="width:260px;height:300px;background:linear-gradient(45deg,#222,#444);border-radius:20px;margin:20px;display:flex;align-items:center;justify-content:center;font-size:50px">🔥</div></div>
-<div id="dots" style="display:flex;justify-content:center;gap:8px;padding:10px"><div style="width:20px;height:6px;background:#fff;border-radius:10px"></div><div style="width:6px;height:6px;background:#333;border-radius:10px"></div><div style="width:6px;height:6px;background:#333;border-radius:10px"></div><div style="width:6px;height:6px;background:#333;border-radius:10px"></div><div style="width:6px;height:6px;background:#333;border-radius:10px"></div></div>
-<button onclick="nextO()" id="nbtn" style="margin:15px;background:#fff;color:#000;padding:14px;border-radius:25px;border:none;font-weight:bold">Next →</button>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PIXORO - Original</title><style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#000;color:#fff}
+.top{position:sticky;top:0;z-index:10;background:#000;display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #222;align-items:center}
+.top b{font-size:22px;letter-spacing:1px;background:linear-gradient(45deg,#feda75,#d62976);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.story{display:flex;gap:12px;padding:12px;overflow-x:auto;border-bottom:1px solid #222}
+.s{flex-shrink:0;text-align:center;width:64px}.ring{width:64px;height:64px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf)}
+.ring div{width:100%;height:100%;border-radius:50%;background:#111;border:2px solid #000;display:flex;align-items:center;justify-content:center;font-size:22px}
+.s small{font-size:10px;margin-top:4px;display:block}
+.post{border-bottom:1px solid #222}.p-head{display:flex;gap:8px;padding:10px;align-items:center}.p-head b{font-size:13px}
+.p-img{width:100%;aspect-ratio:1;background:#111;display:flex;align-items:center;justify-content:center;font-size:18px;text-align:center;padding:20px}
+.p-act{display:flex;gap:15px;padding:10px;font-size:22px}
+.tab{display:none}.tab.active{display:block}.sec{padding-bottom:65px}
+.btm{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:12px 0;font-size:24px;z-index:20}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}.grid div{aspect-ratio:1;background:#111;display:flex;align-items:center;justify-content:center}
+.search{margin:10px;background:#222;padding:10px 14px;border-radius:20px;color:#888}
+</style></head><body>
+
+<div id="onboard" style="position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center">
+<h1 style="font-size:36px;background:linear-gradient(45deg,#feda75,#d62976);-webkit-background-clip:text;-webkit-text-fill-color:transparent">PIXORO</h1>
+<p style="margin-top:20px;font-size:18px">Puthusa Create Panniya<br>Original App da Giri!</p>
+<div style="width:250px;height:250px;background:linear-gradient(135deg,#1a1a1a,#333);border-radius:30px;margin:30px;display:flex;align-items:center;justify-content:center;font-size:60px">🚀</div>
+<button onclick="go()" style="background:#fff;color:#000;padding:14px 50px;border-radius:30px;border:none;font-weight:bold;font-size:16px">Get Started →</button>
 </div>
 
-<!-- MAIN APP -->
 <div id="app" style="display:none">
-<div class="top"><b>PIXORO</b><div>❤️ <span style="position:relative">✈️ <span class="noti">15</span></span></div></div>
+<div class="top"><b>PIXORO</b><div>❤️ ✈️</div></div>
 
-<!-- FEED TAB -->
 <div id="feed" class="sec tab active">
 <div class="story">
-<div class="s"><div class="ring" style="background:#222"><div>😎<br>+</div></div><small>Your story</small></div>
-<div class="s"><div class="ring"><div>👧</div></div><small>meoww_kutty_</small></div>
-<div class="s"><div class="ring"><div>🏍️</div></div><small>heyy_pattu_29</small></div>
-<div class="s"><div class="ring"><div>🦋</div></div><small>smiley_girl_</small></div>
+<div class="s"><div class="ring" style="background:#333"><div>😎+</div></div><small>Your story</small></div>
+<div class="s"><div class="ring"><div>🔥</div></div><small>giri_official</small></div>
+<div class="s"><div class="ring"><div>⚡</div></div><small>pixoro_team</small></div>
+<div class="s"><div class="ring"><div>💜</div></div><small>creator_01</small></div>
+<div class="s"><div class="ring"><div>🎬</div></div><small>reels_tamil</small></div>
 </div>
 
 <div class="post">
-<div class="p-head"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(45deg,#feda75,#d62976)"></div><b>nobi_love_yuva</b> • <span>🎵 Devakottai Abirami - Unna Paatha Nodyle</span></div>
-<div class="p-img" style="background:url('https://picsum.photos/400/500') center/cover">.</div>
+<div class="p-head"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(45deg,#feda75,#d62976)"></div><b>giri_official</b> • 2h</div>
+<div class="p-img" style="background:linear-gradient(135deg,#0f0c29,#302b63,#24243e)">🔥 PIXORO LA FIRST POST DA!<br><br>Original Content Only 🚀</div>
 <div class="p-act">❤️ 💬 ✈️ <span style="margin-left:auto">🔖</span></div>
-<div style="padding:0 10px 10px;font-size:13px"><b>nobi_love_yuva</b> ❤️</div>
+<div style="padding:0 12px 12px;font-size:13px"><b>giri_official</b> Enoda own app da! #pixoro #original</div>
 </div>
 
 <div class="post">
-<div class="p-head"><div style="width:28px;height:28px;border-radius:50%;background:#333"></div><b>tvkhq_team and tvk_youth_media</b></div>
-<div class="p-img">🏁 Vijay Anna F1 Flag 💚</div>
+<div class="p-head"><div style="width:32px;height:32px;border-radius:50%;background:#222"></div><b>pixoro_team</b> • 5h</div>
+<div class="p-img" style="background:linear-gradient(135deg,#ff416c,#ff4b2b)">🎉 Welcome to PIXORO<br>Share Your Vibes!</div>
 <div class="p-act">❤️ 💬 ✈️</div>
 </div>
 </div>
 
-<!-- REELS TAB -->
-<div id="reels" class="sec tab">
-<div class="top"><b>Reels</b><b>Friends ●●●</b></div>
-<div class="p-img" style="height:80vh;background:#111">▶️ REELS FEED - TVK Video<br>Vijay Anna Green Flag 🏁</div>
+<div id="reels" class="sec tab"><div class="top"><b>Reels</b><b>Trending</b></div>
+<div style="height:80vh;background:linear-gradient(#111,#222);display:flex;align-items:center;justify-content:center;text-align:center">▶️<br><br>PIXORO Reels<br>Original Tamil Reels Only<br>🚀 No Insta Copy</div>
 </div>
 
-<!-- DM TAB -->
-<div id="dm" class="sec tab">
-<div class="top"><b>comedy_gi... ▼</b><span>✎</span></div>
-<div class="search">🔍 Search or ask Meta AI</div>
-<div style="padding:8px;display:flex;gap:8px;overflow:auto"><span style="background:#222;padding:6px 10px;border-radius:15px;font-size:12px">Make this place yours...</span><span style="background:#444;padding:6px 10px;border-radius:15px;font-size:12px">Hi Sidu Tamarakau</span></div>
-<div style="display:flex;gap:10px;padding:10px"><span style="background:#fff;color:#000;padding:5px 10px;border-radius:15px;font-size:12px">Primary 2</span><span style="background:#111;padding:5px 10px;border-radius:15px;font-size:12px">General</span><span style="background:#111;padding:5px 10px;border-radius:15px;font-size:12px">Requests →</span></div>
-<div class="dm-row"><div style="width:40px;height:40px;border-radius:50%;background:#444"></div><div><b>Namba_Family's 🎀</b><br><small style="color:#888">Sent</small></div></div>
-<div class="dm-row"><div style="width:40px;height:40px;border-radius:50%;background:#ff00aa"></div><div><b>Welcome 🎀</b><br><small>Mentioned you in a story · 2h</small></div></div>
+<div id="search" class="sec tab"><div class="search">🔍 Search PIXORO</div>
+<div class="grid"><div>🔥 2.3M</div><div>⚡ 1.1M</div><div>💜 890K</div><div>🎬 5M</div><div>🚀 3M</div><div>💥 1.5M</div></div>
 </div>
 
-<!-- SEARCH TAB -->
-<div id="search" class="sec tab">
-<div class="search">🔍 Search with Meta AI</div>
-<div class="grid">
-<div>Love Senior</div><div>28K</div><div>1.6M</div>
-<div>12.4M</div><div>3.1M</div><div>640K</div>
-<div>1M</div><div>10.2M</div><div>9.9M</div>
-</div>
+<div id="dm" class="sec tab"><div class="top"><b>pixoro_messages</b></div>
+<div class="search">🔍 Search</div>
+<div style="padding:12px;border-bottom:1px solid #222">👑 <b>pixoro_team</b><br><small style="color:#888">Welcome to PIXORO da Giri! 🎉</small></div>
+<div style="padding:12px;border-bottom:1px solid #222">🔥 <b>giri_official</b><br><small style="color:#888">You: Original app ready da!</small></div>
 </div>
 
-<!-- PROFILE TAB -->
 <div id="profile" class="sec tab">
-<div class="top"><b>comedy_girl_ ▼</b><span>☰</span></div>
-<div style="padding:10px;display:flex;gap:15px;align-items:center"><div style="width:70px;height:70px;border-radius:50%;background:#444"></div><div style="display:flex;gap:20px;text-align:center"><div><b>128</b><br><small>posts</small></div><div><b>10.1K</b><br><small>followers</small></div><div><b>91</b><br><small>following</small></div></div></div>
-<div style="padding:0 10px;font-size:13px"><b>🎀Giri🎀</b><br>Reel creator<br>Heart Break 💔<br>Record Break 💥<br><a style="color:#0095f6">youtube.com/@comedy_girl...</a></div>
-<div style="padding:10px;display:flex;gap:8px"><button style="flex:1;background:#222;color:#fff;padding:6px;border-radius:8px;border:none">Edit profile</button><button style="flex:1;background:#222;color:#fff;padding:6px;border-radius:8px;border:none">Share profile</button></div>
-<div class="grid"><div>❤️</div><div>😂</div><div>🔥</div></div>
+<div class="top"><b>giri_official ▼</b></div>
+<div style="padding:15px;display:flex;gap:20px;align-items:center"><div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(45deg,#feda75,#d62976);display:flex;align-items:center;justify-content:center;font-size:30px">😎</div>
+<div style="display:flex;gap:25px;text-align:center"><div><b>3</b><br><small>posts</small></div><div><b>1.2K</b><br><small>followers</small></div><div><b>10</b><br><small>following</small></div></div></div>
+<div style="padding:0 15px"><b>GIRI | PIXORO Founder 🚀</b><br>Original App Creator<br>Salem 📍</div>
+<div style="padding:15px;display:flex;gap:8px"><button style="flex:1;background:#222;color:#fff;padding:8px;border-radius:8px;border:none">Edit profile</button><button style="flex:1;background:#222;color:#fff;padding:8px;border-radius:8px;border:none">Share</button></div>
+<div class="grid"><div>🔥</div><div>🚀</div><div>💥</div></div>
 </div>
 
-<div class="btm">
-<span onclick="show('feed')">🏠</span>
-<span onclick="show('search')">🔍</span>
-<span onclick="show('reels')">🎬</span>
-<span onclick="show('dm')">✈️</span>
-<span onclick="show('profile')">👤</span>
-</div>
+<div class="btm"><span onclick="sh('feed')">🏠</span><span onclick="sh('search')">🔍</span><span onclick="sh('reels')">🎬</span><span onclick="sh('dm')">✈️</span><span onclick="sh('profile')">👤</span></div>
 </div>
 
 <script>
-let o=0;
-function nextO(){
-o++;
-if(o>=1){document.getElementById('onboard').style.display='none';document.getElementById('app').style.display='block';localStorage.setItem('pixoro_seen','1')}
-}
-if(localStorage.getItem('pixoro_seen')){document.getElementById('onboard').style.display='none';document.getElementById('app').style.display='block'}
-function show(id){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.getElementById(id).classList.add('active')}
-</script>
-</body>
-</html>
+function go(){document.getElementById('onboard').style.display='none';document.getElementById('app').style.display='block';localStorage.setItem('pix_seen','1')}
+if(localStorage.getItem('pix_seen')){document.getElementById('onboard').style.display='none';document.getElementById('app').style.display='block'}
+function sh(id){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.getElementById(id).classList.add('active')}
+</script></body></html>
