@@ -1,71 +1,38 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO - Coins</title><style>
+<title>PIXORO WORLD</title><style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#000;color:#fff}
-.top{position:sticky;top:0;z-index:10;background:#000;display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #222;align-items:center}
+.top{position:sticky;top:0;z-index:20;background:#000;display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #222}
 .top b{font-size:22px;background:linear-gradient(45deg,#feda75,#d62976);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.coin{background:linear-gradient(45deg,#FFD700,#FFA500);color:#000;padding:5px 12px;border-radius:20px;font-weight:bold;font-size:14px}
 .tab{display:none}.tab.active{display:block}.sec{padding-bottom:70px}
-.btm{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:10px 0;font-size:22px;z-index:20}
-.story{display:flex;gap:12px;padding:10px;overflow-x:auto;border-bottom:1px solid #222}
-.s{width:60px;text-align:center;flex-shrink:0}.ring{width:60px;height:60px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#d62976)}
-.ring div{width:100%;height:100%;border-radius:50%;background:#111;border:2px solid #000;display:flex;align-items:center;justify-content:center}
+.btm{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:12px 0;font-size:22px;z-index:30}
 .post{border-bottom:1px solid #222}.p-img{width:100%;aspect-ratio:1;background:#111;position:relative}.p-img img{width:100%;height:100%;object-fit:cover}
-.view{position:absolute;top:8px;right:8px;background:#000a;padding:4px 8px;border-radius:12px;font-size:11px}
-.reel{height:85vh;position:relative;background:#000}.reel img{width:100%;height:100%;object-fit:cover}
+.story{display:flex;gap:10px;padding:10px;overflow-x:auto;border-bottom:1px solid #222}.s{width:62px;text-align:center;flex-shrink:0}.ring{width:62px;height:62px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#d62976,#962fbf)}
+.ring img{width:100%;height:100%;border-radius:50%;border:2px solid #000;object-fit:cover}
+.live{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);background:red;color:#fff;font-size:8px;padding:1px 4px;border-radius:4px}
 </style></head><body>
-
 <div id="app">
 <div id="feed" class="sec tab active">
-<div class="top"><b>PIXORO</b><div style="display:flex;gap:8px;align-items:center"><div class="coin" id="coinTop">🪙 120</div><span>❤️</span></div></div>
-<div class="story">
-<div class="s"><div class="ring" style="background:#333"><div>+</div></div><small>Your story</small></div>
-<div class="s"><div class="ring"><div>🔥</div></div><small>giri_new</small></div>
-<div class="s"><div class="ring"><div>⚡</div></div><small>pixoro_new</small></div>
-</div>
-<div style="margin:8px;background:#111;padding:10px;border-radius:10px;font-size:12px;border:1px solid #222">💰 <b>Views = Coins DA!</b><br>1 View = 1 Coin | 1000 Views = ₹10 | Reels paatha coin varum da Giri!</div>
+<div class="top"><b>PIXORO WORLD</b><div>🌍 LIVE • <span id="online">1,234</span> online</div></div>
+<div style="margin:8px;background:linear-gradient(45deg,#111,#222);padding:10px;border-radius:10px;border:1px solid #333;font-size:12px">🌍 <b>World Feed ON da Giri!</b><br>India, USA, Korea, Brazil ellam irunthu photos varuthu da! Nee post potta world paakum!</div>
+<div class="story" id="storyBar"></div>
 <div id="feedList"></div>
-<button onclick="loadMore()" style="width:100%;padding:10px;background:#222;color:#fff;border:none;margin:10px 0">Load More Photos → +10 Coins</button>
+<button onclick="loadWorld()" style="width:100%;padding:12px;background:#fff;color:#000;border:none;font-weight:bold">🌍 Load More World Posts →</button>
 </div>
 
-<div id="reels" class="sec tab">
-<div class="reel"><img id="reelImg" src="https://picsum.photos/400/800?random=1">
-<div style="position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between"><div class="coin" id="coinReel">🪙 120</div><div style="background:#000a;padding:4px 10px;border-radius:20px;font-size:12px" id="vCount">👁 1.2K Views = 1.2K Coins</div></div>
-<div style="position:absolute;bottom:80px;left:12px"><b>@pixoro_new • New Reels</b><br>Views ku coins varuthu da! 🪙<br><span style="color:#FFD700">+5 coins earned</span><br>🎵 Tamil Trending</div>
-<div style="position:absolute;right:12px;bottom:80px;text-align:center">❤️<br><small>1.2K</small><br><br>💬<br><br>🪙<br><small>5</small></div>
-<button onclick="nextReel()" style="position:absolute;bottom:20px;left:10px;right:10px;background:#fff;color:#000;padding:10px;border-radius:20px;border:none;font-weight:bold">Next Reel → +5 Coins 🪙</button>
-</div>
-</div>
+<div id="reels" class="sec tab"><div id="reelBox" style="height:100vh;position:relative;background:#000" onclick="nextWorldReel()"><img id="reelImg" style="width:100%;height:100%;object-fit:cover"><div style="position:absolute;top:10px;left:10px;background:red;padding:3px 8px;border-radius:10px;font-size:10px">● LIVE WORLD</div><div style="position:absolute;bottom:80px;left:12px" id="reelInfo"><b>@world_girl_01</b><br>World reel da! 🔥<br>📍 USA</div><div style="position:absolute;bottom:20px;left:10px;right:10px;background:#ffffff22;padding:8px;border-radius:20px;text-align:center">Tap for Next World Reel 🌍 →</div></div></div>
 
-<div id="search" class="sec tab"><div class="top"><b>Explore - Nariya Photos</b><div class="coin" id="coinSearch">🪙 120</div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px" id="exploreGrid"></div></div>
+<div id="profile" class="sec tab"><div class="top"><b>pixoro_world</b><span>🌍</span></div><div style="padding:15px"><b>PIXORO WORLD 🌍</b><br>World ellam un photo varum da Giri! Instagram maadhiri!<br><br>🔥 <b>How it works:</b><br>1. Ipo random world photos API la irunthu varuthu<br>2. Real world ku kondu varanum na Firebase venum da<br>3. Na free ah setup panni tharen da</div></div>
 
-<div id="dm" class="sec tab"><div class="top"><b>Coins Wallet</b><div class="coin">🪙 120</div></div><div style="padding:12px;background:#111;margin:10px;border-radius:12px"><b>🪙 Total Coins: <span id="totalCoin">120</span></b><br><small>100 Coins = ₹1 | Withdrawal min 1000 coins</small><br><br><div style="display:flex;gap:8px"><div style="flex:1;background:#222;padding:8px;border-radius:8px;text-align:center"><b id="tViews">12.5K</b><br><small>Views</small></div><div style="flex:1;background:#222;padding:8px;border-radius:8px;text-align:center"><b>₹<span id="earn">12</span></b><br><small>Earning</small></div></div><br><button style="width:100%;background:linear-gradient(45deg,#feda75,#d62976);color:#fff;padding:10px;border-radius:20px;border:none">Withdraw Coins →</button></div></div>
-
-<div id="profile" class="sec tab">
-<div class="top"><b>pixoro_new</b><div class="coin" id="coinPro">🪙 120</div></div>
-<div style="padding:12px;display:flex;gap:15px"><div style="width:70px;height:70px;border-radius:50%;background:linear-gradient(45deg,#feda75,#d62976);display:flex;align-items:center;justify-content:center;font-size:28px">🚀</div><div style="display:flex;gap:20px;text-align:center"><div><b id="pc">0</b><br><small>posts</small></div><div><b id="fView">12.5K</b><br><small>views</small></div><div><b>🪙120</b><br><small>coins</small></div></div></div>
-<div style="padding:0 12px;font-size:13px"><b>PIXORO NEW - Coin System 🚀</b><br>Views ku coins da Giri! Tamil reels nariya varum!</div>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:10px" id="myGrid"></div>
-</div>
-
-<div class="btm"><span onclick="sh('feed')">🏠</span><span onclick="sh('search')">🔍</span><span onclick="sh('reels')">🎬</span><span onclick="sh('dm')">🪙</span><span onclick="sh('profile')">👤</span></div>
+<div class="btm"><span onclick="sh('feed')">🏠</span><span onclick="sh('reels')">🎬</span><span onclick="sh('profile')">🌍</span></div>
 </div>
 
 <script>
-let coins=parseInt(localStorage.getItem('pixoro_coin')||'120');let views=parseInt(localStorage.getItem('pixoro_views')||'12500');let reelIndex=1;
-function updateCoins(n){coins+=n;views+=n*100;localStorage.setItem('pixoro_coin',coins);localStorage.setItem('pixoro_views',views);document.querySelectorAll('[id^=coin]').forEach(e=>e.innerText='🪙 '+coins);document.getElementById('totalCoin').innerText=coins;document.getElementById('tViews').innerText=(views/1000).toFixed(1)+'K';document.getElementById('fView').innerText=(views/1000).toFixed(1)+'K';document.getElementById('earn').innerText=Math.floor(coins/10);}
-
-function sh(id){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.getElementById(id).classList.add('active');if(id=='feed'||id=='reels'){updateCoins(2)}}
-let feedHTML='';for(let i=1;i<=15;i++){feedHTML+=`<div class=post><div style="padding:10px"><b>pixoro_new</b> • ${i}h • <span style=color:#FFD700>🪙 +${i} coins</span><br><small style=color:#0095f6>@giri_new mention</small></div><div class=p-img onclick="updateCoins(1)"><img src="https://picsum.photos/400/400?random=${100+i}"><div class=view>👁 ${i*234} views = 🪙 ${i*234}</div></div><div style="padding:8px 10px;display:flex;gap:12px">❤️ ${i*12} 💬 ✈️ <span style="margin-left:auto;color:#FFD700">🪙 ${i}</span></div></div>`}
-document.getElementById('feedList').innerHTML=feedHTML;
-
-let exploreHTML='';for(let i=1;i<=30;i++){exploreHTML+=`<div style="aspect-ratio:1" onclick="updateCoins(1)"><img src="https://picsum.photos/200?random=${200+i}" style="width:100%;height:100%;object-fit:cover"></div>`}
-document.getElementById('exploreGrid').innerHTML=exploreHTML;
-
-let myHTML='';for(let i=1;i<=12;i++){myHTML+=`<div style="aspect-ratio:1"><img src="https://picsum.photos/400/400?random=${100+i}" style="width:100%;height:100%;object-fit:cover"></div>`}
-document.getElementById('myGrid').innerHTML=myHTML;document.getElementById('pc').innerText=15;
-
-function nextReel(){reelIndex++;document.getElementById('reelImg').src=`https://picsum.photos/400/800?random=${reelIndex+300}`;document.getElementById('vCount').innerText=`👁 ${reelIndex*1.2}K Views = ${reelIndex*1.2}K Coins`;updateCoins(5)}
-function loadMore(){let more='';for(let i=1;i<=10;i++){more+=`<div class=post><div style="padding:10px"><b>friend_0${i}</b> • Now • <span style=color:#FFD700>🪙 +2</span></div><div class=p-img onclick="updateCoins(1)"><img src="https://picsum.photos/400/400?random=${400+Math.random()*100|0}"><div class=view>👁 ${Math.floor(Math.random()*1000)} views</div></div></div>`}document.getElementById('feedList').insertAdjacentHTML('beforeend',more);updateCoins(10)}
-updateCoins(0);sh('feed');
+function sh(id){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.getElementById(id).classList.add('active')}
+let worldNames=['emma_usa','sophia_korea','priya_india','maria_brazil','yuki_japan','giri_new','pixoro_new','world_girl_01','tamil_ponnu_02','salem_boy'];let places=['USA','Korea','India','Brazil','Japan','Salem','Chennai','Mumbai','Dubai','London'];
+function randomStory(){let h='';for(let i=0;i<12;i++){h+=`<div class=s><div class=ring><img src="https://i.pravatar.cc/150?img=${i+5}"></div><small>${worldNames[i%10]}</small><div class=live>LIVE</div></div>`}document.getElementById('storyBar').innerHTML=h}
+function loadWorld(){let h='';for(let i=0;i<10;i++){let name=worldNames[Math.floor(Math.random()*10)];let place=places[Math.floor(Math.random()*10)];let likes=Math.floor(Math.random()*5000);h+=`<div class=post><div style="padding:10px;display:flex;gap:8px"><img src="https://i.pravatar.cc/100?img=${Math.floor(Math.random()*30)+1}" style="width:32px;height:32px;border-radius:50%"><div><b>${name}</b> • ${place} 🌍<br><small>${Math.floor(Math.random()*10)+1}h ago • World feed</small></div><span style="margin-left:auto">⋯</span></div><div class=p-img><img src="https://picsum.photos/400/400?random=${Math.floor(Math.random()*5000)}"></div><div style="padding:10px;display:flex;gap:12px">❤️ ${likes} 💬 ${Math.floor(likes/10)} ✈️<span style="margin-left:auto">🔖</span></div><div style="padding:0 10px 10px;font-size:13px"><b>${name}</b> My world photo da! #pixoro_world #${place}</div></div>`}document.getElementById('feedList').insertAdjacentHTML('beforeend',h);document.getElementById('online').innerText=Math.floor(1000+Math.random()*5000).toLocaleString()}
+let reelId=1;function nextWorldReel(){reelId++;document.getElementById('reelImg').src=`https://picsum.photos/400/800?random=${3000+reelId}`;let n=worldNames[Math.floor(Math.random()*10)];let p=places[Math.floor(Math.random()*10)];document.getElementById('reelInfo').innerHTML=`<b>@${n}</b><br>World reel da! 🔥<br>📍 ${p} 🌍`}
+randomStory();loadWorld();document.getElementById('reelImg').src=`https://picsum.photos/400/800?random=3001`;sh('feed');
+setInterval(()=>{document.getElementById('online').innerText=Math.floor(1000+Math.random()*5000).toLocaleString()},3000);
 </script></body></html>
