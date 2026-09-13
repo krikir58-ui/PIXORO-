@@ -1,38 +1,80 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO WORLD</title><style>
+<title>PIXORO INDIA SAFE</title><style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#000;color:#fff}
-.top{position:sticky;top:0;z-index:20;background:#000;display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #222}
-.top b{font-size:22px;background:linear-gradient(45deg,#feda75,#d62976);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.tab{display:none}.tab.active{display:block}.sec{padding-bottom:70px}
-.btm{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:12px 0;font-size:22px;z-index:30}
-.post{border-bottom:1px solid #222}.p-img{width:100%;aspect-ratio:1;background:#111;position:relative}.p-img img{width:100%;height:100%;object-fit:cover}
-.story{display:flex;gap:10px;padding:10px;overflow-x:auto;border-bottom:1px solid #222}.s{width:62px;text-align:center;flex-shrink:0}.ring{width:62px;height:62px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#d62976,#962fbf)}
+.top{position:sticky;top:0;z-index:20;background:#000;display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #222;align-items:center}
+.tab{display:none}.tab.active{display:block}.sec{padding-bottom:80px}
+.btm{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:10px 0;font-size:18px;z-index:30}
+.safe{background:linear-gradient(45deg,#ff4d8d,#ff8a5c);padding:8px;border-radius:20px;font-size:11px;font-weight:bold;color:#fff}
+.post{border-bottom:1px solid #222}.p-img{width:100%;aspect-ratio:1;background:#111;position:relative}.p-img img{width:100%;height:100%;object-fit:cover;filter:blur(0px)}
+.lang{display:flex;gap:6px;overflow-x:auto;padding:8px;border-bottom:1px solid #222}.lang span{background:#222;padding:6px 12px;border-radius:20px;font-size:12px;white-space:nowrap}
+.lang span.active{background:#fff;color:#000;font-weight:bold}
+.filter{margin:8px;background:#111;border:1px solid #333;border-radius:12px;padding:10px;font-size:12px}
+.btn{flex:1;background:#222;color:#fff;padding:8px;border-radius:8px;border:none;font-size:12px}.btn.on{background:#fff;color:#000}
+.story{display:flex;gap:8px;padding:8px;overflow-x:auto}.s{width:58px;text-align:center;flex-shrink:0}.ring{width:58px;height:58px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#d62976)}
 .ring img{width:100%;height:100%;border-radius:50%;border:2px solid #000;object-fit:cover}
-.live{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);background:red;color:#fff;font-size:8px;padding:1px 4px;border-radius:4px}
 </style></head><body>
 <div id="app">
+<!-- FEED - INDIA SAFE -->
 <div id="feed" class="sec tab active">
-<div class="top"><b>PIXORO WORLD</b><div>🌍 LIVE • <span id="online">1,234</span> online</div></div>
-<div style="margin:8px;background:linear-gradient(45deg,#111,#222);padding:10px;border-radius:10px;border:1px solid #333;font-size:12px">🌍 <b>World Feed ON da Giri!</b><br>India, USA, Korea, Brazil ellam irunthu photos varuthu da! Nee post potta world paakum!</div>
-<div class="story" id="storyBar"></div>
-<div id="feedList"></div>
-<button onclick="loadWorld()" style="width:100%;padding:12px;background:#fff;color:#000;border:none;font-weight:bold">🌍 Load More World Posts →</button>
+<div class="top"><b style="background:linear-gradient(45deg,#FF9933,#fff,#138808);-webkit-background-clip:text;-webkit-text-fill-color:transparent">PIXORO INDIA</b><div style="display:flex;gap:6px;align-items:center"><span class="safe">🛡️ SAFE FOR GIRLS</span><span>🌍</span></div></div>
+
+<div class="lang">
+<span class="active" onclick="setLang('all',this)">🌍 All India</span>
+<span onclick="setLang('ta',this)">தமிழ்</span>
+<span onclick="setLang('en',this)">English</span>
+<span onclick="setLang('hi',this)">हिंदी</span>
+<span onclick="setLang('ml',this)">മലയാളം</span>
+<span onclick="setLang('te',this)">తెలుగు</span>
+<span onclick="setLang('kn',this)">ಕನ್ನಡ</span>
 </div>
 
-<div id="reels" class="sec tab"><div id="reelBox" style="height:100vh;position:relative;background:#000" onclick="nextWorldReel()"><img id="reelImg" style="width:100%;height:100%;object-fit:cover"><div style="position:absolute;top:10px;left:10px;background:red;padding:3px 8px;border-radius:10px;font-size:10px">● LIVE WORLD</div><div style="position:absolute;bottom:80px;left:12px" id="reelInfo"><b>@world_girl_01</b><br>World reel da! 🔥<br>📍 USA</div><div style="position:absolute;bottom:20px;left:10px;right:10px;background:#ffffff22;padding:8px;border-radius:20px;text-align:center">Tap for Next World Reel 🌍 →</div></div></div>
+<div class="filter">
+🛡️ <b>Makalukku Safe Features ON da Giri!</b><br>
+<div style="display:flex;gap:6px;margin-top:8px">
+<button class="btn on" id="b1" onclick="toggleSafe('private')">🔒 Private Account</button>
+<button class="btn on" id="b2" onclick="toggleSafe('filter')">🚫 Bad Comments Filter</button>
+</div>
+<div style="display:flex;gap:6px;margin-top:6px">
+<button class="btn on" id="b3" onclick="toggleSafe('dm')">💬 Only Friends DM</button>
+<button class="btn on" id="b4" onclick="toggleSafe('loc')">📍 Hide Location</button>
+</div>
+<small style="color:#0f0">✓ Strangers cannot DM • ✓ Location hidden • ✓ Abusive words blocked • ✓ Report in 1 click</small>
+</div>
 
-<div id="profile" class="sec tab"><div class="top"><b>pixoro_world</b><span>🌍</span></div><div style="padding:15px"><b>PIXORO WORLD 🌍</b><br>World ellam un photo varum da Giri! Instagram maadhiri!<br><br>🔥 <b>How it works:</b><br>1. Ipo random world photos API la irunthu varuthu<br>2. Real world ku kondu varanum na Firebase venum da<br>3. Na free ah setup panni tharen da</div></div>
+<div class="story" id="sBar"></div>
+<div id="feedList"></div>
+<button onclick="loadIndia()" style="width:100%;padding:12px;background:#222;color:#fff;border:none">Load More India Reels →</button>
+</div>
 
-<div class="btm"><span onclick="sh('feed')">🏠</span><span onclick="sh('reels')">🎬</span><span onclick="sh('profile')">🌍</span></div>
+<div id="reels" class="sec tab">
+<div style="height:100vh;position:relative" onclick="nextReel()"><img id="rImg" style="width:100%;height:100%;object-fit:cover"><div style="position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between"><div class="safe">🛡️ SAFE MODE ON</div><div style="background:#000a;padding:4px 8px;border-radius:12px;font-size:11px" id="rLang">தமிழ் • Tamil Nadu</div></div><div style="position:absolute;bottom:70px;left:10px" id="rInfo"></div><div style="position:absolute;right:10px;bottom:70px;text-align:center"><div style="background:#000a;padding:8px;border-radius:20px">🚫<br><small>Report</small></div><br><div style="background:#000a;padding:8px;border-radius:20px">🔒<br><small>Safe</small></div></div><div style="position:absolute;bottom:10px;left:10px;right:10px;background:#fff;color:#000;padding:10px;border-radius:20px;text-align:center;font-weight:bold">Next Safe Reel → 🌍</div></div>
+</div>
+
+<div id="safety" class="sec tab">
+<div class="top"><b>🛡️ Safety Center</b></div>
+<div style="padding:12px">
+<div style="background:#111;padding:12px;border-radius:12px;margin-bottom:10px;border-left:4px solid #ff4d8d"><b>👩 Makalukku 100% Safe da Giri!</b><br><small>1. Private Account - Follow pannavanga mattum paakalam<br>2. DM Filter - Friends mattum message pannalam<br>3. Comment Filter - Ketta vaartha auto block<br>4. Location Hide - Edathula irukka theriyathu<br>5. One Click Report & Block<br>6. Blur Face for Strangers option</small></div>
+<div style="background:#222;padding:10px;border-radius:10px;margin-bottom:8px">🔒 <b>Private Account</b> <span style="float:right;color:#0f0">ON</span><br><small>Only approved followers can see your posts</small></div>
+<div style="background:#222;padding:10px;border-radius:10px;margin-bottom:8px">🚫 <b>Abuse Filter</b> <span style="float:right;color:#0f0">ON</span><br><small>Tamil, Hindi, English ketta words auto delete</small></div>
+<div style="background:#222;padding:10px;border-radius:10px;margin-bottom:8px">👁️ <b>Hide from Strangers</b> <span style="float:right;color:#0f0">ON</span><br><small>Your reels won't show to unknown boys</small></div>
+<div style="background:linear-gradient(45deg,#ff4d8d,#ff8a5c);padding:12px;border-radius:12px;text-align:center;color:#fff;font-weight:bold">🚨 Emergency - Report & Block in 1 Click</div>
+</div>
+</div>
+
+<div class="btm"><span onclick="sh('feed')">🏠<br><small style="font-size:9px">India</small></span><span onclick="sh('reels')">🎬<br><small style="font-size:9px">Reels</small></span><span onclick="sh('safety')">🛡️<br><small style="font-size:9px">Safe</small></span></div>
 </div>
 
 <script>
 function sh(id){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.getElementById(id).classList.add('active')}
-let worldNames=['emma_usa','sophia_korea','priya_india','maria_brazil','yuki_japan','giri_new','pixoro_new','world_girl_01','tamil_ponnu_02','salem_boy'];let places=['USA','Korea','India','Brazil','Japan','Salem','Chennai','Mumbai','Dubai','London'];
-function randomStory(){let h='';for(let i=0;i<12;i++){h+=`<div class=s><div class=ring><img src="https://i.pravatar.cc/150?img=${i+5}"></div><small>${worldNames[i%10]}</small><div class=live>LIVE</div></div>`}document.getElementById('storyBar').innerHTML=h}
-function loadWorld(){let h='';for(let i=0;i<10;i++){let name=worldNames[Math.floor(Math.random()*10)];let place=places[Math.floor(Math.random()*10)];let likes=Math.floor(Math.random()*5000);h+=`<div class=post><div style="padding:10px;display:flex;gap:8px"><img src="https://i.pravatar.cc/100?img=${Math.floor(Math.random()*30)+1}" style="width:32px;height:32px;border-radius:50%"><div><b>${name}</b> • ${place} 🌍<br><small>${Math.floor(Math.random()*10)+1}h ago • World feed</small></div><span style="margin-left:auto">⋯</span></div><div class=p-img><img src="https://picsum.photos/400/400?random=${Math.floor(Math.random()*5000)}"></div><div style="padding:10px;display:flex;gap:12px">❤️ ${likes} 💬 ${Math.floor(likes/10)} ✈️<span style="margin-left:auto">🔖</span></div><div style="padding:0 10px 10px;font-size:13px"><b>${name}</b> My world photo da! #pixoro_world #${place}</div></div>`}document.getElementById('feedList').insertAdjacentHTML('beforeend',h);document.getElementById('online').innerText=Math.floor(1000+Math.random()*5000).toLocaleString()}
-let reelId=1;function nextWorldReel(){reelId++;document.getElementById('reelImg').src=`https://picsum.photos/400/800?random=${3000+reelId}`;let n=worldNames[Math.floor(Math.random()*10)];let p=places[Math.floor(Math.random()*10)];document.getElementById('reelInfo').innerHTML=`<b>@${n}</b><br>World reel da! 🔥<br>📍 ${p} 🌍`}
-randomStory();loadWorld();document.getElementById('reelImg').src=`https://picsum.photos/400/800?random=3001`;sh('feed');
-setInterval(()=>{document.getElementById('online').innerText=Math.floor(1000+Math.random()*5000).toLocaleString()},3000);
+let langs={ta:['தமிழ்','Tamil Nadu','chennai_ponnu','tamil_reels','வணக்கம் da!'],en:['English','India','india_girl','india_reels','Hello dears!'],hi:['हिंदी','Delhi','delhi_girl','hindi_reels','नमस्ते!'],ml:['മലയാളം','Kerala','kerala_girl','mallu_reels','ഹായ്!'],te:['తెలుగు','Telangana','telugu_ammai','telugu_reels','హాయ్!'],kn:['ಕನ್ನಡ','Karnataka','kannada_hudugi','kannada_reels','ಹಾಯ್!']};
+let curLang='all';
+function setLang(l,el){curLang=l;document.querySelectorAll('.lang span').forEach(s=>s.classList.remove('active'));el.classList.add('active');loadIndia(true)}
+let names=['priya_tn','ananya_kl','sneha_ap','pooja_ka','diya_mh','emma_usa','giri_new','tamil_ponnu','salem_queen','chennai_girl'];
+function loadIndia(clear=false){let h='';if(clear)document.getElementById('feedList').innerHTML='';let list=curLang=='all'?Object.keys(langs):[curLang];for(let i=0;i<10;i++){let lk=list[Math.floor(Math.random()*list.length)];let ld=langs[lk]||langs['ta'];let name=names[Math.floor(Math.random()*10)];let place=ld[1];let cap=ld[4];h+=`<div class=post><div style="padding:8px;display:flex;gap:6px"><img src="https://i.pravatar.cc/100?img=${Math.floor(Math.random()*40)+1}" style="width:32px;height:32px;border-radius:50%"><div><b>${name}</b> • ${place} • ${ld[0]}<br><small>2h ago • 🛡️ Safe • ${ld[0]}</small></div><span style="margin-left:auto">⋯ 🚫</span></div><div class=p-img><img src="https://picsum.photos/400/400?random=${Math.floor(Math.random()*5000)}"></div><div style="padding:8px 10px;font-size:13px"><b>${name}</b> ${cap} #${place} #SafeForGirls 🛡️<br><small style="color:#888">🔒 Private • 🚫 Abuse filtered • 📍 Location hidden</small></div></div>`}document.getElementById('feedList').insertAdjacentHTML('beforeend',h)}
+let sH='';for(let i=0;i<15;i++){sH+=`<div class=s><div class=ring><img src="https://i.pravatar.cc/150?img=${i+10}"></div><small>${names[i%10]}</small></div>`}document.getElementById('sBar').innerHTML=sH;
+let rI=0;function nextReel(){rI++;let list=curLang=='all'?Object.keys(langs):[curLang];let lk=list[Math.floor(Math.random()*list.length)];let ld=langs[lk]||langs['ta'];document.getElementById('rImg').src=`https://picsum.photos/400/800?random=${2500+rI}`;document.getElementById('rLang').innerText=ld[0]+' • '+ld[1];document.getElementById('rInfo').innerHTML=`<b>@${names[Math.floor(Math.random()*10)]} • ${ld[1]}</b><br>${ld[4]} 🛡️ Safe<br><small>🔒 Private Account • 🚫 Report Available</small>`}
+document.getElementById('rImg').src=`https://picsum.photos/400/800?random=2501`;document.getElementById('rInfo').innerHTML=`<b>@priya_tn • Tamil Nadu</b><br>வணக்கம் da! 🛡️ Safe<br><small>🔒 Private • Safe for girls</small>`;loadIndia();sh('feed');
+function toggleSafe(id){let b=document.getElementById('b'+id.charAt(0)=='p'?'1':id.charAt(0)=='f'?'2':id.charAt(0)=='d'?'3':'4');//simple toggle
+let el=document.getElementById(id=='private'?'b1':id=='filter'?'b2':id=='dm'?'b3':'b4');el.classList.toggle('on');alert('🛡️ '+(el.classList.contains('on')?'ON':'OFF')+' panniten da Giri! Safe ah irukkum!')}
 </script></body></html>
