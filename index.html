@@ -1,73 +1,88 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="manifest" href="manifest.json">
 <title>PIXORO</title>
+<link rel="manifest" href="manifest.json">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#fff;font-family:sans-serif;overflow:hidden}
+body{background:#000;color:#fff;font-family:Arial;overflow-x:hidden}
 #onboard{position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column}
 .slide{display:none;flex:1;padding:20px;text-align:center;justify-content:center;flex-direction:column}
 .slide.active{display:flex}
-.slide h2{font-size:28px;margin:15px 0}
+.slide h2{font-size:28px;margin:15px 0;line-height:1.2}
 .slide h2 span{border:1px solid #fff;border-radius:20px;padding:2px 10px}
-.slide img{width:280px;margin:20px auto;border-radius:20px;border:1px solid #333}
-.dots{display:flex;justify-content:center;gap:8px;padding:20px}
-.dot{width:8px;height:8px;border-radius:50%;background:#333}
-.dot.active{background:#fff}
-.btn{margin:20px;background:#fff;color:#000;padding:12px;border-radius:20px;border:none;font-weight:bold}
+.slide.box{width:280px;height:350px;margin:20px auto;border-radius:20px;border:1px solid #333;background:linear-gradient(45deg,#111,#222);display:flex;align-items:center;justify-content:center;font-size:60px}
+.dots{display:flex;justify-content:center;gap:8px;padding:10px}
+.dot{width:20px;height:6px;border-radius:10px;background:#333}
+.dot.active{background:#fff;width:25px}
+.btn{margin:15px;background:#fff;color:#000;padding:14px;border-radius:25px;border:none;font-weight:bold;font-size:16px}
 #app{display:none}
+.top{display:flex;justify-content:space-between;padding:12px 15px;border-bottom:1px solid #222;align-items:center}
+.search{margin:10px 15px;background:#111;padding:10px 15px;border-radius:20px;color:#888}
+.tabs{display:flex;justify-content:space-around;padding:12px;border-bottom:1px solid #222;background:#000;position:sticky;top:0}
+.tab{cursor:pointer;opacity:0.6}.tab.active{opacity:1;color:#ff0055;font-weight:bold}
+.story{padding:10px 15px;display:flex;gap:12px;overflow-x:auto}
+.s{width:60px;text-align:center;flex-shrink:0}
+.s.cir{width:60px;height:60px;border-radius:50%;background:linear-gradient(45deg,#ff00cc,#ff9900);padding:2px}
+.s.cir div{width:100%;height:100%;background:#000;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.post{border-bottom:1px solid #222;padding:12px 0}
+.p-head{display:flex;align-items:center;padding:0 15px;gap:10px}
+.p-img{width:100%;height:350px;background:#111;margin:10px 0;display:flex;align-items:center;justify-content:center;font-size:40px}
+.actions{padding:0 15px;display:flex;gap:15px;font-size:20px}
 </style>
 </head>
 <body>
 <div id="onboard">
-  <div class="slide active">
-    <h2>Engage with your <br> favorite <span>creators</span></h2>
-    <img src="https://i.imgur.com/8Km9tLL.jpg">
-    <p>Follow and interact with PIXORO creators</p>
-  </div>
-  <div class="slide">
-    <h2>Share with <br> people who get you</h2>
-    <img src="https://i.imgur.com/8Km9tLL.jpg">
-    <p>Your story, your close friends</p>
-  </div>
-  <div class="slide">
-    <h2>Send memes, <br> posts and more</h2>
-    <img src="https://i.imgur.com/8Km9tLL.jpg">
-    <p>DM your friends instantly</p>
-  </div>
-  <div class="slide">
-    <h2>Stay close with <br> Close Friends</h2>
-    <img src="https://i.imgur.com/8Km9tLL.jpg">
-    <p>Only close friends can see</p>
-  </div>
-  <div class="slide">
-    <h2><span>Note</span> what's on <br> your mind</h2>
-    <img src="https://i.imgur.com/8Km9tLL.jpg">
-    <p>Share quick thoughts</p>
-    <button class="btn" onclick="startApp()">Get Started - PIXORO 🚀</button>
-  </div>
+  <div class="slide active"><h2>Engage with your <br>favorite <span>creators</span></h2><div class="box">🔥</div><p>Follow PIXORO creators</p></div>
+  <div class="slide"><h2>Share with <br>people who get you</h2><div class="box">💬</div><p>Your story, your vibe</p></div>
+  <div class="slide"><h2>Send memes, <br>posts and more</h2><div class="box">😂</div><p>DM friends instantly</p></div>
+  <div class="slide"><h2>Stay close with <br>Close Friends</h2><div class="box">❤️</div><p>Only close friends</p></div>
+  <div class="slide"><h2><span>Note</span> what's on <br>your mind</h2><div class="box">📝</div><p>Share quick thoughts</p><button class="btn" onclick="startApp()">Get Started - PIXORO 🚀</button></div>
   <div class="dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-  <button class="btn" id="nextBtn" onclick="nextSlide()">Next</button>
+  <button class="btn" id="nextBtn" onclick="nextSlide()">Next →</button>
 </div>
 
 <div id="app">
-  <h1 style="padding:15px">PIXORO</h1>
-  <div style="display:flex;justify-content:space-around;border-top:1px solid #222;padding:10px">
-    <span>📸 Feed</span><span>🎨 Editor</span><span>👤 Profile</span>
+  <div class="top"><h2>PIXORO</h2><span>❤️ ✈️</span></div>
+  <div class="search">🔍 PIXORO Search</div>
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('feed',this)">📸 Feed</div>
+    <div class="tab" onclick="showTab('editor',this)">🎨 Editor</div>
+    <div class="tab" onclick="showTab('profile',this)">👤 Profile</div>
   </div>
-  <p style="text-align:center;margin-top:100px">Welcome to PIXORO - Your Original App is Ready da Giri! 🔥</p>
+  <div id="feedSec">
+    <div class="story">
+      <div class="s"><div class="cir"><div>You</div></div><small>You giri</small></div>
+      <div class="s"><div class="cir"><div>🔥</div></div><small>giri_</small></div>
+      <div class="s"><div class="cir"><div>⭐</div></div><small>user1</small></div>
+    </div>
+    <div class="post">
+      <div class="p-head"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(45deg,#f00,#ff0)"></div><b>giri_official</b></div>
+      <div class="p-img">🖼️ My first PIXORO post da 🔥</div>
+      <div class="actions">❤️ 💬 ✈️ <span style="margin-left:auto">🔖</span></div>
+      <div style="padding:5px 15px"><b>giri_official</b> My first PIXORO post da 🔥<br><small style="color:#888">2 hours ago</small></div>
+    </div>
+  </div>
+  <div id="editorSec" style="display:none;padding:20px;text-align:center">
+    <h3>🎨 PIXORO Editor</h3><br>
+    <div style="background:#111;height:300px;border-radius:20px;display:flex;align-items:center;justify-content:center">📸 Your Photo Here<br>Filters Ready</div><br>
+    <button class="btn" style="width:100%">✨ Apply Filter</button>
+  </div>
+  <div id="profileSec" style="display:none;padding:20px;text-align:center">
+    <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(45deg,#ff00cc,#ff9900);margin:0 auto"></div><br>
+    <h3>giri_official</h3><small>10 posts • 1.2k followers</small><br><br>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px"><div style="background:#111;height:100px"></div><div style="background:#111;height:100px"></div><div style="background:#111;height:100px"></div></div>
+  </div>
 </div>
 
 <script>
 let s=0; slides=document.querySelectorAll('.slide'); dots=document.querySelectorAll('.dot');
-function nextSlide(){
- s++; if(s>=slides.length-1){document.getElementById('nextBtn').style.display='none'}
- if(s<slides.length){slides.forEach(e=>e.classList.remove('active'));dots.forEach(e=>e.classList.remove('active'));slides[s].classList.add('active');dots[s].classList.add('active')}
-}
+function nextSlide(){s++;if(s>=slides.length-1)document.getElementById('nextBtn').style.display='none';slides.forEach(e=>e.classList.remove('active'));dots.forEach(e=>e.classList.remove('active'));slides[s].classList.add('active');dots[s].classList.add('active')}
 function startApp(){localStorage.setItem('pixoro_seen','1');document.getElementById('onboard').style.display='none';document.getElementById('app').style.display='block'}
 if(localStorage.getItem('pixoro_seen')){startApp()}
+function showTab(t,el){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById('feedSec').style.display=t=='feed'?'block':'none';document.getElementById('editorSec').style.display=t=='editor'?'block':'none';document.getElementById('profileSec').style.display=t=='profile'?'block':'none'}
 </script>
 </body>
 </html>
