@@ -1,120 +1,141 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO SOCIAL PAY</title><style>
+<title>PIXORO FULL INSTA</title><style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#000;color:#fff}
 .top{position:sticky;top:0;z-index:20;background:#000;display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #222;align-items:center}
 .tab{display:none}.tab.active{display:block}.sec{padding-bottom:80px}
-.btm{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:8px 0;font-size:12px;z-index:30;text-align:center}
-.coinBar{background:#111;border:1px solid #333;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:bold;display:flex;gap:6px;align-items:center}
-.coinBar span{background:#FFD700;color:#000;padding:2px 6px;border-radius:10px}
-.owner{background:linear-gradient(45deg,#FFD700,#FFA500);color:#000;padding:3px 8px;border-radius:12px;font-size:10px;font-weight:bold}
+.btm{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:8px 0;font-size:10px;z-index:30;text-align:center}
+.card{background:#111;margin:8px;border-radius:12px;border:1px solid #222;padding:10px}
+.coinBar{background:#111;border:1px solid #333;padding:4px 8px;border-radius:15px;font-size:10px;display:flex;gap:4px;align-items:center}
+.coinBar span{background:#FFD700;color:#000;padding:2px 6px;border-radius:8px}
+.owner{background:linear-gradient(45deg,#FFD700,#FFA500);color:#000;padding:2px 6px;border-radius:10px;font-size:9px;font-weight:bold}
 .post{background:#111;margin:8px;border-radius:12px;overflow:hidden;border:1px solid #222}
-.p-head{padding:8px;display:flex;gap:8px;align-items:center}
-.p-head img{width:32px;height:32px;border-radius:50%}
-.p-img{width:100%;aspect-ratio:9/12;background:#000;position:relative;overflow:hidden}.p-img video,.p-img img{width:100%;height:100%;object-fit:cover}
-.actions{display:flex;gap:14px;padding:8px;font-size:18px;align-items:center}.actions small{font-size:11px}
-.cmtBox{display:flex;gap:6px;padding:8px}.cmtBox input{flex:1;background:#222;border:1px solid #333;padding:6px 10px;border-radius:20px;color:#fff;font-size:12px}
-.storyBar{display:flex;gap:10px;padding:8px;overflow-x:auto;border-bottom:1px solid #222}.s{width:56px;text-align:center;flex-shrink:0}.ring{width:56px;height:56px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#d62976)}.ring img{width:100%;height:100%;border-radius:50%;border:2px solid #000}
-.payBox{background:linear-gradient(45deg,#111,#1a1a1a);border:1px solid #FFD700;padding:10px;margin:8px;border-radius:12px;font-size:11px}
-.followBtn{background:#0095f6;color:#fff;padding:4px 12px;border-radius:6px;border:none;font-size:11px;font-weight:bold}.followBtn.following{background:#222;color:#fff}
+.toggle{width:36px;height:20px;background:#333;border-radius:20px;position:relative}.toggle.on{background:#0095f6}.toggle i{position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.2s}.toggle.on i{left:18px}
+.setRow{display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid #222;font-size:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}
+.storyBar{display:flex;gap:10px;padding:8px;overflow-x:auto}.s{width:54px;text-align:center;flex-shrink:0}.ring{width:54px;height:54px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#d62976)}.ring img{width:100%;height:100%;border-radius:50%;border:2px solid #000}
+.btn{background:#222;color:#fff;padding:6px 10px;border-radius:20px;border:none;font-size:11px}.btn.w{background:#fff;color:#000}.btn.blue{background:#0095f6;color:#fff}
 </style></head><body>
 <div id="app">
 
 <div id="feed" class="sec tab active">
-<div class="top">
-<div style="display:flex;gap:8px;align-items:center"><b style="background:linear-gradient(45deg,#feda75,#d62976);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:20px">PIXORO</b><span id="myIdShow" style="font-size:11px;color:#888">@pixoro_owner 👑</span></div>
-<div class="coinBar" id="topCoin">🪙 19040 <span>650/1000</span> <span id="pay">₹190</span></div>
-</div>
+<div class="top"><b style="background:linear-gradient(45deg,#feda75,#d62976);-webkit-background-clip:text;-webkit-text-fill-color:transparent">PIXORO FULL</b><div style="display:flex;gap:6px"><div class="coinBar" id="topCoin">🪙 19040 <span>₹190</span></div><span onclick="sh('settings')">⚙️</span></div></div>
 
-<div class="payBox">
-💰 <b>Instagram Mari Payment System ON da Giri!</b><br>
-👁️ 1 View = 1 Coin • 1000 Views = ₹10 • Like = 2 Coins • Share = 5 Coins • Follow = 10 Coins<br>
-<div style="display:flex;gap:6px;margin-top:6px"><div style="flex:1;background:#222;padding:6px;border-radius:8px;text-align:center"><b id="totalViews">45.2K</b><br><small>Total Views</small></div><div style="flex:1;background:#FFD700;color:#000;padding:6px;border-radius:8px;text-align:center"><b>₹<span id="totalEarn">452</span></b><br><small>Your Earning</small></div><div style="flex:1;background:#222;padding:6px;border-radius:8px;text-align:center"><b id="totalCoins">19040</b><br><small>Coins</small></div></div>
+<div class="card" style="background:linear-gradient(45deg,#111,#222);border:1px solid #FFD700">
+<b>💰 Views = Coins Settings - Instagram Payment Mari da!</b><br>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;font-size:11px">
+<div style="background:#222;padding:6px;border-radius:8px">👁️ 1K Views = <input id="v1k" value="100" style="width:40px;background:#000;color:#FFD700;border:1px solid #333;border-radius:4px"> coins</div>
+<div style="background:#222;padding:6px;border-radius:8px">❤️ 1 Like = <input id="l1" value="2" style="width:30px;background:#000;color:#FFD700;border:1px solid #333;border-radius:4px"> coins</div>
+<div style="background:#222;padding:6px;border-radius:8px">✈️ 1 Share = <input id="s1" value="5" style="width:30px;background:#000;color:#FFD700;border:1px solid #333;border-radius:4px"> coins</div>
+<div style="background:#222;padding:6px;border-radius:8px">👥 1 Follow = <input id="f1" value="10" style="width:30px;background:#000;color:#FFD700;border:1px solid #333;border-radius:4px"> coins</div>
+</div>
+<small style="color:#0f0">✓ Ivvlo views vantha ivlo coin - Nee maathalam da Giri! Settings la save aagum!</small>
 </div>
 
 <div class="storyBar" id="sBar"></div>
-
-<div style="padding:8px;display:flex;gap:6px">
-<button onclick="createId()" style="flex:1;background:#fff;color:#000;padding:8px;border-radius:20px;border:none;font-weight:bold;font-size:12px">+ Create ID - Friends ku</button>
-<button onclick="postReel()" style="flex:1;background:linear-gradient(45deg,#feda75,#d62976);color:#fff;padding:8px;border-radius:20px;border:none;font-weight:bold;font-size:12px">+ Post Reel - Payment varum</button>
-</div>
-
 <div id="feedList"></div>
 </div>
 
 <div id="reels" class="sec tab">
-<div style="height:100vh;position:relative;background:#000" onclick="nextReel()">
-<video id="rVideo" autoplay muted loop style="width:100%;height:100%;object-fit:cover"></video>
-<img id="rImg" style="width:100%;height:100%;object-fit:cover;display:none">
-<div style="position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between"><div class="owner" id="rOwner">👑 pixoro_owner</div><div class="coinBar" id="rCoin">🪙 19040 • ₹190</div></div>
+<div style="height:100vh;position:relative" onclick="nextReel()">
+<img id="rImg" style="width:100%;height:100%;object-fit:cover">
+<div style="position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between"><div class="owner">👑 pixoro_owner PUBLIC</div><div class="coinBar">👁️ <span id="rViews">1.3K</span> = 🪙 <span id="rCoins">1300</span></div></div>
 <div style="position:absolute;bottom:80px;left:10px;right:70px" id="rInfo"></div>
-<div style="position:absolute;right:10px;bottom:80px;display:flex;flex-direction:column;gap:12px;text-align:center">
-<div onclick="event.stopPropagation();likeReel()" style="background:#000a;padding:10px;border-radius:20px">❤️<br><small id="rLikes">1.3K</small><br><small style="color:#FFD700">+2 🪙</small></div>
-<div onclick="event.stopPropagation();commentReel()" style="background:#000a;padding:10px;border-radius:20px">💬<br><small>Comment</small></div>
-<div onclick="event.stopPropagation();shareReel()" style="background:#000a;padding:10px;border-radius:20px">✈️<br><small>Share</small><br><small style="color:#FFD700">+5 🪙</small></div>
-<div onclick="event.stopPropagation();followReel()" style="background:#0095f6;padding:8px;border-radius:20px;color:#fff;font-size:11px;font-weight:bold" id="rFollow">Follow<br><small>+10 🪙</small></div>
+<div style="position:absolute;right:10px;bottom:80px;display:flex;flex-direction:column;gap:10px;text-align:center">
+<div style="background:#000a;padding:8px;border-radius:15px">❤️<br><small id="rLike">1,379</small></div>
+<div style="background:#000a;padding:8px;border-radius:15px">💬<br><small id="rCmt">35</small></div>
+<div style="background:#000a;padding:8px;border-radius:15px">✈️<br><small id="rShare">10</small></div>
+<div style="background:#0095f6;padding:8px;border-radius:15px">👥<br><small>Collab</small></div>
+<div style="background:#222;padding:8px;border-radius:15px">🔖<br><small>Repost</small></div>
 </div>
-<div style="position:absolute;bottom:10px;left:10px;right:10px;background:#FFD700;color:#000;padding:8px;border-radius:20px;text-align:center;font-weight:bold">👁️ View = 1 Coin • Next Reel → Payment varum da!</div>
-</div>
-</div>
-
-<div id="wallet" class="sec tab">
-<div class="top"><b>💰 Payment Wallet</b><div class="coinBar">🪙 <span id="wCoins">19040</span></div></div>
-<div style="padding:12px">
-<div style="background:#111;padding:12px;border-radius:12px;border:1px solid #333">
-<b>🪙 Total Coins: <span id="wTotal">19040</span></b><br><small>Friends paatha, like, share, follow panna coins varum da Giri!</small><br><br>
-<div style="background:#222;padding:8px;border-radius:8px;margin-bottom:6px">👁️ Views (45.2K) → 45200 Coins → ₹452</div>
-<div style="background:#222;padding:8px;border-radius:8px;margin-bottom:6px">❤️ Likes (2.1K) → 4200 Coins → ₹42</div>
-<div style="background:#222;padding:8px;border-radius:8px;margin-bottom:6px">✈️ Shares (340) → 1700 Coins → ₹17</div>
-<div style="background:#222;padding:8px;border-radius:8px;margin-bottom:8px">👥 Followers (1.2K) → 12000 Coins → ₹120</div>
-<div style="background:linear-gradient(45deg,#FFD700,#FFA500);color:#000;padding:10px;border-radius:10px;text-align:center;font-weight:bold">Total Earning: ₹<span id="wEarn">631</span> • Withdraw panna min ₹100</div><br>
-<button onclick="alert('💰 Payment request sent da Giri! ₹'+document.getElementById('wEarn').innerText+' will be credited in 24hrs!')" style="width:100%;background:#fff;color:#000;padding:10px;border-radius:20px;border:none;font-weight:bold">Withdraw to UPI → 💸</button>
-</div>
+<div style="position:absolute;bottom:10px;left:10px;right:10px;background:#fff;color:#000;padding:8px;border-radius:20px;text-align:center;font-weight:bold;font-size:12px">Next Reel • Free Data • Free Reels • Tap → 🪙</div>
 </div>
 </div>
 
-<div class="btm"><span onclick="sh('feed')">🏠<br>Feed</span><span onclick="sh('reels')">🎬<br>Reels Pay</span><span onclick="sh('wallet')">💰<br>Wallet</span></div>
+<div id="profile" class="sec tab">
+<div class="top"><b id="profName">pixoro_owner 👑</b><div style="display:flex;gap:8px"><span class="owner">PUBLIC</span><span onclick="sh('settings')">⚙️</span><span>☰</span></div></div>
+<div style="padding:10px;display:flex;gap:10px"><img src="https://i.pravatar.cc/150?img=5" style="width:70px;height:70px;border-radius:50%"><div style="flex:1;display:flex;justify-content:space-around;text-align:center"><div><b id="postCount">25</b><br><small>posts</small></div><div><b id="follCount">10.1K</b><br><small>followers</small></div><div><b id="fingCount">91</b><br><small>following</small></div><div><b>👑<span id="crownCount">19K</span></b><br><small>crowns</small></div></div></div>
+<div style="padding:0 10px;font-size:12px"><b id="bioName">GIRI OWNER 👑</b> • Reel creator<br>Heart Break 💔 Record Break 💥<br>🌍 Public ID • 🛡️ Safe • 💰 Payment ON<br><small>🔗 pixoro.bio/giri • 📍 Salem</small></div>
+<div style="display:flex;gap:6px;padding:10px"><button class="btn w" style="flex:1" onclick="editProfile()">Edit Profile</button><button class="btn" style="flex:1" onclick="sh('closefriends')">Close Friends</button><button class="btn" style="flex:1" onclick="alert('Profile I List - Insights da!')">I List</button></div>
+<div style="display:flex;gap:20px;padding:0 10px;border-bottom:1px solid #222;font-size:12px"><span style="border-bottom:2px solid #fff;padding:6px">📷 Posts</span><span style="padding:6px">🎬 Reels</span><span style="padding:6px">🔖 Reposed</span><span style="padding:6px">🏷️ Tagged</span><span style="padding:6px">👥 Collab</span></div>
+<div class="grid3" id="pGrid"></div>
+</div>
+
+<div id="chat" class="sec tab">
+<div class="top"><b>Messages</b><div style="display:flex;gap:8px"><span>Public</span><span style="background:#0095f6;padding:2px 8px;border-radius:10px">Private</span></div></div>
+<div style="padding:8px"><input placeholder="Search or ask Meta AI" style="width:100%;background:#222;border:1px solid #333;padding:8px;border-radius:20px;color:#fff"></div>
+<div style="display:flex;gap:8px;padding:8px"><span style="background:#fff;color:#000;padding:6px 12px;border-radius:20px;font-size:11px">Primary 3</span><span style="background:#222;padding:6px 12px;border-radius:20px;font-size:11px">General</span><span style="background:#222;padding:6px 12px;border-radius:20px;font-size:11px">Requests</span><span style="background:#222;padding:6px 12px;border-radius:20px;font-size:11px">Close Friends</span></div>
+<div id="chatList"></div>
+</div>
+
+<div id="settings" class="sec tab">
+<div class="top"><b>⚙️ Settings - Full Control da Giri!</b><span onclick="sh('feed')">✕</span></div>
+
+<div class="card"><b>🔓 Account - Public / Private</b>
+<div class="setRow"><span>🌍 Public Account - Friends ellam paakalam</span><div class="toggle on" onclick="this.classList.toggle('on')"><i></i></div></div>
+<div class="setRow"><span>🔒 Private Account - Follow pannavanga mattum</span><div class="toggle" onclick="this.classList.toggle('on')"><i></i></div></div>
+<div class="setRow"><span>👤 Public ID Create - Yaarum create pannalam</span><div class="toggle on" onclick="this.classList.toggle('on')"><i></i></div></div>
+</div>
+
+<div class="card"><b>🎬 Reels / Story / Posts</b>
+<div class="setRow"><span>🎬 Reels Post - Owner + Friends</span><div class="toggle on"><i></i></div></div>
+<div class="setRow"><span>📷 Story Post + Mention</span><div class="toggle on"><i></i></div></div>
+<div class="setRow"><span>🏷️ Tag People in Reels</span><div class="toggle on"><i></i></div></div>
+<div class="setRow"><span>👥 Collaboration - 2 per reels</span><div class="toggle on"><i></i></div></div>
+<div class="setRow"><span>🔖 Reposed / Repost Count</span><div class="toggle on"><i></i></div></div>
+<div class="setRow"><span>📝 Notes - What's on your mind</span><div class="toggle on"><i></i></div></div>
+</div>
+
+<div class="card"><b>👁️ Counts - All Show</b>
+<div class="setRow"><span>👁️ View Count - Reels & Posts</span><div class="toggle on"><i></i></div></div>
+<div class="setRow"><span>❤️ Like Count</span><div class="toggle on"><i></i></div></div>
+<div class="setRow"><span>👑 Crowns Count - Owner badge</span><div class="toggle on"><i></i></div></div>
+<div class="setRow"><span>👥 Follow / Following Count</span><div class="toggle on"><i></i></div></div>
+<div class="setRow"><span>💬 Comment Count</span><div class="toggle on"><i></i></div></div>
+</div>
+
+<div class="card"><b>💬 Chat</b>
+<div class="setRow"><span>🌍 Public Chat - Ellarum pesalam</span><div class="toggle on"><i></i></div></div>
+<div class="setRow"><span>🔒 Private Chat - Friends mattum</span><div class="toggle on"><i></i></div></div>
+<div class="setRow"><span>💚 Close Friend Chat Only</span><div class="toggle on"><i></i></div></div>
+</div>
+
+<div class="card"><b>🎨 Background & Free Data</b>
+<div class="setRow"><span>🎨 Instagram All Background Free</span><div class="toggle on" onclick="changeBg()"><i></i></div></div>
+<div class="setRow"><span>📶 Free Data Mode - Free Reels (Data Saver)</span><div class="toggle on"><i></i></div></div>
+<div class="setRow"><span>🌙 Dark / Light Theme</span><div class="toggle on"><i></i></div></div>
+</div>
+
+<div class="card"><b>💰 Payment - Views to Coins</b>
+<div class="setRow"><span>💰 Payment ON - Views ku coins</span><div class="toggle on"><i></i></div></div>
+<div style="font-size:11px;color:#888">Settings la mela irukura Views=Coins table ah maathu da Giri - Auto save aagum!</div>
+</div>
+
+<div class="card" style="background:linear-gradient(45deg,#0095f6,#00d4ff);color:#fff;text-align:center"><b>👑 Owner: pixoro_owner - Nee than da owner da Giri!</b><br><small>All settings un control la da!</small></div>
+
+</div>
+
+<div id="closefriends" class="sec tab"><div class="top"><b>💚 Close Friends</b><span onclick="sh('profile')">✕</span></div><div id="cfList" style="padding:10px"></div></div>
+
+<div class="btm"><span onclick="sh('feed')">🏠<br>Feed</span><span onclick="sh('reels')">🎬<br>Reels</span><span onclick="sh('chat')">💬<br>Chat</span><span onclick="sh('profile')">👤<br>Profile</span><span onclick="sh('settings')">⚙️<br>Settings</span></div>
 </div>
 
 <script>
-function sh(id){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.getElementById(id).classList.add('active');if(id=='reels')addView(1)}
+function sh(id){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.getElementById(id).classList.add('active')}
+let coins=19040; let users=[{id:'pixoro_owner',owner:true,avatar:5},{id:'captain_giri',avatar:8},{id:'giri_official',avatar:12},{id:'priya_tn',avatar:6},{id:'emma_usa',avatar:10}];
+let posts=[{user:'pixoro_owner',views:15200,likes:1379,comments:35,shares:10,caption:'Public reel da - Owner 👑',img:'https://picsum.photos/400/600?random=1',tagged:['priya_tn'],collab:'captain_giri',mention:'@emma_usa',repost:12},{user:'captain_giri',views:12300,likes:2340,comments:20,shares:15,caption:'My reel with mention',img:'https://picsum.photos/400/600?random=2',tagged:['giri_official']},{user:'priya_tn',views:8900,likes:2100,comments:40,shares:8,caption:'Close friends only 💚',img:'https://picsum.photos/400/600?random=3',close:true}];
+function renderAll(){
+let sH='';users.forEach(u=>{sH+=`<div class=s><div class=ring><img src="https://i.pravatar.cc/100?img=${u.avatar}"></div><small>${u.id}</small></div>`});document.getElementById('sBar').innerHTML=sH;
+let h='';posts.forEach(p=>{h+=`<div class=post><div style="padding:8px;display:flex;gap:6px"><img src="https://i.pravatar.cc/100?img=${users.find(u=>u.id==p.user)?.avatar||5}" style="width:32px;height:32px;border-radius:50%"><div><b>${p.user}</b> ${p.user=='pixoro_owner'?'<span class=owner>👑 PUBLIC OWNER</span>':''} ${p.close?'<span style="background:#00ff00;color:#000;padding:2px 6px;border-radius:10px;font-size:9px">💚 Close</span>':''}<br><small>📅 Sep 5 • ${p.tagged?'🏷️ Tag: '+p.tagged.join(',')+' ':''} ${p.collab?'👥 Collab: '+p.collab+' ':''} ${p.mention?'📣 Mention '+p.mention:''}</small></div><span style="margin-left:auto">⋯</span></div><img src="${p.img}" style="width:100%;aspect-ratio:1;object-fit:cover"><div style="padding:8px;display:flex;gap:12px;font-size:12px"><span>❤️ ${p.likes} Like</span><span>💬 ${p.comments} Cmt</span><span>✈️ ${p.shares} Share</span><span>🔖 ${p.repost||0} Reposed</span><span style="margin-left:auto">👁️ ${p.views} Views = 🪙 ${p.views} coins</span></div><div style="padding:0 8px 8px;font-size:12px"><b>${p.user}</b> ${p.caption}<br><small>👑 ${p.views>=1000?Math.floor(p.views/1000)+'K views = ₹'+Math.floor(p.views/10)+' coins':p.views+' views'} • Profile I List • Notes • Free Reels</small></div></div>`});document.getElementById('feedList').innerHTML=h;
+let pH='';for(let i=0;i<12;i++){pH+=`<div><img src="https://picsum.photos/200?random=${100+i}" style="width:100%;aspect-ratio:1;object-fit:cover"><small style="padding:2px;font-size:9px">👁️ ${Math.floor(Math.random()*5000)} • ❤️ ${Math.floor(Math.random()*1000)}</small></div>`}document.getElementById('pGrid').innerHTML=pH;
+let chH='';users.forEach(u=>{chH+=`<div style="display:flex;gap:8px;padding:8px;border-bottom:1px solid #111"><img src="https://i.pravatar.cc/100?img=${u.avatar}" style="width:40px;height:40px;border-radius:50%"><div><b>${u.id}</b><br><small>Public chat • Private chat • 💚 Close</small></div><span style="margin-left:auto;font-size:10px">●</span></div>`});document.getElementById('chatList').innerHTML=chH;
+let cfH='';users.forEach(u=>{cfH+=`<div style="display:flex;justify-content:space-between;padding:8px;background:#111;margin-bottom:6px;border-radius:8px"><span>💚 ${u.id}</span><span style="color:#0f0">Close Friend</span></div>`});document.getElementById('cfList').innerHTML=cfH;
+}
+function editProfile(){let n=prompt('Profile name enna da?', 'GIRI OWNER');if(n)document.getElementById('bioName').innerText=n+' 👑';let b=prompt('Bio enna da?');if(b)alert('Bio updated da Giri: '+b)}
+function changeBg(){document.body.style.background=document.body.style.background=='#000'?'linear-gradient(45deg,#1a1a1a,#000)':'#000';alert('🎨 Background free ah maathiten da Giri! Instagram all background free da!')}
+let ri=0;function nextReel(){ri=(ri+1)%posts.length;let p=posts[ri];document.getElementById('rImg').src=p.img;document.getElementById('rInfo').innerHTML=`<b>@${p.user} ${p.user=='pixoro_owner'?'👑 PUBLIC OWNER':''}</b><br>${p.caption}<br><small>🏷️ Tag: ${p.tagged||''} • 👥 Collab: ${p.collab||''} • 📣 ${p.mention||''}<br>👁️ ${p.views} Views = 🪙 ${p.views} Coins = ₹${Math.floor(p.views/100)} • 🔖 Reposed ${p.repost||0} • 📝 Notes • I List</small>`;document.getElementById('rViews').innerText=p.views;document.getElementById('rCoins').innerText=p.views;document.getElementById('rLike').innerText=p.likes;document.getElementById('rCmt').innerText=p.comments;document.getElementById('rShare').innerText=p.shares;}
+renderAll();nextReel();sh('feed');
+document.getElementById('v1k').addEventListener('input',e=>{alert(`✅ Ipo 1K views = ${e.target.value} coins nu maathiten da Giri! Settings save aachu da!`)})
 
-let myId=localStorage.getItem('pixoro_myid')||'pixoro_owner';
-let coins=parseInt(localStorage.getItem('pix_coins')||'19040');
-let users=[
-{id:'pixoro_owner',name:'Giri Owner',owner:true,followers:10100,following:91,avatar:5},
-{id:'captain_giri',name:'Captain Giri',owner:false,followers:2340,following:120,avatar:8},
-{id:'giri_official',name:'Giri Official',owner:false,followers:1200,following:90,avatar:12},
-{id:'priya_tn',name:'Priya TN',owner:false,followers:5600,following:200,avatar:5},
-{id:'emma_usa',name:'Emma USA',owner:false,followers:8900,following:150,avatar:10},
-{id:'tamil_ponnu',name:'Tamil Ponnu',owner:false,followers:3400,following:180,avatar:16},
-];
-let posts=[
-{user:'pixoro_owner',date:'2024-09-05',likes:1379,views:15200,comments:['super da','owner da nee than'],caption:'Vignesh m official garland da - Owner reel',type:'img',src:'https://picsum.photos/400/600?random=1'},
-{user:'captain_giri',date:'2025-09-10',likes:2340,views:12300,comments:['semma da giri'],caption:'My first PIXORO post da 🔥',type:'img',src:'https://picsum.photos/400/600?random=2'},
-{user:'giri_official',date:'2025-09-12',likes:890,views:5600,comments:['mass'],caption:'Hope For Humanity ❤️',type:'img',src:'https://picsum.photos/400/600?random=3'},
-{user:'priya_tn',date:'2025-09-13',likes:2100,views:8900,comments:['cute'],caption:'Vanakkam da - Safe reel 🛡️',type:'img',src:'https://picsum.photos/400/600?random=4'},
-];
-
-function updateCoins(n){coins+=n;localStorage.setItem('pix_coins',coins);document.querySelectorAll('[id$=Coins],[id$=Coin]').forEach(e=>{if(e.id.includes('Coin'))e.innerText='🪙 '+coins;});document.getElementById('topCoin').innerHTML=`🪙 ${coins} <span>650/1000</span> <span>₹${Math.floor(coins/100)}</span>`;document.getElementById('wCoins').innerText=coins;document.getElementById('wTotal').innerText=coins;document.getElementById('totalCoins').innerText=coins;document.getElementById('wEarn').innerText=Math.floor(coins/100);document.getElementById('totalEarn').innerText=Math.floor(coins/100);}
-
-function renderStories(){let h=`<div class=s><div class=ring><img src="https://i.pravatar.cc/150?img=${users[0].avatar}"></div><small>You</small></div>`;users.forEach(u=>{h+=`<div class=s><div class=ring><img src="https://i.pravatar.cc/150?img=${u.avatar}"></div><small>${u.id}</small></div>`});document.getElementById('sBar').innerHTML=h}
-
-function renderFeed(){let h='';posts.forEach((p,i)=>{let u=users.find(x=>x.id==p.user)||users[0];h+=`<div class=post><div class=p-head><img src="https://i.pravatar.cc/100?img=${u.avatar}"><div style="flex:1"><b>${p.user}</b> ${u.owner?'<span class=owner>👑 OWNER</span>':''} ${u.id!=myId?`<button class="followBtn" id="f-${i}" onclick="follow('${p.user}',${i})">Follow +10 🪙</button>`:''}<br><small>📅 ${p.date} • 👁️ ${p.views} views • 🪙 ${p.views} coins • 🛡️ Safe</small></div><span>⋯</span></div><div class=p-img onclick="addView(1)"><img src="${p.src}"><div style="position:absolute;top:8px;right:8px;background:#000c;padding:4px 8px;border-radius:12px;font-size:10px;color:#FFD700">👁️ ${p.views} = 🪙 ${p.views} = ₹${Math.floor(p.views/100)}</div></div><div class=actions><span onclick="likePost(${i})">❤️ ${p.likes} <small style="color:#FFD700">+2</small></span><span onclick="commentPost(${i})">💬 ${p.comments.length}</span><span onclick="sharePost(${i})">✈️ Share <small style="color:#FFD700">+5</small></span><span style="margin-left:auto" onclick="addView(1)">🪙 ${p.views}</span></div><div style="padding:0 8px 8px;font-size:12px"><b>${p.user}</b> ${p.caption}<br>${p.comments.map(c=>`<small>• ${c}</small>`).join('<br>')}<br><div class=cmtBox><input id="cmt-${i}" placeholder="Comment pannu da..."><button onclick="doComment(${i})" style="background:#0095f6;color:#fff;border:none;padding:6px 12px;border-radius:20px">Post</button></div></div></div>`});document.getElementById('feedList').innerHTML=h;document.getElementById('totalViews').innerText=(posts.reduce((a,b)=>a+b.views,0)/1000).toFixed(1)+'K'}
-
-function createId(){let nid=prompt('Friends ID enna da Giri? ex: surya_99');if(!nid)return;if(users.find(u=>u.id==nid)){alert('ID already irukku da!');return}users.push({id:nid,name:nid,owner:false,followers:0,following:0,avatar:Math.floor(Math.random()*60)+1});renderStories();alert(`✅ ID Created da! @${nid} - Ipo avan post poda mudiyum da Giri!`)}
-function postReel(){let cap=prompt('Reel caption enna da Owner?');if(!cap)return;posts.unshift({user:myId,date:new Date().toISOString().split('T')[0],likes:0,views:1,comments:[],caption:cap+' • Owner 👑 • Payment varum da!',type:'img',src:`https://picsum.photos/400/600?random=${Math.floor(Math.random()*5000)}`});renderFeed();updateCoins(10);alert('👑 Owner reel posted da Giri! Views vantha coins varum da!')}
-function likePost(i){posts[i].likes++;renderFeed();updateCoins(2)}
-function sharePost(i){posts[i].views+=10;renderFeed();updateCoins(5);alert('✈️ Shared da Giri! +5 coins!')}
-function follow(user,i){let btn=document.getElementById(`f-${i}`);if(btn){btn.innerText='Following';btn.classList.add('following');updateCoins(10)}}
-function doComment(i){let inp=document.getElementById(`cmt-${i}`);if(!inp.value)return;posts[i].comments.push(myId+': '+inp.value);inp.value='';renderFeed();updateCoins(1)}
-function addView(n){coins+=n;updateCoins(0);posts.forEach(p=>p.views+=n);renderFeed();}
-function commentPost(i){document.getElementById(`cmt-${i}`)?.focus()}
-let ri=0;function nextReel(){ri=(ri+1)%posts.length;let p=posts[ri];document.getElementById('rImg').style.display='block';document.getElementById('rImg').src=p.src;document.getElementById('rOwner').innerText=(users.find(u=>u.id==p.user)?.owner?'👑 ':'')+p.user;document.getElementById('rInfo').innerHTML=`<b>@${p.user}</b> ${users.find(u=>u.id==p.user)?.owner?'👑 OWNER':''}<br>${p.caption}<br>👁️ ${p.views} views = 🪙 ${p.views} = ₹${Math.floor(p.views/100)} • ${p.date}`;document.getElementById('rLikes').innerText=p.likes;addView(5)}
-function likeReel(){posts[ri].likes++;document.getElementById('rLikes').innerText=posts[ri].likes;updateCoins(2)}
-function shareReel(){sharePost(ri)}
-function followReel(){follow(posts[ri].user,ri);document.getElementById('rFollow').innerText='Following';}
-
-renderStories();renderFeed();updateCoins(0);sh('feed');nextReel();
-document.getElementById('myIdShow').innerText='@'+myId+' 👑 OWNER';
+function shTab(id){sh(id)}
 </script></body></html>
