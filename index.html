@@ -12,4 +12,39 @@ h1{color:#ff00ff;text-shadow:0 0 20px #ff00ff}
 #ph{height:280px;background:#111;border-radius:15px;display:flex;align-items:center;justify-content:center;color:#777;margin:15px 0;border:1px dashed #444}
 input[type=file]{background:#fff;color:#000;padding:10px;border-radius:10px;width:95%}
 input[type=range]{width:100%;accent-color:#ff00ff}
-label{display:block;text-align:left;margin-top
+label{display:block;text-align:left;margin-top:10px;color:#aaa;font-size:13px}
+button{background:linear-gradient(90deg,#ff00ff,#7b2cff);border:none;color:#fff;padding:13px;width:100%;border-radius:30px;font-weight:bold;margin-top:15px}
+</style>
+</head>
+<body>
+<h1>PIXORO PRO ✨</h1>
+<div class="box">
+<input type="file" id="up" accept="image/*">
+<div id="ph">📸 Photo Choose Pannu Da Giri</div>
+<img id="preview">
+<label>BRIGHTNESS</label><input type="range" id="b" min="0" max="200" value="100">
+<label>CONTRAST</label><input type="range" id="c" min="0" max="200" value="100">
+<label>SATURATE</label><input type="range" id="s" min="0" max="200" value="100">
+<label>BLUR</label><input type="range" id="bl" min="0" max="10" value="0">
+<button id="dl">HD DOWNLOAD 📥</button>
+</div>
+<script>
+const up=document.getElementById('up'), pr=document.getElementById('preview'), ph=document.getElementById('ph');
+const b=document.getElementById('b'), c=document.getElementById('c'), s=document.getElementById('s'), bl=document.getElementById('bl');
+function upd(){pr.style.filter=`brightness(${b.value}%) contrast(${c.value}%) saturate(${s.value}%) blur(${bl.value}px)`}
+up.onchange=(e)=>{
+let f=e.target.files[0]; if(!f) return;
+let r=new FileReader();
+r.onload=(ev)=>{pr.src=ev.target.result; pr.style.display='block'; ph.style.display='none'; upd();};
+r.readAsDataURL(f);
+};
+b.oninput=upd; c.oninput=upd; s.oninput=upd; bl.oninput=upd;
+document.getElementById('dl').onclick=()=>{
+if(!pr.src || pr.style.display=='none'){alert('Photo Choose Pannu Da Giri!'); return;}
+let can=document.createElement('canvas'), ctx=can.getContext('2d'), img=new Image();
+img.onload=()=>{can.width=img.width; can.height=img.height; ctx.filter=pr.style.filter; ctx.drawImage(img,0,0); let a=document.createElement('a'); a.download='PIXORO-HD.png'; a.href=can.toDataURL('image/png'); a.click();};
+img.src=pr.src;
+};
+</script>
+</body>
+</html>
