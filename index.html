@@ -1,101 +1,79 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO - Full Options</title><style>
+<title>PIXORO - New ID</title><style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#000;color:#fff}
-.top{position:sticky;top:0;z-index:10;background:#000;display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #222;align-items:center}
-.top b{font-size:18px}.tab{display:none}.tab.active{display:block}.sec{padding-bottom:70px}
+.top{position:sticky;top:0;z-index:10;background:#000;display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #222}
+.top b{font-size:20px;background:linear-gradient(45deg,#feda75,#d62976);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.tab{display:none}.tab.active{display:block}.sec{padding-bottom:70px}
 .btm{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:12px 0;font-size:22px;z-index:20}
-.btn{padding:7px 12px;background:#222;border-radius:8px;border:none;color:#fff;font-size:13px;flex:1}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}.grid div{aspect-ratio:1;background:#111;position:relative;overflow:hidden}
+.story{display:flex;gap:12px;padding:12px;overflow-x:auto;border-bottom:1px solid #222}
+.s{width:64px;text-align:center;flex-shrink:0}.ring{width:64px;height:64px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#d62976,#962fbf)}
+.ring div{width:100%;height:100%;border-radius:50%;background:#111;border:2px solid #000;display:flex;align-items:center;justify-content:center;font-size:20px}
+.post{border-bottom:1px solid #222}.p-img{width:100%;aspect-ratio:1;background:#111;overflow:hidden}.p-img img{width:100%;height:100%;object-fit:cover}
+.p-act{padding:10px;display:flex;gap:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}.grid div{aspect-ratio:1;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .grid div img{width:100%;height:100%;object-fit:cover}
-.hl{display:flex;gap:12px;padding:12px;overflow-x:auto}.h{width:60px;text-align:center;flex-shrink:0}.h div{width:60px;height:60px;border-radius:50%;border:1px solid #333;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.set{padding:14px;border-bottom:1px solid #111;display:flex;justify-content:space-between;align-items:center}
+.mention{background:#222;padding:10px;border-radius:12px;margin:10px;display:flex;gap:8px;align-items:center}
+.btn{flex:1;background:#222;color:#fff;padding:8px;border-radius:8px;border:none}
+.reel{height:85vh;position:relative;background:#000}.reel img{width:100%;height:100%;object-fit:cover}
 </style></head><body>
 
 <div id="app">
+<!-- FEED -->
 <div id="feed" class="sec tab active">
-<div class="top"><b style="font-size:22px;background:linear-gradient(45deg,#feda75,#d62976);-webkit-background-clip:text;-webkit-text-fill-color:transparent">PIXORO</b><div>❤️ ✈️</div></div>
-<div style="padding:10px;display:flex;gap:10px;overflow:auto"><div style="width:60px;height:60px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center">😎+</div><div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(45deg,#feda75,#d62976);padding:2px"><div style="width:100%;height:100%;border-radius:50%;background:#111;display:flex;align-items:center;justify-content:center">🔥</div></div></div>
-<div style="padding:10px;border-bottom:1px solid #222"><b>giri_official</b> • 2h<br><div style="height:300px;background:#111;margin-top:8px;display:flex;align-items:center;justify-content:center">🔥 PIXORO FIRST POST</div></div>
+<div class="top"><b>PIXORO</b><div>❤️ ✈️</div></div>
+<div class="story">
+<div class="s" onclick="addStory()"><div class="ring" style="background:#333"><div>+</div></div><small>Your story</small></div>
+<div class="s"><div class="ring"><div>🔥</div></div><small>giri_new</small></div>
+<div class="s"><div class="ring"><div>⚡</div></div><small>pixoro_new</small></div>
+<div class="s"><div class="ring"><div>💜</div></div><small>friend_01</small></div>
+<div class="s"><div class="ring"><div>🎬</div></div><small>reels_tn</small></div>
 </div>
 
-<div id="search" class="sec tab"><div style="margin:10px;background:#222;padding:10px;border-radius:20px;color:#888">🔍 Search with Meta AI</div><div class="grid"><div><img src="https://picsum.photos/200?random=1"></div><div><img src="https://picsum.photos/200?random=2"></div><div><img src="https://picsum.photos/200?random=3"></div></div></div>
+<div style="padding:10px"><input id="caption" placeholder="New post... @mention pannu da" style="width:100%;background:#111;border:1px solid #222;padding:10px;border-radius:20px;color:#fff">
+<div id="mentList" style="display:none;background:#222;margin-top:6px;border-radius:10px;padding:8px">
+<div onclick="tag('@giri_new')">🔥 @giri_new</div><div onclick="tag('@pixoro_new')">⚡ @pixoro_new</div><div onclick="tag('@friend_01')">💜 @friend_01</div>
+</div>
+<button onclick="newPost()" style="margin-top:8px;width:100%;background:#fff;color:#000;padding:8px;border-radius:20px;border:none;font-weight:bold">Post - Mention oda</button>
+</div>
 
-<div id="reels" class="sec tab"><div class="top"><b>Reels</b></div><div style="height:80vh;background:#111;display:flex;align-items:center;justify-content:center">▶️ PIXORO Reels SD</div></div>
+<div id="feedList">
+<div class="post"><div style="padding:10px"><b>pixoro_new</b> • 1h - Mention: <span style="color:#0095f6">@giri_new</span></div><div class="p-img"><img src="https://picsum.photos/400/400?random=101"></div><div class="p-act">❤️ 💬 ✈️ 🔖</div><div style="padding:0 10px 10px;font-size:13px"><b>pixoro_new</b> New ID first photo da! @giri_new</div></div>
+</div>
+</div>
 
-<div id="dm" class="sec tab"><div class="top"><b>comedy_gi...</b></div><div style="padding:10px">DM List - Real</div></div>
+<!-- REELS - NEW -->
+<div id="reels" class="sec tab">
+<div class="reel"><img id="reelImg" src="https://picsum.photos/400/800?random=201"><div style="position:absolute;bottom:80px;left:12px"><b>@pixoro_new</b><br>New Reels da! @giri_new<br>🎵 Original Audio</div><div style="position:absolute;right:12px;bottom:80px;text-align:center">❤️<br><br>💬<br><br>✈️</div><button onclick="nextReel()" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:#ffffff33;color:#fff;padding:6px 14px;border-radius:20px;border:none">Next Reel →</button></div>
+</div>
 
-<!-- FULL PROFILE LIKE YOUR VIDEO -->
+<!-- SEARCH - PHOTO -->
+<div id="search" class="sec tab"><div style="margin:10px;background:#222;padding:10px;border-radius:20px">🔍 Search PIXORO New</div><div class="grid"><div><img src="https://picsum.photos/200?random=11"></div><div><img src="https://picsum.photos/200?random=12"></div><div><img src="https://picsum.photos/200?random=13"></div><div><img src="https://picsum.photos/200?random=14"></div><div><img src="https://picsum.photos/200?random=15"></div><div><img src="https://picsum.photos/200?random=16"></div></div></div>
+
+<div id="dm" class="sec tab"><div class="top"><b>Messages - New ID</b></div>
+<div class="mention"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(45deg,#feda75,#d62976)"></div><div><b>pixoro_new</b><br><small>Mentioned you in a reel</small></div><div style="margin-left:auto;color:#0095f6">●</div></div>
+</div>
+
+<!-- PROFILE - NEW ID ONLY -->
 <div id="profile" class="sec tab">
-<div class="top"><b>comedy_girl_ ▼</b><div style="display:flex;gap:12px"><span>🧵</span><span onclick="showSet()">☰</span></div></div>
-
-<div style="padding:12px;display:flex;gap:12px;align-items:center">
-<img src="https://picsum.photos/200?random=10" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #333">
-<div style="flex:1;display:flex;justify-content:space-around;text-align:center"><div><b>128</b><br><small>posts</small></div><div><b>10.1K</b><br><small>followers</small></div><div><b>91</b><br><small>following</small></div></div>
-</div>
-
-<div style="padding:0 12px;line-height:18px;font-size:14px">
-<b>🎀Giri🎀</b><br>
-<span style="background:#222;padding:2px 6px;border-radius:10px;font-size:12px">💤 In sleep mode</span><br>
-Reel creator 😎<br>
-Comedy Girl 😂<br>
-Heart Break 💔 Record Break 💥<br>
-காமெடிக்கு Content... more<br>
-🔗 <span style="color:#0095f6">youtube.com/@comedy_girl_37s...</span><br>
-👤 <b>comedy_girl_</b>  🎀 <b>Namba_Family's🎀</b><br>
-➕ Add
-</div>
-
-<!-- PROFESSIONAL DASHBOARD - LIKE VIDEO -->
-<div style="margin:12px;background:#111;padding:12px;border-radius:12px">
-<small style="color:#aaa">Professional dashboard</small><br>
-<small style="color:#00ff00">↗ 260.1K views in the last 30 days.</small>
-</div>
-
-<div style="display:flex;gap:6px;padding:0 12px">
-<button class="btn">Edit profile</button><button class="btn">Share profile</button><button class="btn">Contact</button>
-</div>
-
-<!-- HIGHLIGHTS - LIKE VIDEO -->
-<div class="hl">
-<div class="h"><div style="font-size:22px">+</div><small>New</small></div>
-<div class="h"><div><img src="https://picsum.photos/100?random=11" style="width:100%;height:100%;object-fit:cover"></div><small>Mom ❤️ Dad</small></div>
-<div class="h"><div><img src="https://picsum.photos/100?random=12" style="width:100%;height:100%;object-fit:cover"></div><small>Appa Muruga</small></div>
-<div class="h"><div><img src="https://picsum.photos/100?random=13" style="width:100%;height:100%;object-fit:cover"></div><small>🎀 sports love</small></div>
-</div>
-
-<!-- POSTS GRID WITH VIEWS LIKE VIDEO -->
-<div class="grid">
-<div><img src="https://picsum.photos/200?random=20"><span style="position:absolute;bottom:4px;left:4px;font-size:11px">👁 4,641</span></div>
-<div><img src="https://picsum.photos/200?random=21"><span style="position:absolute;bottom:4px;left:4px;font-size:11px">❤️ 468</span></div>
-<div><img src="https://picsum.photos/200?random=22"><span style="position:absolute;bottom:4px;left:4px;font-size:11px">👁 34.6K</span></div>
-<div><img src="https://picsum.photos/200?random=23"></div>
-<div><img src="https://picsum.photos/200?random=24"></div>
-<div><img src="https://picsum.photos/200?random=25"></div>
-</div>
-</div>
-
-<!-- SETTINGS AND ACTIVITY - LIKE VIDEO -->
-<div id="settings" class="sec tab">
-<div class="top"><span onclick="sh('profile')">←</span><b>Settings and activity</b><span></span></div>
-<div style="margin:10px;background:#222;padding:10px;border-radius:20px;color:#888">🔍 Search</div>
-<div class="set"><span>👤 Accounts Center<br><small style="color:#888">Password, security, personal details...</small></span><span>›</span></div>
-<div style="padding:12px;color:#888;font-size:13px">For you</div>
-<div class="set"><span>👶 Teen Account settings</span><span>›</span></div>
-<div style="padding:12px;color:#888;font-size:13px">How you use PIXORO</div>
-<div class="set"><span>🔖 Saved</span><span>›</span></div>
-<div class="set"><span>🕒 Archive</span><span>›</span></div>
-<div class="set"><span>📊 Your activity</span><span>›</span></div>
-<div class="set"><span>🔔 Notifications</span><span>›</span></div>
-<div class="set"><span>⏰ Time management</span><span>›</span></div>
-<div class="set"><span>📱 PIXORO for tablets</span><span>›</span></div>
+<div class="top"><b>pixoro_new ▼</b><span onclick="sh('feed')">☰</span></div>
+<div style="padding:12px;display:flex;gap:20px;align-items:center"><div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(45deg,#feda75,#d62976);display:flex;align-items:center;justify-content:center;font-size:30px">🚀</div><div style="display:flex;gap:25px;text-align:center"><div><b id="pc">1</b><br><small>posts</small></div><div><b>0</b><br><small>followers</small></div><div><b>3</b><br><small>following</small></div></div></div>
+<div style="padding:0 12px"><b>PIXORO NEW 🚀</b><br>New ID Only - No Old Photo<br>Reels | Photo | Story | Mention<br>🔗 @giri_new @pixoro_new</div>
+<div style="display:flex;gap:6px;padding:12px"><button class="btn">Edit profile</button><button class="btn">Share profile</button></div>
+<div style="display:flex;gap:12px;padding:12px"><div style="width:60px;text-align:center"><div style="width:60px;height:60px;border-radius:50%;border:1px solid #333;display:flex;align-items:center;justify-content:center">+</div><small>New</small></div></div>
+<div class="grid" id="myGrid"><div><img src="https://picsum.photos/400/400?random=101"></div></div>
 </div>
 
 <div class="btm"><span onclick="sh('feed')">🏠</span><span onclick="sh('search')">🔍</span><span onclick="sh('reels')">🎬</span><span onclick="sh('dm')">✈️</span><span onclick="sh('profile')">👤</span></div>
 </div>
 
 <script>
+let reels=["https://picsum.photos/400/800?random=201","https://picsum.photos/400/800?random=202","https://picsum.photos/400/800?random=203"];let r=0;
 function sh(id){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.getElementById(id).classList.add('active')}
-function showSet(){sh('settings')}
+function nextReel(){r=(r+1)%reels.length;document.getElementById('reelImg').src=reels[r]}
+function addStory(){let s=document.createElement('div');s.className='s';s.innerHTML='<div class=ring><div>✓</div></div><small>New story</small>';document.querySelector('.story').appendChild(s);alert('Story added da Giri! 🔥')}
+document.getElementById('caption').addEventListener('input',function(){if(this.value.includes('@')){document.getElementById('mentList').style.display='block'}else{document.getElementById('mentList').style.display='none'}})
+function tag(name){document.getElementById('caption').value+=name+' ';document.getElementById('mentList').style.display='none'}
+function newPost(){let cap=document.getElementById('caption').value||'New post with mention @giri_new';let html=`<div class=post><div style="padding:10px"><b>pixoro_new</b> • Now - ${cap.replace(/@(\w+)/g,'<span style=color:#0095f6>@$1</span>')}</div><div class=p-img><img src="https://picsum.photos/400/400?random=${Math.floor(Math.random()*100)}"></div><div class=p-act>❤️ 💬 ✈️</div><div style="padding:0 10px 10px"><b>pixoro_new</b> ${cap}</div></div>`;document.getElementById('feedList').insertAdjacentHTML('afterbegin',html);document.getElementById('caption').value='';document.getElementById('pc').innerText=parseInt(document.getElementById('pc').innerText)+1}
 sh('profile')
 </script></body></html>
