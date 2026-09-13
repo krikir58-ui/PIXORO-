@@ -1,59 +1,76 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO - Pinterest Style</title>
+<title>PIXORO FULL</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a0a;color:#fff;font-family:system-ui;overflow-x:hidden}
-header{position:sticky;top:0;z-index:50;background:#0a0a0a;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222}
-.logo{font-size:28px;font-weight:900;background:linear-gradient(45deg,#ff0055,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.search{flex:1;max-width:500px;margin:0 20px;background:#1a1a1a;border-radius:24px;padding:10px 16px;display:flex;align-items:center}
-.search input{background:transparent;border:none;color:#fff;width:100%;outline:none}
-.btn{background:linear-gradient(45deg,#ff0055,#7c3aed);color:#fff;border:none;padding:10px 20px;border-radius:24px;font-weight:700;cursor:pointer}
+body{background:#0a0a0a;color:#fff;font-family:system-ui}
+header{position:sticky;top:0;z-index:50;background:#0a0a0a;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #333;flex-wrap:wrap;gap:8px}
+.logo{font-size:22px;font-weight:900;background:linear-gradient(45deg,#FFD700,#ff0055);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.coin-box{background:#1a1a1a;border:1px solid #333;border-radius:20px;padding:5px 12px;display:flex;gap:8px;align-items:center;font-size:14px}
+.rupee{background:#FFD700;color:#000;padding:2px 8px;border-radius:12px;font-weight:700}
+.settings-panel{margin:12px;border:2px solid #FFD700;border-radius:16px;padding:16px;background:#111}
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.set-item{background:#222;padding:8px 12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.set-item input{width:50px;background:#000;border:1px solid #FFD700;color:#FFD700;text-align:center;border-radius:6px;padding:2px;font-weight:bold}
 .masonry{columns:2;column-gap:12px;padding:12px}
 @media(min-width:768px){.masonry{columns:4}}
-@media(min-width:1200px){.masonry{columns:5}}
-.card{break-inside:avoid;margin-bottom:12px;border-radius:16px;overflow:hidden;background:#1a1a1a;cursor:pointer;position:relative}
+.card{break-inside:avoid;margin-bottom:12px;border-radius:16px;overflow:hidden;background:#1a1a1a;border:1px solid #222}
 .card img{width:100%;display:block}
 .card-info{padding:8px}
-.card-user{display:flex;align-items:center;gap:8px;font-size:12px}
-.card-user img{width:24px;height:24px;border-radius:50%}
-.upload-fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(45deg,#ff0055,#7c3aed);border:none;color:#fff;font-size:32px;cursor:pointer;z-index:40;box-shadow:0 4px 20px rgba(255,0,85,0.4)}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
+.search{flex:1;max-width:300px;background:#1a1a1a;border-radius:24px;padding:6px 12px}
+.search input{background:transparent;border:none;color:#fff;width:100%;outline:none}
+.btn{background:linear-gradient(45deg,#ff0055,#7c3aed);color:#fff;border:none;padding:6px 14px;border-radius:20px;font-weight:600;cursor:pointer}
+.upload-fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(45deg,#FFD700,#ff0055);border:none;font-size:28px;z-index:40}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
 .modal.active{display:flex}
 .modal-box{background:#1a1a1a;border-radius:16px;padding:24px;width:100%;max-width:400px}
-.modal-box input,.modal-box textarea{width:100%;background:#0a0a0a;border:1px solid #333;border-radius:8px;padding:12px;color:#fff;margin:8px 0;outline:none}
+.modal-box input,.modal-box textarea{width:100%;background:#0a0a0a;border:1px solid #333;border-radius:8px;padding:10px;color:#fff;margin-top:8px}
 </style>
 </head>
 <body>
 <header>
-<div class="logo">PIXORO</div>
+<div class="logo">PIXORO FULL</div>
+<div style="display:flex;align-items:center;gap:10px">
+<div class="coin-box">🪙 <span id="coinCount">19040</span> <span class="rupee">₹<span id="rupeeCount">190</span></span></div>
+<button onclick="toggleSettings()" style="background:none;border:none;font-size:22px">⚙️</button>
+</div>
 <div class="search"><input id="searchInput" placeholder="Search ideas..." oninput="filterPosts()"></div>
-<button class="btn" onclick="openUpload()">+</button>
+<button class="btn" onclick="openUpload()">+ Create</button>
 </header>
+
+<div id="settingsPanel" class="settings-panel">
+<h2>💰 Views = Coins Settings - Instagram Payment Mari da!</h2>
+<div class="set-grid">
+<div class="set-item">👁️ 1K Views = <span><input id="viewCoin" value="100"> coins</span></div>
+<div class="set-item">❤️ 1 Like = <span><input id="likeCoin" value="2"> coins</span></div>
+<div class="set-item">✈️ 1 Share = <span><input id="shareCoin" value="5"> coins</span></div>
+<div class="set-item">👥 1 Follow = <span><input id="followCoin" value="10"> coins</span></div>
+</div>
+<p style="color:#22ff22;font-size:12px;margin-top:8px">✓ Ivvlo views vantha ivlo coin - Nee maathalam da Giri! Settings la save aagum!</p>
+<button onclick="saveSettings()" style="margin-top:10px;width:100%;background:#FFD700;color:#000;font-weight:700;padding:8px;border-radius:8px;border:none">Save Settings 💾</button>
+</div>
 
 <div id="masonry" class="masonry"></div>
 <button class="upload-fab" onclick="openUpload()">+</button>
 
 <div id="uploadModal" class="modal" onclick="if(event.target==this)closeUpload()">
 <div class="modal-box">
-<h2 style="margin-bottom:16px">Create Pin</h2>
-<input type="file" id="fileInput" accept="image/*,video/*" onchange="previewFile()">
+<h2>Create Pin</h2>
+<input type="file" id="fileInput" accept="image/*" onchange="previewFile()">
 <div id="preview" style="margin:12px 0;border-radius:12px;overflow:hidden;display:none"></div>
-<input id="titleInput" placeholder="Title...">
+<input id="titleInput" placeholder="Title... Mom Dad">
 <textarea id="descInput" placeholder="Description..." rows="3"></textarea>
-<input id="tagsInput" placeholder="Tags #fashion #art">
-<button class="btn" style="width:100%;margin-top:12px" onclick="uploadPost()" id="uploadBtn">Upload to PIXORO</button>
-<button style="width:100%;background:transparent;border:none;color:#888;margin-top:8px;cursor:pointer" onclick="closeUpload()">Cancel</button>
+<button class="btn" style="width:100%;margin-top:12px" onclick="uploadPost()" id="uploadBtn">Upload Pin</button>
+<button style="width:100%;background:transparent;border:none;color:#888;margin-top:8px" onclick="closeUpload()">Cancel</button>
 </div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const firebaseConfig = {
   apiKey: "AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",
   authDomain: "pixoro-75927.firebaseapp.com",
@@ -63,105 +80,26 @@ const firebaseConfig = {
   appId: "1:814840120295:web:6c02c613df5a17209bf342",
   measurementId: "G-H3NR8P270D"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 const CLOUD_NAME = "vi4etpob";
 const UPLOAD_PRESET = "pixoro_preset";
-
-let allPosts = [];
-let selectedFile = null;
-
-window.openUpload = () => document.getElementById('uploadModal').classList.add('active');
-window.closeUpload = () => document.getElementById('uploadModal').classList.remove('active');
-
-window.previewFile = () => {
-  const file = document.getElementById('fileInput').files[0];
-  if(!file) return;
-  selectedFile = file;
-  const preview = document.getElementById('preview');
-  preview.style.display = 'block';
-  const url = URL.createObjectURL(file);
-  if(file.type.startsWith('video')) preview.innerHTML = `<video src="${url}" style="width:100%;max-height:300px" controls></video>`;
-  else preview.innerHTML = `<img src="${url}" style="width:100%">`;
-};
-
-window.uploadPost = async () => {
-  const title = document.getElementById('titleInput').value;
-  const desc = document.getElementById('descInput').value;
-  const tags = document.getElementById('tagsInput').value;
-  const btn = document.getElementById('uploadBtn');
-
-  if(!selectedFile){ alert('Select image/video da Giri!'); return; }
-  if(!title){ alert('Title podu da!'); return; }
-
-  btn.textContent = 'Uploading...'; btn.disabled = true;
-
-  try {
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-    formData.append('upload_preset', UPLOAD_PRESET);
-
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
-      method: 'POST', body: formData
-    });
-    const data = await res.json();
-    if(!data.secure_url) throw new Error('Cloudinary upload failed: ' + JSON.stringify(data));
-
-    await addDoc(collection(db, 'posts'), {
-      title, description: desc, tags,
-      imageUrl: data.secure_url,
-      type: selectedFile.type.startsWith('video')? 'video' : 'image',
-      createdAt: serverTimestamp(),
-      likes: 0,
-      username: 'Giri'
-    });
-
-    alert('PIXORO la upload aayiduchu da Giri! 🔥');
-    closeUpload();
-    document.getElementById('fileInput').value = '';
-    document.getElementById('titleInput').value = '';
-    document.getElementById('descInput').value = '';
-    document.getElementById('tagsInput').value = '';
-    document.getElementById('preview').style.display = 'none';
-    selectedFile = null;
-  } catch(e){
-    alert('Error da Giri: ' + e.message);
-    console.error(e);
-  }
-  btn.textContent = 'Upload to PIXORO'; btn.disabled = false;
-};
-
-const masonry = document.getElementById('masonry');
-const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
-
-onSnapshot(q, (snapshot) => {
-  allPosts = [];
-  snapshot.forEach(doc => allPosts.push({id: doc.id,...doc.data()}));
-  renderPosts(allPosts);
-});
-
-function renderPosts(posts){
-  masonry.innerHTML = '';
-  if(posts.length === 0){
-    masonry.innerHTML = '<div style="column-span:all;text-align:center;padding:60px;color:#666"><h2>No posts yet da Giri!</h2><p>First post ah nee upload pannu da! 👑</p></div>';
-    return;
-  }
-  posts.forEach(post => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    const media = post.type === 'video'? `<video src="${post.imageUrl}" style="width:100%" muted loop onmouseenter="this.play()" onmouseleave="this.pause()"></video>` : `<img src="${post.imageUrl}" loading="lazy">`;
-    card.innerHTML = `${media}<div class="card-info"><div style="font-weight:600;font-size:14px">${post.title || 'Untitled'}</div><div class="card-user" style="margin-top:6px"><img src="https://i.pravatar.cc/100?u=${post.username}"><span>${post.username || 'Giri'}</span></div></div>`;
-    masonry.appendChild(card);
-  });
-}
-
-window.filterPosts = () => {
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  const filtered = allPosts.filter(p => (p.title||'').toLowerCase().includes(search) || (p.tags||'').toLowerCase().includes(search));
-  renderPosts(filtered);
-};
+let allPosts=[];let selectedFile=null;let coins=parseInt(localStorage.getItem('pixoro_coins')||'19040');
+let settings=JSON.parse(localStorage.getItem('pixoro_settings')||'{"view":100,"like":2,"share":5,"follow":10}');
+function updateCoinUI(){document.getElementById('coinCount').innerText=coins;document.getElementById('rupeeCount').innerText=Math.floor(coins/100);localStorage.setItem('pixoro_coins',coins);}
+document.getElementById('viewCoin').value=settings.view;document.getElementById('likeCoin').value=settings.like;document.getElementById('shareCoin').value=settings.share;document.getElementById('followCoin').value=settings.follow;updateCoinUI();
+window.toggleSettings=()=>{let p=document.getElementById('settingsPanel');p.style.display=p.style.display=='none'?'block':'none';}
+window.saveSettings=()=>{settings={view:parseInt(viewCoin.value),like:parseInt(likeCoin.value),share:parseInt(shareCoin.value),follow:parseInt(followCoin.value)};localStorage.setItem('pixoro_settings',JSON.stringify(settings));alert('Save Aayiduchu da Giri! ✅');}
+window.openUpload=()=>document.getElementById('uploadModal').classList.add('active');
+window.closeUpload=()=>document.getElementById('uploadModal').classList.remove('active');
+window.previewFile=()=>{let file=fileInput.files[0];if(!file)return;selectedFile=file;let preview=document.getElementById('preview');preview.style.display='block';let reader=new FileReader();reader.onload=e=>preview.innerHTML=`<img src="${e.target.result}" style="width:100%">`;reader.readAsDataURL(file);}
+window.uploadPost=async()=>{let title=titleInput.value||'PIXORO';let btn=uploadBtn;if(!selectedFile)return alert('Photo select pannu da!');btn.innerText='Uploading...';btn.disabled=true;try{let form=new FormData();form.append('file',selectedFile);form.append('upload_preset',UPLOAD_PRESET);let res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`,{method:'POST',body:form});let data=await res.json();await addDoc(collection(db,'posts'),{image:data.secure_url,title:title,username:'Giri',likes:0,views:0,timestamp:Date.now()});btn.innerText='Done da! 🔥';setTimeout(()=>{closeUpload();fileInput.value='';titleInput.value='';preview.style.display='none';btn.innerText='Upload Pin';btn.disabled=false;},1000);}catch(e){alert('Fail: '+e.message);btn.innerText='Upload Pin';btn.disabled=false;}}
+function render(posts){let m=masonry;m.innerHTML='';posts.forEach(p=>{let d=document.createElement('div');d.className='card';d.innerHTML=`<img src="${p.image}" onclick="addView('${p.id}')"><div class="card-info"><div style="font-size:13px;font-weight:600">${p.title}</div><div style="font-size:11px;color:#aaa">👤 ${p.username} 👁️ ${p.views||0}</div><div style="display:flex;gap:4px;margin-top:6px"><button onclick="addLike('${p.id}')" style="flex:1;background:#222;border:none;color:#fff;padding:4px;border-radius:6px;font-size:11px">❤️ ${p.likes||0} +${settings.like}</button><button onclick="addShare('${p.id}')" style="flex:1;background:#222;border:none;color:#fff;padding:4px;border-radius:6px;font-size:11px">✈️ +${settings.share}</button></div></div>`;m.appendChild(d);});}
+window.addView=async(id)=>{try{await updateDoc(doc(db,'posts',id),{views:increment(1)});}catch(e){}coins+=1;if(Math.random()<0.1){coins+=settings.view;updateCoinUI();}}
+window.addLike=async(id)=>{try{await updateDoc(doc(db,'posts',id),{likes:increment(1)});}catch(e){}coins+=settings.like;updateCoinUI();}
+window.addShare=()=>{coins+=settings.share;updateCoinUI();navigator.clipboard.writeText('https://krikir58-ui.github.io/PIXORO-/');alert('Coin +'+settings.share);}
+window.filterPosts=()=>{let q=searchInput.value.toLowerCase();render(allPosts.filter(p=>(p.title||'').toLowerCase().includes(q)));};
+let q=query(collection(db,'posts'),orderBy('timestamp','desc'));onSnapshot(q,(snap)=>{allPosts=[];snap.forEach(d=>allPosts.push({id:d.id,...d.data()}));render(allPosts);});
 </script>
 </body>
 </html>
