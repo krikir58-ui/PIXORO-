@@ -3,103 +3,63 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO FULL</title>
+<title>PIXORO FULL - Instagram Clone</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a0a;color:#fff;font-family:system-ui}
-header{position:sticky;top:0;z-index:50;background:#0a0a0a;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #333;flex-wrap:wrap;gap:8px}
-.logo{font-size:22px;font-weight:900;background:linear-gradient(45deg,#FFD700,#ff0055);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.coin-box{background:#1a1a1a;border:1px solid #333;border-radius:20px;padding:5px 12px;display:flex;gap:8px;align-items:center;font-size:14px}
-.rupee{background:#FFD700;color:#000;padding:2px 8px;border-radius:12px;font-weight:700}
-.settings-panel{margin:12px;border:2px solid #FFD700;border-radius:16px;padding:16px;background:#111}
-.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.set-item{background:#222;padding:8px 12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
-.set-item input{width:50px;background:#000;border:1px solid #FFD700;color:#FFD700;text-align:center;border-radius:6px;padding:2px;font-weight:bold}
-.masonry{columns:2;column-gap:12px;padding:12px}
-@media(min-width:768px){.masonry{columns:4}}
-.card{break-inside:avoid;margin-bottom:12px;border-radius:16px;overflow:hidden;background:#1a1a1a;border:1px solid #222}
-.card img{width:100%;display:block}
-.card-info{padding:8px}
-.search{flex:1;max-width:300px;background:#1a1a1a;border-radius:24px;padding:6px 12px}
-.search input{background:transparent;border:none;color:#fff;width:100%;outline:none}
-.btn{background:linear-gradient(45deg,#ff0055,#7c3aed);color:#fff;border:none;padding:6px 14px;border-radius:20px;font-weight:600;cursor:pointer}
-.upload-fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(45deg,#FFD700,#ff0055);border:none;font-size:28px;z-index:40}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto}
+body{background:#000;color:#fff}
+header{position:sticky;top:0;z-index:100;background:#000;border-bottom:1px solid #262626;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:24px;font-weight:900;letter-spacing:-1px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.coin-box{background:#1a1a1a;border:1px solid #333;border-radius:20px;padding:5px 12px;display:flex;gap:8px;align-items:center;font-size:13px}
+.rupee{background:#FFD700;color:#000;padding:2px 8px;border-radius:12px;font-weight:800}
+.stories{display:flex;gap:14px;overflow-x:auto;padding:12px;border-bottom:1px solid #262626;scrollbar-width:none}
+.stories::-webkit-scrollbar{display:none}
+.story{text-align:center;min-width:64px;cursor:pointer}
+.story-ring{width:64px;height:64px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)}
+.story-ring img{width:100%;height:100%;border-radius:50%;border:2px solid #000;object-fit:cover;background:#222}
+.story span{font-size:11px;margin-top:4px;display:block;white-space:nowrap}
+.settings-panel{margin:12px;border:2px solid #FFD700;border-radius:16px;padding:14px;background:#111}
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.set-item{background:#222;padding:8px 10px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600}
+.set-item input{width:52px;background:#000;border:1px solid #FFD700;color:#FFD700;text-align:center;border-radius:6px;padding:3px;font-weight:bold}
+.feed{max-width:470px;margin:0 auto;padding-bottom:80px}
+.post{background:#000;border-bottom:1px solid #262626;margin-bottom:0}
+.post-header{padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
+.post-user{display:flex;align-items:center;gap:10px}
+.post-user img{width:32px;height:32px;border-radius:50%}
+.post-user b{font-size:14px}
+.post-img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111;display:block}
+.post-actions{padding:10px 12px;display:flex;justify-content:space-between}
+.action-left{display:flex;gap:16px;font-size:24px}
+.action-left i{cursor:pointer}
+.action-left i.liked{color:#ed4956}
+.post-likes{padding:0 12px;font-size:14px;font-weight:700}
+.post-caption{padding:4px 12px;font-size:14px}
+.post-caption b{margin-right:6px}
+.post-time{padding:4px 12px 10px;color:#8e8e8e;font-size:11px;text-transform:uppercase}
+.comment-box{padding:8px 12px;border-top:1px solid #262626;display:flex;gap:10px;align-items:center}
+.comment-box input{flex:1;background:transparent;border:none;color:#fff;outline:none;font-size:14px}
+.search-bar{flex:1;margin:0 10px;background:#262626;border-radius:8px;padding:6px 10px;display:flex}
+.search-bar input{background:transparent;border:none;color:#fff;width:100%;outline:none;font-size:14px}
+.fab{position:fixed;bottom:20px;right:20px;width:56px;height:56px;border-radius:50%;background:linear-gradient(45deg,#FFD700,#ff0055);border:none;font-size:26px;z-index:50}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
 .modal.active{display:flex}
-.modal-box{background:#1a1a1a;border-radius:16px;padding:24px;width:100%;max-width:400px}
-.modal-box input,.modal-box textarea{width:100%;background:#0a0a0a;border:1px solid #333;border-radius:8px;padding:10px;color:#fff;margin-top:8px}
+.modal-box{background:#121212;border:1px solid #333;border-radius:16px;padding:20px;width:100%;max-width:400px}
+.modal-box input,.modal-box textarea{width:100%;background:#000;border:1px solid #333;border-radius:8px;padding:10px;color:#fff;margin-top:10px}
+.btn{width:100%;background:#0095f6;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:700;margin-top:12px}
+.btn-yellow{background:#FFD700;color:#000}
 </style>
 </head>
 <body>
 <header>
 <div class="logo">PIXORO FULL</div>
-<div style="display:flex;align-items:center;gap:10px">
-<div class="coin-box">🪙 <span id="coinCount">19040</span> <span class="rupee">₹<span id="rupeeCount">190</span></span></div>
-<button onclick="toggleSettings()" style="background:none;border:none;font-size:22px">⚙️</button>
+<div style="display:flex;gap:8px;align-items:center">
+<div class="coin-box">🪙 <span id="coinCount">19068</span> <span class="rupee">₹<span id="rupeeCount">190</span></span></div>
+<i class="fas fa-cog" style="font-size:22px;color:#fff;cursor:pointer" onclick="toggleSet()"></i>
 </div>
-<div class="search"><input id="searchInput" placeholder="Search ideas..." oninput="filterPosts()"></div>
-<button class="btn" onclick="openUpload()">+ Create</button>
 </header>
 
-<div id="settingsPanel" class="settings-panel">
-<h2>💰 Views = Coins Settings - Instagram Payment Mari da!</h2>
-<div class="set-grid">
-<div class="set-item">👁️ 1K Views = <span><input id="viewCoin" value="100"> coins</span></div>
-<div class="set-item">❤️ 1 Like = <span><input id="likeCoin" value="2"> coins</span></div>
-<div class="set-item">✈️ 1 Share = <span><input id="shareCoin" value="5"> coins</span></div>
-<div class="set-item">👥 1 Follow = <span><input id="followCoin" value="10"> coins</span></div>
-</div>
-<p style="color:#22ff22;font-size:12px;margin-top:8px">✓ Ivvlo views vantha ivlo coin - Nee maathalam da Giri! Settings la save aagum!</p>
-<button onclick="saveSettings()" style="margin-top:10px;width:100%;background:#FFD700;color:#000;font-weight:700;padding:8px;border-radius:8px;border:none">Save Settings 💾</button>
-</div>
+<div class="search-bar" style="margin:10px"><i class="fas fa-search" style="color:#888;margin-right:8px"></i><input id="searchInput" placeholder="Search ideas..." oninput="filterPosts()"></div>
 
-<div id="masonry" class="masonry"></div>
-<button class="upload-fab" onclick="openUpload()">+</button>
-
-<div id="uploadModal" class="modal" onclick="if(event.target==this)closeUpload()">
-<div class="modal-box">
-<h2>Create Pin</h2>
-<input type="file" id="fileInput" accept="image/*" onchange="previewFile()">
-<div id="preview" style="margin:12px 0;border-radius:12px;overflow:hidden;display:none"></div>
-<input id="titleInput" placeholder="Title... Mom Dad">
-<textarea id="descInput" placeholder="Description..." rows="3"></textarea>
-<button class="btn" style="width:100%;margin-top:12px" onclick="uploadPost()" id="uploadBtn">Upload Pin</button>
-<button style="width:100%;background:transparent;border:none;color:#888;margin-top:8px" onclick="closeUpload()">Cancel</button>
-</div>
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const firebaseConfig = {
-  apiKey: "AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",
-  authDomain: "pixoro-75927.firebaseapp.com",
-  projectId: "pixoro-75927",
-  storageBucket: "pixoro-75927.firebasestorage.app",
-  messagingSenderId: "814840120295",
-  appId: "1:814840120295:web:6c02c613df5a17209bf342",
-  measurementId: "G-H3NR8P270D"
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const CLOUD_NAME = "vi4etpob";
-const UPLOAD_PRESET = "pixoro_preset";
-let allPosts=[];let selectedFile=null;let coins=parseInt(localStorage.getItem('pixoro_coins')||'19040');
-let settings=JSON.parse(localStorage.getItem('pixoro_settings')||'{"view":100,"like":2,"share":5,"follow":10}');
-function updateCoinUI(){document.getElementById('coinCount').innerText=coins;document.getElementById('rupeeCount').innerText=Math.floor(coins/100);localStorage.setItem('pixoro_coins',coins);}
-document.getElementById('viewCoin').value=settings.view;document.getElementById('likeCoin').value=settings.like;document.getElementById('shareCoin').value=settings.share;document.getElementById('followCoin').value=settings.follow;updateCoinUI();
-window.toggleSettings=()=>{let p=document.getElementById('settingsPanel');p.style.display=p.style.display=='none'?'block':'none';}
-window.saveSettings=()=>{settings={view:parseInt(viewCoin.value),like:parseInt(likeCoin.value),share:parseInt(shareCoin.value),follow:parseInt(followCoin.value)};localStorage.setItem('pixoro_settings',JSON.stringify(settings));alert('Save Aayiduchu da Giri! ✅');}
-window.openUpload=()=>document.getElementById('uploadModal').classList.add('active');
-window.closeUpload=()=>document.getElementById('uploadModal').classList.remove('active');
-window.previewFile=()=>{let file=fileInput.files[0];if(!file)return;selectedFile=file;let preview=document.getElementById('preview');preview.style.display='block';let reader=new FileReader();reader.onload=e=>preview.innerHTML=`<img src="${e.target.result}" style="width:100%">`;reader.readAsDataURL(file);}
-window.uploadPost=async()=>{let title=titleInput.value||'PIXORO';let btn=uploadBtn;if(!selectedFile)return alert('Photo select pannu da!');btn.innerText='Uploading...';btn.disabled=true;try{let form=new FormData();form.append('file',selectedFile);form.append('upload_preset',UPLOAD_PRESET);let res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`,{method:'POST',body:form});let data=await res.json();await addDoc(collection(db,'posts'),{image:data.secure_url,title:title,username:'Giri',likes:0,views:0,timestamp:Date.now()});btn.innerText='Done da! 🔥';setTimeout(()=>{closeUpload();fileInput.value='';titleInput.value='';preview.style.display='none';btn.innerText='Upload Pin';btn.disabled=false;},1000);}catch(e){alert('Fail: '+e.message);btn.innerText='Upload Pin';btn.disabled=false;}}
-function render(posts){let m=masonry;m.innerHTML='';posts.forEach(p=>{let d=document.createElement('div');d.className='card';d.innerHTML=`<img src="${p.image}" onclick="addView('${p.id}')"><div class="card-info"><div style="font-size:13px;font-weight:600">${p.title}</div><div style="font-size:11px;color:#aaa">👤 ${p.username} 👁️ ${p.views||0}</div><div style="display:flex;gap:4px;margin-top:6px"><button onclick="addLike('${p.id}')" style="flex:1;background:#222;border:none;color:#fff;padding:4px;border-radius:6px;font-size:11px">❤️ ${p.likes||0} +${settings.like}</button><button onclick="addShare('${p.id}')" style="flex:1;background:#222;border:none;color:#fff;padding:4px;border-radius:6px;font-size:11px">✈️ +${settings.share}</button></div></div>`;m.appendChild(d);});}
-window.addView=async(id)=>{try{await updateDoc(doc(db,'posts',id),{views:increment(1)});}catch(e){}coins+=1;if(Math.random()<0.1){coins+=settings.view;updateCoinUI();}}
-window.addLike=async(id)=>{try{await updateDoc(doc(db,'posts',id),{likes:increment(1)});}catch(e){}coins+=settings.like;updateCoinUI();}
-window.addShare=()=>{coins+=settings.share;updateCoinUI();navigator.clipboard.writeText('https://krikir58-ui.github.io/PIXORO-/');alert('Coin +'+settings.share);}
-window.filterPosts=()=>{let q=searchInput.value.toLowerCase();render(allPosts.filter(p=>(p.title||'').toLowerCase().includes(q)));};
-let q=query(collection(db,'posts'),orderBy('timestamp','desc'));onSnapshot(q,(snap)=>{allPosts=[];snap.forEach(d=>allPosts.push({id:d.id,...d.data()}));render(allPosts);});
-</script>
-</body>
-</html>
+<div class="stories">
+<div class="story" onclick="openUpload()"><div class="story-ring
