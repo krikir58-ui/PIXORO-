@@ -1,83 +1,167 @@
-<!DOCTYPE html>
-<html>
+ <!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO LIVE</title>
+<title>PIXORO - Pinterest Style</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#fff;font-family:system-ui;overflow-x:hidden}
+header{position:sticky;top:0;z-index:50;background:#0a0a0a;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222}
+.logo{font-size:28px;font-weight:900;background:linear-gradient(45deg,#ff0055,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.search{flex:1;max-width:500px;margin:0 20px;background:#1a1a1a;border-radius:24px;padding:10px 16px;display:flex;align-items:center}
+.search input{background:transparent;border:none;color:#fff;width:100%;outline:none}
+.btn{background:linear-gradient(45deg,#ff0055,#7c3aed);color:#fff;border:none;padding:10px 20px;border-radius:24px;font-weight:700;cursor:pointer}
+.masonry{columns:2;column-gap:12px;padding:12px}
+@media(min-width:768px){.masonry{columns:4}}
+@media(min-width:1200px){.masonry{columns:5}}
+.card{break-inside:avoid;margin-bottom:12px;border-radius:16px;overflow:hidden;background:#1a1a1a;cursor:pointer;position:relative}
+.card img{width:100%;display:block}
+.card-info{padding:8px}
+.card-user{display:flex;align-items:center;gap:8px;font-size:12px}
+.card-user img{width:24px;height:24px;border-radius:50%}
+.upload-fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(45deg,#ff0055,#7c3aed);border:none;color:#fff;font-size:32px;cursor:pointer;z-index:40;box-shadow:0 4px 20px rgba(255,0,85,0.4)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal.active{display:flex}
+.modal-box{background:#1a1a1a;border-radius:16px;padding:24px;width:100%;max-width:400px}
+.modal-box input,.modal-box textarea{width:100%;background:#0a0a0a;border:1px solid #333;border-radius:8px;padding:12px;color:#fff;margin:8px 0;outline:none}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">PIXORO</div>
+<div class="search"><input id="searchInput" placeholder="Search ideas..." oninput="filterPosts()"></div>
+<button class="btn" onclick="openUpload()">+</button>
+</header>
+
+<div id="masonry" class="masonry"></div>
+<button class="upload-fab" onclick="openUpload()">+</button>
+
+<div id="uploadModal" class="modal" onclick="if(event.target==this)closeUpload()">
+<div class="modal-box">
+<h2 style="margin-bottom:16px">Create Pin</h2>
+<input type="file" id="fileInput" accept="image/*,video/*" onchange="previewFile()">
+<div id="preview" style="margin:12px 0;border-radius:12px;overflow:hidden;display:none"></div>
+<input id="titleInput" placeholder="Title...">
+<textarea id="descInput" placeholder="Description..." rows="3"></textarea>
+<input id="tagsInput" placeholder="Tags #fashion #art">
+<button class="btn" style="width:100%;margin-top:12px" onclick="uploadPost()" id="uploadBtn">Upload to PIXORO</button>
+<button style="width:100%;background:transparent;border:none;color:#888;margin-top:8px;cursor:pointer" onclick="closeUpload()">Cancel</button>
+</div>
+</div>
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSy_YOUR_REAL_KEY_HERE",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "1234567890",
-  appId: "1:1234567890:web:abcdef"
+  apiKey: "AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",
+  authDomain: "pixoro-75927.firebaseapp.com",
+  projectId: "pixoro-75927",
+  storageBucket: "pixoro-75927.firebasestorage.app",
+  messagingSenderId: "814840120295",
+  appId: "1:814840120295:web:6c02c613df5a17209bf342",
+  measurementId: "G-H3NR8P270D"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-window._fb = {db, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, increment};
-</script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#000;color:#fff}
-.top{position:sticky;top:0;z-index:10;background:#000;padding:12px;border-bottom:1px solid #222;display:flex;justify-content:space-between}
-.card{margin:10px;background:#111;border:1px solid #333;border-radius:12px;padding:12px}
-.post{margin:10px;background:#111;border:1px solid #222;border-radius:12px;overflow:hidden}
-.btn{padding:12px;border-radius:20px;border:none;font-weight:bold;width:100%;margin-top:8px}
-.gold{background:#FFD700;color:#000}
-.blue{background:#0095f6;color:#fff}
-.btm{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:12px}
-</style>
-</head>
-<body>
-<div style="padding-bottom:80px">
-<div class="top"><b style="color:#FFD700">PIXORO LIVE 👑</b><span id="coins" style="color:#FFD700">🪙 0</span></div>
 
-<div class="card" style="border-color:#FFD700">
-<b>📸 PIXORO UPLOAD - BILLING ILLA DA!</b>
-<input type="file" id="file" accept="image/*" style="display:none">
-<button class="btn gold" onclick="document.getElementById('file').click()">📷 Photo Select Pannu Da Giri</button>
-<input id="cap" placeholder="Caption @mention #tag #collab" style="width:100%;margin-top:8px;padding:10px;background:#222;border:1px solid #333;color:#fff;border-radius:8px">
-<div id="preview" style="display:none;margin-top:10px"><img id="pImg" style="width:100%;border-radius:10px"><div id="status" style="margin-top:5px;color:#0f0"></div></div>
-<button id="upBtn" class="btn blue" onclick="upload()">🚀 Upload Pannu Da - Free da!</button>
-</div>
+const CLOUD_NAME = "vi4etpob";
+const UPLOAD_PRESET = "pixoro_preset";
 
-<div id="feed"><div class="card">⏳ Loading da Giri...</div></div>
-</div>
+let allPosts = [];
+let selectedFile = null;
 
-<div class="btm"><span>🏠 Feed</span><span>🎥 Reels</span><span>💬 Chat</span></div>
+window.openUpload = () => document.getElementById('uploadModal').classList.add('active');
+window.closeUpload = () => document.getElementById('uploadModal').classList.remove('active');
 
-<script>
-let selData=null;
-let coins=0;
-document.getElementById('file').addEventListener('change', e=>{
-let f=e.target.files[0]; let r=new FileReader();
-r.onload=ev=>{
-let img=new Image(); img.onload=()=>{
-let c=document.createElement('canvas'); c.width=800; c.height=img.height*(800/img.width);
-c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-selData=c.toDataURL('image/jpeg',0.7);
-document.getElementById('pImg').src=selData;
-document.getElementById('preview').style.display='block';
-document.getElementById('status').innerText='✅ Ready da Giri - Upload pannu da!';
-}; img.src=ev.target.result;
-}; r.readAsDataURL(f);
+window.previewFile = () => {
+  const file = document.getElementById('fileInput').files[0];
+  if(!file) return;
+  selectedFile = file;
+  const preview = document.getElementById('preview');
+  preview.style.display = 'block';
+  const url = URL.createObjectURL(file);
+  if(file.type.startsWith('video')) preview.innerHTML = `<video src="${url}" style="width:100%;max-height:300px" controls></video>`;
+  else preview.innerHTML = `<img src="${url}" style="width:100%">`;
+};
+
+window.uploadPost = async () => {
+  const title = document.getElementById('titleInput').value;
+  const desc = document.getElementById('descInput').value;
+  const tags = document.getElementById('tagsInput').value;
+  const btn = document.getElementById('uploadBtn');
+
+  if(!selectedFile){ alert('Select image/video da Giri!'); return; }
+  if(!title){ alert('Title podu da!'); return; }
+
+  btn.textContent = 'Uploading...'; btn.disabled = true;
+
+  try {
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('upload_preset', UPLOAD_PRESET);
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
+      method: 'POST', body: formData
+    });
+    const data = await res.json();
+    if(!data.secure_url) throw new Error('Cloudinary upload failed: ' + JSON.stringify(data));
+
+    await addDoc(collection(db, 'posts'), {
+      title, description: desc, tags,
+      imageUrl: data.secure_url,
+      type: selectedFile.type.startsWith('video')? 'video' : 'image',
+      createdAt: serverTimestamp(),
+      likes: 0,
+      username: 'Giri'
+    });
+
+    alert('PIXORO la upload aayiduchu da Giri! 🔥');
+    closeUpload();
+    document.getElementById('fileInput').value = '';
+    document.getElementById('titleInput').value = '';
+    document.getElementById('descInput').value = '';
+    document.getElementById('tagsInput').value = '';
+    document.getElementById('preview').style.display = 'none';
+    selectedFile = null;
+  } catch(e){
+    alert('Error da Giri: ' + e.message);
+    console.error(e);
+  }
+  btn.textContent = 'Upload to PIXORO'; btn.disabled = false;
+};
+
+const masonry = document.getElementById('masonry');
+const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+
+onSnapshot(q, (snapshot) => {
+  allPosts = [];
+  snapshot.forEach(doc => allPosts.push({id: doc.id,...doc.data()}));
+  renderPosts(allPosts);
 });
 
-async function upload(){
-if(!selData){alert('Photo select pannu da Giri!');return}
-let cap=document.getElementById('cap').value||'PIXORO First Post da 👑';
-document.getElementById('upBtn').innerText='Uploading to Cloudinary...';
-document.getElementById('upBtn').disabled=true;
-try{
-let fb=window._fb;
+function renderPosts(posts){
+  masonry.innerHTML = '';
+  if(posts.length === 0){
+    masonry.innerHTML = '<div style="column-span:all;text-align:center;padding:60px;color:#666"><h2>No posts yet da Giri!</h2><p>First post ah nee upload pannu da! 👑</p></div>';
+    return;
+  }
+  posts.forEach(post => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const media = post.type === 'video'? `<video src="${post.imageUrl}" style="width:100%" muted loop onmouseenter="this.play()" onmouseleave="this.pause()"></video>` : `<img src="${post.imageUrl}" loading="lazy">`;
+    card.innerHTML = `${media}<div class="card-info"><div style="font-weight:600;font-size:14px">${post.title || 'Untitled'}</div><div class="card-user" style="margin-top:6px"><img src="https://i.pravatar.cc/100?u=${post.username}"><span>${post.username || 'Giri'}</span></div></div>`;
+    masonry.appendChild(card);
+  });
+}
 
-// CLOUDINARY - 100% FREE DA GIRI - BILLING ILLA
-let formData = new FormData();
-formData.append('file', selData);
-formData.append('upload_preset', 'pixoro_preset');
-let cloudRes = await fetch('https://api.cloudinary.com/v1_1/vi4etpob/image/upload
+window.filterPosts = () => {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allPosts.filter(p => (p.title||'').toLowerCase().includes(search) || (p.tags||'').toLowerCase().includes(search));
+  renderPosts(filtered);
+};
+</script>
+</body>
+</html>
