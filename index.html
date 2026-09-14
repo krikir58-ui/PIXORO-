@@ -11,6 +11,7 @@ button{background:#ff3040;color:#fff;border:none;padding:10px 20px;border-radius
 #feed{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}
 #feed img{width:100%;height:150px;object-fit:cover}
 input{width:100%}
+#status{color:#0f0;text-align:center;margin-top:10px}
 </style>
 </head>
 <body>
@@ -47,7 +48,8 @@ async function uploadPost(){
     const data = await res.json();
 
     if(!data.secure_url){
-      alert("Upload Preset create pannala da! Cloudinary la Upload Presets -> Add -> Unsigned -> pixoro_posts nu create pannu da!");
+      alert("Upload Preset create pannala da! Cloudinary la Settings -> Upload -> Upload Presets -> Add -> Name: pixoro_posts -> Unsigned -> Save pannu da!");
+      console.log(data);
       document.getElementById('status').innerText = "";
       document.getElementById('postBtn').disabled = false;
       return;
@@ -59,9 +61,11 @@ async function uploadPost(){
     localStorage.setItem("pixoro_posts", JSON.stringify(posts));
 
     document.getElementById('status').innerText = "Semma da Giri! Post Ready! 🔥";
+    document.getElementById('fileInput').value = "";
     showPosts();
   } catch(e){
     alert("Error da: " + e.message);
+    document.getElementById('status').innerText = "";
   }
   document.getElementById('postBtn').disabled = false;
 }
