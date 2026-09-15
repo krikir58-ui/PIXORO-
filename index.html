@@ -1,13 +1,20 @@
 <!DOCTYPE html>
-<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>PIXORO 🔥</title>
-<style>body{background:#000;color:#fff;font-family:sans-serif;padding:12px}img,video{width:100%;border-radius:16px;margin:10px 0}.post{background:#111;padding:10px;border-radius:16px;margin:14px 0}button{background:red;color:#fff;border:none;padding:12px;width:100%;border-radius:25px;font-weight:bold}input{width:95%;padding:10px;border-radius:10px;margin:6px 0}.top{display:flex;justify-content:space-between;align-items:center}.del{background:#222;color:#ff4444;border:1px solid red;margin-top:6px;padding:8px}</style>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PIXORO 🔥</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff0000">
+<style>body{background:#000;color:#fff;font-family:sans-serif;padding:12px}img,video{width:100%;border-radius:16px;margin:10px 0}.post{background:#111;padding:10px;border-radius:16px;margin:14px 0}button{background:red;color:#fff;border:none;padding:12px;width:100%;border-radius:25px;font-weight:bold;margin-top:8px}input{width:95%;padding:10px;border-radius:10px;margin:6px 0}.top{display:flex;justify-content:space-between;align-items:center}.del{background:#222;color:#ff4444;border:1px solid red;margin-top:6px;padding:8px}#dlBtn{background:#fff;color:#000;display:none;margin-bottom:12px;animation:pop.5s}</style>
 </head><body>
 <div class="top"><h2>PIXORO 🔥</h2><span onclick="adminLogin()" style="color:gray;cursor:pointer">👮 Admin</span></div>
+
+<button id="dlBtn" onclick="installApp()">⬇️ DOWNLOAD APP 🔥 - INSTALL PANNU DA</button>
+
 <input id="userName" placeholder="Un peru enna da? (ex: giri)">
 <input type="file" id="fileInput" accept="image/*,video/*">
 <button onclick="handlePost()">POST 🔥</button>
 <p id="msg" style="color:#0f0;text-align:center"></p>
 <div id="feed">Loading da Giri...</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -17,27 +24,27 @@ const ADMIN_PASS="pixoro17";let isAdmin=localStorage.getItem("pixoro_admin")==="
 let myId=localStorage.getItem("pixoro_myid"); if(!myId){myId="user_"+Math.random().toString(36).slice(2,7);localStorage.setItem("pixoro_myid",myId);}
 let savedName=localStorage.getItem("pixoro_name"); if(savedName) document.getElementById("userName").value=savedName;
 
-window.adminLogin=()=>{let p=prompt("Admin password da Giri?"); if(p===ADMIN_PASS){localStorage.setItem("pixoro_admin","yes");isAdmin=true;alert("Admin ON da Giri! 🔥");showPosts();}else alert("Wrong da!");}
+// PWA DOWNLOAD LOGIC DA GIRI
+let deferredPrompt; window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;document.getElementById('dlBtn').style.display='block';});
+window.installApp=async()=>{if(deferredPrompt){deferredPrompt.prompt();let r=await deferredPrompt.userChoice;if(r.outcome==='accepted')document.getElementById('dlBtn').innerText='✅ APP INSTALL AAYIDUCHU DA!';deferredPrompt=null;}else alert('Mobile la Chrome la open pannu da Giri - aprom 3 dot click panni Add to Home Screen pannu da!');}
 
+window.adminLogin=()=>{let p=prompt("Admin password da Giri?"); if(p===ADMIN_PASS){localStorage.setItem("pixoro_admin","yes");isAdmin=true;alert("Admin ON da Giri! 🔥");showPosts();}else alert("Wrong da!");}
 async function showPosts(){
   const snap=await getDocs(collection(db,"posts"));
   let posts=[];snap.forEach(d=>{posts.push({id:d.id,...d.data()})}); posts.reverse();
-  let h="";
-  posts.forEach(p=>{
-    let isMyPost = p.ownerId===myId;
-    let canDelete = isAdmin || isMyPost;
+  let h=""; posts.forEach(p=>{
+    let isMyPost = p.ownerId===myId; let canDelete = isAdmin || isMyPost;
     let media = p.imageUrl? (p.imageUrl.startsWith("data:video")? `<video src="${p.imageUrl}" controls></video>` : `<img src="${p.imageUrl}">`) : "";
-    h+=`<div class="post">${media}<p>👤 <b>${p.username||'unknown'}</b> | 🆔 ${p.ownerId} ${isMyPost?'(NEE DA!)':''}</p><small>${p.createdAt?new Date(p.createdAt.seconds?p.createdAt.seconds*1000:p.createdAt).toLocaleString():''}</small>${canDelete?`<button class="del" onclick="deletePost('${p.id}')">🗑️ DELETE ${isMyPost?'MY POST':'- ADMIN'}</button>`:''}</div>`;
+    h+=`<div class="post">${media}<p>👤 <b>${p.username||'unknown'}</b> ${isMyPost?'(NEE DA!)':''}</p>${canDelete?`<button class="del" onclick="deletePost('${p.id}')">🗑️ DELETE</button>`:''}</div>`;
   });
-  document.getElementById("feed").innerHTML=h||"No posts da - first post nee podu da Giri!";
+  document.getElementById("feed").innerHTML=h||"No posts da";
 }
-window.deletePost=async(id)=>{if(!confirm("Delete pannava da?"))return;await deleteDoc(doc(db,"posts",id));alert("Delete panniten da!");showPosts();}
+window.deletePost=async(id)=>{if(!confirm("Delete pannava da?"))return;await deleteDoc(doc(db,"posts",id));showPosts();}
 window.handlePost=async()=>{
   let file=document.getElementById("fileInput").files[0];let name=document.getElementById("userName").value.trim()||"unknown";
   if(!file)return alert("File select pannu da!"); localStorage.setItem("pixoro_name",name);
-  document.getElementById("msg").innerText="Uploading da Giri...";
+  document.getElementById("msg").innerText="Uploading da...";
   let dataUrl=await new Promise(res=>{let r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});
-  // image compress, video apdiye
   if(dataUrl.startsWith("data:image")){dataUrl=await new Promise(res=>{let img=new Image();img.onload=()=>{let c=document.createElement("canvas");let max=700,w=img.width,h=img.height;if(w>max){h*=max/w;w=max;}if(h>max){w*=max/h;h=max;}c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);res(c.toDataURL("image/jpeg",0.65));};img.src=dataUrl;});}
   await addDoc(collection(db,"posts"),{imageUrl:dataUrl,username:name,ownerId:myId,createdAt:new Date()});
   document.getElementById("msg").innerText="Post aayiduchu da! 🔥";document.getElementById("fileInput").value="";showPosts();
