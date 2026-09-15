@@ -1,98 +1,46 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO 🔥 PUBLIC</title>
-<style>
-body{background:#000;color:#fff;font-family:sans-serif;padding:12px;margin:0}
-#feed img{width:100%;border-radius:16px;margin:10px 0;display:block}
-button{background:red;color:#fff;border:none;padding:12px;width:100%;border-radius:25px;font-weight:bold;margin-top:8px}
-input{width:95%;padding:10px;border-radius:10px;margin:8px 0}
-#msg{color:#0f0;text-align:center}
-.post{background:#111;padding:10px;border-radius:12px;margin:12px 0;position:relative}
-.delBtn{background:#333;color:red;border:1px solid red;margin-top:5px;display:none}
-.adminBar{text-align:right;font-size:12px;color:gray}
-</style>
-</head>
-<body>
-<h2>PIXORO 🔥</h2>
-<div class="adminBar"><span onclick="adminLogin()" style="cursor:pointer">👮 Admin</span></div>
-
-<input type="file" id="fileInput" accept="image/*">
-<button onclick="handlePost()">POST PUBLIC 🔥</button>
-<p id="msg"></p>
-<div id="feed">Loading...</div>
-
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>PIXORO 🔥</title>
+<style>body{background:#000;color:#fff;font-family:sans-serif;padding:12px}img,video{width:100%;border-radius:16px;margin:10px 0}.post{background:#111;padding:10px;border-radius:16px;margin:14px 0}button{background:red;color:#fff;border:none;padding:12px;width:100%;border-radius:25px;font-weight:bold}input{width:95%;padding:10px;border-radius:10px;margin:6px 0}.top{display:flex;justify-content:space-between;align-items:center}.del{background:#222;color:#ff4444;border:1px solid red;margin-top:6px;padding:8px}</style>
+</head><body>
+<div class="top"><h2>PIXORO 🔥</h2><span onclick="adminLogin()" style="color:gray;cursor:pointer">👮 Admin</span></div>
+<input id="userName" placeholder="Un peru enna da? (ex: giri)">
+<input type="file" id="fileInput" accept="image/*,video/*">
+<button onclick="handlePost()">POST 🔥</button>
+<p id="msg" style="color:#0f0;text-align:center"></p>
+<div id="feed">Loading da Giri...</div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",authDomain:"pixoro-75927.firebaseapp.com",projectId:"pixoro-75927",storageBucket:"pixoro-75927.firebasestorage.app",messagingSenderId:"814840120295",appId:"1:814840120295:web:6c02c613df5a17209bf342"};
+const app=initializeApp(firebaseConfig);const db=getFirestore(app);
+const ADMIN_PASS="pixoro17";let isAdmin=localStorage.getItem("pixoro_admin")==="yes";
+let myId=localStorage.getItem("pixoro_myid"); if(!myId){myId="user_"+Math.random().toString(36).slice(2,7);localStorage.setItem("pixoro_myid",myId);}
+let savedName=localStorage.getItem("pixoro_name"); if(savedName) document.getElementById("userName").value=savedName;
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",
-  authDomain: "pixoro-75927.firebaseapp.com",
-  projectId: "pixoro-75927",
-  storageBucket: "pixoro-75927.firebasestorage.app",
-  messagingSenderId: "814840120295",
-  appId: "1:814840120295:web:6c02c613df5a17209bf342",
-  measurementId: "G-H3NR8P270D"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const ADMIN_PASS = "pixoro17"; // un secret da Giri - yaarukkum sollatha da
-let isAdmin = localStorage.getItem("pixoro_admin")==="yes";
-
-window.adminLogin = ()=>{
-  let p = prompt("Admin password enna da Giri?");
-  if(p===ADMIN_PASS){ localStorage.setItem("pixoro_admin","yes"); isAdmin=true; alert("Admin login success da Giri! 🔥"); showPosts(); }
-  else alert("Wrong password da!");
-}
+window.adminLogin=()=>{let p=prompt("Admin password da Giri?"); if(p===ADMIN_PASS){localStorage.setItem("pixoro_admin","yes");isAdmin=true;alert("Admin ON da Giri! 🔥");showPosts();}else alert("Wrong da!");}
 
 async function showPosts(){
-  const snap = await getDocs(collection(db,"posts"));
+  const snap=await getDocs(collection(db,"posts"));
+  let posts=[];snap.forEach(d=>{posts.push({id:d.id,...d.data()})}); posts.reverse();
   let h="";
-  snap.forEach(d=>{
-    let data=d.data();
-    let url = data.imageUrl || "";
-    if(url) h+=`<div class="post"><img src="${url}"><p>🔥 ${data.username||'user'}</p><button class="delBtn" style="${isAdmin?'display:block':''}" onclick="deletePost('${d.id}')">🗑️ DELETE BAD PHOTO</button></div>`;
+  posts.forEach(p=>{
+    let isMyPost = p.ownerId===myId;
+    let canDelete = isAdmin || isMyPost;
+    let media = p.imageUrl? (p.imageUrl.startsWith("data:video")? `<video src="${p.imageUrl}" controls></video>` : `<img src="${p.imageUrl}">`) : "";
+    h+=`<div class="post">${media}<p>👤 <b>${p.username||'unknown'}</b> | 🆔 ${p.ownerId} ${isMyPost?'(NEE DA!)':''}</p><small>${p.createdAt?new Date(p.createdAt.seconds?p.createdAt.seconds*1000:p.createdAt).toLocaleString():''}</small>${canDelete?`<button class="del" onclick="deletePost('${p.id}')">🗑️ DELETE ${isMyPost?'MY POST':'- ADMIN'}</button>`:''}</div>`;
   });
-  document.getElementById("feed").innerHTML = h || "No posts da";
+  document.getElementById("feed").innerHTML=h||"No posts da - first post nee podu da Giri!";
 }
-
-window.deletePost=async(id)=>{
-  if(!isAdmin) return alert("Nee admin illa da!");
-  if(confirm("Itha delete pannava da Giri?")){
-    await deleteDoc(doc(db,"posts",id));
-    alert("Delete panniten da! ✅");
-    showPosts();
-  }
-}
-
+window.deletePost=async(id)=>{if(!confirm("Delete pannava da?"))return;await deleteDoc(doc(db,"posts",id));alert("Delete panniten da!");showPosts();}
 window.handlePost=async()=>{
-  let file=document.getElementById("fileInput").files[0];
-  if(!file) return alert("Photo select pannu da!");
-  document.getElementById("msg").innerText="Uploading...";
-
-  let compressed = await new Promise(res=>{
-    let img=new Image();
-    img.onload=()=>{
-      let c=document.createElement("canvas");
-      let max=600,w=img.width,h=img.height;
-      if(w>max){h*=max/w; w=max;}
-      if(h>max){w*=max/h; h=max;}
-      c.width=w; c.height=h;
-      c.getContext("2d").drawImage(img,0,0,w,h);
-      res(c.toDataURL("image/jpeg",0.6));
-    };
-    let r=new FileReader(); r.onload=e=>img.src=e.target.result; r.readAsDataURL(file);
-  });
-
-  await addDoc(collection(db,"posts"),{imageUrl: compressed, username:"user", createdAt: new Date()});
-  document.getElementById("msg").innerText="Public la post aayiduchu da! 🔥";
-  document.getElementById("fileInput").value="";
-  showPosts();
+  let file=document.getElementById("fileInput").files[0];let name=document.getElementById("userName").value.trim()||"unknown";
+  if(!file)return alert("File select pannu da!"); localStorage.setItem("pixoro_name",name);
+  document.getElementById("msg").innerText="Uploading da Giri...";
+  let dataUrl=await new Promise(res=>{let r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});
+  // image compress, video apdiye
+  if(dataUrl.startsWith("data:image")){dataUrl=await new Promise(res=>{let img=new Image();img.onload=()=>{let c=document.createElement("canvas");let max=700,w=img.width,h=img.height;if(w>max){h*=max/w;w=max;}if(h>max){w*=max/h;h=max;}c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);res(c.toDataURL("image/jpeg",0.65));};img.src=dataUrl;});}
+  await addDoc(collection(db,"posts"),{imageUrl:dataUrl,username:name,ownerId:myId,createdAt:new Date()});
+  document.getElementById("msg").innerText="Post aayiduchu da! 🔥";document.getElementById("fileInput").value="";showPosts();
 }
 showPosts();
-</script>
-</body>
-</html>
+</script></body></html>
