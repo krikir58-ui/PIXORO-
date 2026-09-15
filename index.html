@@ -7,19 +7,21 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#000;color:#fff;font-family:sans-serif}
 .top{padding:12px;text-align:center;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:10}
-.top h1{color:#ff0066;font-size:22px}
+.top h1{color:#ff0066}
 .box{padding:15px;border-bottom:1px solid #222}
 #preview{width:100%;border-radius:12px;display:none;margin:10px 0;max-height:400px;object-fit:cover}
 .filters{display:flex;gap:8px;overflow-x:auto;padding:8px 0}
-.f{padding:6px 12px;background:#222;border:none;color:#fff;border-radius:20px;white-space:nowrap}
+.f{padding:6px 12px;background:#222;border:none;color:#fff;border-radius:20px}
 .f.on{background:#ff0066}
 input{width:100%;padding:12px;background:#1a1a1a;border:none;color:#fff;border-radius:8px;margin:8px 0}
 button.post{width:100%;padding:12px;background:#ff0066;color:#fff;border:none;border-radius:8px;font-weight:bold}
 .post-card{background:#0a0a0a;border-bottom:1px solid #222;padding:10px}
 .post-card img{width:100%;border-radius:10px}
 .actions{display:flex;gap:15px;padding:10px 5px}
-.actions span{cursor:pointer;font-size:14px}
-.comment{font-size:13px;color:#aaa;padding:2px 5px}
+.actions span{cursor:pointer}
+#shareBox{position:fixed;left:0;right:0;bottom:0;background:#151515;border-radius:20px 20px 0 0;padding:20px;z-index:9999;border-top:1px solid #333}
+.share-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;text-align:center}
+.share-icon{width:55px;height:55px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:auto;font-size:26px}
 </style>
 </head>
 <body>
@@ -32,22 +34,24 @@ button.post{width:100%;padding:12px;background:#ff0066;color:#fff;border:none;bo
 <button class="f" onclick="setF('grayscale(100%)',this)">B&W</button>
 <button class="f" onclick="setF('sepia(80%)',this)">Sepia</button>
 <button class="f" onclick="setF('contrast(130%) saturate(130%)',this)">Vivid</button>
-<button class="f" onclick="setF('brightness(1.1) blur(0.5px)',this)">Soft</button>
 </div>
 <input id="cap" placeholder="Caption eluthu da Giri...">
 <button class="post" onclick="add()">Post Pannu</button>
 </div>
 <div id="feed"></div>
+
 <script>
-let filter='none', img='', posts=JSON.parse(localStorage.getItem('pix'))||[];
-function load(e){let r=new FileReader();r.onload=()=>{img=r.result;let p=document.getElementById('preview');p.src=img;p.style.display='block';p.style.filter=filter};r.readAsDataURL(e.target.files[0])}
-function setF(f,b){filter=f;document.getElementById('preview').style.filter=f;document.querySelectorAll('.f').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
-function render(){let h='';for(let i=posts.length-1;i>=0;i--){let p=posts[i];h+=`<div class=post-card><img src="${p.img}" style="filter:${p.filter}"><div style="padding:10px 5px">${p.cap}</div><div class=actions><span onclick="like(${i})">${p.liked?'❤️':'🤍'} ${p.likes} Like</span><span onclick="cmnt(${i})">💬 ${p.comments.length} Comment</span><span onclick="share(${i})">🚀 Share</span></div><div class=comment>${p.comments.map(c=>`<div>💬 ${c}</div>`).join('')}</div></div>`}document.getElementById('feed').innerHTML=h}
-function add(){let c=document.getElementById('cap').value;if(!img &&!c) return;posts.push({img:img,filter:filter,cap:c,likes:0,liked:false,comments:[]});localStorage.setItem('pix',JSON.stringify(posts));img='';document.getElementById('preview').style.display='none';document.getElementById('cap').value='';render()}
-function like(i){if(posts[i].liked){posts[i].likes--;posts[i].liked=false;}else{posts[i].likes++;posts[i].liked=true;}localStorage.setItem('pix',JSON.stringify(posts));render()}
-function share(i){let t=posts[i].cap+"\n\n- Shared from PIXORO 🚀 "+location.href;if(navigator.share){navigator.share({title:'PIXORO',text:t,url:location.href})}else{navigator.clipboard.writeText(t);alert('Copy aayiduchu da Giri! 📋 Whatsapp la paste pannu da!')}}
-function cmnt(i){let t=prompt('Comment sollu da:');if(t){posts[i].comments.push(t);localStorage.setItem('pix',JSON.stringify(posts));render()}}
-render();
-</script>
-</body>
-</html>
+let filter='none', img='', posts=JSON.parse(localStorage.getItem('pix')||'[]');
+
+function load(e){
+ let r=new FileReader();
+ r.onload=()=>{img=r.result;let p=document.getElementById('preview');p.src=img;p.style.display='block';p.style.filter=filter;};
+ r.readAsDataURL(e.target.files[0]);
+}
+function setF(f,b){filter=f;document.getElementById('preview').style.filter=f;document.querySelectorAll('.f').forEach(x=>x.classList.remove('on'));b.classList.add('on');}
+
+function render(){
+ let h='';
+ for(let i=posts.length-1;i>=0;i--){
+  let p=posts[i];
+  h+=`<div class="post-card"><img src="${p.img}" style="filter:${p.filter}"><div style="padding:10px 5px">${p.cap}</div><div class="actions"><span
