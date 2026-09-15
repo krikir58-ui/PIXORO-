@@ -1,60 +1,479 @@
-<!-- PIXORO Bottom Navigation -->
-<nav class="bottom-nav">
-  <button onclick="showPage('home')">🏠<span>Home</span></button>
-  <button onclick="showPage('search')">🔍<span>Search</span></button>
-  <button onclick="showPage('create')">➕<span>Create</span></button>
-  <button onclick="showPage('reels')">🎬<span>Reels</span></button>
-  <button onclick="showPage('profile')">👤<span>Profile</span></button>
-</nav>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIXORO</title>
 
-<div id="pageContent"></div>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="top-header">
+    <h1>📸 PIXORO</h1>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- HOME -->
+    <section id="homePage" class="page active">
+
+      <h2>Home</h2>
+
+      <!-- Create Post -->
+      <div class="create-card">
+
+        <input
+          type="file"
+          id="fileInput"
+          accept="image/*,video/*"
+        >
+
+        <div id="preview"></div>
+
+        <input
+          type="text"
+          id="captionInput"
+          placeholder="Write a caption..."
+        >
+
+        <button class="post-btn" onclick="createPost()">
+          Post
+        </button>
+
+      </div>
+
+      <!-- Feed -->
+      <div id="feed"></div>
+
+    </section>
+
+
+    <!-- SEARCH -->
+    <section id="searchPage" class="page">
+
+      <h2>🔍 Search</h2>
+
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Search users..."
+        oninput="searchUser(this.value)"
+      >
+
+      <div id="searchResult"></div>
+
+    </section>
+
+
+    <!-- CREATE -->
+    <section id="createPage" class="page">
+
+      <h2>➕ Create Post</h2>
+
+      <input
+        type="file"
+        id="createFile"
+        accept="image/*,video/*"
+      >
+
+      <input
+        type="text"
+        id="createCaption"
+        placeholder="Write a caption..."
+      >
+
+      <button
+        class="post-btn"
+        onclick="createPostFromCreatePage()"
+      >
+        Publish
+      </button>
+
+    </section>
+
+
+    <!-- REELS -->
+    <section id="reelsPage" class="page">
+
+      <h2>🎬 PIXORO Reels</h2>
+
+      <p class="empty-text">
+        Your short videos will appear here.
+      </p>
+
+    </section>
+
+
+    <!-- PROFILE -->
+    <section id="profilePage" class="page">
+
+      <div class="profile">
+
+        <div class="profile-photo">
+          👤
+        </div>
+
+        <h2>@pixoro_user</h2>
+
+        <p>PIXORO Creator</p>
+
+        <div class="stats">
+          <div>
+            <b id="postCount">0</b>
+            <span>Posts</span>
+          </div>
+
+          <div>
+            <b>0</b>
+            <span>Followers</span>
+          </div>
+
+          <div>
+            <b>0</b>
+            <span>Following</span>
+          </div>
+        </div>
+
+        <button class="edit-btn">
+          Edit Profile
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+
+    <button onclick="showPage('home')">
+      🏠
+      <span>Home</span>
+    </button>
+
+    <button onclick="showPage('search')">
+      🔍
+      <span>Search</span>
+    </button>
+
+    <button onclick="showPage('create')">
+      ➕
+      <span>Create</span>
+    </button>
+
+    <button onclick="showPage('reels')">
+      🎬
+      <span>Reels</span>
+    </button>
+
+    <button onclick="showPage('profile')">
+      👤
+      <span>Profile</span>
+    </button>
+
+  </nav>
+
 
 <script>
+
+/* =========================
+   PAGE NAVIGATION
+========================= */
+
 function showPage(page) {
 
-  const content = document.getElementById("pageContent");
+  document.querySelectorAll(".page").forEach(function(item) {
+    item.classList.remove("active");
+  });
 
-  if (page === "home") {
-    content.innerHTML = `
-      <h2>🏠 PIXORO</h2>
-      <p>Welcome to your feed!</p>
-    `;
-  }
+  document.getElementById(page + "Page").classList.add("active");
 
-  if (page === "search") {
-    content.innerHTML = `
-      <h2>🔍 Search</h2>
-      <input type="text" placeholder="Search users or posts..."
-             style="width:90%;padding:12px;border-radius:10px;">
-    `;
-  }
-
-  if (page === "create") {
-    content.innerHTML = `
-      <h2>➕ Create Post</h2>
-      <input type="file" accept="image/*,video/*">
-      <br><br>
-      <input type="text" placeholder="Write a caption..."
-             style="padding:12px;width:90%;">
-      <br><br>
-      <button onclick="alert('Post created!')">Post</button>
-    `;
-  }
-
-  if (page === "reels") {
-    content.innerHTML = `
-      <h2>🎬 PIXORO Reels</h2>
-      <p>Short videos will appear here.</p>
-    `;
-  }
-
-  if (page === "profile") {
-    content.innerHTML = `
-      <h2>👤 My Profile</h2>
-      <p>@pixoro_user</p>
-      <p>Followers: 0 &nbsp; Following: 0</p>
-      <button>Edit Profile</button>
-    `;
-  }
 }
-</script>
+
+
+/* =========================
+   IMAGE / VIDEO PREVIEW
+========================= */
+
+document.getElementById("fileInput").addEventListener("change", function(event) {
+
+  const file = event.target.files[0];
+  const preview = document.getElementById("preview");
+
+  preview.innerHTML = "";
+
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+
+  if (file.type.startsWith("image/")) {
+
+    const img = document.createElement("img");
+    img.src = url;
+
+    preview.appendChild(img);
+
+  } else if (file.type.startsWith("video/")) {
+
+    const video = document.createElement("video");
+
+    video.src = url;
+    video.controls = true;
+
+    preview.appendChild(video);
+  }
+
+});
+
+
+/* =========================
+   CREATE POST
+========================= */
+
+function createPost() {
+
+  const file = document.getElementById("fileInput").files[0];
+  const caption = document.getElementById("captionInput").value;
+
+  if (!file) {
+    alert("Please choose a photo or video.");
+    return;
+  }
+
+  addPost(file, caption);
+
+  document.getElementById("fileInput").value = "";
+  document.getElementById("captionInput").value = "";
+  document.getElementById("preview").innerHTML = "";
+
+}
+
+
+/* =========================
+   CREATE FROM CREATE PAGE
+========================= */
+
+function createPostFromCreatePage() {
+
+  const file = document.getElementById("createFile").files[0];
+  const caption = document.getElementById("createCaption").value;
+
+  if (!file) {
+    alert("Please choose a photo or video.");
+    return;
+  }
+
+  addPost(file, caption);
+
+  document.getElementById("createFile").value = "";
+  document.getElementById("createCaption").value = "";
+
+  showPage("home");
+
+}
+
+
+/* =========================
+   ADD POST TO FEED
+========================= */
+
+function addPost(file, caption) {
+
+  const feed = document.getElementById("feed");
+
+  const post = document.createElement("article");
+  post.className = "post-card";
+
+  const url = URL.createObjectURL(file);
+
+  let media = "";
+
+  if (file.type.startsWith("image/")) {
+
+    media = `
+      <img class="post-media" src="${url}">
+    `;
+
+  } else {
+
+    media = `
+      <video class="post-media" src="${url}" controls></video>
+    `;
+
+  }
+
+  post.innerHTML = `
+
+    <div class="post-user">
+      <div class="avatar">👤</div>
+      <b>@pixoro_user</b>
+    </div>
+
+    ${media}
+
+    <div class="post-actions">
+
+      <button onclick="likePost(this)">
+        ❤️ <span>0</span>
+      </button>
+
+      <button onclick="commentPost(this)">
+        💬
+      </button>
+
+      <button onclick="sharePost()">
+        📤
+      </button>
+
+      <button onclick="savePost(this)">
+        🔖
+      </button>
+
+    </div>
+
+    <p class="caption">
+      ${escapeHTML(caption)}
+    </p>
+
+    <div class="comment-area">
+
+      <input
+        type="text"
+        placeholder="Add a comment..."
+      >
+
+      <button onclick="addComment(this)">
+        Send
+      </button>
+
+      <div class="comments"></div>
+
+    </div>
+
+  `;
+
+  feed.prepend(post);
+
+  updatePostCount();
+
+}
+
+
+/* =========================
+   LIKE
+========================= */
+
+function likePost(button) {
+
+  const span = button.querySelector("span");
+
+  let count = Number(span.textContent);
+
+  if (button.classList.contains("liked")) {
+
+    count--;
+    button.classList.remove("liked");
+
+  } else {
+
+    count++;
+    button.classList.add("liked");
+
+  }
+
+  span.textContent = count;
+
+}
+
+
+/* =========================
+   COMMENT
+========================= */
+
+function addComment(button) {
+
+  const area = button.parentElement;
+  const input = area.querySelector("input");
+  const comments = area.querySelector(".comments");
+
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  const comment = document.createElement("p");
+
+  comment.innerHTML =
+    "<b>@pixoro_user</b> " + escapeHTML(text);
+
+  comments.appendChild(comment);
+
+  input.value = "";
+
+}
+
+
+/* =========================
+   COMMENT BUTTON
+========================= */
+
+function commentPost(button) {
+
+  const post = button.closest(".post-card");
+
+  const input = post.querySelector(".comment-area input");
+
+  input.focus();
+
+}
+
+
+/* =========================
+   SHARE
+========================= */
+
+function sharePost() {
+
+  if (navigator.share) {
+
+    navigator.share({
+      title: "PIXORO",
+      text: "Check this post on PIXORO!"
+    });
+
+  } else {
+
+    alert("Share option is not available on this browser.");
+
+  }
+
+}
+
+
+/* =========================
+   SAVE
+========================= */
+
+function savePost(button) {
+
+  button.classList.toggle("saved");
+
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+function searchUser(value) {
+
+  const result = document.getElementById("searchResult");
+
+  if (!value.trim()) {
+
+   
