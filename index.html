@@ -7,31 +7,73 @@
 body{background:#000;color:#fff;font-family:sans-serif;margin:0;padding:10px}
 #feed img{width:100%;border-radius:12px;margin:12px 0;display:block}
 button{background:red;color:white;border:none;padding:12px;width:100%;border-radius:20px;font-weight:bold;margin-top:8px}
+input{width:100%;padding:10px;border-radius:10px}
 </style>
 </head>
 <body>
 <h2>PIXORO 🔥</h2>
 <input type="file" id="fileInput" accept="image/*">
-<button onclick="handlePost()">Post</button>
+<button onclick="handlePost()">Post Public 🔥</button>
 <p id="msg" style="color:lightgreen;text-align:center"></p>
 <div id="feed"></div>
-<script>
-function showPosts(){
- let p=JSON.parse(localStorage.getItem("pixoro_posts")||"[]");
- document.getElementById("feed").innerHTML=p.map(u=>`<img src="${u}">`).join("");
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// UN FIREBASE CONFIG-A INGA PASTE PANNU DA GIRI
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function showPosts(){
+  const q = query(collection(db,"posts"));
+  const snap = await getDocs(q);
+  let html = "";
+  snap.forEach(doc=>{
+    let d = doc.data();
+    if(d.imageUrl) html += `<img src="${d.imageUrl}">`;
+  });
+  document.getElementById("feed").innerHTML = html;
 }
-function handlePost(){
- let input=document.getElementById("fileInput");
- if(!input.files[0]){alert("Photo select pannu da");return}
- let reader=new FileReader();
- reader.onload=function(e){
-  let posts=JSON.parse(localStorage.getItem("pixoro_posts")||"[]");
-  posts.unshift(e.target.result);
-  localStorage.setItem("pixoro_posts",JSON.stringify(posts));
-  document.getElementById("msg").innerText="Semma da Giri! Post Ready!";
+window.showPosts = showPosts;
+
+window.handlePost = async () => {
+  let file = document.getElementById("fileInput").files[0];
+  if(!file) return alert("Photo select pannu da!");
+  document.getElementById("msg").innerText = "Uploading da Giri...";
+
+  // PHOTO-VA CHINNA SIZE AAKKUREN DA - FIRESTORE KU
+  let compressed = await new Promise(res=>{
+    let img = new Image();
+    img.onload = ()=>{
+      let canvas = document.createElement("canvas");
+      let max = 600; // 600px ku compress
+      let w = img.width, h = img.height;
+      if(w>max){ h*=max/w; w=max; }
+      canvas.width=w; canvas.height=h;
+      canvas.getContext("2d").drawImage(img,0,0,w,h);
+      res(canvas.toDataURL("image/jpeg",0.6));
+    };
+    let r = new FileReader();
+    r.onload = e=>{ img.src=e.target.result; };
+    r.readAsDataURL(file);
+  });
+
+  await addDoc(collection(db,"posts"),{
+    imageUrl: compressed,
+    likes: 0,
+    username: "giri",
+    createdAt: new Date()
+  });
+  document.getElementById("msg").innerText = "Semma da Giri! Public la vanthuduchu! 🔥";
   showPosts();
- };
- reader.readAsDataURL(input.files[0]);
 }
 showPosts();
 </script>
