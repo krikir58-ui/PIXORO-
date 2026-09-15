@@ -3,68 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO - Filter Launch</title>
+<title>PIXORO</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#fff;font-family:Arial;padding:10px}
-h1{color:#ff0066;text-align:center;padding:10px}
-.box{background:#1a1a1a;padding:15px;border-radius:15px;border:1px solid #333}
-input[type=file]{color:#fff;margin:10px 0}
-#preview{width:100%;max-height:300px;border-radius:10px;display:none;margin:10px 0}
-.filters{display:flex;gap:8px;overflow-x:auto;padding:10px 0}
-.f-btn{padding:8px 14px;background:#333;border:none;color:#fff;border-radius:20px;white-space:nowrap}
-.f-btn.active{background:#ff0066}
-input[type=text]{width:100%;padding:12px;background:#333;border:none;color:#fff;border-radius:10px;margin-top:10px}
-button.post{width:100%;padding:14px;background:#ff0066;color:#fff;border:none;border-radius:10px;margin-top:10px;font-weight:bold}
-.post{background:#1a1a1a;padding:10px;border-radius:10px;margin-top:12px}
-.post img{width:100%;border-radius:10px}
+body{background:#000;color:#fff;font-family:sans-serif}
+.top{padding:12px;text-align:center;border-bottom:1px solid #222;position:sticky;top:0;background:#000}
+.top h1{color:#ff0066;font-size:22px}
+.box{padding:15px;border-bottom:1px solid #222}
+#preview{width:100%;border-radius:12px;display:none;margin:10px 0;max-height:350px;object-fit:cover}
+.filters{display:flex;gap:8px;overflow-x:auto;padding:8px 0}
+.f{padding:6px 12px;background:#222;border:none;color:#fff;border-radius:20px;font-size:13px}
+.f.on{background:#ff0066}
+input{width:100%;padding:12px;background:#1a1a1a;border:none;color:#fff;border-radius:10px;margin-top:10px}
+button.post{width:100%;padding:12px;background:#ff0066;color:#fff;border:none;border-radius:10px;margin-top:10px;font-weight:bold}
+.post-card{background:#0a0a0a;border-bottom:1px solid #222;padding:10px}
+.post-card img{width:100%;border-radius:10px}
+.actions{display:flex;gap:15px;padding:10px 5px}
+.actions span{cursor:pointer;font-size:14px}
+.comment{font-size:13px;color:#aaa;padding:2px 5px}
 </style>
 </head>
 <body>
-<h1>PIXORO 🚀 FILTERS</h1>
+<div class="top"><h1>PIXORO 🚀</h1></div>
 <div class="box">
-<input type="file" id="file" accept="image/*" onchange="loadFile(event)">
+<input type="file" id="file" accept="image/*" onchange="load(event)">
 <img id="preview">
 <div class="filters">
-<button class="f-btn active" onclick="setFilter('none',this)">Original</button>
-<button class="f-btn" onclick="setFilter('grayscale(100%)',this)">B&W</button>
-<button class="f-btn" onclick="setFilter('sepia(100%)',this)">Sepia</button>
-<button class="f-btn" onclick="setFilter('contrast(150%) saturate(150%)',this)">Vivid</button>
-<button class="f-btn" onclick="setFilter('blur(1px) brightness(1.2)',this)">Soft</button>
-<button class="f-btn" onclick="setFilter('hue-rotate(90deg)',this)">Retro</button>
+<button class="f on" onclick="setF('none',this)">Original</button>
+<button class="f" onclick="setF('grayscale(100%)',this)">B&W</button>
+<button class="f" onclick="setF('sepia(80%)',this)">Sepia</button>
+<button class="f" onclick="setF('contrast(130%) saturate(130%)',this)">Vivid</button>
+<button class="f" onclick="setF('brightness(1.1) blur(0.5px)',this)">Soft</button>
 </div>
-<input type="text" id="caption" placeholder="Enna yosikura Giri?">
-<button class="post" onclick="addPost()">Post Pannu</button>
+<input id="cap" placeholder="Caption eluthu da Giri...">
+<button class="post" onclick="add()">Post Pannu</button>
 </div>
-<div id="list"></div>
+<div id="feed"></div>
 <script>
-let curFilter='none';
-let curImg='';
-function loadFile(e){
-  let r=new FileReader();
-  r.onload=function(){
-    curImg=r.result;
-    let p=document.getElementById('preview');
-    p.src=curImg; p.style.display='block'; p.style.filter=curFilter;
-  }
-  r.readAsDataURL(e.target.files[0]);
+let filter='none', img='', posts=JSON.parse(localStorage.getItem('pix')||'[]');
+function load(e){let r=new FileReader();r.onload=()=>{img=r.result;let p=document.getElementById('preview');p.src=img;p.style.display='block';p.style.filter=filter};r.readAsDataURL(e.target.files[0])}
+function setF(f,b){filter=f;document.getElementById('preview').style.filter=f;document.querySelectorAll('.f').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
+function render(){
+let h='';for(let i=posts.length-1;i>=0;i--){let p=posts[i];h+=`<div class=post-card>${p.img?`<img src="${p.img}" style="filter:${p.filter}">`:''}<div class=actions><span onclick="like(${i})">❤️ ${p.likes} Like</span><span onclick="cmnt(${i})">💬 Comment</span></div>${p.cap?`<div style="padding:0 5px">${p.cap}</div>`:''}${p.comments.map(c=>`<div class=comment>• ${c}</div>`).join('')}</div>`}
+document.getElementById('feed').innerHTML=h
 }
-function setFilter(f,btn){
-  curFilter=f;
-  document.getElementById('preview').style.filter=f;
-  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+function add(){
+let c=document.getElementById('cap').value;if(!img &&!c) return;
+posts.push({img:img,filter:filter,cap:c,likes:0,comments:[]});localStorage.setItem('pix',JSON.stringify(posts));
+img='';document.getElementById('preview').style.display='none';document.getElementById('cap').value='';render()
 }
-function addPost(){
-  let cap=document.getElementById('caption').value;
-  if(!curImg &&!cap) return;
-  let html=`<div class="post">`;
-  if(curImg) html+=`<img src="${curImg}" style="filter:${curFilter}">`;
-  if(cap) html+=`<p style="margin-top:8px">${cap}</p>`;
-  html+=`</div>`;
-  document.getElementById('list').innerHTML=html+document.getElementById('list').innerHTML;
-  document.getElementById('caption').value='';
-}
+function like(i){posts[i].likes++;localStorage.setItem('pix',JSON.stringify(posts));render()}
+function cmnt(i){let t=prompt('Comment sollu da:');if(t){posts[i].comments.push(t);localStorage.setItem('pix',JSON.stringify(posts));render()}}
+render();
 </script>
 </body>
 </html>
