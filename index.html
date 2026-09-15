@@ -1,73 +1,128 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO 🚀</title>
+<title>PIXORO</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui;background:#ff6a2b;color:#fff;min-height:100vh}
-.top{background:#000;text-align:center;padding:14px;font-size:26px;font-weight:900;letter-spacing:2px;position:sticky;top:0;z-index:10}
-.wrap{max-width:500px;margin:auto;padding:12px}
-.card{background:#2b1212;border-radius:26px;padding:16px;border:1px solid #4a2a2a}
-.btn{width:100%;background:#ff1a75;border:none;color:#fff;padding:14px;border-radius:14px;font-weight:800;font-size:17px}
-#preview{width:100%;border-radius:18px;margin-top:12px;display:none;max-height:420px;object-fit:cover}
+body{margin:0;background:linear-gradient(#ff6a00,#ee0979);min-height:100vh;color:#fff;font-family:sans-serif}
+.top{background:#000;padding:15px;text-align:center;font-size:22px;font-weight:900;position:sticky;top:0;z-index:10}
+.wrap{max-width:500px;margin:auto;padding:14px}
+.card{background:#2b1114;border-radius:24px;padding:16px;border:1px solid #5a2a2d}
+.btn{background:#ff165d;color:#fff;border:none;width:100%;padding:14px;border-radius:12px;font-weight:800;font-size:17px}
+#preview{width:100%;border-radius:14px;margin-top:10px;display:none;max-height:400px;object-fit:cover}
 .filters{display:flex;gap:8px;overflow-x:auto;margin-top:12px;padding-bottom:6px}
-.filters button{white-space:nowrap;background:#1a1a1a;border:1px solid #333;color:#fff;padding:7px 14px;border-radius:20px}
-.filters button.active{background:#ff1a75;border-color:#ff1a75}
-.cap{width:100%;padding:14px;border-radius:12px;border:none;outline:none;margin-top:10px}
-.post{background:#3a1a12;border-radius:28px;padding:12px;margin-top:18px;border:2px solid #5a2a1a}
-.post img{width:100%;border-radius:20px;display:block}
-.act{display:flex;gap:10px;margin-top:12px}
-.act div{flex:1;padding:10px;border-radius:20px;text-align:center;font-weight:700;background:#222;cursor:pointer}
-.act div.like{background:#ff1a75}
-.act div.liked{background:#fff;color:#ff1a75}
-.cmt-view{background:#111;border-radius:12px;padding:8px 12px;margin-top:8px;font-size:14px}
-.cmt-box{display:flex;gap:8px;margin-top:10px}
-.cmt-box input{flex:1;padding:12px 16px;border-radius:22px;border:none;outline:none}
-.cmt-box button{background:#ff1a75;border:none;color:#fff;padding:0 18px;border-radius:22px;font-weight:800}
-/* Share Sheet */
+.filters button{background:#3a1a1d;border:1px solid #6b2f33;color:#fff;padding:7px 14px;border-radius:20px;white-space:nowrap}
+.filters button.active{background:#ff165d;border-color:#ff165d}
+.cap{width:100%;box-sizing:border-box;padding:14px;border-radius:12px;border:none;margin-top:12px;outline:none}
+.post{background:rgba(0,0,0,0.7);border-radius:20px;padding:12px;margin-top:16px}
+.post img{width:100%;border-radius:14px;margin-top:8px}
+.act{display:flex;justify-content:space-around;margin-top:10px}
+.act b{background:#222;padding:8px 14px;border-radius:20px;font-size:14px}
+.act b.liked{background:#ff165d}
 #shareSheet{position:fixed;bottom:0;left:0;right:0;background:#111;border-radius:22px 22px 0 0;padding:18px;display:none;z-index:99}
-#shareSheet a{display:block;background:#222;color:#fff;text-decoration:none;padding:12px;border-radius:12px;margin-top:8px;text-align:center;font-weight:600}
+#shareSheet a, #shareSheet button{display:block;width:100%;text-align:left;padding:14px;background:#222;color:#fff;border:none;border-radius:12px;margin-top:8px;text-decoration:none;font-size:16px}
 </style>
 </head>
 <body>
 <div class="top">PIXORO 🚀</div>
 <div class="wrap">
-  <div class="card">
-    <label for="fileIn" class="btn">📁 Choose File</label>
-    <input type="file" id="fileIn" accept="image/*" style="display:none">
-    <img id="preview">
-    <div class="filters" id="filterBox"></div>
-    <input id="capIn" class="cap" placeholder="Caption...">
-    <div style="height:10px"></div>
-    <button class="btn" onclick="doPost()">🚀 Post</button>
-  </div>
-  <div id="feed"></div>
+<div class="card">
+<label for="f" class="btn">📁 Choose File</label>
+<input type="file" id="f" accept="image/*" style="display:none">
+<img id="preview">
+<div class="filters" id="fb"></div>
+<input id="cap" class="cap" placeholder="Caption...">
+<div style="height:12px"></div>
+<button class="btn" onclick="post()">🚀 Post</button>
+</div>
+<div id="feed"></div>
 </div>
 
 <div id="shareSheet">
-  <b>Share via</b>
-  <a id="s_whatsapp" target="_blank">WhatsApp</a>
-  <a id="s_telegram" target="_blank">Telegram</a>
-  <a id="s_fb" target="_blank">Facebook</a>
-  <a id="s_mail" target="_blank">Gmail / Mail</a>
-  <a onclick="copyLink()">Copy Link</a>
-  <a onclick="closeShare()" style="background:#ff1a75">Close</a>
+<b style="font-size:18px">Share via</b>
+<a id="s_whatsapp" href="#" target="_blank">🟢 WhatsApp</a>
+<a id="s_telegram" href="#" target="_blank">🔵 Telegram</a>
+<a id="s_fb" href="#" target="_blank">🔵 Facebook</a>
+<a id="s_mail" href="#">📧 Gmail / Mail</a>
+<button onclick="copyLink()">🔗 Copy Link</button>
+<button onclick="downloadImg()">⬇️ Download Photo</button>
+<button onclick="document.getElementById('shareSheet').style.display='none'" style="background:#ff165d;text-align:center">Close</button>
 </div>
 
 <script>
-let imgData=null, curFilter='none', curFileName='pixoro.jpg';
-let posts=JSON.parse(localStorage.getItem('pixoro_p')||'[]');
-let liked=JSON.parse(localStorage.getItem('pixoro_liked')||'[]');
-let shareTarget=null;
+let imgData=null, curFilter='none', shareImg=null, shareCap='';
+let posts=JSON.parse(localStorage.getItem('pix_p')||'[]');
+let liked=JSON.parse(localStorage.getItem('pix_liked')||'[]');
 
-const FILTERS=[
-{n:'Original',v:'none'},{n:'B&W',v:'grayscale(100%)'},{n:'Sepia',v:'sepia(100%)'},
-{n:'Vivid',v:'saturate(200%) contrast(120%)'},{n:'Soft',v:'brightness(110%) sepia(20%)'},
-{n:'Vintage',v:'sepia(60%) contrast(110%) brightness(90%)'},{n:'Cool',v:'hue-rotate(180deg) saturate(120%)'},
-{n:'Warm',v:'saturate(140%) sepia(40%) hue-rotate(-10deg)'},{n:'Blur',v:'blur(1px) brightness(105%)'},
-{n:'Bright',v:'brightness(130%)'},{n:'Dark',v:'brightness(70%) contrast(120%)'},
-{n:'Invert',v:'invert(100%)'},{n:'Sunset',v:'saturate(180%) hue-rotate(-20deg) brightness(110%)'},
-{n:'Night',v:'brightness(60%) contrast(140%) hue-rotate(200deg)'},{n:'Cinematic',v:'contrast(130%) sepia(30%) brightness(90%)'},
-{n:'HDR',v:'contrast(150%) saturate(150%)'},{n:'Old Film',v:'sepia(
+const filters=[
+{name:'Original',v:'none'},{name:'B&W',v:'grayscale(100%)'},{name:'Sepia',v:'sepia(100%)'},{name:'Vivid',v:'saturate(200%) contrast(110%)'},{name:'Vintage',v:'sepia(60%) contrast(120%)'},{name:'Cool',v:'hue-rotate(180deg) saturate(120%)'},{name:'Warm',v:'sepia(30%) saturate(150%)'},{name:'Bright',v:'brightness(130%)'},{name:'Dark',v:'brightness(70%)'},{name:'Blur Soft',v:'brightness(105%) blur(0.6px)'},{name:'Sharp',v:'contrast(150%) brightness(105%)'},{name:'Sunset',v:'sepia(40%) hue-rotate(-20deg) saturate(180%)'},{name:'Cinematic',v:'contrast(130%) brightness(90%) sepia(20%)'},{name:'Night',v:'brightness(60%) contrast(130%) hue-rotate(180deg)'},{name:'Invert',v:'invert(100%)'},{name:'HDR',v:'contrast(140%) saturate(160%)'},{name:'Old Film',v:'sepia(80%) contrast(110%) brightness(90%)'},{name:'Dreamy',v:'brightness(115%) blur(0.4px) saturate(130%)'},{name:'Pinkish',v:'hue-rotate(300deg) saturate(140%)'},{name:'Greenish',v:'hue-rotate(90deg) saturate(130%)'}
+];
+const fb=document.getElementById('fb');
+filters.forEach(fl=>{
+ let b=document.createElement('button'); b.innerText=fl.name;
+ b.onclick=()=>{curFilter=fl.v; document.getElementById('preview').style.filter=curFilter; document.querySelectorAll('.filters button').forEach(x=>x.classList.remove('active')); b.classList.add('active');};
+ if(fl.name=='Original') b.classList.add('active');
+ fb.appendChild(b);
+});
+
+document.getElementById('f').addEventListener('change',e=>{
+ let file=e.target.files[0]; if(!file) return;
+ let r=new FileReader(); r.onload=ev=>{
+  imgData=ev.target.result; let p=document.getElementById('preview'); p.src=imgData; p.style.display='block'; p.style.filter=curFilter;
+ }; r.readAsDataURL(file);
+});
+
+function post(){
+ if(!imgData) return alert('Photo select pannu da!');
+ let obj={id:Date.now(),img:imgData,filter:curFilter,cap:document.getElementById('cap').value,likes:0,comments:[]};
+ posts.unshift(obj); save();
+ document.getElementById('cap').value=''; document.getElementById('preview').style.display='none'; imgData=null; document.getElementById('f').value='';
+}
+function save(){localStorage.setItem('pix_p',JSON.stringify(posts)); localStorage.setItem('pix_liked',JSON.stringify(liked)); render();}
+function like(id){
+ let p=posts.find(x=>x.id===id);
+ if(liked.includes(id)){p.likes--; liked=liked.filter(x=>x!==id);} else {p.likes++; liked.push(id);}
+ save();
+}
+function openShare(id){
+ let p=posts.find(x=>x.id===id); shareImg=p.img; shareCap=p.cap;
+ let url=location.href; let text=encodeURIComponent((p.cap||'PIXORO Photo')+' '+url);
+ document.getElementById('s_whatsapp').href=`https://wa.me/?text=${text}`;
+ document.getElementById('s_telegram').href=`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(p.cap)}`;
+ document.getElementById('s_fb').href=`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+ document.getElementById('s_mail').href=`mailto:?subject=PIXORO&body=${text}`;
+ document.getElementById('shareSheet').style.display='block';
+ // try native share if available
+ if(navigator.share){
+   try{
+     fetch(p.img).then(res=>res.blob()).then(blob=>{
+       let file=new File([blob],'pixoro.jpg',{type:'image/jpeg'});
+       if(navigator.canShare && navigator.canShare({files:[file]})){
+         navigator.share({files:[file],title:'PIXORO',text:p.cap});
+       }
+     });
+   }catch(e){}
+ }
+}
+function copyLink(){ navigator.clipboard.writeText(location.href); alert('Link Copied!'); }
+function downloadImg(){
+ let a=document.createElement('a'); a.href=shareImg; a.download='pixoro.jpg'; a.click();
+}
+function addCmt(id){
+ let inp=document.getElementById('c'+id); if(!inp.value.trim()) return;
+ posts.find(x=>x.id===id).comments.push(inp.value.trim()); inp.value=''; save();
+}
+function render(){
+ let feed=document.getElementById('feed'); feed.innerHTML='';
+ posts.forEach(p=>{
+  let isL=liked.includes(p.id);
+  let d=document.createElement('div'); d.className='post';
+  d.innerHTML=`<div>${p.cap||''}</div><img src="${p.img}" style="filter:${p.filter}"><div class="act"><b class="${isL?'liked':''}" onclick="like(${p.id})">❤️ ${p.likes} Like</b><b onclick="document.getElementById('c${p.id}').focus()">💬 ${p.comments.length}</b><b onclick="openShare(${p.id})">🚀 Share</b></div><div>${p.comments.map(c=>`<div style="background:#1f1f1f;padding:6px 10px;border-radius:10px;margin-top:5px;font-size:13px">${c}</div>`).join('')}</div><div style="display:flex;gap:5px;margin-top:8px"><input id="c${p.id}" placeholder="Comment..." style="flex:1;padding:10px;border-radius:20px;border:none"><button onclick="addCmt(${p.id})" style="background:#ff165d;border:none;color:#fff;border-radius:20px;padding:0 14px">OK</button></div>`;
+  feed.appendChild(d);
+ });
+}
+render();
+</script>
+</body>
+</html>
