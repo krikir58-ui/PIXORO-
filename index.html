@@ -1,54 +1,53 @@
 <!DOCTYPE html>
-<html><head><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO 🔥</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIXORO</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#ff0000">
-<style>body{background:#000;color:#fff;font-family:sans-serif;padding:12px}img,video{width:100%;border-radius:16px;margin:10px 0}.post{background:#111;padding:10px;border-radius:16px;margin:14px 0}button{background:red;color:#fff;border:none;padding:12px;width:100%;border-radius:25px;font-weight:bold;margin-top:8px}input{width:95%;padding:10px;border-radius:10px;margin:6px 0}.top{display:flex;justify-content:space-between;align-items:center}.del{background:#222;color:#ff4444;border:1px solid red;margin-top:6px;padding:8px}#dlBtn{background:#fff;color:#000;display:none;margin-bottom:12px;animation:pop.5s}</style>
-</head><body>
-<div class="top"><h2>PIXORO 🔥</h2><span onclick="adminLogin()" style="color:gray;cursor:pointer">👮 Admin</span></div>
+<meta name="theme-color" content="#ff0066">
+<style>
+body{background:#0a0a0a;color:white;font-family:sans-serif;margin:0;padding:20px}
+h1{color:#ff0066;text-align:center}
+.card{background:#1a1a1a;padding:15px;border-radius:12px;margin:10px 0;border:1px solid #ff006633}
+button{background:#ff0066;color:white;border:none;padding:10px 20px;border-radius:8px;width:100%;font-weight:bold}
+input{width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:white;box-sizing:border-box;margin-bottom:10px}
+#posts{margin-top:20px}
+</style>
+</head>
+<body>
+<h1>PIXORO 🚀</h1>
+<div class="card">
+<input id="postInput" placeholder="Enna yosikura Giri?">
+<button onclick="addPost()">Post Pannu</button>
+</div>
+<div id="posts"></div>
 
-<button id="dlBtn" onclick="installApp()">⬇️ DOWNLOAD APP 🔥 - INSTALL PANNU DA</button>
+<script>
+let posts = JSON.parse(localStorage.getItem('pixoro_posts') || '[]');
 
-<input id="userName" placeholder="Un peru enna da? (ex: giri)">
-<input type="file" id="fileInput" accept="image/*,video/*">
-<button onclick="handlePost()">POST 🔥</button>
-<p id="msg" style="color:#0f0;text-align:center"></p>
-<div id="feed">Loading da Giri...</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-const firebaseConfig={apiKey:"AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",authDomain:"pixoro-75927.firebaseapp.com",projectId:"pixoro-75927",storageBucket:"pixoro-75927.firebasestorage.app",messagingSenderId:"814840120295",appId:"1:814840120295:web:6c02c613df5a17209bf342"};
-const app=initializeApp(firebaseConfig);const db=getFirestore(app);
-const ADMIN_PASS="pixoro17";let isAdmin=localStorage.getItem("pixoro_admin")==="yes";
-let myId=localStorage.getItem("pixoro_myid"); if(!myId){myId="user_"+Math.random().toString(36).slice(2,7);localStorage.setItem("pixoro_myid",myId);}
-let savedName=localStorage.getItem("pixoro_name"); if(savedName) document.getElementById("userName").value=savedName;
-
-// PWA DOWNLOAD LOGIC DA GIRI
-let deferredPrompt; window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;document.getElementById('dlBtn').style.display='block';});
-window.installApp=async()=>{if(deferredPrompt){deferredPrompt.prompt();let r=await deferredPrompt.userChoice;if(r.outcome==='accepted')document.getElementById('dlBtn').innerText='✅ APP INSTALL AAYIDUCHU DA!';deferredPrompt=null;}else alert('Mobile la Chrome la open pannu da Giri - aprom 3 dot click panni Add to Home Screen pannu da!');}
-
-window.adminLogin=()=>{let p=prompt("Admin password da Giri?"); if(p===ADMIN_PASS){localStorage.setItem("pixoro_admin","yes");isAdmin=true;alert("Admin ON da Giri! 🔥");showPosts();}else alert("Wrong da!");}
-async function showPosts(){
-  const snap=await getDocs(collection(db,"posts"));
-  let posts=[];snap.forEach(d=>{posts.push({id:d.id,...d.data()})}); posts.reverse();
-  let h=""; posts.forEach(p=>{
-    let isMyPost = p.ownerId===myId; let canDelete = isAdmin || isMyPost;
-    let media = p.imageUrl? (p.imageUrl.startsWith("data:video")? `<video src="${p.imageUrl}" controls></video>` : `<img src="${p.imageUrl}">`) : "";
-    h+=`<div class="post">${media}<p>👤 <b>${p.username||'unknown'}</b> ${isMyPost?'(NEE DA!)':''}</p>${canDelete?`<button class="del" onclick="deletePost('${p.id}')">🗑️ DELETE</button>`:''}</div>`;
-  });
-  document.getElementById("feed").innerHTML=h||"No posts da";
+function showPosts(){
+  let html = '';
+  for(let i=posts.length-1; i>=0; i--){
+    html += `<div class="card">${posts[i]}</div>`;
+  }
+  document.getElementById('posts').innerHTML = html;
 }
-window.deletePost=async(id)=>{if(!confirm("Delete pannava da?"))return;await deleteDoc(doc(db,"posts",id));showPosts();}
-window.handlePost=async()=>{
-  let file=document.getElementById("fileInput").files[0];let name=document.getElementById("userName").value.trim()||"unknown";
-  if(!file)return alert("File select pannu da!"); localStorage.setItem("pixoro_name",name);
-  document.getElementById("msg").innerText="Uploading da...";
-  let dataUrl=await new Promise(res=>{let r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});
-  if(dataUrl.startsWith("data:image")){dataUrl=await new Promise(res=>{let img=new Image();img.onload=()=>{let c=document.createElement("canvas");let max=700,w=img.width,h=img.height;if(w>max){h*=max/w;w=max;}if(h>max){w*=max/h;h=max;}c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);res(c.toDataURL("image/jpeg",0.65));};img.src=dataUrl;});}
-  await addDoc(collection(db,"posts"),{imageUrl:dataUrl,username:name,ownerId:myId,createdAt:new Date()});
-  document.getElementById("msg").innerText="Post aayiduchu da! 🔥";document.getElementById("fileInput").value="";showPosts();
+
+function addPost(){
+  let val = document.getElementById('postInput').value;
+  if(!val) return;
+  posts.push(val);
+  localStorage.setItem('pixoro_posts', JSON.stringify(posts));
+  document.getElementById('postInput').value='';
+  showPosts();
 }
-  if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+
 showPosts();
-</script></body></html>
+</script>
+</body>
+</html>
