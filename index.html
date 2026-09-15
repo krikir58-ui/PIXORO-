@@ -1,80 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PIXORO 🔥</title>
-<style>
-body{font-family:sans-serif;background:#000;color:#fff;margin:0;padding:0}
-header{padding:15px;text-align:center;font-size:24px;font-weight:bold;border-bottom:1px solid #333}
-.upload-box{padding:15px;background:#111;margin:10px;border-radius:12px}
-button{background:#ff3040;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;width:100%;margin-top:10px}
-#feed{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}
-#feed img{width:100%;height:150px;object-fit:cover}
-input{width:100%}
-#status{color:#0f0;text-align:center;margin-top:10px}
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PIXORO</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header>PIXORO 🔥</header>
-
-<div class="upload-box">
+<div class="container">
+<h1>PIXORO 🔥</h1>
 <input type="file" id="fileInput" accept="image/*">
-<button id="postBtn" onclick="uploadPost()">Post Pannu Da Giri! 🚀</button>
+<button id="postBtn">Post</button>
 <p id="status"></p>
-</div>
-
 <div id="feed"></div>
-
-<script>
-const CLOUD_NAME = "vi4etpob";
-const UPLOAD_PRESET = "pixoro_posts";
-
-async function uploadPost(){
-  const file = document.getElementById('fileInput').files[0];
-  if(!file) return alert("Photo select pannu da Giri!");
-
-  document.getElementById('status').innerText = "Uploading... ⏳";
-  document.getElementById('postBtn').disabled = true;
-
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", UPLOAD_PRESET);
-
-  try{
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-      method: "POST",
-      body: formData
-    });
-    const data = await res.json();
-
-    if(!data.secure_url){
-      alert("Upload Preset create pannala da! Cloudinary la Settings -> Upload -> Upload Presets -> Add -> Name: pixoro_posts -> Unsigned -> Save pannu da!");
-      console.log(data);
-      document.getElementById('status').innerText = "";
-      document.getElementById('postBtn').disabled = false;
-      return;
-    }
-
-    // Save to localStorage (Free, No Firebase billing)
-    let posts = JSON.parse(localStorage.getItem("pixoro_posts") || "[]");
-    posts.unshift(data.secure_url);
-    localStorage.setItem("pixoro_posts", JSON.stringify(posts));
-
-    document.getElementById('status').innerText = "Semma da Giri! Post Ready! 🔥";
-    document.getElementById('fileInput').value = "";
-    showPosts();
-  } catch(e){
-    alert("Error da: " + e.message);
-    document.getElementById('status').innerText = "";
-  }
-  document.getElementById('postBtn').disabled = false;
-}
-
-function showPosts(){
-  let posts = JSON.parse(localStorage.getItem("pixoro_posts") || "[]");
-  document.getElementById('feed').innerHTML = posts.map(url => `<img src="${url}">`).join("");
-}
-showPosts();
-</script>
+</div>
+<script src="js/config.js"></script>
+<script src="js/upload.js"></script>
+<script src="js/feed.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
