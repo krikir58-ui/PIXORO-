@@ -1,204 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-body{background:linear-gradient(180deg,#ff8c42 0%,#ffb67a 100%);min-height:100vh;color:#fff}
-header{background:#111;padding:14px 16px;position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:10px}
-header h1{font-size:20px;letter-spacing:1px}
-.container{max-width:480px;margin:0 auto;padding:16px}
-.create-card{background:#1a1a1a;border-radius:16px;padding:14px;margin-bottom:18px}
-.create-card input[type="file"]{width:100%;color:#aaa;margin-bottom:10px}
-#previewWrap{display:none;margin-bottom:10px}
-#previewImg{width:100%;border-radius:12px;max-height:350px;object-fit:cover;transition:0.3s}
-.filter-bar{display:flex;gap:8px;overflow-x:auto;padding:8px 0;scrollbar-width:none}
-.filter-bar::-webkit-scrollbar{display:none}
-.filter-btn{flex:0 0 auto;background:#2a2a2a;border:1px solid #333;color:#fff;padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer}
-.filter-btn.active{background:#ff8c42;border-color:#ff8c42;color:#000;font-weight:700}
-input[type="text"]{width:100%;background:#2a2a2a;border:1px solid #333;border-radius:10px;padding:10px 12px;color:#fff;outline:none;margin-top:8px}
-.post-btn{width:100%;background:#ff8c42;color:#000;border:none;padding:11px;border-radius:10px;font-weight:800;margin-top:10px;cursor:pointer}
-.post{background:#1a1a1a;border-radius:16px;overflow:hidden;margin-bottom:16px}
-.post img.post-img{width:100%;display:block;max-height:520px;object-fit:cover}
-.post-info{padding:12px}
-.post-actions{display:flex;gap:16px;padding:0 12px 12px;font-size:14px}
-.action{cursor:pointer;display:flex;gap:5px;align-items:center;opacity:0.9}
-.action.liked{color:#ff4d4d;font-weight:700}
-.comment-box{display:flex;gap:6px;margin-top:8px}
-.comment-box input{flex:1}
-.comment{font-size:13px;opacity:0.8;margin-top:6px;background:#252525;padding:6px 10px;border-radius:8px}
+<!-- PIXORO Bottom Navigation -->
+<nav class="bottom-nav">
+  <button onclick="showPage('home')">🏠<span>Home</span></button>
+  <button onclick="showPage('search')">🔍<span>Search</span></button>
+  <button onclick="showPage('create')">➕<span>Create</span></button>
+  <button onclick="showPage('reels')">🎬<span>Reels</span></button>
+  <button onclick="showPage('profile')">👤<span>Profile</span></button>
+</nav>
 
-/* Share Sheet - This fixes APK share */
-#shareSheet{position:fixed;left:0;right:0;bottom:-100%;background:#222;border-radius:20px 20px 0 0;padding:20px;transition:0.35s;z-index:100;box-shadow:0 -10px 30px rgba(0,0,0,0.5)}
-#shareSheet.show{bottom:0}
-#shareOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;z-index:99}
-#shareOverlay.show{display:block}
-.share-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;text-align:center;margin-top:12px}
-.share-item{background:#2e2e2e;border-radius:14px;padding:12px 4px;cursor:pointer;font-size:12px}
-.share-item span{font-size:22px;display:block;margin-bottom:4px}
-</style>
-</head>
-<body>
-<header><h1>📸 PIXORO</h1></header>
-<div class="container">
-  <div class="create-card">
-    <input type="file" id="fileInput" accept="image/*">
-    <div id="previewWrap">
-      <img id="previewImg">
-      <div class="filter-bar" id="filterBar"></div>
-      <input type="text" id="captionInput" placeholder="Write a caption...">
-      <button class="post-btn" onclick="createPost()">Post</button>
-    </div>
-  </div>
-  <div id="feed"></div>
-</div>
-
-<div id="shareOverlay" onclick="closeShare()"></div>
-<div id="shareSheet">
-  <div style="display:flex;justify-content:space-between"><b>Share via</b><span onclick="closeShare()" style="cursor:pointer">✕</span></div>
-  <div class="share-grid">
-    <div class="share-item" onclick="shareTo('whatsapp')"><span>🟢</span>WhatsApp</div>
-    <div class="share-item" onclick="shareTo('telegram')"><span>✈️</span>Telegram</div>
-    <div class="share-item" onclick="shareTo('facebook')"><span>📘</span>Facebook</div>
-    <div class="share-item" onclick="shareTo('gmail')"><span>✉️</span>Gmail</div>
-    <div class="share-item" onclick="shareTo('copy')"><span>🔗</span>Copy</div>
-    <div class="share-item" onclick="shareTo('download')"><span>⬇️</span>Download</div>
-  </div>
-</div>
+<div id="pageContent"></div>
 
 <script>
-const filters = [
-  {name:'Original', value:'none'},
-  {name:'B&W', value:'grayscale(100%)'},
-  {name:'Sepia', value:'sepia(100%)'},
-  {name:'Vivid', value:'saturate(200%) contrast(120%)'},
-  {name:'Soft', value:'brightness(110%) saturate(90%) blur(0.3px)'},
-  {name:'Vintage', value:'sepia(60%) contrast(110%) brightness(90%)'},
-  {name:'Cool', value:'hue-rotate(180deg) saturate(120%)'},
-  {name:'Warm', value:'sepia(30%) saturate(150%) hue-rotate(-15deg)'},
-  {name:'Bright', value:'brightness(130%)'},
-  {name:'Contrast', value:'contrast(160%)'},
-  {name:'Blur', value:'blur(2px)'},
-  {name:'Invert', value:'invert(100%)'},
-  {name:'Hue', value:'hue-rotate(90deg)'},
-  {name:'Sunset', value:'sepia(50%) saturate(180%) hue-rotate(-20deg) brightness(110%)'},
-  {name:'Night', value:'brightness(70%) contrast(130%) saturate(80%) hue-rotate(200deg)'},
-  {name:'Cinematic', value:'contrast(130%) brightness(90%) sepia(20%)'},
-  {name:'HDR', value:'contrast(150%) saturate(180%) brightness(110%)'},
-  {name:'Old Film', value:'sepia(80%) contrast(120%) brightness(90%) grayscale(20%)'},
-  {name:'Dreamy', value:'brightness(115%) saturate(120%) blur(0.5px)'},
-  {name:'Sharp', value:'contrast(140%) saturate(130%)'}
-];
+function showPage(page) {
 
-let selectedFilter = 'none';
-let currentImageBase64 = '';
-let currentShareIndex = null;
+  const content = document.getElementById("pageContent");
 
-const fileInput = document.getElementById('fileInput');
-const previewImg = document.getElementById('previewImg');
-const previewWrap = document.getElementById('previewWrap');
-const filterBar = document.getElementById('filterBar');
-
-filters.forEach((f,i)=>{
-  const btn = document.createElement('button');
-  btn.className='filter-btn'+(i==0?' active':'');
-  btn.innerText=f.name;
-  btn.onclick=()=>{
-    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    selectedFilter=f.value;
-    previewImg.style.filter=f.value;
-  };
-  filterBar.appendChild(btn);
-});
-
-fileInput.onchange = e=>{
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev=>{
-    currentImageBase64 = ev.target.result;
-    previewImg.src = currentImageBase64;
-    previewImg.style.filter = selectedFilter;
-    previewWrap.style.display='block';
-  };
-  reader.readAsDataURL(file);
-};
-
-let posts = JSON.parse(localStorage.getItem('pixoro_posts')||'[]');
-let liked = JSON.parse(localStorage.getItem('pixoro_liked')||'[]');
-
-function save(){ localStorage.setItem('pixoro_posts', JSON.stringify(posts)); localStorage.setItem('pixoro_liked', JSON.stringify(liked)); }
-
-function createPost(){
-  if(!currentImageBase64) return alert('Photo select pannunga');
-  const caption = document.getElementById('captionInput').value;
-  posts.unshift({id:Date.now(), img:currentImageBase64, filter:selectedFilter, caption, likes:0, comments:[]});
-  save(); render();
-  document.getElementById('captionInput').value=''; previewWrap.style.display='none'; fileInput.value=''; currentImageBase64='';
-}
-
-function render(){
-  const feed = document.getElementById('feed');
-  feed.innerHTML='';
-  posts.forEach((p, idx)=>{
-    const isLiked = liked.includes(p.id);
-    const div = document.createElement('div');
-    div.className='post';
-    div.innerHTML=`
-      <img class="post-img" src="${p.img}" style="filter:${p.filter}">
-      <div class="post-info"><b style="font-size:14px">${p.caption||''}</b></div>
-      <div class="post-actions">
-        <div class="action ${isLiked?'liked':''}" onclick="likePost(${idx})">❤️ ${p.likes} Like</div>
-        <div class="action" onclick="document.getElementById('cmt-${p.id}').focus()">💬 Comment</div>
-        <div class="action" onclick="openShare(${idx})">↗️ Share</div>
-      </div>
-      <div style="padding:0 12px 12px">
-        ${p.comments.map(c=>`<div class="comment">${c}</div>`).join('')}
-        <div class="comment-box"><input id="cmt-${p.id}" placeholder="Add comment..." onkeydown="if(event.key==='Enter')addComment(${idx},this.value)"></div>
-      </div>
+  if (page === "home") {
+    content.innerHTML = `
+      <h2>🏠 PIXORO</h2>
+      <p>Welcome to your feed!</p>
     `;
-    feed.appendChild(div);
-  });
-}
-
-function likePost(idx){
-  const p = posts[idx];
-  if(liked.includes(p.id)){ // already liked -> unlike
-    p.likes--; liked = liked.filter(id=>id!==p.id);
-  } else {
-    p.likes++; liked.push(p.id);
   }
-  save(); render();
-}
 
-function addComment(idx, text){
-  if(!text.trim()) return;
-  posts[idx].comments.push(text);
-  save(); render();
-}
+  if (page === "search") {
+    content.innerHTML = `
+      <h2>🔍 Search</h2>
+      <input type="text" placeholder="Search users or posts..."
+             style="width:90%;padding:12px;border-radius:10px;">
+    `;
+  }
 
-// SHARE FIX FOR APK
-function openShare(idx){
-  currentShareIndex = idx;
-  document.getElementById('shareSheet').classList.add('show');
-  document.getElementById('shareOverlay').classList.add('show');
-}
-function closeShare(){
-  document.getElementById('shareSheet').classList.remove('show');
-  document.getElementById('shareOverlay').classList.remove('show');
-}
-function shareTo(type){
-  const p = posts[currentShareIndex];
-  const text = encodeURIComponent((p.caption||'Check this photo on PIXORO') + ' 📸');
-  const url = encodeURIComponent(window.location.href);
+  if (page === "create") {
+    content.innerHTML = `
+      <h2>➕ Create Post</h2>
+      <input type="file" accept="image/*,video/*">
+      <br><br>
+      <input type="text" placeholder="Write a caption..."
+             style="padding:12px;width:90%;">
+      <br><br>
+      <button onclick="alert('Post created!')">Post</button>
+    `;
+  }
 
-  if(type==='whatsapp') window.open(`https://wa.me/?text=${text}%20${url}`,'_blank');
-  if(type==='telegram') window.open(`https://t.me/share/url?url=${url}&text=${text}`,'_blank');
-  if(type==='facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`,'_blank');
-  if(type==='gmail') window.open(`mailto:?subject=PIXORO Photo&body=${text}%20${url}`,'_blank');
-  if(type==='copy'){ navigator.clipboard.writeText(window.location.href); alert('Link copied!'); }
-  if(type==='download'){
-    const a = document.createElement('a'); a.href=p.img; a.download='pixoro-'+p.id+'.jpg'; a.click();
+  if (page === "reels") {
+    content.innerHTML = `
+      <h2>🎬 PIXORO Reels</h2>
+      <p>Short videos will appear here.</p>
+    `;
+  }
+
+  if (page === "profile") {
+    content.innerHTML = `
+      <h2>👤 My Profile</h2>
+      <p>@pixoro_user</p>
+      <p>Followers: 0 &nbsp; Following: 0</p>
+      <button>Edit Profile</button>
+    `;
+  }
+}
+</script>
