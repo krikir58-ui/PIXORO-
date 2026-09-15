@@ -1,67 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ta">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PIXORO 🚀</title>
 <style>
-  body {
-    margin:0; font-family: sans-serif; color: white;
-    background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
-    background-size: 400% 400%;
-    animation: bg 10s ease infinite;
-    min-height: 100vh;
-  }
-  @keyframes bg { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-  .top { background: black; padding: 15px; text-align: center; font-weight: bold; font-size: 22px; letter-spacing: 2px; position: sticky; top:0; z-index:10; }
-  .container { max-width: 480px; margin: auto; padding: 15px; }
-  .card { background: rgba(0,0,0,0.75); border-radius: 20px; padding: 15px; margin-bottom: 20px; backdrop-filter: blur(10px); }
-  .btn-pink { background: #ff2d78; color: white; border: none; padding: 12px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 16px; }
-  input[type="file"] { display: none; }
-  .file-label { background: #ff2d78; display: block; text-align: center; padding: 12px; border-radius: 12px; font-weight: bold; }
-  #preview { width: 100%; border-radius: 15px; margin-top: 10px; display: none; max-height: 400px; object-fit: cover; }
-  .filters { display: flex; gap: 8px; overflow-x: auto; margin-top: 10px; padding-bottom: 5px; }
-  .filters button { background: #333; color: white; border: 1px solid #555; padding: 6px 12px; border-radius: 20px; white-space: nowrap; }
-  .filters button.active { background: #ff2d78; border-color: #ff2d78; }
-  .post-img { width: 100%; border-radius: 15px; margin-top: 10px; }
-  .actions { display: flex; justify-content: space-around; margin-top: 10px; font-size: 18px; }
-  .actions span { cursor: pointer; user-select: none; }
-  .liked { color: #ff2d78; }
-  .comment-box { display: flex; gap: 5px; margin-top: 10px; }
-  .comment-box input { flex: 1; padding: 8px; border-radius: 20px; border: none; outline: none; }
+  body{margin:0;font-family:system-ui;background:linear-gradient(180deg,#e94057,#f27121);min-height:100vh;color:white}
+ .top{background:#000;text-align:center;padding:16px;font-size:24px;font-weight:800;letter-spacing:2px;position:sticky;top:0;z-index:99}
+ .wrap{max-width:500px;margin:auto;padding:15px}
+ .card{background:#2b1215;border-radius:28px;padding:18px;border:1px solid #4a2a2d}
+ .btn{width:100%;background:#ff1a75;border:none;color:white;padding:16px;border-radius:15px;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+  input[type=file]{display:none}
+  #preview{width:100%;border-radius:15px;margin-top:12px;display:none;max-height:380px;object-fit:cover}
+ .cap{width:100%;box-sizing:border-box;padding:16px;border-radius:14px;border:none;outline:none;margin-top:14px;font-size:16px}
+ .post-card{background:rgba(0,0,0,0.6);border-radius:22px;padding:12px;margin-top:18px;backdrop-filter:blur(10px)}
+ .post-card img{width:100%;border-radius:16px;margin-top:8px}
+ .act{display:flex;justify-content:space-around;margin-top:10px;font-size:16px}
+ .act b{cursor:pointer;padding:8px 12px;border-radius:20px;background:#222}
+ .act b.liked{background:#ff1a75;color:white}
+ .cmt{display:flex;gap:6px;margin-top:10px}
+ .cmt input{flex:1;padding:10px;border-radius:20px;border:none;outline:none}
 </style>
 </head>
 <body>
 <div class="top">PIXORO 🚀</div>
-<div class="container">
-
+<div class="wrap">
   <div class="card">
-    <label for="fileInput" class="file-label">📁 Choose File</label>
-    <input type="file" id="fileInput" accept="image/*">
+    <label for="fileIn" class="btn">📁 Choose File</label>
+    <input type="file" id="fileIn" accept="image/*">
     <img id="preview">
-    
-    <div class="filters" id="filterBox"></div>
-    
-    <input id="captionInput" placeholder="Caption..." style="width:100%; margin-top:10px; padding:12px; border-radius:10px; border:none; box-sizing: border-box;">
-    <br><br>
-    <button class="btn-pink" onclick="createPost()">🚀 Post</button>
+    <input id="capIn" class="cap" placeholder="Caption...">
+    <div style="height:14px"></div>
+    <button class="btn" onclick="doPost()">🚀 Post</button>
   </div>
-
   <div id="feed"></div>
 </div>
 
 <script>
-let currentFilter = 'none';
-let currentImageData = null;
-let posts = JSON.parse(localStorage.getItem('pixoro_posts') || '[]');
-let likedPosts = JSON.parse(localStorage.getItem('pixoro_liked') || '[]');
+let imgData = null;
+let posts = JSON.parse(localStorage.getItem('pixoro_p') || '[]');
+let liked = JSON.parse(localStorage.getItem('pixoro_liked') || '[]');
 
-const filtersList = [
-  { name: 'Original', value: 'none' },
-  { name: 'B&W', value: 'grayscale(100%)' },
-  { name: 'Sepia', value: 'sepia(100%)' },
-  { name: 'Vivid', value: 'saturate(200%) contrast(120%)' },
-  { name: 'Soft', value: 'brightness(110%) blur(0.5px)' },
-  { name: 'Vintage', value: 'sepia(50%) contrast(120%)' },
-  { name: 'Cool', value: 'hue-rotate(180deg)' },
-  { name: 'Warm', value: 's
+document.getElementById('fileIn').addEventListener('change', e=>{
+  let f = e.target.files[0];
+  if(!f) return;
+  let r = new FileReader();
+  r.onload = ev=>{
+    imgData = ev.target.result;
+    let p = document.getElementById('preview');
+    p.src = imgData;
+    p.style.display='block';
+  };
+  r.readAsDataURL(f);
+});
+
+function doPost(){
+  if(!imgData){ alert('Photo select pannu machi!'); return; }
+  let newPost = { id: Date.now(), img: imgData, cap: document.getElementById('capIn').value, likes:0, comments:[] };
+  posts.unshift(newPost);
+  save();
+  document.getElementById('capIn').value='';
+  document.getElementById('preview').style.display='none';
+  imgData=null;
+  document.getElementById('fileIn').value='';
+}
+
+function toggleLike(id){
+  let p = posts.find(x=>x.id===id);
+  if(liked.includes(id)){
+    p.likes--; liked = liked.filter(x=>x!==id);
+  }else{
+    p.likes++; liked.push(id);
+  }
+  save();
+}
+
+function doShare(id){
+  let p = posts.find(x=>x.id===id);
+  let text = p.cap + ' - PIXORO App';
+  if(navigator.share){
+    navigator.share({title:'PIXORO', text:text, url:location.href}).catch(()=>{});
+  }else{
+    // fallback for wrapper: copy + mail
+    navigator.clipboard.writeText(text+' '+location.href);
+    window.location.href = `mailto:?subject=PIXORO Photo&body=${encodeURIComponent(text+' '+location.href)}`;
+  }
+}
+
+function addCmt(id){
+  let inp = document.getElementById('c-'+id);
+  if(!inp.value.trim()) return;
+  let p = posts.find(x=>x.id===id);
+  p.comments.push(inp.value.trim());
+  inp.value='';
+  save();
+}
+
+function save(){
+  localStorage.setItem('pixoro_p', JSON.stringify(posts));
+  localStorage.setItem('pixoro_liked', JSON.stringify(liked));
+  render();
+}
+
+function render(){
+  let feed = document.getElementById('feed');
+  feed.innerHTML='';
+  posts.forEach(p=>{
+    let isLiked = liked.includes(p.id);
+    let d = document.createElement('div');
+    d.className='post-card';
+    d.innerHTML=`
+      <div style="font-weight:600">${p.cap || 'No caption'}</div>
+      <img src="${p.img}">
+      <div class="act">
+        <b onclick="toggleLike(${p.id})" class="${isLiked?'liked':''}">❤️ ${p.likes} Like</b>
+        <b onclick="document.getElementById('c-${p.id}').focus()">💬 ${p.comments.length}</b>
+        <b onclick="doShare(${p.id})">📤 Share</b>
+      </div>
+      <div style="margin-top:8px">${p.comments.map(c=>`<div style="background:#1a1a1a;padding:6px 10px;border-radius:10px;margin-top:4px;font-size:14px">💬 ${c}</div>`).join('')}</div>
+      <div class="cmt"><input id="c-${p.id}" placeholder="Comment..."><button onclick="addCmt(${p.id})" style="background:#ff1a75;border:none;color:white;border-radius:20px;padding:0 14px">OK</button></div>
+    `;
+    feed.appendChild(d);
+  });
+}
+render();
+</script>
+</body>
+</html>
