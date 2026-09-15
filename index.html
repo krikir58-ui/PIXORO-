@@ -1,156 +1,436 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIXORO</title>
 
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-  <title>PIXORO</title>
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  color: #222;
+}
 
-  <link rel="stylesheet" href="css/style.css">
+header {
+  background: white;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
 
-  <style>
-    /* IMPORTANT PAGE FIX */
+.logo {
+  font-size: 25px;
+  font-weight: bold;
+}
 
-    .page {
-      display: none;
-    }
+.search {
+  width: 40%;
+  padding: 9px 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+}
 
-    .page.active {
-      display: block;
-    }
+.profile {
+  font-weight: bold;
+}
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      padding-bottom: 80px;
-    }
+.container {
+  max-width: 600px;
+  margin: 20px auto;
+}
 
-    .top-header {
-      background: #111;
-      color: white;
-      padding: 15px;
-    }
+/* Stories */
 
-    .top-header h1 {
-      margin: 0;
-    }
+.stories {
+  background: white;
+  padding: 15px;
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  border-radius: 10px;
+}
 
-    .main-content {
-      padding: 15px;
-      max-width: 600px;
-      margin: auto;
-    }
+.story {
+  min-width: 65px;
+  text-align: center;
+  font-size: 12px;
+}
 
-    .card {
-      background: white;
-      padding: 15px;
-      border-radius: 15px;
-      margin-bottom: 15px;
-    }
+.story img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid #ff4d8d;
+  padding: 2px;
+}
 
-    input[type="text"],
-    input[type="file"] {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      box-sizing: border-box;
-    }
+/* Post */
 
-    button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
+.post {
+  background: white;
+  margin-top: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+}
 
-    .post-btn {
-      background: #ff6b00;
-      color: white;
-      font-weight: bold;
-      width: 100%;
-    }
+.post-header {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  gap: 10px;
+  font-weight: bold;
+}
 
-    #feed img,
-    #feed video {
-      width: 100%;
-      max-height: 600px;
-      object-fit: cover;
-      border-radius: 10px;
-    }
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
 
-    .post {
-      background: white;
-      margin: 15px 0;
-      border-radius: 15px;
-      overflow: hidden;
-    }
+.post img {
+  width: 100%;
+  display: block;
+}
 
-    .post-info {
-      padding: 12px;
-    }
+.actions {
+  padding: 12px;
+  display: flex;
+  gap: 18px;
+  font-size: 25px;
+}
 
-    .actions {
-      padding: 10px;
-      display: flex;
-      gap: 15px;
-    }
+.like {
+  cursor: pointer;
+}
 
-    .actions button {
-      background: none;
-      font-size: 20px;
-    }
+.liked {
+  color: red;
+}
 
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 70px;
-      background: #111;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 9999;
-    }
+.caption {
+  padding: 0 12px 12px;
+}
 
-    .bottom-nav button {
-      background: transparent;
-      color: white;
-      font-size: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+.comment-box {
+  display: flex;
+  border-top: 1px solid #eee;
+}
 
-    .bottom-nav span {
-      font-size: 11px;
-      margin-top: 3px;
-    }
+.comment-box input {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  outline: none;
+}
 
-    .profile {
-      text-align: center;
-      background: white;
-      padding: 25px;
-      border-radius: 15px;
-    }
+.comment-box button {
+  border: none;
+  background: white;
+  color: #0095f6;
+  font-weight: bold;
+  padding: 10px;
+  cursor: pointer;
+}
 
-    .avatar {
-      font-size: 60px;
-    }
-  </style>
+.comments {
+  padding: 0 12px 12px;
+}
+
+.upload {
+  background: white;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 10px;
+}
+
+.upload input {
+  width: 100%;
+  margin: 10px 0;
+}
+
+.upload button {
+  padding: 10px 18px;
+  border: none;
+  background: #0095f6;
+  color: white;
+  border-radius: 8px;
+}
+</style>
 </head>
-
 
 <body>
 
-<!-- ================= HEADER ================= -->
+<header>
+  <div class="logo">PIXORO</div>
 
-<header class="top-header">
-  <h1>📸 PIXORO</h1>
+  <input
+    id="searchInput"
+    class="search"
+    type="text"
+    placeholder="Search users..."
+    oninput="searchUsers()"
+  >
+
+  <div class="profile">@pixoro_user</div>
 </header>
 
+<div class="container">
 
-<!--
+  <!-- STORIES -->
+  <div class="stories">
+
+    <div class="story">
+      <img src="https://i.pravatar.cc/100?img=1">
+      <p>You</p>
+    </div>
+
+    <div class="story">
+      <img src="https://i.pravatar.cc/100?img=2">
+      <p>Arun</p>
+    </div>
+
+    <div class="story">
+      <img src="https://i.pravatar.cc/100?img=3">
+      <p>Kavi</p>
+    </div>
+
+    <div class="story">
+      <img src="https://i.pravatar.cc/100?img=4">
+      <p>Ravi</p>
+    </div>
+
+    <div class="story">
+      <img src="https://i.pravatar.cc/100?img=5">
+      <p>Priya</p>
+    </div>
+
+  </div>
+
+  <!-- SEARCH RESULT -->
+  <div id="searchResults"></div>
+
+  <!-- UPLOAD -->
+  <div class="upload">
+    <h3>Create Post</h3>
+
+    <input
+      type="file"
+      id="photoInput"
+      accept="image/*"
+    >
+
+    <button onclick="uploadPost()">Post</button>
+  </div>
+
+  <!-- POST -->
+  <div class="post">
+
+    <div class="post-header">
+      <img
+        class="avatar"
+        src="https://i.pravatar.cc/100?img=12"
+      >
+      <span>pixoro_user</span>
+    </div>
+
+    <img
+      src="https://picsum.photos/600/600?random=10"
+      alt="Post"
+    >
+
+    <div class="actions">
+
+      <span
+        id="likeButton"
+        class="like"
+        onclick="likePost()"
+      >♡</span>
+
+      <span>💬</span>
+      <span>↗</span>
+
+    </div>
+
+    <div class="caption">
+      <b id="likeCount">0</b> likes
+      <br><br>
+      <b>pixoro_user</b>
+      Welcome to PIXORO 🚀
+    </div>
+
+    <div id="comments" class="comments"></div>
+
+    <div class="comment-box">
+      <input
+        id="commentInput"
+        type="text"
+        placeholder="Add a comment..."
+      >
+
+      <button onclick="addComment()">
+        Post
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+/* LIKE */
+
+let likes = 0;
+
+function likePost() {
+
+  const button =
+    document.getElementById("likeButton");
+
+  if (button.classList.contains("liked")) {
+
+    likes--;
+
+    button.classList.remove("liked");
+    button.innerHTML = "♡";
+
+  } else {
+
+    likes++;
+
+    button.classList.add("liked");
+    button.innerHTML = "♥";
+
+  }
+
+  document.getElementById("likeCount")
+    .innerText = likes;
+}
+
+
+/* COMMENT */
+
+function addComment() {
+
+  const input =
+    document.getElementById("commentInput");
+
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  const comment =
+    document.createElement("p");
+
+  comment.innerHTML =
+    "<b>You</b> " + text;
+
+  document
+    .getElementById("comments")
+    .appendChild(comment);
+
+  input.value = "";
+}
+
+
+/* SEARCH */
+
+function searchUsers() {
+
+  const value =
+    document
+      .getElementById("searchInput")
+      .value
+      .toLowerCase();
+
+  const result =
+    document.getElementById("searchResults");
+
+  if (!value) {
+    result.innerHTML = "";
+    return;
+  }
+
+  const users = [
+    "pixoro_user",
+    "arun",
+    "kavi",
+    "ravi",
+    "priya"
+  ];
+
+  const found =
+    users.filter(user =>
+      user.includes(value)
+    );
+
+  if (found.length > 0) {
+
+    result.innerHTML =
+      "<div style='background:white;padding:15px;margin-top:10px;border-radius:10px'>" +
+      found.map(user =>
+        "<p style='padding:8px'><b>👤 @" +
+        user +
+        "</b></p>"
+      ).join("") +
+      "</div>";
+
+  } else {
+
+    result.innerHTML =
+      "<div style='padding:15px'>No users found</div>";
+  }
+}
+
+
+/* IMAGE UPLOAD */
+
+function uploadPost() {
+
+  const input =
+    document.getElementById("photoInput");
+
+  if (!input.files.length) {
+    alert("Please select a photo");
+    return;
+  }
+
+  const file = input.files[0];
+
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+
+    const post =
+      document.createElement("div");
+
+    post.className = "post";
+
+    post.innerHTML = `
+      <div class="post-header">
+        <img
+          class="avatar"
+          src="https://i.pravatar.cc/100?img=12"
+        >
+        <span>@pixoro_user</span>
+      </div>
+
+      <img src="${e.target.result}">
+
+      <div class="actions">
+        ❤️ &nbsp
