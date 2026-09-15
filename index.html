@@ -1,58 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PIXORO</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#ff0066">
 <style>
-body{background:#0a0a0a;color:white;font-family:sans-serif;margin:0;padding:20px}
-h1{color:#ff0066;text-align:center}
-.card{background:#1a1a1a;padding:15px;border-radius:12px;margin:10px 0;border:1px solid #ff006633}
-button{background:#ff0066;color:white;border:none;padding:10px 20px;border-radius:8px;width:100%;font-weight:bold}
-input{width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:white;box-sizing:border-box;margin-bottom:10px}
-#posts{margin-top:20px}
+body{margin:0;background:#111;color:#fff;font-family:Arial;padding:20px}
+h1{color:#ff0066;text-align:center;font-size:32px}
+.box{background:#222;padding:15px;border-radius:12px;margin-bottom:15px;border:1px solid #333}
+input{width:100%;padding:14px;border-radius:10px;border:none;background:#333;color:white;box-sizing:border-box;font-size:16px}
+button{background:#ff0066;color:white;border:none;padding:14px;border-radius:10px;width:100%;font-size:16px;font-weight:bold;margin-top:10px}
+.post{background:#222;padding:12px;border-radius:10px;margin-top:10px;border-left:3px solid #ff0066}
 </style>
 </head>
 <body>
 <h1>PIXORO 🚀</h1>
-<div class="card">
-<input id="postInput" placeholder="Enna yosikura Giri?">
-<button onclick="addPost()">Post Pannu</button>
+<div class="box">
+<input id="t" placeholder="Enna yosikura?">
+<button onclick="post()">Post Pannu</button>
 </div>
-<div id="posts"></div>
+<div id="list"></div>
 
 <script>
-let posts = JSON.parse(localStorage.getItem('pixoro_posts') || '[]');
-function showPosts(){
-  posts = posts.filter(p => p && p!='null' && p!='');
-  localStorage.setItem('pixoro_posts', JSON.stringify(posts));
-  let html = '';
-  for(let i=posts.length-1; i>=0; i--){
-    if(posts[i].startsWith('data:image')){
-      html += `<div class="card"><img src="${posts[i]}" style="width:100%;border-radius:8px"></div>`;
-    } else {
-      html += `<div class="card">${posts[i]}</div>`;
-    }
-  }
-  document.getElementById('posts').innerHTML = html;
+localStorage.clear();
+let a = [];
+function show(){
+  let h="";
+  for(let i=a.length-1;i>=0;i++){ h+=`<div class="post">${a[i]}</div>` }
+  document.getElementById("list").innerHTML=h;
 }
-
-function addPost(){
-  let val = document.getElementById('postInput').value;
-  if(!val) return;
-  posts.push(val);
-  localStorage.setItem('pixoro_posts', JSON.stringify(posts));
-  document.getElementById('postInput').value='';
-  showPosts();
+function post(){
+  let v=document.getElementById("t").value;
+  if(!v) return;
+  a.push(v);
+  document.getElementById("t").value="";
+  show();
 }
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
-}
-
-showPosts();
+show();
 </script>
 </body>
 </html>
