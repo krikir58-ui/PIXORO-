@@ -3,29 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO</title>
+<title>PIXORO - Filter Launch</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0f0f0f;color:white;font-family:sans-serif;padding:20px}
-h1{color:#ff0066;text-align:center;padding:15px;font-size:30px}
-.box{background:#1f1f1f;padding:20px;border-radius:15px;border:1px solid #333}
-input{width:100%;padding:15px;border-radius:10px;border:none;background:#333;color:white;font-size:16px}
-button{width:100%;padding:15px;background:#ff0066;color:white;border:none;border-radius:10px;margin-top:10px;font-weight:bold;font-size:16px}
-.post{background:#1f1f1f;padding:15px;margin-top:10px;border-radius:10px;border-left:4px solid #ff0066}
+body{background:#000;color:#fff;font-family:Arial;padding:10px}
+h1{color:#ff0066;text-align:center;padding:10px}
+.box{background:#1a1a1a;padding:15px;border-radius:15px;border:1px solid #333}
+input[type=file]{color:#fff;margin:10px 0}
+#preview{width:100%;max-height:300px;border-radius:10px;display:none;margin:10px 0}
+.filters{display:flex;gap:8px;overflow-x:auto;padding:10px 0}
+.f-btn{padding:8px 14px;background:#333;border:none;color:#fff;border-radius:20px;white-space:nowrap}
+.f-btn.active{background:#ff0066}
+input[type=text]{width:100%;padding:12px;background:#333;border:none;color:#fff;border-radius:10px;margin-top:10px}
+button.post{width:100%;padding:14px;background:#ff0066;color:#fff;border:none;border-radius:10px;margin-top:10px;font-weight:bold}
+.post{background:#1a1a1a;padding:10px;border-radius:10px;margin-top:12px}
+.post img{width:100%;border-radius:10px}
 </style>
 </head>
 <body>
-<h1>PIXORO 🚀</h1>
+<h1>PIXORO 🚀 FILTERS</h1>
 <div class="box">
-<input id="t" placeholder="Enna yosikura Giri?">
-<button onclick="add()">Post Pannu</button>
+<input type="file" id="file" accept="image/*" onchange="loadFile(event)">
+<img id="preview">
+<div class="filters">
+<button class="f-btn active" onclick="setFilter('none',this)">Original</button>
+<button class="f-btn" onclick="setFilter('grayscale(100%)',this)">B&W</button>
+<button class="f-btn" onclick="setFilter('sepia(100%)',this)">Sepia</button>
+<button class="f-btn" onclick="setFilter('contrast(150%) saturate(150%)',this)">Vivid</button>
+<button class="f-btn" onclick="setFilter('blur(1px) brightness(1.2)',this)">Soft</button>
+<button class="f-btn" onclick="setFilter('hue-rotate(90deg)',this)">Retro</button>
+</div>
+<input type="text" id="caption" placeholder="Enna yosikura Giri?">
+<button class="post" onclick="addPost()">Post Pannu</button>
 </div>
 <div id="list"></div>
 <script>
-let arr=[];
-function show(){let s="";for(let i=arr.length-1;i>=0;i--)s+=`<div class=post>${arr[i]}</div>`;document.getElementById("list").innerHTML=s}
-function add(){let v=document.getElementById("t").value;if(!v)return;arr.push(v);document.getElementById("t").value="";show()}
-show();
+let curFilter='none';
+let curImg='';
+function loadFile(e){
+  let r=new FileReader();
+  r.onload=function(){
+    curImg=r.result;
+    let p=document.getElementById('preview');
+    p.src=curImg; p.style.display='block'; p.style.filter=curFilter;
+  }
+  r.readAsDataURL(e.target.files[0]);
+}
+function setFilter(f,btn){
+  curFilter=f;
+  document.getElementById('preview').style.filter=f;
+  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function addPost(){
+  let cap=document.getElementById('caption').value;
+  if(!curImg &&!cap) return;
+  let html=`<div class="post">`;
+  if(curImg) html+=`<img src="${curImg}" style="filter:${curFilter}">`;
+  if(cap) html+=`<p style="margin-top:8px">${cap}</p>`;
+  html+=`</div>`;
+  document.getElementById('list').innerHTML=html+document.getElementById('list').innerHTML;
+  document.getElementById('caption').value='';
+}
 </script>
 </body>
 </html>
