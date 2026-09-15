@@ -15,47 +15,58 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: #f5f5f5;
+  color: #111;
+  padding-bottom: 75px;
 }
 
+/* HEADER */
 header {
+  height: 65px;
   width: 100%;
-  height: 70px;
   background: white;
   display: flex;
   align-items: center;
-  padding: 10px;
   gap: 10px;
+  padding: 8px 12px;
   border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .logo {
-  font-size: 25px;
+  font-size: 24px;
   font-weight: bold;
 }
 
 .search {
   flex: 1;
   min-width: 0;
-  padding: 11px;
+  padding: 11px 14px;
   border: 1px solid #ddd;
   border-radius: 25px;
+  font-size: 14px;
+  outline: none;
 }
 
 .owner {
+  font-size: 12px;
   font-weight: bold;
-  font-size: 13px;
+  white-space: nowrap;
 }
 
+/* MAIN */
 main {
   width: 100%;
   max-width: 600px;
   margin: auto;
 }
 
+/* STORIES */
 .stories {
   background: white;
   margin-top: 10px;
-  padding: 15px;
+  padding: 15px 10px;
   display: flex;
   gap: 18px;
   overflow-x: auto;
@@ -63,18 +74,23 @@ main {
 }
 
 .story {
-  min-width: 65px;
+  min-width: 68px;
   text-align: center;
 }
 
 .story img {
-  width: 60px;
-  height: 60px;
+  width: 62px;
+  height: 62px;
   object-fit: cover;
   border-radius: 50%;
   border: 3px solid #ff2685;
 }
 
+.story p {
+  margin: 6px 0 0;
+}
+
+/* CREATE */
 .create {
   background: white;
   margin-top: 10px;
@@ -82,41 +98,167 @@ main {
   border-radius: 12px;
 }
 
-.create button {
+.create h2 {
+  margin-top: 0;
+}
+
+.create input {
+  width: 100%;
+  margin: 10px 0;
+}
+
+.postBtn {
   background: #1296ed;
   color: white;
   border: 0;
   padding: 12px 25px;
   border-radius: 8px;
-  margin-top: 10px;
+  font-size: 16px;
 }
 
+/* POST */
 .post {
   background: white;
   margin-top: 10px;
-  border: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
 }
 
-.post-header {
-  padding: 12px;
+.postHeader {
+  padding: 13px;
+  font-weight: bold;
+  font-size: 17px;
+}
+
+.postImage {
+  width: 100%;
+  display: block;
+  max-height: 650px;
+  object-fit: cover;
+}
+
+/* ACTIONS */
+.actions {
+  display: flex;
+  gap: 20px;
+  padding: 10px 13px;
+}
+
+.action {
+  border: 0;
+  background: none;
+  font-size: 27px;
+  cursor: pointer;
+}
+
+.liked {
+  color: red;
+}
+
+.likeCount {
+  padding: 0 13px 8px;
   font-weight: bold;
 }
 
-.post-image {
-  width: 100%;
-  display: block;
-}
-
-.actions {
-  padding: 12px;
-  font-size: 28px;
-}
-
 .caption {
-  padding: 0 12px 15px;
+  padding: 0 13px 13px;
+  line-height: 1.5;
 }
 
+/* COMMENT */
+.commentBox {
+  display: flex;
+  border-top: 1px solid #eee;
+}
+
+.commentBox input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  padding: 14px;
+}
+
+.commentBox button {
+  border: 0;
+  background: white;
+  color: #1296ed;
+  font-weight: bold;
+  padding: 0 15px;
+}
+
+.comments {
+  padding: 0 13px 8px;
+}
+
+/* PROFILE */
+#profilePage {
+  display: none;
+  background: white;
+  margin-top: 10px;
+  padding: 25px;
+  text-align: center;
+  border-radius: 12px;
+}
+
+.profilePic {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #ff2685;
+}
+
+.followBtn {
+  background: #1296ed;
+  color: white;
+  border: 0;
+  padding: 10px 25px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+/* SEARCH */
+#searchResults {
+  background: white;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+
+.searchUser {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+/* BOTTOM NAVIGATION */
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 65px;
+  background: white;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+}
+
+.navBtn {
+  border: 0;
+  background: none;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.navText {
+  display: block;
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+/* MOBILE */
 @media (max-width: 600px) {
+
   .logo {
     font-size: 22px;
   }
@@ -129,156 +271,4 @@ main {
     width: 100%;
   }
 
-  .post {
-    border-left: 0;
-    border-right: 0;
-  }
-}
-</style>
-</head>
-
-<body>
-
-<header>
-
-  <div class="logo">PIXORO</div>
-
-  <input
-    class="search"
-    type="text"
-    placeholder="Search users..."
-  >
-
-  <div class="owner">
-    👑 OWNER
-  </div>
-
-</header>
-
-<main>
-
-  <div class="stories">
-
-    <div class="story">
-      <img src="https://i.pravatar.cc/100?img=12">
-      <p>You</p>
-    </div>
-
-    <div class="story">
-      <img src="https://i.pravatar.cc/100?img=2">
-      <p>Arun</p>
-    </div>
-
-    <div class="story">
-      <img src="https://i.pravatar.cc/100?img=3">
-      <p>Kavi</p>
-    </div>
-
-    <div class="story">
-      <img src="https://i.pravatar.cc/100?img=4">
-      <p>Ravi</p>
-    </div>
-
-    <div class="story">
-      <img src="https://i.pravatar.cc/100?img=5">
-      <p>Priya</p>
-    </div>
-
-  </div>
-
-  <div class="create">
-
-    <h2>Create Post</h2>
-
-    <input
-      type="file"
-      id="photo"
-      accept="image/*"
-    >
-
-    <br>
-
-    <button onclick="createPost()">
-      Post
-    </button>
-
-  </div>
-
-  <div class="post">
-
-    <div class="post-header">
-      @pixoro_user 👑
-    </div>
-
-    <img
-      class="post-image"
-      src="https://picsum.photos/600/600"
-      alt="PIXORO"
-    >
-
-    <div class="actions">
-      ♡ &nbsp; 💬 &nbsp; ↗
-    </div>
-
-    <div class="caption">
-      <b>@pixoro_user</b>
-      Welcome to PIXORO 🚀
-    </div>
-
-  </div>
-
-</main>
-
-<script>
-
-function createPost() {
-
-  var file =
-    document.getElementById("photo").files[0];
-
-  if (!file) {
-    alert("Please choose a photo");
-    return;
-  }
-
-  var reader =
-    new FileReader();
-
-  reader.onload = function(e) {
-
-    var post =
-      document.createElement("div");
-
-    post.className = "post";
-
-    post.innerHTML =
-      '<div class="post-header">' +
-      '@pixoro_user 👑' +
-      '</div>' +
-
-      '<img class="post-image" src="' +
-      e.target.result +
-      '">' +
-
-      '<div class="actions">' +
-      '♡ &nbsp; 💬 &nbsp; ↗' +
-      '</div>' +
-
-      '<div class="caption">' +
-      '<b>@pixoro_user</b> ' +
-      'My new PIXORO post 🚀' +
-      '</div>';
-
-    document
-      .querySelector("main")
-      .appendChild(post);
-
-  };
-
-  reader.readAsDataURL(file);
-}
-
-</script>
-
-</body>
-</html>
+  .
