@@ -5,37 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PIXORO</title>
 <style>
-body{margin:0;background:#111;color:#fff;font-family:Arial;padding:20px}
-h1{color:#ff0066;text-align:center;font-size:32px}
-.box{background:#222;padding:15px;border-radius:12px;margin-bottom:15px;border:1px solid #333}
-input{width:100%;padding:14px;border-radius:10px;border:none;background:#333;color:white;box-sizing:border-box;font-size:16px}
-button{background:#ff0066;color:white;border:none;padding:14px;border-radius:10px;width:100%;font-size:16px;font-weight:bold;margin-top:10px}
-.post{background:#222;padding:12px;border-radius:10px;margin-top:10px;border-left:3px solid #ff0066}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f0f0f;color:white;font-family:sans-serif;padding:20px}
+h1{color:#ff0066;text-align:center;padding:15px;font-size:30px}
+.box{background:#1f1f1f;padding:20px;border-radius:15px;border:1px solid #333}
+input{width:100%;padding:15px;border-radius:10px;border:none;background:#333;color:white;font-size:16px}
+button{width:100%;padding:15px;background:#ff0066;color:white;border:none;border-radius:10px;margin-top:10px;font-weight:bold;font-size:16px}
+.post{background:#1f1f1f;padding:15px;margin-top:10px;border-radius:10px;border-left:4px solid #ff0066}
 </style>
 </head>
 <body>
 <h1>PIXORO 🚀</h1>
 <div class="box">
-<input id="t" placeholder="Enna yosikura?">
-<button onclick="post()">Post Pannu</button>
+<input id="t" placeholder="Enna yosikura Giri?">
+<button onclick="add()">Post Pannu</button>
 </div>
 <div id="list"></div>
-
 <script>
-localStorage.clear();
-let a = [];
-function show(){
-  let h="";
-  for(let i=a.length-1;i>=0;i++){ h+=`<div class="post">${a[i]}</div>` }
-  document.getElementById("list").innerHTML=h;
-}
-function post(){
-  let v=document.getElementById("t").value;
-  if(!v) return;
-  a.push(v);
-  document.getElementById("t").value="";
-  show();
-}
+let arr=[];
+function show(){let s="";for(let i=arr.length-1;i>=0;i--)s+=`<div class=post>${arr[i]}</div>`;document.getElementById("list").innerHTML=s}
+function add(){let v=document.getElementById("t").value;if(!v)return;arr.push(v);document.getElementById("t").value="";show()}
 show();
 </script>
 </body>
