@@ -2,77 +2,81 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO 🔥</title>
+<title>PIXORO 🔥 LIVE</title>
 <style>
-body{background:#000;color:#fff;font-family:sans-serif;margin:0;padding:10px}
-#feed img{width:100%;border-radius:12px;margin:12px 0;display:block}
-button{background:red;color:white;border:none;padding:12px;width:100%;border-radius:20px;font-weight:bold;margin-top:8px}
-input{width:100%;padding:10px;border-radius:10px}
+body{background:#000;color:#fff;font-family:sans-serif;padding:12px;margin:0}
+#feed img{width:100%;border-radius:16px;margin:12px 0;display:block;border:1px solid #222}
+button{background:red;color:#fff;border:none;padding:14px;width:100%;border-radius:25px;font-weight:bold;font-size:16px;margin-top:10px}
+input{width:95%;padding:12px;border-radius:10px;margin:10px 0}
+#msg{color:#0f0;text-align:center;font-weight:bold}
+.post{background:#111;padding:10px;border-radius:12px;margin:10px 0}
 </style>
 </head>
 <body>
-<h2>PIXORO 🔥</h2>
+<h2>PIXORO 🔥 LIVE</h2>
 <input type="file" id="fileInput" accept="image/*">
-<button onclick="handlePost()">Post Public 🔥</button>
-<p id="msg" style="color:lightgreen;text-align:center"></p>
-<div id="feed"></div>
+<button onclick="handlePost()">POST PUBLIC 🔥</button>
+<p id="msg"></p>
+<div id="feed">Loading da Giri...</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// UN FIREBASE CONFIG-A INGA PASTE PANNU DA GIRI
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",
+  authDomain: "pixoro-75927.firebaseapp.com",
+  projectId: "pixoro-75927",
+  storageBucket: "pixoro-75927.firebasestorage.app",
+  messagingSenderId: "814840120295",
+  appId: "1:814840120295:web:6c02c613df5a17209bf342",
+  measurementId: "G-H3NR8P270D"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 async function showPosts(){
-  const q = query(collection(db,"posts"));
-  const snap = await getDocs(q);
-  let html = "";
-  snap.forEach(doc=>{
-    let d = doc.data();
-    if(d.imageUrl) html += `<img src="${d.imageUrl}">`;
+  const snap = await getDocs(collection(db,"posts"));
+  let h="";
+  snap.forEach(d=>{
+    let data=d.data();
+    let url = data.imageUrl || data.imageUrl1 || "";
+    if(url) h+=`<div class="post"><img src="${url}"><p>🔥 ${data.username||'giri'} • ${data.likes||0} likes</p></div>`;
   });
-  document.getElementById("feed").innerHTML = html;
+  document.getElementById("feed").innerHTML = h || "<p style='text-align:center;color:gray'>No posts yet da - first post podu da! 🔥</p>";
 }
-window.showPosts = showPosts;
 
-window.handlePost = async () => {
-  let file = document.getElementById("fileInput").files[0];
-  if(!file) return alert("Photo select pannu da!");
-  document.getElementById("msg").innerText = "Uploading da Giri...";
+window.handlePost=async()=>{
+  let file=document.getElementById("fileInput").files[0];
+  if(!file) return alert("Photo select pannu da Giri!");
+  document.getElementById("msg").innerText="Uploading da Giri... ⏳";
 
-  // PHOTO-VA CHINNA SIZE AAKKUREN DA - FIRESTORE KU
   let compressed = await new Promise(res=>{
-    let img = new Image();
-    img.onload = ()=>{
-      let canvas = document.createElement("canvas");
-      let max = 600; // 600px ku compress
-      let w = img.width, h = img.height;
-      if(w>max){ h*=max/w; w=max; }
-      canvas.width=w; canvas.height=h;
-      canvas.getContext("2d").drawImage(img,0,0,w,h);
-      res(canvas.toDataURL("image/jpeg",0.6));
+    let img=new Image();
+    img.onload=()=>{
+      let c=document.createElement("canvas");
+      let max=600,w=img.width,h=img.height;
+      if(w>max){h*=max/w; w=max;}
+      if(h>max){w*=max/h; h=max;}
+      c.width=w; c.height=h;
+      c.getContext("2d").drawImage(img,0,0,w,h);
+      res(c.toDataURL("image/jpeg",0.6));
     };
-    let r = new FileReader();
-    r.onload = e=>{ img.src=e.target.result; };
-    r.readAsDataURL(file);
+    let reader=new FileReader();
+    reader.onload=e=>img.src=e.target.result;
+    reader.readAsDataURL(file);
   });
 
   await addDoc(collection(db,"posts"),{
     imageUrl: compressed,
-    likes: 0,
+    title: "PIXORO Post",
     username: "giri",
+    likes: 0,
+    type: "image",
     createdAt: new Date()
   });
-  document.getElementById("msg").innerText = "Semma da Giri! Public la vanthuduchu! 🔥";
+  document.getElementById("msg").innerText="Semma da Giri! Public la save aayiduchu! 🔥";
   showPosts();
 }
 showPosts();
