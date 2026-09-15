@@ -49,10 +49,10 @@ document.getElementById('feed').innerHTML=h
 }
 function add(){
 let c=document.getElementById('cap').value;if(!img &&!c) return;
-posts.push({img:img,filter:filter,cap:c,likes:0,comments:[]});localStorage.setItem('pix',JSON.stringify(posts));
+posts.push({img:img,filter:filter,cap:c,likes:0,liked:false,comments:[]});
 img='';document.getElementById('preview').style.display='none';document.getElementById('cap').value='';render()
-}
-function like(i){posts[i].likes++;localStorage.setItem('pix',JSON.stringify(posts));render()}
+ }
+ function like(i){if(posts[i].liked){posts[i].likes--;posts[i].liked=false;}else{posts[i].likes++;posts[i].liked=true;}localStorage.setItem('pix',JSON.stringify(posts));render();}
 function cmnt(i){let t=prompt('Comment sollu da:');if(t){posts[i].comments.push(t);localStorage.setItem('pix',JSON.stringify(posts));render()}}
 render();
 </script>
