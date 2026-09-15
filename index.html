@@ -2,192 +2,637 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>PIXORO</title>
 
 <style>
-*{
-    box-sizing:border-box;
-}
-
-html,body{
-    margin:0;
-    padding:0;
-    width:100%;
-    min-height:100%;
-    font-family:Arial,sans-serif;
-    background:#f2f2f2;
-}
-
+*{box-sizing:border-box}
 body{
-    padding-bottom:70px;
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#f2f2f2;
+ padding-bottom:70px;
 }
-
-/* HEADER */
 .header{
-    height:60px;
-    background:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 16px;
-    border-bottom:1px solid #ddd;
-    position:sticky;
-    top:0;
-    z-index:100;
+ height:60px;
+ background:#fff;
+ border-bottom:1px solid #ddd;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ padding:0 15px;
+ position:sticky;
+ top:0;
+ z-index:10;
 }
-
 .logo{
-    font-size:25px;
-    font-weight:bold;
-    color:#168fe8;
+ font-size:25px;
+ font-weight:bold;
+ color:#168fe8;
 }
-
 .header button{
-    border:0;
-    background:none;
-    font-size:24px;
-    margin-left:12px;
+ border:0;
+ background:none;
+ font-size:24px;
+ margin-left:12px;
 }
-
-/* MAIN */
-.container{
-    width:100%;
-    max-width:600px;
-    margin:auto;
+main{
+ max-width:600px;
+ margin:auto;
 }
+.page{display:none}
+.page.active{display:block}
 
-/* PAGES */
-.page{
-    display:none;
+.create,.post{
+ background:#fff;
+ margin-bottom:10px;
 }
-
-.page.active{
-    display:block;
+.create{padding:12px}
+.row{
+ display:flex;
+ align-items:center;
+ gap:10px;
 }
-
-/* CREATE */
-.create{
-    background:white;
-    padding:12px;
-    margin-bottom:10px;
-}
-
-.create-row{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
 .avatar{
-    width:44px;
-    height:44px;
-    min-width:44px;
-    border-radius:50%;
-    background:#168fe8;
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:bold;
+ width:44px;
+ height:44px;
+ min-width:44px;
+ border-radius:50%;
+ background:#168fe8;
+ color:white;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-weight:bold;
 }
-
-.create-input{
-    flex:1;
-    border:1px solid #ddd;
-    border-radius:25px;
-    padding:12px 15px;
-    outline:none;
-}
-
-/* POST */
-.post{
-    background:white;
-    margin-bottom:10px;
+.create input{
+ flex:1;
+ border:1px solid #ddd;
+ border-radius:25px;
+ padding:12px 15px;
+ outline:none;
 }
 
 .post-head{
-    display:flex;
-    align-items:center;
-    padding:12px;
-    gap:10px;
+ display:flex;
+ align-items:center;
+ gap:10px;
+ padding:12px;
 }
-
-.user{
-    flex:1;
-}
-
-.user b{
-    font-size:15px;
-}
-
+.user{flex:1}
 .user small{
-    display:block;
-    color:#777;
-    margin-top:3px;
+ display:block;
+ color:#777;
+ margin-top:3px;
 }
-
 .more{
-    border:0;
-    background:none;
-    font-size:22px;
+ border:0;
+ background:none;
+ font-size:22px;
 }
-
 .post-photo{
-    width:100%;
-    height:380px;
-    background:linear-gradient(135deg,#168fe8,#7b4ce2);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:white;
-    font-size:40px;
-    font-weight:bold;
+ height:380px;
+ background:linear-gradient(135deg,#168fe8,#7b4ce2);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ color:white;
+ font-size:40px;
+ font-weight:bold;
 }
-
 .actions{
-    display:flex;
-    gap:18px;
-    padding:8px 12px 2px;
+ display:flex;
+ gap:16px;
+ padding:8px 12px 2px;
 }
-
 .actions button{
-    border:0;
-    background:none;
-    font-size:27px;
-    cursor:pointer;
+ border:0;
+ background:none;
+ font-size:27px;
+ cursor:pointer;
 }
-
-.like.liked{
-    color:red;
-}
-
+.liked{color:red!important}
 .likes{
-    padding:3px 12px;
-    font-weight:bold;
+ font-weight:bold;
+ padding:3px 12px;
 }
-
 .caption{
-    padding:5px 12px 12px;
+ padding:5px 12px 12px;
 }
-
 .comments{
-    padding:0 12px 5px;
+ padding:0 12px;
 }
-
 .comment{
-    padding:5px 0;
-    font-size:14px;
+ padding:5px 0;
+ font-size:14px;
 }
-
 .comment-box{
-    display:flex;
-    border-top:1px solid #eee;
+ display:flex;
+ border-top:1px solid #eee;
+}
+.comment-box input{
+ flex:1;
+ border:0;
+ outline:0;
+ padding:14px;
+}
+.comment-box button{
+ border:0;
+ background:white;
+ color:#168fe8;
+ font-weight:bold;
+ padding:0 14px;
 }
 
-.comment-box input{
-    flex:1;
-    min-width:0;
-    border:0;
-   
+.search{
+ padding:15px;
+}
+.search input{
+ width:100%;
+ padding:13px 16px;
+ border:1px solid #ddd;
+ border-radius:25px;
+ outline:none;
+ font-size:16px;
+}
+.result{
+ background:white;
+ margin-top:10px;
+ padding:12px;
+ border-radius:8px;
+ display:flex;
+ align-items:center;
+ gap:10px;
+}
+
+.profile{
+ background:white;
+ text-align:center;
+ padding:30px 15px;
+ min-height:500px;
+}
+.profile-avatar{
+ width:110px;
+ height:110px;
+ border-radius:50%;
+ background:#168fe8;
+ color:white;
+ margin:auto;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-size:40px;
+ font-weight:bold;
+}
+.stats{
+ display:flex;
+ justify-content:center;
+ gap:45px;
+ margin:25px;
+}
+.edit{
+ background:#168fe8;
+ color:white;
+ border:0;
+ border-radius:8px;
+ padding:10px 28px;
+}
+
+.nav{
+ position:fixed;
+ bottom:0;
+ left:0;
+ width:100%;
+ height:68px;
+ background:white;
+ border-top:1px solid #ddd;
+ display:flex;
+ justify-content:space-around;
+ align-items:center;
+ z-index:20;
+}
+.nav button{
+ border:0;
+ background:none;
+ font-size:23px;
+ cursor:pointer;
+}
+.nav span{
+ display:block;
+ font-size:10px;
+ margin-top:2px;
+}
+
+@media(max-width:600px){
+ .post-photo{height:330px}
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+ <div class="logo">PIXORO</div>
+ <div>
+  <button onclick="showPage('search')">🔍</button>
+  <button onclick="alert('Notifications')">♡</button>
+ </div>
+</header>
+
+<main>
+
+<!-- HOME -->
+<section id="home" class="page active">
+
+<div class="create">
+ <div class="row">
+  <div class="avatar">K</div>
+  <input
+   placeholder="Create a post..."
+   onclick="createPost()">
+ </div>
+</div>
+
+<!-- POST -->
+<article class="post">
+
+<div class="post-head">
+ <div class="avatar">P</div>
+ <div class="user">
+  <b>pixoro_user</b>
+  <small>Just now</small>
+ </div>
+ <button class="more">⋮</button>
+</div>
+
+<div class="post-photo">PIXORO</div>
+
+<div class="actions">
+ <button onclick="likePost(this)">♡</button>
+ <button onclick="focusComment(this)">💬</button>
+ <button onclick="alert('Share')">➤</button>
+</div>
+
+<div class="likes">
+ <span>0</span> likes
+</div>
+
+<div class="caption">
+ <b>pixoro_user</b>
+ Welcome to PIXORO! 🎉
+</div>
+
+<div class="comments"></div>
+
+<div class="comment-box">
+ <input placeholder="Add a comment...">
+ <button onclick="addComment(this)">Post</button>
+</div>
+
+</article>
+
+<!-- POST 2 -->
+<article class="post">
+
+<div class="post-head">
+ <div class="avatar">K</div>
+ <div class="user">
+  <b>kri_user</b>
+  <small>1 hour ago</small>
+ </div>
+ <button class="more">⋮</button>
+</div>
+
+<div class="post-photo">📸</div>
+
+<div class="actions">
+ <button onclick="likePost(this)">♡</button>
+ <button onclick="focusComment(this)">💬</button>
+ <button onclick="alert('Share')">➤</button>
+</div>
+
+<div class="likes">
+ <span>0</span> likes
+</div>
+
+<div class="caption">
+ <b>kri_user</b>
+ My first PIXORO post ❤️
+</div>
+
+<div class="comments"></div>
+
+<div class="comment-box">
+ <input placeholder="Add a comment...">
+ <button onclick="addComment(this)">Post</button>
+</div>
+
+</article>
+
+</section>
+
+
+<!-- SEARCH -->
+<section id="search" class="page search">
+
+<h2>Search</h2>
+
+<input
+ id="searchInput"
+ placeholder="Search users..."
+ oninput="searchUsers()">
+
+<div id="results"></div>
+
+</section>
+
+
+<!-- PROFILE -->
+<section id="profile" class="page profile">
+
+<div class="profile-avatar">K</div>
+
+<h2>Kri User</h2>
+<p>@kri_user</p>
+
+<div class="stats">
+
+<div>
+<b id="postCount">2</b>
+<br>Posts
+</div>
+
+<div>
+<b>120</b>
+<br>Followers
+</div>
+
+<div>
+<b>85</b>
+<br>Following
+</div>
+
+</div>
+
+<button class="edit">Edit Profile</button>
+
+</section>
+
+</main>
+
+
+<!-- NAVIGATION -->
+<nav class="nav">
+
+<button onclick="showPage('home')">
+ 🏠
+ <span>Home</span>
+</button>
+
+<button onclick="showPage('search')">
+ 🔍
+ <span>Search</span>
+</button>
+
+<button onclick="createPost()">
+ ➕
+ <span>Post</span>
+</button>
+
+<button onclick="alert('Reels coming soon')">
+ ▶️
+ <span>Reels</span>
+</button>
+
+<button onclick="showPage('profile')">
+ 👤
+ <span>Profile</span>
+</button>
+
+</nav>
+
+
+<script>
+
+function showPage(id){
+
+ document.querySelectorAll('.page')
+ .forEach(function(page){
+  page.classList.remove('active');
+ });
+
+ document.getElementById(id)
+ .classList.add('active');
+
+ window.scrollTo(0,0);
+}
+
+
+function likePost(button){
+
+ var post=button.closest('.post');
+
+ var number=
+ post.querySelector('.likes span');
+
+ var count=parseInt(number.textContent)||0;
+
+ if(button.classList.contains('liked')){
+
+  count--;
+  button.classList.remove('liked');
+  button.textContent='♡';
+
+ }else{
+
+  count++;
+  button.classList.add('liked');
+  button.textContent='♥';
+
+ }
+
+ number.textContent=count;
+}
+
+
+function focusComment(button){
+
+ var post=button.closest('.post');
+
+ var input=
+ post.querySelector('.comment-box input');
+
+ input.focus();
+}
+
+
+function addComment(button){
+
+ var box=button.closest('.comment-box');
+
+ var input=box.querySelector('input');
+
+ var text=input.value.trim();
+
+ if(text===''){
+  return;
+ }
+
+ var post=button.closest('.post');
+
+ var comments=
+ post.querySelector('.comments');
+
+ var div=document.createElement('div');
+
+ div.className='comment';
+
+ var name=document.createElement('b');
+
+ name.textContent='Kri User: ';
+
+ div.appendChild(name);
+
+ div.appendChild(
+  document.createTextNode(text)
+ );
+
+ comments.appendChild(div);
+
+ input.value='';
+}
+
+
+function createPost(){
+
+ var text=prompt('Write your post:');
+
+ if(!text || text.trim()===''){
+  return;
+ }
+
+ var post=document.createElement('article');
+
+ post.className='post';
+
+ post.innerHTML=`
+
+ <div class="post-head">
+
+  <div class="avatar">K</div>
+
+  <div class="user">
+   <b>Kri User</b>
+   <small>Just now</small>
+  </div>
+
+  <button class="more">⋮</button>
+
+ </div>
+
+ <div class="post-photo">📷</div>
+
+ <div class="actions">
+
+  <button onclick="likePost(this)">♡</button>
+
+  <button onclick="focusComment(this)">💬</button>
+
+  <button onclick="alert('Share')">➤</button>
+
+ </div>
+
+ <div class="likes">
+  <span>0</span> likes
+ </div>
+
+ <div class="caption"></div>
+
+ <div class="comments"></div>
+
+ <div class="comment-box">
+  <input placeholder="Add a comment...">
+  <button onclick="addComment(this)">Post</button>
+ </div>
+
+ `;
+
+ var caption=post.querySelector('.caption');
+
+ var bold=document.createElement('b');
+
+ bold.textContent='Kri User ';
+
+ caption.appendChild(bold);
+
+ caption.appendChild(
+  document.createTextNode(text)
+ );
+
+ document.getElementById('home')
+ .appendChild(post);
+
+ document.getElementById('postCount')
+ .textContent=
+ document.querySelectorAll('#home .post').length;
+
+ showPage('home');
+}
+
+
+function searchUsers(){
+
+ var q=
+ document.getElementById('searchInput')
+ .value
+ .toLowerCase()
+ .trim();
+
+ var results=
+ document.getElementById('results');
+
+ results.innerHTML='';
+
+ if(q===''){
+  return;
+ }
+
+ var users=[
+  'pixoro_user',
+  'kri_user',
+  'pixoro_official',
+  'photo_user'
+ ];
+
+ users.forEach(function(user){
+
+  if(user.includes(q)){
+
+   var div=
+   document.createElement('div');
+
+   div.className='result';
+
+   div.innerHTML=
+   '<div class="avatar">'+
+   user.charAt(0).toUpperCase()+
+   '</div>';
+
+   var b=
+   document.createElement('b');
+
+   b.textContent='@'+user;
+
+   div.appendChild(b);
+
+   results.appendChild(div);
+  }
+
+ });
+
+}
+
+</script>
+
+</body>
+</html>
