@@ -25,11 +25,16 @@ input{width:100%;padding:12px;border-radius:8px;border:1px solid #333;background
 
 <script>
 let posts = JSON.parse(localStorage.getItem('pixoro_posts') || '[]');
-
 function showPosts(){
+  posts = posts.filter(p => p && p!='null' && p!='');
+  localStorage.setItem('pixoro_posts', JSON.stringify(posts));
   let html = '';
   for(let i=posts.length-1; i>=0; i--){
-    html += `<div class="card">${posts[i]}</div>`;
+    if(posts[i].startsWith('data:image')){
+      html += `<div class="card"><img src="${posts[i]}" style="width:100%;border-radius:8px"></div>`;
+    } else {
+      html += `<div class="card">${posts[i]}</div>`;
+    }
   }
   document.getElementById('posts').innerHTML = html;
 }
