@@ -2,26 +2,30 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO 🔥 LIVE</title>
+<title>PIXORO 🔥 PUBLIC</title>
 <style>
 body{background:#000;color:#fff;font-family:sans-serif;padding:12px;margin:0}
-#feed img{width:100%;border-radius:16px;margin:12px 0;display:block;border:1px solid #222}
-button{background:red;color:#fff;border:none;padding:14px;width:100%;border-radius:25px;font-weight:bold;font-size:16px;margin-top:10px}
-input{width:95%;padding:12px;border-radius:10px;margin:10px 0}
-#msg{color:#0f0;text-align:center;font-weight:bold}
-.post{background:#111;padding:10px;border-radius:12px;margin:10px 0}
+#feed img{width:100%;border-radius:16px;margin:10px 0;display:block}
+button{background:red;color:#fff;border:none;padding:12px;width:100%;border-radius:25px;font-weight:bold;margin-top:8px}
+input{width:95%;padding:10px;border-radius:10px;margin:8px 0}
+#msg{color:#0f0;text-align:center}
+.post{background:#111;padding:10px;border-radius:12px;margin:12px 0;position:relative}
+.delBtn{background:#333;color:red;border:1px solid red;margin-top:5px;display:none}
+.adminBar{text-align:right;font-size:12px;color:gray}
 </style>
 </head>
 <body>
-<h2>PIXORO 🔥 LIVE</h2>
+<h2>PIXORO 🔥</h2>
+<div class="adminBar"><span onclick="adminLogin()" style="cursor:pointer">👮 Admin</span></div>
+
 <input type="file" id="fileInput" accept="image/*">
 <button onclick="handlePost()">POST PUBLIC 🔥</button>
 <p id="msg"></p>
-<div id="feed">Loading da Giri...</div>
+<div id="feed">Loading...</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",
@@ -35,22 +39,39 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const ADMIN_PASS = "pixoro17"; // un secret da Giri - yaarukkum sollatha da
+let isAdmin = localStorage.getItem("pixoro_admin")==="yes";
+
+window.adminLogin = ()=>{
+  let p = prompt("Admin password enna da Giri?");
+  if(p===ADMIN_PASS){ localStorage.setItem("pixoro_admin","yes"); isAdmin=true; alert("Admin login success da Giri! 🔥"); showPosts(); }
+  else alert("Wrong password da!");
+}
 
 async function showPosts(){
   const snap = await getDocs(collection(db,"posts"));
   let h="";
   snap.forEach(d=>{
     let data=d.data();
-    let url = data.imageUrl || data.imageUrl1 || "";
-    if(url) h+=`<div class="post"><img src="${url}"><p>🔥 ${data.username||'giri'} • ${data.likes||0} likes</p></div>`;
+    let url = data.imageUrl || "";
+    if(url) h+=`<div class="post"><img src="${url}"><p>🔥 ${data.username||'user'}</p><button class="delBtn" style="${isAdmin?'display:block':''}" onclick="deletePost('${d.id}')">🗑️ DELETE BAD PHOTO</button></div>`;
   });
-  document.getElementById("feed").innerHTML = h || "<p style='text-align:center;color:gray'>No posts yet da - first post podu da! 🔥</p>";
+  document.getElementById("feed").innerHTML = h || "No posts da";
+}
+
+window.deletePost=async(id)=>{
+  if(!isAdmin) return alert("Nee admin illa da!");
+  if(confirm("Itha delete pannava da Giri?")){
+    await deleteDoc(doc(db,"posts",id));
+    alert("Delete panniten da! ✅");
+    showPosts();
+  }
 }
 
 window.handlePost=async()=>{
   let file=document.getElementById("fileInput").files[0];
-  if(!file) return alert("Photo select pannu da Giri!");
-  document.getElementById("msg").innerText="Uploading da Giri... ⏳";
+  if(!file) return alert("Photo select pannu da!");
+  document.getElementById("msg").innerText="Uploading...";
 
   let compressed = await new Promise(res=>{
     let img=new Image();
@@ -63,20 +84,12 @@ window.handlePost=async()=>{
       c.getContext("2d").drawImage(img,0,0,w,h);
       res(c.toDataURL("image/jpeg",0.6));
     };
-    let reader=new FileReader();
-    reader.onload=e=>img.src=e.target.result;
-    reader.readAsDataURL(file);
+    let r=new FileReader(); r.onload=e=>img.src=e.target.result; r.readAsDataURL(file);
   });
 
-  await addDoc(collection(db,"posts"),{
-    imageUrl: compressed,
-    title: "PIXORO Post",
-    username: "giri",
-    likes: 0,
-    type: "image",
-    createdAt: new Date()
-  });
-  document.getElementById("msg").innerText="Semma da Giri! Public la save aayiduchu! 🔥";
+  await addDoc(collection(db,"posts"),{imageUrl: compressed, username:"user", createdAt: new Date()});
+  document.getElementById("msg").innerText="Public la post aayiduchu da! 🔥";
+  document.getElementById("fileInput").value="";
   showPosts();
 }
 showPosts();
