@@ -244,16 +244,25 @@ main{
 <!-- HOME -->
 <section id="home" class="page active">
 
-<div class="create">
- <div class="row">
-  <div class="avatar">K</div>
-  <input
-   placeholder="Create a post..."
-   onclick="createPost()">
- </div>
-</div>
+  <div class="create">
+    <div class="row">
+      <div class="avatar">K</div>
 
-<!-- POST -->
+      <input
+        id="postText"
+        placeholder="Create a post..."
+      >
+
+      <input
+        id="postImage"
+        type="file"
+        accept="image/*"
+      >
+
+      <button onclick="createPost()">Post</button>
+    </div>
+  </div>
+
 <article class="post">
 
 <div class="post-head">
@@ -502,137 +511,71 @@ function addComment(button){
  input.value='';
 }
 
-
 function createPost(){
 
- var text=prompt('Write your post:');
+  var text = document.getElementById("postText").value.trim();
+  var imageInput = document.getElementById("postImage");
 
- if(!text || text.trim()===''){
-  return;
- }
-
- var post=document.createElement('article');
-
- post.className='post';
-
- post.innerHTML=`
-
- <div class="post-head">
-
-  <div class="avatar">K</div>
-
-  <div class="user">
-   <b>Kri User</b>
-   <small>Just now</small>
-  </div>
-
-  <button class="more">⋮</button>
-
- </div>
-
- <div class="post-photo">📷</div>
-
- <div class="actions">
-
-  <button onclick="likePost(this)">♡</button>
-
-  <button onclick="focusComment(this)">💬</button>
-
-  <button onclick="alert('Share')">➤</button>
-
- </div>
-
- <div class="likes">
-  <span>0</span> likes
- </div>
-
- <div class="caption"></div>
-
- <div class="comments"></div>
-
- <div class="comment-box">
-  <input placeholder="Add a comment...">
-  <button onclick="addComment(this)">Post</button>
- </div>
-
- `;
-
- var caption=post.querySelector('.caption');
-
- var bold=document.createElement('b');
-
- bold.textContent='Kri User ';
-
- caption.appendChild(bold);
-
- caption.appendChild(
-  document.createTextNode(text)
- );
-
- document.getElementById('home')
- .appendChild(post);
-
- document.getElementById('postCount')
- .textContent=
- document.querySelectorAll('#home .post').length;
-
- showPage('home');
-}
-
-
-function searchUsers(){
-
- var q=
- document.getElementById('searchInput')
- .value
- .toLowerCase()
- .trim();
-
- var results=
- document.getElementById('results');
-
- results.innerHTML='';
-
- if(q===''){
-  return;
- }
-
- var users=[
-  'pixoro_user',
-  'kri_user',
-  'pixoro_official',
-  'photo_user'
- ];
-
- users.forEach(function(user){
-
-  if(user.includes(q)){
-
-   var div=
-   document.createElement('div');
-
-   div.className='result';
-
-   div.innerHTML=
-   '<div class="avatar">'+
-   user.charAt(0).toUpperCase()+
-   '</div>';
-
-   var b=
-   document.createElement('b');
-
-   b.textContent='@'+user;
-
-   div.appendChild(b);
-
-   results.appendChild(div);
+  if(text === "" && imageInput.files.length === 0){
+    alert("Write something or select a photo");
+    return;
   }
 
- });
+  var post = document.createElement("article");
+  post.className = "post";
 
+  var imageHTML = "";
+
+  if(imageInput.files.length > 0){
+    var imageURL = URL.createObjectURL(imageInput.files[0]);
+
+    imageHTML =
+      '<div class="post-photo">' +
+      '<img src="' + imageURL + '" style="width:100%;display:block;">' +
+      '</div>';
+  }
+
+  post.innerHTML =
+    '<div class="post-head">' +
+      '<div class="avatar">K</div>' +
+      '<div class="user">' +
+        '<b>Kri User</b>' +
+        '<small>Just now</small>' +
+      '</div>' +
+      '<button class="more">⋮</button>' +
+    '</div>' +
+
+    imageHTML +
+
+    '<div class="actions">' +
+      '<button onclick="likePost(this)">♥</button>' +
+      '<button onclick="focusComment(this)">💬</button>' +
+      '<button onclick="alert(\'Share\')">➤</button>' +
+    '</div>' +
+
+    '<div class="likes">' +
+      '<span>0</span> likes' +
+    '</div>' +
+
+    '<div class="caption">' +
+      '<b>Kri User</b><br>' +
+      text +
+    '</div>' +
+
+    '<div class="comments"></div>' +
+
+    '<div class="comment-box">' +
+      '<input placeholder="Add a comment...">' +
+      '<button onclick="addComment(this)">Post</button>' +
+    '</div>';
+
+  document.getElementById("home").prepend(post);
+
+  document.getElementById("postText").value = "";
+  document.getElementById("postImage").value = "";
+
+  document.getElementById("postCount").textContent =
+    document.querySelectorAll("#home .post").length;
+
+  showPage("home");
 }
-
-</script>
-
-</body>
-</html>
