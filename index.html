@@ -2,639 +2,1265 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PIXORO</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial}
 body{background:#f3f6ff;color:#222}
-button{cursor:pointer;border:0}
-.login{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,#667eea,#764ba2)
-}
-.login-box{
-  width:90%;max-width:380px;background:white;padding:30px;
-  border-radius:20px;text-align:center;box-shadow:0 10px 30px #0004
-}
-.logo{font-size:38px;font-weight:bold;color:#667eea;margin-bottom:25px}
+button{border:0;cursor:pointer}
 input,textarea{
-  width:100%;padding:14px;margin:7px 0;border:1px solid #ddd;
-  border-radius:12px;outline:none
+ width:100%;padding:13px;margin:6px 0;
+ border:1px solid #ddd;border-radius:12px;
+ font-size:15px
 }
-.login-btn,.post-btn,.send{
-  width:100%;padding:14px;background:#667eea;color:white;
-  border-radius:12px;margin-top:10px;font-weight:bold
+button{padding:12px 16px;border-radius:10px}
+.primary{width:100%;background:#667eea;color:white;font-weight:bold}
+.login{
+ min-height:100vh;display:flex;align-items:center;
+ justify-content:center;
+ background:linear-gradient(135deg,#667eea,#764ba2);
+ padding:20px
 }
-#msg{color:red;margin-top:12px}
+.box{
+ width:100%;max-width:390px;background:white;
+ padding:28px;border-radius:22px;text-align:center
+}
+.logo{font-size:40px;font-weight:bold;color:#667eea;margin-bottom:20px}
 #app{display:none}
 header{
-  position:sticky;top:0;background:white;padding:15px;
-  display:flex;justify-content:space-between;align-items:center;
-  box-shadow:0 2px 10px #0001;z-index:5
+ position:sticky;top:0;background:white;height:62px;
+ display:flex;align-items:center;justify-content:space-between;
+ padding:0 18px;box-shadow:0 2px 10px #0001;z-index:5
 }
 header h2{color:#667eea}
 .container{max-width:650px;margin:auto;padding:15px 15px 90px}
-.page{display:none}
-.page.active{display:block}
+.page{display:none}.page.active{display:block}
 .card,.post{
-  background:white;border-radius:18px;padding:15px;margin:12px 0;
-  box-shadow:0 3px 15px #0001
+ background:white;padding:16px;margin:12px 0;
+ border-radius:18px;box-shadow:0 3px 15px #0001
 }
-.post-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .avatar{
-  width:45px;height:45px;border-radius:50%;background:#667eea;
-  color:white;display:flex;align-items:center;justify-content:center;
-  font-weight:bold
+ width:45px;height:45px;border-radius:50%;
+ background:#667eea;color:white;
+ display:flex;align-items:center;justify-content:center;
+ font-weight:bold
 }
-.post img{width:100%;border-radius:14px;margin-top:10px;max-height:500px;object-fit:cover}
-.actions{display:flex;gap:8px;margin-top:12px}
-.actions button{
-  background:#f0f2f8;padding:10px 14px;border-radius:10px
+.head{display:flex;align-items:center;gap:10px}
+.post img,.post video{
+ width:100%;max-height:520px;object-fit:cover;
+ border-radius:14px;margin-top:10px
 }
-.liked{color:#e91e63!important}
+.actions{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.actions button{background:#f0f2f8}
+.liked{color:#e91e63}
 .comment{
-  background:#f3f4f8;padding:8px;border-radius:10px;margin-top:6px
+ background:#f1f3f7;padding:8px;border-radius:9px;margin-top:6px
 }
-.comment-row{display:flex;gap:7px;margin-top:10px}
-.comment-row input{margin:0}
-.comment-row button{padding:10px 15px;background:#667eea;color:white;border-radius:10px}
+.commentrow{display:flex;gap:6px;margin-top:8px}
+.commentrow input{margin:0}
+.commentrow button{background:#667eea;color:white}
+.user{
+ display:flex;justify-content:space-between;
+ align-items:center;padding:12px 0;
+ border-bottom:1px solid #eee
+}
+.follow{background:#667eea;color:white}
+.following{background:#444;color:white}
+.stats{
+ display:flex;justify-content:space-around;
+ text-align:center;margin:20px 0
+}
+.stats b{display:block;font-size:21px}
 nav{
-  position:fixed;bottom:0;left:0;right:0;background:white;
-  display:flex;justify-content:space-around;padding:10px;
-  box-shadow:0 -2px 12px #0002;z-index:10
+ position:fixed;bottom:0;left:0;right:0;
+ background:white;display:flex;
+ justify-content:space-around;
+ padding:8px 2px;box-shadow:0 -2px 10px #0002
 }
-nav button{background:none;font-size:14px}
+nav button{background:none;font-size:11px}
 nav span{display:block;font-size:22px}
-.stat{display:flex;justify-content:space-around;text-align:center;margin:15px 0}
-.stat b{font-size:20px}
-.logout{background:#ff5252;color:white;padding:12px;border-radius:10px;margin-top:15px}
+.hidden{display:none}
+#message{color:#d00;margin:10px}
 </style>
 </head>
 
 <body>
 
 <!-- LOGIN -->
+
 <div class="login" id="loginScreen">
-  <div class="login-box">
-    <div class="logo">PIXORO</div>
 
-    <input id="username" type="text" placeholder="Username">
-    <input id="password" type="password" placeholder="Password">
+<div class="box">
 
-    <button class="login-btn" onclick="login()">LOGIN</button>
+<div class="logo">PIXORO</div>
 
-    <p id="msg"></p>
-  </div>
+<div id="phoneStep">
+
+<h3>Login with Phone</h3>
+
+<input
+ id="phone"
+ type="tel"
+ placeholder="+91 9876543210">
+
+<div id="recaptcha"></div>
+
+<button
+ class="primary"
+ id="sendOtpBtn"
+ onclick="sendOTP()">
+SEND OTP
+</button>
+
 </div>
 
+
+<div id="otpStep" class="hidden">
+
+<h3>Enter OTP</h3>
+
+<input
+ id="otp"
+ type="number"
+ placeholder="6 digit OTP">
+
+<button
+ class="primary"
+ onclick="verifyOTP()">
+VERIFY OTP
+</button>
+
+</div>
+
+
+<div id="nameStep" class="hidden">
+
+<h3>Create PIXORO Profile</h3>
+
+<input
+ id="username"
+ placeholder="Choose username">
+
+<button
+ class="primary"
+ onclick="saveProfile()">
+CONTINUE
+</button>
+
+</div>
+
+<p id="message"></p>
+
+</div>
+</div>
+
+
 <!-- APP -->
+
 <div id="app">
 
 <header>
-  <h2>PIXORO</h2>
-  <b>👤</b>
+<h2>PIXORO</h2>
+<div>👤</div>
 </header>
+
 
 <div class="container">
 
 <!-- HOME -->
+
 <section id="home" class="page active">
 
-  <div class="card">
-    <h3>Create Post</h3>
+<div class="card">
 
-    <textarea id="caption" rows="3"
-      placeholder="What's happening?"></textarea>
+<h3>Create Post</h3>
 
-    <input id="photo" type="file" accept="image/*">
+<textarea
+ id="caption"
+ rows="3"
+ placeholder="What's happening?"></textarea>
 
-    <button class="post-btn" onclick="createPost()">
-      + POST
-    </button>
-  </div>
+<input
+ id="media"
+ type="file"
+ accept="image/*,video/*">
 
-  <div id="posts"></div>
+<button class="primary" onclick="createPost()">
+POST
+</button>
+
+</div>
+
+<div id="posts"></div>
 
 </section>
+
 
 <!-- SEARCH -->
+
 <section id="search" class="page">
-  <div class="card">
-    <h3>🔍 Search</h3>
-    <input id="searchInput"
-      placeholder="Search posts..."
-      oninput="searchPosts()">
-  </div>
 
-  <div id="searchResults"></div>
-</section>
+<div class="card">
 
-<!-- PROFILE -->
-<section id="profile" class="page">
+<h3>🔍 Search</h3>
 
-  <div class="card" style="text-align:center">
+<input
+ id="searchInput"
+ placeholder="Search users..."
+ oninput="searchUsers()">
 
-    <div class="avatar" style="margin:auto;font-size:22px">
-      P
-    </div>
+</div>
 
-    <h2 style="margin-top:10px">Pixoro</h2>
-
-    <div class="stat">
-      <div>
-        <b id="postCount">0</b>
-        <small>Posts</small>
-      </div>
-
-      <div>
-        <b id="viewCount">0</b>
-        <small>Views</small>
-      </div>
-
-      <div>
-        <b id="coinCount">0</b>
-        <small>Coins</small>
-      </div>
-    </div>
-
-    <button class="logout" onclick="logout()">
-      LOGOUT
-    </button>
-
-  </div>
+<div id="users"></div>
 
 </section>
+
+
+<!-- POST -->
+
+<section id="postPage" class="page">
+
+<div class="card">
+
+<h3>Create Post</h3>
+
+<textarea
+ id="caption2"
+ rows="5"
+ placeholder="Write your post..."></textarea>
+
+<input
+ id="media2"
+ type="file"
+ accept="image/*,video/*">
+
+<button class="primary" onclick="createPost2()">
+PUBLISH
+</button>
+
+</div>
+
+</section>
+
 
 <!-- REWARDS -->
+
 <section id="rewards" class="page">
 
-  <div class="card">
-    <h2>🪙 PIXORO Rewards</h2>
+<div class="card" style="text-align:center">
 
-    <p style="margin-top:15px">
-      Views: <b id="rewardViews">0</b>
-    </p>
+<h2>🪙 PIXORO Rewards</h2>
 
-    <p style="margin-top:10px">
-      Coins: <b id="rewardCoins">0</b>
-    </p>
+<h1 id="coins">0</h1>
 
-    <button class="post-btn" onclick="payout()">
-      Request Payout
-    </button>
+<p>Coins</p>
 
-    <p id="payoutMsg" style="margin-top:15px"></p>
-  </div>
+<br>
+
+<p>👁 Views: <b id="views">0</b></p>
+
+</div>
+
+</section>
+
+
+<!-- PROFILE -->
+
+<section id="profile" class="page">
+
+<div class="card" style="text-align:center">
+
+<div class="avatar" style="margin:auto" id="avatar">
+P
+</div>
+
+<h2 id="profileName">PIXORO</h2>
+
+<div class="stats">
+
+<div>
+<b id="myPosts">0</b>
+Posts
+</div>
+
+<div>
+<b id="followers">0</b>
+Followers
+</div>
+
+<div>
+<b id="following">0</b>
+Following
+</div>
+
+</div>
+
+<button
+onclick="logout()"
+style="background:#ff5252;color:white">
+LOGOUT
+</button>
+
+</div>
 
 </section>
 
 </div>
 
-<!-- NAVIGATION -->
+
 <nav>
-  <button onclick="showPage('home')">
-    <span>🏠</span>Home
-  </button>
 
-  <button onclick="showPage('search')">
-    <span>🔍</span>Search
-  </button>
+<button onclick="page('home')">
+<span>🏠</span>Home
+</button>
 
-  <button onclick="showPage('home');focusPost()">
-    <span>➕</span>Post
-  </button>
+<button onclick="page('search')">
+<span>🔍</span>Search
+</button>
 
-  <button onclick="showPage('rewards')">
-    <span>🪙</span>Rewards
-  </button>
+<button onclick="page('postPage')">
+<span>➕</span>Post
+</button>
 
-  <button onclick="showPage('profile')">
-    <span>👤</span>Profile
-  </button>
+<button onclick="page('rewards')">
+<span>🪙</span>Rewards
+</button>
+
+<button onclick="page('profile')">
+<span>👤</span>Profile
+</button>
+
 </nav>
 
 </div>
 
-<script>
 
-let posts = JSON.parse(
-  localStorage.getItem("pixoroPosts") || "[]"
-);
+<script type="module">
 
-let views = Number(
-  localStorage.getItem("pixoroViews") || 0
-);
+/* ================= FIREBASE ================= */
 
-let coins = Number(
-  localStorage.getItem("pixoroCoins") || 0
-);
+import {initializeApp}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
-
-/* LOGIN */
-function login(){
-
-  const username =
-    document.getElementById("username").value.trim();
-
-  const password =
-    document.getElementById("password").value.trim();
-
-  if(
-    username.toLowerCase() === "pixoro" &&
-    password === "123456"
-  ){
-
-    document.getElementById("loginScreen").style.display="none";
-    document.getElementById("app").style.display="block";
-
-    renderPosts();
-
-  }else{
-
-    document.getElementById("msg").textContent =
-      "Wrong username or password";
-
-  }
+import {
+ getAuth,
+ RecaptchaVerifier,
+ signInWithPhoneNumber,
+ onAuthStateChanged,
+ signOut
 }
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
-
-/* LOGOUT */
-function logout(){
-
-  document.getElementById("app").style.display="none";
-  document.getElementById("loginScreen").style.display="flex";
-
-  document.getElementById("password").value="";
+import {
+ getFirestore,
+ doc,
+ setDoc,
+ getDoc,
+ updateDoc,
+ collection,
+ addDoc,
+ query,
+ orderBy,
+ onSnapshot,
+ arrayUnion,
+ arrayRemove,
+ serverTimestamp
 }
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-
-/* PAGE */
-function showPage(id){
-
-  document.querySelectorAll(".page")
-    .forEach(p=>p.classList.remove("active"));
-
-  document.getElementById(id)
-    .classList.add("active");
-
-  window.scrollTo(0,0);
+import {
+ getStorage,
+ ref,
+ uploadBytes,
+ getDownloadURL
 }
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
 
 
-/* SAVE */
-function saveData(){
+const firebaseConfig = {
 
-  localStorage.setItem(
-    "pixoroPosts",
-    JSON.stringify(posts)
-  );
+ apiKey:"AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",
 
-  localStorage.setItem(
-    "pixoroViews",
-    views
-  );
+ authDomain:"pixoro-75927.firebaseapp.com",
 
-  localStorage.setItem(
-    "pixoroCoins",
-    coins
-  );
-}
+ projectId:"pixoro-75927",
 
+ storageBucket:"pixoro-75927.firebasestorage.app",
 
-/* CREATE POST */
-function createPost(){
+ messagingSenderId:"814840120295",
 
-  const caption =
-    document.getElementById("caption").value.trim();
+ appId:"1:814840120295:web:6c02c613df5a17209bf342",
 
-  const file =
-    document.getElementById("photo").files[0];
+ measurementId:"G-H3NR8P270D"
 
-  if(!caption && !file){
+};
 
-    alert("Write something or select an image.");
-    return;
 
-  }
+const app=initializeApp(firebaseConfig);
 
-  function addPost(image=""){
+const auth=getAuth(app);
 
-    posts.unshift({
+const db=getFirestore(app);
 
-      id:Date.now(),
-      caption:caption,
-      image:image,
-      likes:0,
-      liked:false,
-      comments:[]
+const storage=getStorage(app);
 
-    });
 
-    document.getElementById("caption").value="";
-    document.getElementById("photo").value="";
+/* ================= VARIABLES ================= */
 
-    saveData();
-    renderPosts();
+let confirmationResult=null;
 
-  }
+let currentUser=null;
 
+let unsubscribePosts=null;
 
-  if(file){
 
-    const reader = new FileReader();
+/* ================= OTP ================= */
 
-    reader.onload=function(e){
-      addPost(e.target.result);
-    };
+window.sendOTP=async function(){
 
-    reader.readAsDataURL(file);
+ const phone=
+ document.getElementById("phone").value.trim();
 
-  }else{
+ if(!phone.startsWith("+91") || phone.length<13){
 
-    addPost();
+   message("Enter number like +919876543210");
 
-  }
+   return;
+ }
 
-}
 
+ try{
 
-/* RENDER */
-function renderPosts(list=posts){
+   if(!window.recaptchaVerifier){
 
-  const box =
-    document.getElementById("posts");
+     window.recaptchaVerifier=
+       new RecaptchaVerifier(
+         auth,
+         "recaptcha",
+         {
+           size:"normal"
+         }
+       );
 
-  box.innerHTML="";
+   }
 
+   confirmationResult=
+     await signInWithPhoneNumber(
+       auth,
+       phone,
+       window.recaptchaVerifier
+     );
 
-  if(list.length===0){
+   document.getElementById("phoneStep")
+   .classList.add("hidden");
 
-    box.innerHTML=
-      "<div class='card'>No posts yet. Create your first post!</div>";
+   document.getElementById("otpStep")
+   .classList.remove("hidden");
 
-  }
+   message("OTP sent successfully.");
 
+ }catch(error){
 
-  list.forEach(post=>{
+   console.error(error);
 
-    const div=document.createElement("div");
+   message(error.message);
 
-    div.className="post";
+ }
 
+};
 
-    div.innerHTML=`
 
-      <div class="post-head">
+/* ================= VERIFY OTP ================= */
 
-        <div class="avatar">P</div>
+window.verifyOTP=async function(){
 
-        <b>Pixoro</b>
+ const code=
+ document.getElementById("otp").value.trim();
 
-      </div>
+ if(code.length!==6){
 
-      ${
-        post.caption
-        ? `<p>${safe(post.caption)}</p>`
-        : ""
-      }
+   message("Enter 6 digit OTP");
 
-      ${
-        post.image
-        ? `<img src="${post.image}">`
-        : ""
-      }
+   return;
+ }
 
-      <div class="actions">
 
-        <button
-          class="${post.liked ? "liked":""}"
-          onclick="likePost(${post.id})">
+ try{
 
-          ${post.liked ? "♥" : "♡"}
-          ${post.likes}
+   await confirmationResult.confirm(code);
 
-        </button>
+ }catch(error){
 
-        <button onclick="viewPost(${post.id})">
-          👁 View
-        </button>
+   message("Wrong OTP. Try again.");
 
-      </div>
+   console.error(error);
 
-      <div>
+ }
 
-        ${
-          post.comments.map(c=>
-            `<div class="comment">
-              <b>Pixoro:</b> ${safe(c)}
-            </div>`
-          ).join("")
-        }
+};
 
-      </div>
 
-      <div class="comment-row">
+/* ================= AUTH STATE ================= */
 
-        <input
-          id="comment-${post.id}"
-          placeholder="Write a comment">
+onAuthStateChanged(auth,async user=>{
 
-        <button
-          onclick="addComment(${post.id})">
-          Send
-        </button>
+ if(!user)return;
 
-      </div>
+ currentUser=user;
 
-    `;
+ const userRef=
+   doc(db,"users",user.uid);
 
-    box.appendChild(div);
+ const snap=
+   await getDoc(userRef);
 
-  });
 
+ if(!snap.exists()){
 
-  updateStats();
+   document.getElementById("otpStep")
+   .classList.add("hidden");
 
-}
+   document.getElementById("nameStep")
+   .classList.remove("hidden");
 
+   return;
 
-/* LIKE */
-function likePost(id){
+ }
 
-  const post =
-    posts.find(p=>p.id===id);
 
-  if(!post)return;
+ openApp();
 
-  post.liked=!post.liked;
+});
 
-  if(post.liked){
-    post.likes++;
-  }else{
-    post.likes--;
-  }
 
-  saveData();
-  renderPosts();
+/* ================= PROFILE ================= */
+
+window.saveProfile=async function(){
+
+ const name=
+ document.getElementById("username")
+ .value.trim();
+
+ if(name.length<3){
+
+   message("Username minimum 3 characters");
+
+   return;
+
+ }
+
+
+ await setDoc(
+   doc(db,"users",currentUser.uid),
+   {
+     username:name,
+     phone:currentUser.phoneNumber,
+     followers:[],
+     following:[],
+     createdAt:serverTimestamp()
+   }
+ );
+
+ openApp();
+
+};
+
+
+/* ================= OPEN APP ================= */
+
+async function openApp(){
+
+ document.getElementById("loginScreen")
+ .style.display="none";
+
+ document.getElementById("app")
+ .style.display="block";
+
+ loadProfile();
+
+ loadPosts();
 
 }
 
 
-/* VIEW */
-function viewPost(id){
+/* ================= LOAD POSTS ================= */
 
-  views++;
-  coins++;
+function loadPosts(){
 
-  saveData();
-  updateStats();
-
-}
+ const q=query(
+   collection(db,"posts"),
+   orderBy("createdAt","desc")
+ );
 
 
-/* COMMENT */
-function addComment(id){
+ unsubscribePosts=
+ onSnapshot(q,snapshot=>{
 
-  const input =
-    document.getElementById("comment-"+id);
+   const box=
+     document.getElementById("posts");
 
-  const text=input.value.trim();
-
-  if(!text)return;
-
-  const post =
-    posts.find(p=>p.id===id);
-
-  post.comments.push(text);
-
-  input.value="";
-
-  saveData();
-  renderPosts();
-
-}
+   box.innerHTML="";
 
 
-/* SEARCH */
-function searchPosts(){
+   snapshot.forEach(item=>{
 
-  const q =
-    document.getElementById("searchInput")
-      .value.toLowerCase().trim();
+     const p=item.data();
 
-  const result =
-    document.getElementById("searchResults");
+     renderPost(
+       item.id,
+       p,
+       box
+     );
 
-  if(!q){
+   });
 
-    result.innerHTML="";
-    return;
 
-  }
+   if(snapshot.empty){
 
-  const found =
-    posts.filter(p=>
-      (p.caption || "")
-      .toLowerCase()
-      .includes(q)
-    );
+     box.innerHTML=
+       `<div class="card">
+       No public posts yet.
+       </div>`;
 
-  if(found.length===0){
+   }
 
-    result.innerHTML=
-      "<div class='card'>No posts found.</div>";
-
-    return;
-
-  }
-
-  result.innerHTML =
-    found.map(p=>`
-
-      <div class="card">
-
-        <b>Pixoro</b>
-
-        <p style="margin-top:8px">
-          ${safe(p.caption || "Image post")}
-        </p>
-
-      </div>
-
-    `).join("");
+ });
 
 }
 
 
-/* STATS */
-function updateStats(){
+/* ================= POST UI ================= */
 
-  document.getElementById("postCount")
-    .textContent=posts.length;
+function renderPost(id,p,box){
 
-  document.getElementById("viewCount")
-    .textContent=views;
+ const liked=
+   (p.likes||[])
+   .includes(currentUser.uid);
 
-  document.getElementById("coinCount")
-    .textContent=coins;
 
-  document.getElementById("rewardViews")
-    .textContent=views;
+ const div=
+ document.createElement("div");
 
-  document.getElementById("rewardCoins")
-    .textContent=coins;
+ div.className="post";
+
+
+ let media="";
+
+
+ if(p.mediaType==="image"){
+
+   media=
+   `<img src="${p.mediaUrl}">`;
+
+ }
+
+
+ if(p.mediaType==="video"){
+
+   media=
+   `<video controls src="${p.mediaUrl}"></video>`;
+
+ }
+
+
+ div.innerHTML=`
+
+ <div class="head">
+
+   <div class="avatar">
+     ${(p.username||"P")
+       .charAt(0)
+       .toUpperCase()}
+   </div>
+
+   <b>${safe(p.username||"PIXORO")}</b>
+
+ </div>
+
+ <p style="margin-top:10px">
+ ${safe(p.text||"")}
+ </p>
+
+ ${media}
+
+ <div class="actions">
+
+ <button
+ class="${liked?"liked":""}"
+ onclick="likePost('${id}',${liked})">
+
+ ${liked?"♥ Liked":"♡ Like"}
+ ${(p.likes||[]).length}
+
+ </button>
+
+ <button onclick="viewPost('${id}')">
+ 👁 ${(p.views||0)}
+ </button>
+
+ <button onclick="sharePost('${id}')">
+ 🔗 Share
+ </button>
+
+ </div>
+
+ <div id="comments-${id}"></div>
+
+ <div class="commentrow">
+
+ <input
+ id="comment-${id}"
+ placeholder="Comment...">
+
+ <button onclick="comment('${id}')">
+ Send
+ </button>
+
+ </div>
+
+ `;
+
+
+ box.appendChild(div);
+
+ loadComments(id);
 
 }
 
 
-/* PAYOUT */
-function payout(){
+/* ================= LIKE ================= */
 
-  document.getElementById("payoutMsg")
-    .textContent=
-    "Demo only. Real payment requires a secure backend and payment service.";
+window.likePost=async function(id,liked){
+
+ const postRef=
+   doc(db,"posts",id);
+
+ if(liked){
+
+   await updateDoc(
+     postRef,
+     {
+       likes:arrayRemove(currentUser.uid)
+     }
+   );
+
+ }else{
+
+   await updateDoc(
+     postRef,
+     {
+       likes:arrayUnion(currentUser.uid)
+     }
+   );
+
+ }
+
+};
+
+
+/* ================= VIEW ================= */
+
+window.viewPost=async function(id){
+
+ await updateDoc(
+   doc(db,"posts",id),
+   {
+     views:
+       await getViews(id)+1
+   }
+ );
+
+};
+
+
+async function getViews(id){
+
+ const snap=
+   await getDoc(doc(db,"posts",id));
+
+ return snap.data().views||0;
 
 }
 
 
-/* FOCUS POST */
-function focusPost(){
+/* ================= COMMENTS ================= */
 
-  setTimeout(()=>{
+function loadComments(id){
 
-    document.getElementById("caption")
-      .focus();
+ const q=query(
+   collection(db,"posts",id,"comments"),
+   orderBy("createdAt","asc")
+ );
 
-  },100);
+
+ onSnapshot(q,snapshot=>{
+
+   const box=
+     document.getElementById("comments-"+id);
+
+   if(!box)return;
+
+   box.innerHTML="";
+
+   snapshot.forEach(item=>{
+
+     const c=item.data();
+
+     box.innerHTML+=
+       `<div class="comment">
+       <b>${safe(c.username)}</b>:
+       ${safe(c.text)}
+       </div>`;
+
+   });
+
+ });
 
 }
 
 
-/* SECURITY */
+window.comment=async function(id){
+
+ const input=
+   document.getElementById(
+     "comment-"+id
+   );
+
+ const text=
+   input.value.trim();
+
+ if(!text)return;
+
+
+ const userSnap=
+   await getDoc(
+     doc(db,"users",currentUser.uid)
+   );
+
+ const username=
+   userSnap.data().username;
+
+
+ await addDoc(
+   collection(
+     db,
+     "posts",
+     id,
+     "comments"
+   ),
+   {
+     uid:currentUser.uid,
+     username:username,
+     text:text,
+     createdAt:serverTimestamp()
+   }
+ );
+
+ input.value="";
+
+};
+
+
+/* ================= SHARE ================= */
+
+window.sharePost=async function(id){
+
+ const url=
+   location.origin+
+   location.pathname+
+   "?post="+id;
+
+
+ try{
+
+   if(navigator.share){
+
+     await navigator.share({
+       title:"PIXORO",
+       text:"Check this PIXORO post",
+       url:url
+     });
+
+   }else{
+
+     await navigator.clipboard.writeText(url);
+
+     alert("Post link copied!");
+
+   }
+
+ }catch(e){}
+
+};
+
+
+/* ================= CREATE POST ================= */
+
+window.createPost=async function(){
+
+ const text=
+   document.getElementById("caption")
+   .value.trim();
+
+ const file=
+   document.getElementById("media")
+   .files[0];
+
+ await create(text,file);
+
+};
+
+
+window.createPost2=async function(){
+
+ const text=
+   document.getElementById("caption2")
+   .value.trim();
+
+ const file=
+   document.getElementById("media2")
+   .files[0];
+
+ await create(text,file);
+
+};
+
+
+async function create(text,file){
+
+ if(!text && !file){
+
+   alert("Write something or select photo/video.");
+
+   return;
+
+ }
+
+
+ try{
+
+   const userSnap=
+     await getDoc(
+       doc(db,"users",currentUser.uid)
+     );
+
+   const username=
+     userSnap.data().username;
+
+
+   let mediaUrl="";
+
+   let mediaType="";
+
+
+   if(file){
+
+     if(file.size>10*1024*1024){
+
+       alert("File must be below 10MB.");
+
+       return;
+
+     }
+
+
+     mediaType=
+       file.type.startsWith("video")
+       ? "video"
+       : "image";
+
+
+     const path=
+       "posts/"+
+       currentUser.uid+
+       "/"+
+       Date.now()+"_"+file.name;
+
+
+     const storageRef=
+       ref(storage,path);
+
+
+     await uploadBytes(
+       storageRef,
+       file
+     );
+
+
+     mediaUrl=
+       await getDownloadURL(
+         storageRef
+       );
+
+   }
+
+
+   await addDoc(
+     collection(db,"posts"),
+     {
+       uid:currentUser.uid,
+       username:username,
+       text:text,
+       mediaUrl:mediaUrl,
+       mediaType:mediaType,
+       likes:[],
+       views:0,
+       createdAt:serverTimestamp()
+     }
+   );
+
+
+   document.getElementById("caption").value="";
+   document.getElementById("caption2").value="";
+   document.getElementById("media").value="";
+   document.getElementById("media2").value="";
+
+
+   page("home");
+
+ }catch(error){
+
+   console.error(error);
+
+   alert(
+     "Post failed: "+
+     error.message
+   );
+
+ }
+
+}
+
+
+/* ================= SEARCH USERS ================= */
+
+window.searchUsers=async function(){
+
+ const text=
+   document.getElementById("searchInput")
+   .value.trim()
+   .toLowerCase();
+
+ const box=
+   document.getElementById("users");
+
+ box.innerHTML="";
+
+ if(!text)return;
+
+
+ const snap=
+   await getDocs(
+     collection(db,"users")
+   );
+
+
+ snap.forEach(item=>{
+
+   const u=item.data();
+
+   if(
+     u.username.toLowerCase()
+     .includes(text)
+   ){
+
+     const isFollowing=
+       (u.followers||[])
+       .includes(currentUser.uid);
+
+
+     box.innerHTML+=`
+
+     <div class="card user">
+
+       <b>👤 ${safe(u.username)}</b>
+
+       ${
+         item.id===currentUser.uid
+         ? "<span>You</span>"
+         :
+         `<button
+         class="${isFollowing?"following":"follow"}"
+         onclick="follow('${item.id}',${isFollowing})">
+
+         ${isFollowing?"Following":"Follow"}
+
+         </button>`
+       }
+
+     </div>
+
+     `;
+
+   }
+
+ });
+
+};
+
+
+/* ================= FOLLOW ================= */
+
+window.follow=async function(uid,isFollowing){
+
+ const meRef=
+   doc(db,"users",currentUser.uid);
+
+ const otherRef=
+   doc(db,"users",uid);
+
+
+ if(isFollowing){
+
+   await updateDoc(
+     meRef,
+     {
+       following:arrayRemove(uid)
+     }
+   );
+
+   await updateDoc(
+     otherRef,
+     {
+       followers:
+         arrayRemove(currentUser.uid)
+     }
+   );
+
+ }else{
+
+   await updateDoc(
+     meRef,
+     {
+       following:arrayUnion(uid)
+     }
+   );
+
+   await updateDoc(
+     otherRef,
+     {
+       followers:
+         arrayUnion(currentUser.uid)
+     }
+   );
+
+ }
+
+ searchUsers();
+ loadProfile();
+
+};
+
+
+/* ================= PROFILE ================= */
+
+async function loadProfile(){
+
+ const snap=
+   await getDoc(
+     doc(db,"users",currentUser.uid)
+   );
+
+ if(!snap.exists())return;
+
+ const u=snap.data();
+
+
+ document.getElementById("profileName")
+ .textContent=u.username;
+
+ document.getElementById("avatar")
+ .textContent=
+   u.username.charAt(0).toUpperCase();
+
+ document.getElementById("followers")
+ .textContent=
+   (u.followers||[]).length;
+
+ document.getElementById("following")
+ .textContent=
+   (u.following||[]).length;
+
+
+ const q=query(
+   collection(db,"posts")
+ );
+
+
+ onSnapshot(q,s=>{
+
+   let count=0;
+
+   s.forEach(x=>{
+
+     if(x.data().uid===currentUser.uid)
+       count++;
+
+   });
+
+   document.getElementById("myPosts")
+   .textContent=count;
+
+ });
+
+}
+
+
+/* ================= PAGE ================= */
+
+window.page=function(id){
+
+ document.querySelectorAll(".page")
+ .forEach(x=>
+   x.classList.remove("active")
+ );
+
+ document.getElementById(id)
+ .classList.add("active");
+
+ window.scrollTo(0,0);
+
+};
+
+
+/* ================= LOGOUT ================= */
+
+window.logout=async function(){
+
+ if(unsubscribePosts)
+   unsubscribePosts();
+
+ await signOut(auth);
+
+ location.reload();
+
+};
+
+
+/* ================= MESSAGE ================= */
+
+function message(text){
+
+ document.getElementById("message")
+ .textContent=text;
+
+}
+
+
+/* ================= SAFE ================= */
+
 function safe(text){
 
-  const div=document.createElement("div");
+ const d=
+   document.createElement("div");
 
-  div.textContent=text;
+ d.textContent=
+   String(text||"");
 
-  return div.innerHTML;
+ return d.innerHTML;
 
 }
-
-
-/* ENTER LOGIN */
-document.getElementById("password")
-  .addEventListener("keydown",function(e){
-
-    if(e.key==="Enter"){
-      login();
-    }
-
-  });
-
-
-updateStats();
 
 </script>
 
