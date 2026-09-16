@@ -655,6 +655,75 @@ if(username === "pixoro" && password === "123456"){
   message.style.color = "#e91e63";
 }
   }
+  <!-- PIXORO REWARDS -->
+<div id="rewardBox" style="
+  margin:15px;
+  padding:18px;
+  border-radius:15px;
+  background:#fff;
+  box-shadow:0 3px 12px rgba(0,0,0,.12);
+">
+  <h2>💰 PIXORO Rewards</h2>
+
+  <p>Views: <b id="totalViews">0</b></p>
+  <p>Coins: <b id="totalCoins">0</b> 🪙</p>
+
+  <button onclick="showWallet()">Wallet</button>
+  <button onclick="requestPayout()">Request Payout</button>
+
+  <p id="payoutMessage"></p>
+</div>
+
+<script>
+let totalViews = 0;
+let totalCoins = 0;
+
+/* VIEW → COIN */
+function addView(){
+
+  totalViews++;
+
+  // Every 100 views = 1 coin
+  totalCoins = Math.floor(totalViews / 100);
+
+  document.getElementById("totalViews").innerText = totalViews;
+  document.getElementById("totalCoins").innerText = totalCoins;
+
+}
+
+/* WALLET */
+function showWallet(){
+
+  alert(
+    "PIXORO WALLET\n\n" +
+    "Views: " + totalViews + "\n" +
+    "Coins: " + totalCoins
+  );
+
+}
+
+/* PAYOUT DEMO */
+function requestPayout(){
+
+  const message = document.getElementById("payoutMessage");
+
+  if(totalCoins < 100){
+
+    message.innerText =
+      "Minimum 100 coins required for payout.";
+
+    message.style.color = "red";
+
+    return;
+  }
+
+  message.innerText =
+    "Payout request submitted for review.";
+
+  message.style.color = "green";
+
+}
+
 function createPost(){
 
   const caption =
