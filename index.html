@@ -6,1325 +6,663 @@
 <title>PIXORO</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial}
-body{background:#f3f6ff;color:#222}
-button{border:0;cursor:pointer}
-input,textarea{
- width:100%;padding:13px;margin:6px 0;
- border:1px solid #ddd;border-radius:12px;
- font-size:15px
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif
 }
-button{padding:12px 16px;border-radius:10px}
-.primary{width:100%;background:#667eea;color:white;font-weight:bold}
-.login{
- min-height:100vh;display:flex;align-items:center;
- justify-content:center;
- background:linear-gradient(135deg,#667eea,#764ba2);
- padding:20px
+
+body{
+  background:#f3f6ff;
+  color:#222;
+  padding-bottom:90px
 }
-.box{
- width:100%;max-width:390px;background:white;
- padding:28px;border-radius:22px;text-align:center
-}
-.logo{font-size:40px;font-weight:bold;color:#667eea;margin-bottom:20px}
-#app{display:none}
+
 header{
- position:sticky;top:0;background:white;height:62px;
- display:flex;align-items:center;justify-content:space-between;
- padding:0 18px;box-shadow:0 2px 10px #0001;z-index:5
+  height:125px;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 38px;
+  box-shadow:0 2px 12px #dce2f0
 }
-header h2{color:#667eea}
-.container{max-width:650px;margin:auto;padding:15px 15px 90px}
-.page{display:none}.page.active{display:block}
-.card,.post{
- background:white;padding:16px;margin:12px 0;
- border-radius:18px;box-shadow:0 3px 15px #0001
+
+.logo{
+  font-size:48px;
+  font-weight:bold;
+  color:#6179df
 }
+
+.profile{
+  font-size:38px;
+  color:#1680c8
+}
+
+.container{
+  padding:35px 30px
+}
+
+.card{
+  background:white;
+  border-radius:35px;
+  padding:32px;
+  box-shadow:0 8px 25px #dce2f0;
+  margin-bottom:30px
+}
+
+h2{
+  font-size:34px;
+  margin-bottom:22px
+}
+
+textarea{
+  width:100%;
+  height:150px;
+  border:2px solid #ddd;
+  border-radius:25px;
+  padding:20px;
+  font-size:22px;
+  resize:none;
+  outline:none
+}
+
+.filebox{
+  margin-top:20px;
+  border:2px solid #ddd;
+  border-radius:25px;
+  padding:18px
+}
+
+input[type=file]{
+  width:100%;
+  font-size:17px
+}
+
+.preview{
+  width:100%;
+  margin-top:20px;
+  border-radius:22px;
+  display:none;
+  max-height:450px;
+  object-fit:cover
+}
+
+.filters{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  margin-top:15px;
+  padding-bottom:5px
+}
+
+.filters button{
+  white-space:nowrap;
+  padding:12px 18px;
+  border-radius:20px;
+  background:#eef1ff;
+  font-size:16px
+}
+
+.filters button:hover{
+  background:#637be4;
+  color:white
+}
+
+.publish{
+  width:100%;
+  margin-top:20px;
+  padding:20px;
+  border-radius:22px;
+  background:#637be4;
+  color:white;
+  font-size:24px;
+  font-weight:bold
+}
+
+.post{
+  background:white;
+  border-radius:28px;
+  margin-bottom:25px;
+  overflow:hidden;
+  box-shadow:0 5px 20px #dce2f0
+}
+
+.posttop{
+  padding:18px;
+  display:flex;
+  align-items:center;
+  gap:12px
+}
+
 .avatar{
- width:45px;height:45px;border-radius:50%;
- background:#667eea;color:white;
- display:flex;align-items:center;justify-content:center;
- font-weight:bold
+  width:45px;
+  height:45px;
+  border-radius:50%;
+  background:#1680c8;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:25px
 }
-.head{display:flex;align-items:center;gap:10px}
-.post img,.post video{
- width:100%;max-height:520px;object-fit:cover;
- border-radius:14px;margin-top:10px
+
+.username{
+  font-size:19px;
+  font-weight:bold
 }
-.actions{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
-.actions button{background:#f0f2f8}
-.liked{color:#e91e63}
-.comment{
- background:#f1f3f7;padding:8px;border-radius:9px;margin-top:6px
+
+.time{
+  font-size:13px;
+  color:#777
 }
-.commentrow{display:flex;gap:6px;margin-top:8px}
-.commentrow input{margin:0}
-.commentrow button{background:#667eea;color:white}
-.user{
- display:flex;justify-content:space-between;
- align-items:center;padding:12px 0;
- border-bottom:1px solid #eee
+
+.caption{
+  padding:0 18px 18px;
+  font-size:19px
 }
-.follow{background:#667eea;color:white}
-.following{background:#444;color:white}
+
+.postimg{
+  width:100%;
+  display:block;
+  max-height:600px;
+  object-fit:cover
+}
+
+.actions{
+  display:flex;
+  justify-content:space-around;
+  padding:15px 8px;
+  border-top:1px solid #eee
+}
+
+.actions button{
+  background:none;
+  font-size:16px;
+  color:#444
+}
+
+.actions button.liked{
+  color:#e91e63
+}
+
 .stats{
- display:flex;justify-content:space-around;
- text-align:center;margin:20px 0
+  padding:0 18px 15px;
+  color:#777;
+  font-size:14px
 }
-.stats b{display:block;font-size:21px}
-nav{
- position:fixed;bottom:0;left:0;right:0;
- background:white;display:flex;
- justify-content:space-around;
- padding:8px 2px;box-shadow:0 -2px 10px #0002
+
+.comments{
+  padding:0 18px 18px
 }
-nav button{background:none;font-size:11px}
-nav span{display:block;font-size:22px}
-.hidden{display:none}
-#message{color:#d00;margin:10px}
+
+.commentrow{
+  display:flex;
+  gap:8px;
+  margin-top:10px
+}
+
+.commentrow input{
+  flex:1;
+  border:1px solid #ddd;
+  border-radius:18px;
+  padding:10px 14px;
+  outline:none
+}
+
+.commentrow button{
+  border:0;
+  border-radius:18px;
+  background:#637be4;
+  color:white;
+  padding:0 15px
+}
+
+.comment{
+  margin-top:8px;
+  background:#f4f5fa;
+  padding:9px 12px;
+  border-radius:15px
+}
+
+.bottom{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  height:90px;
+  background:white;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  box-shadow:0 -3px 15px #ddd;
+  z-index:20
+}
+
+.nav{
+  text-align:center;
+  font-size:16px
+}
+
+.nav div{
+  font-size:30px
+}
+
+.empty{
+  text-align:center;
+  color:#777;
+  padding:30px
+}
+
+.filter-normal{filter:none}
+.filter-gray{filter:grayscale(100%)}
+.filter-sepia{filter:sepia(80%)}
+.filter-bright{filter:brightness(1.3)}
+.filter-contrast{filter:contrast(1.4)}
+.filter-saturate{filter:saturate(1.8)}
+.filter-vintage{filter:sepia(.35) contrast(1.15) saturate(1.3)}
+.filter-cool{filter:hue-rotate(15deg) saturate(1.2)}
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-
-<div class="login" id="loginScreen">
-
-<div class="box">
-
-<div class="logo">PIXORO</div>
-
-<div id="loginStep">
-
-<h3>PIXORO Account</h3>
-
-<input
- id="email"
- type="email"
- placeholder="Email">
-
-<input
- id="password"
- type="password"
- placeholder="Password">
-
-<input
- id="username"
- type="text"
- placeholder="Username (new account only)">
-
-<button
- class="primary"
- onclick="registerUser()">
-CREATE ACCOUNT
-</button>
-
-<button
- style="width:100%;margin-top:8px;background:#eee"
- onclick="loginUser()">
-LOGIN
-</button>
-
-</div>
-
-<p id="message"></p>
-
-</div>
-</div>
-
-
-<!-- APP -->
-
-<div id="app">
-
 <header>
-<h2>PIXORO</h2>
-<div>👤</div>
+  <div class="logo">PIXORO</div>
+  <div class="profile">👤</div>
 </header>
-
 
 <div class="container">
 
-<!-- HOME -->
-
-<section id="home" class="page active">
-
 <div class="card">
+<h2>Create Post</h2>
 
-<h3>Create Post</h3>
+<textarea id="caption" placeholder="Write your post..."></textarea>
 
-<textarea
- id="caption"
- rows="3"
- placeholder="What's happening?"></textarea>
+<div class="filebox">
+<input type="file" id="photo" accept="image/*">
+</div>
 
-<input
- id="media"
- type="file"
- accept="image/*,video/*">
+<img id="preview" class="preview">
 
-<button class="primary" onclick="createPost()">
-POST
-</button>
+<div class="filters">
+<button onclick="setFilter('filter-normal')">Normal</button>
+<button onclick="setFilter('filter-gray')">B&W</button>
+<button onclick="setFilter('filter-sepia')">Sepia</button>
+<button onclick="setFilter('filter-bright')">Bright</button>
+<button onclick="setFilter('filter-contrast')">Contrast</button>
+<button onclick="setFilter('filter-saturate')">Color</button>
+<button onclick="setFilter('filter-vintage')">Vintage</button>
+<button onclick="setFilter('filter-cool')">Cool</button>
+</div>
+
+<button class="publish" onclick="publishPost()">PUBLISH</button>
 
 </div>
 
 <div id="posts"></div>
 
-</section>
-
-
-<!-- SEARCH -->
-
-<section id="search" class="page">
-
-<div class="card">
-
-<h3>🔍 Search</h3>
-
-<input
- id="searchInput"
- placeholder="Search users..."
- oninput="searchUsers()">
-
 </div>
 
-<div id="users"></div>
-
-</section>
-
-
-<!-- POST -->
-
-<section id="postPage" class="page">
-
-<div class="card">
-
-<h3>Create Post</h3>
-
-<textarea
- id="caption2"
- rows="5"
- placeholder="Write your post..."></textarea>
-
-<input
- id="media2"
- type="file"
- accept="image/*,video/*">
-<div id="filterBox" style="display:none;">
-
-  <img id="filterPreview"
-       style="width:100%;max-height:300px;object-fit:contain;border-radius:15px;">
-
-  <div class="filters">
-
-    <button type="button" onclick="applyFilter('normal')">Normal</button>
-    <button type="button" onclick="applyFilter('bright')">☀️ Bright</button>
-    <button type="button" onclick="applyFilter('bw')">🖤 B&W</button>
-    <button type="button" onclick="applyFilter('sepia')">🟤 Sepia</button>
-    <button type="button" onclick="applyFilter('vintage')">📷 Vintage</button>
-    <button type="button" onclick="applyFilter('warm')">🔥 Warm</button>
-    <button type="button" onclick="applyFilter('cool')">❄️ Cool</button>
-
+<div class="bottom">
+  <div class="nav">
+    <div>🏠</div>
+    Home
   </div>
 
-     </div>
-<button class="primary" onclick="createPost2()">
-PUBLISH
-</button>
+  <div class="nav">
+    <div>🔍</div>
+    Search
+  </div>
 
+  <div class="nav">
+    <div>➕</div>
+    Post
+  </div>
+
+  <div class="nav">
+    <div>🏆</div>
+    Rewards
+  </div>
+
+  <div class="nav">
+    <div>👤</div>
+    Profile
+  </div>
 </div>
 
-</section>
+<script>
 
+let selectedImage="";
+let selectedFilter="filter-normal";
+let posts=JSON.parse(localStorage.getItem("pixoroPosts")||"[]");
 
-<!-- REWARDS -->
+const photo=document.getElementById("photo");
+const preview=document.getElementById("preview");
 
-<section id="rewards" class="page">
+photo.addEventListener("change",function(){
 
-<div class="card" style="text-align:center">
+  const file=this.files[0];
 
-<h2>🪙 PIXORO Rewards</h2>
+  if(!file)return;
 
-<h1 id="coins">0</h1>
+  const reader=new FileReader();
 
-<p>Coins</p>
+  reader.onload=function(e){
 
-<br>
+    selectedImage=e.target.result;
 
-<p>👁 Views: <b id="views">0</b></p>
+    preview.src=selectedImage;
+    preview.style.display="block";
 
-</div>
+  };
 
-</section>
-
-
-<!-- PROFILE -->
-
-<section id="profile" class="page">
-
-<div class="card" style="text-align:center">
-
-<div class="avatar" style="margin:auto" id="avatar">
-P
-</div>
-
-<h2 id="profileName">PIXORO</h2>
-
-<div class="stats">
-
-<div>
-<b id="myPosts">0</b>
-Posts
-</div>
-
-<div>
-<b id="followers">0</b>
-Followers
-</div>
-
-<div>
-<b id="following">0</b>
-Following
-</div>
-
-</div>
-
-<button
-onclick="logout()"
-style="background:#ff5252;color:white">
-LOGOUT
-</button>
-
-</div>
-
-</section>
-
-</div>
-
-
-<nav>
-
-<button onclick="page('home')">
-<span>🏠</span>Home
-</button>
-
-<button onclick="page('search')">
-<span>🔍</span>Search
-</button>
-
-<button onclick="page('postPage')">
-<span>➕</span>Post
-</button>
-
-<button onclick="page('rewards')">
-<span>🪙</span>Rewards
-</button>
-
-<button onclick="page('profile')">
-<span>👤</span>Profile
-</button>
-
-</nav>
-
-</div>
-
-
-<script type="module">
-
-/* ================= FIREBASE ================= */
-
-import {initializeApp}
-from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendEmailVerification,
-  onAuthStateChanged,
-  signOut,
-  RecaptchaVerifier,
-  signInWithPhoneNumber
-}
-from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
-import {
- getFirestore,
- doc,
- setDoc,
- getDoc,
- getDocs,
- updateDoc,
- collection,
- addDoc,
- query,
- orderBy,
- onSnapshot,
- arrayUnion,
- arrayRemove,
- serverTimestamp
-}
-from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-import {
- getStorage,
- ref,
- uploadBytes,
- getDownloadURL
-}
-from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
-
-
-const firebaseConfig = {
-
- apiKey:"AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",
-
- authDomain:"pixoro-75927.firebaseapp.com",
-
- projectId:"pixoro-75927",
-
- storageBucket:"pixoro-75927.firebasestorage.app",
-
- messagingSenderId:"814840120295",
-
- appId:"1:814840120295:web:6c02c613df5a17209bf342",
-
- measurementId:"G-H3NR8P270D"
-
-};
-
-
-const app=initializeApp(firebaseConfig);
-
-const auth=getAuth(app);
-
-const db=getFirestore(app);
-
-const storage=getStorage(app);
-
-
-/* ================= VARIABLES ================= */
-
-
-
-let currentUser=null;
-
-let unsubscribePosts=null;
-
-/* ================= AUTH STATE ================= */
-
-onAuthStateChanged(auth, async user => {
-
-  if (!user) {
-    document.getElementById("loginScreen").style.display = "flex";
-    document.getElementById("app").style.display = "none";
-    return;
-  }
-
-  currentUser = user;
-
-  const userRef = doc(db, "users", user.uid);
-  const snap = await getDoc(userRef);
-
-  if (!snap.exists()) {
-
-    await setDoc(userRef, {
-      username: user.email.split("@")[0],
-      email: user.email,
-      followers: [],
-      following: [],
-      createdAt: serverTimestamp()
-    });
-
-  }
-
-  openApp();
-
+  reader.readAsDataURL(file);
 });
 
-/* ================= PROFILE ================= */
+function setFilter(filter){
 
-window.saveProfile=async function(){
+  selectedFilter=filter;
 
- const name=
- document.getElementById("username")
- .value.trim();
+  preview.className="preview "+filter;
+}
 
- if(name.length<3){
+function publishPost(){
 
-   message("Username minimum 3 characters");
+  const caption=document.getElementById("caption").value.trim();
 
-   return;
+  if(!selectedImage){
 
- }
+    alert("Please choose a photo!");
+    return;
 
+  }
 
- await setDoc(
-   doc(db,"users",currentUser.uid),
-   {
-     username:name,
-     phone:currentUser.phoneNumber,
-     followers:[],
-     following:[],
-     createdAt:serverTimestamp()
-   }
- );
+  const post={
 
- openApp();
+    id:Date.now(),
 
-};
+    caption:caption,
 
+    image:selectedImage,
 
-/* ================= OPEN APP ================= */
+    filter:selectedFilter,
 
-async function openApp(){
+    likes:0,
 
- document.getElementById("loginScreen")
- .style.display="none";
+    liked:false,
 
- document.getElementById("app")
- .style.display="block";
+    views:0,
 
- loadProfile();
+    saved:false,
 
- loadPosts();
+    comments:[],
+
+    time:new Date().toLocaleString()
+
+  };
+
+  posts.unshift(post);
+
+  localStorage.setItem("pixoroPosts",JSON.stringify(posts));
+
+  document.getElementById("caption").value="";
+  photo.value="";
+  preview.src="";
+  preview.style.display="none";
+
+  selectedImage="";
+
+  renderPosts();
+
+  alert("Post published successfully!");
 
 }
 
+function likePost(id){
 
-/* ================= LOAD POSTS ================= */
+  const post=posts.find(p=>p.id===id);
 
-function loadPosts(){
+  if(!post)return;
 
- const q=query(
-   collection(db,"posts"),
-   orderBy("createdAt","desc")
- );
+  if(post.liked){
 
+    post.likes--;
+    post.liked=false;
 
- unsubscribePosts=
- onSnapshot(q,snapshot=>{
+  }else{
 
-   const box=
-     document.getElementById("posts");
+    post.likes++;
+    post.liked=true;
 
-   box.innerHTML="";
+  }
 
-
-   snapshot.forEach(item=>{
-
-     const p=item.data();
-
-     renderPost(
-       item.id,
-       p,
-       box
-     );
-
-   });
-
-
-   if(snapshot.empty){
-
-     box.innerHTML=
-       `<div class="card">
-       No public posts yet.
-       </div>`;
-
-   }
-
- });
+  saveAndRender();
 
 }
 
+function viewPost(id){
 
-/* ================= POST UI ================= */
+  const post=posts.find(p=>p.id===id);
 
-function renderPost(id,p,box){
+  if(!post)return;
 
- const liked=
-   (p.likes||[])
-   .includes(currentUser.uid);
+  post.views++;
 
-
- const div=
- document.createElement("div");
-
- div.className="post";
-
-
- let media="";
-
-
- if(p.mediaType==="image"){
-
-   media=
-   `<img src="${p.mediaUrl}">`;
-
- }
-
-
- if(p.mediaType==="video"){
-
-   media=
-   `<video controls src="${p.mediaUrl}"></video>`;
-
- }
-
-
- div.innerHTML=`
-
- <div class="head">
-
-   <div class="avatar">
-     ${(p.username||"P")
-       .charAt(0)
-       .toUpperCase()}
-   </div>
-
-   <b>${safe(p.username||"PIXORO")}</b>
-
- </div>
-
- <p style="margin-top:10px">
- ${safe(p.text||"")}
- </p>
-
- ${media}
-
- <div class="actions">
-
- <button
- class="${liked?"liked":""}"
- onclick="likePost('${id}',${liked})">
-
- ${liked?"♥ Liked":"♡ Like"}
- ${(p.likes||[]).length}
-
- </button>
-
- <button onclick="viewPost('${id}')">
- 👁 ${(p.views||0)}
- </button>
-
- <button onclick="sharePost('${id}')">
- 🔗 Share
- </button>
-
-<button onclick="downloadPost('${p.mediaUrl}')">
-⬇ Download
-</button>
-
-</div>
-
- </div>
-
- <div id="comments-${id}"></div>
-
- <div class="commentrow">
-
- <input
- id="comment-${id}"
- placeholder="Comment...">
-
- <button onclick="comment('${id}')">
- Send
- </button>
-
- </div>
-
- `;
-
-
- box.appendChild(div);
-
- loadComments(id);
+  localStorage.setItem("pixoroPosts",JSON.stringify(posts));
 
 }
 
-/* ================= LIKE ================= */
+function savePost(id){
 
-window.likePost = async function(id, liked){
+  const post=posts.find(p=>p.id===id);
 
-  const postRef = doc(db, "posts", id);
+  if(!post)return;
 
-  if(liked){
+  post.saved=!post.saved;
 
-    await updateDoc(
-      postRef,
-      {
-        likes: arrayRemove(currentUser.uid)
+  saveAndRender();
+
+}
+
+function addComment(id){
+
+  const input=document.getElementById("comment-"+id);
+
+  if(!input)return;
+
+  const text=input.value.trim();
+
+  if(!text)return;
+
+  const post=posts.find(p=>p.id===id);
+
+  post.comments.push(text);
+
+  input.value="";
+
+  saveAndRender();
+
+}
+
+function deletePost(id){
+
+  if(!confirm("Delete this post?"))return;
+
+  posts=posts.filter(p=>p.id!==id);
+
+  saveAndRender();
+
+}
+
+function sharePost(id){
+
+  const post=posts.find(p=>p.id===id);
+
+  if(navigator.share){
+
+    navigator.share({
+
+      title:"PIXORO Post",
+
+      text:post.caption||"Check this post on PIXORO"
+
+    });
+
+  }else{
+
+    navigator.clipboard.writeText(
+      "PIXORO Post: "+(post.caption||"")
+    );
+
+    alert("Post text copied!");
+
+  }
+
+}
+
+function saveAndRender(){
+
+  localStorage.setItem(
+    "pixoroPosts",
+    JSON.stringify(posts)
+  );
+
+  renderPosts();
+
+}
+
+function renderPosts(){
+
+  const box=document.getElementById("posts");
+
+  if(posts.length===0){
+
+    box.innerHTML=
+      '<div class="empty">No public posts yet 📸</div>';
+
+    return;
+
+  }
+
+  box.innerHTML=posts.map(post=>`
+
+    <div class="post">
+
+      <div class="posttop">
+
+        <div class="avatar">👤</div>
+
+        <div>
+
+          <div class="username">PIXORO User</div>
+
+          <div class="time">${post.time}</div>
+
+        </div>
+
+      </div>
+
+      ${
+        post.caption
+        ?
+        `<div class="caption">${escapeHTML(post.caption)}</div>`
+        :
+        ""
       }
-    );
 
-  } else {
+      <img
+        class="postimg ${post.filter}"
+        src="${post.image}"
+        onclick="viewPost(${post.id})"
+      >
 
-    await updateDoc(
-      postRef,
-      {
-        likes: arrayUnion(currentUser.uid)
-      }
-    );
+      <div class="actions">
 
-  }
+        <button
+          class="${post.liked?'liked':''}"
+          onclick="likePost(${post.id})">
+          ❤️ ${post.likes}
+        </button>
 
-};
+        <button onclick="focusComment(${post.id})">
+          💬 ${post.comments.length}
+        </button>
 
- 
-/* ================= DOWNLOAD ================= */
+        <button onclick="sharePost(${post.id})">
+          🔗 Share
+        </button>
 
-window.downloadPost = async function(url){
+        <button onclick="savePost(${post.id})">
+          ${post.saved?'💾 Saved':'🔖 Save'}
+        </button>
 
-  try{
+        <button onclick="deletePost(${post.id})">
+          🗑️
+        </button>
 
-    const response = await fetch(url);
-    const blob = await response.blob();
+      </div>
 
-    const link = document.createElement("a");
+      <div class="stats">
+        👁️ ${post.views} views
+      </div>
 
-    link.href = URL.createObjectURL(blob);
-    link.download = "PIXORO-photo.jpg";
+      <div class="comments">
 
-    document.body.appendChild(link);
+        ${
+          post.comments.map(c=>
+            `<div class="comment">💬 ${escapeHTML(c)}</div>`
+          ).join("")
+        }
 
-    link.click();
+        <div class="commentrow">
 
-    link.remove();
+          <input
+            id="comment-${post.id}"
+            placeholder="Write a comment..."
+          >
 
-    URL.revokeObjectURL(link.href);
+          <button onclick="addComment(${post.id})">
+            Send
+          </button>
 
-  }catch(error){
+        </div>
 
-    console.error(error);
+      </div>
 
-    alert("Download failed");
+    </div>
 
-  }
-
-};
-
-
-/* ================= VIEW ================= */
-
-window.viewPost=async function(id){
-
- await updateDoc(
-   doc(db,"posts",id),
-   {
-     views:
-       await getViews(id)+1
-   }
- );
-
-};
-
-
-async function getViews(id){
-
- const snap=
-   await getDoc(doc(db,"posts",id));
-
- return snap.data().views||0;
+  `).join("");
 
 }
 
+function focusComment(id){
 
-/* ================= COMMENTS ================= */
+  const input=document.getElementById("comment-"+id);
 
-function loadComments(id){
+  if(input){
 
- const q=query(
-   collection(db,"posts",id,"comments"),
-   orderBy("createdAt","asc")
- );
+    input.focus();
 
-
- onSnapshot(q,snapshot=>{
-
-   const box=
-     document.getElementById("comments-"+id);
-
-   if(!box)return;
-
-   box.innerHTML="";
-
-   snapshot.forEach(item=>{
-
-     const c=item.data();
-
-     box.innerHTML+=
-       `<div class="comment">
-       <b>${safe(c.username)}</b>:
-       ${safe(c.text)}
-       </div>`;
-
-   });
-
- });
+  }
 
 }
 
-
-window.comment=async function(id){
-
- const input=
-   document.getElementById(
-     "comment-"+id
-   );
-
- const text=
-   input.value.trim();
-
- if(!text)return;
-
-
- const userSnap=
-   await getDoc(
-     doc(db,"users",currentUser.uid)
-   );
-
- const username=
-   userSnap.data().username;
-
-
- await addDoc(
-   collection(
-     db,
-     "posts",
-     id,
-     "comments"
-   ),
-   {
-     uid:currentUser.uid,
-     username:username,
-     text:text,
-     createdAt:serverTimestamp()
-   }
- );
-
- input.value="";
-
-};
-
-
-/* ================= SHARE ================= */
-
-window.sharePost=async function(id){
-
- const url=
-   location.origin+
-   location.pathname+
-   "?post="+id;
-
-
- try{
-
-   if(navigator.share){
-
-     await navigator.share({
-       title:"PIXORO",
-       text:"Check this PIXORO post",
-       url:url
-     });
-
-   }else{
-
-     await navigator.clipboard.writeText(url);
-
-     alert("Post link copied!");
-
-   }
-
- }catch(e){}
-
-};
-
-
-/* ================= CREATE POST ================= */
-
-window.createPost=async function(){
-
- const text=
-   document.getElementById("caption")
-   .value.trim();
-
- const file=
-   document.getElementById("media")
-   .files[0];
-
- await create(text,file);
-
-};
-
-
-window.createPost2=async function(){
-
- const text=
-   document.getElementById("caption2")
-   .value.trim();
-
- const file=
-   document.getElementById("media2")
-   .files[0];
-
- await create(text,file);
-
-};
-
-
-async function create(text,file){
-
- if(!text && !file){
-
-   alert("Write something or select photo/video.");
-
-   return;
-
- }
-
-
- try{
-
-   const userSnap=
-     await getDoc(
-       doc(db,"users",currentUser.uid)
-     );
-
-   const username=
-     userSnap.data().username;
-
-
-   let mediaUrl="";
-
-   let mediaType="";
-
-
-   if(file){
-
-     if(file.size>10*1024*1024){
-
-       alert("File must be below 10MB.");
-
-       return;
-
-     }
-
-
-     mediaType=
-       file.type.startsWith("video")
-       ? "video"
-       : "image";
-
-
-     const path=
-       "posts/"+
-       currentUser.uid+
-       "/"+
-       Date.now()+"_"+file.name;
-
-
-     const storageRef=
-       ref(storage,path);
-
-
-     await uploadBytes(
-       storageRef,
-       file
-     );
-
-
-     mediaUrl=
-       await getDownloadURL(
-         storageRef
-       );
-
-   }
-
-
-   await addDoc(
-     collection(db,"posts"),
-     {
-       uid:currentUser.uid,
-       username:username,
-       text:text,
-       mediaUrl:mediaUrl,
-       mediaType:mediaType,
-       likes:[],
-       views:0,
-       createdAt:serverTimestamp()
-     }
-   );
-
-
-   document.getElementById("caption").value="";
-   document.getElementById("caption2").value="";
-   document.getElementById("media").value="";
-   document.getElementById("media2").value="";
-
-
-   page("home");
-
- }catch(error){
-
-   console.error(error);
-
-   alert(
-     "Post failed: "+
-     error.message
-   );
-
- }
+function escapeHTML(text){
+
+  return text
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 
 }
 
+renderPosts();
 
-/* ================= SEARCH USERS ================= */
-
-window.searchUsers=async function(){
-
- const text=
-   document.getElementById("searchInput")
-   .value.trim()
-   .toLowerCase();
-
- const box=
-   document.getElementById("users");
-
- box.innerHTML="";
-
- if(!text)return;
-
-
- const snap=
-   await getDocs(
-     collection(db,"users")
-   );
-
-
- snap.forEach(item=>{
-
-   const u=item.data();
-
-   if(
-     u.username.toLowerCase()
-     .includes(text)
-   ){
-
-     const isFollowing=
-       (u.followers||[])
-       .includes(currentUser.uid);
-
-
-     box.innerHTML+=`
-
-     <div class="card user">
-
-       <b>👤 ${safe(u.username)}</b>
-
-       ${
-         item.id===currentUser.uid
-         ? "<span>You</span>"
-         :
-         `<button
-         class="${isFollowing?"following":"follow"}"
-         onclick="follow('${item.id}',${isFollowing})">
-
-         ${isFollowing?"Following":"Follow"}
-
-         </button>`
-       }
-
-     </div>
-
-     `;
-
-   }
-
- });
-
-};
-
-
-/* ================= FOLLOW ================= */
-
-window.follow=async function(uid,isFollowing){
-
- const meRef =
-  doc(db,"users",currentUser.uid);
- const otherRef=
-   doc(db,"users",uid);
-
-
- if(isFollowing){
-
-   await updateDoc(
-     meRef,
-     {
-       following:arrayRemove(uid)
-     }
-   );
-
-   await updateDoc(
-     otherRef,
-     {
-       followers:
-         arrayRemove(currentUser.uid)
-     }
-   );
-
- }else{
-
-   await updateDoc(
-     meRef,
-     {
-       following:arrayUnion(uid)
-     }
-   );
-
-   await updateDoc(
-     otherRef,
-     {
-       followers:
-         arrayUnion(currentUser.uid)
-     }
-   );
-
- }
-
- searchUsers();
- loadProfile();
-
-};
-
-
-/* ================= PROFILE ================= */
-
-async function loadProfile(){
-
- const snap=
-   await getDoc(
-     doc(db,"users",currentUser.uid)
-   );
-
- if(!snap.exists())return;
-
- const u=snap.data();
-
-
- document.getElementById("profileName")
- .textContent=u.username;
-
- document.getElementById("avatar")
- .textContent=
-   u.username.charAt(0).toUpperCase();
-
- document.getElementById("followers")
- .textContent=
-   (u.followers||[]).length;
-
- document.getElementById("following")
- .textContent=
-   (u.following||[]).length;
-
-
- const q=query(
-   collection(db,"posts")
- );
-
-
- onSnapshot(q,s=>{
-
-   let count=0;
-
-   s.forEach(x=>{
-
-     if(x.data().uid===currentUser.uid)
-       count++;
-
-   });
-
-   document.getElementById("myPosts")
-   .textContent=count;
-
- });
-
-}
-
-
-/* ================= PAGE ================= */
-
-window.page=function(id){
-
- document.querySelectorAll(".page")
- .forEach(x=>
-   x.classList.remove("active")
- );
-
- document.getElementById(id)
- .classList.add("active");
-
- window.scrollTo(0,0);
-
-};
-
-
-/* ================= LOGOUT ================= */
-
-window.logout=async function(){
-
- if(unsubscribePosts)
-   unsubscribePosts();
-
- await signOut(auth);
-
- location.reload();
-
-};
-
-
-/* ================= REGISTER ================= */
-
-window.registerUser = async function(){
-
-  const email =
-    document.getElementById("email").value.trim();
-
-  const password =
-    document.getElementById("password").value;
-
-  const username =
-    document.getElementById("username").value.trim();
-
-  if(!email || !password || !username){
-    message("Please fill all fields.");
-    return;
-  }
-
-  if(username.length < 3){
-    message("Username minimum 3 characters.");
-    return;
-  }
-
-  if(password.length < 6){
-    message("Password must be at least 6 characters.");
-    return;
-  }
-
-  try{
-
-    message("Creating account...");
-
-    const result =
-      await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-    const user = result.user;
-
-    await setDoc(
-      doc(db,"users",user.uid),
-      {
-        username: username,
-        email: email,
-        followers: [],
-        following: [],
-        createdAt: serverTimestamp()
-      }
-    );
-
-    message("Account created successfully!");
-
-    openApp();
-
-  }catch(error){
-
-    console.error(error);
-
-    if(error.code === "auth/email-already-in-use"){
-      message("Email already registered. Please LOGIN.");
-    }
-    else if(error.code === "auth/invalid-email"){
-      message("Invalid email address.");
-    }
-    else if(error.code === "auth/weak-password"){
-      message("Password is too weak.");
-    }
-    else{
-      message(error.message);
-    }
-
-  }
-
-};
-
-
-/* ================= LOGIN ================= */
-
-window.loginUser = async function(){
-
-  const email =
-    document.getElementById("email").value.trim();
-
-  const password =
-    document.getElementById("password").value;
-
-  if(!email || !password){
-    message("Enter email and password.");
-    return;
-  }
-
-  try{
-
-    message("Logging in...");
-
-    await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-
-    message("Login successful!");
-
-  }catch(error){
-
-    console.error(error);
-
-    if(error.code === "auth/invalid-credential"){
-      message("Wrong email or password.");
-    }
-    else if(error.code === "auth/user-not-found"){
-      message("Account not found.");
-    }
-    else{
-      message(error.message);
-    }
-
-  }
-
-};
-
-
-/* ================= SAFE ================= */
-
-function safe(text){
-
- const d=
-   document.createElement("div");
-
- d.textContent=
-   String(text||"");
-
- return d.innerHTML;
-
-}
-function message(text){
-  document.getElementById("message").textContent = text;
- }
 </script>
 
-</body></html>
-
+</body>
+</html>
