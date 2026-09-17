@@ -1184,14 +1184,128 @@ window.logout=async function(){
 };
 
 
-/* ================= MESSAGE ================= */
+/* ================= REGISTER ================= */
 
-function message(text){
+window.registerUser = async function(){
 
- document.getElementById("message")
- .textContent=text;
+  const email =
+    document.getElementById("email").value.trim();
 
-}
+  const password =
+    document.getElementById("password").value;
+
+  const username =
+    document.getElementById("username").value.trim();
+
+  if(!email || !password || !username){
+    message("Please fill all fields.");
+    return;
+  }
+
+  if(username.length < 3){
+    message("Username minimum 3 characters.");
+    return;
+  }
+
+  if(password.length < 6){
+    message("Password must be at least 6 characters.");
+    return;
+  }
+
+  try{
+
+    message("Creating account...");
+
+    const result =
+      await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+    const user = result.user;
+
+    await setDoc(
+      doc(db,"users",user.uid),
+      {
+        username: username,
+        email: email,
+        followers: [],
+        following: [],
+        createdAt: serverTimestamp()
+      }
+    );
+
+    message("Account created successfully!");
+
+    openApp();
+
+  }catch(error){
+
+    console.error(error);
+
+    if(error.code === "auth/email-already-in-use"){
+      message("Email already registered. Please LOGIN.");
+    }
+    else if(error.code === "auth/invalid-email"){
+      message("Invalid email address.");
+    }
+    else if(error.code === "auth/weak-password"){
+      message("Password is too weak.");
+    }
+    else{
+      message(error.message);
+    }
+
+  }
+
+};
+
+
+/* ================= LOGIN ================= */
+
+window.loginUser = async function(){
+
+  const email =
+    document.getElementById("email").value.trim();
+
+  const password =
+    document.getElementById("password").value;
+
+  if(!email || !password){
+    message("Enter email and password.");
+    return;
+  }
+
+  try{
+
+    message("Logging in...");
+
+    await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    message("Login successful!");
+
+  }catch(error){
+
+    console.error(error);
+
+    if(error.code === "auth/invalid-credential"){
+      message("Wrong email or password.");
+    }
+    else if(error.code === "auth/user-not-found"){
+      message("Account not found.");
+    }
+    else{
+      message(error.message);
+    }
+
+  }
+
+};
 
 
 /* ================= SAFE ================= */
@@ -1210,5 +1324,5 @@ function safe(text){
 
 </script>
 
-</body>
-</html>
+</body></html>
+
