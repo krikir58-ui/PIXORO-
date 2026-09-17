@@ -1,430 +1,439 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>PIXORO</title>
 
 <style>
+
 *{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:Arial,sans-serif;
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:Arial,sans-serif;
 }
 
 body{
-  background:#f3f5ff;
-  color:#222;
-  padding-bottom:75px;
+background:#f3f5ff;
+color:#222;
+padding-bottom:75px;
 }
 
 button{
-  border:0;
-  cursor:pointer;
+border:0;
+cursor:pointer;
 }
 
 input,textarea{
-  width:100%;
-  border:1px solid #ddd;
-  border-radius:13px;
-  padding:13px;
-  font-size:15px;
-  outline:none;
-  margin-top:8px;
-  background:#fff;
+width:100%;
+border:1px solid #ddd;
+border-radius:13px;
+padding:13px;
+font-size:15px;
+outline:none;
+margin-top:8px;
+background:#fff;
 }
 
 textarea{
-  height:100px;
-  resize:none;
+height:100px;
+resize:none;
 }
 
 .hidden{
-  display:none!important;
+display:none!important;
 }
 
 /* AUTH */
 
 .auth{
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:20px;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
 }
 
 .authbox{
-  width:100%;
-  max-width:430px;
-  background:#fff;
-  padding:25px;
-  border-radius:24px;
-  box-shadow:0 8px 30px #0002;
+width:100%;
+max-width:430px;
+background:#fff;
+padding:25px;
+border-radius:24px;
+box-shadow:0 8px 30px #0002;
 }
 
 .logo{
-  text-align:center;
-  font-size:32px;
-  font-weight:bold;
-  color:#635bff;
-  margin-bottom:5px;
+text-align:center;
+font-size:32px;
+font-weight:bold;
+color:#635bff;
+margin-bottom:5px;
 }
 
 .subtitle{
-  text-align:center;
-  color:#888;
-  margin-bottom:22px;
+text-align:center;
+color:#888;
+margin-bottom:22px;
 }
 
 .authbox h2{
-  margin-bottom:8px;
+margin-bottom:8px;
 }
 
 .primary{
-  width:100%;
-  background:#635bff;
-  color:#fff;
-  padding:14px;
-  border-radius:13px;
-  font-size:16px;
-  font-weight:bold;
-  margin-top:13px;
+width:100%;
+background:#635bff;
+color:#fff;
+padding:14px;
+border-radius:13px;
+font-size:16px;
+font-weight:bold;
+margin-top:13px;
 }
 
 .switch{
-  text-align:center;
-  color:#635bff;
-  margin-top:17px;
-  cursor:pointer;
+text-align:center;
+color:#635bff;
+margin-top:17px;
+cursor:pointer;
 }
 
 .message{
-  text-align:center;
-  margin-top:12px;
-  color:#555;
-  font-size:14px;
+text-align:center;
+margin-top:12px;
+color:#555;
+font-size:14px;
 }
 
 /* APP */
 
 .topbar{
-  position:sticky;
-  top:0;
-  z-index:20;
-  height:62px;
-  background:#fff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  box-shadow:0 2px 12px #0001;
+position:sticky;
+top:0;
+z-index:20;
+height:62px;
+background:#fff;
+display:flex;
+justify-content:center;
+align-items:center;
+box-shadow:0 2px 12px #0001;
 }
 
 .toplogo{
-  color:#635bff;
-  font-size:25px;
-  font-weight:bold;
+color:#635bff;
+font-size:25px;
+font-weight:bold;
 }
 
 .page{
-  max-width:650px;
-  margin:auto;
-  padding:15px;
+max-width:650px;
+margin:auto;
+padding:15px;
 }
 
 .heading{
-  font-size:24px;
-  font-weight:bold;
-  margin-bottom:14px;
+font-size:24px;
+font-weight:bold;
+margin-bottom:14px;
+}
+
+/* CARD */
+
+.card{
+background:#fff;
+border-radius:19px;
+padding:16px;
+box-shadow:0 3px 16px #0001;
+margin-bottom:15px;
 }
 
 /* CREATE */
 
-.card{
-  background:#fff;
-  border-radius:19px;
-  padding:16px;
-  box-shadow:0 3px 16px #0001;
-  margin-bottom:15px;
-}
-
 .preview{
-  width:100%;
-  max-height:550px;
-  object-fit:contain;
-  border-radius:15px;
-  margin-top:12px;
-  background:#eee;
+width:100%;
+max-height:550px;
+object-fit:contain;
+border-radius:15px;
+margin-top:12px;
+background:#eee;
 }
 
 .filters{
-  display:flex;
-  gap:7px;
-  overflow-x:auto;
-  margin-top:12px;
-  padding-bottom:5px;
+display:flex;
+gap:7px;
+overflow-x:auto;
+margin-top:12px;
+padding-bottom:5px;
 }
 
 .filter{
-  white-space:nowrap;
-  padding:9px 12px;
-  border-radius:10px;
-  background:#eee;
+white-space:nowrap;
+padding:9px 12px;
+border-radius:10px;
+background:#eee;
 }
 
 .filter.active{
-  background:#635bff;
-  color:#fff;
+background:#635bff;
+color:#fff;
 }
 
 /* POST */
 
 .post{
-  background:#fff;
-  border-radius:18px;
-  overflow:hidden;
-  margin-bottom:16px;
-  box-shadow:0 3px 16px #0001;
+background:#fff;
+border-radius:18px;
+overflow:hidden;
+margin-bottom:16px;
+box-shadow:0 3px 16px #0001;
 }
 
 .posthead{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:13px;
+display:flex;
+align-items:center;
+gap:10px;
+padding:13px;
 }
 
 .avatar{
-  width:43px;
-  height:43px;
-  border-radius:50%;
-  background:#635bff;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
-  flex-shrink:0;
+width:43px;
+height:43px;
+border-radius:50%;
+background:#635bff;
+color:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+flex-shrink:0;
 }
 
 .userinfo{
-  flex:1;
+flex:1;
 }
 
 .username{
-  font-weight:bold;
+font-weight:bold;
 }
 
 .time{
-  color:#888;
-  font-size:12px;
-  margin-top:3px;
+color:#888;
+font-size:12px;
+margin-top:3px;
 }
 
 .deletebtn{
-  background:#ffe7e7;
-  color:#d00;
-  padding:8px 10px;
-  border-radius:9px;
+background:#ffe7e7;
+color:#d00;
+padding:8px 10px;
+border-radius:9px;
 }
 
 .postimage{
-  width:100%;
-  max-height:650px;
-  object-fit:contain;
-  background:#eee;
-  display:block;
+width:100%;
+max-height:650px;
+object-fit:contain;
+background:#eee;
+display:block;
 }
 
 .caption{
-  padding:12px 14px;
-  line-height:1.45;
-  white-space:pre-wrap;
+padding:12px 14px;
+line-height:1.45;
+white-space:pre-wrap;
 }
 
 .actions{
-  display:flex;
-  padding:7px;
-  gap:3px;
+display:flex;
+padding:7px;
+gap:3px;
 }
 
 .action{
-  flex:1;
-  padding:10px 3px;
-  background:#fff;
-  border-radius:10px;
-  font-size:14px;
+flex:1;
+padding:10px 3px;
+background:#fff;
+border-radius:10px;
+font-size:14px;
 }
 
 .action:hover{
-  background:#f3f3f3;
+background:#f3f3f3;
 }
 
 .liked{
-  color:#e53935;
+color:#e53935;
 }
 
 .saved{
-  color:#635bff;
+color:#635bff;
 }
 
 .comments{
-  padding:0 13px 8px;
+padding:0 13px 8px;
 }
 
 .comment{
-  background:#f1f2f6;
-  border-radius:10px;
-  padding:8px 10px;
-  margin-top:5px;
-  font-size:14px;
+background:#f1f2f6;
+border-radius:10px;
+padding:8px 10px;
+margin-top:5px;
+font-size:14px;
 }
 
 .commentbox{
-  display:flex;
-  gap:7px;
-  padding:6px 13px 13px;
+display:flex;
+gap:7px;
+padding:6px 13px 13px;
 }
 
 .commentbox input{
-  margin:0;
+margin:0;
 }
 
 .commentbox button{
-  padding:10px 13px;
-  border-radius:10px;
-  background:#635bff;
-  color:#fff;
+padding:10px 13px;
+border-radius:10px;
+background:#635bff;
+color:#fff;
 }
 
 .empty{
-  text-align:center;
-  color:#888;
-  padding:35px 15px;
+text-align:center;
+color:#888;
+padding:35px 15px;
 }
 
 /* SEARCH */
 
 .userrow{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:12px 0;
-  border-bottom:1px solid #eee;
+display:flex;
+align-items:center;
+gap:10px;
+padding:12px 0;
+border-bottom:1px solid #eee;
 }
 
 .userinfo2{
-  flex:1;
+flex:1;
 }
 
 .followbtn{
-  background:#635bff;
-  color:#fff;
-  padding:9px 13px;
-  border-radius:10px;
+background:#635bff;
+color:#fff;
+padding:9px 13px;
+border-radius:10px;
 }
 
 .following{
-  background:#eee;
-  color:#222;
+background:#eee;
+color:#222;
 }
 
 /* PROFILE */
 
 .profile{
-  text-align:center;
-  background:#fff;
-  padding:25px;
-  border-radius:20px;
-  box-shadow:0 3px 16px #0001;
+text-align:center;
+background:#fff;
+padding:25px;
+border-radius:20px;
+box-shadow:0 3px 16px #0001;
 }
 
 .bigavatar{
-  width:90px;
-  height:90px;
-  border-radius:50%;
-  background:#635bff;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:34px;
-  font-weight:bold;
-  margin:auto;
+width:90px;
+height:90px;
+border-radius:50%;
+background:#635bff;
+color:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:34px;
+font-weight:bold;
+margin:auto;
 }
 
 .profile h2{
-  margin-top:12px;
+margin-top:12px;
 }
 
 .profile p{
-  color:#777;
-  margin-top:4px;
+color:#777;
+margin-top:4px;
 }
 
 .stats{
-  display:flex;
-  justify-content:center;
-  gap:40px;
-  margin:20px 0;
+display:flex;
+justify-content:center;
+gap:40px;
+margin:20px 0;
 }
 
 .stat b{
-  display:block;
-  font-size:20px;
+display:block;
+font-size:20px;
 }
 
 .stat span{
-  font-size:12px;
-  color:#777;
+font-size:12px;
+color:#777;
 }
 
 /* NAV */
 
 .bottomnav{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  height:68px;
-  background:#fff;
-  box-shadow:0 -3px 15px #0002;
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  z-index:30;
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+height:68px;
+background:#fff;
+box-shadow:0 -3px 15px #0002;
+display:flex;
+justify-content:space-around;
+align-items:center;
+z-index:30;
 }
 
 .nav{
-  background:#fff;
-  color:#666;
-  padding:6px 12px;
-  font-size:11px;
+background:#fff;
+color:#666;
+padding:6px 12px;
+font-size:11px;
 }
 
 .nav span{
-  display:block;
-  font-size:23px;
-  margin-bottom:2px;
+display:block;
+font-size:23px;
+margin-bottom:2px;
 }
 
 .nav.active{
-  color:#635bff;
+color:#635bff;
 }
 
 /* LOADING */
 
 .loading{
-  text-align:center;
-  padding:30px;
-  color:#777;
+text-align:center;
+padding:30px;
+color:#777;
 }
+
 </style>
 </head>
 
 <body>
 
-<!-- ================= AUTH ================= -->
+
+<!-- ==================================================
+AUTH
+================================================== -->
 
 <div id="authPage" class="auth">
 
@@ -435,6 +444,7 @@ textarea{
 <div class="subtitle">
 Share your world 🌎
 </div>
+
 
 <!-- LOGIN -->
 
@@ -467,6 +477,7 @@ Create new account
 </div>
 
 </div>
+
 
 <!-- SIGNUP -->
 
@@ -510,6 +521,7 @@ Already have account? Login
 
 </div>
 
+
 <div
 id="authMessage"
 class="message">
@@ -519,12 +531,19 @@ class="message">
 </div>
 
 
-<!-- ================= APP ================= -->
+<!-- ==================================================
+APP
+================================================== -->
 
 <div id="app" class="hidden">
 
+
 <div class="topbar">
-<div class="toplogo">PIXORO</div>
+
+<div class="toplogo">
+PIXORO
+</div>
+
 </div>
 
 
@@ -539,9 +558,11 @@ Public Feed
 </div>
 
 <div id="feed">
+
 <div class="loading">
 Loading posts...
 </div>
+
 </div>
 
 </section>
@@ -716,11 +737,10 @@ Logout
 
 </div>
 
+
 <div style="height:15px"></div>
 
-<div
-id="myPosts">
-</div>
+<div id="myPosts"></div>
 
 </section>
 
@@ -732,29 +752,40 @@ id="myPosts">
 <button
 class="nav active"
 data-page="home">
+
 <span>⌂</span>
 Home
+
 </button>
+
 
 <button
 class="nav"
 data-page="search">
+
 <span>⌕</span>
 Search
+
 </button>
+
 
 <button
 class="nav"
 data-page="create">
+
 <span>＋</span>
 Post
+
 </button>
+
 
 <button
 class="nav"
 data-page="profile">
+
 <span>◉</span>
 Profile
+
 </button>
 
 </div>
@@ -762,201 +793,151 @@ Profile
 </div>
 
 
+<!-- ==================================================
+SUPABASE
+================================================== -->
+
 <script type="module">
 
-/* =====================================================
-   FIREBASE
-   ===================================================== */
-
 import {
-initializeApp
+createClient
 }
 from
-"https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-
-import {
-getAuth,
-createUserWithEmailAndPassword,
-signInWithEmailAndPassword,
-onAuthStateChanged,
-signOut
-}
-from
-"https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-
-import {
-getFirestore,
-collection,
-doc,
-getDoc,
-getDocs,
-setDoc,
-addDoc,
-updateDoc,
-deleteDoc,
-query,
-where,
-orderBy,
-onSnapshot,
-arrayUnion,
-arrayRemove,
-increment,
-serverTimestamp,
-writeBatch
-}
-from
-"https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-
-import {
-getStorage,
-ref,
-uploadBytes,
-getDownloadURL,
-deleteObject
-}
-from
-"https://www.gstatic.com/firebasejs/12.19.0/firebase-storage.js";
+"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 
-/* =====================================================
-   🔥 FIREBASE CONFIG
-   =====================================================
+/* ==================================================
+SUPABASE CONFIG
+================================================== */
 
-   Replace these values with your Firebase Web App
-   config.
-*/
+const SUPABASE_URL =
+"https://yecpltndhlzfjplzhcpm.supabase.co";
 
-const firebaseConfig = {
-
-apiKey:
-"PASTE_YOUR_API_KEY",
-
-authDomain:
-"PASTE_YOUR_PROJECT.firebaseapp.com",
-
-projectId:
-"PASTE_YOUR_PROJECT_ID",
-
-storageBucket:
-"PASTE_YOUR_PROJECT.firebasestorage.app",
-
-messagingSenderId:
-"PASTE_YOUR_MESSAGING_SENDER_ID",
-
-appId:
-"PASTE_YOUR_APP_ID"
-
-};
+const SUPABASE_KEY =
+"sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_";
 
 
-/* =====================================================
-   INITIALIZE
-   ===================================================== */
-
-const firebaseApp =
-initializeApp(firebaseConfig);
-
-const auth =
-getAuth(firebaseApp);
-
-const db =
-getFirestore(firebaseApp);
-
-const storage =
-getStorage(firebaseApp);
+const supabase =
+createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
 
 
-/* =====================================================
-   VARIABLES
-   ===================================================== */
+/* ==================================================
+VARIABLES
+================================================== */
 
-let currentUser=null;
+let currentUser = null;
 
-let currentUserData=null;
+let currentProfile = null;
 
-let currentFilter="none";
+let currentFilter = "none";
 
-let unsubscribePosts=null;
+let feedPosts = [];
 
 
-/* =====================================================
-   ELEMENTS
-   ===================================================== */
+/* ==================================================
+ELEMENTS
+================================================== */
 
-const authPage=
+const authPage =
 document.getElementById("authPage");
 
-const app=
+const app =
 document.getElementById("app");
 
-const loginBox=
+const loginBox =
 document.getElementById("loginBox");
 
-const signupBox=
+const signupBox =
 document.getElementById("signupBox");
 
-const authMessage=
+const authMessage =
 document.getElementById("authMessage");
 
 
-/* =====================================================
-   LOGIN / SIGNUP SWITCH
-   ===================================================== */
+/* ==================================================
+AUTH SWITCH
+================================================== */
 
-document.getElementById("openSignup").onclick=()=>{
+document
+.getElementById("openSignup")
+.onclick = () => {
 
-loginBox.classList.add("hidden");
+loginBox
+.classList
+.add("hidden");
 
-signupBox.classList.remove("hidden");
+signupBox
+.classList
+.remove("hidden");
 
-authMessage.innerText="";
-
-};
-
-document.getElementById("openLogin").onclick=()=>{
-
-signupBox.classList.add("hidden");
-
-loginBox.classList.remove("hidden");
-
-authMessage.innerText="";
+authMessage.innerText = "";
 
 };
 
 
-/* =====================================================
-   CREATE ACCOUNT
-   ===================================================== */
+document
+.getElementById("openLogin")
+.onclick = () => {
 
-document.getElementById("signupBtn").onclick=
-async()=>{
+signupBox
+.classList
+.add("hidden");
 
-const name=
-document.getElementById("signupName")
-.value.trim();
+loginBox
+.classList
+.remove("hidden");
 
-const username=
-document.getElementById("signupUsername")
+authMessage.innerText = "";
+
+};
+
+
+/* ==================================================
+CREATE ACCOUNT
+================================================== */
+
+document
+.getElementById("signupBtn")
+.onclick =
+async () => {
+
+const name =
+document
+.getElementById("signupName")
+.value
+.trim();
+
+const username =
+document
+.getElementById("signupUsername")
 .value
 .trim()
 .toLowerCase()
 .replace(/[^a-z0-9_]/g,"");
 
-const email=
-document.getElementById("signupEmail")
-.value.trim();
+const email =
+document
+.getElementById("signupEmail")
+.value
+.trim();
 
-const password=
-document.getElementById("signupPassword")
+const password =
+document
+.getElementById("signupPassword")
 .value;
 
 
-if(!name||
-!username||
-!email||
-!password){
+if(
+!name ||
+!username ||
+!email ||
+!password
+){
 
-authMessage.innerText=
+authMessage.innerText =
 "Please fill all fields.";
 
 return;
@@ -964,9 +945,9 @@ return;
 }
 
 
-if(username.length<3){
+if(username.length < 3){
 
-authMessage.innerText=
+authMessage.innerText =
 "Username needs 3+ characters.";
 
 return;
@@ -974,9 +955,9 @@ return;
 }
 
 
-if(password.length<6){
+if(password.length < 6){
 
-authMessage.innerText=
+authMessage.innerText =
 "Password needs 6+ characters.";
 
 return;
@@ -986,23 +967,28 @@ return;
 
 try{
 
-authMessage.innerText=
+authMessage.innerText =
 "Checking username...";
 
 
-const usernameQuery=
-query(
-collection(db,"users"),
-where("username","==",username)
-);
+const {
+data:existing,
+error:existingError
+} =
+await supabase
+.from("profiles")
+.select("id")
+.eq("username",username)
+.limit(1);
 
-const usernameResult=
-await getDocs(usernameQuery);
+
+if(existingError)
+throw existingError;
 
 
-if(!usernameResult.empty){
+if(existing && existing.length){
 
-authMessage.innerText=
+authMessage.innerText =
 "Username already taken.";
 
 return;
@@ -1010,41 +996,74 @@ return;
 }
 
 
-authMessage.innerText=
+authMessage.innerText =
 "Creating account...";
 
 
-const result=
-await createUserWithEmailAndPassword(
-auth,
-email,
-password
-);
-
-
-await setDoc(
-doc(db,"users",result.user.uid),
-{
-
-uid:result.user.uid,
-
-name:name,
-
-username:username,
+const {
+data,
+error
+} =
+await supabase.auth.signUp({
 
 email:email,
 
-followers:[],
+password:password,
 
-following:[],
+options:{
+data:{
+username:username,
+display_name:name
+}
+}
 
-createdAt:serverTimestamp()
+});
+
+
+if(error)
+throw error;
+
+
+if(!data.user){
+
+authMessage.innerText =
+"Account created. Please check your email.";
+
+return;
 
 }
-);
 
 
-authMessage.innerText=
+/*
+Update profile created by trigger
+*/
+
+const {
+error:profileError
+} =
+await supabase
+.from("profiles")
+.upsert({
+
+id:data.user.id,
+
+username:username,
+
+display_name:name
+
+},{
+onConflict:"id"
+});
+
+
+if(profileError){
+
+console.log(profileError);
+
+}
+
+
+authMessage.innerText =
 "Account created successfully!";
 
 
@@ -1052,33 +1071,38 @@ authMessage.innerText=
 
 console.error(error);
 
-authMessage.innerText=
-firebaseError(error);
+authMessage.innerText =
+supabaseError(error);
 
 }
 
 };
 
 
-/* =====================================================
-   LOGIN
-   ===================================================== */
+/* ==================================================
+LOGIN
+================================================== */
 
-document.getElementById("loginBtn").onclick=
-async()=>{
+document
+.getElementById("loginBtn")
+.onclick =
+async () => {
 
-const email=
-document.getElementById("loginEmail")
-.value.trim();
+const email =
+document
+.getElementById("loginEmail")
+.value
+.trim();
 
-const password=
-document.getElementById("loginPassword")
+const password =
+document
+.getElementById("loginPassword")
 .value;
 
 
-if(!email||!password){
+if(!email || !password){
 
-authMessage.innerText=
+authMessage.innerText =
 "Enter email and password.";
 
 return;
@@ -1088,119 +1112,219 @@ return;
 
 try{
 
-authMessage.innerText=
+authMessage.innerText =
 "Logging in...";
 
-await signInWithEmailAndPassword(
-auth,
-email,
-password
-);
+
+const {
+error
+} =
+await supabase.auth.signInWithPassword({
+
+email:email,
+
+password:password
+
+});
+
+
+if(error)
+throw error;
 
 
 }catch(error){
 
 console.error(error);
 
-authMessage.innerText=
-firebaseError(error);
+authMessage.innerText =
+supabaseError(error);
 
 }
 
 };
 
 
-/* =====================================================
-   AUTH STATE
-   ===================================================== */
+/* ==================================================
+AUTH STATE
+================================================== */
 
-onAuthStateChanged(
-auth,
-async(user)=>{
+const {
+data:authListener
+} =
+supabase.auth
+.onAuthStateChange(
+async(event,session)=>{
 
-if(user){
+if(session){
 
-currentUser=user;
+currentUser =
+session.user;
 
-await loadCurrentUser();
+await loadCurrentProfile();
 
-authPage.classList.add("hidden");
+showApp();
 
-app.classList.remove("hidden");
+}else{
+
+currentUser = null;
+
+currentProfile = null;
+
+showAuth();
+
+}
+
+}
+);
+
+
+/* ==================================================
+CHECK EXISTING SESSION
+================================================== */
+
+const {
+data:sessionData
+} =
+await supabase.auth.getSession();
+
+
+if(sessionData.session){
+
+currentUser =
+sessionData.session.user;
+
+await loadCurrentProfile();
+
+showApp();
+
+}
+
+
+/* ==================================================
+SHOW APP
+================================================== */
+
+function showApp(){
+
+authPage
+.classList
+.add("hidden");
+
+app
+.classList
+.remove("hidden");
 
 loadPublicPosts();
 
 loadProfile();
 
-}else{
-
-currentUser=null;
-
-currentUserData=null;
-
-authPage.classList.remove("hidden");
-
-app.classList.add("hidden");
-
 }
 
-});
 
+/* ==================================================
+SHOW AUTH
+================================================== */
 
-/* =====================================================
-   LOAD CURRENT USER
-   ===================================================== */
+function showAuth(){
 
-async function loadCurrentUser(){
+authPage
+.classList
+.remove("hidden");
 
-if(!currentUser)return;
-
-const snap=
-await getDoc(
-doc(db,"users",currentUser.uid)
-);
-
-
-if(snap.exists()){
-
-currentUserData=snap.data();
-
-}
+app
+.classList
+.add("hidden");
 
 }
 
 
-/* =====================================================
-   IMAGE PREVIEW
-   ===================================================== */
+/* ==================================================
+LOAD PROFILE
+================================================== */
 
-document.getElementById("photoInput")
+async function loadCurrentProfile(){
+
+if(!currentUser)
+return;
+
+
+const {
+data,
+error
+} =
+await supabase
+.from("profiles")
+.select("*")
+.eq("id",currentUser.id)
+.single();
+
+
+if(error){
+
+console.error(error);
+
+currentProfile = {
+
+id:currentUser.id,
+
+username:
+currentUser.email
+?.split("@")[0]
+||
+"user",
+
+display_name:
+"PIXORO User"
+
+};
+
+return;
+
+}
+
+
+currentProfile = data;
+
+}
+
+
+/* ==================================================
+IMAGE PREVIEW
+================================================== */
+
+document
+.getElementById("photoInput")
 .addEventListener(
 "change",
 event=>{
 
-const file=
+const file =
 event.target.files[0];
 
-if(!file)return;
+if(!file)
+return;
 
 
-const reader=
+const reader =
 new FileReader();
 
 
-reader.onload=
+reader.onload =
 e=>{
 
-const preview=
-document.getElementById("preview");
+const preview =
+document
+.getElementById("preview");
 
-preview.src=e.target.result;
+preview.src =
+e.target.result;
 
-preview.style.filter=
+preview.style.filter =
 currentFilter;
 
-preview.classList.remove("hidden");
+preview
+.classList
+.remove("hidden");
 
 };
 
@@ -1211,27 +1335,35 @@ reader.readAsDataURL(file);
 );
 
 
-/* =====================================================
-   FILTER BUTTONS
-   ===================================================== */
+/* ==================================================
+FILTERS
+================================================== */
 
-document.querySelectorAll(".filter")
+document
+.querySelectorAll(".filter")
 .forEach(button=>{
 
-button.onclick=()=>{
+button.onclick = () => {
 
-document.querySelectorAll(".filter")
+document
+.querySelectorAll(".filter")
 .forEach(x=>
 x.classList.remove("active")
 );
 
-button.classList.add("active");
 
-currentFilter=
+button
+.classList
+.add("active");
+
+
+currentFilter =
 button.dataset.filter;
 
-document.getElementById("preview")
-.style.filter=
+
+document
+.getElementById("preview")
+.style.filter =
 currentFilter;
 
 };
@@ -1239,62 +1371,71 @@ currentFilter;
 });
 
 
-/* =====================================================
-   PROCESS IMAGE
-   ===================================================== */
+/* ==================================================
+PROCESS IMAGE
+================================================== */
 
 function processImage(file){
 
 return new Promise(
 (resolve,reject)=>{
 
-const reader=
+const reader =
 new FileReader();
 
-reader.onload=
+
+reader.onload =
 e=>{
 
-const img=
+const img =
 new Image();
 
-img.onload=
+
+img.onload =
 ()=>{
 
-const maxWidth=1200;
+const maxWidth = 1200;
 
-let width=img.width;
+let width =
+img.width;
 
-let height=img.height;
+let height =
+img.height;
 
 
-if(width>maxWidth){
+if(width > maxWidth){
 
-height=
+height =
 Math.round(
-height*maxWidth/width
+height * maxWidth / width
 );
 
-width=maxWidth;
+width =
+maxWidth;
 
 }
 
 
-const canvas=
+const canvas =
 document.createElement("canvas");
 
-canvas.width=width;
+canvas.width =
+width;
 
-canvas.height=height;
+canvas.height =
+height;
 
 
-const ctx=
+const ctx =
 canvas.getContext("2d");
 
 
-ctx.filter=
-currentFilter==="none"
-?"none"
-:currentFilter;
+ctx.filter =
+currentFilter === "none"
+?
+"none"
+:
+currentFilter;
 
 
 ctx.drawImage(
@@ -1316,7 +1457,9 @@ resolve(blob);
 }else{
 
 reject(
-new Error("Image processing failed")
+new Error(
+"Image processing failed"
+)
 );
 
 }
@@ -1329,14 +1472,17 @@ new Error("Image processing failed")
 };
 
 
-img.onerror=reject;
+img.onerror =
+reject;
 
-img.src=e.target.result;
+img.src =
+e.target.result;
 
 };
 
 
-reader.onerror=reject;
+reader.onerror =
+reject;
 
 reader.readAsDataURL(file);
 
@@ -1345,12 +1491,13 @@ reader.readAsDataURL(file);
 }
 
 
-/* =====================================================
-   PUBLISH POST
-   ===================================================== */
+/* ==================================================
+PUBLISH POST
+================================================== */
 
-document.getElementById("publishBtn")
-.onclick=
+document
+.getElementById("publishBtn")
+.onclick =
 async()=>{
 
 if(!currentUser){
@@ -1362,13 +1509,17 @@ return;
 }
 
 
-const file=
-document.getElementById("photoInput")
+const file =
+document
+.getElementById("photoInput")
 .files[0];
 
-const caption=
-document.getElementById("caption")
-.value.trim();
+
+const caption =
+document
+.getElementById("caption")
+.value
+.trim();
 
 
 if(!file){
@@ -1382,112 +1533,141 @@ return;
 
 try{
 
-const message=
-document.getElementById("postMessage");
+const message =
+document
+.getElementById("postMessage");
 
-message.innerText=
+
+message.innerText =
 "Processing photo...";
 
 
-const blob=
+const blob =
 await processImage(file);
 
 
-message.innerText=
+message.innerText =
 "Uploading photo...";
 
 
-const fileName=
-Date.now()+"_"+Math.random()
+const fileName =
+Date.now()
++"_"
++
+Math.random()
 .toString(36)
-.substring(2)+".jpg";
+.substring(2)
++
+".jpg";
 
 
-const storagePath=
-"posts/"
-+currentUser.uid+
-"/"+
+const storagePath =
+currentUser.id
++
+"/"
++
 fileName;
 
 
-const imageRef=
-ref(storage,storagePath);
+/*
+Upload to existing bucket:
+Post-images
+*/
 
-
-await uploadBytes(
-imageRef,
+const {
+error:uploadError
+} =
+await supabase
+.storage
+.from("Post-images")
+.upload(
+storagePath,
 blob,
 {
-contentType:"image/jpeg"
+contentType:"image/jpeg",
+upsert:false
 }
 );
 
 
-const imageURL=
-await getDownloadURL(imageRef);
+if(uploadError)
+throw uploadError;
 
 
-message.innerText=
+const {
+data:publicData
+} =
+supabase
+.storage
+.from("Post-images")
+.getPublicUrl(storagePath);
+
+
+const imageURL =
+publicData.publicUrl;
+
+
+message.innerText =
 "Publishing...";
 
 
-await addDoc(
-collection(db,"posts"),
-{
+const {
+error:postError
+} =
+await supabase
+.from("posts")
+.insert({
 
-uid:currentUser.uid,
+user_id:
+currentUser.id,
 
-username:
-currentUserData?.username||
-"user",
+image_url:
+imageURL,
 
-name:
-currentUserData?.name||
-"PIXORO User",
+caption:
+caption
 
-caption:caption,
-
-imageURL:imageURL,
-
-storagePath:storagePath,
-
-likes:[],
-
-saves:[],
-
-comments:[],
-
-views:0,
-
-createdAt:
-serverTimestamp()
-
-}
-);
+});
 
 
-document.getElementById("caption")
-.value="";
-
-document.getElementById("photoInput")
-.value="";
-
-document.getElementById("preview")
-.classList.add("hidden");
+if(postError)
+throw postError;
 
 
-currentFilter="none";
+/* RESET */
 
-document.querySelectorAll(".filter")
+document
+.getElementById("caption")
+.value = "";
+
+document
+.getElementById("photoInput")
+.value = "";
+
+document
+.getElementById("preview")
+.classList
+.add("hidden");
+
+
+currentFilter =
+"none";
+
+
+document
+.querySelectorAll(".filter")
 .forEach(
 (x,i)=>
-x.classList.toggle("active",i===0)
+x.classList
+.toggle("active",i===0)
 );
 
 
-message.innerText=
+message.innerText =
 "✅ Post published!";
 
+
+await loadPublicPosts();
 
 showPage("home");
 
@@ -1496,48 +1676,59 @@ showPage("home");
 
 console.error(error);
 
-document.getElementById("postMessage")
-.innerText=
-firebaseError(error);
+document
+.getElementById("postMessage")
+.innerText =
+supabaseError(error);
 
 }
 
 };
 
 
-/* =====================================================
-   PUBLIC FEED
-   ===================================================== */
+/* ==================================================
+LOAD PUBLIC POSTS
+================================================== */
 
-function loadPublicPosts(){
+async function loadPublicPosts(){
 
-const feed=
-document.getElementById("feed");
+const feed =
+document
+.getElementById("feed");
 
 
-const postsQuery=
-query(
-collection(db,"posts"),
-orderBy("createdAt","desc")
+feed.innerHTML =
+`
+<div class="loading">
+Loading posts...
+</div>
+`;
+
+
+try{
+
+const {
+data:posts,
+error
+} =
+await supabase
+.from("posts")
+.select("*")
+.order(
+"created_at",
+{
+ascending:false
+}
 );
 
 
-if(unsubscribePosts){
-
-unsubscribePosts();
-
-}
+if(error)
+throw error;
 
 
-unsubscribePosts=
-onSnapshot(
-postsQuery,
+if(!posts || !posts.length){
 
-snapshot=>{
-
-if(snapshot.empty){
-
-feed.innerHTML=
+feed.innerHTML =
 `
 <div class="card empty">
 No public posts yet 📷
@@ -1549,118 +1740,214 @@ return;
 }
 
 
-feed.innerHTML="";
+feedPosts = posts;
 
 
-snapshot.forEach(
-snap=>{
+feed.innerHTML = "";
 
-const post={
-id:snap.id,
-...snap.data()
-};
+
+for(const post of posts){
+
+const html =
+await createPostHTML(post);
 
 feed.insertAdjacentHTML(
 "beforeend",
-createPostHTML(post)
+html
 );
 
-});
+}
 
-},
 
-error=>{
+}catch(error){
 
 console.error(error);
 
-feed.innerHTML=
+feed.innerHTML =
 `
 <div class="card empty">
 Could not load posts.<br>
-Check Firestore rules.
+${escapeHTML(
+supabaseError(error)
+)}
 </div>
 `;
 
 }
 
-);
-
 }
 
 
-/* =====================================================
-   CREATE POST HTML
-   ===================================================== */
+/* ==================================================
+CREATE POST HTML
+================================================== */
 
-function createPostHTML(post){
+async function createPostHTML(post){
 
-const likes=
-post.likes||[];
+/* PROFILE */
 
-const saves=
-post.saves||[];
-
-const comments=
-post.comments||[];
+let profile = null;
 
 
-const liked=
-currentUser&&
-likes.includes(currentUser.uid);
-
-const saved=
-currentUser&&
-saves.includes(currentUser.uid);
-
-
-const own=
-currentUser&&
-post.uid===currentUser.uid;
+const {
+data:profileData
+} =
+await supabase
+.from("profiles")
+.select("*")
+.eq("id",post.user_id)
+.maybeSingle();
 
 
-let date="Just now";
+profile =
+profileData ||
+{};
 
 
-if(post.createdAt?.toDate){
+/* LIKES */
 
-date=
-post.createdAt
-.toDate()
+const {
+data:likesData
+} =
+await supabase
+.from("likes")
+.select("user_id")
+.eq("post_id",post.id);
+
+
+const likes =
+likesData || [];
+
+
+const liked =
+currentUser &&
+likes.some(
+x=>x.user_id===currentUser.id
+);
+
+
+/* SAVES */
+
+const {
+data:savesData
+} =
+await supabase
+.from("saves")
+.select("user_id")
+.eq("post_id",post.id);
+
+
+const saves =
+savesData || [];
+
+
+const saved =
+currentUser &&
+saves.some(
+x=>x.user_id===currentUser.id
+);
+
+
+/* COMMENTS */
+
+const {
+data:commentsData
+} =
+await supabase
+.from("comments")
+.select("*")
+.eq("post_id",post.id)
+.order(
+"created_at",
+{
+ascending:true
+}
+);
+
+
+const comments =
+commentsData || [];
+
+
+/* DATE */
+
+let date =
+"Just now";
+
+
+if(post.created_at){
+
+date =
+new Date(
+post.created_at
+)
 .toLocaleString();
 
 }
 
 
-let commentsHTML="";
+/* USER */
+
+const username =
+profile.username ||
+"user";
 
 
-comments.slice(-5)
+const name =
+profile.display_name ||
+"PIXORO User";
+
+
+const letter =
+name
+.charAt(0)
+.toUpperCase();
+
+
+/* OWN POST */
+
+const own =
+currentUser &&
+post.user_id === currentUser.id;
+
+
+/* COMMENTS HTML */
+
+let commentsHTML = "";
+
+
+comments
+.slice(-5)
 .forEach(comment=>{
 
-commentsHTML+=
+commentsHTML +=
 `
 <div class="comment">
+
 <b>
-@${escapeHTML(comment.username||"user")}
+@${escapeHTML(
+comment.username ||
+" user"
+)}
 </b>
-${escapeHTML(comment.text||"")}
+
+${escapeHTML(
+comment.comment ||
+""
+)}
+
 </div>
 `;
 
 });
 
 
-const letter=
-(post.name||
-post.username||
-"P")
-.charAt(0)
-.toUpperCase();
+return `
 
-
-return`
-
-<div class="post">
+<div
+class="post"
+data-post-id="${post.id}"
+>
 
 <div class="posthead">
 
@@ -1668,12 +1955,11 @@ return`
 ${escapeHTML(letter)}
 </div>
 
+
 <div class="userinfo">
 
 <div class="username">
-@${escapeHTML(
-post.username||"user"
-)}
+@${escapeHTML(username)}
 </div>
 
 <div class="time">
@@ -1682,6 +1968,7 @@ ${escapeHTML(date)}
 
 </div>
 
+
 ${
 own
 ?
@@ -1689,7 +1976,7 @@ own
 <button
 class="deletebtn"
 onclick=
-"window.deletePost('${post.id}')">
+"window.deletePost(${post.id})">
 Delete
 </button>
 `
@@ -1702,10 +1989,10 @@ Delete
 
 <img
 class="postimage"
-src="${post.imageURL}"
+src="${escapeHTML(post.image_url)}"
 loading="lazy"
 onclick=
-"window.viewPost('${post.id}')"
+"window.viewPost(${post.id})"
 >
 
 
@@ -1724,14 +2011,16 @@ ${escapeHTML(post.caption)}
 
 <div class="actions">
 
+
 <button
 class=
 "action ${liked?"liked":""}"
 onclick=
 "window.likePost(
-'${post.id}',
+${post.id},
 ${liked}
-)">
+)"
+>
 
 ${liked?"❤️":"♡"}
 ${likes.length}
@@ -1743,8 +2032,9 @@ ${likes.length}
 class="action"
 onclick=
 "window.focusComment(
-'${post.id}'
-)">
+${post.id}
+)"
+>
 
 💬
 ${comments.length}
@@ -1756,8 +2046,9 @@ ${comments.length}
 class="action"
 onclick=
 "window.sharePost(
-'${post.id}'
-)">
+${post.id}
+)"
+>
 
 ↗ Share
 
@@ -1769,9 +2060,10 @@ class=
 "action ${saved?"saved":""}"
 onclick=
 "window.savePost(
-'${post.id}',
+${post.id},
 ${saved}
-)">
+)"
+>
 
 ${saved?"🔖":"☆"}
 
@@ -1798,8 +2090,9 @@ placeholder="Write a comment..."
 <button
 onclick=
 "window.addComment(
-'${post.id}'
-)">
+${post.id}
+)"
+>
 Send
 </button>
 
@@ -1812,56 +2105,15 @@ Send
 }
 
 
-/* =====================================================
-   LIKE
-   ===================================================== */
+/* ==================================================
+LIKE
+================================================== */
 
-window.likePost=
-async(id,liked)=>{
-
-if(!currentUser){
-
-alert("Login first.");
-
-return;
-
-}
-
-
-try{
-
-await updateDoc(
-doc(db,"posts",id),
-
-liked
-?
-{
-likes:
-arrayRemove(currentUser.uid)
-}
-:
-{
-likes:
-arrayUnion(currentUser.uid)
-}
-
-);
-
-}catch(error){
-
-alert(firebaseError(error));
-
-}
-
-};
-
-
-/* =====================================================
-   SAVE
-   ===================================================== */
-
-window.savePost=
-async(id,saved)=>{
+window.likePost =
+async(
+postId,
+isLiked
+)=>{
 
 if(!currentUser){
 
@@ -1874,38 +2126,77 @@ return;
 
 try{
 
-await updateDoc(
-doc(db,"posts",id),
+if(isLiked){
 
-saved
-?
-{
-saves:
-arrayRemove(currentUser.uid)
-}
-:
-{
-saves:
-arrayUnion(currentUser.uid)
-}
-
+const {
+error
+} =
+await supabase
+.from("likes")
+.delete()
+.eq(
+"post_id",
+postId
+)
+.eq(
+"user_id",
+currentUser.id
 );
+
+
+if(error)
+throw error;
+
+
+}else{
+
+const {
+error
+} =
+await supabase
+.from("likes")
+.insert({
+
+post_id:
+postId,
+
+user_id:
+currentUser.id
+
+});
+
+
+if(error)
+throw error;
+
+}
+
+
+await loadPublicPosts();
+
 
 }catch(error){
 
-alert(firebaseError(error));
+console.error(error);
+
+alert(
+supabaseError(error)
+);
 
 }
 
 };
 
 
-/* =====================================================
-   COMMENT
-   ===================================================== */
+/* ==================================================
+SAVE
+================================================== */
 
-window.addComment=
-async id=>{
+window.savePost =
+async(
+postId,
+isSaved
+)=>{
 
 if(!currentUser){
 
@@ -1916,66 +2207,160 @@ return;
 }
 
 
-const input=
-document.getElementById(
-"comment-"+id
-);
-
-const text=
-input.value.trim();
-
-
-if(!text)return;
-
-
 try{
 
-await updateDoc(
-doc(db,"posts",id),
-{
+if(isSaved){
 
-comments:
-arrayUnion({
-
-uid:currentUser.uid,
-
-username:
-currentUserData?.username||
-"user",
-
-text:text,
-
-time:Date.now()
-
-})
-
-}
+const {
+error
+} =
+await supabase
+.from("saves")
+.delete()
+.eq(
+"post_id",
+postId
+)
+.eq(
+"user_id",
+currentUser.id
 );
 
 
-input.value="";
+if(error)
+throw error;
+
+
+}else{
+
+const {
+error
+} =
+await supabase
+.from("saves")
+.insert({
+
+post_id:
+postId,
+
+user_id:
+currentUser.id
+
+});
+
+
+if(error)
+throw error;
+
+}
+
+
+await loadPublicPosts();
 
 
 }catch(error){
 
-alert(firebaseError(error));
+console.error(error);
+
+alert(
+supabaseError(error)
+);
 
 }
 
 };
 
 
-/* =====================================================
-   FOCUS COMMENT
-   ===================================================== */
+/* ==================================================
+COMMENT
+================================================== */
 
-window.focusComment=
-id=>{
+window.addComment =
+async postId=>{
 
-const input=
-document.getElementById(
-"comment-"+id
+if(!currentUser){
+
+alert("Login first.");
+
+return;
+
+}
+
+
+const input =
+document
+.getElementById(
+"comment-"+postId
 );
+
+
+const text =
+input
+.value
+.trim();
+
+
+if(!text)
+return;
+
+
+try{
+
+const {
+error
+} =
+await supabase
+.from("comments")
+.insert({
+
+post_id:
+postId,
+
+user_id:
+currentUser.id,
+
+comment:
+text
+
+});
+
+
+if(error)
+throw error;
+
+
+input.value = "";
+
+
+await loadPublicPosts();
+
+
+}catch(error){
+
+console.error(error);
+
+alert(
+supabaseError(error)
+);
+
+}
+
+};
+
+
+/* ==================================================
+FOCUS COMMENT
+================================================== */
+
+window.focusComment =
+postId=>{
+
+const input =
+document
+.getElementById(
+"comment-"+postId
+);
+
 
 if(input){
 
@@ -1986,48 +2371,88 @@ input.focus();
 };
 
 
-/* =====================================================
-   VIEW
-   ===================================================== */
+/* ==================================================
+VIEW
+================================================== */
 
-window.viewPost=
-async id=>{
+window.viewPost =
+async postId=>{
+
+if(!currentUser)
+return;
+
 
 try{
 
-await updateDoc(
-doc(db,"posts",id),
-{
-views:
-increment(1)
-}
-);
+/*
+Avoid counting same user repeatedly
+*/
+
+const {
+data:existing
+} =
+await supabase
+.from("views")
+.select("post_id")
+.eq(
+"post_id",
+postId
+)
+.eq(
+"user_id",
+currentUser.id
+)
+.limit(1);
+
+
+if(existing && existing.length)
+return;
+
+
+await supabase
+.from("views")
+.insert({
+
+post_id:
+postId,
+
+user_id:
+currentUser.id
+
+});
+
 
 }catch(error){
 
-console.log(error);
+console.log(
+"View error:",
+error
+);
 
 }
 
 };
 
 
-/* =====================================================
-   SHARE
-   ===================================================== */
+/* ==================================================
+SHARE
+================================================== */
 
-window.sharePost=
-async id=>{
+window.sharePost =
+async postId=>{
 
-const url=
-location.origin+
-location.pathname+
-"?post="+id;
+const url =
+location.origin +
+location.pathname +
+"?post=" +
+postId;
 
 
 try{
 
-if(navigator.share){
+if(
+navigator.share
+){
 
 await navigator.share({
 
@@ -2041,10 +2466,13 @@ url:url
 
 }else{
 
-await navigator.clipboard
+await navigator
+.clipboard
 .writeText(url);
 
-alert("Post link copied!");
+alert(
+"Post link copied!"
+);
 
 }
 
@@ -2057,41 +2485,50 @@ console.log(error);
 };
 
 
-/* =====================================================
-   DELETE POST
-   ===================================================== */
+/* ==================================================
+DELETE POST
+================================================== */
 
-window.deletePost=
-async id=>{
+window.deletePost =
+async postId=>{
 
-if(!currentUser)return;
+if(!currentUser)
+return;
 
 
-const yes=
+const yes =
 confirm(
 "Are you sure you want to delete this post?"
 );
 
 
-if(!yes)return;
+if(!yes)
+return;
 
 
 try{
 
-const postRef=
-doc(db,"posts",id);
+/* GET POST */
 
-const snap=
-await getDoc(postRef);
+const {
+data:post,
+error:getError
+} =
+await supabase
+.from("posts")
+.select("*")
+.eq("id",postId)
+.single();
 
 
-if(!snap.exists())return;
+if(getError)
+throw getError;
 
 
-const post=snap.data();
-
-
-if(post.uid!==currentUser.uid){
+if(
+post.user_id !==
+currentUser.id
+){
 
 alert(
 "You can delete only your own post."
@@ -2102,20 +2539,44 @@ return;
 }
 
 
-/* Delete image from Storage */
+/* DELETE STORAGE IMAGE */
 
-if(post.storagePath){
+if(post.image_url){
 
 try{
 
-await deleteObject(
-ref(storage,post.storagePath)
+const url =
+new URL(post.image_url);
+
+const marker =
+"/storage/v1/object/public/Post-images/";
+
+const index =
+url.pathname.indexOf(marker);
+
+
+if(index !== -1){
+
+const path =
+decodeURIComponent(
+url.pathname.substring(
+index + marker.length
+)
 );
 
-}catch(e){
+
+await supabase
+.storage
+.from("Post-images")
+.remove([path]);
+
+}
+
+}catch(storageError){
 
 console.log(
-"Storage image already missing."
+"Storage delete skipped:",
+storageError
 );
 
 }
@@ -2123,28 +2584,90 @@ console.log(
 }
 
 
-/* Delete Firestore post */
+/* DELETE RELATED DATA */
 
-await deleteDoc(postRef);
+await supabase
+.from("likes")
+.delete()
+.eq(
+"post_id",
+postId
+);
 
 
-loadProfile();
+await supabase
+.from("comments")
+.delete()
+.eq(
+"post_id",
+postId
+);
+
+
+await supabase
+.from("saves")
+.delete()
+.eq(
+"post_id",
+postId
+);
+
+
+await supabase
+.from("views")
+.delete()
+.eq(
+"post_id",
+postId
+);
+
+
+/* DELETE POST */
+
+const {
+error:deleteError
+} =
+await supabase
+.from("posts")
+.delete()
+.eq(
+"id",
+postId
+)
+.eq(
+"user_id",
+currentUser.id
+);
+
+
+if(deleteError)
+throw deleteError;
+
+
+await loadPublicPosts();
+
+await loadProfile();
 
 
 }catch(error){
 
-alert(firebaseError(error));
+console.error(error);
+
+alert(
+supabaseError(error)
+);
 
 }
 
 };
 
 
-/* =====================================================
-   SEARCH USERS
-   ===================================================== */
+/* ==================================================
+SEARCH USERS
+================================================== */
 
-document.getElementById("searchInput")
+document
+.getElementById("searchInput")
 .addEventListener(
 "input",
 searchUsers
@@ -2153,22 +2676,24 @@ searchUsers
 
 async function searchUsers(){
 
-const text=
-document.getElementById("searchInput")
+const text =
+document
+.getElementById("searchInput")
 .value
 .trim()
 .toLowerCase();
 
 
-const resultBox=
-document.getElementById(
+const resultBox =
+document
+.getElementById(
 "searchResults"
 );
 
 
 if(!text){
 
-resultBox.innerText=
+resultBox.innerText =
 "Search for a username or name.";
 
 return;
@@ -2178,96 +2703,132 @@ return;
 
 try{
 
-const snap=
-await getDocs(
-collection(db,"users")
-);
+const {
+data:users,
+error
+} =
+await supabase
+.from("profiles")
+.select("*")
+.or(
+`username.ilike.%${text}%,display_name.ilike.%${text}%`
+)
+.limit(30);
 
 
-let html="";
+if(error)
+throw error;
 
 
-snap.forEach(
-docSnap=>{
+let html = "";
 
-const u=docSnap.data();
+
+for(const u of users || []){
 
 
 if(
-currentUser&&
-u.uid===currentUser.uid
+currentUser &&
+u.id === currentUser.id
 ){
 
-return;
+continue;
 
 }
 
 
-const name=
-(u.name||"")
-.toLowerCase();
+/* FOLLOW STATUS */
 
-const username=
-(u.username||"")
-.toLowerCase();
+const {
+data:followData
+} =
+await supabase
+.from("follows")
+.select("id")
+.eq(
+"follower_id",
+currentUser.id
+)
+.eq(
+"following_id",
+u.id
+)
+.limit(1);
 
 
-if(
-name.includes(text)||
-username.includes(text)
-){
+const isFollowing =
+followData &&
+followData.length > 0;
 
-const followers=
-u.followers||[];
 
-const isFollowing=
-currentUser&&
-followers.includes(
-currentUser.uid
+/* FOLLOWER COUNT */
+
+const {
+count
+} =
+await supabase
+.from("follows")
+.select(
+"id",
+{
+count:"exact",
+head:true
+}
+)
+.eq(
+"following_id",
+u.id
 );
 
 
-html+=`
+html +=
+`
 
 <div class="userrow">
 
 <div class="avatar">
+
 ${escapeHTML(
-(u.name||"P")
+(u.display_name||"P")
 .charAt(0)
 .toUpperCase()
 )}
+
 </div>
+
 
 <div class="userinfo2">
 
 <b>
 ${escapeHTML(
-u.name||"PIXORO User"
+u.display_name ||
+"PIXORO User"
 )}
 </b>
 
 <div>
 @${escapeHTML(
-u.username||"user"
+u.username ||
+"user"
 )}
 </div>
 
 <small>
-${followers.length}
+${count || 0}
 followers
 </small>
 
 </div>
+
 
 <button
 class=
 "followbtn ${isFollowing?"following":""}"
 onclick=
 "window.followUser(
-'${u.uid}',
+'${u.id}',
 ${isFollowing}
-)">
+)"
+>
 
 ${
 isFollowing
@@ -2285,99 +2846,85 @@ isFollowing
 
 }
 
-});
 
-
-resultBox.innerHTML=
-html||"No users found.";
+resultBox.innerHTML =
+html ||
+"No users found.";
 
 
 }catch(error){
 
-resultBox.innerText=
-firebaseError(error);
+console.error(error);
+
+resultBox.innerText =
+supabaseError(error);
 
 }
 
 }
 
 
-/* =====================================================
-   FOLLOW / UNFOLLOW
-   ===================================================== */
+/* ==================================================
+FOLLOW / UNFOLLOW
+================================================== */
 
-window.followUser=
-async(targetUid,isFollowing)=>{
+window.followUser =
+async(
+targetUid,
+isFollowing
+)=>{
 
-if(!currentUser)return;
+if(!currentUser)
+return;
 
 
 try{
 
-const meRef=
-doc(db,"users",currentUser.uid);
-
-const targetRef=
-doc(db,"users",targetUid);
-
-
-const batch=
-writeBatch(db);
-
-
 if(isFollowing){
 
-batch.update(
-meRef,
-{
-
-following:
-arrayRemove(targetUid)
-
-}
+const {
+error
+} =
+await supabase
+.from("follows")
+.delete()
+.eq(
+"follower_id",
+currentUser.id
+)
+.eq(
+"following_id",
+targetUid
 );
 
 
-batch.update(
-targetRef,
-{
+if(error)
+throw error;
 
-followers:
-arrayRemove(currentUser.uid)
-
-}
-);
 
 }else{
 
-batch.update(
-meRef,
-{
+const {
+error
+} =
+await supabase
+.from("follows")
+.insert({
 
-following:
-arrayUnion(targetUid)
+follower_id:
+currentUser.id,
 
-}
-);
+following_id:
+targetUid
+
+});
 
 
-batch.update(
-targetRef,
-{
-
-followers:
-arrayUnion(currentUser.uid)
-
-}
-);
+if(error)
+throw error;
 
 }
 
-
-await batch.commit();
-
-
-await loadCurrentUser();
 
 await searchUsers();
 
@@ -2386,132 +2933,161 @@ await loadProfile();
 
 }catch(error){
 
-alert(firebaseError(error));
+console.error(error);
+
+alert(
+supabaseError(error)
+);
 
 }
 
 };
 
 
-/* =====================================================
-   PROFILE
-   ===================================================== */
+/* ==================================================
+PROFILE
+================================================== */
 
 async function loadProfile(){
 
-if(!currentUser)return;
+if(!currentUser)
+return;
 
 
-await loadCurrentUser();
+await loadCurrentProfile();
 
 
-const u=
-currentUserData||{};
+const u =
+currentProfile || {};
 
 
-document.getElementById(
-"myName"
-).innerText=
-u.name||
+document
+.getElementById("myName")
+.innerText =
+u.display_name ||
 "PIXORO User";
 
 
-document.getElementById(
-"myUsername"
-).innerText=
-"@"+
-(u.username||"user");
+document
+.getElementById("myUsername")
+.innerText =
+"@" +
+(
+u.username ||
+"user"
+);
 
 
-document.getElementById(
-"myAvatar"
-).innerText=
-(u.name||"P")
+document
+.getElementById("myAvatar")
+.innerText =
+(
+u.display_name ||
+"P"
+)
 .charAt(0)
 .toUpperCase();
 
 
-document.getElementById(
-"myFollowers"
-).innerText=
-(u.followers||[]).length;
+/* FOLLOWERS */
 
-
-document.getElementById(
-"myFollowing"
-).innerText=
-(u.following||[]).length;
-
-
-try{
-
-const postsQuery=
-query(
-collection(db,"posts"),
-where("uid","==",currentUser.uid)
+const {
+count:followersCount
+} =
+await supabase
+.from("follows")
+.select(
+"id",
+{
+count:"exact",
+head:true
+}
+)
+.eq(
+"following_id",
+currentUser.id
 );
 
 
-const snap=
-await getDocs(postsQuery);
+/* FOLLOWING */
 
-
-document.getElementById(
-"myPostsCount"
-).innerText=
-snap.size;
-
-
-const box=
-document.getElementById(
-"myPosts"
+const {
+count:followingCount
+} =
+await supabase
+.from("follows")
+.select(
+"id",
+{
+count:"exact",
+head:true
+}
+)
+.eq(
+"follower_id",
+currentUser.id
 );
 
-box.innerHTML="";
 
+/* POSTS */
 
-const posts=[];
-
-
-snap.forEach(
-s=>{
-
-posts.push({
-
-id:s.id,
-...s.data()
-
-});
-
-});
-
-
-posts.sort(
-(a,b)=>{
-
-const aTime=
-a.createdAt?.toMillis
-?
-a.createdAt.toMillis()
-:
-0;
-
-const bTime=
-b.createdAt?.toMillis
-?
-b.createdAt.toMillis()
-:
-0;
-
-return bTime-aTime;
-
+const {
+data:posts,
+error
+} =
+await supabase
+.from("posts")
+.select("*")
+.eq(
+"user_id",
+currentUser.id
+)
+.order(
+"created_at",
+{
+ascending:false
 }
 );
 
 
-if(posts.length===0){
+if(error){
 
-box.innerHTML=
+console.error(error);
+
+return;
+
+}
+
+
+document
+.getElementById("myPostsCount")
+.innerText =
+posts?.length || 0;
+
+
+document
+.getElementById("myFollowers")
+.innerText =
+followersCount || 0;
+
+
+document
+.getElementById("myFollowing")
+.innerText =
+followingCount || 0;
+
+
+const box =
+document
+.getElementById("myPosts");
+
+
+box.innerHTML = "";
+
+
+if(!posts || !posts.length){
+
+box.innerHTML =
 `
 <div class="card empty">
 You haven't posted anything yet 📷
@@ -2523,33 +3099,30 @@ return;
 }
 
 
-posts.forEach(
-post=>{
+for(const post of posts){
+
+const html =
+await createPostHTML(post);
 
 box.insertAdjacentHTML(
 "beforeend",
-createPostHTML(post)
+html
 );
 
-});
-
-}catch(error){
-
-console.error(error);
-
 }
 
 }
 
 
-/* =====================================================
-   NAVIGATION
-   ===================================================== */
+/* ==================================================
+NAVIGATION
+================================================== */
 
-document.querySelectorAll(".nav")
+document
+.querySelectorAll(".nav")
 .forEach(button=>{
 
-button.onclick=()=>{
+button.onclick = () => {
 
 showPage(
 button.dataset.page
@@ -2562,67 +3135,76 @@ button.dataset.page
 
 function showPage(page){
 
-document.getElementById(
-"homePage"
-).classList.add("hidden");
+document
+.getElementById("homePage")
+.classList
+.add("hidden");
 
-document.getElementById(
-"searchPage"
-).classList.add("hidden");
+document
+.getElementById("searchPage")
+.classList
+.add("hidden");
 
-document.getElementById(
-"createPage"
-).classList.add("hidden");
+document
+.getElementById("createPage")
+.classList
+.add("hidden");
 
-document.getElementById(
-"profilePage"
-).classList.add("hidden");
-
-
-if(page==="home"){
-
-document.getElementById(
-"homePage"
-).classList.remove("hidden");
-
-}
+document
+.getElementById("profilePage")
+.classList
+.add("hidden");
 
 
-if(page==="search"){
+if(page === "home"){
 
-document.getElementById(
-"searchPage"
-).classList.remove("hidden");
+document
+.getElementById("homePage")
+.classList
+.remove("hidden");
 
 }
 
 
-if(page==="create"){
+if(page === "search"){
 
-document.getElementById(
-"createPage"
-).classList.remove("hidden");
+document
+.getElementById("searchPage")
+.classList
+.remove("hidden");
 
 }
 
 
-if(page==="profile"){
+if(page === "create"){
 
-document.getElementById(
-"profilePage"
-).classList.remove("hidden");
+document
+.getElementById("createPage")
+.classList
+.remove("hidden");
+
+}
+
+
+if(page === "profile"){
+
+document
+.getElementById("profilePage")
+.classList
+.remove("hidden");
 
 loadProfile();
 
 }
 
 
-document.querySelectorAll(".nav")
+document
+.querySelectorAll(".nav")
 .forEach(button=>{
 
 button.classList.toggle(
 "active",
-button.dataset.page===page
+button.dataset.page === page
 );
 
 });
@@ -2630,56 +3212,81 @@ button.dataset.page===page
 }
 
 
-/* =====================================================
-   LOGOUT
-   ===================================================== */
+/* ==================================================
+LOGOUT
+================================================== */
 
-document.getElementById("logoutBtn")
-.onclick=
+document
+.getElementById("logoutBtn")
+.onclick =
 async()=>{
 
 try{
 
-await signOut(auth);
+await supabase.auth.signOut();
 
 }catch(error){
 
-alert(firebaseError(error));
+alert(
+supabaseError(error)
+);
 
 }
 
 };
 
 
-/* =====================================================
-   ESCAPE HTML
-   ===================================================== */
+/* ==================================================
+ESCAPE HTML
+================================================== */
 
 function escapeHTML(value){
 
-return String(value??"")
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
+return String(value ?? "")
+.replace(
+/&/g,
+"&amp;"
+)
+.replace(
+/</g,
+"&lt;"
+)
+.replace(
+/>/g,
+"&gt;"
+)
+.replace(
+/"/g,
+"&quot;"
+)
+.replace(
+/'/g,
+"&#039;"
+);
 
 }
 
 
-/* =====================================================
-   FIREBASE ERROR
-   ===================================================== */
+/* ==================================================
+SUPABASE ERROR
+================================================== */
 
-function firebaseError(error){
+function supabaseError(error){
 
-const code=
-error?.code||"";
+const message =
+error?.message ||
+"";
+
+
+const code =
+error?.code ||
+"";
 
 
 if(
-code.includes("invalid-credential")||
-code.includes("wrong-password")
+message
+.toLowerCase()
+.includes("invalid login")
 ){
 
 return "Wrong email or password.";
@@ -2688,7 +3295,20 @@ return "Wrong email or password.";
 
 
 if(
-code.includes("email-already-in-use")
+message
+.toLowerCase()
+.includes("email not confirmed")
+){
+
+return "Please confirm your email first.";
+
+}
+
+
+if(
+message
+.toLowerCase()
+.includes("already registered")
 ){
 
 return "This email is already registered.";
@@ -2697,69 +3317,57 @@ return "This email is already registered.";
 
 
 if(
-code.includes("invalid-email")
+message
+.toLowerCase()
+.includes("password")
 ){
 
-return "Invalid email address.";
+return message;
 
 }
 
 
 if(
-code.includes("weak-password")
+code === "23505"
 ){
 
-return "Password must contain at least 6 characters.";
+return "This username is already taken.";
 
 }
 
 
 if(
-code.includes("permission-denied")
+code === "42501"
 ){
 
-return "Permission denied. Check Firebase Rules.";
+return "Permission denied. Check Supabase RLS policies.";
 
 }
 
 
 if(
-code.includes("storage/unauthorized")
+message
+.toLowerCase()
+.includes("row-level security")
 ){
 
-return "Storage permission denied. Check Storage Rules.";
+return "Permission denied. Check Supabase RLS policies.";
 
 }
 
 
 if(
-code.includes("storage/quota-exceeded")
+message
+.toLowerCase()
+.includes("bucket")
 ){
 
-return "Storage limit exceeded.";
+return "Storage error. Check the Post-images bucket and Storage policies.";
 
 }
 
 
-if(
-code.includes("network-request-failed")
-){
-
-return "Internet connection problem.";
-
-}
-
-
-if(
-code.includes("api-key-not-valid")
-){
-
-return "Firebase API key is invalid.";
-
-}
-
-
-return error?.message||
+return message ||
 "Something went wrong.";
 
 }
