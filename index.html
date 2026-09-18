@@ -4,14 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PIXORO</title>
+
 <link rel="manifest" href="./manifest.json">
-  <link rel="apple-touch-icon" href="./IMG-20260914-WA8318.jpg">
+<link rel="apple-touch-icon" href="./IMG-20260914-WA8318.jpg">
+
 <meta name="theme-color" content="#5b4cff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="PIXORO">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 *{
   box-sizing:border-box;
   margin:0;
@@ -30,13 +34,15 @@ button{
   cursor:pointer;
 }
 
-input,textarea{
+input,
+textarea{
   width:100%;
   padding:12px;
   border:1px solid #ddd;
   border-radius:10px;
   outline:none;
   margin-bottom:10px;
+  font-size:15px;
 }
 
 textarea{
@@ -94,6 +100,7 @@ textarea{
 .auth h1{
   text-align:center;
   margin-bottom:20px;
+  color:#5b4cff;
 }
 
 .primary{
@@ -179,6 +186,7 @@ textarea{
   margin-top:12px;
   border-top:1px solid #eee;
   padding-top:10px;
+  flex-wrap:wrap;
 }
 
 .actions button{
@@ -267,6 +275,7 @@ textarea{
   border-radius:50%;
   width:35px;
   height:35px;
+  font-size:20px;
 }
 
 .profile-actions{
@@ -329,47 +338,68 @@ hr{
   border-top:1px solid #eee;
   margin:15px 0;
 }
+
+.success{
+  color:green;
+}
+
+.error{
+  color:#d00;
+}
+
 </style>
 </head>
 
 <body>
 
-<!-- AUTH -->
+<!-- =========================
+     AUTH
+========================= -->
+
 <div id="authPage" class="auth">
 
   <div class="card">
 
     <h1>PIXORO</h1>
 
-    <input id="authName"
-           placeholder="Name"
-           autocomplete="name">
+    <input
+      id="authName"
+      placeholder="Name"
+      autocomplete="name">
 
-    <input id="authUsername"
-           placeholder="Username"
-           autocomplete="username">
+    <input
+      id="authUsername"
+      placeholder="Username"
+      autocomplete="username">
 
-    <input id="authEmail"
-           type="email"
-           placeholder="Email"
-           autocomplete="email">
+    <input
+      id="authEmail"
+      type="email"
+      placeholder="Email"
+      autocomplete="email">
 
-    <input id="authPassword"
-           type="password"
-           placeholder="Password"
-           autocomplete="new-password">
+    <input
+      id="authPassword"
+      type="password"
+      placeholder="Password"
+      autocomplete="new-password">
 
-    <button class="primary" onclick="signup()">
+    <button
+      class="primary"
+      onclick="signup()">
       Create Account
     </button>
 
-    <button class="secondary" onclick="login()">
+    <button
+      class="secondary"
+      onclick="login()">
       Login
     </button>
 
-    <p id="authMsg"
-       class="small"
-       style="margin-top:12px;text-align:center">
+    <p
+      id="authMsg"
+      class="small"
+      style="margin-top:12px;text-align:center">
     </p>
 
   </div>
@@ -377,24 +407,43 @@ hr{
 </div>
 
 
-<!-- APP -->
+<!-- =========================
+     APP
+========================= -->
+
 <div id="app" class="hidden">
 
   <div class="top">
-    <div class="logo">PIXORO</div>
-    <button onclick="logout()">Logout</button>
+
+    <div class="logo">
+      PIXORO
+    </div>
+
+    <button onclick="logout()">
+      Logout
+    </button>
+
   </div>
+
 
   <main class="page">
 
-    <!-- HOME -->
+    <!-- =====================
+         HOME
+    ====================== -->
+
     <section id="homePage">
 
       <div class="card">
-        <button class="primary" onclick="openCreate()">
+
+        <button
+          class="primary"
+          onclick="openCreate()">
           + Create Post
         </button>
+
       </div>
+
 
       <input
         id="searchInput"
@@ -402,15 +451,25 @@ hr{
         placeholder="Search username or name..."
         oninput="searchPosts()">
 
+
       <div id="feed">
-        <div class="loading">Loading...</div>
+
+        <div class="loading">
+          Loading...
+        </div>
+
       </div>
 
     </section>
 
 
-    <!-- PROFILE -->
-    <section id="profilePage" class="hidden">
+    <!-- =====================
+         PROFILE
+    ====================== -->
+
+    <section
+      id="profilePage"
+      class="hidden">
 
       <div class="card">
 
@@ -422,15 +481,29 @@ hr{
             src="https://via.placeholder.com/100">
 
           <div>
-            <div id="myName" class="user-name">User</div>
-            <div id="myUsername" class="username">@username</div>
+
+            <div
+              id="myName"
+              class="user-name">
+              User
+            </div>
+
+            <div
+              id="myUsername"
+              class="username">
+              @username
+            </div>
+
           </div>
 
         </div>
 
-        <div id="myBio"
-             style="margin-top:12px">
+
+        <div
+          id="myBio"
+          style="margin-top:12px">
         </div>
+
 
         <div class="stats">
 
@@ -451,6 +524,7 @@ hr{
 
         </div>
 
+
         <div class="profile-actions">
 
           <button onclick="openEditProfile()">
@@ -465,6 +539,7 @@ hr{
 
       </div>
 
+
       <div id="profilePosts"></div>
 
     </section>
@@ -472,24 +547,38 @@ hr{
   </main>
 
 
-  <!-- NAV -->
+  <!-- =====================
+       NAV
+  ====================== -->
+
   <nav class="nav">
 
     <button
       id="homeNav"
       class="active"
       onclick="showPage('home')">
-      🏠<br>Home
+
+      🏠<br>
+      Home
+
     </button>
 
+
     <button onclick="openCreate()">
-      ➕<br>Post
+
+      ➕<br>
+      Post
+
     </button>
+
 
     <button
       id="profileNav"
       onclick="showPage('profile')">
-      👤<br>Profile
+
+      👤<br>
+      Profile
+
     </button>
 
   </nav>
@@ -497,25 +586,42 @@ hr{
 </div>
 
 
-<!-- CREATE MODAL -->
-<div id="createModal" class="modal hidden">
+<!-- =========================
+     CREATE POST MODAL
+========================= -->
+
+<div
+  id="createModal"
+  class="modal hidden">
 
   <div class="modal-box">
 
     <div class="modal-head">
-      <h2>Create Post</h2>
-      <button class="close" onclick="closeCreate()">×</button>
+
+      <h2>
+        Create Post
+      </h2>
+
+      <button
+        class="close"
+        onclick="closeCreate()">
+        ×
+      </button>
+
     </div>
+
 
     <input
       id="postImage"
       type="file"
       accept="image/*">
 
+
     <textarea
       id="postCaption"
       rows="4"
       placeholder="Write something..."></textarea>
+
 
     <button
       class="primary"
@@ -523,9 +629,11 @@ hr{
       Publish
     </button>
 
-    <p id="postMsg"
-       class="small"
-       style="margin-top:10px">
+
+    <p
+      id="postMsg"
+      class="small"
+      style="margin-top:10px">
     </p>
 
   </div>
@@ -533,33 +641,51 @@ hr{
 </div>
 
 
-<!-- EDIT PROFILE MODAL -->
-<div id="editProfileModal" class="modal hidden">
+<!-- =========================
+     EDIT PROFILE MODAL
+========================= -->
+
+<div
+  id="editProfileModal"
+  class="modal hidden">
 
   <div class="modal-box">
 
     <div class="modal-head">
-      <h2>Edit Profile</h2>
-      <button class="close"
-              onclick="closeEditProfile()">×</button>
+
+      <h2>
+        Edit Profile
+      </h2>
+
+      <button
+        class="close"
+        onclick="closeEditProfile()">
+        ×
+      </button>
+
     </div>
+
 
     <input
       id="editName"
       placeholder="Name">
 
+
     <input
       id="editUsername"
       placeholder="Username">
+
 
     <input
       id="editAvatar"
       placeholder="Avatar URL">
 
+
     <textarea
       id="editBio"
       rows="3"
       placeholder="Bio"></textarea>
+
 
     <button
       class="primary"
@@ -584,11 +710,8 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_";
 
-const { createClient } =
-  supabase;
-
 const db =
-  createClient(
+  supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
   );
@@ -599,7 +722,10 @@ const db =
 ========================================================= */
 
 let currentUser = null;
+
 let currentProfile = null;
+
+let profileCache = new Map();
 
 
 /* =========================================================
@@ -608,11 +734,13 @@ let currentProfile = null;
 
 document.addEventListener(
   "DOMContentLoaded",
-  async () => {
+  async function(){
 
     const {
       data
-    } = await db.auth.getSession();
+    } =
+    await db.auth.getSession();
+
 
     if(data.session){
 
@@ -627,8 +755,12 @@ document.addEventListener(
 
     }
 
+
     db.auth.onAuthStateChange(
-      async (_event, session) => {
+      async function(
+        event,
+        session
+      ){
 
         if(session){
 
@@ -640,7 +772,10 @@ document.addEventListener(
         }else{
 
           currentUser = null;
+
           currentProfile = null;
+
+          profileCache.clear();
 
           showAuth();
 
@@ -663,6 +798,7 @@ function showAuth(){
     .getElementById("authPage")
     .classList.remove("hidden");
 
+
   document
     .getElementById("app")
     .classList.add("hidden");
@@ -678,6 +814,7 @@ async function signup(){
       .value
       .trim();
 
+
   const username =
     document
       .getElementById("authUsername")
@@ -685,25 +822,43 @@ async function signup(){
       .trim()
       .toLowerCase();
 
+
   const email =
     document
       .getElementById("authEmail")
       .value
       .trim();
 
+
   const password =
     document
       .getElementById("authPassword")
       .value;
 
+
   const msg =
     document.getElementById("authMsg");
 
 
-  if(!name || !username || !email || !password){
+  if(
+    !name ||
+    !username ||
+    !email ||
+    !password
+  ){
 
     msg.textContent =
       "Fill all fields.";
+
+    return;
+
+  }
+
+
+  if(password.length < 6){
+
+    msg.textContent =
+      "Password must be at least 6 characters.";
 
     return;
 
@@ -720,8 +875,9 @@ async function signup(){
   } =
   await db.auth.signUp({
 
-    email,
-    password
+    email:email,
+
+    password:password
 
   });
 
@@ -747,7 +903,7 @@ async function signup(){
 
 
   const {
-    error: profileError
+    error:profileError
   } =
   await db
     .from("profiles")
@@ -777,7 +933,20 @@ async function signup(){
 
 
   msg.textContent =
-    "Account created!";
+    "Account created successfully!";
+
+
+  /*
+    If Supabase email confirmation
+    is enabled, user must confirm email.
+  */
+
+  if(!data.session){
+
+    msg.textContent =
+      "Account created. Check your email to confirm.";
+
+  }
 
 }
 
@@ -794,10 +963,12 @@ async function login(){
       .value
       .trim();
 
+
   const password =
     document
       .getElementById("authPassword")
       .value;
+
 
   const msg =
     document.getElementById("authMsg");
@@ -822,8 +993,9 @@ async function login(){
   } =
   await db.auth.signInWithPassword({
 
-    email,
-    password
+    email:email,
+
+    password:password
 
   });
 
@@ -833,7 +1005,13 @@ async function login(){
     msg.textContent =
       error.message;
 
+    return;
+
   }
+
+
+  msg.textContent =
+    "Login successful!";
 
 }
 
@@ -859,12 +1037,15 @@ async function startApp(){
     .getElementById("authPage")
     .classList.add("hidden");
 
+
   document
     .getElementById("app")
     .classList.remove("hidden");
 
 
   await loadMyProfile();
+
+  await loadProfileCounts();
 
   await loadFeed();
 
@@ -874,6 +1055,62 @@ async function startApp(){
 /* =========================================================
    PROFILE
 ========================================================= */
+
+async function getProfile(userId){
+
+  if(!userId)
+    return {};
+
+
+  if(profileCache.has(userId)){
+
+    return profileCache.get(userId);
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+  await db
+    .from("profiles")
+    .select(
+      "id,name,username,avatar_url,bio"
+    )
+    .eq(
+      "id",
+      userId
+    )
+    .maybeSingle();
+
+
+  if(error){
+
+    console.log(
+      "Profile error:",
+      error.message
+    );
+
+    return {};
+
+  }
+
+
+  const profile =
+    data || {};
+
+
+  profileCache.set(
+    userId,
+    profile
+  );
+
+
+  return profile;
+
+}
+
 
 async function loadMyProfile(){
 
@@ -887,14 +1124,20 @@ async function loadMyProfile(){
   } =
   await db
     .from("profiles")
-    .select("*")
-    .eq("id",currentUser.id)
+    .select(
+      "id,name,username,avatar_url,bio"
+    )
+    .eq(
+      "id",
+      currentUser.id
+    )
     .maybeSingle();
 
 
   if(error){
 
     console.log(error);
+
     return;
 
   }
@@ -906,21 +1149,19 @@ async function loadMyProfile(){
 
   if(!currentProfile){
 
+    const emailName =
+      currentUser.email
+      ? currentUser.email.split("@")[0]
+      : "user";
+
+
     const fallback = {
 
       id:currentUser.id,
 
-      name:
-        currentUser.email
-        ? currentUser.email.split("@")[0]
-        : "User",
+      name:emailName,
 
-      username:
-        currentUser.email
-        ? currentUser.email
-            .split("@")[0]
-            .toLowerCase()
-        : "user",
+      username:emailName.toLowerCase(),
 
       avatar_url:"",
 
@@ -930,19 +1171,37 @@ async function loadMyProfile(){
 
 
     const {
-      data:newProfile
+      data:newProfile,
+      error:newError
     } =
     await db
       .from("profiles")
-      .insert(fallback)
+      .upsert(fallback)
       .select()
       .single();
+
+
+    if(newError){
+
+      console.log(
+        newError.message
+      );
+
+      return;
+
+    }
 
 
     currentProfile =
       newProfile;
 
   }
+
+
+  profileCache.set(
+    currentUser.id,
+    currentProfile
+  );
 
 
   renderMyProfile();
@@ -985,14 +1244,15 @@ function renderMyProfile(){
       currentProfile.bio || "";
 
 
-  if(currentProfile.avatar_url){
+  const avatar =
+    document.getElementById(
+      "myAvatar"
+    );
 
-    document
-      .getElementById("myAvatar")
-      .src =
-        currentProfile.avatar_url;
 
-  }
+  avatar.src =
+    currentProfile.avatar_url ||
+    "https://via.placeholder.com/100";
 
 }
 
@@ -1003,32 +1263,38 @@ function renderMyProfile(){
 
 function openEditProfile(){
 
+  if(!currentProfile)
+    return;
+
+
   document
     .getElementById("editName")
     .value =
-      currentProfile?.name || "";
+      currentProfile.name || "";
 
 
   document
     .getElementById("editUsername")
     .value =
-      currentProfile?.username || "";
+      currentProfile.username || "";
 
 
   document
     .getElementById("editAvatar")
     .value =
-      currentProfile?.avatar_url || "";
+      currentProfile.avatar_url || "";
 
 
   document
     .getElementById("editBio")
     .value =
-      currentProfile?.bio || "";
+      currentProfile.bio || "";
 
 
   document
-    .getElementById("editProfileModal")
+    .getElementById(
+      "editProfileModal"
+    )
     .classList.remove("hidden");
 
 }
@@ -1037,7 +1303,9 @@ function openEditProfile(){
 function closeEditProfile(){
 
   document
-    .getElementById("editProfileModal")
+    .getElementById(
+      "editProfileModal"
+    )
     .classList.add("hidden");
 
 }
@@ -1051,6 +1319,7 @@ async function saveProfile(){
       .value
       .trim();
 
+
   const username =
     document
       .getElementById("editUsername")
@@ -1058,17 +1327,30 @@ async function saveProfile(){
       .trim()
       .toLowerCase();
 
+
   const avatar_url =
     document
       .getElementById("editAvatar")
       .value
       .trim();
 
+
   const bio =
     document
       .getElementById("editBio")
       .value
       .trim();
+
+
+  if(!name || !username){
+
+    alert(
+      "Name and username are required."
+    );
+
+    return;
+
+  }
 
 
   const {
@@ -1078,26 +1360,44 @@ async function saveProfile(){
     .from("profiles")
     .update({
 
-      name,
-      username,
-      avatar_url,
-      bio
+      name:name,
+
+      username:username,
+
+      avatar_url:avatar_url,
+
+      bio:bio
 
     })
-    .eq("id",currentUser.id);
+    .eq(
+      "id",
+      currentUser.id
+    );
 
 
   if(error){
 
     alert(error.message);
+
     return;
 
   }
 
 
+  profileCache.delete(
+    currentUser.id
+  );
+
+
   await loadMyProfile();
 
+
   closeEditProfile();
+
+
+  alert(
+    "Profile updated!"
+  );
 
 }
 
@@ -1109,7 +1409,9 @@ async function saveProfile(){
 function openCreate(){
 
   document
-    .getElementById("createModal")
+    .getElementById(
+      "createModal"
+    )
     .classList.remove("hidden");
 
 }
@@ -1118,18 +1420,37 @@ function openCreate(){
 function closeCreate(){
 
   document
-    .getElementById("createModal")
+    .getElementById(
+      "createModal"
+    )
     .classList.add("hidden");
+
+
+  document
+    .getElementById(
+      "postMsg"
+    )
+    .textContent = "";
 
 }
 
 
 async function createPost(){
 
+  if(!currentUser){
+
+    alert("Please login.");
+
+    return;
+
+  }
+
+
   const file =
     document
       .getElementById("postImage")
       .files[0];
+
 
   const caption =
     document
@@ -1137,14 +1458,27 @@ async function createPost(){
       .value
       .trim();
 
+
   const msg =
-    document.getElementById("postMsg");
+    document.getElementById(
+      "postMsg"
+    );
 
 
   if(!file){
 
     msg.textContent =
       "Select an image.";
+
+    return;
+
+  }
+
+
+  if(!file.type.startsWith("image/")){
+
+    msg.textContent =
+      "Please select an image file.";
 
     return;
 
@@ -1158,7 +1492,8 @@ async function createPost(){
   const extension =
     file.name
       .split(".")
-      .pop();
+      .pop()
+      .toLowerCase();
 
 
   const fileName =
@@ -1169,10 +1504,6 @@ async function createPost(){
     extension;
 
 
-  const filePath =
-    fileName;
-
-
   const {
     error:uploadError
   } =
@@ -1180,7 +1511,7 @@ async function createPost(){
     .storage
     .from("Post-images")
     .upload(
-      filePath,
+      fileName,
       file,
       {
         upsert:false
@@ -1204,7 +1535,9 @@ async function createPost(){
   db
     .storage
     .from("Post-images")
-    .getPublicUrl(filePath);
+    .getPublicUrl(
+      fileName
+    );
 
 
   const image_url =
@@ -1221,9 +1554,9 @@ async function createPost(){
       user_id:
         currentUser.id,
 
-      image_url,
+      image_url:image_url,
 
-      caption
+      caption:caption
 
     });
 
@@ -1243,33 +1576,42 @@ async function createPost(){
 
 
   document
-    .getElementById("postImage")
+    .getElementById(
+      "postImage"
+    )
     .value = "";
 
+
   document
-    .getElementById("postCaption")
+    .getElementById(
+      "postCaption"
+    )
     .value = "";
+
+
+  await loadFeed();
 
 
   setTimeout(
     closeCreate,
-    500
+    700
   );
-
-
-  await loadFeed();
 
 }
 
 
 /* =========================================================
    LOAD FEED
+   IMPORTANT:
+   NO profiles(...) EMBED HERE
 ========================================================= */
 
 async function loadFeed(){
 
   const feed =
-    document.getElementById("feed");
+    document.getElementById(
+      "feed"
+    );
 
 
   feed.innerHTML =
@@ -1282,19 +1624,9 @@ async function loadFeed(){
   } =
   await db
     .from("posts")
-    .select(`
-      id,
-      user_id,
-      image_url,
-      caption,
-      created_at,
-      profiles (
-        id,
-        name,
-        username,
-        avatar_url
-      )
-    `)
+    .select(
+      "id,user_id,image_url,caption,created_at"
+    )
     .order(
       "created_at",
       {
@@ -1315,7 +1647,7 @@ async function loadFeed(){
   }
 
 
-  if(!data || data.length===0){
+  if(!data || data.length === 0){
 
     feed.innerHTML =
       '<div class="empty">No posts yet.</div>';
@@ -1328,7 +1660,9 @@ async function loadFeed(){
   feed.innerHTML = "";
 
 
-  for(const post of data){
+  for(
+    const post of data
+  ){
 
     await renderPost(
       post,
@@ -1342,6 +1676,8 @@ async function loadFeed(){
 
 /* =========================================================
    RENDER POST
+   PROFILE IS LOADED SEPARATELY
+   This fixes relationship error.
 ========================================================= */
 
 async function renderPost(
@@ -1350,7 +1686,9 @@ async function renderPost(
 ){
 
   const profile =
-    post.profiles || {};
+    await getProfile(
+      post.user_id
+    );
 
 
   const name =
@@ -1370,7 +1708,9 @@ async function renderPost(
 
 
   const card =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
 
   card.className =
@@ -1378,25 +1718,34 @@ async function renderPost(
 
 
   card.id =
-    "post-" + post.id;
+    "post-" +
+    post.id;
 
 
   const isMine =
-    post.user_id === currentUser.id;
+    post.user_id ===
+    currentUser.id;
 
 
   const liked =
-    await hasLike(post.id);
+    await hasLike(
+      post.id
+    );
 
 
   const saved =
-    await hasSave(post.id);
+    await hasSave(
+      post.id
+    );
 
 
   const following =
-    post.user_id === currentUser.id
-      ? false
-      : await isFollowing(post.user_id);
+    post.user_id ===
+    currentUser.id
+    ? false
+    : await isFollowing(
+        post.user_id
+      );
 
 
   const likeCount =
@@ -1446,11 +1795,26 @@ async function renderPost(
       ${
         !isMine
         ?
-        `<button
-          class="follow-btn ${following ? "following":""}"
-          onclick="toggleFollow('${post.user_id}',this)">
-          ${following ? "Following":"Follow"}
-        </button>`
+        `
+        <button
+          class="follow-btn ${
+            following
+            ? "following"
+            : ""
+          }"
+          onclick="toggleFollow(
+            '${post.user_id}',
+            this
+          )">
+
+          ${
+            following
+            ? "Following"
+            : "Follow"
+          }
+
+        </button>
+        `
         :
         ""
       }
@@ -1461,10 +1825,14 @@ async function renderPost(
     ${
       post.image_url
       ?
-      `<img
+      `
+      <img
         class="post-image"
-        src="${escapeAttr(post.image_url)}"
-        loading="lazy">`
+        src="${escapeAttr(
+          post.image_url
+        )}"
+        loading="lazy">
+      `
       :
       ""
     }
@@ -1473,56 +1841,104 @@ async function renderPost(
     ${
       post.caption
       ?
-      `<div class="caption">
-        ${escapeHtml(post.caption)}
-      </div>`
+      `
+      <div class="caption">
+        ${escapeHtml(
+          post.caption
+        )}
+      </div>
+      `
       :
       ""
     }
 
 
-    <div class="small"
-         style="margin-top:8px">
-      ${formatDate(post.created_at)}
+    <div
+      class="small"
+      style="margin-top:8px">
+
+      ${formatDate(
+        post.created_at
+      )}
+
     </div>
 
 
     <div class="actions">
 
       <button
-        class="${liked ? "active":""}"
-        onclick="toggleLike('${post.id}',this)">
+        class="${
+          liked
+          ? "active"
+          : ""
+        }"
+        onclick="toggleLike(
+          '${post.id}',
+          this
+        )">
+
         ❤️ ${likeCount}
+
       </button>
 
+
       <button
-        onclick="toggleComments('${post.id}')">
+        onclick="toggleComments(
+          '${post.id}'
+        )">
+
         💬 ${commentCount}
+
       </button>
 
+
       <button
-        class="${saved ? "active":""}"
-        onclick="toggleSave('${post.id}',this)">
+        class="${
+          saved
+          ? "active"
+          : ""
+        }"
+        onclick="toggleSave(
+          '${post.id}',
+          this
+        )">
+
         🔖
+
       </button>
 
+
       <button
-        onclick="sharePost('${post.id}')">
+        onclick="sharePost(
+          '${post.id}'
+        )">
+
         📤 Share
+
       </button>
+
 
       <button>
+
         👁 ${viewCount}
+
       </button>
+
 
       ${
         isMine
         ?
-        `<button
+        `
+        <button
           class="danger"
-          onclick="deletePost('${post.id}')">
-          🗑
-        </button>`
+          onclick="deletePost(
+            '${post.id}'
+          )">
+
+          🗑 Delete
+
+        </button>
+        `
         :
         ""
       }
@@ -1534,22 +1950,40 @@ async function renderPost(
       id="comments-${post.id}"
       class="comment-box hidden">
 
-      <div id="commentList-${post.id}">
+      <div
+        id="commentList-${post.id}">
+
         Loading comments...
+
       </div>
 
-      <div style="display:flex;gap:5px;margin-top:10px">
+
+      <div
+        style="
+          display:flex;
+          gap:5px;
+          margin-top:10px
+        ">
 
         <input
           id="commentInput-${post.id}"
           placeholder="Write a comment..."
           style="margin:0">
 
+
         <button
           class="primary"
-          style="width:auto;margin:0;padding:10px 15px"
-          onclick="addComment('${post.id}')">
+          style="
+            width:auto;
+            margin:0;
+            padding:10px 15px
+          "
+          onclick="addComment(
+            '${post.id}'
+          )">
+
           Send
+
         </button>
 
       </div>
@@ -1559,10 +1993,14 @@ async function renderPost(
   `;
 
 
-  container.appendChild(card);
+  container.appendChild(
+    card
+  );
 
 
-  await addView(post.id);
+  await addView(
+    post.id
+  );
 
 }
 
@@ -1571,7 +2009,9 @@ async function renderPost(
    LIKE
 ========================================================= */
 
-async function hasLike(postId){
+async function hasLike(
+  postId
+){
 
   const {
     data
@@ -1579,8 +2019,14 @@ async function hasLike(postId){
   await db
     .from("likes")
     .select("post_id")
-    .eq("post_id",postId)
-    .eq("user_id",currentUser.id)
+    .eq(
+      "post_id",
+      postId
+    )
+    .eq(
+      "user_id",
+      currentUser.id
+    )
     .maybeSingle();
 
 
@@ -1595,7 +2041,9 @@ async function toggleLike(
 ){
 
   const liked =
-    await hasLike(postId);
+    await hasLike(
+      postId
+    );
 
 
   if(liked){
@@ -1606,18 +2054,23 @@ async function toggleLike(
     await db
       .from("likes")
       .delete()
-      .eq("post_id",postId)
-      .eq("user_id",currentUser.id);
+      .eq(
+        "post_id",
+        postId
+      )
+      .eq(
+        "user_id",
+        currentUser.id
+      );
 
 
     if(error){
 
       alert(error.message);
+
       return;
 
     }
-
-    button.classList.remove("active");
 
   }else{
 
@@ -1639,11 +2092,10 @@ async function toggleLike(
     if(error){
 
       alert(error.message);
+
       return;
 
     }
-
-    button.classList.add("active");
 
   }
 
@@ -1657,34 +2109,46 @@ async function toggleLike(
    COMMENTS
 ========================================================= */
 
-async function toggleComments(postId){
+async function toggleComments(
+  postId
+){
 
   const box =
-    document
-      .getElementById(
-        "comments-" + postId
-      );
+    document.getElementById(
+      "comments-" +
+      postId
+    );
 
 
-  box.classList.toggle("hidden");
+  box.classList.toggle(
+    "hidden"
+  );
 
 
-  if(!box.classList.contains("hidden")){
+  if(
+    !box.classList.contains(
+      "hidden"
+    )
+  ){
 
-    await loadComments(postId);
+    await loadComments(
+      postId
+    );
 
   }
 
 }
 
 
-async function loadComments(postId){
+async function loadComments(
+  postId
+){
 
   const list =
-    document
-      .getElementById(
-        "commentList-" + postId
-      );
+    document.getElementById(
+      "commentList-" +
+      postId
+    );
 
 
   const {
@@ -1693,18 +2157,13 @@ async function loadComments(postId){
   } =
   await db
     .from("comments")
-    .select(`
-      id,
-      comment,
-      created_at,
-      user_id,
-      profiles (
-        name,
-        username,
-        avatar_url
-      )
-    `)
-    .eq("post_id",postId)
+    .select(
+      "id,comment,created_at,user_id"
+    )
+    .eq(
+      "post_id",
+      postId
+    )
     .order(
       "created_at",
       {
@@ -1717,7 +2176,9 @@ async function loadComments(postId){
 
     list.innerHTML =
       `<div class="small">
-        ${escapeHtml(error.message)}
+        ${escapeHtml(
+          error.message
+        )}
       </div>`;
 
     return;
@@ -1725,7 +2186,10 @@ async function loadComments(postId){
   }
 
 
-  if(!data || data.length===0){
+  if(
+    !data ||
+    data.length === 0
+  ){
 
     list.innerHTML =
       '<div class="small">No comments yet.</div>';
@@ -1735,36 +2199,59 @@ async function loadComments(postId){
   }
 
 
+  let html = "";
+
+
+  for(
+    const c of data
+  ){
+
+    const p =
+      await getProfile(
+        c.user_id
+      );
+
+
+    const n =
+      p.name ||
+      p.username ||
+      "User";
+
+
+    html += `
+
+      <div class="comment">
+
+        <b>
+          ${escapeHtml(n)}
+        </b>
+
+        ${escapeHtml(
+          c.comment
+        )}
+
+      </div>
+
+    `;
+
+  }
+
+
   list.innerHTML =
-    data.map(c => {
-
-      const p =
-        c.profiles || {};
-
-      const n =
-        p.name ||
-        p.username ||
-        "User";
-
-      return `
-        <div class="comment">
-          <b>${escapeHtml(n)}</b>
-          ${escapeHtml(c.comment)}
-        </div>
-      `;
-
-    }).join("");
+    html;
 
 }
 
 
-async function addComment(postId){
+async function addComment(
+  postId
+){
 
   const input =
-    document
-      .getElementById(
-        "commentInput-" + postId
-      );
+    document.getElementById(
+      "commentInput-" +
+      postId
+    );
 
 
   const comment =
@@ -1787,7 +2274,7 @@ async function addComment(postId){
       user_id:
         currentUser.id,
 
-      comment
+      comment:comment
 
     });
 
@@ -1795,6 +2282,7 @@ async function addComment(postId){
   if(error){
 
     alert(error.message);
+
     return;
 
   }
@@ -1803,7 +2291,10 @@ async function addComment(postId){
   input.value = "";
 
 
-  await loadComments(postId);
+  await loadComments(
+    postId
+  );
+
 
   await loadFeed();
 
@@ -1814,7 +2305,9 @@ async function addComment(postId){
    SAVE
 ========================================================= */
 
-async function hasSave(postId){
+async function hasSave(
+  postId
+){
 
   const {
     data
@@ -1822,8 +2315,14 @@ async function hasSave(postId){
   await db
     .from("saves")
     .select("post_id")
-    .eq("post_id",postId)
-    .eq("user_id",currentUser.id)
+    .eq(
+      "post_id",
+      postId
+    )
+    .eq(
+      "user_id",
+      currentUser.id
+    )
     .maybeSingle();
 
 
@@ -1838,7 +2337,9 @@ async function toggleSave(
 ){
 
   const saved =
-    await hasSave(postId);
+    await hasSave(
+      postId
+    );
 
 
   if(saved){
@@ -1849,18 +2350,23 @@ async function toggleSave(
     await db
       .from("saves")
       .delete()
-      .eq("post_id",postId)
-      .eq("user_id",currentUser.id);
+      .eq(
+        "post_id",
+        postId
+      )
+      .eq(
+        "user_id",
+        currentUser.id
+      );
 
 
     if(error){
 
       alert(error.message);
+
       return;
 
     }
-
-    button.classList.remove("active");
 
   }else{
 
@@ -1882,13 +2388,17 @@ async function toggleSave(
     if(error){
 
       alert(error.message);
+
       return;
 
     }
 
-    button.classList.add("active");
-
   }
+
+
+  button.classList.toggle(
+    "active"
+  );
 
 }
 
@@ -1897,7 +2407,9 @@ async function toggleSave(
    FOLLOW
 ========================================================= */
 
-async function isFollowing(userId){
+async function isFollowing(
+  userId
+){
 
   const {
     data
@@ -1927,7 +2439,9 @@ async function toggleFollow(
 ){
 
   const following =
-    await isFollowing(userId);
+    await isFollowing(
+      userId
+    );
 
 
   if(following){
@@ -1951,6 +2465,7 @@ async function toggleFollow(
     if(error){
 
       alert(error.message);
+
       return;
 
     }
@@ -1984,6 +2499,7 @@ async function toggleFollow(
     if(error){
 
       alert(error.message);
+
       return;
 
     }
@@ -1998,6 +2514,9 @@ async function toggleFollow(
 
   }
 
+
+  await loadProfileCounts();
+
 }
 
 
@@ -2005,7 +2524,13 @@ async function toggleFollow(
    VIEWS
 ========================================================= */
 
-async function addView(postId){
+async function addView(
+  postId
+){
+
+  if(!currentUser)
+    return;
+
 
   const {
     data
@@ -2013,8 +2538,14 @@ async function addView(postId){
   await db
     .from("views")
     .select("id")
-    .eq("post_id",postId)
-    .eq("user_id",currentUser.id)
+    .eq(
+      "post_id",
+      postId
+    )
+    .eq(
+      "user_id",
+      currentUser.id
+    )
     .maybeSingle();
 
 
@@ -2040,7 +2571,9 @@ async function addView(postId){
    SHARE
 ========================================================= */
 
-async function sharePost(postId){
+async function sharePost(
+  postId
+){
 
   const url =
     location.href.split("#")[0] +
@@ -2048,7 +2581,9 @@ async function sharePost(postId){
     postId;
 
 
-  if(navigator.share){
+  if(
+    navigator.share
+  ){
 
     try{
 
@@ -2056,9 +2591,10 @@ async function sharePost(postId){
 
         title:"PIXORO",
 
-        text:"Check this PIXORO post",
+        text:
+          "Check this PIXORO post",
 
-        url
+        url:url
 
       });
 
@@ -2068,9 +2604,13 @@ async function sharePost(postId){
 
     try{
 
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(
+        url
+      );
 
-      alert("Post link copied!");
+      alert(
+        "Post link copied!"
+      );
 
     }catch(e){
 
@@ -2087,46 +2627,83 @@ async function sharePost(postId){
 
 
 /* =========================================================
-   DELETE
+   DELETE POST
 ========================================================= */
 
-async function deletePost(postId){
+async function deletePost(
+  postId
+){
 
-  if(!confirm("Delete this post?"))
+  if(
+    !confirm(
+      "Delete this post?"
+    )
+  ){
+
     return;
+
+  }
 
 
   const {
-    data:post
+    data:post,
+    error:postError
   } =
   await db
     .from("posts")
-    .select("image_url")
-    .eq("id",postId)
-    .eq("user_id",currentUser.id)
-    .single();
+    .select(
+      "image_url"
+    )
+    .eq(
+      "id",
+      postId
+    )
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .maybeSingle();
 
 
-  if(post){
+  if(postError){
+
+    alert(
+      postError.message
+    );
+
+    return;
+
+  }
+
+
+  if(post && post.image_url){
 
     try{
 
+      const marker =
+        "/Post-images/";
+
+
       const parts =
         post.image_url.split(
-          "/Post-images/"
+          marker
         );
 
-      if(parts.length>1){
+
+      if(parts.length > 1){
 
         const path =
           decodeURIComponent(
             parts[1]
           );
 
+
         await db
           .storage
           .from("Post-images")
-          .remove([path]);
+          .remove([
+            path
+          ]);
 
       }
 
@@ -2145,13 +2722,22 @@ async function deletePost(postId){
   await db
     .from("posts")
     .delete()
-    .eq("id",postId)
-    .eq("user_id",currentUser.id);
+    .eq(
+      "id",
+      postId
+    )
+    .eq(
+      "user_id",
+      currentUser.id
+    );
 
 
   if(error){
 
-    alert(error.message);
+    alert(
+      error.message
+    );
+
     return;
 
   }
@@ -2159,16 +2745,33 @@ async function deletePost(postId){
 
   await loadFeed();
 
+
+  if(
+    !document
+      .getElementById(
+        "profilePage"
+      )
+      .classList.contains(
+        "hidden"
+      )
+  ){
+
+    await loadMyPosts();
+
+  }
+
 }
 
 
 /* =========================================================
-   MY PROFILE POSTS
+   MY POSTS
+   NO profiles(...) EMBED
 ========================================================= */
 
 async function loadMyPosts(){
 
-  showPage("profile");
+  if(!currentUser)
+    return;
 
 
   const container =
@@ -2187,19 +2790,9 @@ async function loadMyPosts(){
   } =
   await db
     .from("posts")
-    .select(`
-      id,
-      user_id,
-      image_url,
-      caption,
-      created_at,
-      profiles (
-        id,
-        name,
-        username,
-        avatar_url
-      )
-    `)
+    .select(
+      "id,user_id,image_url,caption,created_at"
+    )
     .eq(
       "user_id",
       currentUser.id
@@ -2216,7 +2809,9 @@ async function loadMyPosts(){
 
     container.innerHTML =
       `<div class="card">
-        ${escapeHtml(error.message)}
+        ${escapeHtml(
+          error.message
+        )}
       </div>`;
 
     return;
@@ -2227,7 +2822,10 @@ async function loadMyPosts(){
   container.innerHTML = "";
 
 
-  if(!data.length){
+  if(
+    !data ||
+    data.length === 0
+  ){
 
     container.innerHTML =
       '<div class="empty">No posts.</div>';
@@ -2237,7 +2835,9 @@ async function loadMyPosts(){
   }
 
 
-  for(const post of data){
+  for(
+    const post of data
+  ){
 
     await renderPost(
       post,
@@ -2267,42 +2867,80 @@ async function loadProfileCounts(){
     );
 
 
-  const followersResult =
-    await db
-      .from("follows")
-      .select("id")
-      .eq(
-        "following_id",
-        currentUser.id
-      );
+  const {
+    data:followers
+  } =
+  await db
+    .from("follows")
+    .select(
+      "id",
+      {
+        count:"exact",
+        head:true
+      }
+    )
+    .eq(
+      "following_id",
+      currentUser.id
+    );
 
 
-  const followingResult =
-    await db
-      .from("follows")
-      .select("id")
-      .eq(
-        "follower_id",
-        currentUser.id
-      );
+  const {
+    data:following
+  } =
+  await db
+    .from("follows")
+    .select(
+      "id",
+      {
+        count:"exact",
+        head:true
+      }
+    )
+    .eq(
+      "follower_id",
+      currentUser.id
+    );
+
+
+  const followerCount =
+    await countRows(
+      "follows",
+      "following_id",
+      currentUser.id
+    );
+
+
+  const followingCount =
+    await countRows(
+      "follows",
+      "follower_id",
+      currentUser.id
+    );
 
 
   document
-    .getElementById("myPosts")
+    .getElementById(
+      "myPosts"
+    )
     .textContent =
       posts;
 
 
   document
-    .getElementById("myFollowers")
+    .getElementById(
+      "myFollowers"
+    )
     .textContent =
-      followersResult.data?.length || 0;
+      followerCount;
 
 
   document
-    .getElementById("myFollowing")
+    .getElementById(
+      "myFollowing"
+    )
     .textContent =
-      followingResult.data?.length || 0;
+      followingCount;
 
 }
 
@@ -2315,7 +2953,9 @@ async function searchPosts(){
 
   const q =
     document
-      .getElementById("searchInput")
+      .getElementById(
+        "searchInput"
+      )
       .value
       .trim()
       .toLowerCase();
@@ -2324,28 +2964,57 @@ async function searchPosts(){
   if(!q){
 
     await loadFeed();
+
     return;
 
   }
 
 
   const {
-    data:profiles
+    data:profiles,
+    error:profileError
   } =
   await db
     .from("profiles")
     .select("id")
     .or(
-      `username.ilike.%${q}%,name.ilike.%${q}%`
+      "username.ilike.%" +
+      q +
+      "%,name.ilike.%" +
+      q +
+      "%"
     );
 
 
-  if(!profiles || !profiles.length){
+  if(profileError){
 
     document
-      .getElementById("feed")
+      .getElementById(
+        "feed"
+      )
       .innerHTML =
-        '<div class="empty">No user found.</div>';
+      `<div class="card">
+        ${escapeHtml(
+          profileError.message
+        )}
+      </div>`;
+
+    return;
+
+  }
+
+
+  if(
+    !profiles ||
+    profiles.length === 0
+  ){
+
+    document
+      .getElementById(
+        "feed"
+      )
+      .innerHTML =
+      '<div class="empty">No user found.</div>';
 
     return;
 
@@ -2364,19 +3033,9 @@ async function searchPosts(){
   } =
   await db
     .from("posts")
-    .select(`
-      id,
-      user_id,
-      image_url,
-      caption,
-      created_at,
-      profiles (
-        id,
-        name,
-        username,
-        avatar_url
-      )
-    `)
+    .select(
+      "id,user_id,image_url,caption,created_at"
+    )
     .in(
       "user_id",
       ids
@@ -2390,7 +3049,9 @@ async function searchPosts(){
 
 
   const feed =
-    document.getElementById("feed");
+    document.getElementById(
+      "feed"
+    );
 
 
   feed.innerHTML = "";
@@ -2400,7 +3061,9 @@ async function searchPosts(){
 
     feed.innerHTML =
       `<div class="card">
-        ${escapeHtml(error.message)}
+        ${escapeHtml(
+          error.message
+        )}
       </div>`;
 
     return;
@@ -2408,7 +3071,10 @@ async function searchPosts(){
   }
 
 
-  if(!data.length){
+  if(
+    !data ||
+    data.length === 0
+  ){
 
     feed.innerHTML =
       '<div class="empty">No posts found.</div>';
@@ -2418,7 +3084,9 @@ async function searchPosts(){
   }
 
 
-  for(const post of data){
+  for(
+    const post of data
+  ){
 
     await renderPost(
       post,
@@ -2434,12 +3102,15 @@ async function searchPosts(){
    PAGE NAVIGATION
 ========================================================= */
 
-async function showPage(page){
+async function showPage(
+  page
+){
 
   const home =
     document.getElementById(
       "homePage"
     );
+
 
   const profile =
     document.getElementById(
@@ -2447,7 +3118,19 @@ async function showPage(page){
     );
 
 
-  if(page==="home"){
+  const homeNav =
+    document.getElementById(
+      "homeNav"
+    );
+
+
+  const profileNav =
+    document.getElementById(
+      "profileNav"
+    );
+
+
+  if(page === "home"){
 
     home.classList.remove(
       "hidden"
@@ -2458,18 +3141,13 @@ async function showPage(page){
     );
 
 
-    document
-      .getElementById(
-        "homeNav"
-      )
-      .classList.add("active");
+    homeNav.classList.add(
+      "active"
+    );
 
-
-    document
-      .getElementById(
-        "profileNav"
-      )
-      .classList.remove("active");
+    profileNav.classList.remove(
+      "active"
+    );
 
 
     await loadFeed();
@@ -2485,21 +3163,22 @@ async function showPage(page){
     );
 
 
-    document
-      .getElementById(
-        "homeNav"
-      )
-      .classList.remove("active");
+    homeNav.classList.remove(
+      "active"
+    );
 
-
-    document
-      .getElementById(
-        "profileNav"
-      )
-      .classList.add("active");
+    profileNav.classList.add(
+      "active"
+    );
 
 
     await loadProfileCounts();
+
+    /*
+      IMPORTANT:
+      Do NOT call showPage('profile')
+      from loadMyPosts().
+    */
 
     await loadMyPosts();
 
@@ -2509,7 +3188,7 @@ async function showPage(page){
 
 
 /* =========================================================
-   HELPERS
+   COUNT
 ========================================================= */
 
 async function countRows(
@@ -2539,7 +3218,10 @@ async function countRows(
 
   if(error){
 
-    console.log(error);
+    console.log(
+      "Count error:",
+      error.message
+    );
 
     return 0;
 
@@ -2551,10 +3233,17 @@ async function countRows(
 }
 
 
-function formatDate(date){
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function formatDate(
+  date
+){
 
   if(!date)
     return "";
+
 
   return new Date(date)
     .toLocaleString();
@@ -2562,21 +3251,44 @@ function formatDate(date){
 }
 
 
-function escapeHtml(value){
+function escapeHtml(
+  value
+){
 
-  return String(value ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+  return String(
+    value ?? ""
+  )
+  .replaceAll(
+    "&",
+    "&amp;"
+  )
+  .replaceAll(
+    "<",
+    "&lt;"
+  )
+  .replaceAll(
+    ">",
+    "&gt;"
+  )
+  .replaceAll(
+    '"',
+    "&quot;"
+  )
+  .replaceAll(
+    "'",
+    "&#039;"
+  );
 
 }
 
 
-function escapeAttr(value){
+function escapeAttr(
+  value
+){
 
-  return escapeHtml(value);
+  return escapeHtml(
+    value
+  );
 
 }
 
