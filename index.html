@@ -78,10 +78,12 @@ margin-bottom:5px;
 text-align:center;
 color:#888;
 margin-bottom:22px;
+font-size:18px;
 }
 
 .authbox h2{
 margin-bottom:8px;
+font-size:28px;
 }
 
 .primary{
@@ -95,11 +97,16 @@ font-weight:bold;
 margin-top:13px;
 }
 
+.primary:active{
+transform:scale(.98);
+}
+
 .switch{
 text-align:center;
 color:#635bff;
 margin-top:17px;
 cursor:pointer;
+font-size:16px;
 }
 
 .message{
@@ -107,6 +114,7 @@ text-align:center;
 margin-top:12px;
 color:#555;
 font-size:14px;
+line-height:1.4;
 }
 
 /* APP */
@@ -239,6 +247,7 @@ max-height:650px;
 object-fit:contain;
 background:#eee;
 display:block;
+cursor:pointer;
 }
 
 .caption{
@@ -259,10 +268,12 @@ padding:10px 3px;
 background:#fff;
 border-radius:10px;
 font-size:14px;
+min-width:0;
 }
 
-.action:hover{
-background:#f3f3f3;
+.action:active{
+background:#eee;
+transform:scale(.97);
 }
 
 .liked{
@@ -283,6 +294,7 @@ border-radius:10px;
 padding:8px 10px;
 margin-top:5px;
 font-size:14px;
+line-height:1.4;
 }
 
 .commentbox{
@@ -293,6 +305,7 @@ padding:6px 13px 13px;
 
 .commentbox input{
 margin:0;
+min-width:0;
 }
 
 .commentbox button{
@@ -320,6 +333,7 @@ border-bottom:1px solid #eee;
 
 .userinfo2{
 flex:1;
+min-width:0;
 }
 
 .followbtn{
@@ -431,9 +445,9 @@ color:#777;
 <body>
 
 
-<!-- ==================================================
+<!-- =========================
 AUTH
-================================================== -->
+========================= -->
 
 <div id="authPage" class="auth">
 
@@ -531,19 +545,14 @@ class="message">
 </div>
 
 
-<!-- ==================================================
+<!-- =========================
 APP
-================================================== -->
+========================= -->
 
 <div id="app" class="hidden">
 
-
 <div class="topbar">
-
-<div class="toplogo">
-PIXORO
-</div>
-
+<div class="toplogo">PIXORO</div>
 </div>
 
 
@@ -737,7 +746,6 @@ Logout
 
 </div>
 
-
 <div style="height:15px"></div>
 
 <div id="myPosts"></div>
@@ -758,7 +766,6 @@ Home
 
 </button>
 
-
 <button
 class="nav"
 data-page="search">
@@ -768,7 +775,6 @@ Search
 
 </button>
 
-
 <button
 class="nav"
 data-page="create">
@@ -777,7 +783,6 @@ data-page="create">
 Post
 
 </button>
-
 
 <button
 class="nav"
@@ -793,10 +798,6 @@ Profile
 </div>
 
 
-<!-- ==================================================
-SUPABASE
-================================================== -->
-
 <script type="module">
 
 import {
@@ -806,16 +807,15 @@ from
 "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 
-/* ==================================================
-SUPABASE CONFIG
-================================================== */
+/* =========================
+SUPABASE
+========================= */
 
 const SUPABASE_URL =
 "https://yecpltndhlzfjplzhcpm.supabase.co";
 
 const SUPABASE_KEY =
 "sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_";
-
 
 const supabase =
 createClient(
@@ -824,22 +824,18 @@ SUPABASE_KEY
 );
 
 
-/* ==================================================
+/* =========================
 VARIABLES
-================================================== */
+========================= */
 
 let currentUser = null;
-
 let currentProfile = null;
-
 let currentFilter = "none";
 
-let feedPosts = [];
 
-
-/* ==================================================
+/* =========================
 ELEMENTS
-================================================== */
+========================= */
 
 const authPage =
 document.getElementById("authPage");
@@ -857,21 +853,17 @@ const authMessage =
 document.getElementById("authMessage");
 
 
-/* ==================================================
+/* =========================
 AUTH SWITCH
-================================================== */
+========================= */
 
 document
 .getElementById("openSignup")
 .onclick = () => {
 
-loginBox
-.classList
-.add("hidden");
+loginBox.classList.add("hidden");
 
-signupBox
-.classList
-.remove("hidden");
+signupBox.classList.remove("hidden");
 
 authMessage.innerText = "";
 
@@ -882,22 +874,18 @@ document
 .getElementById("openLogin")
 .onclick = () => {
 
-signupBox
-.classList
-.add("hidden");
+signupBox.classList.add("hidden");
 
-loginBox
-.classList
-.remove("hidden");
+loginBox.classList.remove("hidden");
 
 authMessage.innerText = "";
 
 };
 
 
-/* ==================================================
-CREATE ACCOUNT
-================================================== */
+/* =========================
+SIGNUP
+========================= */
 
 document
 .getElementById("signupBtn")
@@ -930,12 +918,7 @@ document
 .value;
 
 
-if(
-!name ||
-!username ||
-!email ||
-!password
-){
+if(!name || !username || !email || !password){
 
 authMessage.innerText =
 "Please fill all fields.";
@@ -1034,9 +1017,7 @@ return;
 }
 
 
-/*
-Update profile created by trigger
-*/
+/* CREATE PROFILE */
 
 const {
 error:profileError
@@ -1058,7 +1039,10 @@ onConflict:"id"
 
 if(profileError){
 
-console.log(profileError);
+console.log(
+"Profile error:",
+profileError
+);
 
 }
 
@@ -1079,9 +1063,9 @@ supabaseError(error);
 };
 
 
-/* ==================================================
+/* =========================
 LOGIN
-================================================== */
+========================= */
 
 document
 .getElementById("loginBtn")
@@ -1144,13 +1128,10 @@ supabaseError(error);
 };
 
 
-/* ==================================================
+/* =========================
 AUTH STATE
-================================================== */
+========================= */
 
-const {
-data:authListener
-} =
 supabase.auth
 .onAuthStateChange(
 async(event,session)=>{
@@ -1174,13 +1155,12 @@ showAuth();
 
 }
 
-}
-);
+});
 
 
-/* ==================================================
-CHECK EXISTING SESSION
-================================================== */
+/* =========================
+INITIAL SESSION
+========================= */
 
 const {
 data:sessionData
@@ -1197,22 +1177,22 @@ await loadCurrentProfile();
 
 showApp();
 
+}else{
+
+showAuth();
+
 }
 
 
-/* ==================================================
+/* =========================
 SHOW APP
-================================================== */
+========================= */
 
 function showApp(){
 
-authPage
-.classList
-.add("hidden");
+authPage.classList.add("hidden");
 
-app
-.classList
-.remove("hidden");
+app.classList.remove("hidden");
 
 loadPublicPosts();
 
@@ -1221,26 +1201,22 @@ loadProfile();
 }
 
 
-/* ==================================================
+/* =========================
 SHOW AUTH
-================================================== */
+========================= */
 
 function showAuth(){
 
-authPage
-.classList
-.remove("hidden");
+authPage.classList.remove("hidden");
 
-app
-.classList
-.add("hidden");
+app.classList.add("hidden");
 
 }
 
 
-/* ==================================================
-LOAD PROFILE
-================================================== */
+/* =========================
+LOAD CURRENT PROFILE
+========================= */
 
 async function loadCurrentProfile(){
 
@@ -1256,7 +1232,7 @@ await supabase
 .from("profiles")
 .select("*")
 .eq("id",currentUser.id)
-.single();
+.maybeSingle();
 
 
 if(error){
@@ -1269,8 +1245,7 @@ id:currentUser.id,
 
 username:
 currentUser.email
-?.split("@")[0]
-||
+?.split("@")[0] ||
 "user",
 
 display_name:
@@ -1283,14 +1258,34 @@ return;
 }
 
 
+if(data){
+
 currentProfile = data;
+
+}else{
+
+currentProfile = {
+
+id:currentUser.id,
+
+username:
+currentUser.email
+?.split("@")[0] ||
+"user",
+
+display_name:
+"PIXORO User"
+
+};
+
+}
 
 }
 
 
-/* ==================================================
-IMAGE PREVIEW
-================================================== */
+/* =========================
+PHOTO PREVIEW
+========================= */
 
 document
 .getElementById("photoInput")
@@ -1313,8 +1308,7 @@ reader.onload =
 e=>{
 
 const preview =
-document
-.getElementById("preview");
+document.getElementById("preview");
 
 preview.src =
 e.target.result;
@@ -1322,22 +1316,19 @@ e.target.result;
 preview.style.filter =
 currentFilter;
 
-preview
-.classList
-.remove("hidden");
+preview.classList.remove("hidden");
 
 };
 
 
 reader.readAsDataURL(file);
 
-}
-);
+});
 
 
-/* ==================================================
+/* =========================
 FILTERS
-================================================== */
+========================= */
 
 document
 .querySelectorAll(".filter")
@@ -1347,19 +1338,14 @@ button.onclick = () => {
 
 document
 .querySelectorAll(".filter")
-.forEach(x=>
+.forEach(x =>
 x.classList.remove("active")
 );
 
-
-button
-.classList
-.add("active");
-
+button.classList.add("active");
 
 currentFilter =
 button.dataset.filter;
-
 
 document
 .getElementById("preview")
@@ -1371,9 +1357,9 @@ currentFilter;
 });
 
 
-/* ==================================================
+/* =========================
 PROCESS IMAGE
-================================================== */
+========================= */
 
 function processImage(file){
 
@@ -1419,11 +1405,8 @@ maxWidth;
 const canvas =
 document.createElement("canvas");
 
-canvas.width =
-width;
-
-canvas.height =
-height;
+canvas.width = width;
+canvas.height = height;
 
 
 const ctx =
@@ -1472,8 +1455,10 @@ new Error(
 };
 
 
-img.onerror =
-reject;
+img.onerror = () =>
+reject(
+new Error("Could not read image.")
+);
 
 img.src =
 e.target.result;
@@ -1481,8 +1466,10 @@ e.target.result;
 };
 
 
-reader.onerror =
-reject;
+reader.onerror = () =>
+reject(
+new Error("Could not read file.")
+);
 
 reader.readAsDataURL(file);
 
@@ -1491,9 +1478,9 @@ reader.readAsDataURL(file);
 }
 
 
-/* ==================================================
+/* =========================
 PUBLISH POST
-================================================== */
+========================= */
 
 document
 .getElementById("publishBtn")
@@ -1513,7 +1500,6 @@ const file =
 document
 .getElementById("photoInput")
 .files[0];
-
 
 const caption =
 document
@@ -1551,28 +1537,19 @@ message.innerText =
 
 
 const fileName =
-Date.now()
-+"_"
-+
+Date.now() +
+"_" +
 Math.random()
 .toString(36)
-.substring(2)
-+
+.substring(2) +
 ".jpg";
 
 
 const storagePath =
-currentUser.id
-+
-"/"
-+
+currentUser.id +
+"/" +
 fileName;
 
-
-/*
-Upload to existing bucket:
-Post-images
-*/
 
 const {
 error:uploadError
@@ -1600,7 +1577,9 @@ data:publicData
 supabase
 .storage
 .from("Post-images")
-.getPublicUrl(storagePath);
+.getPublicUrl(
+storagePath
+);
 
 
 const imageURL =
@@ -1649,7 +1628,6 @@ document
 .classList
 .add("hidden");
 
-
 currentFilter =
 "none";
 
@@ -1658,9 +1636,10 @@ document
 .querySelectorAll(".filter")
 .forEach(
 (x,i)=>
-x.classList
-.toggle("active",i===0)
-);
+x.classList.toggle(
+"active",
+i === 0
+));
 
 
 message.innerText =
@@ -1668,6 +1647,8 @@ message.innerText =
 
 
 await loadPublicPosts();
+
+await loadProfile();
 
 showPage("home");
 
@@ -1686,15 +1667,14 @@ supabaseError(error);
 };
 
 
-/* ==================================================
+/* =========================
 LOAD PUBLIC POSTS
-================================================== */
+========================= */
 
 async function loadPublicPosts(){
 
 const feed =
-document
-.getElementById("feed");
+document.getElementById("feed");
 
 
 feed.innerHTML =
@@ -1740,9 +1720,6 @@ return;
 }
 
 
-feedPosts = posts;
-
-
 feed.innerHTML = "";
 
 
@@ -1778,16 +1755,15 @@ supabaseError(error)
 }
 
 
-/* ==================================================
+/* =========================
 CREATE POST HTML
-================================================== */
+========================= */
 
 async function createPostHTML(post){
 
 /* PROFILE */
 
 let profile = null;
-
 
 const {
 data:profileData
@@ -1798,16 +1774,15 @@ await supabase
 .eq("id",post.user_id)
 .maybeSingle();
 
-
 profile =
-profileData ||
-{};
+profileData || {};
 
 
 /* LIKES */
 
 const {
-data:likesData
+data:likesData,
+error:likesError
 } =
 await supabase
 .from("likes")
@@ -1815,21 +1790,28 @@ await supabase
 .eq("post_id",post.id);
 
 
+if(likesError)
+console.error("Likes:",likesError);
+
+
 const likes =
 likesData || [];
 
 
 const liked =
-currentUser &&
+!!currentUser &&
 likes.some(
-x=>x.user_id===currentUser.id
+x =>
+String(x.user_id) ===
+String(currentUser.id)
 );
 
 
 /* SAVES */
 
 const {
-data:savesData
+data:savesData,
+error:savesError
 } =
 await supabase
 .from("saves")
@@ -1837,21 +1819,28 @@ await supabase
 .eq("post_id",post.id);
 
 
+if(savesError)
+console.error("Saves:",savesError);
+
+
 const saves =
 savesData || [];
 
 
 const saved =
-currentUser &&
+!!currentUser &&
 saves.some(
-x=>x.user_id===currentUser.id
+x =>
+String(x.user_id) ===
+String(currentUser.id)
 );
 
 
 /* COMMENTS */
 
 const {
-data:commentsData
+data:commentsData,
+error:commentsError
 } =
 await supabase
 .from("comments")
@@ -1862,6 +1851,13 @@ await supabase
 {
 ascending:true
 }
+);
+
+
+if(commentsError)
+console.error(
+"Comments:",
+commentsError
 );
 
 
@@ -1880,8 +1876,7 @@ if(post.created_at){
 date =
 new Date(
 post.created_at
-)
-.toLocaleString();
+).toLocaleString();
 
 }
 
@@ -1892,11 +1887,9 @@ const username =
 profile.username ||
 "user";
 
-
 const name =
 profile.display_name ||
 "PIXORO User";
-
 
 const letter =
 name
@@ -1904,14 +1897,15 @@ name
 .toUpperCase();
 
 
-/* OWN POST */
+/* OWN */
 
 const own =
-currentUser &&
-post.user_id === currentUser.id;
+!!currentUser &&
+String(post.user_id) ===
+String(currentUser.id);
 
 
-/* COMMENTS HTML */
+/* COMMENTS */
 
 let commentsHTML = "";
 
@@ -1942,11 +1936,21 @@ comment.comment ||
 });
 
 
+/*
+IMPORTANT:
+JSON.stringify(post.id)
+makes UUID and number IDs safe.
+*/
+
+const safePostId =
+JSON.stringify(post.id);
+
+
 return `
 
 <div
 class="post"
-data-post-id="${post.id}"
+data-post-id="${escapeHTML(post.id)}"
 >
 
 <div class="posthead">
@@ -1954,7 +1958,6 @@ data-post-id="${post.id}"
 <div class="avatar">
 ${escapeHTML(letter)}
 </div>
-
 
 <div class="userinfo">
 
@@ -1968,15 +1971,13 @@ ${escapeHTML(date)}
 
 </div>
 
-
 ${
 own
 ?
 `
 <button
 class="deletebtn"
-onclick=
-"window.deletePost(${post.id})">
+onclick="window.deletePost(${safePostId})">
 Delete
 </button>
 `
@@ -1991,8 +1992,7 @@ Delete
 class="postimage"
 src="${escapeHTML(post.image_url)}"
 loading="lazy"
-onclick=
-"window.viewPost(${post.id})"
+onclick="window.viewPost(${safePostId})"
 >
 
 
@@ -2011,87 +2011,56 @@ ${escapeHTML(post.caption)}
 
 <div class="actions">
 
-
 <button
-class=
-"action ${liked?"liked":""}"
-onclick=
-"window.likePost(
-${post.id},
-${liked}
-)"
+class="action ${liked ? "liked" : ""}"
+onclick="window.likePost(${safePostId},${liked})"
 >
-
-${liked?"❤️":"♡"}
+${liked ? "❤️" : "♡"}
 ${likes.length}
-
 </button>
 
 
 <button
 class="action"
-onclick=
-"window.focusComment(
-${post.id}
-)"
+onclick="window.focusComment(${safePostId})"
 >
-
 💬
 ${comments.length}
-
 </button>
 
 
 <button
 class="action"
-onclick=
-"window.sharePost(
-${post.id}
-)"
+onclick="window.sharePost(${safePostId})"
 >
-
 ↗ Share
-
 </button>
 
 
 <button
-class=
-"action ${saved?"saved":""}"
-onclick=
-"window.savePost(
-${post.id},
-${saved}
-)"
+class="action ${saved ? "saved" : ""}"
+onclick="window.savePost(${safePostId},${saved})"
 >
-
-${saved?"🔖":"☆"}
-
+${saved ? "🔖" : "☆"}
 </button>
-
 
 </div>
 
 
 <div class="comments">
-
 ${commentsHTML}
-
 </div>
 
 
 <div class="commentbox">
 
 <input
-id="comment-${post.id}"
+id="comment-${escapeHTML(post.id)}"
 placeholder="Write a comment..."
 >
 
 <button
-onclick=
-"window.addComment(
-${post.id}
-)"
+onclick="window.addComment(${safePostId})"
 >
 Send
 </button>
@@ -2105,9 +2074,9 @@ Send
 }
 
 
-/* ==================================================
+/* =========================
 LIKE
-================================================== */
+========================= */
 
 window.likePost =
 async(
@@ -2143,10 +2112,8 @@ postId
 currentUser.id
 );
 
-
 if(error)
 throw error;
-
 
 }else{
 
@@ -2165,7 +2132,6 @@ currentUser.id
 
 });
 
-
 if(error)
 throw error;
 
@@ -2180,6 +2146,7 @@ await loadPublicPosts();
 console.error(error);
 
 alert(
+"Like error: " +
 supabaseError(error)
 );
 
@@ -2188,9 +2155,9 @@ supabaseError(error)
 };
 
 
-/* ==================================================
+/* =========================
 SAVE
-================================================== */
+========================= */
 
 window.savePost =
 async(
@@ -2226,10 +2193,8 @@ postId
 currentUser.id
 );
 
-
 if(error)
 throw error;
-
 
 }else{
 
@@ -2248,7 +2213,6 @@ currentUser.id
 
 });
 
-
 if(error)
 throw error;
 
@@ -2263,6 +2227,7 @@ await loadPublicPosts();
 console.error(error);
 
 alert(
+"Save error: " +
 supabaseError(error)
 );
 
@@ -2271,9 +2236,9 @@ supabaseError(error)
 };
 
 
-/* ==================================================
+/* =========================
 COMMENT
-================================================== */
+========================= */
 
 window.addComment =
 async postId=>{
@@ -2288,16 +2253,22 @@ return;
 
 
 const input =
-document
-.getElementById(
-"comment-"+postId
+document.getElementById(
+"comment-" + postId
 );
 
 
+if(!input){
+
+alert("Comment box not found.");
+
+return;
+
+}
+
+
 const text =
-input
-.value
-.trim();
+input.value.trim();
 
 
 if(!text)
@@ -2331,7 +2302,6 @@ throw error;
 
 input.value = "";
 
-
 await loadPublicPosts();
 
 
@@ -2340,6 +2310,7 @@ await loadPublicPosts();
 console.error(error);
 
 alert(
+"Comment error: " +
 supabaseError(error)
 );
 
@@ -2348,17 +2319,16 @@ supabaseError(error)
 };
 
 
-/* ==================================================
+/* =========================
 FOCUS COMMENT
-================================================== */
+========================= */
 
 window.focusComment =
 postId=>{
 
 const input =
-document
-.getElementById(
-"comment-"+postId
+document.getElementById(
+"comment-" + postId
 );
 
 
@@ -2366,14 +2336,19 @@ if(input){
 
 input.focus();
 
+input.scrollIntoView({
+behavior:"smooth",
+block:"center"
+});
+
 }
 
 };
 
 
-/* ==================================================
+/* =========================
 VIEW
-================================================== */
+========================= */
 
 window.viewPost =
 async postId=>{
@@ -2384,12 +2359,9 @@ return;
 
 try{
 
-/*
-Avoid counting same user repeatedly
-*/
-
 const {
-data:existing
+data:existing,
+error:checkError
 } =
 await supabase
 .from("views")
@@ -2405,10 +2377,25 @@ currentUser.id
 .limit(1);
 
 
+if(checkError){
+
+console.log(
+"View check:",
+checkError
+);
+
+return;
+
+}
+
+
 if(existing && existing.length)
 return;
 
 
+const {
+error
+} =
 await supabase
 .from("views")
 .insert({
@@ -2422,6 +2409,15 @@ currentUser.id
 });
 
 
+if(error){
+
+console.log(
+"View insert:",
+error
+);
+
+}
+
 }catch(error){
 
 console.log(
@@ -2434,9 +2430,9 @@ error
 };
 
 
-/* ==================================================
+/* =========================
 SHARE
-================================================== */
+========================= */
 
 window.sharePost =
 async postId=>{
@@ -2445,7 +2441,7 @@ const url =
 location.origin +
 location.pathname +
 "?post=" +
-postId;
+encodeURIComponent(postId);
 
 
 try{
@@ -2464,30 +2460,59 @@ url:url
 
 });
 
-}else{
-
-await navigator
-.clipboard
-.writeText(url);
-
-alert(
-"Post link copied!"
-);
+return;
 
 }
 
+
+/* Clipboard */
+
+if(
+navigator.clipboard &&
+navigator.clipboard.writeText
+){
+
+await navigator.clipboard.writeText(url);
+
+alert("Post link copied!");
+
+return;
+
+}
+
+
+/* OLD BROWSER FALLBACK */
+
+const temp =
+document.createElement("input");
+
+temp.value = url;
+
+document.body.appendChild(temp);
+
+temp.select();
+
+document.execCommand("copy");
+
+temp.remove();
+
+alert("Post link copied!");
+
 }catch(error){
 
-console.log(error);
+console.log(
+"Share error:",
+error
+);
 
 }
 
 };
 
 
-/* ==================================================
+/* =========================
 DELETE POST
-================================================== */
+========================= */
 
 window.deletePost =
 async postId=>{
@@ -2508,8 +2533,6 @@ return;
 
 try{
 
-/* GET POST */
-
 const {
 data:post,
 error:getError
@@ -2518,16 +2541,25 @@ await supabase
 .from("posts")
 .select("*")
 .eq("id",postId)
-.single();
+.maybeSingle();
 
 
 if(getError)
 throw getError;
 
 
+if(!post){
+
+alert("Post not found.");
+
+return;
+
+}
+
+
 if(
-post.user_id !==
-currentUser.id
+String(post.user_id) !==
+String(currentUser.id)
 ){
 
 alert(
@@ -2539,7 +2571,7 @@ return;
 }
 
 
-/* DELETE STORAGE IMAGE */
+/* STORAGE */
 
 if(post.image_url){
 
@@ -2565,17 +2597,27 @@ index + marker.length
 );
 
 
+const {
+error:storageError
+} =
 await supabase
 .storage
 .from("Post-images")
 .remove([path]);
+
+
+if(storageError)
+console.log(
+"Storage delete:",
+storageError
+);
 
 }
 
 }catch(storageError){
 
 console.log(
-"Storage delete skipped:",
+"Storage skipped:",
 storageError
 );
 
@@ -2584,7 +2626,7 @@ storageError
 }
 
 
-/* DELETE RELATED DATA */
+/* RELATED */
 
 await supabase
 .from("likes")
@@ -2594,7 +2636,6 @@ await supabase
 postId
 );
 
-
 await supabase
 .from("comments")
 .delete()
@@ -2603,7 +2644,6 @@ await supabase
 postId
 );
 
-
 await supabase
 .from("saves")
 .delete()
@@ -2611,7 +2651,6 @@ await supabase
 "post_id",
 postId
 );
-
 
 await supabase
 .from("views")
@@ -2622,7 +2661,7 @@ postId
 );
 
 
-/* DELETE POST */
+/* POST */
 
 const {
 error:deleteError
@@ -2654,6 +2693,7 @@ await loadProfile();
 console.error(error);
 
 alert(
+"Delete error: " +
 supabaseError(error)
 );
 
@@ -2662,9 +2702,9 @@ supabaseError(error)
 };
 
 
-/* ==================================================
-SEARCH USERS
-================================================== */
+/* =========================
+SEARCH
+========================= */
 
 document
 .getElementById("searchInput")
@@ -2685,8 +2725,7 @@ document
 
 
 const resultBox =
-document
-.getElementById(
+document.getElementById(
 "searchResults"
 );
 
@@ -2725,10 +2764,10 @@ let html = "";
 
 for(const u of users || []){
 
-
 if(
 currentUser &&
-u.id === currentUser.id
+String(u.id) ===
+String(currentUser.id)
 ){
 
 continue;
@@ -2736,10 +2775,11 @@ continue;
 }
 
 
-/* FOLLOW STATUS */
+/* FOLLOW */
 
 const {
-data:followData
+data:followData,
+error:followError
 } =
 await supabase
 .from("follows")
@@ -2755,15 +2795,23 @@ u.id
 .limit(1);
 
 
+if(followError)
+console.log(
+"Follow check:",
+followError
+);
+
+
 const isFollowing =
-followData &&
+!!followData &&
 followData.length > 0;
 
 
-/* FOLLOWER COUNT */
+/* FOLLOWERS */
 
 const {
-count
+count,
+error:countError
 } =
 await supabase
 .from("follows")
@@ -2780,6 +2828,17 @@ u.id
 );
 
 
+if(countError)
+console.log(
+"Follower count:",
+countError
+);
+
+
+const safeUid =
+JSON.stringify(u.id);
+
+
 html +=
 `
 
@@ -2788,7 +2847,7 @@ html +=
 <div class="avatar">
 
 ${escapeHTML(
-(u.display_name||"P")
+(u.display_name || "P")
 .charAt(0)
 .toUpperCase()
 )}
@@ -2813,21 +2872,15 @@ u.username ||
 </div>
 
 <small>
-${count || 0}
-followers
+${count || 0} followers
 </small>
 
 </div>
 
 
 <button
-class=
-"followbtn ${isFollowing?"following":""}"
-onclick=
-"window.followUser(
-'${u.id}',
-${isFollowing}
-)"
+class="followbtn ${isFollowing ? "following" : ""}"
+onclick="window.followUser(${safeUid},${isFollowing})"
 >
 
 ${
@@ -2864,9 +2917,9 @@ supabaseError(error);
 }
 
 
-/* ==================================================
-FOLLOW / UNFOLLOW
-================================================== */
+/* =========================
+FOLLOW
+========================= */
 
 window.followUser =
 async(
@@ -2876,6 +2929,18 @@ isFollowing
 
 if(!currentUser)
 return;
+
+
+if(
+String(targetUid) ===
+String(currentUser.id)
+){
+
+alert("You cannot follow yourself.");
+
+return;
+
+}
 
 
 try{
@@ -2900,7 +2965,6 @@ targetUid
 
 if(error)
 throw error;
-
 
 }else{
 
@@ -2936,6 +3000,7 @@ await loadProfile();
 console.error(error);
 
 alert(
+"Follow error: " +
 supabaseError(error)
 );
 
@@ -2944,9 +3009,9 @@ supabaseError(error)
 };
 
 
-/* ==================================================
+/* =========================
 PROFILE
-================================================== */
+========================= */
 
 async function loadProfile(){
 
@@ -2992,7 +3057,8 @@ u.display_name ||
 /* FOLLOWERS */
 
 const {
-count:followersCount
+count:followersCount,
+error:followersError
 } =
 await supabase
 .from("follows")
@@ -3009,10 +3075,18 @@ currentUser.id
 );
 
 
+if(followersError)
+console.log(
+"Followers:",
+followersError
+);
+
+
 /* FOLLOWING */
 
 const {
-count:followingCount
+count:followingCount,
+error:followingError
 } =
 await supabase
 .from("follows")
@@ -3026,6 +3100,13 @@ head:true
 .eq(
 "follower_id",
 currentUser.id
+);
+
+
+if(followingError)
+console.log(
+"Following:",
+followingError
 );
 
 
@@ -3078,8 +3159,9 @@ followingCount || 0;
 
 
 const box =
-document
-.getElementById("myPosts");
+document.getElementById(
+"myPosts"
+);
 
 
 box.innerHTML = "";
@@ -3114,9 +3196,9 @@ html
 }
 
 
-/* ==================================================
+/* =========================
 NAVIGATION
-================================================== */
+========================= */
 
 document
 .querySelectorAll(".nav")
@@ -3162,6 +3244,8 @@ document
 .getElementById("homePage")
 .classList
 .remove("hidden");
+
+loadPublicPosts();
 
 }
 
@@ -3212,9 +3296,9 @@ button.dataset.page === page
 }
 
 
-/* ==================================================
+/* =========================
 LOGOUT
-================================================== */
+========================= */
 
 document
 .getElementById("logoutBtn")
@@ -3236,40 +3320,25 @@ supabaseError(error)
 };
 
 
-/* ==================================================
+/* =========================
 ESCAPE HTML
-================================================== */
+========================= */
 
 function escapeHTML(value){
 
 return String(value ?? "")
-.replace(
-/&/g,
-"&amp;"
-)
-.replace(
-/</g,
-"&lt;"
-)
-.replace(
-/>/g,
-"&gt;"
-)
-.replace(
-/"/g,
-"&quot;"
-)
-.replace(
-/'/g,
-"&#039;"
-);
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 
 }
 
 
-/* ==================================================
-SUPABASE ERROR
-================================================== */
+/* =========================
+ERROR
+========================= */
 
 function supabaseError(error){
 
@@ -3277,16 +3346,17 @@ const message =
 error?.message ||
 "";
 
-
 const code =
 error?.code ||
 "";
 
+const lower =
+message.toLowerCase();
+
 
 if(
-message
-.toLowerCase()
-.includes("invalid login")
+lower.includes("invalid login") ||
+lower.includes("invalid credentials")
 ){
 
 return "Wrong email or password.";
@@ -3295,9 +3365,7 @@ return "Wrong email or password.";
 
 
 if(
-message
-.toLowerCase()
-.includes("email not confirmed")
+lower.includes("email not confirmed")
 ){
 
 return "Please confirm your email first.";
@@ -3306,9 +3374,7 @@ return "Please confirm your email first.";
 
 
 if(
-message
-.toLowerCase()
-.includes("already registered")
+lower.includes("already registered")
 ){
 
 return "This email is already registered.";
@@ -3317,27 +3383,19 @@ return "This email is already registered.";
 
 
 if(
-message
-.toLowerCase()
-.includes("password")
-){
-
-return message;
-
-}
-
-
-if(
+lower.includes("duplicate")
+||
 code === "23505"
 ){
 
-return "This username is already taken.";
+return "This item already exists.";
 
 }
 
 
 if(
-code === "42501"
+code === "42501" ||
+lower.includes("row-level security")
 ){
 
 return "Permission denied. Check Supabase RLS policies.";
@@ -3346,23 +3404,22 @@ return "Permission denied. Check Supabase RLS policies.";
 
 
 if(
-message
-.toLowerCase()
-.includes("row-level security")
+lower.includes("bucket")
+||
+lower.includes("storage")
 ){
 
-return "Permission denied. Check Supabase RLS policies.";
+return "Storage error. Check Post-images bucket and Storage policies.";
 
 }
 
 
 if(
-message
-.toLowerCase()
-.includes("bucket")
+lower.includes("relation") &&
+lower.includes("does not exist")
 ){
 
-return "Storage error. Check the Post-images bucket and Storage policies.";
+return "Database table is missing. Check your Supabase tables.";
 
 }
 
