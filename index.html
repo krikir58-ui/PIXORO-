@@ -1339,7 +1339,10 @@ async function saveProfile(){
       .value
       .trim();
 
-
+const is_private = 
+    document
+      .getElementById("editPrivate")
+      .checked;
   if(!name || !username){
 
     alert(
@@ -1355,23 +1358,18 @@ async function saveProfile(){
     error
   } =
   await db
-    .from("profiles")
-    .update({
-
-      name:name,
-
-      username:username,
-
-      avatar_url:avatar_url,
-
-      bio:bio
-
-    })
-    .eq(
-      "id",
-      currentUser.id
-    );
-
+  .from("profiles")
+  .update({
+        name:name,
+        username:username,
+        avatar_url:avatar_url,
+        bio:bio,
+        is_private:is_private
+      })
+      .eq(
+        "id",
+        currentUser.id
+      );
 
   if(error){
 
