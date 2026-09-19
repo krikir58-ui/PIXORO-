@@ -1770,7 +1770,7 @@ async function renderPost(
 
   card.innerHTML = `
 
-    <div class="profile-head">
+    <div class="profile-head" onclick="openUserProfile('${post.user_id}')" style="cursor:pointer;">
 
       <img
         class="avatar"
@@ -2428,11 +2428,24 @@ async function isFollowing(
 
 }
 
+async function openUserProfile(userId) {
+  if (!userId) return;
+  if (userId === currentUser.id) {
+    showPage('profile');
+    return;
+  }
+  window.viewingUserId = userId;
+  showPage('user');
+  // Oru vela 'user' page name 'user-profile' na itha use pannu
+  // showPage('user-profile');
+  
+  // Profile load pannu - un code la enna function irukku nu try pannu
+  if (typeof loadUserPage === 'function') {
+    await loadUserPage(userId);
+  }
+}
 
 async function toggleFollow(
-  userId,
-  button
-){
 
   const following =
     await isFollowing(
