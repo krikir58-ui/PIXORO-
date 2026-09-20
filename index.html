@@ -1,114 +1,180 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIXORO - from GIRI</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-body{background:#fafafa}
-.header{position:sticky;top:0;background:#fff;border-bottom:1px solid #dbdbdb;padding:12px;display:flex;justify-content:space-between;z-index:100}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,sans-serif}
+body{background:#fafafa;padding-bottom:70px}
+.header{position:sticky;top:0;background:#fff;border-bottom:1px solid #dbdbdb;padding:12px 16px;display:flex;justify-content:space-between;z-index:90}
 .logo{font-weight:900;font-size:24px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.authBox{background:#fff;border:1px solid #dbdbdb;padding:30px 20px;border-radius:8px;width:350px;text-align:center}
+.post{max-width:470px;margin:0 auto 12px;background:#fff;border:1px solid #dbdbdb;border-radius:8px;overflow:hidden}
+.post img{width:100%;display:block;aspect-ratio:1/1;object-fit:cover;background:#eee}
+.post-header{padding:10px;display:flex;justify-content:space-between;font-weight:600;font-size:14px}
+.post-actions{padding:10px;display:flex;gap:16px;font-size:22px}
+.post-actions i{cursor:pointer}
+#authPage{min-height:100vh;display:flex;justify-content:center;align-items:center}
+.authBox{width:350px;background:#fff;border:1px solid #dbdbdb;padding:30px 20px;border-radius:8px;text-align:center}
 .authBox input{width:100%;padding:10px;margin:6px 0;border:1px solid #dbdbdb;border-radius:4px}
-.authBox button{width:100%;padding:10px;background:#0095f6;color:#fff;border:none;border-radius:8px;margin-top:8px}
-.post{background:#fff;border:1px solid #dbdbdb;max-width:470px;margin:12px auto;border-radius:8px;overflow:hidden}
-.post img{width:100%}
-.actions{display:flex;gap:16px;padding:10px;font-size:20px}
-#splash{position:fixed;inset:0;background:#fff;z-index:99999;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:60px 0 40px;transition:opacity .6s}
+.authBox button{width:100%;padding:10px;background:#0095f6;color:#fff;border:none;border-radius:8px;font-weight:600;margin-top:8px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center;z-index:1000}
+.modal.active{display:flex}
+.modalBox{background:#fff;border-radius:12px;width:90%;max-width:400px;padding:20px}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #dbdbdb;display:flex;justify-content:space-around;padding:12px 0 18px;z-index:90}
+.bottom-nav i{font-size:24px;cursor:pointer}
+.bottom-sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;align-items:flex-end}
+.bottom-sheet.active{display:flex}
+.sheet-box{background:#1e1e1e;width:100%;border-radius:20px 20px 0 0;padding:20px 20px 40px;color:#fff}
+.sheet-option{display:flex;align-items:center;gap:15px;padding:16px 10px;border-bottom:1px solid #333;font-weight:600;cursor:pointer}
+.sheet-tabs{display:flex;justify-content:space-around;background:#2a2a2a;border-radius:30px;padding:10px;margin-top:20px}
+.sheet-tabs span{padding:8px 16px;border-radius:20px;color:#888;font-weight:700;cursor:pointer}
+.sheet-tabs span.active{background:#fff;color:#000}
+#splash{position:fixed;inset:0;background:#fff;z-index:99999;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:70px 0 45px;transition:opacity .7s}
 #splash.hide{opacity:0;pointer-events:none}
-.splash-from{text-align:center;color:#666;font-size:14px}
-.splash-from b{color:#ff004f;font-weight:800;font-size:18px}
 </style>
 </head>
 <body>
 <div id="splash">
-  <div></div>
-  <div style="flex:1;display:flex;align-items:center;justify-content:center;text-align:center">
-    <div><div style="font-size:90px">📸</div><div style="font-weight:900;font-size:32px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent">PIXORO</div></div>
-  </div>
-  <div class="splash-from">from<br><b>∞ GIRI</b></div>
-</div>
-<!-- LOGIN PAGE -->
-<div id="authPage" style="display:flex;justify-content:center;align-items:center;min-height:100vh">
-  <div class="authBox">
-    <h1 style="font-weight:900;font-size:28px;margin-bottom:20px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent">PIXORO</h1>
-    <input id="email" type="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
-    <button onclick="login()">Log In</button>
-    <button onclick="signup()" style="background:#fff;color:#000;border:1px solid #dbdbdb">Sign Up</button>
-  </div>
+<div></div>
+<div style="text-align:center"><div style="font-size:100px">📸</div><div style="font-weight:900;font-size:36px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent">PIXORO</div></div>
+<div style="text-align:center"><div style="color:#9ca3af;font-size:12px">from</div><div style="font-weight:900;color:#ff004f;font-size:20px">∞ GIRI</div></div>
 </div>
 
-<!-- MAIN PAGE -->
+<div id="authPage">
+<div class="authBox">
+<h1 style="font-weight:900;font-size:32px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:15px">PIXORO</h1>
+<input id="email" placeholder="Email"><input id="password" type="password" placeholder="Password">
+<button onclick="login()">Log In</button>
+<button onclick="signup()" style="background:#fff;color:#000;border:1px solid #dbdbdb">Sign Up</button>
+</div>
+</div>
+
 <div id="mainPage" style="display:none">
-  <div class="header">
-    <div class="logo">PIXORO</div>
-    <button onclick="logout()" style="padding:6px 12px;border:1px solid #dbdbdb;background:#fff;border-radius:6px">Logout</button>
-  </div>
-  <div id="posts" style="padding-bottom:20px"></div>
+<div class="header"><div class="logo">PIXORO</div><div style="display:flex;gap:12px;font-size:20px"><i class="fa-regular fa-heart"></i><i class="fa-solid fa-right-from-bracket" onclick="logout()"></i></div></div>
+<div id="posts"></div>
+<div class="bottom-nav">
+<i class="fa-solid fa-house"></i><i class="fa-solid fa-magnifying-glass"></i><i class="fa-regular fa-square-plus" onclick="openBottomSheet()"></i><i class="fa-solid fa-clapperboard"></i><i class="fa-regular fa-user"></i>
+</div>
+</div>
+<!-- CREATE POST MODAL -->
+<div id="createModal" class="modal">
+<div class="modalBox">
+<h3 style="margin-bottom:12px">Create New</h3>
+<input id="postImage" placeholder="Image / Video URL podu da Giri" style="width:100%;padding:10px;border:1px solid #dbdbdb;border-radius:8px;margin-bottom:8px">
+<input id="postCaption" placeholder="Caption..." style="width:100%;padding:10px;border:1px solid #dbdbdb;border-radius:8px">
+<button id="systemBtn" onclick="toggleSystemFilter()" style="width:100%;padding:10px;background:#fff;color:#000;border:2px dashed #ff004f;border-radius:8px;margin-top:10px;font-weight:800">⚡ SYSTEM SETHU</button>
+<button onclick="createPost()" style="width:100%;padding:10px;background:#0095f6;color:#fff;border:none;border-radius:8px;margin-top:10px;font-weight:600">Share</button>
+<button onclick="closeCreate()" style="width:100%;padding:10px;background:#fff;border:1px solid #dbdbdb;border-radius:8px;margin-top:8px">Cancel</button>
+</div>
 </div>
 
+<!-- COMMENT MODAL -->
+<div id="commentModal" class="modal">
+<div class="modalBox">
+<h3>Comments</h3><div id="commentList" style="margin:12px 0;max-height:300px;overflow:auto;color:#666">No comments yet</div>
+<div style="display:flex;gap:8px"><input id="commentInput" placeholder="Add comment..." style="flex:1;padding:10px;border:1px solid #dbdbdb;border-radius:20px"><button onclick="addComment()" style="padding:10px 16px;background:#0095f6;color:#fff;border:none;border-radius:20px">Post</button></div>
+<button onclick="closeComment()" style="width:100%;margin-top:10px;padding:8px;background:#fff;border:1px solid #dbdbdb;border-radius:8px">Close</button>
+</div>
+</div>
+
+<!-- INSTAGRAM LIKE BOTTOM SHEET - + CLICK -->
+<div id="bottomSheet" class="bottom-sheet" onclick="closeBottomSheet()">
+<div class="sheet-box" onclick="event.stopPropagation()">
+<div style="width:40px;height:4px;background:#555;border-radius:10px;margin:0 auto 20px"></div>
+<div class="sheet-option" onclick="handleCreate('POST')"><i class="fa-regular fa-square"></i> POST <span style="margin-left:auto">▸</span></div>
+<div class="sheet-option" onclick="handleCreate('STORY')"><i class="fa-solid fa-circle-plus"></i> STORY</div>
+<div class="sheet-option" onclick="handleCreate('REEL')"><i class="fa-solid fa-clapperboard"></i> REEL</div>
+<div class="sheet-option" onclick="handleCreate('LIVE')"><i class="fa-solid fa-video" style="color:#ff3040"></i> LIVE</div>
+<div class="sheet-option" onclick="handleCreate('SYSTEM')" style="color:#ff2e88"><i class="fa-solid fa-bolt"></i> SYSTEM SETHU <span style="margin-left:auto;background:#ff004f;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px">NEW 🔥</span></div>
+<div class="sheet-tabs"><span>POST</span><span>STORY</span><span class="active">REEL</span><span>LIVE</span></div>
+</div>
+</div>
 <script>
 const SUPABASE_URL = "https://rrjrmvdvyqvtjdwdhmsd.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyanJtdmR2eXF2dGpkd2RobXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODk3OTYsImV4cCI6MjA3Mzg2NTc5Nn0.8x3d6ry3N5XhKj7pE9g0Qz6JkL2mN4bV7cX1yZ3aB9dE";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const supa = supabaseClient;
-let currentUser = null;
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyanJtdmR2eXF2dGpkd2RobXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODk3OTYsImV4cCI6MjA3Mzg2NTc5Nn0.o3J4YjRjK3a8v5b9c2d1e6f7g8h9i0j1k2l3m4n5o6p";
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let currentUser=null; let currentPostId=null; let glitchMode=false;
 
-// Splash 2.5 sec la maraiyum
-setTimeout(()=>{document.getElementById('splash').classList.add('hide')},2500);
+// Splash 2.6 sec
+setTimeout(()=>{document.getElementById('splash')?.classList.add('hide')},2600);
 
-async function signup(){
-  const {data,error}=await supa.auth.signUp({email:email.value,password:password.value});
-  if(error) alert(error.message); else alert("Email check pannu da Giri!");
-}
-async function login(){
-  const {data,error}=await supa.auth.signInWithPassword({email:email.value,password:password.value});
-  if(error) alert(error.message); else {currentUser=data.user; showMain();}
-}
-function showMain(){
-  document.getElementById('authPage').style.display='none';
-  document.getElementById('mainPage').style.display='block';
-  loadPosts();
-}
-  async function loadPosts(){
-  const {data}=await supa.from('posts').select('*').order('id',{ascending:false});
-  if(!data || data.length==0){
-    posts.innerHTML='<p style="text-align:center;margin-top:30px;color:#999">No posts da Giri! First post podu!</p>';
-    return;
-  }
-  posts.innerHTML=data.map(p=>`
-    <div class="post">
-      <div style="padding:10px;font-weight:600">📸 ${p.username||'giri'}</div>
-      <img src="${p.image_url}" loading="lazy">
-      <div class="actions">
-        <span onclick="likePost('${p.id}',${p.likes||0})">❤️ ${p.likes||0}</span>
-        <span>💬</span>
-        <span onclick="navigator.clipboard.writeText('${p.image_url}')">↗️</span>
-      </div>
-      <div style="padding:0 12px 12px;font-size:14px"><b>${p.username||'giri'}</b> ${p.caption||''}</div>
-    </div>
-  `).join('');
+// Bottom Sheet
+function openBottomSheet(){document.getElementById('bottomSheet').classList.add('active')}
+function closeBottomSheet(){document.getElementById('bottomSheet').classList.remove('active')}
+function handleCreate(type){
+ closeBottomSheet();
+ if(type==='POST') openCreate();
+ if(type==='STORY'){ alert("📸 STORY coming soon da Giri!"); openCreate(); }
+ if(type==='REEL'){
+   const url=prompt("REEL Video URL podu da:");
+   if(url){ supa.from('posts').insert({image_url:url,caption:"🔥 REEL • from GIRI",username:currentUser.email.split('@')[0],user_id:currentUser.id,likes:0}).then(()=>loadPosts()); }
+ }
+ if(type==='LIVE'){ alert("🔴 LIVE soon da!"); }
+ if(type==='SYSTEM'){ glitchMode=true; const b=document.getElementById('systemBtn'); b.style.background='#ff004f'; b.style.color='#fff'; b.innerHTML='🔥 SYSTEM ON'; openCreate(); alert("⚡ SYSTEM SETHU ON da!"); }
 }
 
-async function likePost(id,likes){
-  await supa.from('posts').update({likes:likes+1}).eq('id',id);
-  loadPosts();
+function openCreate(){document.getElementById('createModal').classList.add('active')}
+function closeCreate(){document.getElementById('createModal').classList.remove('active');}
+function openComment(id){currentPostId=id; document.getElementById('commentModal').classList.add('active'); loadComments();}
+function closeComment(){document.getElementById('commentModal').classList.remove('active');}
+
+function toggleSystemFilter(){
+ glitchMode=!glitchMode;
+ const btn=document.getElementById('systemBtn');
+ if(glitchMode){btn.style.background='#ff004f'; btn.style.color='#fff'; btn.innerHTML='🔥 SYSTEM ON';}
+ else{btn.style.background='#fff'; btn.style.color='#000'; btn.innerHTML='⚡ SYSTEM SETHU';}
 }
 
-async function logout(){
-  await supa.auth.signOut();
-  location.reload();
+async function applySystemGlitch(url){
+ return new Promise((resolve)=>{
+   const img=new Image(); img.crossOrigin="anonymous";
+   img.onload=()=>{
+     const c=document.createElement('canvas'); c.width=img.width; c.height=img.height;
+     const ctx=c.getContext('2d'); ctx.drawImage(img,0,0);
+     const id=ctx.getImageData(0,0,c.width,c.height); const d=id.data;
+     for(let y=0;y<c.height;y+=3){
+       if(Math.random()>0.6){
+         let shift=(Math.random()*30|0)-15;
+         for(let x=0;x<c.width;x++){ let i=(y*c.width+x)*4; let j=(y*c.width+Math.max(0,Math.min(c.width-1,x+shift)))*4; d[i]=d[j]; d[i+1]=d[j+1]; d[i+2]=d[j+2]; if(Math.random()>0.97){d[i]=255*Math.random(); d[i+1]=255*Math.random(); d[i+2]=255*Math.random();}}
+       }
+       if(Math.random()>0.88){ ctx.fillStyle=`hsl(${360*Math.random()},100%,50%)`; ctx.fillRect(0,y,c.width,2+4*Math.random());}
+     }
+     ctx.putImageData(id,0,0); resolve(c.toDataURL('image/jpeg',0.75));
+   };
+   img.onerror=()=>resolve(url); img.src=url;
+ });
 }
 
-// Auto login check
-(async()=>{
-  const {data}=await supa.auth.getSession();
-  if(data.session){ currentUser=data.session.user; showMain(); }
-})();
-
+async function signup(){const {error}=await supa.auth.signUp({email:email.value,password:password.value}); if(error)alert(error.message); else alert("Verify email da!");}
+async function login(){const {data,error}=await supa.auth.signInWithPassword({email:email.value,password:password.value}); if(error)alert(error.message); else{currentUser=data.user;showMain();}}
+function showMain(){document.getElementById('authPage').style.display='none';document.getElementById('mainPage').style.display='block';loadPosts();}
+async function createPost(){
+ if(!postImage.value) return alert("URL podu da!");
+ let finalUrl=postImage.value;
+ if(glitchMode) finalUrl=await applySystemGlitch(finalUrl);
+ await supa.from('posts').insert({image_url:finalUrl,caption:postCaption.value,username:currentUser.email.split('@')[0],user_id:currentUser.id,likes:0});
+ closeCreate(); postImage.value=''; postCaption.value=''; glitchMode=false; document.getElementById('systemBtn').innerHTML='⚡ SYSTEM SETHU'; document.getElementById('systemBtn').style.background='#fff'; document.getElementById('systemBtn').style.color='#000'; loadPosts();
+}
+async function loadPosts(){
+ const {data}=await supa.from('posts').select('*').order('created_at',{ascending:false});
+ if(!data||!data.length){posts.innerHTML='<p style="text-align:center;margin-top:40px;color:#999">No posts da Giri! + thotta post podu!</p>';return;}
+ posts.innerHTML=data.map(p=>`
+ <div class="post">
+ <div class="post-header"><b>${p.username||'giri'}</b><i class="fa-solid fa-ellipsis"></i></div>
+ <img src="${p.image_url}">
+ <div class="post-actions"><i class="fa-regular fa-heart" onclick="likePost('${p.id}',${p.likes||0})"></i><i class="fa-regular fa-comment" onclick="openComment('${p.id}')"></i><i class="fa-regular fa-paper-plane"></i></div>
+ <div style="padding:0 12px;font-weight:600;font-size:14px">${p.likes||0} likes</div>
+ <div style="padding:4px 12px 12px;font-size:14px"><b>${p.username}</b> ${p.caption||''}</div>
+ </div>`).join('');
+}
+async function likePost(id,l){await supa.from('posts').update({likes:l+1}).eq('id',id);loadPosts();}
+async function loadComments(){const {data}=await supa.from('comments').select('*').eq('post_id',currentPostId); commentList.innerHTML=(data||[]).map(c=>`<div style="padding:6px 0;border-bottom:1px solid #eee"><b>${c.username}</b> ${c.text}</div>`).join('')||'No comments';}
+async function addComment(){if(!commentInput.value)return; await supa.from('comments').insert({post_id:currentPostId,text:commentInput.value,username:currentUser.email.split('@')[0]}); commentInput.value='';loadComments();}
+async function logout(){await supa.auth.signOut();location.reload();}
+(async()=>{const {data}=await supa.auth.getSession(); if(data.session){currentUser=data.session.user;showMain();}})();
 </script>
 </body>
 </html>
