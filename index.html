@@ -2430,23 +2430,18 @@ async function isFollowing(
 
 async function openUserProfile(userId) {
   if (!userId) return;
-  if (userId === currentUser.id) {
+  if (currentUser && userId === currentUser.id) {
     showPage('profile');
     return;
   }
   window.viewingUserId = userId;
   showPage('user');
-  // Oru vela 'user' page name 'user-profile' na itha use pannu
-  // showPage('user-profile');
-  
-  // Profile load pannu - un code la enna function irukku nu try pannu
   if (typeof loadUserPage === 'function') {
     await loadUserPage(userId);
   }
 }
 
-async function toggleFollow(
-
+async function toggleFollow(userId) {
   const following =
     await isFollowing(
       userId
