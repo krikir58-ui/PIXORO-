@@ -1,285 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO - Private Insta 2FA</title>
+<title>PIXORO</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui;background:#fafafa;color:#111;max-width:480px;margin:0 auto;min-height:100vh}
-.header{background:#fff;border-bottom:1px solid #ddd;padding:12px 16px;position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center}
-.logo{font-weight:900;font-size:22px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.btn{padding:8px 14px;border-radius:20px;border:none;font-weight:600;cursor:pointer}
-.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;margin:12px;padding:12px}
-.avatar{width:44px;height:44px;border-radius:50%;object-fit:cover}
-.profile-head{display:flex;gap:10px;align-items:center}
-.user-name{font-weight:700}
-.username{color:#666;font-size:13px}
-.post-image{width:100%;border-radius:10px;margin-top:10px;max-height:500px;object-fit:cover}
-.actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.actions button{padding:6px 10px;border:1px solid #ddd;border-radius:20px;background:#fff;cursor:pointer;font-size:13px}
-.actions button.active{background:#ffe8ec;border-color:#ff2e88}
-.caption{margin-top:8px;font-size:14px}
-.small{font-size:12px;color:#888}
-.follow-btn{margin-left:auto;padding:5px 12px;border-radius:20px;border:1px solid #5b4cff;color:#5b4cff;background:#fff;cursor:pointer;font-weight:600}
-.follow-btn.following{background:#5b4cff;color:#fff}
-.private-badge{font-size:11px;background:#f0f2ff;color:#5b4cff;padding:2px 8px;border-radius:10px;border:1px solid #5b4cff30}
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #ddd;display:flex;justify-content:space-around;padding:10px 0}
-.nav button{background:none;border:none;font-size:22px;cursor:pointer;opacity:.5}
-.nav button.active{opacity:1}
-.modal{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
-.modal-box{background:#fff;border-radius:16px;width:100%;max-width:400px;padding:20px;max-height:90vh;overflow:auto}
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.close{width:32px;height:32px;border-radius:50%;border:1px solid #ddd;background:#fff;cursor:pointer}
-input,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:8px 0}
-.primary{width:100%;padding:12px;background:#5b4cff;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;margin-top:10px}
-.loading,.empty{text-align:center;padding:40px;color:#888}
-.hidden{display:none!important}
-.comment-box{margin-top:10px;border-top:1px solid #eee;padding-top:10px}
-.comment{padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:13px}
-.auth-page{padding:30px 20px}
-.report-reasons button{width:100%;text-align:left;padding:12px;border:1px solid #eee;border-radius:10px;margin:5px 0;background:#fff;cursor:pointer}
-.code-box{letter-spacing:8px;font-size:24px;font-weight:900;text-align:center;background:#f0f2ff;padding:15px;border-radius:12px;border:2px dashed #5b4cff;margin:10px 0}
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+body{background:#fafafa}
+.header{position:sticky;top:0;background:#fff;border-bottom:1px solid #dbdbdb;padding:12px;display:flex;justify-content:space-between;z-index:100}
+.logo{font-weight:900;font-size:24px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.authBox{background:#fff;border:1px solid #dbdbdb;padding:30px 20px;border-radius:8px;width:350px;text-align:center}
+.authBox input{width:100%;padding:10px;margin:6px 0;border:1px solid #dbdbdb;border-radius:4px}
+.authBox button{width:100%;padding:10px;background:#0095f6;color:#fff;border:none;border-radius:8px;margin-top:8px}
+.post{background:#fff;border:1px solid #dbdbdb;max-width:470px;margin:12px auto;border-radius:8px;overflow:hidden}
+.post img{width:100%}
+.actions{display:flex;gap:16px;padding:10px;font-size:20px}
+#splash{position:fixed;inset:0;background:#fff;z-index:99999;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:60px 0 40px;transition:opacity .6s}
+#splash.hide{opacity:0;pointer-events:none}
+.splash-from{text-align:center;color:#666;font-size:14px}
+.splash-from b{color:#ff004f;font-weight:800;font-size:18px}
 </style>
 </head>
 <body>
-<div id="authPage" class="auth-page">
-<h1 class="logo" style="font-size:32px;text-align:center;margin:20px 0">PIXORO</h1>
-<p style="text-align:center" class="small">🔐 2FA Secured Instagram Style</p>
-<input id="authName" placeholder="Name">
-<input id="authUsername" placeholder="Username">
-<input id="authEmail" placeholder="Email">
-<input id="authDOB" type="date">
-<p class="small">DOB 13+ must</p>
-<input id="authPassword" type="password" placeholder="Password 6+ chars">
-<div style="background:#f0f2ff;padding:12px;border-radius:10px;margin:10px 0;border:1px dashed #5b4cff">
-<div class="small" style="font-weight:bold">Bot Check: <span id="captchaQ"></span></div>
-<input id="captchaAns" placeholder="Answer">
+<div id="splash">
+  <div></div>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;text-align:center">
+    <div><div style="font-size:90px">📸</div><div style="font-weight:900;font-size:32px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent">PIXORO</div></div>
+  </div>
+  <div class="splash-from">from<br><b>∞ GIRI</b></div>
 </div>
-<button class="primary" onclick="signup()">Sign Up</button>
-<button class="primary" style="background:#fff;color:#5b4cff;border:1px solid #5b4cff" onclick="login()">Login</button>
-<p id="authMsg" class="small" style="text-align:center;margin-top:10px"></p>
-</div>
-
-<div id="twoFAPage" class="auth-page hidden">
-<h1 class="logo" style="font-size:32px;text-align:center;margin:20px 0">🔐 2FA</h1>
-<p style="text-align:center" class="small">Enter 6-digit code sent to your email</p>
-<div style="background:#fff3cd;padding:12px;border-radius:10px;margin:15px 0;border:1px solid #ffc107">
-<div class="small"><b>DEMO OTP (Email ku pona mari):</b></div>
-<div id="demoOTP" class="code-box">------</div>
-<div class="small">Real app la email ku pogum da Giri! Ippo testing ku inga kaaturen</div>
-</div>
-<input id="twoFAInput" placeholder="Enter 6-digit code" maxlength="6">
-<button class="primary" onclick="verify2FA()">Verify & Login</button>
-<button class="primary" style="background:#eee;color:#111" onclick="resendOTP()">Resend Code</button>
-<p id="twoFAMsg" class="small" style="text-align:center;margin-top:10px"></p>
+<!-- LOGIN PAGE -->
+<div id="authPage" style="display:flex;justify-content:center;align-items:center;min-height:100vh">
+  <div class="authBox">
+    <h1 style="font-weight:900;font-size:28px;margin-bottom:20px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent">PIXORO</h1>
+    <input id="email" type="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="login()">Log In</button>
+    <button onclick="signup()" style="background:#fff;color:#000;border:1px solid #dbdbdb">Sign Up</button>
+  </div>
 </div>
 
-<div id="app" class="hidden">
-<div class="header"><div class="logo">PIXORO</div><div><button class="btn" style="background:#eee" onclick="openCreate()">+ Post</button> <button class="btn" style="background:#eee" onclick="logout()">Logout</button></div></div>
-<div id="homePage"><div style="padding:10px"><input id="searchInput" placeholder="Search username" oninput="searchPosts()"></div><div id="feed"></div></div>
-<div id="profilePage" class="hidden"><div class="card"><div class="profile-head"><img id="myAvatar" class="avatar" src="https://via.placeholder.com/100"><div><div id="myName" class="user-name">User</div><div id="myUsername" class="username">@user</div><div id="myPrivateBadge"></div><div id="my2FABadge"></div></div></div><div id="myBio" class="small" style="margin-top:8px"></div><div style="display:flex;gap:15px;margin-top:12px;text-align:center"><div><b id="myPosts">0</b><br><span class="small">Posts</span></div><div><b id="myFollowers">0</b><br><span class="small">Followers</span></div><div><b id="myFollowing">0</b><br><span class="small">Following</span></div></div><button class="primary" style="background:#fff;color:#5b4cff;border:1px solid #5b4cff" onclick="openEditProfile()">Edit Profile & Privacy & 2FA</button></div><div id="profilePosts"></div></div>
-<div class="nav"><button id="homeNav" class="active" onclick="showPage('home')">🏠</button><button id="profileNav" onclick="showPage('profile')">👤</button></div>
+<!-- MAIN PAGE -->
+<div id="mainPage" style="display:none">
+  <div class="header">
+    <div class="logo">PIXORO</div>
+    <button onclick="logout()" style="padding:6px 12px;border:1px solid #dbdbdb;background:#fff;border-radius:6px">Logout</button>
+  </div>
+  <div id="posts" style="padding-bottom:20px"></div>
 </div>
-<div id="createModal" class="modal hidden"><div class="modal-box"><div class="modal-head"><h3>New Post</h3><button class="close" onclick="closeCreate()">✕</button></div><textarea id="postCaption" placeholder="Caption..."></textarea><input id="postImage" type="file" accept="image/*"><button class="primary" onclick="createPost()">Post</button><p id="createMsg" class="small"></p></div></div>
-
-<div id="editModal" class="modal hidden"><div class="modal-box"><div class="modal-head"><h3>Edit Profile, Privacy & 2FA 🔐</h3><button class="close" onclick="closeEdit()">✕</button></div>
-<input id="editName" placeholder="Name"><input id="editUsername" placeholder="Username"><input id="editBio" placeholder="Bio"><input id="editAvatar" type="file" accept="image/*">
-<div style="background:#f8f8ff;padding:12px;border-radius:10px;margin:10px 0;border:1px solid #ddd">
-<label style="font-size:14px;font-weight:bold;display:flex;justify-content:space-between"><span>🔒 Private Account</span><input id="editPrivate" type="checkbox" style="width:20px"></label>
-<p class="small">ON panna followers mattum than un posts paakka mudiyum da</p>
-</div>
-
-<div style="background:#fff8e1;padding:12px;border-radius:10px;margin:10px 0;border:1px solid #ffc107">
-<label style="font-size:14px;font-weight:bold;display:flex;justify-content:space-between"><span>🔐 Two-Factor Authentication (2FA)</span><input id="edit2FA" type="checkbox" style="width:20px" onchange="toggle2FASetup()"></label>
-<p class="small">ON panna login pothu OTP ketkum da - Instagram mari super secure!</p>
-<div id="twoFASetup" class="hidden" style="margin-top:10px">
-<div class="small" style="font-weight:bold">Your 2FA Secret Code (safe ah vechu da):</div>
-<div id="twoFASecret" class="code-box">------</div>
-<p class="small">Itha yaarukkum solla koodathu da Giri!</p>
-</div>
-</div>
-
-<button class="primary" onclick="saveProfile()">Save All</button><p id="editMsg" class="small"></p></div></div>
-
-<div id="commentModal" class="modal hidden"><div class="modal-box"><div class="modal-head"><h3>Comments</h3><button class="close" onclick="closeComment()">✕</button></div><div id="commentList"></div><div style="display:flex;gap:6px;margin-top:10px"><input id="commentInput" placeholder="Add comment..."><button class="btn" style="background:#5b4cff;color:#fff" onclick="addComment()">Send</button></div></div></div>
 
 <script>
-const SUPABASE_URL='https://qokqvvwzdyhkooevcmiu.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFva3F2dnd6ZHloa29vZXZjbWl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5OTcyNTYsImV4cCI6MjA3MTU3MzI1Nn0.ETu4PjDJ-7nF0bJfWnq3cR9eE9l1k2X3p4Y5z6A7b8C9d0';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL = "https://rrjrmvdvyqvtjdwdhmsd.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyanJtdmR2eXF2dGpkd2RobXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODk3OTYsImV4cCI6MjA3Mzg2NTc5Nn0.8x3d6ry3N5XhKj7pE9g0Qz6JkL2mN4bV7cX1yZ3aB9dE";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supa = supabaseClient;
+let currentUser = null;
 
-let currentUser=null, currentProfile=null, posts=[], currentCommentPost=null, pendingUser=null, pendingProfile=null, currentOTP=null, captchaNum1=0,captchaNum2=0;
-
-function genCaptcha(){captchaNum1=Math.floor(Math.random()*10)+1;captchaNum2=Math.floor(Math.random()*10)+1;document.getElementById('captchaQ').innerText=captchaNum1+' + '+captchaNum2+' = ?';}
-function checkCaptcha(){const ans=parseInt(document.getElementById('captchaAns').value);return ans===(captchaNum1+captchaNum2);}
-function calcAge(dob){const diff=Date.now()-new Date(dob).getTime();return Math.floor(diff/(1000*60*60*24*365.25));}
-function genOTP(){return Math.floor(100000+Math.random()*900000).toString();}
-function genSecret(){return Math.random().toString(36).substring(2,10).toUpperCase()+'-'+Math.random().toString(36).substring(2,6).toUpperCase();}
-
-function showAuth(msg=''){document.getElementById('authPage').classList.remove('hidden');document.getElementById('app').classList.add('hidden');document.getElementById('twoFAPage').classList.add('hidden');document.getElementById('authMsg').innerText=msg;genCaptcha();}
-function show2FA(){document.getElementById('authPage').classList.add('hidden');document.getElementById('app').classList.add('hidden');document.getElementById('twoFAPage').classList.remove('hidden');currentOTP=genOTP();document.getElementById('demoOTP').innerText=currentOTP;document.getElementById('twoFAMsg').innerText='OTP sent to '+pendingProfile.email+' da (demo)';}
+// Splash 2.5 sec la maraiyum
+setTimeout(()=>{document.getElementById('splash').classList.add('hide')},2500);
 
 async function signup(){
-try{
-const name=document.getElementById('authName').value.trim(), username=document.getElementById('authUsername').value.trim().toLowerCase(), email=document.getElementById('authEmail').value.trim(), dob=document.getElementById('authDOB').value, password=document.getElementById('authPassword').value;
-if(!name||!username||!email||!dob||!password){document.getElementById('authMsg').innerText='Full fill pannu da';return;}
-if(!checkCaptcha()){document.getElementById('authMsg').innerText='Bot check thappu da';genCaptcha();return;}
-if(calcAge(dob)<13){document.getElementById('authMsg').innerText='13+ age must da';return;}
-if(password.length<6||!/\d/.test(password)){document.getElementById('authMsg').innerText='Password 6+ chars + 1 number must da';return;}
-const {data:exist}=await supabase.from('profiles').select('id').eq('username',username).maybeSingle(); if(exist){document.getElementById('authMsg').innerText='Username taken da';return;}
-document.getElementById('authMsg').innerText='Creating...';
-const {data,error}=await supabase.auth.signUp({email,password}); if(error) throw error;
-const userId=data.user?.id||data.user?.id; 
-await supabase.from('profiles').insert({id:data.user.id, name, username, email, bio:'', avatar_url:'https://via.placeholder.com/100', is_private:false, two_factor_enabled:false, two_factor_secret:genSecret()});
-document.getElementById('authMsg').innerText='Check email da & login pannu!';
-}catch(e){document.getElementById('authMsg').innerText=e.message;genCaptcha();}}
-
+  const {data,error}=await supa.auth.signUp({email:email.value,password:password.value});
+  if(error) alert(error.message); else alert("Email check pannu da Giri!");
+}
 async function login(){
-try{
-const email=document.getElementById('authEmail').value.trim(), password=document.getElementById('authPassword').value;
-if(!email||!password){document.getElementById('authMsg').innerText='Email/password podu da';return;}
-document.getElementById('authMsg').innerText='Checking...';
-const {data,error}=await supabase.auth.signInWithPassword({email,password}); if(error) throw error;
-const {data:profile}=await supabase.from('profiles').select('*').eq('id',data.user.id).single();
-if(profile.two_factor_enabled){
-pendingUser=data.user; pendingProfile=profile; show2FA(); return;
+  const {data,error}=await supa.auth.signInWithPassword({email:email.value,password:password.value});
+  if(error) alert(error.message); else {currentUser=data.user; showMain();}
 }
-currentUser=data.user; currentProfile=profile; startApp();
-}catch(e){document.getElementById('authMsg').innerText=e.message;}}
-
-function verify2FA(){
-const code=document.getElementById('twoFAInput').value.trim();
-if(code===currentOTP){currentUser=pendingUser; currentProfile=pendingProfile; document.getElementById('twoFAMsg').innerText='2FA Success da!'; setTimeout(()=>startApp(),500);}
-else{document.getElementById('twoFAMsg').innerText='OTP thappu da Giri! '+currentOTP+' try pannu';}}
-function resendOTP(){currentOTP=genOTP();document.getElementById('demoOTP').innerText=currentOTP;document.getElementById('twoFAMsg').innerText='New OTP sent da: '+currentOTP;}
-
-function startApp(){document.getElementById('authPage').classList.add('hidden');document.getElementById('twoFAPage').classList.add('hidden');document.getElementById('app').classList.remove('hidden');loadMyProfile();loadFeed();}
-async function logout(){await supabase.auth.signOut();currentUser=null;currentProfile=null;pendingUser=null;showAuth('Logged out da');}
-function showPage(p){document.getElementById('homePage').classList.toggle('hidden',p!=='home');document.getElementById('profilePage').classList.toggle('hidden',p!=='profile');document.getElementById('homeNav').classList.toggle('active',p==='home');document.getElementById('profileNav').classList.toggle('active',p==='profile'); if(p==='profile') loadMyProfile(); else loadFeed();}
-function openCreate(){document.getElementById('createModal').classList.remove('hidden');}
-function closeCreate(){document.getElementById('createModal').classList.add('hidden');}
-  async function loadMyProfile(){
-if(!currentProfile) return;
-document.getElementById('myName').innerText=currentProfile.name;
-document.getElementById('myUsername').innerText='@'+currentProfile.username;
-document.getElementById('myAvatar').src=currentProfile.avatar_url||'https://via.placeholder.com/100';
-document.getElementById('myBio').innerText=currentProfile.bio||'';
-document.getElementById('myPrivateBadge').innerHTML=currentProfile.is_private?'<span class="private-badge">🔒 Private</span>':'<span class="private-badge" style="background:#e8ffe8;color:green">🌍 Public</span>';
-document.getElementById('my2FABadge').innerHTML=currentProfile.two_factor_enabled?'<span class="private-badge" style="background:#fff8e1;color:#ff9800;border-color:#ffc107">🔐 2FA ON - Super Secure</span>':'<span class="private-badge">🔓 2FA OFF</span>';
-const {count:postCount}=await supabase.from('posts').select('*',{count:'exact',head:true}).eq('user_id',currentUser.id);
-document.getElementById('myPosts').innerText=postCount||0;
-const {count:followers}=await supabase.from('follows').select('*',{count:'exact',head:true}).eq('following_id',currentUser.id);
-document.getElementById('myFollowers').innerText=followers||0;
-const {count:following}=await supabase.from('follows').select('*',{count:'exact',head:true}).eq('follower_id',currentUser.id);
-document.getElementById('myFollowing').innerText=following||0;
-const {data:myPosts}=await supabase.from('posts').select('*,profiles(username,avatar_url)').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-document.getElementById('profilePosts').innerHTML=(myPosts||[]).map(p=>renderPost(p)).join('')||'<p class="empty">No posts da</p>';
+function showMain(){
+  document.getElementById('authPage').style.display='none';
+  document.getElementById('mainPage').style.display='block';
+  loadPosts();
+}
+  async function loadPosts(){
+  const {data}=await supa.from('posts').select('*').order('id',{ascending:false});
+  if(!data || data.length==0){
+    posts.innerHTML='<p style="text-align:center;margin-top:30px;color:#999">No posts da Giri! First post podu!</p>';
+    return;
+  }
+  posts.innerHTML=data.map(p=>`
+    <div class="post">
+      <div style="padding:10px;font-weight:600">📸 ${p.username||'giri'}</div>
+      <img src="${p.image_url}" loading="lazy">
+      <div class="actions">
+        <span onclick="likePost('${p.id}',${p.likes||0})">❤️ ${p.likes||0}</span>
+        <span>💬</span>
+        <span onclick="navigator.clipboard.writeText('${p.image_url}')">↗️</span>
+      </div>
+      <div style="padding:0 12px 12px;font-size:14px"><b>${p.username||'giri'}</b> ${p.caption||''}</div>
+    </div>
+  `).join('');
 }
 
-function toggle2FASetup(){
-const enabled=document.getElementById('edit2FA').checked;
-document.getElementById('twoFASetup').classList.toggle('hidden',!enabled);
-if(enabled){
-const secret=genSecret();
-document.getElementById('twoFASecret').innerText=secret;
-document.getElementById('twoFASetup').dataset.secret=secret;
-}
+async function likePost(id,likes){
+  await supa.from('posts').update({likes:likes+1}).eq('id',id);
+  loadPosts();
 }
 
-function openEditProfile(){
-document.getElementById('editModal').classList.remove('hidden');
-document.getElementById('editName').value=currentProfile.name||'';
-document.getElementById('editUsername').value=currentProfile.username||'';
-document.getElementById('editBio').value=currentProfile.bio||'';
-document.getElementById('editPrivate').checked=currentProfile.is_private||false;
-document.getElementById('edit2FA').checked=currentProfile.two_factor_enabled||false;
-document.getElementById('my2FABadge').innerHTML;
-if(currentProfile.two_factor_enabled){
-document.getElementById('twoFASetup').classList.remove('hidden');
-document.getElementById('twoFASecret').innerText=currentProfile.two_factor_secret||genSecret();
-document.getElementById('twoFASetup').dataset.secret=currentProfile.two_factor_secret||genSecret();
-}
+async function logout(){
+  await supa.auth.signOut();
+  location.reload();
 }
 
-function closeEdit(){document.getElementById('editModal').classList.add('hidden');}
-
-async function saveProfile(){
-try{
-document.getElementById('editMsg').innerText='Saving...';
-const name=document.getElementById('editName').value.trim(), username=document.getElementById('editUsername').value.trim().toLowerCase(), bio=document.getElementById('editBio').value.trim(), is_private=document.getElementById('editPrivate').checked, two_factor_enabled=document.getElementById('edit2FA').checked;
-const secret=document.getElementById('twoFASetup').dataset.secret||currentProfile.two_factor_secret||genSecret();
-if(username!==currentProfile.username){const {data:exist}=await supabase.from('profiles').select('id').eq('username',username).maybeSingle(); if(exist){document.getElementById('editMsg').innerText='Username taken da';return;}}
-let avatar_url=currentProfile.avatar_url;
-const file=document.getElementById('editAvatar').files[0];
-if(file){
-const path=currentUser.id+'/'+Date.now()+'.jpg';
-await supabase.storage.from('avatars').upload(path,file,{upsert:true});
-const {data}=supabase.storage.from('avatars').getPublicUrl(path); avatar_url=data.publicUrl;
-}
-const {error}=await supabase.from('profiles').update({name,username,bio,is_private,two_factor_enabled,two_factor_secret:secret,avatar_url}).eq('id',currentUser.id);
-if(error) throw error;
-currentProfile={...currentProfile,name,username,bio,is_private,two_factor_enabled,two_factor_secret:secret,avatar_url};
-document.getElementById('editMsg').innerText='Saved da! 2FA '+(two_factor_enabled?'ON 🔐':'OFF');
-setTimeout(()=>{closeEdit();loadMyProfile();},800);
-}catch(e){document.getElementById('editMsg').innerText=e.message;}}
-
-async function loadFeed(){
-document.getElementById('feed').innerHTML='<p class="loading">Loading...</p>';
-const {data:following}=await supabase.from('follows').select('following_id').eq('follower_id',currentUser.id);
-const followingIds=(following||[]).map(f=>f.following_id); followingIds.push(currentUser.id);
-let {data:allPosts}=await supabase.from('posts').select('*,profiles!posts_user_id_fkey(id,username,name,avatar_url,is_private)').order('created_at',{ascending:false}).limit(50);
-if(!allPosts) allPosts=[];
-const visible=allPosts.filter(p=>{
-if(p.user_id===currentUser.id) return true;
-if(!p.profiles.is_private) return true;
-return followingIds.includes(p.user_id);
-});
-const query=document.getElementById('searchInput')?.value.trim().toLowerCase();
-let filtered=visible;
-if(query) filtered=visible.filter(p=>p.profiles.username.toLowerCase().includes(query));
-document.getElementById('feed').innerHTML=filtered.map(p=>renderPost(p)).join('')||'<p class="empty">No posts da Giri</p>';
-}
-
-function searchPosts(){loadFeed();}
-function renderPost(p){
-const liked=(p.likes||[]).includes(currentUser.id);
-return `<div class="card">
-<div class="profile-head"><img class="avatar" src="${p.profiles.avatar_url||'https://via.placeholder.com/100'}"><div><div class="user-name">${p.profiles.name||p.profiles.username}</div><div class="username">@${p.profiles.username} ${p.profiles.is_private?'🔒':''}</div></div><button class="follow-btn" onclick="toggleFollow('${p.user_id}')">Follow</button></div>
-${p.image_url?`<img class="post-image" src="${p.image_url}">`:''}
-<div class="caption"><b>${p.profiles.username}</b> ${p.caption||''}</div>
-<div class="actions"><button class="${liked?'active':''}" onclick="likePost('${p.id}')">❤️ ${(p.likes||[]).length}</button><button onclick="openComment('${p.id}')">💬 Comment</button><button onclick="sharePost('${p.id}')">🔗 Share</button></div>
-<div class="small">${new Date(p.created_at).toLocaleString()}</div>
-</div>`;
-}
-
-async function createPost(){
-try{
-document.getElementById('createMsg').innerText='Posting...';
-const caption=document.getElementById('postCaption').value.trim(); const file=document.getElementById('postImage').files[0]; let image_url='';
-if(file){const path=currentUser.id+'/'+Date.now()+'.jpg'; await supabase.storage.from('posts').upload(path,file); const {data}=supabase.storage.from('posts').getPublicUrl(path); image_url=data.publicUrl;}
-const {error}=await supabase.from('posts').insert({user_id:currentUser.id,caption,image_url,likes:[]}); if(error) throw error;
-document.getElementById('createMsg').innerText='Posted da!'; document.getElementById('postCaption').value=''; document.getElementById('postImage').value='';
-setTimeout(()=>{closeCreate();loadFeed();loadMyProfile();},500);
-}catch(e){document.getElementById('createMsg').innerText=e.message;}}
-
-async function likePost(id){
-const {data:post}=await supabase.from('posts').select('likes').eq('id',id).single();
-let likes=post.likes||[]; if(likes.includes(currentUser.id)) likes=likes.filter(x=>x!==currentUser.id); else likes.push(currentUser.id);
-await supabase.from('posts').update({likes}).eq('id',id); loadFeed(); if(!document.getElementById('profilePage').classList.contains('hidden')) loadMyProfile();
-}
-async function toggleFollow(uid){if(uid===currentUser.id) return; const {data:exist}=await supabase.from('follows').select('*').eq('follower_id',currentUser.id).eq('following_id',uid).maybeSingle(); if(exist) await supabase.from('follows').delete().eq('follower_id',currentUser.id).eq('following_id',uid); else await supabase.from('follows').insert({follower_id:currentUser.id,following_id:uid}); loadMyProfile();}
-let commentPostId=null;
-async function openComment(id){commentPostId=id; document.getElementById('commentModal').classList.remove('hidden'); loadComments();}
-function closeComment(){document.getElementById('commentModal').classList.add('hidden');}
-async function loadComments(){const {data}=await supabase.from('comments').select('*,profiles(username)').eq('post_id',commentPostId).order('created_at'); document.getElementById('commentList').innerHTML=(data||[]).map(c=>`<div class="comment"><b>@${c.profiles.username}</b> ${c.text}</div>`).join('')||'<p class="small">No comments</p>';}
-async function addComment(){const text=document.getElementById('commentInput').value.trim(); if(!text) return; await supabase.from('comments').insert({post_id:commentPostId,user_id:currentUser.id,text}); document.getElementById('commentInput').value=''; loadComments();}
-function sharePost(id){navigator.clipboard.writeText('https://krikir58-ui.github.io/PIXORO-/#post-'+id); alert('Link copied da Giri!');}
-
+// Auto login check
 (async()=>{
-const {data}=await supabase.auth.getSession(); if(data.session){const {data:profile}=await supabase.from('profiles').select('*').eq('id',data.session.user.id).single(); currentUser=data.session.user; currentProfile=profile; if(profile) startApp(); else showAuth();} else showAuth();
+  const {data}=await supa.auth.getSession();
+  if(data.session){ currentUser=data.session.user; showMain(); }
 })();
+
 </script>
 </body>
 </html>
