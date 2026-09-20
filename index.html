@@ -141,36 +141,24 @@ ctx.putImageData(id,0,0);res(c.toDataURL('image/jpeg',0.75));
 };
 img.onerror=()=>res(url);img.src=url;
 });
-}
-
-async function signup(){
-const {error}=await supa.auth.signUp({email:document.getElementById('email').value,password:document.getElementById('password').value});
-if(error)alert(error.message);else alert("Account created da! Ippo Log In pannu GIRI!");
-}
+  }
 async function login(){
-const e=document.getElementById('email').value;const p=document.getElementById('password').value;
+const e=document.getElementById('email').value;
+const p=document.getElementById('password').value;
 if(!e||!p)return alert("Email password podu da!");
+try{
 const {data,error}=await supa.auth.signInWithPassword({email:e,password:p});
-if(error)alert("Login failed: "+error.message+"\nPassword thappu pola da!");else{currentUser=data.user;showMain();}
+if(error) throw error;
+currentUser=data.user;showMain();
+}catch(err){
+// FAILED TO FETCH na Guest mode la open pannu
+console.log(err);
+if(err.message.includes("fetch")||err.message.includes("Failed")){
+alert("Supabase pause aayiduchu da! Guest mode la open pandren!");
+currentUser={email:e||"giri@pixoro.app",id:"guest"};
+showMain();
+return;
 }
-function showMain(){document.getElementById('authPage').style.display='none';document.getElementById('mainPage').style.display='block';loadPosts();}
-async function createPost(){
-let url=document.getElementById('postImage').value;if(!url)return alert("URL podu da!");
-if(glitchMode)url=await applySystemGlitch(url);
-await supa.from('posts').insert({image_url:url,caption:document.getElementById('postCaption').value,username:currentUser.email.split('@')[0],user_id:currentUser.id,likes:0});
-closeCreate();document.getElementById('postImage').value='';document.getElementById('postCaption').value='';glitchMode=false;
-let b=document.getElementById('systemBtn');b.innerHTML='⚡ SYSTEM SETHU';b.style.background='#fff';b.style.color='#000';loadPosts();
+alert("Login failed: "+err.message);
 }
-async function loadPosts(){
-const {data}=await supa.from('posts').select('*').order('created_at',{ascending:false});
-if(!data||!data.length){document.getElementById('posts').innerHTML='<p style="text-align:center;margin-top:50px;color:#999">No posts da! Keela + thodu GIRI! 👇</p>';return;}
-document.getElementById('posts').innerHTML=data.map(p=>`<div class="post"><div class="post-header"><b>${p.username}</b><i class="fa-solid fa-ellipsis"></i></div><img src="${p.image_url}"><div class="post-actions"><i class="fa-regular fa-heart" onclick="likePost('${p.id}',${p.likes||0})"></i><i class="fa-regular fa-comment" onclick="openComment('${p.id}')"></i><i class="fa-regular fa-paper-plane"></i></div><div style="padding:0 12px;font-weight:700;font-size:14px">${p.likes||0} likes</div><div style="padding:4px 12px 12px;font-size:14px"><b>${p.username}</b> ${p.caption||''}</div></div>`).join('');
 }
-async function likePost(id,l){await supa.from('posts').update({likes:l+1}).eq('id',id);loadPosts();}
-async function loadComments(){const {data}=await supa.from('comments').select('*').eq('post_id',currentPostId);document.getElementById('commentList').innerHTML=(data||[]).map(c=>`<div style="padding:7px 0;border-bottom:1px solid #eee"><b>${c.username}</b> ${c.text}</div>`).join('')||'No comments da';}
-async function addComment(){const t=document.getElementById('commentInput').value;if(!t)return;await supa.from('comments').insert({post_id:currentPostId,text:t,username:currentUser.email.split('@')[0]});document.getElementById('commentInput').value='';loadComments();}
-async function logout(){await supa.auth.signOut();location.reload();}
-(async()=>{const {data}=await supa.auth.getSession();if(data.session){currentUser=data.session.user;showMain();}})();
-</script>
-</body>
-</html>
