@@ -1,17 +1,86 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PIXORO</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui;background:#fafafa;color:#111;max-width:480px;margin:0 auto;min-height:100vh}.header{background:white;border-bottom:1px solid #ddd;padding:12px 16px;position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center}.logo{font-weight:900;font-size:22px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.btn{padding:8px 14px;border-radius:20px;border:none;font-weight:600;cursor:pointer}.btn-p{background:#5b4cff;color:white}.btn-g{background:#eee}.card{background:white;border:1px solid #e5e5e5;border-radius:12px;margin:12px;padding:12px}.avatar{width:44px;height:44px;border-radius:50%;object-fit:cover}.profile-head{display:flex;gap:10px;align-items:center}.user-name{font-weight:700}.username{color:#666;font-size:13px}.post-image{width:100%;border-radius:10px;margin-top:10px;max-height:500px;object-fit:cover}.actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.actions button{padding:6px 10px;border:1px solid #ddd;border-radius:20px;background:white;cursor:pointer;font-size:13px}.actions button.active{background:#ffe8ec;border-color:#ff2e88}.caption{margin-top:8px;font-size:14px}.small{font-size:12px;color:#888}.follow-btn{margin-left:auto;padding:5px 12px;border-radius:20px;border:1px solid #5b4cff;color:#5b4cff;background:white;cursor:pointer;font-weight:600}.follow-btn.following{background:#5b4cff;color:white}.private-badge{font-size:11px;background:#f0f2ff;color:#5b4cff;padding:2px 8px;border-radius:10px;border:1px solid #5b4cff30}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:white;border-top:1px solid #ddd;display:flex;justify-content:space-around;padding:10px 0}.nav button{background:none;border:none;font-size:22px;cursor:pointer;opacity:.5}.nav button.active{opacity:1}.modal{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}.modal-box{background:white;border-radius:16px;width:100%;max-width:400px;padding:20px;max-height:90vh;overflow:auto}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.close{width:32px;height:32px;border-radius:50%;border:1px solid #ddd;background:white;cursor:pointer}input,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:8px 0}.primary{width:100%;padding:12px;background:#5b4cff;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;margin-top:10px}.loading,.empty{text-align:center;padding:40px;color:#888}.hidden{display:none!important}.comment-box{margin-top:10px;border-top:1px solid #eee;padding-top:10px}.comment{padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:13px}.auth-page{padding:30px 20px}.report-reasons button{width:100%;text-align:left;padding:12px;border:1px solid #eee;border-radius:10px;margin:5px 0;background:white;cursor:pointer}</style></head><body>
-<div id="authPage" class="auth-page"><h1 class="logo" style="font-size:32px;text-align:center;margin:20px 0">PIXORO</h1><p style="text-align:center" class="small">Instagram Style Private</p><input id="authName" placeholder="Name"><input id="authUsername" placeholder="Username"><input id="authEmail" placeholder="Email"><input id="authPassword" type="password" placeholder="Password"><button class="primary" onclick="signup()">Sign Up</button><button class="primary" style="background:white;color:#5b4cff;border:1px solid #5b4cff" onclick="login()">Login</button><p id="authMsg" class="small" style="text-align:center;margin-top:10px"></p></div>
-<div id="app" class="hidden"><div class="header"><div class="logo">PIXORO</div><div><button class="btn btn-g" onclick="openCreate()">+ Post</button> <button class="btn btn-g" onclick="logout()">Logout</button></div></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PIXORO - Private Insta</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui;background:#fafafa;color:#111;max-width:480px;margin:0 auto;min-height:100vh}
+.header{background:#fff;border-bottom:1px solid #ddd;padding:12px 16px;position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:900;font-size:22px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.btn{padding:8px 14px;border-radius:20px;border:none;font-weight:600;cursor:pointer}
+.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;margin:12px;padding:12px}
+.avatar{width:44px;height:44px;border-radius:50%;object-fit:cover}
+.profile-head{display:flex;gap:10px;align-items:center}
+.user-name{font-weight:700}
+.username{color:#666;font-size:13px}
+.post-image{width:100%;border-radius:10px;margin-top:10px;max-height:500px;object-fit:cover}
+.actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.actions button{padding:6px 10px;border:1px solid #ddd;border-radius:20px;background:#fff;cursor:pointer;font-size:13px}
+.actions button.active{background:#ffe8ec;border-color:#ff2e88}
+.caption{margin-top:8px;font-size:14px}
+.small{font-size:12px;color:#888}
+.follow-btn{margin-left:auto;padding:5px 12px;border-radius:20px;border:1px solid #5b4cff;color:#5b4cff;background:#fff;cursor:pointer;font-weight:600}
+.follow-btn.following{background:#5b4cff;color:#fff}
+.private-badge{font-size:11px;background:#f0f2ff;color:#5b4cff;padding:2px 8px;border-radius:10px;border:1px solid #5b4cff30}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #ddd;display:flex;justify-content:space-around;padding:10px 0}
+.nav button{background:none;border:none;font-size:22px;cursor:pointer;opacity:.5}
+.nav button.active{opacity:1}
+.modal{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal-box{background:#fff;border-radius:16px;width:100%;max-width:400px;padding:20px;max-height:90vh;overflow:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.close{width:32px;height:32px;border-radius:50%;border:1px solid #ddd;background:#fff;cursor:pointer}
+input,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:8px 0}
+.primary{width:100%;padding:12px;background:#5b4cff;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;margin-top:10px}
+.loading,.empty{text-align:center;padding:40px;color:#888}
+.hidden{display:none!important}
+.comment-box{margin-top:10px;border-top:1px solid #eee;padding-top:10px}
+.comment{padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:13px}
+.auth-page{padding:30px 20px}
+.report-reasons button{width:100%;text-align:left;padding:12px;border:1px solid #eee;border-radius:10px;margin:5px 0;background:#fff;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="authPage" class="auth-page">
+<h1 class="logo" style="font-size:32px;text-align:center;margin:20px 0">PIXORO</h1>
+<p style="text-align:center" class="small">Instagram Style Private</p>
+<input id="authName" placeholder="Name">
+<input id="authUsername" placeholder="Username">
+<input id="authEmail" placeholder="Email">
+<input id="authDOB" type="date">
+<p class="small">DOB 13+ must</p>
+<input id="authPassword" type="password" placeholder="Password 6+ chars">
+<div style="background:#f0f2ff;padding:12px;border-radius:10px;margin:10px 0;border:1px dashed #5b4cff">
+<div class="small" style="font-weight:bold">Bot Check: <span id="captchaQ"></span></div>
+<input id="captchaAns" placeholder="Answer">
+</div>
+<button class="primary" onclick="signup()">Sign Up</button>
+<button class="primary" style="background:#fff;color:#5b4cff;border:1px solid #5b4cff" onclick="login()">Login</button>
+<p id="authMsg" class="small" style="text-align:center;margin-top:10px"></p>
+</div>
+<div id="app" class="hidden">
+<div class="header"><div class="logo">PIXORO</div><div><button class="btn" style="background:#eee" onclick="openCreate()">+ Post</button> <button class="btn" style="background:#eee" onclick="logout()">Logout</button></div></div>
 <div id="homePage"><div style="padding:10px"><input id="searchInput" placeholder="Search username" oninput="searchPosts()"></div><div id="feed"></div></div>
-<div id="profilePage" class="hidden"><div class="card"><div class="profile-head"><img id="myAvatar" class="avatar" src="https://via.placeholder.com/100"><div><div id="myName" class="user-name">User</div><div id="myUsername" class="username">@user</div><div id="myPrivateBadge"></div></div></div><div id="myBio" class="small" style="margin-top:8px"></div><div style="display:flex;gap:15px;margin-top:12px;text-align:center"><div><b id="myPosts">0</b><br><span class="small">Posts</span></div><div><b id="myFollowers">0</b><br><span class="small">Followers</span></div><div><b id="myFollowing">0</b><br><span class="small">Following</span></div></div><button class="primary" style="background:white;color:#5b4cff;border:1px solid #5b4cff" onclick="openEditProfile()">Edit Profile & Privacy</button></div><div id="profilePosts"></div></div>
-<div class="nav"><button id="homeNav" class="active" onclick="showPage('home')">🏠</button><button id="profileNav" onclick="showPage('profile')">👤</button></div></div>
+<div id="profilePage" class="hidden"><div class="card"><div class="profile-head"><img id="myAvatar" class="avatar" src="https://via.placeholder.com/100"><div><div id="myName" class="user-name">User</div><div id="myUsername" class="username">@user</div><div id="myPrivateBadge"></div></div></div><div id="myBio" class="small" style="margin-top:8px"></div><div style="display:flex;gap:15px;margin-top:12px;text-align:center"><div><b id="myPosts">0</b><br><span class="small">Posts</span></div><div><b id="myFollowers">0</b><br><span class="small">Followers</span></div><div><b id="myFollowing">0</b><br><span class="small">Following</span></div></div><button class="primary" style="background:#fff;color:#5b4cff;border:1px solid #5b4cff" onclick="openEditProfile()">Edit Profile & Privacy</button></div><div id="profilePosts"></div></div>
+<div class="nav"><button id="homeNav" class="active" onclick="showPage('home')">🏠</button><button id="profileNav" onclick="showPage('profile')">👤</button></div>
+</div>
 <div id="createModal" class="modal hidden"><div class="modal-box"><div class="modal-head"><h2>New Post</h2><button class="close" onclick="closeCreate()">x</button></div><input id="postImage" type="file" accept="image/*"><textarea id="postCaption" rows="3" placeholder="Caption..."></textarea><button class="primary" onclick="createPost()">Post</button><p id="postMsg" class="small" style="text-align:center;margin-top:8px"></p></div></div>
-<div id="editProfileModal" class="modal hidden"><div class="modal-box"><div class="modal-head"><h2>Profile & Privacy</h2><button class="close" onclick="closeEditProfile()">x</button></div><input id="editName" placeholder="Name"><input id="editUsername" placeholder="Username"><input id="editAvatar" placeholder="Avatar URL"><textarea id="editBio" rows="3" placeholder="Bio"></textarea><div style="margin:15px 0;padding:15px;background:#f0f2ff;border-radius:12px;border:2px solid #5b4cff30"><div style="font-weight:bold;margin-bottom:8px">Privacy</div><label style="display:flex;justify-content:space-between;align-items:center;padding:10px 0"><span><b>Private Account</b><br><span class="small">ON = Followers only</span></span><input type="checkbox" id="editPrivate" style="width:24px;height:24px"></label><div class="small" style="margin-top:8px;background:white;padding:8px;border-radius:8px">Public = Everyone can see<br>Private = Followers only</div></div><button class="primary" onclick="saveProfile()">Save</button></div></div>
-<div id="reportModal" class="modal hidden"><div class="modal-box"><div class="modal-head"><h2>Report</h2><button class="close" onclick="closeReport()">x</button></div><div class="report-reasons"><button onclick="submitReport('spam')">Spam</button><button onclick="submitReport('abuse')">Abusive</button><button onclick="submitReport('other')">Other</button></div><p id="reportMsg" class="small" style="text-align:center"></p></div></div>
+<div id="editProfileModal" class="modal hidden"><div class="modal-box"><div class="modal-head"><h2>Profile & Privacy</h2><button class="close" onclick="closeEditProfile()">x</button></div><input id="editName" placeholder="Name"><input id="editUsername" placeholder="Username"><input id="editAvatar" placeholder="Avatar URL"><textarea id="editBio" rows="3" placeholder="Bio"></textarea><div style="margin:15px 0;padding:15px;background:#f0f2ff;border-radius:12px;border:2px solid #5b4cff30"><div style="font-weight:bold;margin-bottom:8px">Privacy</div><label style="display:flex;justify-content:space-between;align-items:center;padding:10px 0"><span><b>Private Account</b><br><span class="small">ON = Followers only</span></span><input type="checkbox" id="editPrivate" style="width:24px;height:24px"></label><div class="small" style="margin-top:8px;background:#fff;padding:8px;border-radius:8px">Public = Everyone can see<br>Private = Followers only</div></div><button class="primary" onclick="saveProfile()">Save</button></div></div>
+<div id="reportModal" class="modal hidden"><div class="modal-box"><div class="modal-head"><h2>Report</h2><button class="close" onclick="closeReport()">x</button></div><div class="report-reasons"><button onclick="submitReport('spam')">Spam</button><button onclick="submitReport('abuse')">Abusive</button><button onclick="submitReport('other')">Other</button></div><p id="reportMsg" class="small" style="margin-top:10px;text-align:center"></p></div></div>
+
 <script>
-const SUPABASE_URL="https://yecpltndhlzfjplzhcpm.supabase.co";const SUPABASE_KEY="sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_";const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);let currentUser=null,currentProfile=null,profileCache=new Map(),reportingPostId=null,reportingUserId=null;
+const SUPABASE_URL="https://yecpltndhlzfjplzhcpm.supabase.co";
+const SUPABASE_KEY="sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let currentUser=null,currentProfile=null,profileCache=new Map(),reportingPostId=null,reportingUserId=null;
+let captchaA=0,captchaB=0;
+function genCaptcha(){captchaA=Math.floor(Math.random()*10)+1;captchaB=Math.floor(Math.random()*10)+1;const q=document.getElementById("captchaQ");if(q)q.textContent=captchaA+" + "+captchaB+" =?";const ans=document.getElementById("captchaAns");if(ans)ans.value="";}
+function checkAge(dob){const today=new Date(),birth=new Date(dob);let age=today.getFullYear()-birth.getFullYear();const m=today.getMonth()-birth.getMonth();if(m<0||(m===0&&today.getDate()<birth.getDate()))age--;return age;}
 document.addEventListener("DOMContentLoaded",async()=>{const{data}=await db.auth.getSession();if(data.session){currentUser=data.session.user;await startApp()}else showAuth();db.auth.onAuthStateChange(async(e,s)=>{if(s){currentUser=s.user;await startApp()}else{currentUser=null;currentProfile=null;profileCache.clear();showAuth()}})});
-function showAuth(){document.getElementById("authPage").classList.remove("hidden");document.getElementById("app").classList.add("hidden")}
-async function signup(){const n=document.getElementById("authName").value.trim(),u=document.getElementById("authUsername").value.trim().toLowerCase(),e=document.getElementById("authEmail").value.trim(),p=document.getElementById("authPassword").value,m=document.getElementById("authMsg");if(!n||!u||!e||!p){m.textContent="Fill all";return}if(p.length<6){m.textContent="6+ chars";return}m.textContent="Creating...";const{data,error}=await db.auth.signUp({email:e,password:p});if(error){m.textContent=error.message;return}if(!data.user){m.textContent="Failed";return}const{error:pe}=await db.from("profiles").upsert({id:data.user.id,name:n,username:u,avatar_url:"",bio:"",is_private:false});if(pe){m.textContent=pe.message;return}m.textContent="Created!";}
+function showAuth(){document.getElementById("authPage").classList.remove("hidden");document.getElementById("app").classList.add("hidden");genCaptcha();}
+async function signup(){const n=document.getElementById("authName").value.trim(),u=document.getElementById("authUsername").value.trim().toLowerCase(),e=document.getElementById("authEmail").value.trim(),dob=document.getElementById("authDOB").value,p=document.getElementById("authPassword").value,cap=document.getElementById("captchaAns").value.trim(),m=document.getElementById("authMsg");if(!n||!u||!e||!dob||!p){m.textContent="Fill all da";return}if(checkAge(dob)<13){m.textContent="13+ age must da";return}if(p.length<6||!/\d/.test(p)){m.textContent="Password 6+ & 1 number must";return}if(parseInt(cap)!==(captchaA+captchaB)){m.textContent="Bot check thappu da";genCaptcha();return}const{data:exist}=await db.from("profiles").select("id").eq("username",u).maybeSingle();if(exist){m.textContent="Username taken da";genCaptcha();return}m.textContent="Creating...";const{data,error}=await db.auth.signUp({email:e,password:p});if(error){m.textContent=error.message;return}if(!data.user){m.textContent="Failed";return}const{error:pe}=await db.from("profiles").upsert({id:data.user.id,name:n,username:u,avatar_url:"",bio:"",is_private:false});if(pe){m.textContent=pe.message;return}m.textContent="Created! Check email!";}
 async function login(){const e=document.getElementById("authEmail").value.trim(),p=document.getElementById("authPassword").value,m=document.getElementById("authMsg");if(!e||!p){m.textContent="Enter email & pass";return}m.textContent="Logging...";const{error}=await db.auth.signInWithPassword({email:e,password:p});if(error){m.textContent=error.message;return}m.textContent="Success!"}
 async function logout(){await db.auth.signOut()}
 async function startApp(){document.getElementById("authPage").classList.add("hidden");document.getElementById("app").classList.remove("hidden");await loadMyProfile();await loadProfileCounts();await loadFeed()}
@@ -47,4 +116,6 @@ function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt
 function openReport(pid,uid){reportingPostId=pid;reportingUserId=uid;document.getElementById("reportMsg").textContent="";document.getElementById("reportModal").classList.remove("hidden")}
 function closeReport(){document.getElementById("reportModal").classList.add("hidden");reportingPostId=null;reportingUserId=null}
 async function submitReport(reason){if(!reportingPostId)return;const m=document.getElementById("reportMsg");m.textContent="Reporting...";try{await db.from("reports").insert({post_id:reportingPostId,reported_by:currentUser.id,reported_user_id:reportingUserId,reason:reason});m.textContent="Reported!";setTimeout(closeReport,1500)}catch(e){m.textContent="Reported!";setTimeout(closeReport,1500)}}
-</script></body></html>
+</script>
+</body>
+</html>
