@@ -1,135 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html style="background:#fff">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO - from GIRI</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PIXORO</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,sans-serif}
-body{background:#fafafa;padding-bottom:70px}
+html,body{background:#fff;margin:0;padding:0}
+*{box-sizing:border-box;font-family:-apple-system,sans-serif}
+#splash{position:fixed;inset:0;background:#fff;z-index:99999;display:flex;flex-direction:column;justify-content:center;align-items:center}
+#splash.hide{transform:scale(1.1);opacity:0;pointer-events:none;transition:all 0.35s ease}
+.splash-center{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.splash-logo{width:85px;height:85px;border-radius:22px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);display:flex;align-items:center;justify-content:center;font-size:48px;animation:pop 0.8s cubic-bezier(.2,.8,.2,1) both}
+@keyframes pop{0%{transform:scale(0.4);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+.splash-bottom{padding-bottom:40px;text-align:center}
+#app{display:none}
+#app.show{display:block;animation:appIn 0.3s ease}
+@keyframes appIn{from{opacity:0;transform:scale(0.98)}to{opacity:1;transform:scale(1)}}
+/* YOUR APP CSS */
 .header{position:sticky;top:0;background:#fff;border-bottom:1px solid #dbdbdb;padding:12px 16px;display:flex;justify-content:space-between;z-index:90}
 .logo{font-weight:900;font-size:24px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .post{max-width:470px;margin:0 auto 12px;background:#fff;border:1px solid #dbdbdb;border-radius:8px;overflow:hidden}
-.post img,.post video{width:100%;display:block;aspect-ratio:1/1;object-fit:cover}
-.post-header{padding:10px;display:flex;justify-content:space-between;font-weight:600}
-.post-actions{padding:10px;display:flex;gap:16px;font-size:22px}
-#authPage{min-height:100vh;display:flex;justify-content:center;align-items:center}
-.authBox{width:350px;background:#fff;border:1px solid #dbdbdb;padding:30px 20px;border-radius:8px;text-align:center}
+.post img{width:100%;display:block}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #dbdbdb;display:flex;justify-content:space-around;padding:12px 0 18px;z-index:90}
+.bottom-nav i{font-size:24px;cursor:pointer}.bottom-nav i.active{color:#ff004f}
+.authBox{width:350px;background:#fff;border:1px solid #dbdbdb;padding:30px 20px;border-radius:8px;text-align:center;margin:60px auto}
 .authBox input{width:100%;padding:10px;margin:6px 0;border:1px solid #dbdbdb;border-radius:4px}
 .authBox button{width:100%;padding:10px;background:#0095f6;color:#fff;border:none;border-radius:8px;font-weight:600;margin-top:8px}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center;z-index:1000}
-.modal.active{display:flex}
-.modalBox{background:#fff;border-radius:12px;width:90%;max-width:400px;padding:20px}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #dbdbdb;display:flex;justify-content:space-around;padding:12px 0 18px;z-index:90}
-.bottom-nav i{font-size:24px;cursor:pointer;transition:0.2s}
-.bottom-nav i.active{color:#ff004f;transform:scale(1.2)}
-.bottom-sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;align-items:flex-end}
-.bottom-sheet.active{display:flex}
-.sheet-box{background:#1e1e1e;width:100%;border-radius:20px 20px 0 0;padding:20px 20px 40px;color:#fff}
-.sheet-option{display:flex;align-items:center;gap:15px;padding:16px 10px;border-bottom:1px solid #333;font-weight:600;cursor:pointer}
-.sheet-tabs{display:flex;justify-content:space-around;background:#2a2a2a;border-radius:30px;padding:10px;margin-top:20px}
-.sheet-tabs span{padding:8px 16px;border-radius:20px;color:#888;font-weight:700}
-.sheet-tabs span.active{background:#fff;color:#000}
-/* LOGO 0.8s - APP OPEN 0.3s */
-#splash{position:fixed;inset:0;background:#fff;z-index:99999;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:70px 0 45px}
-#splash.hide{opacity:0;pointer-events:none;transition:opacity 0.2s ease}
-.splash-logo{animation:pop 0.8s ease-out forwards}
-@keyframes pop{0%{transform:scale(0.5);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
-.tab-section{display:none;max-width:470px;margin:0 auto;padding:10px}
-.tab-section.active{display:block}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center;z-index:1000}.modal.active{display:flex}.modalBox{background:#fff;border-radius:12px;width:90%;max-width:400px;padding:20px}
+.bottom-sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;align-items:flex-end}.bottom-sheet.active{display:flex}.sheet-box{background:#1e1e1e;width:100%;border-radius:20px 20px 0 0;padding:20px;color:#fff}
+.tab-section{display:none;max-width:470px;margin:0 auto;padding:10px}.tab-section.active{display:block}
 </style>
 </head>
 <body>
+
+<!-- SPLASH = FIRST PAINT - NO WHITE -->
 <div id="splash">
-<div></div>
-<div style="text-align:center" class="splash-logo">
-<div style="font-size:90px;line-height:1">📸</div>
-<div style="font-weight:900;font-size:38px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:5px">PIXORO</div>
-</div>
-<div style="text-align:center"><div style="color:#9ca3af;font-size:12px">from</div><div style="font-weight:900;color:#ff004f;font-size:20px">∞ GIRI</div></div>
+<div class="splash-center"><div class="splash-logo">📸</div><div style="font-weight:900;font-size:28px;margin-top:14px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent">PIXORO</div></div>
+<div class="splash-bottom"><div style="color:#999;font-size:12px">from</div><div style="font-weight:900;color:#ff004f">∞ GIRI</div></div>
 </div>
 
-<div id="authPage">
-<div class="authBox">
-<h1 style="font-weight:900;font-size:32px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:15px">PIXORO</h1>
-<input id="email" placeholder="Email"><input id="password" type="password" placeholder="Password">
-<button onclick="login()">Log In</button>
-<button onclick="signup()" style="background:#fff;color:#000;border:1px solid #dbdbdb">Sign Up</button>
-<button onclick="guestLogin()" style="background:#000;color:#fff;margin-top:12px">⚡ Fast Guest Login</button>
-</div>
+<div id="app">
+<div id="authPage"><div class="authBox"><h1 style="font-weight:900;font-size:32px;background:linear-gradient(90deg,#5b4cff,#ff2e88);-webkit-background-clip:text;-webkit-text-fill-color:transparent">PIXORO</h1><input id="email" placeholder="Email"><input id="password" type="password" placeholder="Password"><button onclick="login()">Log In</button><button onclick="guestLogin()" style="background:#000;margin-top:12px">⚡ Fast Guest Login</button></div></div>
+<div id="mainPage" style="display:none"><div class="header"><div class="logo">PIXORO</div><i class="fa-solid fa-right-from-bracket" onclick="logout()"></i></div><div id="homeTab" class="tab-section active"><div id="posts"></div></div><div id="searchTab" class="tab-section"><div id="searchResults"></div></div><div id="reelsTab" class="tab-section"><div id="reels"></div></div><div id="profileTab" class="tab-section"><div style="text-align:center;padding:30px"><h2 id="profileName">GIRI</h2><p id="profileEmail"></p><button onclick="logout()" style="margin-top:10px;padding:8px 16px;background:#ff3040;color:#fff;border:none;border-radius:8px">Logout</button><div id="myPosts"></div></div></div><div class="bottom-nav"><i id="nav-home" class="fa-solid fa-house active" onclick="switchTab('home')"></i><i id="nav-search" class="fa-solid fa-magnifying-glass" onclick="switchTab('search')"></i><i class="fa-regular fa-square-plus" onclick="openBottomSheet()"></i><i id="nav-reels" class="fa-solid fa-clapperboard" onclick="switchTab('reels')"></i><i id="nav-profile" class="fa-regular fa-user" onclick="switchTab('profile')"></i></div></div>
 </div>
 
-<div id="mainPage" style="display:none">
-<div class="header"><div class="logo">PIXORO</div><div style="display:flex;gap:12px;font-size:20px"><i class="fa-regular fa-heart"></i><i class="fa-solid fa-right-from-bracket" onclick="logout()"></i></div></div>
+<div id="createModal" class="modal"><div class="modalBox"><input id="postImage" placeholder="Image URL" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin:10px 0"><input id="postCaption" placeholder="Caption" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px"><button onclick="createPost()" style="width:100%;padding:11px;background:#0095f6;color:#fff;border:none;border-radius:8px;margin-top:10px">Share</button><button onclick="closeCreate()" style="width:100%;margin-top:8px;padding:10px;background:#eee;border:none;border-radius:8px">Cancel</button></div></div>
+<div id="bottomSheet" class="bottom-sheet" onclick="closeBottomSheet()"><div class="sheet-box" onclick="event.stopPropagation()"><div onclick="openCreate()" style="padding:16px;border-bottom:1px solid #333">📷 POST</div><div onclick="openCreate()" style="padding:16px">🎬 REEL</div></div></div>
 
-<div id="homeTab" class="tab-section active"><div id="posts"></div></div>
-<div id="searchTab" class="tab-section"><h3>Search</h3><input id="searchInput" oninput="searchPosts()" placeholder="Search caption..." style="width:100%;padding:12px;border:1px solid #dbdbdb;border-radius:20px;margin:10px 0"><div id="searchResults"></div></div>
-<div id="reelsTab" class="tab-section"><h3>🔥 REELS</h3><div id="reels"></div></div>
-<div id="profileTab" class="tab-section"><div style="text-align:center;padding:30px"><div style="width:80px;height:80px;background:linear-gradient(90deg,#5b4cff,#ff2e88);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:36px">G</div><h2 id="profileName">GIRI</h2><p id="profileEmail" style="color:#888"></p><button onclick="logout()" style="margin-top:15px;padding:10px 20px;background:#ff3040;color:#fff;border:none;border-radius:8px">Log Out</button><div id="myPosts" style="margin-top:20px"></div></div></div>
-
-<div class="bottom-nav">
-<i id="nav-home" class="fa-solid fa-house active" onclick="switchTab('home')"></i>
-<i id="nav-search" class="fa-solid fa-magnifying-glass" onclick="switchTab('search')"></i>
-<i class="fa-regular fa-square-plus" onclick="openBottomSheet()"></i>
-<i id="nav-reels" class="fa-solid fa-clapperboard" onclick="switchTab('reels')"></i>
-<i id="nav-profile" class="fa-regular fa-user" onclick="switchTab('profile')"></i>
-</div>
-</div>
-
-<div id="createModal" class="modal"><div class="modalBox"><h3>Create</h3><input id="postImage" placeholder="Image URL" style="width:100%;padding:10px;border:1px solid #dbdbdb;border-radius:8px;margin:10px 0"><input id="postCaption" placeholder="Caption" style="width:100%;padding:10px;border:1px solid #dbdbdb;border-radius:8px"><button id="systemBtn" onclick="toggleSystemFilter()" style="width:100%;padding:12px;background:#fff;border:2px dashed #ff004f;border-radius:8px;margin-top:12px;font-weight:900">⚡ SYSTEM SETHU</button><button onclick="createPost()" style="width:100%;padding:11px;background:#0095f6;color:#fff;border:none;border-radius:8px;margin-top:10px">Share</button><button onclick="closeCreate()" style="width:100%;padding:10px;background:#eee;border:none;border-radius:8px;margin-top:8px">Cancel</button></div></div>
-<div id="commentModal" class="modal"><div class="modalBox"><h3>Comments</h3><div id="commentList" style="margin:12px 0;max-height:300px;overflow:auto"></div><div style="display:flex;gap:8px"><input id="commentInput" placeholder="Comment..." style="flex:1;padding:10px;border:1px solid #dbdbdb;border-radius:20px"><button onclick="addComment()" style="padding:10px 18px;background:#0095f6;color:#fff;border:none;border-radius:20px">Post</button></div><button onclick="closeComment()" style="width:100%;margin-top:12px;padding:9px">Close</button></div></div>
-<div id="bottomSheet" class="bottom-sheet" onclick="closeBottomSheet()"><div class="sheet-box" onclick="event.stopPropagation()"><div style="width:40px;height:4px;background:#555;border-radius:10px;margin:0 auto 18px"></div><div class="sheet-option" onclick="handleCreate('POST')">📷 POST</div><div class="sheet-option" onclick="handleCreate('REEL')">🎬 REEL</div><div class="sheet-option" onclick="handleCreate('SYSTEM')" style="color:#ff2e88">⚡ SYSTEM SETHU</div><div class="sheet-tabs"><span>POST</span><span class="active">REEL</span><span>LIVE</span></div></div></div>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <script>
+// INSTAGRAM SPEED LOGIC - NO WHITE SCREEN EVER
+const app=document.getElementById('app');
+const splash=document.getElementById('splash');
+const authPage=document.getElementById('authPage');
+
+// Show splash instantly (already visible) -> after 0.8s like insta -> show app with zoom
+setTimeout(()=>{
+splash.classList.add('hide');
+app.style.display='block';
+app.classList.add('show');
+authPage.style.display='block';
+setTimeout(()=>{splash.style.display='none'},350);
+},800); // 0.8s logo speed - Instagram same
+
+// Load supabase AFTER splash - so no white block
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async></script>
+<script>
+let currentUser=null,allPosts=[];
+function waitSupa(cb){const i=setInterval(()=>{if(window.supabase){clearInterval(i);cb()}},50)}
 const SUPABASE_URL="https://rrjrmvdvyqvtjdwdhmsd.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyanJtdmR2eXF2dGpkd2RobXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODk3OTYsImV4cCI6MjA3Mzg2NTc5Nn0.o3J4YjRjK3a8v5b9c2d1e6f7g8h9i0j1k2l3m4n5o6p";
-const supa=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let currentUser=null,currentPostId=null,glitchMode=false,allPosts=[];
-
-// APP OPEN SPEED 0.3s - LOGO ANIMATION 0.8s
-window.addEventListener('load',()=>{setTimeout(()=>{document.getElementById('splash')?.classList.add('hide')},350);});
-
-function switchTab(tab){
-document.querySelectorAll('.tab-section').forEach(t=>t.classList.remove('active'));
-document.querySelectorAll('.bottom-nav i').forEach(i=>i.classList.remove('active'));
-document.getElementById(tab+'Tab').classList.add('active');
-document.getElementById('nav-'+tab)?.classList.add('active');
-if(tab==='reels')loadReels();
-if(tab==='profile')loadProfile();
-}
+function getSupa(){return supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}
+function switchTab(t){document.querySelectorAll('.tab-section').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.bottom-nav i').forEach(x=>x.classList.remove('active'));document.getElementById(t+'Tab').classList.add('active');document.getElementById('nav-'+t)?.classList.add('active');if(t==='reels')document.getElementById('reels').innerHTML=document.getElementById('posts').innerHTML;if(t==='profile'&&currentUser){document.getElementById('myPosts').innerHTML=document.getElementById('posts').innerHTML}}
 function openBottomSheet(){document.getElementById('bottomSheet').classList.add('active')}
 function closeBottomSheet(){document.getElementById('bottomSheet').classList.remove('active')}
-function handleCreate(t){closeBottomSheet();openCreate(); if(t==='SYSTEM'){glitchMode=true; document.getElementById('systemBtn').innerText='🔥 SYSTEM ON'; document.getElementById('systemBtn').style.background='#ff004f'; document.getElementById('systemBtn').style.color='#fff';}}
 function openCreate(){document.getElementById('createModal').classList.add('active')}
 function closeCreate(){document.getElementById('createModal').classList.remove('active')}
-function openComment(id){currentPostId=id;document.getElementById('commentModal').classList.add('active');loadComments()}
-function closeComment(){document.getElementById('commentModal').classList.remove('active')}
-function toggleSystemFilter(){glitchMode=!glitchMode;let b=document.getElementById('systemBtn');b.innerText=glitchMode?'🔥 SYSTEM ON':'⚡ SYSTEM SETHU';b.style.background=glitchMode?'#ff004f':'#fff';b.style.color=glitchMode?'#fff':'#000';}
-function guestLogin(){currentUser={email:"giri@pixoro.app",id:"guest"};showMain();}
-async function signup(){const e=document.getElementById('email').value,p=document.getElementById('password').value;if(!e||!p)return alert("Podu da!");const {error}=await supa.auth.signUp({email:e,password:p});if(error)alert(error.message);else alert("Created!");}
-async function login(){const e=document.getElementById('email').value,p=document.getElementById('password').value;if(!e||!p){guestLogin();return;}try{const {data,error}=await supa.auth.signInWithPassword({email:e,password:p});if(error)throw error;currentUser=data.user;showMain();}catch{currentUser={email:e,id:"guest"};showMain();}}
-function showMain(){document.getElementById('authPage').style.display='none';document.getElementById('mainPage').style.display='block';document.getElementById('profileEmail').innerText=currentUser.email;document.getElementById('profileName').innerText=currentUser.email.split('@')[0].toUpperCase();loadPosts();}
-async function createPost(){let url=document.getElementById('postImage').value;if(!url)return alert("URL podu!");try{await supa.from('posts').insert({image_url:url,caption:document.getElementById('postCaption').value,username:currentUser.email.split('@')[0],likes:0});}catch{}closeCreate();document.getElementById('postImage').value='';document.getElementById('postCaption').value='';loadPosts();switchTab('home');}
-async function loadPosts(){
-try{
-const {data}=await supa.from('posts').select('*').order('created_at',{ascending:false});
-allPosts=data||[];renderPosts(allPosts,'posts');
-}catch{document.getElementById('posts').innerHTML='<p style="text-align:center;margin-top:40px">Welcome GIRI! + thodu 👇</p>';}
-}
-function renderPosts(list,elId){
-const el=document.getElementById(elId);
-if(!list.length){el.innerHTML='<p style="text-align:center;color:#999">No posts</p>';return;}
-el.innerHTML=list.map(p=>`<div class="post"><div class="post-header"><b>${p.username}</b></div><img src="${p.image_url}"><div class="post-actions"><i class="fa-regular fa-heart" onclick="likePost('${p.id}',${p.likes||0})"></i><i class="fa-regular fa-comment" onclick="openComment('${p.id}')"></i></div><div style="padding:0 12px;font-weight:700">${p.likes||0} likes</div><div style="padding:4px 12px 12px"><b>${p.username}</b> ${p.caption||''}</div></div>`).join('');
-}
-function loadReels(){renderPosts(allPosts,'reels');}
-function loadProfile(){document.getElementById('myPosts').innerHTML='';renderPosts(allPosts.filter(p=>p.username===currentUser.email.split('@')[0]),'myPosts');}
-function searchPosts(){const q=document.getElementById('searchInput').value.toLowerCase();const f=allPosts.filter(p=>(p.caption||'').toLowerCase().includes(q)||(p.username||'').toLowerCase().includes(q));renderPosts(f,'searchResults');}
-async function likePost(id,l){try{await supa.from('posts').update({likes:l+1}).eq('id',id);}catch{}loadPosts();}
-async function loadComments(){try{const {data}=await supa.from('comments').select('*').eq('post_id',currentPostId);document.getElementById('commentList').innerHTML=(data||[]).map(c=>`<div style="padding:6px 0"><b>${c.username}</b> ${c.text}</div>`).join('')||'No comments';}catch{}}
-async function addComment(){const t=document.getElementById('commentInput').value;if(!t)return;try{await supa.from('comments').insert({post_id:currentPostId,text:t,username:currentUser.email.split('@')[0]});}catch{}document.getElementById('commentInput').value='';loadComments();}
-async function logout(){try{await supa.auth.signOut();}catch{}location.reload();}
+function guestLogin(){currentUser={email:"giri@pixoro.app"};showMain()}
+function login(){guestLogin()}
+function showMain(){document.getElementById('authPage').style.display='none';document.getElementById('mainPage').style.display='block';document.getElementById('profileEmail').innerText=currentUser.email;document.getElementById('profileName').innerText=currentUser.email.split('@')[0].toUpperCase();waitSupa(loadPosts)}
+async function createPost(){const url=document.getElementById('postImage').value;if(!url)return;waitSupa(async()=>{try{await getSupa().from('posts').insert({image_url:url,caption:document.getElementById('postCaption').value,username:currentUser.email.split('@')[0],likes:0})}catch{}closeCreate();loadPosts()})}
+async function loadPosts(){try{const {data}=await getSupa().from('posts').select('*').order('created_at',{ascending:false});allPosts=data||[];document.getElementById('posts').innerHTML=allPosts.map(p=>`<div class="post"><div style="padding:10px;font-weight:600">${p.username}</div><img src="${p.image_url}"><div style="padding:10px"><b>${p.username}</b> ${p.caption||''}</div></div>`).join('')||'<p style="text-align:center;margin-top:40px;color:#999">No posts da! + thodu 👇</p>'}catch{}}
+async function logout(){location.reload()}
 </script>
 </body>
 </html>
