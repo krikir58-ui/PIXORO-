@@ -163,5 +163,23 @@ async function startCamera(){try{if(camStream)camStream.getTracks().forEach(t=>t
 function flipCam(){facing=facing==='user'?'environment':'user';startCamera()}
 async function capture(){let video=document.getElementById('cam');let c=document.createElement('canvas');c.width=video.videoWidth;c.height=video.videoHeight;let ctx=c.getContext('2d');ctx.filter=document.getElementById('cam').style.filter;ctx.drawImage(video,0,0);let data=c.toDataURL('image/jpeg',0.8);document.getElementById('lastThumb').innerHTML=`<img src="${data}" style="width:100%;height:100%;object-fit:cover">`;try{await supa.from('posts').insert({image_url:data,caption:'Camera 📸',username:currentUser.username,likes:0,views:0,type:'post',filter:currentFilter})}catch{}alert("Saved!");switchTab('home');loadPosts();}
 </script>
+ <!-- PIXORO Free Update System da -->
+<script>
+const MY_RAW_LINK = "https://pastebin.com/raw/UxtXXXXX"; // UN RAW LINK AH INGA MAATHU DA!
+
+async function checkPixoroUpdate(){
+  try{
+    let res = await fetch(MY_RAW_LINK);
+    let data = await res.json();
+    let currentVersion = "1";
+    if(data.latest_version != currentVersion){
+      if(confirm("🔥 PIXORO ku puthu update vanthirukku da!\n\n" + data.message + "\n\nUpdate panna poriya da?")){
+         location.reload(); // illa un download link ku pottukalam da
+      }
+    }
+  }catch(e){ console.log("Update check fail da"); }
+}
+checkPixoroUpdate();
+</script>
 </body>
 </html>
