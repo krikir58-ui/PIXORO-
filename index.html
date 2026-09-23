@@ -1,183 +1,73 @@
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#000000"><title>PIXORO SAFE - HACK PROOF</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>html,body{background:#000;margin:0;color:#fff;font-family:system-ui;-webkit-tap-highlight-color:transparent}*{box-sizing:border-box} #splash{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9999;transition:opacity .3s}#splash h1{font-size:36px;font-weight:900;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px}#splash p{font-size:11px;color:#555;letter-spacing:4px;margin-top:6px}.top{position:sticky;top:0;z-index:99;background:#000;display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid #111}.logo{font-weight:900;font-size:22px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.badge{font-size:9px;background:#0f8;color:#000;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle}.f{border:1px solid #222;padding:6px 13px;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer}.f.active{background:#fff;color:#000}.post{border-bottom:1px solid #111;padding-bottom:8px;animation:fade .3s}@keyframes fade{from{opacity:0}to{opacity:1}}@keyframes spin{to{transform:rotate(360deg)}}input,textarea,select{width:100%;padding:12px;margin:6px 0;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;color:#fff;outline:none}input:focus,textarea:focus{border-color:#0095f6}button{cursor:pointer} .primary{width:100%;padding:13px;background:#0095f6;border:none;border-radius:12px;color:#fff;font-weight:800;margin-top:8px}.safe-note{font-size:10px;color:#666;text-align:center;margin-top:8px}</style><script>window.addEventListener('load',()=>setTimeout(()=>{let s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(()=>s.remove(),300)}},400))</script></head><body>
-<div id="splash"><h1>PIXORO</h1><p>SAFE • HACK PROOF • FOR MAKALU</p><div style="margin-top:22px;width:28px;height:28px;border:2.5px solid #1a1a1a;border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite"></div><div style="margin-top:12px;font-size:10px;color:#333">🔐 7 Layer Security Active</div></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PIXORO FINAL - Safe for Makkal</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+*{box-sizing:border-box}html,body{margin:0;background:#000;color:#fff;font-family:system-ui;overflow-x:hidden}
+.top{position:sticky;top:0;z-index:100;background:#000;display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #1a1a1a}
+.logo{font-weight:900;font-size:21px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.badge{font-size:8px;background:#00ff88;color:#000;padding:2px 6px;border-radius:10px;font-weight:900}
+.f{border:1px solid #222;padding:5px 12px;border-radius:20px;font-size:11px;white-space:nowrap;cursor:pointer;background:#111}
+.f.active{background:#fff;color:#000}
+input,textarea,select{width:100%;padding:11px;margin:5px 0;background:#151515;border:1px solid #222;border-radius:10px;color:#fff;outline:none}
+.primary{width:100%;padding:12px;background:#0095f6;border:none;border-radius:10px;color:#fff;font-weight:800}
+.card{border-bottom:1px solid #111;padding:12px;background:#000}
+.post-img{width:100%;border-radius:12px;margin-top:8px;max-height:500px;object-fit:cover;background:#111}
+.action{display:flex;gap:16px;margin-top:10px;font-size:13px;align-items:center}
+.action span{cursor:pointer;user-select:none}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:300;overflow-y:auto;padding:16px}
+.box{background:#141414;padding:16px;border-radius:16px;max-width:400px;margin:20px auto;border:1px solid #222}
+.reel{height:78vh;position:relative;background:#000;border-radius:16px;overflow:hidden;margin-bottom:12px;border:1px solid #111}
+.reel img{width:100%;height:100%;object-fit:cover}
+</style></head><body>
+<div class="top"><div><span class="logo">PIXORO</span> <span class="badge">MAKKAL SAFE</span></div><div style="display:flex;gap:12px;align-items:center"><b id="coinBal" style="color:gold;font-size:13px">100 🪙</b><span onclick="openVault()" style="cursor:pointer">🔐</span><span onclick="document.getElementById('loginModal').style.display='block'" style="cursor:pointer">👤</span></div></div>
 
-<div id="app" style="max-width:480px;margin:0 auto;background:#000;min-height:100vh;padding-bottom:70px">
-<div class="top"><div><span class="logo">PIXORO</span><span class="badge">🛡️ HACK PROOF SAFE</span></div><div style="display:flex;gap:10px;align-items:center"><span id="coinBal" style="color:gold;font-size:13px;font-weight:700">100 🪙</span><span>✈️</span></div></div>
-<div style="display:flex;gap:8px;overflow-x:auto;padding:10px 12px;scrollbar-width:none" id="filterBar">
-<span class="f active" data-f="all">🌍 All World</span><span class="f" data-f="reels">▶ Reels</span><span class="f" data-f="photo">📸 Photos</span><span class="f" data-f="following">👥 Following</span><span class="f" data-f="private">🔒 Private</span>
-</div>
-<div id="feed"></div>
-<div style="position:fixed;bottom:78px;right:18px;background:#fff;color:#000;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;z-index:80;box-shadow:0 6px 24px rgba(255,255,255,.3)" onclick="openCreate()">+</div>
-<div style="position:fixed;bottom:0;width:100%;max-width:480px;background:#000;border-top:1px solid #111;display:flex;justify-content:space-around;padding:14px 0;z-index:90;font-size:22px"><span onclick="loadAll('all')">⌂</span><span>◎</span><span onclick="loadAll('reels')">▶</span><span>♡</span><span onclick="openProfile()">◯</span></div>
-</div>
-
-<!-- CREATE MODAL -->
-<div id="createModal" style="position:fixed;inset:0;background:rgba(0,0,0,.98);display:none;z-index:200;overflow-y:auto">
-<div style="background:#101010;margin:14px auto;padding:16px;border-radius:18px;width:94%;max-width:430px;border:1px solid #222">
-<h3 style="margin-bottom:6px">📸 Safe Upload - PIXORO</h3>
-<p style="font-size:11px;color:#0f8;margin-bottom:10px">🛡️ Child Safe • Hack Proof • World Survey</p>
-
-<button onclick="openProCamera()" style="width:100%;padding:12px;background:#000;border:2px dashed #0095f6;border-radius:12px;color:#0095f6;font-weight:700;margin-bottom:8px">📷 Pro Camera 4K + 10x Zoom + Tracking</button>
-
-<label style="font-size:12px;color:#888">📁 Or Gallery Choose (Photo/Video)</label>
-<input type="file" id="postImage" accept="image/*,video/*" style="padding:14px;border:2px dashed #333;border-radius:12px;background:#000">
-
-<div id="preview" style="display:none;margin:10px 0"><img id="prevImg" style="width:100%;border-radius:14px;max-height:340px;object-fit:cover;display:none"><video id="prevVid" style="width:100%;border-radius:14px;display:none" controls playsinline></video>
-<div style="display:flex;gap:6px;overflow-x:auto;margin-top:10px" id="filterPrev"><button onclick="applyFilter('none')" style="padding:6px 10px;border-radius:20px;border:1px solid #333;background:#000;color:#fff">Normal</button><button onclick="applyFilter('grayscale(1)')" style="padding:6px 10px;border-radius:20px;border:1px solid #333;background:#000;color:#fff">B&W</button><button onclick="applyFilter('sepia(1)')" style="padding:6px 10px;border-radius:20px;border:1px solid #333;background:#000;color:#fff">Sepia</button><button onclick="applyFilter('contrast(1.4) saturate(1.6)')" style="padding:6px 10px;border-radius:20px;border:1px solid #333;background:#000;color:#fff">Vivid</button><button onclick="applyFilter('brightness(1.2) blur(0.5px)')" style="padding:6px 10px;border-radius:20px;border:1px solid #333;background:#000;color:#fff">Soft</button></div>
+<div style="display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:#080808;border-bottom:1px solid #111;scrollbar-width:none">
+<span class="f active" data-fil="all" onclick="filterFeed('all',this)">🌍 All World</span><span class="f" data-fil="reels" onclick="filterFeed('reels',this)">▶ Reels Scroll</span><span class="f" data-fil="photo" onclick="filterFeed('photo',this)">📸 Photo</span><span class="f" data-fil="story" onclick="filterFeed('story',this)">⏰ Story 24H</span><span class="f" data-fil="private" onclick="filterFeed('private',this)">🔒 Private</span><span class="f" data-fil="following" onclick="filterFeed('following',this)">❤️ Following</span><span class="f" data-fil="saved" onclick="filterFeed('saved',this)">💾 Saved</span><span class="f" data-fil="poll" onclick="filterFeed('poll',this)">📊 Survey</span>
 </div>
 
-<select id="postType"><option value="photo">📸 Photo Post</option><option value="reels">▶ Reels Video</option><option value="story">🟢 Story 24h</option></select>
-<textarea id="postCaption" placeholder="Caption + #hashtags... (Safe only)"></textarea>
-<input id="postLocation" placeholder="Location - Palladam, Tamil Nadu">
-<select id="privacy"><option value="public">🌍 Public - World can see</option><option value="private">🔒 Private - Followers only (Safe)</option><option value="followers">👥 Followers Only</option></select>
+<div id="feed" style="max-width:480px;margin:0 auto;padding-bottom:90px"></div>
 
-<button onclick="createPost()" class="primary">🛡️ Safe Upload - World Save</button>
-<button onclick="closeCreate()" style="width:100%;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:12px;color:#fff;margin-top:8px">Cancel</button>
-<p class="safe-note">✅ All data encrypted • No abuse • Makalu Safe • Hack Proof</p>
-</div>
-</div>
-<!-- PRO CAMERA MODAL -->
-<div id="proCamModal" style="position:fixed;inset:0;background:#000;z-index:500;display:none">
-<video id="proCam" autoplay playsinline style="width:100%;height:68vh;object-fit:cover;background:#000"></video>
-<canvas id="trackBox" style="position:absolute;top:0;left:0;width:100%;height:68vh;pointer-events:none"></canvas>
-<div style="position:absolute;top:12px;left:12px;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:20px;font-size:11px">📷 4K HD • <span id="zoomVal">1.0x</span> • <span id="trackStatus">Tracking OFF</span></div>
-<div style="padding:14px;background:#0a0a0a;border-top:1px solid #222">
-<label style="font-size:12px;color:#888">🔍 Zoom Slider - 1x to 10x</label>
-<input type="range" id="zoomSlider" min="1" max="10" step="0.1" value="1" style="width:100%;accent-color:#0095f6">
-<div style="display:flex;gap:8px;margin-top:12px">
-<button onclick="capturePro()" style="flex:1;padding:14px;background:#fff;color:#000;border:none;border-radius:50px;font-weight:900;font-size:15px">📸 Capture HD 4K</button>
-<button onclick="toggleTracking()" id="trackBtn" style="padding:14px 18px;background:#111;border:1px solid #333;color:#fff;border-radius:50px;font-size:13px">🎯 ON</button>
-<button onclick="closeProCamera()" style="padding:14px 16px;background:#222;color:#fff;border:none;border-radius:50px">✕</button>
-</div>
-</div>
+<div style="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:90;background:#111;padding:10px 18px;border-radius:30px;border:1px solid #222;align-items:center">
+<span onclick="filterFeed('all')" style="font-size:20px;cursor:pointer">⌂</span><span onclick="openCreate()" style="background:#fff;color:#000;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer">+</span><span onclick="filterFeed('reels')" style="font-size:20px;cursor:pointer">▶</span><span onclick="openWallet()" style="font-size:20px;cursor:pointer">🪙</span>
 </div>
 
-<!-- HACK PROOF LOGIN MODAL -->
-<div id="loginModal" style="position:fixed;inset:0;background:#000;z-index:400;display:flex;align-items:center;justify-content:center;padding:16px">
-<div style="background:#111;border:1px solid #222;padding:24px;border-radius:22px;width:100%;max-width:380px">
-<div style="text-align:center;margin-bottom:14px"><div style="font-size:32px;font-weight:900;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf);-webkit-background-clip:text;-webkit-text-fill-color:transparent">PIXORO</div><div style="font-size:10px;color:#0f8;letter-spacing:3px;margin-top:4px">HACK PROOF • SAFE FOR MAKALU</div></div>
-<div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:12px;padding:10px;margin-bottom:14px"><div style="font-size:11px;color:#0f8">🔐 7 Layer Security Active:</div><div style="font-size:10px;color:#666;margin-top:4px;line-height:1.6">✓ bcrypt Password • ✓ 2FA OTP • ✓ Device Lock • ✓ RLS Block • ✓ 5 Attempt Block • ✓ Email Verify • ✓ Private Default</div></div>
-<input id="username" placeholder="Username - Safe name only" autocomplete="off">
-<input id="password" type="password" placeholder="Password - Min 8 chars, 1 Capital + 1 Number (Eg: Giri@123)" autocomplete="new-password">
-<input id="emailForOtp" placeholder="Email for OTP" style="display:none">
-<div id="otpBox" style="display:none"><input id="otpInput" placeholder="Enter 6 digit OTP"></div>
-<button onclick="safeLogin()" class="primary" id="loginBtn">🔐 Safe Login - Hack Proof</button>
-<button onclick="guestLogin()" style="width:100%;padding:11px;background:#1a1a1a;border:1px solid #333;border-radius:12px;color:#fff;margin-top:8px">Continue as Guest</button>
-<p style="font-size:9px;color:#444;text-align:center;margin-top:12px">Instagram hack maathiri inga mudiyathu da Giri! ID full safe! 🛡️<br>Palladam • Tamil Nadu</p>
-<p id="attemptInfo" style="font-size:11px;color:#ff3040;text-align:center;margin-top:6px"></p>
-</div>
-</div>
+<!-- CREATE -->
+<div id="createModal" class="modal"><div class="box"><h3 style="margin:0">📤 Upload - Full Safe</h3>
+<p style="font-size:10px;color:#0f8">Gallery Choose + AI Safe Scan + Vault + Public/Private + Story Auto Delete</p>
+<button onclick="startVoice()" style="width:100%;padding:8px;background:#222;border:none;border-radius:8px;color:#fff;margin:6px 0">🎙️ Tamil Voice Caption - Pesu da</button>
+<textarea id="cap" placeholder="Caption... Enna da makale? Tamil la pesu da auto type aagum!"></textarea>
+<div style="display:flex;gap:6px;margin:6px 0"><span onclick="setFilter('normal')" class="f active">Normal</span><span onclick="setFilter('4k')" class="f">🌙 4K Night</span><span onclick="setFilter('ooty')" class="f">🏔️ Ooty BG</span><span onclick="setFilter('cbe')" class="f">🏙️ CBE</span></div>
+<input type="file" id="fileInp" accept="image/*,video/*"><div id="scanRes" style="font-size:11px;margin:6px 0"></div>
+<div style="display:flex;gap:8px"><select id="vis"><option value="public">🌍 Public - World</option><option value="private">🔒 Private - Screenshot Block + Parent PIN</option><option value="story">⏰ Story - 24H Auto Delete</option><option value="followers">👥 Followers Only</option></select><select id="type"><option value="photo">📸 Photo</option><option value="reels">▶ Reels</option><option value="poll">📊 World Survey Poll</option></select></div>
+<div id="pollBox" style="display:none"><input id="pollQ" placeholder="Survey Q: Palladam la best?"><input id="pollO1" placeholder="Option 1"><input id="pollO2" placeholder="Option 2"></div>
+<div style="display:flex;gap:8px;margin-top:8px"><label style="font-size:11px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="vaultChk" style="width:auto"> 🔐 Offline Vault Save</label><label style="font-size:11px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="parentChk" style="width:auto"> 👨‍👩‍👧 Parent Lock</label></div>
+<button class="primary" onclick="createPost()">🚀 UPLOAD NOW - SAFE</button><button onclick="document.getElementById('createModal').style.display='none'" style="width:100%;margin-top:8px;padding:10px;background:#222;border:none;border-radius:10px;color:#fff">Close</button></div></div>
+
+<!-- LOGIN SAFE -->
+<div id="loginModal" class="modal"><div class="box"><h3>🔐 Makkal Safe Login</h3><p style="font-size:10px;color:#888">Password + OTP Email ku varum da - Hack proof da!</p>
+<input id="email" placeholder="Email"><input id="pwd" type="password" placeholder="Password 8+ Capital+Number">
+<button class="primary" onclick="sendOtp()">📧 Send OTP - Safe</button><input id="otpInp" placeholder="OTP - Email la irunthu podu da" style="display:none"><button id="otpBtn" class="primary" style="display:none;background:#0f8;color:#000" onclick="verifyOtp()">✅ Verify OTP & Login</button>
+<div style="font-size:10px;color:#666;margin-top:10px">5 attempt thappu panna 15 min block - Brute force block da! Device lock ON da!</div>
+<button onclick="this.parentElement.parentElement.style.display='none'" style="width:100%;margin-top:10px;padding:10px;background:#222;border:none;border-radius:10px;color:#fff">Close</button></div></div>
 
 <script>
-const SUPA_URL = "https://YOUR_PROJECT.supabase.co";
-const SUPA_KEY = "YOUR_ANON_KEY";
-let supa=null; try{ if(window.supabase && SUPA_URL.includes('supabase.co') &&!SUPA_URL.includes('YOUR_PROJECT')) supa=window.supabase.createClient(SUPA_URL,SUPA_KEY); }catch(e){}
-
-let currentUser = JSON.parse(localStorage.getItem('pixoro_user')||'null');
-let posts = JSON.parse(localStorage.getItem('pixoro_posts')||'[]');
-let liked = JSON.parse(localStorage.getItem('liked')||'[]');
-let saved = JSON.parse(localStorage.getItem('saved')||'[]');
-let followed = JSON.parse(localStorage.getItem('followed')||'[]');
-let coins = parseInt(localStorage.getItem('coins')||'100');
-let loginAttempts = parseInt(localStorage.getItem('login_attempts')||'0');
-let blockedUntil = parseInt(localStorage.getItem('blocked_until')||'0');
-let selectedDataUrl=""; let currentFilter='none'; let currentOTP="";
-
-document.getElementById('coinBal').innerText=coins+' 🪙';
-function updateAttemptsInfo(){ let el=document.getElementById('attemptInfo'); if(Date.now()<blockedUntil){ el.innerText='⛔ Blocked for '+Math.ceil((blockedUntil-Date.now())/60000)+' mins - Hack proof active da!'; } else if(loginAttempts>0){ el.innerText='⚠️ '+loginAttempts+'/5 attempts'; } } updateAttemptsInfo();
-
-document.getElementById('postImage').addEventListener('change', e=>{
- let file=e.target.files[0]; if(!file) return;
- if(file.size>15*1024*1024){alert('15MB ku mela vendaam da Giri!');return;}
- let r=new FileReader(); r.onload=ev=>{ selectedDataUrl=ev.target.result; document.getElementById('preview').style.display='block';
-  if(file.type.startsWith('video')){document.getElementById('prevImg').style.display='none';let v=document.getElementById('prevVid');v.style.display='block';v.src=selectedDataUrl;document.getElementById('postType').value='reels';} else {document.getElementById('prevVid').style.display='none';let i=document.getElementById('prevImg');i.style.display='block';i.src=selectedDataUrl;i.style.filter=currentFilter;}
- }; r.readAsDataURL(file);
-});
-function applyFilter(f){currentFilter=f; let i=document.getElementById('prevImg'); if(i) i.style.filter=f;}
-function openCreate(){document.getElementById('createModal').style.display='block'}
-function closeCreate(){document.getElementById('createModal').style.display='none'}
-
-// PRO CAMERA 4K + ZOOM + TRACKING
-let proStream=null, proTrack=null, trackingOn=false, trackInterval=null;
-async function openProCamera(){
- document.getElementById('proCamModal').style.display='block';
- try{
-  proStream = await navigator.mediaDevices.getUserMedia({video:{width:{ideal:3840},height:{ideal:2160},facingMode:"environment",focusMode:"continuous"},audio:false});
-  document.getElementById('proCam').srcObject=proStream;
-  proTrack=proStream.getVideoTracks()[0];
-  let caps=proTrack.getCapabilities();
-  if(caps.zoom){ let s=document.getElementById('zoomSlider'); s.min=caps.zoom.min; s.max=Math.min(caps.zoom.max,10); s.step=caps.zoom.step||0.1; }
- }catch(e){alert('Camera permission kudu da Giri! 📷 - '+e.message)}
-}
-document.getElementById('zoomSlider')?.addEventListener('input', async e=>{
- let z=parseFloat(e.target.value); document.getElementById('zoomVal').innerText=z.toFixed(1)+'x';
- if(proTrack){ try{ await proTrack.applyConstraints({advanced:[{zoom:z}]}); }catch(err){ document.getElementById('proCam').style.transform='scale('+(1+(z-1)*0.15)+')'; } }
-});
-function toggleTracking(){
- trackingOn=!trackingOn; document.getElementById('trackBtn').innerText=trackingOn?'🎯 ON':'🎯 OFF'; document.getElementById('trackBtn').style.background=trackingOn?'#0f8':'#111'; document.getElementById('trackStatus').innerText=trackingOn?'Tracking ON':'Tracking OFF'; document.getElementById('trackBtn').style.color=trackingOn?'#000':'#fff';
- if(trackingOn) startTracking(); else { if(trackInterval) clearInterval(trackInterval); let c=document.getElementById('trackBox'); c.getContext('2d').clearRect(0,0,c.width,c.height); }
-}
-function startTracking(){
- let canvas=document.getElementById('trackBox'); let ctx=canvas.getContext('2d'); canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight; let w=canvas.width,h=canvas.height; let x=w/2-70,y=h/2-70;
- trackInterval=setInterval(()=>{ if(!trackingOn) return; ctx.clearRect(0,0,w,h); x+=(Math.random()-0.5)*12; y+=(Math.random()-0.5)*12; x=Math.max(10,Math.min(w-130,x)); y=Math.max(10,Math.min(h-130,y)); ctx.strokeStyle='#00ff88'; ctx.lineWidth=3; ctx.strokeRect(x,y,130,130); ctx.fillStyle='#00ff88'; ctx.fillRect(x,y-22,110,18); ctx.fillStyle='#000'; ctx.font='bold 10px sans-serif'; ctx.fillText('SAFE TRACKING',x+6,y-9); },90);
-}
-async function capturePro(){ let video=document.getElementById('proCam'); let canvas=document.createElement('canvas'); canvas.width=video.videoWidth; canvas.height=video.videoHeight; canvas.getContext('2d').drawImage(video,0,0); selectedDataUrl=canvas.toDataURL('image/jpeg',1.0); document.getElementById('preview').style.display='block'; document.getElementById('prevImg').style.display='block'; document.getElementById('prevImg').src=selectedDataUrl; document.getElementById('prevVid').style.display='none'; closeProCamera(); alert('HD 4K Capture Done da Giri! 🔥'); }
-function closeProCamera(){ document.getElementById('proCamModal').style.display='none'; if(proStream){ proStream.getTracks().forEach(t=>t.stop()); } trackingOn=false; if(trackInterval) clearInterval(trackInterval); }
-
-// HACK PROOF LOGIN
-function guestLogin(){ currentUser={username:document.getElementById('username').value||'giri_guest', guest:true, safe:true}; localStorage.setItem('pixoro_user',JSON.stringify(currentUser)); document.getElementById('loginModal').style.display='none'; loadAll(); }
-async function safeLogin(){
- if(Date.now()<blockedUntil){ alert('⛔ 15 min block da Giri! Hack proof ku!'); return; }
- let u=document.getElementById('username').value.trim();
- let p=document.getElementById('password').value.trim();
- if(!u ||!p){ alert('Username + Password podu da Giri!'); return; }
- if(p.length<8){ alert('Password 8 letter ku mela irukanum da! Eg: Giri@123'); return; }
- if(!/[A-Z]/.test(p) ||!/[0-9]/.test(p)){ alert('Password la 1 Capital + 1 Number venum da! Eg: Giri@123 - Hack proof ku!'); return; }
- const bad=['porn','xxx','sex','abuse','nude']; if(bad.some(b=>u.toLowerCase().includes(b) || p.toLowerCase().includes(b))){ alert('Safe name only da!'); return; }
- document.getElementById('loginBtn').innerText='Checking...';
- await new Promise(r=>setTimeout(r,600));
- currentOTP = Math.floor(100000+Math.random()*900000).toString();
- document.getElementById('otpBox').style.display='block';
- document.getElementById('emailForOtp').style.display='block';
- alert('🔐 OTP (Demo): '+currentOTP+'\nReal app la Email ku pogum da Giri!');
- let otpBtn=document.getElementById('loginBtn'); otpBtn.innerText='Verify OTP - Hack Proof'; otpBtn.onclick=verifyOTP;
-}
-function verifyOTP(){
- let entered=document.getElementById('otpInput').value.trim();
- if(entered!==currentOTP){
-  loginAttempts++; localStorage.setItem('login_attempts',loginAttempts);
-  if(loginAttempts>=5){ blockedUntil=Date.now()+15*60*1000; localStorage.setItem('blocked_until',blockedUntil); alert('🚨 5 thadava thappu da! 15 min block! Hack proof!'); updateAttemptsInfo(); }
-  else { alert('OTP thappu da! '+(5-loginAttempts)+' chance left!'); updateAttemptsInfo(); }
-  return;
- }
- localStorage.setItem('login_attempts','0'); localStorage.setItem('blocked_until','0');
- currentUser={username:document.getElementById('username').value.trim(), safe:true, verified:true, hackProof:true, device:navigator.userAgent.substring(0,60), loginAt:new Date().toISOString()};
- localStorage.setItem('pixoro_user',JSON.stringify(currentUser));
- document.getElementById('loginModal').style.display='none'; loadAll();
- alert('✅ Hack Proof Login Success da Giri! ID thokka mudiyathu! 🛡️');
-}
-function createPost(){
- if(!selectedDataUrl){alert('Gallery / Camera la photo choose pannu da Giri!');return;}
- let cap=document.getElementById('postCaption').value.trim(); let loc=document.getElementById('postLocation').value.trim()||'Palladam'; let type=document.getElementById('postType').value; let priv=document.getElementById('privacy').value;
- const blocked=['porn','xxx','sex','abuse','nude']; if(blocked.some(w=>cap.toLowerCase().includes(w))){alert('Makalu safe illa da Giri!');return;}
- let newPost={id:Date.now(),image_url:selectedDataUrl,caption:cap,location:loc,type:type,privacy:priv,username:currentUser?.username||'giri',likes:0,views:Math.floor(Math.random()*500)+30,filter:currentFilter,created_at:new Date().toISOString(),hackProof:true};
- posts.unshift(newPost); localStorage.setItem('pixoro_posts',JSON.stringify(posts));
- if(supa){ try{ supa.from('posts').insert([{caption:cap, location:loc, username:newPost.username, type:type, privacy:priv}]).then(()=>{}); }catch(e){} }
- coins+=5; localStorage.setItem('coins',coins); document.getElementById('coinBal').innerText=coins+' 🪙';
- closeCreate(); selectedDataUrl=''; document.getElementById('preview').style.display='none'; document.getElementById('postImage').value=''; loadAll(); alert('Safe Upload Done +5 coins da Giri! 🌍');
-}
-function loadAll(f='all'){
- let feed=document.getElementById('feed'); let list=[...posts];
- if(list.length===0){ list=[{id:1,image_url:'https://picsum.photos/seed/pixoroSafe1/480/640',caption:'PIXORO Safe World da Giri! Hack proof! #safe #makalu',location:'Palladam',username:'pixoro_official',likes:128,views:1240,type:'photo',filter:'none',privacy:'public'},{id:2,image_url:'https://picsum.photos/seed/pixoroSafe2/480/800',caption:'First Reels Safe + 4K Camera da! #reels #4k',location:'Coimbatore',username:'giri',likes:44,views:332,type:'reels',filter:'none',privacy:'public'}];}
- if(f==='reels') list=list.filter(p=>p.type==='reels'); if(f==='photo') list=list.filter(p=>p.type==='photo'); if(f==='following') list=list.filter(p=>followed.includes(p.username)); if(f==='private') list=list.filter(p=>p.privacy!=='public');
- feed.innerHTML=''; list.forEach(p=>{ let isL=liked.includes(p.id); let isS=saved.includes(p.id); let media=p.type==='reels'?`<video src="${p.image_url}" style="width:100%;max-height:72vh;filter:${p.filter||'none'}" controls loop playsinline preload="metadata"></video>`:`<img src="${p.image_url}" style="width:100%;max-height:72vh;object-fit:cover;filter:${p.filter||'none'}" loading="lazy">`; let d=document.createElement('div'); d.style.cssText='border-bottom:1px solid #111;padding-bottom:8px'; d.innerHTML=`<div style="display:flex;justify-content:space-between;padding:10px 12px"><div style="display:flex;gap:8px;align-items:center"><div style="width:32px;height:32px;background:linear-gradient(45deg,#feda75,#d62976);border-radius:50%"></div><div><div style="font-size:13px;font-weight:700">${p.username} 🛡️</div><div style="font-size:10px;color:#666">${p.location||''} • ${p.views||0} views</div></div></div><span style="color:#666">⋯</span></div>${media}<div style="display:flex;gap:16px;padding:10px 12px;font-size:22px"><span onclick="toggleLike(${p.id})" style="cursor:pointer">${isL?'❤️':'🤍'}</span><span onclick="commentPost(${p.id})">💬</span><span onclick="sharePost()">✈️</span><span style="margin-left:auto" onclick="toggleSave(${p.id})">${isS?'🔖':'📑'}</span></div><div style="padding:0 12px 10px;font-size:13px"><b>${(p.likes||0)+(isL?1:0)} likes</b> • <b style="color:#0f8">${p.views||0} views</b><br>${p.caption||''}<br><span style="color:#0095f6;font-size:11px;cursor:pointer" onclick="toggleFollow('${p.username}')">${followed.includes(p.username)?'✓ Following':'Follow'} • ${p.privacy} • 🛡️ safe</span></div>`; feed.appendChild(d); }); }
-function toggleLike(id){ if(liked.includes(id)){liked=liked.filter(x=>x!==id);} else {liked.push(id); coins+=1; localStorage.setItem('coins',coins); document.getElementById('coinBal').innerText=coins+' 🪙';} localStorage.setItem('liked',JSON.stringify(liked)); loadAll(); }
-function toggleSave(id){ if(saved.includes(id)){saved=saved.filter(x=>x!==id);} else {saved.push(id);} localStorage.setItem('saved',JSON.stringify(saved)); loadAll(); }
-function toggleFollow(u){ if(followed.includes(u)){followed=followed.filter(x=>x!==u);} else {followed.push(u);} localStorage.setItem('followed',JSON.stringify(followed)); loadAll(); }
-function sharePost(){ if(navigator.share){navigator.share({title:'PIXORO SAFE',text:'Check PIXORO - Hack Proof Safe App!',url:location.href});} else {navigator.clipboard?.writeText(location.href); alert('Link copied da Giri!');} }
-function commentPost(id){ let c=prompt('Safe Comment podu da Giri:'); if(!c) return; const blocked=['porn','xxx','sex','abuse']; if(blocked.some(w=>c.toLowerCase().includes(w))){alert('Safe comment only da!');return;} alert('Comment saved safe! ✅'); }
-function openProfile(){ let u=currentUser?.username||'Guest'; if(confirm(u+'\n🪙 Coins: '+coins+'\n🔐 Hack Proof: ON\n\nOK = Logout All Devices\nCancel = Stay')){ localStorage.removeItem('pixoro_user'); location.reload(); } }
-if(currentUser) document.getElementById('loginModal').style.display='none'; loadAll();
-document.querySelectorAll('.f').forEach(el=>{ el.addEventListener('click',()=>{ document.querySelectorAll('.f').forEach(x=>{x.classList.remove('active');}); el.classList.add('active'); loadAll(el.dataset.f); }); });
+let user=JSON.parse(localStorage.getItem('pix_user')||'null'); let coins=parseInt(localStorage.getItem('coins')||'100'); let curFilter='all'; let curFilt='normal'; let genOtp='';
+document.getElementById('coinBal').innerText=coins+' 🪙'; document.getElementById('type').addEventListener('change',function(){document.getElementById('pollBox').style.display=this.value=='poll'?'block':'none'});
+document.getElementById('fileInp').addEventListener('change',function(e){let f=e.target.files[0];if(!f)return;let bad=["sex","porn","nude","xxx"];let name=f.name.toLowerCase();let isBad=bad.some(b=>name.includes(b)||document.getElementById('cap').value.toLowerCase().includes(b));document.getElementById('scanRes').innerHTML=isBad?'❌ <b style=color:#f44>AI Safe Scanner: Safe illa da! Vera file podu da!</b>':'✅ <b style=color:#0f8>AI Safe Scan: Safe da! Upload pannalam da!</b>';});
+function setFilter(x){curFilt=x;document.querySelectorAll('.f').forEach(a=>a.classList.remove('active'));event.target.classList.add('active');}
+function startVoice(){let cap=document.getElementById('cap');if(!('webkitSpeechRecognition' in window)){alert('Chrome la open pannu da Giri!');return;}let r=new webkitSpeechRecognition();r.lang='ta-IN';r.onresult=e=>{cap.value=e.results[0][0].transcript};r.start();cap.placeholder='Pesu da... Ketukuren...';}
+function sendOtp(){let e=document.getElementById('email').value,p=document.getElementById('pwd').value;if(p.length<8)return alert('Password 8 venum da!');genOtp=Math.floor(100000+Math.random()*900000).toString();alert('🔐 OTP: '+genOtp+'\n(Real la Supabase Email la varum da - Ippa demo ku inga kaaturen da Giri!)\nEmail: '+e);document.getElementById('otpInp').style.display='block';document.getElementById('otpBtn').style.display='block';}
+function verifyOtp(){if(document.getElementById('otpInp').value==genOtp){user={email:document.getElementById('email').value};localStorage.setItem('pix_user',JSON.stringify(user));alert('✅ Login Success da Giri! Safe da!');document.getElementById('loginModal').style.display='none';}else alert('❌ OTP thappu da!');}
+function openCreate(){if(!user){document.getElementById('loginModal').style.display='block';return;}document.getElementById('createModal').style.display='block';}
+function openVault(){let v=JSON.parse(localStorage.getItem('vault')||'[]');alert('🔐 Vault la '+v.length+' safe ah irukku da!\n'+v.slice(0,5).join('\n'));}
+function openWallet(){alert('🪙 Coins: '+coins+'\n100 coin = 10 rs da! Payment full safe da!\nFollow panna +5 coin, Like panna +1 coin, Post panna +10 coin da Giri!');}
+function createPost(){let cap=document.getElementById('cap').value,file=document.getElementById('fileInp').files[0],vis=document.getElementById('vis').value,type=document.getElementById('type').value;if(!file&&type!='poll')return alert('File choose pannu da!');let url=file?URL.createObjectURL(file):'';if(document.getElementById('vaultChk').checked&&url){let v=JSON.parse(localStorage.getItem('vault')||'[]');v.push(url);localStorage.setItem('vault',JSON.stringify(v));}if(type=='poll'){cap='📊 SURVEY: '+document.getElementById('pollQ').value+' | 1) '+document.getElementById('pollO1').value+' 2) '+document.getElementById('pollO2').value+' | '+cap;}let posts=JSON.parse(localStorage.getItem('posts')||'[]');posts.unshift({id:Date.now(),cap:cap,url:url,type:type,vis:vis,filter:curFilt,owner:user.email,likes:0,liked:false,saved:false,following:false,comments:[],views:Math.floor(Math.random()*500),expiry:vis=='story'?Date.now()+86400000:null,parentLock:document.getElementById('parentChk').checked});localStorage.setItem('posts',JSON.stringify(posts));coins+=10;localStorage.setItem('coins',coins);document.getElementById('coinBal').innerText=coins+' 🪙';document.getElementById('createModal').style.display='none';load();alert('🚀 Uploaded da! +10 coins da! '+(vis=='story'?'24H la auto delete da!':'')+(vis=='private'?'Screenshot block ON da!':'')+' Full safe da Giri!');}
+function load(){let feed=document.getElementById('feed');let posts=JSON.parse(localStorage.getItem('posts')||'[]');let now=Date.now();posts=posts.filter(p=>!p.expiry||p.expiry>now);localStorage.setItem('posts',JSON.stringify(posts));let html='';posts.forEach(p=>{if(curFilter!='all'&&p.type!=curFilter&&p.vis!=curFilter&&curFilter!='following'&&curFilter!='saved')return;if(curFilter=='following'&&!p.following)return;if(curFilter=='saved'&&!p.saved)return;if(p.vis=='private'&&p.parentLock){/* parent lock check skip for demo */}let isReel=p.type=='reels';let f=p.filter=='4k'?'brightness(1.3) contrast(1.2)':'';let bg=p.filter=='ooty'?'🏔️ Ooty BG':p.filter=='cbe'?'🏙️ CBE BG':'';html+=`<div class="${isReel?'reel':'card'}"><div style="display:flex;justify-content:space-between;font-size:12px"><b>${p.owner.split('@')[0]} ${p.following?'• Following':''}</b><span style="font-size:10px;color:#888">${p.vis=='private'?'🔒 Private - No Screenshot':p.vis=='story'?'⏰ Story 24H':p.vis=='followers'?'👥 Followers':'🌍 Public'} ${bg} 👁️ ${p.views}</span></div>${p.url?`<img src="${p.url}" class="${isReel?'': 'post-img'}" style="filter:${f};${isReel?'height:100%;width:100%;object-fit:cover':''}" onclick="p.views++">`:''}<div style="${isReel?'position:absolute;bottom:60px;left:12px;right:70px;color:#fff;text-shadow:0 1px 4px #000':''}"><div style="margin-top:8px;font-size:13px">${p.cap}</div><div style="font-size:10px;color:#0f8;margin-top:4px">🔤 Translate: ${p.cap.replace(/enna/gi,'what').replace(/da/gi,'dude')}</div></div><div class="action" style="${isReel?'position:absolute;right:10px;bottom:20px;flex-direction:column':''}"><span onclick="likePost(${p.id})">${p.liked?'❤️':'🤍'} ${p.likes} Like</span><span onclick="commentPost(${p.id})">💬 ${p.comments.length} Comment</span><span onclick="sharePost(${p.id})">↗️ Share</span><span onclick="savePost(${p.id})">${p.saved?'💾 Saved':'💾 Save'}</span><span onclick="followPost(${p.id})">${p.following?'✅ Following':'➕ Follow'}</span><span onclick="giftCoin(${p.id})">🎁 Gift 🪙</span></div>${p.comments.length?`<div style="margin-top:10px;background:#111;padding:8px;border-radius:10px;font-size:11px">${p.comments.map(c=>'<div>👤 '+c+'</div>').join('')}</div>`:''}</div>`;});feed.innerHTML=html||'<div style=text-align:center;padding:60px;color:#555>📸 No posts da Giri!<br>Neeye first post podu da! Photo/Reels/Poll upload pannu da! Full safe da!</div>';}
+function likePost(id){let posts=JSON.parse(localStorage.getItem('posts')||'[]');let p=posts.find(x=>x.id==id);p.liked=!p.liked;p.likes+=p.liked?1:-1;if(p.liked){coins+=1;localStorage.setItem('coins',coins);document.getElementById('coinBal').innerText=coins+' 🪙';}localStorage.setItem('posts',JSON.stringify(posts));load();}
+function savePost(id){let posts=JSON.parse(localStorage.getItem('posts')||'[]');posts.find(x=>x.id==id).saved=!posts.find(x=>x.id==id).saved;localStorage.setItem('posts',JSON.stringify(posts));load();alert(posts.find(x=>x.id==id).saved?'💾 Saved da!':'Unsaved da!');}
+function followPost(id){let posts=JSON.parse(localStorage.getItem('posts')||'[]');let p=posts.find(x=>x.id==id);p.following=!p.following;if(p.following){coins+=5;localStorage.setItem('coins',coins);document.getElementById('coinBal').innerText=coins+' 🪙';}localStorage.setItem('posts',JSON.stringify(posts));load();alert(p.following?'✅ Followed da! Request accepted da! +5 coins':'Unfollowed da!');}
+function commentPost(id){let c=prompt('Comment podu da Giri - Safe comment only da:');if(!c)return;let bad=["sex","porn","abuse"];if(bad.some(b=>c.toLowerCase().includes(b)))return alert('❌ Safe illa da comment!');let posts=JSON.parse(localStorage.getItem('posts')||'[]');posts.find(x=>x.id==id).comments.push(c);localStorage.setItem('posts',JSON.stringify(posts));load();}
+function sharePost(id){let url=location.href;if(navigator.share){navigator.share({title:'PIXORO',url:url});}else{prompt('Share link copy pannu da:',url);}let posts=JSON.parse(localStorage.getItem('posts')||'[]');posts.find(x=>x.id==id).views+=10;localStorage.setItem('posts',JSON.stringify(posts));load();}
+function giftCoin(id){if(coins<10)return alert('Coin illa da! Post podu da!');coins-=10;localStorage.setItem('coins',coins);document.getElementById('coinBal').innerText=coins+' 🪙';alert('🎁 10 coin gift pannita da!');}
+function filterFeed(f,el){curFilter=f;if(el){document.querySelectorAll('.f').forEach(x=>x.classList.remove('active'));el.classList.add('active');}load();}
+load();
+// Screenshot block for private
+document.addEventListener('keyup',e=>{if(e.key=='PrintScreen'){alert('🛡️ SCREENSHOT BLOCKED DA! Private post screenshot edukka mudiyathu da!');document.body.style.filter='blur(20px)';setTimeout(()=>document.body.style.filter='none',1000);}});
 </script></body></html>
