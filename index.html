@@ -1,24 +1,98 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PIXORO - Makkal Safe Final Clear</title><style>*{box-sizing:border-box}body{margin:0;background:#000;color:#fff;font-family:system-ui}.top{position:sticky;top:0;z-index:10;background:#000;display:flex;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #1a1a1a}.logo{font-weight:900;font-size:20px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.f{border:1px solid #222;padding:5px 12px;border-radius:20px;font-size:11px;background:#111;cursor:pointer}.f.active{background:#fff;color:#000}input,textarea,select{width:100%;padding:11px;margin:5px 0;background:#151515;border:1px solid #222;border-radius:10px;color:#fff}.primary{width:100%;padding:12px;background:#0095f6;border:none;border-radius:10px;color:#fff;font-weight:800}.card{border-bottom:1px solid #111;padding:12px}.post-img{width:100%;border-radius:12px;margin-top:8px;max-height:500px;object-fit:cover}.action{display:flex;gap:14px;margin-top:10px;font-size:13px}.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:100;padding:16px}.box{background:#141414;padding:16px;border-radius:16px;max-width:400px;margin:20px auto;border:1px solid #222}</style></head><body>
-<div class="top"><div class="logo">PIXORO <span style="font-size:8px;background:#0f8;color:#000;padding:2px 6px;border-radius:10px">SAFE</span></div><div style="display:flex;gap:10px"><b id="coinBal" style="color:gold;font-size:13px">100 🪙</b><span onclick="openVault()">🔐</span><span onclick="document.getElementById('loginModal').style.display='block'">👤</span></div></div>
-<div style="display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:#080808;border-bottom:1px solid #111"><span class="f active" onclick="filterFeed('all',this)">🌍 All</span><span class="f" onclick="filterFeed('reels',this)">▶ Reels</span><span class="f" onclick="filterFeed('photo',this)">📸 Photo</span><span class="f" onclick="filterFeed('story',this)">⏰ Story</span><span class="f" onclick="filterFeed('private',this)">🔒 Private</span><span class="f" onclick="filterFeed('saved',this)">💾 Saved</span><span class="f" onclick="filterFeed('following',this)">❤️ Following</span></div>
-<div id="feed" style="max-width:480px;margin:0 auto;padding-bottom:90px"></div>
-<div style="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:90;background:#111;padding:10px 18px;border-radius:30px;border:1px solid #222"><span onclick="filterFeed('all')" style="font-size:20px">⌂</span><span onclick="openCreate()" style="background:#fff;color:#000;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px">+</span><span onclick="filterFeed('reels')" style="font-size:20px">▶</span><span onclick="alert('Coins: '+coins+' 🪙')">🪙</span></div>
-<div id="createModal" class="modal"><div class="box"><h3 style="margin:0">📤 Upload Safe</h3><textarea id="cap" placeholder="Caption... Enna da?"></textarea><input type="file" id="fileInp" accept="image/*,video/*"><div id="scanRes" style="font-size:11px;margin:6px 0;color:#0f8"></div><div style="display:flex;gap:8px"><select id="vis"><option value="public">🌍 Public</option><option value="private">🔒 Private</option><option value="story">⏰ Story 24H</option></select><select id="type"><option value="photo">📸 Photo</option><option value="reels">▶ Reels</option><option value="poll">📊 Poll</option></select></div><div id="pollBox" style="display:none"><input id="pollQ" placeholder="Poll Q"><input id="pollO1" placeholder="Opt1"><input id="pollO2" placeholder="Opt2"></div><label style="font-size:11px"><input type="checkbox" id="vaultChk" style="width:auto"> 🔐 Vault Save</label><button class="primary" onclick="createPost()" style="margin-top:8px">🚀 UPLOAD</button><button onclick="this.parentElement.parentElement.style.display='none'" style="width:100%;margin-top:8px;padding:10px;background:#222;border:none;border-radius:10px;color:#fff">Close</button></div></div>
-<div id="loginModal" class="modal"><div class="box"><h3>🔐 Safe Login</h3><input id="email" placeholder="Email"><input id="pwd" type="password" placeholder="Password"><button class="primary" onclick="sendOtp()">📧 Send OTP</button><input id="otpInp" placeholder="OTP" style="display:none"><button id="otpBtn" class="primary" style="display:none;background:#0f8;color:#000" onclick="verifyOtp()">Verify & Login</button><button onclick="this.parentElement.parentElement.style.display='none'" style="width:100%;margin-top:8px;padding:10px;background:#222;border:none;border-radius:10px;color:#fff">Close</button></div></div>
-<script>
-let user=JSON.parse(localStorage.getItem('pix_user')||'null');let coins=parseInt(localStorage.getItem('coins')||'100');let curFilter='all';let genOtp='';document.getElementById('coinBal').innerText=coins+' 🪙';document.getElementById('type').addEventListener('change',function(){document.getElementById('pollBox').style.display=this.value=='poll'?'block':'none';});
-document.getElementById('fileInp').addEventListener('change',function(e){let f=e.target.files[0];if(!f)return;let bad=["sex","porn","nude","xxx"];let name=f.name.toLowerCase();let isBad=bad.some(b=>name.includes(b));document.getElementById('scanRes').innerHTML=isBad?'❌ Safe illa da!':'✅ Safe da! Clear photo da!';});
-function sendOtp(){genOtp=Math.floor(100000+Math.random()*900000).toString();alert('OTP: '+genOtp+'\nDemo OTP da Giri - Itha potu login pannu da!');document.getElementById('otpInp').style.display='block';document.getElementById('otpBtn').style.display='block';}
-function verifyOtp(){if(document.getElementById('otpInp').value==genOtp){user={email:document.getElementById('email').value};localStorage.setItem('pix_user',JSON.stringify(user));alert('Login OK da!');document.getElementById('loginModal').style.display='none';}else alert('OTP thappu da! Alert la varra number ah podu da!');}
-function openCreate(){if(!user){document.getElementById('loginModal').style.display='block';return;}document.getElementById('createModal').style.display='block';}
-function openVault(){let v=JSON.parse(localStorage.getItem('vault')||'[]');alert('Vault: '+v.length+' items safe da!');}
-function createPost(){let cap=document.getElementById('cap').value,file=document.getElementById('fileInp').files[0],vis=document.getElementById('vis').value,type=document.getElementById('type').value;if(!file&&type!='poll')return alert('File choose pannu da!');let url=file?URL.createObjectURL(file):'';if(document.getElementById('vaultChk').checked&&url){let v=JSON.parse(localStorage.getItem('vault')||'[]');v.push(url);localStorage.setItem('vault',JSON.stringify(v));}if(type=='poll'){cap='📊 POLL: '+document.getElementById('pollQ').value+' | 1) '+document.getElementById('pollO1').value+' 2) '+document.getElementById('pollO2').value+' | '+cap;}let posts=JSON.parse(localStorage.getItem('posts')||'[]');posts.unshift({id:Date.now(),cap:cap,url:url,type:type,vis:vis,owner:user.email,likes:0,liked:false,saved:false,following:false,comments:[],views:Math.floor(Math.random()*200),expiry:vis=='story'?Date.now()+86400000:null});localStorage.setItem('posts',JSON.stringify(posts));coins+=10;localStorage.setItem('coins',coins);document.getElementById('coinBal').innerText=coins+' 🪙';document.getElementById('createModal').style.display='none';load();alert('Uploaded da! +10 coin!');}
-function load(){let feed=document.getElementById('feed');let posts=JSON.parse(localStorage.getItem('posts')||'[]');posts=posts.filter(p=>!p.expiry||p.expiry>Date.now());localStorage.setItem('posts',JSON.stringify(posts));let html='';posts.forEach(p=>{if(curFilter!='all'&&p.type!=curFilter&&p.vis!=curFilter&&curFilter!='saved'&&curFilter!='following')return;if(curFilter=='saved'&&!p.saved)return;if(curFilter=='following'&&!p.following)return;html+=`<div class="card"><div style="display:flex;justify-content:space-between;font-size:12px"><b>${p.owner.split('@')[0]}</b><span style="font-size:10px;color:#888">${p.vis} 👁️ ${p.views}</span></div>${p.url?`<img src="${p.url}" class="post-img">`:''}<div style="margin-top:8px;font-size:13px">${p.cap}</div><div class="action"><span onclick="likePost(${p.id})">${p.liked?'❤️':'🤍'} ${p.likes}</span><span onclick="commentPost(${p.id})">💬 ${p.comments.length}</span><span onclick="sharePost(${p.id})">↗️ Share</span><span onclick="savePost(${p.id})">${p.saved?'💾 Saved':'💾 Save'}</span><span onclick="followPost(${p.id})">${p.following?'✅':'➕'} Follow</span><span onclick="giftCoin()">🎁</span></div>${p.comments.length?`<div style="margin-top:8px;background:#111;padding:8px;border-radius:10px;font-size:11px">${p.comments.map(c=>'<div>'+c+'</div>').join('')}</div>`:''}</div>`;});feed.innerHTML=html||'<div style=text-align:center;padding:60px;color:#555>📸 No posts da - Nee first post podu da!</div>';}
-function likePost(id){let posts=JSON.parse(localStorage.getItem('posts')||'[]');let p=posts.find(x=>x.id==id);p.liked=!p.liked;p.likes+=p.liked?1:-1;if(p.liked){coins++;localStorage.setItem('coins',coins);document.getElementById('coinBal').innerText=coins+' 🪙';}localStorage.setItem('posts',JSON.stringify(posts));load();}
-function savePost(id){let posts=JSON.parse(localStorage.getItem('posts')||'[]');posts.find(x=>x.id==id).saved=!posts.find(x=>x.id==id).saved;localStorage.setItem('posts',JSON.stringify(posts));load();}
-function followPost(id){let posts=JSON.parse(localStorage.getItem('posts')||'[]');let p=posts.find(x=>x.id==id);p.following=!p.following;if(p.following){coins+=5;localStorage.setItem('coins',coins);document.getElementById('coinBal').innerText=coins+' 🪙';}localStorage.setItem('posts',JSON.stringify(posts));load();}
-function commentPost(id){let c=prompt('Comment:');if(!c)return;let posts=JSON.parse(localStorage.getItem('posts')||'[]');posts.find(x=>x.id==id).comments.push(c);localStorage.setItem('posts',JSON.stringify(posts));load();}
-function sharePost(id){prompt('Copy share link:',location.href);}
-function giftCoin(){if(coins<10)return alert('Coin illa da!');coins-=10;localStorage.setItem('coins',coins);document.getElementById('coinBal').innerText=coins+' 🪙';alert('Gifted da!');}
-function filterFeed(f,el){curFilter=f;if(el){document.querySelectorAll('.f').forEach(x=>x.classList.remove('active'));el.classList.add('active');}load();}load();
-</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIXORO - World's Safest App by Giri</title>
+
+<!-- PIXORO ADSENSE - GOOGLE KU KAASU VARUM CODE DA -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX" crossorigin="anonymous"></script>
+
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/style.css">
+<style>
+body{background:#000;color:#fff;font-family:sans-serif;margin:0}
+.header{display:flex;justify-content:space-between;align-items:center;padding:10px;background:#111;border-bottom:1px solid #222}
+.logo{color:#FFD700;font-weight:bold;font-size:20px}
+.coins{background:#FFD700;color:#000;padding:5px 10px;border-radius:20px;font-weight:bold;font-size:12px}
+.tabs{display:flex;gap:15px;padding:10px;overflow-x:auto;background:#0a0a0a;border-bottom:1px solid #222;font-size:13px}
+.tabs span{color:#888;white-space:nowrap}
+.tabs .active{color:#FFD700;border-bottom:2px solid #FFD700;padding-bottom:3px}
+.post-card{background:#111;margin:10px;border-radius:10px;padding:10px;border:1px solid #222}
+.post-head{display:flex;gap:8px;align-items:center}
+.avatar{width:30px;height:30px;background:#333;border-radius:50%}
+.ad-box{background:#111;border:1px dashed #FFD700;margin:12px;padding:12px;border-radius:10px;text-align:center}
+.ad-label{font-size:9px;color:#666;letter-spacing:1px}
+.ad-title{color:#FFD700;font-weight:bold;margin:8px 0;font-size:14px}
+.ad-btn{background:#FFD700;color:#000;border:none;padding:7px 18px;border-radius:6px;font-weight:bold;cursor:pointer}
+.ad-foot{font-size:8px;color:#555;margin-top:6px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">PIXORO</div>
+  <div class="coins">🪙 128</div>
+</div>
+
+<div class="tabs">
+  <span class="active">All</span>
+  <span>Reels</span>
+  <span>Photo</span>
+  <span>Story</span>
+  <span>Private</span>
+  <span>Saved</span>
+</div>
+
+<!-- FEED START -->
+<div id="feed">
+
+  <!-- POST 1 -->
+  <div class="post-card">
+    <div class="post-head">
+      <div class="avatar"></div>
+      <b>krikir58-ui</b>
+    </div>
+    <p style="font-size:13px;color:#ccc">My first post on PIXORO - World's Safest App! 🔒</p>
+  </div>
+
+  <!-- POST 2 -->
+  <div class="post-card">
+    <div class="post-head">
+      <div class="avatar"></div>
+      <b>krikir58-ui</b>
+    </div>
+    <p style="font-size:13px;color:#ccc">Made by 17yr old from Madurai - Tamil Nadu ❤️</p>
+  </div>
+
+  <!-- PIXORO SAFE AD - 2 POST KU APROM VARUM DA GIRI -->
+  <div class="ad-box">
+    <div class="ad-label">🔒 PIXORO SAFE AD • Sponsored</div>
+    <div class="ad-title">Tamil Nadu Best Books - 50% Offer!</div>
+    <button class="ad-btn" onclick="window.open('https://google.com','_blank')">Visit Shop</button>
+    <div class="ad-foot">Ad supports free PIXORO • Safe for kids • No bad ads</div>
+    
+    <!-- GOOGLE REAL AD VARUM EDAM DA -->
+    <ins class="adsbygoogle"
+         style="display:block; margin-top:10px;"
+         data-ad-client="ca-pub-XXXXXXXXXX"
+         data-ad-slot="1234567890"
+         data-ad-format="auto"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <!-- POST 3 -->
+  <div class="post-card">
+    <div class="post-head">
+      <div class="avatar"></div>
+      <b>pixoro_official</b>
+    </div>
+    <p style="font-size:13px;color:#ccc">Welcome to PIXORO - 100% Safe for Girls & Kids!</p>
+  </div>
+
+</div>
+<!-- FEED END -->
+
+<script src="js/upload.js"></script>
+</body>
+</html>
