@@ -1,152 +1,153 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO - World's Safest App by Giri</title>
-
-<!-- PIXORO ADSENSE - GOOGLE KU KAASU VARUM CODE DA -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX" crossorigin="anonymous"></script>
-
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="css/style.css">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PIXORO</title>
 <style>
-body{background:#000;color:#fff;font-family:sans-serif;margin:0}
-.header{display:flex;justify-content:space-between;align-items:center;padding:10px;background:#111;border-bottom:1px solid #222}
-.logo{color:#FFD700;font-weight:bold;font-size:20px}
-.coins{background:#FFD700;color:#000;padding:5px 10px;border-radius:20px;font-weight:bold;font-size:12px}
-.tabs{display:flex;gap:15px;padding:10px;overflow-x:auto;background:#0a0a0a;border-bottom:1px solid #222;font-size:13px}
-.tabs span{color:#888;white-space:nowrap}
-.tabs .active{color:#FFD700;border-bottom:2px solid #FFD700;padding-bottom:3px}
-.post-card{background:#111;margin:10px;border-radius:10px;padding:10px;border:1px solid #222}
-.post-head{display:flex;gap:8px;align-items:center}
-.avatar{width:30px;height:30px;background:#333;border-radius:50%}
-.ad-box{background:#111;border:1px dashed #FFD700;margin:12px;padding:12px;border-radius:10px;text-align:center}
-.ad-label{font-size:9px;color:#666;letter-spacing:1px}
-.ad-title{color:#FFD700;font-weight:bold;margin:8px 0;font-size:14px}
-.ad-btn{background:#FFD700;color:#000;border:none;padding:7px 18px;border-radius:6px;font-weight:bold;cursor:pointer}
-.ad-foot{font-size:8px;color:#555;margin-top:6px}
+body{margin:0;background:#000;color:#fff;font-family:Arial}
+#splash{position:fixed;top:0;left:0;width:100%;height:100vh;background:#000;z-index:99999;display:flex;justify-content:center;align-items:center;flex-direction:column}
+.tabs{display:flex;justify-content:space-around;background:#111;padding:12px;position:sticky;top:0;z-index:99}
+.tabs span{padding:6px 15px;border-radius:20px;cursor:pointer}
+.tabs.active{background:#FFD600;color:#000;font-weight:bold}
+.post-card{background:#111;margin:10px;border-radius:12px;padding:10px}
+.post-head{display:flex;align-items:center;gap:10px}
+.avatar{width:35px;height:35px;border-radius:50%;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976)}
+video,img{width:100%;border-radius:10px;margin-top:10px;max-height:500px;object-fit:cover}
+#plus{position:fixed;bottom:20px;right:20px;width:60px;height:60px;border-radius:50%;background:#FFD600;font-size:35px;border:none;z-index:9999}
+#uploadBox{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:100000;display:none;justify-content:center;align-items:center}
+.filter-bar{display:flex;gap:8px;overflow-x:auto;padding:10px 0}
+.filter-bar button{padding:6px 12px;border-radius:15px;border:1px solid #FFD600;background:#000;color:#fff}
 </style>
 </head>
 <body>
-<!-- PIXORO MASS SPLASH DA -->
-<div id="splash" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:black;z-index:99999;display:flex;justify-content:center;align-items:center;flex-direction:column;">
-  <h1 style="color:white;font-size:50px;font-weight:900;letter-spacing:5px;">PIXORO</h1>
-  <p style="color:#FFD600;">WORLD NO.1 SAFE APP</p>
+
+<!-- SPLASH DA -->
+<div id="splash">
+<h1 style="font-size:50px;font-weight:900;letter-spacing:5px">PIXORO</h1>
+<p style="color:#FFD600">WORLD NO.1 SAFE APP</p>
+</div>
+
+<!-- TABS DA -->
+<div class="tabs">
+<span class="active" data-filter="All">All</span>
+<span data-filter="Reels">Reels</span>
+<span data-filter="Photo">Photo</span>
+</div>
+
+<!-- FEED DA -->
+<div id="feed">
+<!-- Default posts -->
+<div class="post-card" data-type="Reels">
+<div class="post-head"><div class="avatar"></div><b>pixoro_official</b></div>
+<p>Welcome to PIXORO Reels! 🔥</p>
+<video controls src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
+<audio controls style="width:100%;margin-top:5px" src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c0c0f0e4f.mp3"></audio>
+</div>
+
+<div class="post-card" data-type="Photo">
+<div class="post-head"><div class="avatar"></div><b>pixoro_official</b></div>
+<p>100% Safe for Girls & Kids! ❤️</p>
+<img src="https://picsum.photos/500/500">
+</div>
+</div>
+
+<!-- PLUS BUTTON DA -->
+<button id="plus">+</button>
+
+<!-- UPLOAD BOX DA - ITHU THAAN MUKKIYAM DA -->
+<div id="uploadBox">
+<div style="background:#222;padding:20px;border-radius:15px;width:90%;max-width:400px">
+<h3>Upload to PIXORO</h3>
+<input type="file" id="fileInput" accept="image/*,video/*" style="width:100%;margin:10px 0">
+<select id="typeSelect" style="width:100%;padding:8px;border-radius:8px">
+<option value="Photo">Photo</option>
+<option value="Reels">Reels</option>
+</select>
+<select id="songSelect" style="width:100%;padding:8px;border-radius:8px;margin-top:10px">
+<option value="">No Song</option>
+<option value="https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c0c0f0e4f.mp3">Trending 1 - Happy</option>
+<option value="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3">Trending 2 - Love</option>
+<option value="https://cdn.pixabay.com/download/audio/2022/06/07/audio_b9bd4170e8.mp3">Trending 3 - Mass</option>
+</select>
+<div class="filter-bar">
+<button onclick="applyFilter('none')">Normal</button>
+<button onclick="applyFilter('grayscale(100%)')">Retro</button>
+<button onclick="applyFilter('sepia(100%)')">Vintage</button>
+<button onclick="applyFilter('contrast(200%)')">High</button>
+<button onclick="applyFilter('saturate(200%)')">Color Pop</button>
+</div>
+<input type="text" id="caption" placeholder="Caption..." style="width:100%;padding:8px;border-radius:8px;margin-top:10px">
+<button onclick="uploadNow()" style="width:100%;background:#FFD600;border:none;padding:10px;border-radius:20px;margin-top:15px;font-weight:bold">POST NOW</button>
+<button onclick="document.getElementById('uploadBox').style.display='none'" style="width:100%;background:#444;color:#fff;border:none;padding:8px;border-radius:20px;margin-top:10px">Cancel</button>
+</div>
 </div>
 
 <script>
-  setTimeout(()=>{ document.getElementById('splash').style.display='none' }, 3000);
-</script>
-<div class="header">
-  <div class="logo">PIXORO</div>
-  <div class="coins">🪙 128</div>
-</div>
+// SPLASH MARAIYA DA
+setTimeout(()=>{document.getElementById('splash').style.display='none'},3000);
 
-<div class="tabs">
-  <span class="active">All</span>
-  <span>Reels</span>
-  <span>Photo</span>
-  <span>Story</span>
-  <span>Private</span>
-  <span>Saved</span>
-</div>
+// TABS FILTER 100% WORKING DA
+document.querySelectorAll('.tabs span').forEach(tab=>{
+tab.onclick=()=>{
+document.querySelector('.tabs.active').classList.remove('active');
+tab.classList.add('active');
+let f=tab.dataset.filter;
+document.querySelectorAll('.post-card').forEach(p=>{
+if(f==='All') p.style.display='block';
+else p.style.display=p.dataset.type===f?'block':'none';
+});
+}
+});
 
-<!-- FEED START -->
-<div id="feed">
+// UPLOAD SYSTEM DA
+let currentFilter='none';
+let previewUrl='';
 
-  <!-- POST 1 -->
-  <div class="post-card">
-    <div class="post-head">
-      <div class="avatar"></div>
-      <b>krikir58-ui</b>
-    </div>
-    <p style="font-size:13px;color:#ccc">My first post on PIXORO - World's Safest App! 🔒</p>
-  </div>
+document.getElementById('plus').onclick=()=>{
+document.getElementById('uploadBox').style.display='flex';
+}
 
-  <!-- POST 2 -->
-  <div class="post-card">
-    <div class="post-head">
-      <div class="avatar"></div>
-      <b>krikir58-ui</b>
-    </div>
-    <p style="font-size:13px;color:#ccc">Made by 17yr old from Madurai - Tamil Nadu ❤️</p>
-  </div>
+document.getElementById('fileInput').onchange=(e)=>{
+let file=e.target.files[0];
+if(file) previewUrl=URL.createObjectURL(file);
+}
 
-  <!-- PIXORO SAFE AD - 2 POST KU APROM VARUM DA GIRI -->
-  <div class="ad-box">
-    <div class="ad-label">🔒 PIXORO SAFE AD • Sponsored</div>
-    <div class="ad-title">Tamil Nadu Best Books - 50% Offer!</div>
-    <button class="ad-btn" onclick="window.open('https://google.com','_blank')">Visit Shop</button>
-    <div class="ad-foot">Ad supports free PIXORO • Safe for kids • No bad ads</div>
-    
-    <!-- GOOGLE REAL AD VARUM EDAM DA -->
-    <ins class="adsbygoogle"
-         style="display:block; margin-top:10px;"
-         data-ad-client="ca-pub-XXXXXXXXXX"
-         data-ad-slot="1234567890"
-         data-ad-format="auto"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  </div>
+function applyFilter(f){
+currentFilter=f;
+}
 
-<!-- POST 1 - REELS DA -->
-<div class="post-card" data-type="Reels">
-  <div class="post-head">
-    <div class="avatar"></div>
-    <b>pixoro_official</b>
-  </div>
-  <p style="font-size:13px;color:#ccc">Welcome to PIXORO - 100% Safe Reels!</p>
-  <video controls style="width:100%;border-radius:10px;margin-top:10px">
-    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-  </video>
-</div>
+function uploadNow(){
+let file=document.getElementById('fileInput').files[0];
+let type=document.getElementById('typeSelect').value;
+let song=document.getElementById('songSelect').value;
+let cap=document.getElementById('caption').value;
+if(!file) {alert('Photo/Video select pannu da!'); return;}
 
-<!-- POST 2 - PHOTO DA -->
-<div class="post-card" data-type="Photo">
-  <div class="post-head">
-    <div class="avatar"></div>
-    <b>pixoro_official</b>
-  </div>
-  <p style="font-size:13px;color:#ccc">Welcome to PIXORO - 100% Safe for Girls & Kids!</p>
-</div>
+let feed=document.getElementById('feed');
+let div=document.createElement('div');
+div.className='post-card';
+div.dataset.type=type;
 
-<!-- POST 3 - ALL DA -->
-<div class="post-card" data-type="All">
-  <div class="post-head">
-    <div class="avatar"></div>
-    <b>pixoro_official</b>
-  </div>
-  <p style="font-size:13px;color:#ccc">PIXORO - World No 1 Safe App</p>
-</div>
-<!-- FEED END -->
+let media='';
+if(type==='Photo'){
+media=`<img style="filter:${currentFilter}" src="${previewUrl}">`;
+} else {
+media=`<video controls style="filter:${currentFilter}" src="${previewUrl}"></video>`;
+}
+let songHtml=song?`<audio controls style="width:100%;margin-top:5px" src="${song}"></audio>`:'';
 
-<script src="js/upload.js"></script>
-  <script>
-  const tabs = document.querySelectorAll('.tabs span');
-  const posts = document.querySelectorAll('.post-card');
-
-  tabs.forEach(tab => {
-    tab.onclick = () => {
-      document.querySelector('.tabs .active').classList.remove('active');
-      tab.classList.add('active');
-      
-      let filter = tab.innerText.trim(); // All, Reels, Photo
-      
-      posts.forEach(post => {
-        if(filter === 'All') {
-          post.style.display = 'block';
-        } else {
-          // Post la data-type="Reels" nu add pannirukanum da!
-          let type = post.getAttribute('data-type') || 'All';
-          if(type === filter) {
-            post.style.display = 'block';
-          } else {
-            post.style.display = 'none';
-          }
-        }
-      });
-    }
-  });
+div.innerHTML=`
+<div class="post-head"><div class="avatar"></div><b>you</b></div>
+<p>${cap}</p>
+${media}
+${songHtml}
+<p style="font-size:10px;color:gray">Just now • ${type}</p>
+`;
+feed.prepend(div);
+document.getElementById('uploadBox').style.display='none';
+document.getElementById('caption').value='';
+alert('Posted da Giri! 🔥');
+}
 </script>
 </body>
 </html>
