@@ -1,120 +1,124 @@
 <!DOCTYPE html>
-<html><head><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO - WORLD NO 1</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PIXORO - INSTA+FB WORLD FINAL</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#000;color:#fff}
-#splash{position:fixed;top:0;left:0;width:100%;height:100vh;background:#000;z-index:999999;display:flex;justify-content:center;align-items:center;flex-direction:column}
-.tabs{display:flex;justify-content:space-around;background:#111;padding:14px;position:sticky;top:0;z-index:100}
-.tabs span{padding:7px 20px;border-radius:20px;cursor:pointer;border:1px solid #333}
-.tabs span.active{background:#FFD600;color:#000;font-weight:900;border-color:#FFD600}
-.story-bar{display:flex;gap:12px;padding:12px;overflow-x:auto;background:#0a0a0a;border-bottom:1px solid #222}
-.story{width:65px;text-align:center;flex-shrink:0}
-.story-ring{width:65px;height:65px;border-radius:50%;padding:3px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf)}
+body{background:#000;color:#fff;padding-bottom:80px}
+#splash{position:fixed;inset:0;background:#000;z-index:9999999;display:flex;justify-content:center;align-items:center;flex-direction:column}
+.top-bar{display:flex;justify-content:space-between;padding:12px;background:#111;position:sticky;top:0;z-index:100}
+.logo{font-weight:900;color:#FFD600;font-size:22px;letter-spacing:3px}
+.mode-switch{display:flex;gap:5px;background:#222;border-radius:25px;padding:4px}
+.mode-switch span{padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer}
+.mode-switch span.active{background:#FFD600;color:#000;font-weight:bold}
+.tabs{display:flex;gap:8px;padding:10px;overflow-x:auto;background:#0f0f0f;position:sticky;top:52px;z-index:99;border-bottom:1px solid #222}
+.tabs span{padding:7px 14px;border-radius:20px;border:1px solid #333;white-space:nowrap;font-size:12px;cursor:pointer}
+.tabs span.active{background:#FFD600;color:#000;font-weight:900}
+.story-bar{display:flex;gap:12px;padding:10px;overflow-x:auto;background:#0a0a0a}
+.story{width:60px;text-align:center;flex-shrink:0}
+.story-ring{width:60px;height:60px;border-radius:50%;padding:3px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf)}
 .story-ring img{width:100%;height:100%;border-radius:50%;border:3px solid #000;object-fit:cover}
-.post-card{background:#111;margin:10px;border-radius:15px;padding:12px;border:1px solid #222}
-.post-head{display:flex;align-items:center;justify-content:space-between}
-.post-head-left{display:flex;align-items:center;gap:10px}
-.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(45deg,#FFD600,#FF9500)}
+.post-card{background:#111;margin:10px;border-radius:16px;padding:12px;border:1px solid #222}
+.post-head{display:flex;justify-content:space-between;align-items:center}
+.head-l{display:flex;gap:10px;align-items:center}
+.avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(45deg,#FFD600,#FF9000)}
 .post-card img,.post-card video{width:100%;border-radius:12px;margin-top:10px;max-height:600px;object-fit:cover}
-.actions{display:flex;justify-content:space-between;margin-top:12px}
-.actions-left{display:flex;gap:15px}
-.icon{font-size:22px;cursor:pointer;user-select:none}
-.icon.liked{color:#ff3040;transform:scale(1.2)}
-.count{font-size:12px;color:#aaa;margin-top:3px}
-.comment-box{display:flex;gap:8px;margin-top:10px}
-.comment-box input{flex:1;background:#222;border:none;padding:8px 12px;border-radius:20px;color:#fff;outline:none}
-.save-active{color:#FFD600}
-#plus{position:fixed;bottom:25px;right:25px;width:62px;height:62px;border-radius:50%;background:#FFD600;font-size:40px;border:none;color:#000;font-weight:bold;z-index:9999;box-shadow:0 4px 15px #FFD600}
-#uploadBox{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0,0.96);z-index:100000;display:none;justify-content:center;align-items:center;padding:15px}
-.filter-bar{display:flex;gap:8px;overflow-x:auto;padding:10px 0}
-.filter-bar button{padding:6px 14px;border-radius:20px;border:1px solid #FFD600;background:#111;color:#fff;white-space:nowrap}
-.clarendon{filter:contrast(1.2) saturate(1.35)}
-.juno{filter:sepia(0.15) saturate(1.5) brightness(1.1)}
-.lark{filter:brightness(1.1) saturate(0.9)}
-.gingham{filter:grayscale(0.2) sepia(0.1)}
-.moon{filter:grayscale(1)}
+.actions{display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid #222}
+.act{font-size:13px;color:#aaa;cursor:pointer}
+.act b{color:#fff}
+.ad-box{background:#1a1a1a;border:1px dashed #FFD600;border-radius:12px;padding:12px;margin:10px;text-align:center;color:#FFD600;font-size:13px}
+#plus{position:fixed;bottom:85px;right:20px;width:62px;height:62px;border-radius:50%;background:#FFD600;color:#000;font-size:38px;border:none;font-weight:bold;z-index:9999;box-shadow:0 0 20px #FFD600}
+#uploadBox,#chatBox,#marketBox,#awardBox{position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:100000;display:none;justify-content:center;align-items:center;padding:15px}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#111;display:flex;justify-content:space-around;padding:12px 0;border-top:1px solid #222;z-index:9998}
+.bottom-nav span{font-size:20px;cursor:pointer;text-align:center}
+.bottom-nav span.active{color:#FFD600}
+.filter-bar{display:flex;gap:8px;overflow-x:auto;padding:8px 0}
+.filter-bar button{padding:6px 12px;border-radius:20px;border:1px solid #FFD600;background:#111;color:#fff}
+.clarendon{filter:contrast(1.2) saturate(1.35)}.juno{filter:sepia(0.15) saturate(1.5) brightness(1.1)}.moon{filter:grayscale(1)}.gingham{filter:grayscale(0.2) sepia(0.1)}
+.chat-msg{padding:8px 12px;border-radius:18px;margin:6px 0;max-width:75%}.me{background:#FFD600;color:#000;margin-left:auto}.other{background:#222}
+.market-item{background:#1a1a1a;border-radius:12px;padding:10px;margin:8px 0;display:flex;gap:10px;border:1px solid #333}
 </style></head><body>
 
-<div id="splash"><h1 style="font-size:55px;letter-spacing:6px;font-weight:900">PIXORO</h1><p style="color:#FFD600;margin-top:10px;font-weight:bold;letter-spacing:2px">WORLD NO.1 SAFE APP</p><p style="font-size:12px;color:#666;margin-top:20px">Loading Mass Features...</p></div>
+<div id="splash"><h1 style="font-size:62px;font-weight:900;letter-spacing:8px">PIXORO</h1><p style="color:#FFD600;font-weight:900;margin-top:8px;letter-spacing:3px">INSTA + FACEBOOK FINAL WORLD</p><p style="color:#666;font-size:11px;margin-top:18px">Part 1 + Part 2 Combined • 1,000,000 Features Loading...</p></div>
 
-<div class="tabs"><span class="active" data-f="All">All</span><span data-f="Reels">Reels</span><span data-f="Photo">Photo</span><span data-f="Saved">Saved ❤️</span></div>
+<div class="top-bar"><div class="logo">PIXORO</div><div class="mode-switch"><span id="mInsta" class="active" onclick="setMode('insta')">Instagram</span><span id="mFb" onclick="setMode('fb')">Facebook</span></div></div>
 
-<div class="story-bar">
-<div class="story"><div class="story-ring"><img src="https://picsum.photos/100/100?1"></div><p style="font-size:10px;margin-top:4px">you</p></div>
-<div class="story"><div class="story-ring"><img src="https://picsum.photos/100/100?2"></div><p style="font-size:10px;margin-top:4px">girl_safe</p></div>
-<div class="story"><div class="story-ring"><img src="https://picsum.photos/100/100?3"></div><p style="font-size:10px;margin-top:4px">kids_fun</p></div>
-</div>
+<div class="tabs"><span class="active" data-f="All">All</span><span data-f="Reels">Reels</span><span data-f="Photo">Photo</span><span data-f="Friends">FB Posts</span><span data-f="Groups">Groups</span><span data-f="Market">Market</span><span data-f="Saved">Saved ❤️</span></div>
 
+<div class="story-bar" id="storyBar"></div>
 <div id="feed"></div>
+<div class="ad-box" id="adMiddle">💰 PIXORO ADS • Google AdSense Ready • ca-pub-PIXORO • Your Ad Earnings $0.10 per view 💰</div>
+
 <button id="plus">+</button>
 
-<div id="uploadBox">
-<div style="background:#1a1a1a;width:100%;max-width:420px;border-radius:20px;padding:20px;border:1px solid #333">
-<h3 style="color:#FFD600">Create PIXORO Post 🔥</h3>
-<input type="file" id="fileInput" accept="image/*,video/*" style="width:100%;margin:12px 0;color:#fff">
-<select id="typeSelect" style="width:100%;padding:10px;border-radius:10px;background:#111;color:#fff;border:1px solid #333"><option value="Photo">Photo</option><option value="Reels">Reels</option></select>
-<select id="songSelect" style="width:100%;padding:10px;border-radius:10px;background:#111;color:#fff;border:1px solid #333;margin-top:10px">
-<option value="">No Music</option><option value="https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c0c0f0e4f.mp3">Trending - Happy</option><option value="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3">Trending - Love</option><option value="https://cdn.pixabay.com/download/audio/2022/06/07/audio_b9bd4170e8.mp3">Trending - Mass Beat</option>
-</select>
-<div class="filter-bar"><button onclick="setF('')">Normal</button><button onclick="setF('clarendon')">Clarendon</button><button onclick="setF('juno')">Juno</button><button onclick="setF('lark')">Lark</button><button onclick="setF('moon')">Moon</button><button onclick="setF('gingham')">Gingham</button></div>
-<input type="text" id="capInput" placeholder="Write a caption..." style="width:100%;padding:10px;border-radius:10px;background:#111;color:#fff;border:1px solid #333;margin-top:8px">
-<button onclick="postNow()" style="width:100%;background:#FFD600;color:#000;border:none;padding:12px;border-radius:25px;margin-top:15px;font-weight:900;font-size:16px">POST NOW 🚀</button>
-<button onclick="document.getElementById('uploadBox').style.display='none'" style="width:100%;background:#222;color:#fff;border:none;padding:10px;border-radius:25px;margin-top:10px">Cancel</button>
+<div class="bottom-nav">
+<span class="active" onclick="navTab('All')">🏠<br><p style="font-size:9px">Home</p></span>
+<span onclick="openChat()">💬<br><p style="font-size:9px">Chat</p></span>
+<span onclick="openMarket()">🛒<br><p style="font-size:9px">Market</p></span>
+<span onclick="openAward()">🏆<br><p style="font-size:9px">Awards</p></span>
+<span onclick="navTab('Saved')">👤<br><p style="font-size:9px">You</p></span>
 </div>
-</div>
+
+<div id="uploadBox"><div style="background:#1a1a1a;width:100%;max-width:420px;border-radius:20px;padding:20px;border:1px solid #333">
+<h3 style="color:#FFD600">PIXORO WORLD POST 🔥</h3>
+<input type="file" id="fileInput" accept="image/*,video/*" style="width:100%;margin:10px 0;color:#fff">
+<select id="typeSelect" style="width:100%;padding:10px;border-radius:10px;background:#111;color:#fff;border:1px solid #333"><option value="Photo">Photo - Insta</option><option value="Reels">Reels - Insta</option><option value="Friends">FB Post</option><option value="Groups">Group Post</option><option value="Market">Marketplace</option></select>
+<select id="songSelect" style="width:100%;padding:10px;border-radius:10px;background:#111;color:#fff;border:1px solid #333;margin-top:8px"><option value="">No Song</option><option value="https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c0c0f0e4f.mp3">Trending Mass</option><option value="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3">Love</option><option value="https://cdn.pixabay.com/download/audio/2022/06/07/audio_b9bd4170e8.mp3">Beat</option></select>
+<div class="filter-bar"><button onclick="setF('')">Normal</button><button onclick="setF('clarendon')">Clarendon</button><button onclick="setF('juno')">Juno</button><button onclick="setF('moon')">Moon</button><button onclick="setF('gingham')">Gingham</button></div>
+<input id="capInput" placeholder="Caption / Price / Group..." style="width:100%;padding:10px;border-radius:10px;background:#111;color:#fff;border:1px solid #333;margin-top:8px">
+<button onclick="postNow()" style="width:100%;background:#FFD600;color:#000;border:none;padding:12px;border-radius:25px;margin-top:12px;font-weight:900">POST TO WORLD + EARN AD 💰</button>
+<button onclick="document.getElementById('uploadBox').style.display='none'" style="width:100%;background:#222;color:#fff;border:none;padding:8px;border-radius:20px;margin-top:8px">Cancel</button>
+</div></div>
+
+<div id="chatBox"><div style="background:#111;width:100%;max-width:400px;height:80vh;border-radius:20px;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:15px;border-bottom:1px solid #222;display:flex;justify-content:space-between"><b style="color:#FFD600">Messenger 💬</b><span onclick="document.getElementById('chatBox').style.display='none'" style="cursor:pointer">✖</span></div><div id="chatList" style="flex:1;overflow-y:auto;padding:10px"></div><div style="display:flex;gap:8px;padding:10px;border-top:1px solid #222"><input id="chatInput" placeholder="Message..." style="flex:1;background:#222;border:none;padding:10px;border-radius:20px;color:#fff"><button onclick="sendChat()" style="background:#FFD600;border:none;padding:10px 16px;border-radius:20px;font-weight:bold">Send</button></div></div></div>
+
+<div id="marketBox"><div style="background:#111;width:100%;max-width:420px;height:80vh;border-radius:20px;overflow-y:auto;padding:15px;border:1px solid #333"><div style="display:flex;justify-content:space-between"><b style="color:#FFD600">Marketplace 🛒</b><span onclick="document.getElementById('marketBox').style.display='none'">✖</span></div><div id="marketList" style="margin-top:12px"></div></div></div>
+
+<div id="awardBox"><div style="background:#111;width:100%;max-width:420px;border-radius:20px;padding:20px;border:1px solid #FFD600"><div style="display:flex;justify-content:space-between"><b style="color:#FFD600">🏆 Awards Leaderboard</b><span onclick="document.getElementById('awardBox').style.display='none'">✖</span></div><div id="awardList" style="margin-top:15px"></div><p style="font-size:11px;color:#888;margin-top:15px">Top 3 ku Gold + Ad Share da!</p></div></div>
 
 <script>
-let curFilter='';
-let curUrl='';
-let posts=JSON.parse(localStorage.getItem('pixoro_posts'))||[
-{id:1,type:'Reels',user:'pixoro_official',cap:'Welcome to PIXORO Reels! World Safe App 🔥',media:'https://www.w3schools.com/html/mov_bbb.mp4',isVideo:true,likes:1250,liked:false,saved:false,views:5420,filter:'',song:'https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c0c0f0e4f.mp3',comments:[{u:'girl_safe',t:'Super da!'}],followed:false},
-{id:2,type:'Photo',user:'girl_safe',cap:'100% Safe for Girls & Kids ❤️',media:'https://picsum.photos/500/600?random=5',isVideo:false,likes:890,liked:false,saved:false,views:1200,filter:'clarendon',song:'',comments:[],followed:false}
+let mode='insta', curFilter='', curUrl='';
+let chatMsgs=JSON.parse(localStorage.getItem('pixoro_chat'))||[{from:'other',text:'Dei Giri! PIXORO Insta+FB mass da! 🔥'}];
+let posts=JSON.parse(localStorage.getItem('pixoro_final'))||[
+{id:1,type:'Reels',user:'pixoro_official',cap:'FINAL WORLD REELS 🔥 Insta + FB serthu!',media:'https://www.w3schools.com/html/mov_bbb.mp4',isVideo:true,likes:4500,liked:false,saved:false,views:25600,filter:'',song:'https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c0c0f0e4f.mp3',comments:[{u:'mass_girl',t:'Vera level da!'}],followed:false,shared:32,group:'',price:''},
+{id:2,type:'Photo',user:'girl_safe',cap:'Insta Photo - Safe Mode ❤️ Filter working',media:'https://picsum.photos/500/600?random=7',isVideo:false,likes:1890,liked:false,saved:true,views:5600,filter:'clarendon',song:'',comments:[],followed:true,shared:12,group:'',price:''},
+{id:3,type:'Friends',user:'cbe_memes',cap:'FB Style Post da - Coimbatore la meetup da!',media:'https://picsum.photos/500/500?random=15',isVideo:false,likes:980,liked:false,saved:false,views:3200,filter:'',song:'',comments:[{u:'giri',t:'Naan varen da!'}],followed:false,shared:56,group:'',price:''},
+{id:4,type:'Groups',user:'coimbatore_gang',cap:'Group Post - PIXORO CBE Gang!',media:'https://picsum.photos/500/500?random=16',isVideo:false,likes:760,liked:false,saved:false,views:1800,filter:'juno',song:'',comments:[],followed:false,shared:8,group:'Coimbatore Gang',price:''},
+{id:5,type:'Market',user:'shop_cbe',cap:'iPhone 15 - Coimbatore Sale',media:'https://picsum.photos/500/500?random=17',isVideo:false,likes:56,liked:false,saved:false,views:890,filter:'',song:'',comments:[],followed:false,shared:3,group:'',price:'₹50000'}
 ];
+function setMode(m){mode=m; document.getElementById('mInsta').classList.toggle('active',m==='insta'); document.getElementById('mFb').classList.toggle('active',m==='fb'); render();}
 function setF(f){curFilter=f;}
-document.getElementById('plus').onclick=()=>document.getElementById('uploadBox').style.display='flex';
+document.getElementById('plus').onclick=()=>{showAd(); document.getElementById('uploadBox').style.display='flex';}
 document.getElementById('fileInput').onchange=e=>{let f=e.target.files[0]; if(f) curUrl=URL.createObjectURL(f); document.getElementById('typeSelect').value=f.type.includes('video')?'Reels':'Photo';}
-
-function savePosts(){localStorage.setItem('pixoro_posts',JSON.stringify(posts));}
+function save(){localStorage.setItem('pixoro_final',JSON.stringify(posts)); localStorage.setItem('pixoro_chat',JSON.stringify(chatMsgs));}
+function showAd(){let ad=document.getElementById('adMiddle'); ad.innerHTML='⏳ Loading Ad... Earning $0.10 💰'; setTimeout(()=>{ad.innerHTML='✅ Ad Watched! Earned $0.10 💰 PIXORO ADS - ca-pub-PIXORO - Google Ready';},1200);}
+function navTab(f){document.querySelectorAll('.tabs span').forEach(s=>s.classList.remove('active')); let t=[...document.querySelectorAll('.tabs span')].find(x=>x.dataset.f===f); if(t) t.classList.add('active'); document.querySelectorAll('.bottom-nav span').forEach(s=>s.classList.remove('active')); render();}
+function openChat(){document.getElementById('chatBox').style.display='flex'; renderChat();}
+function openMarket(){document.getElementById('marketBox').style.display='flex'; renderMarket();}
+function openAward(){document.getElementById('awardBox').style.display='flex'; renderAward();}
+function renderChat(){let l=document.getElementById('chatList'); l.innerHTML=''; chatMsgs.forEach(m=>{l.innerHTML+=`<div class="chat-msg ${m.from==='me'?'me':'other'}">${m.text}</div>`}); l.scrollTop=l.scrollHeight;}
+function sendChat(){let i=document.getElementById('chatInput'); if(!i.value.trim()) return; chatMsgs.push({from:'me',text:i.value}); i.value=''; save(); renderChat(); setTimeout(()=>{chatMsgs.push({from:'other',text:'Mass da Giri! PIXORO world level da! 🔥'}); save(); renderChat();},700);}
+function renderMarket(){let l=document.getElementById('marketList'); l.innerHTML=''; posts.filter(p=>p.type==='Market').forEach(p=>{l.innerHTML+=`<div class="market-item"><img src="${p.media}" style="width:80px;height:80px;border-radius:10px;object-fit:cover"><div><b>${p.cap}</b><p style="font-size:12px;color:#aaa">${p.user}</p><p style="color:#FFD600;font-weight:bold">${p.price}</p><button onclick="alert('Seller ku chat pannu da!')" style="background:#FFD600;border:none;padding:5px 10px;border-radius:15px;font-size:12px;font-weight:bold;margin-top:5px">Buy Now</button></div></div>`});}
+function renderAward(){let sorted=[...posts].sort((a,b)=>b.likes-b.likes||b.views-a.views); let l=document.getElementById('awardList'); l.innerHTML=''; sorted.slice(0,5).forEach((p,i)=>{let medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'🏅'; l.innerHTML+=`<div style="display:flex;justify-content:space-between;padding:10px;background:#1a1a1a;border-radius:10px;margin-top:8px;border:1px solid ${i<3?'#FFD600':'#333'}"><div><b>${medal} ${p.user}</b><p style="font-size:11px;color:#aaa">${p.type} • ${p.likes} Likes • ${p.views} Views</p></div><b style="color:#FFD600">#${i+1}</b></div>`});}
 function render(){
-let feed=document.getElementById('feed'); feed.innerHTML='';
-let activeTab=document.querySelector('.tabs span.active').dataset.f;
+let feed=document.getElementById('feed'); let bar=document.getElementById('storyBar'); let tab=document.querySelector('.tabs span.active').dataset.f;
+feed.innerHTML=''; bar.innerHTML=`<div class="story"><div class="story-ring"><img src="https://picsum.photos/100/100?1"></div><p style="font-size:10px">Your Story</p></div><div class="story"><div class="story-ring"><img src="https://picsum.photos/100/100?2"></div><p style="font-size:10px">girl_safe</p></div><div class="story"><div class="story-ring"><img src="https://picsum.photos/100/100?3"></div><p style="font-size:10px">cbe_group</p></div>`;
 posts.forEach(p=>{
-if(activeTab!=='All' && activeTab!=='Saved' && p.type!==activeTab) return;
-if(activeTab==='Saved' &&!p.saved) return;
-let media=p.isVideo?`<video class="${p.filter}" onplay="addView(${p.id})" controls playsinline src="${p.media}"></video>`:`<img class="${p.filter}" src="${p.media}">`;
-let song=p.song?`<audio controls style="width:100%;margin-top:8px" src="${p.song}"></audio>`:'';
+if(tab!=='All' && tab!=='Saved' && tab!==p.type) return; if(tab==='Saved'&&!p.saved) return;
+let media=p.isVideo?`<video class="${p.filter}" onplay="view(${p.id})" controls playsinline src="${p.media}"></video>`:`<img class="${p.filter}" src="${p.media}">`;
+let song=p.song?`<audio controls style="width:100%;margin-top:6px" src="${p.song}"></audio>`:'';
+let extra=p.group?`<p style="font-size:11px;color:#FFD600;margin-top:5px">👥 ${p.group}</p>`:(p.price?`<p style="color:#FFD600;font-weight:bold;margin-top:5px">${p.price} • 📍 CBE</p>`:'');
 let comments=p.comments.map(c=>`<p style="font-size:13px;margin-top:4px"><b>${c.u}</b> ${c.t}</p>`).join('');
-feed.innerHTML+=`
-<div class="post-card" data-type="${p.type}">
-<div class="post-head"><div class="post-head-left"><div class="avatar"></div><div><b>${p.user}</b><p style="font-size:10px;color:#aaa">Coimbatore • ${p.views} Views</p></div></div><button onclick="follow(${p.id})" style="background:${p.followed?'#333':'#FFD600'};color:${p.followed?'#fff':'#000'};border:none;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:bold">${p.followed?'Following':'Follow'}</button></div>
-<p style="margin-top:10px;font-size:14px">${p.cap}</p>
-${media}${song}
-<div class="actions"><div class="actions-left"><div><span class="icon ${p.liked?'liked':''}" onclick="like(${p.id})">${p.liked?'❤️':'🤍'}</span><div class="count">${p.likes} Likes</div></div><div><span class="icon" onclick="document.getElementById('c${p.id}').focus()">💬</span><div class="count">${p.comments.length} Comments</div></div></div><span class="icon ${p.saved?'save-active':''}" onclick="saveP(${p.id})">${p.saved?'🔖':'📑'}</span></div>
-<div style="margin-top:10px">${comments}</div>
-<div class="comment-box"><input id="c${p.id}" placeholder="Add a comment..."><button onclick="comment(${p.id})" style="background:#FFD600;border:none;padding:8px 14px;border-radius:20px;font-weight:bold">Post</button></div>
-</div>`;
+feed.innerHTML+=`<div class="post-card"><div class="post-head"><div class="head-l"><div class="avatar"></div><div><b>${p.user}</b><p style="font-size:10px;color:#aaa">${p.type}${p.group?' • '+p.group:''} • ${p.views} Views</p></div></div><button onclick="follow(${p.id})" style="background:${p.followed?'#333':'#FFD600'};color:${p.followed?'#fff':'#000'};border:none;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:bold">${p.followed?'Following':'Follow'}</button></div><p style="margin-top:8px;font-size:14px">${p.cap}</p>${media}${song}${extra}<div class="actions"><div class="act" onclick="like(${p.id})"><b>${p.liked?'❤️':'🤍'} ${p.likes}</b></div><div class="act" onclick="document.getElementById('c${p.id}').focus()">💬 ${p.comments.length}</div><div class="act" onclick="share(${p.id})">↗️ ${p.shared}</div><div class="act" onclick="saveP(${p.id})">${p.saved?'🔖':'📑'} Save</div></div><div style="margin-top:8px">${comments}</div><div style="display:flex;gap:8px;margin-top:10px"><input id="c${p.id}" placeholder="Comment..." style="flex:1;background:#222;border:none;padding:8px 12px;border-radius:20px;color:#fff"><button onclick="comment(${p.id})" style="background:#FFD600;border:none;padding:8px 14px;border-radius:20px;font-weight:bold">Post</button></div></div>`;
 });
 }
-function like(id){let p=posts.find(x=>x.id===id); p.liked=!p.liked; p.likes+=p.liked?1:-1; savePosts(); render();}
-function saveP(id){let p=posts.find(x=>x.id===id); p.saved=!p.saved; savePosts(); render();}
-function follow(id){let p=posts.find(x=>x.id===id); p.followed=!p.followed; savePosts(); render();}
-function comment(id){let inp=document.getElementById('c'+id); if(!inp.value.trim()) return; let p=posts.find(x=>x.id===id); p.comments.push({u:'you',t:inp.value}); inp.value=''; savePosts(); render();}
-function addView(id){let p=posts.find(x=>x.id===id); p.views++; savePosts(); render();}
-function postNow(){
-let file=document.getElementById('fileInput').files[0];
-if(!file||!curUrl){alert('Photo/Video select pannu da Giri!');return;}
-let type=document.getElementById('typeSelect').value;
-let song=document.getElementById('songSelect').value;
-let cap=document.getElementById('capInput').value||'My PIXORO Post 🔥';
-let newPost={id:Date.now(),type:type,user:'you',cap:cap,media:curUrl,isVideo:type==='Reels',likes:0,liked:false,saved:false,views:1,filter:curFilter,song:song,comments:[],followed:false};
-posts.unshift(newPost); savePosts(); render();
-document.getElementById('uploadBox').style.display='none'; document.getElementById('capInput').value=''; document.getElementById('fileInput').value=''; curUrl=''; curFilter='';
-alert('POSTED DA GIRI! MASS DA 🔥');
-}
-document.querySelectorAll('.tabs span').forEach(t=>{
-t.onclick=()=>{document.querySelector('.tabs span.active').classList.remove('active'); t.classList.add('active'); render();}
-});
-setTimeout(()=>{document.getElementById('splash').style.display='none'; render();},2500);
+function like(id){let p=posts.find(x=>x.id===id); p.liked=!p.liked; p.likes+=p.liked?1:-1; save(); render();}
+function saveP(id){posts.find(x=>x.id===id).saved=!posts.find(x=>x.id===id).saved; save(); render();}
+function follow(id){posts.find(x=>x.id===id).followed=!posts.find(x=>x.id===id).followed; save(); render();}
+function comment(id){let i=document.getElementById('c'+id); if(!i.value.trim()) return; posts.find(x=>x.id===id).comments.push({u:'you',t:i.value}); i.value=''; save(); render();}
+function view(id){posts.find(x=>x.id===id).views++; save();}
+function share(id){posts.find(x=>x.id===id).shared++; alert('Shared to FB+Insta da! 🔥'); save(); render();}
+function postNow(){let f=document.getElementById('fileInput').files[0]; if(!f||!curUrl){alert('File select pannu da!');return;} showAd(); let type=document.getElementById('typeSelect').value; let song=document.getElementById('songSelect').value; let cap=document.getElementById('capInput').value||'Mass Post da!'; let np={id:Date.now(),type:type,user:'you',cap:cap,media:curUrl,isVideo:type==='Reels',likes:0,liked:false,saved:false,views:1,filter:curFilter,song:song,comments:[],followed:false,shared:0,group:type==='Groups'?'Coimbatore Gang':cap,price:type==='Market'?'₹'+(Math.floor(Math.random()*50000)+500):''}; posts.unshift(np); save(); render(); document.getElementById('uploadBox').style.display='none'; curUrl=''; alert('WORLD MASS POSTED DA! 💰 Ad Earned!');}
+document.querySelectorAll('.tabs span').forEach(t=>{t.onclick=()=>{document.querySelectorAll('.tabs span').forEach(s=>s.classList.remove('active')); t.classList.add('active'); render();}});
+setTimeout(()=>{document.getElementById('splash').style.display='none'; render();},2000);
 render();
 </script></body></html>
