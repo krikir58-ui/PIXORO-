@@ -1,124 +1,206 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO - INSTA+FB WORLD FINAL</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>PIXORO WORLD V6 - GIRI MASS + AD SYSTEM</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#000;color:#fff;padding-bottom:80px}
-#splash{position:fixed;inset:0;background:#000;z-index:9999999;display:flex;justify-content:center;align-items:center;flex-direction:column}
-.top-bar{display:flex;justify-content:space-between;padding:12px;background:#111;position:sticky;top:0;z-index:100}
-.logo{font-weight:900;color:#FFD600;font-size:22px;letter-spacing:3px}
-.mode-switch{display:flex;gap:5px;background:#222;border-radius:25px;padding:4px}
-.mode-switch span{padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer}
-.mode-switch span.active{background:#FFD600;color:#000;font-weight:bold}
-.tabs{display:flex;gap:8px;padding:10px;overflow-x:auto;background:#0f0f0f;position:sticky;top:52px;z-index:99;border-bottom:1px solid #222}
-.tabs span{padding:7px 14px;border-radius:20px;border:1px solid #333;white-space:nowrap;font-size:12px;cursor:pointer}
-.tabs span.active{background:#FFD600;color:#000;font-weight:900}
-.story-bar{display:flex;gap:12px;padding:10px;overflow-x:auto;background:#0a0a0a}
-.story{width:60px;text-align:center;flex-shrink:0}
-.story-ring{width:60px;height:60px;border-radius:50%;padding:3px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf)}
-.story-ring img{width:100%;height:100%;border-radius:50%;border:3px solid #000;object-fit:cover}
-.post-card{background:#111;margin:10px;border-radius:16px;padding:12px;border:1px solid #222}
-.post-head{display:flex;justify-content:space-between;align-items:center}
-.head-l{display:flex;gap:10px;align-items:center}
-.avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(45deg,#FFD600,#FF9000)}
-.post-card img,.post-card video{width:100%;border-radius:12px;margin-top:10px;max-height:600px;object-fit:cover}
-.actions{display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid #222}
-.act{font-size:13px;color:#aaa;cursor:pointer}
-.act b{color:#fff}
-.ad-box{background:#1a1a1a;border:1px dashed #FFD600;border-radius:12px;padding:12px;margin:10px;text-align:center;color:#FFD600;font-size:13px}
-#plus{position:fixed;bottom:85px;right:20px;width:62px;height:62px;border-radius:50%;background:#FFD600;color:#000;font-size:38px;border:none;font-weight:bold;z-index:9999;box-shadow:0 0 20px #FFD600}
-#uploadBox,#chatBox,#marketBox,#awardBox{position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:100000;display:none;justify-content:center;align-items:center;padding:15px}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#111;display:flex;justify-content:space-around;padding:12px 0;border-top:1px solid #222;z-index:9998}
-.bottom-nav span{font-size:20px;cursor:pointer;text-align:center}
-.bottom-nav span.active{color:#FFD600}
-.filter-bar{display:flex;gap:8px;overflow-x:auto;padding:8px 0}
-.filter-bar button{padding:6px 12px;border-radius:20px;border:1px solid #FFD600;background:#111;color:#fff}
-.clarendon{filter:contrast(1.2) saturate(1.35)}.juno{filter:sepia(0.15) saturate(1.5) brightness(1.1)}.moon{filter:grayscale(1)}.gingham{filter:grayscale(0.2) sepia(0.1)}
-.chat-msg{padding:8px 12px;border-radius:18px;margin:6px 0;max-width:75%}.me{background:#FFD600;color:#000;margin-left:auto}.other{background:#222}
-.market-item{background:#1a1a1a;border-radius:12px;padding:10px;margin:8px 0;display:flex;gap:10px;border:1px solid #333}
-</style></head><body>
+:root{--gold:#FFD600;--bg:#000;--card:#111;--border:#222}
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+body{background:var(--bg);color:#fff}
+.header{position:sticky;top:0;z-index:999;background:#000000f2;border-bottom:1px solid var(--border);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(10px)}
+.logo{color:var(--gold);font-weight:900;font-size:22px;letter-spacing:3px}
+.coin-badge{background:var(--gold);color:#000;padding:6px 12px;border-radius:20px;font-weight:900;font-size:13px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;border-bottom:1px solid var(--border);scrollbar-width:none}
+.tab{white-space:nowrap;padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--card);font-size:13px;font-weight:600;cursor:pointer}
+.tab.active{background:var(--gold);color:#000}
+.container{max-width:520px;margin:0 auto;padding:0 14px 90px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;margin:14px 0;overflow:hidden}
+.btn{border:none;padding:12px 18px;border-radius:25px;font-weight:900;cursor:pointer}
+.btn-gold{background:var(--gold);color:#000;width:100%}
+.btn-dark{background:#222;color:#fff;padding:8px 14px;border-radius:20px;font-size:12px}
+input,textarea,select{width:100%;background:#000;border:1px solid #333;color:#fff;padding:12px;border-radius:12px;margin:6px 0}
+.hidden{display:none!important}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:10px 0;z-index:999}
+.bn{color:#666;font-size:11px;text-align:center;cursor:pointer}
+.bn.active{color:var(--gold)}
+.safe-tag{background:#00ff88;color:#000;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:900}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.progress{height:6px;background:#222;border-radius:10px;overflow:hidden}
+.progress-bar{height:100%;background:var(--gold);width:0%;transition:.5s}
+#adFullScreen{position:fixed;inset:0;background:#000;z-index:9999;display:none;flex-direction:column}
+</style>
+</head>
+<body>
 
-<div id="splash"><h1 style="font-size:62px;font-weight:900;letter-spacing:8px">PIXORO</h1><p style="color:#FFD600;font-weight:900;margin-top:8px;letter-spacing:3px">INSTA + FACEBOOK FINAL WORLD</p><p style="color:#666;font-size:11px;margin-top:18px">Part 1 + Part 2 Combined • 1,000,000 Features Loading...</p></div>
-
-<div class="top-bar"><div class="logo">PIXORO</div><div class="mode-switch"><span id="mInsta" class="active" onclick="setMode('insta')">Instagram</span><span id="mFb" onclick="setMode('fb')">Facebook</span></div></div>
-
-<div class="tabs"><span class="active" data-f="All">All</span><span data-f="Reels">Reels</span><span data-f="Photo">Photo</span><span data-f="Friends">FB Posts</span><span data-f="Groups">Groups</span><span data-f="Market">Market</span><span data-f="Saved">Saved ❤️</span></div>
-
-<div class="story-bar" id="storyBar"></div>
-<div id="feed"></div>
-<div class="ad-box" id="adMiddle">💰 PIXORO ADS • Google AdSense Ready • ca-pub-PIXORO • Your Ad Earnings $0.10 per view 💰</div>
-
-<button id="plus">+</button>
-
-<div class="bottom-nav">
-<span class="active" onclick="navTab('All')">🏠<br><p style="font-size:9px">Home</p></span>
-<span onclick="openChat()">💬<br><p style="font-size:9px">Chat</p></span>
-<span onclick="openMarket()">🛒<br><p style="font-size:9px">Market</p></span>
-<span onclick="openAward()">🏆<br><p style="font-size:9px">Awards</p></span>
-<span onclick="navTab('Saved')">👤<br><p style="font-size:9px">You</p></span>
+<div class="header">
+<div class="logo">PIXORO V6</div>
+<div style="display:flex;gap:8px;align-items:center">
+<div class="safe-tag">SAFE ✓</div>
+<div class="coin-badge">🪙 <span id="coinCount">0</span></div>
+</div>
 </div>
 
-<div id="uploadBox"><div style="background:#1a1a1a;width:100%;max-width:420px;border-radius:20px;padding:20px;border:1px solid #333">
-<h3 style="color:#FFD600">PIXORO WORLD POST 🔥</h3>
-<input type="file" id="fileInput" accept="image/*,video/*" style="width:100%;margin:10px 0;color:#fff">
-<select id="typeSelect" style="width:100%;padding:10px;border-radius:10px;background:#111;color:#fff;border:1px solid #333"><option value="Photo">Photo - Insta</option><option value="Reels">Reels - Insta</option><option value="Friends">FB Post</option><option value="Groups">Group Post</option><option value="Market">Marketplace</option></select>
-<select id="songSelect" style="width:100%;padding:10px;border-radius:10px;background:#111;color:#fff;border:1px solid #333;margin-top:8px"><option value="">No Song</option><option value="https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c0c0f0e4f.mp3">Trending Mass</option><option value="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3">Love</option><option value="https://cdn.pixabay.com/download/audio/2022/06/07/audio_b9bd4170e8.mp3">Beat</option></select>
-<div class="filter-bar"><button onclick="setF('')">Normal</button><button onclick="setF('clarendon')">Clarendon</button><button onclick="setF('juno')">Juno</button><button onclick="setF('moon')">Moon</button><button onclick="setF('gingham')">Gingham</button></div>
-<input id="capInput" placeholder="Caption / Price / Group..." style="width:100%;padding:10px;border-radius:10px;background:#111;color:#fff;border:1px solid #333;margin-top:8px">
-<button onclick="postNow()" style="width:100%;background:#FFD600;color:#000;border:none;padding:12px;border-radius:25px;margin-top:12px;font-weight:900">POST TO WORLD + EARN AD 💰</button>
-<button onclick="document.getElementById('uploadBox').style.display='none'" style="width:100%;background:#222;color:#fff;border:none;padding:8px;border-radius:20px;margin-top:8px">Cancel</button>
-</div></div>
+<div class="tabs">
+<div class="tab active" onclick="switchTab('feed')">🏠 Feed</div>
+<div class="tab" onclick="switchTab('reels')">🎬 Reels</div>
+<div class="tab" onclick="switchTab('ads')">💰 Ads</div>
+<div class="tab" onclick="switchTab('games')">🎮 Games</div>
+<div class="tab" onclick="switchTab('wallet')">💳 Wallet</div>
+<div class="tab" onclick="switchTab('safe')">👧 Safe</div>
+</div>
 
-<div id="chatBox"><div style="background:#111;width:100%;max-width:400px;height:80vh;border-radius:20px;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:15px;border-bottom:1px solid #222;display:flex;justify-content:space-between"><b style="color:#FFD600">Messenger 💬</b><span onclick="document.getElementById('chatBox').style.display='none'" style="cursor:pointer">✖</span></div><div id="chatList" style="flex:1;overflow-y:auto;padding:10px"></div><div style="display:flex;gap:8px;padding:10px;border-top:1px solid #222"><input id="chatInput" placeholder="Message..." style="flex:1;background:#222;border:none;padding:10px;border-radius:20px;color:#fff"><button onclick="sendChat()" style="background:#FFD600;border:none;padding:10px 16px;border-radius:20px;font-weight:bold">Send</button></div></div></div>
+<div class="container">
 
-<div id="marketBox"><div style="background:#111;width:100%;max-width:420px;height:80vh;border-radius:20px;overflow-y:auto;padding:15px;border:1px solid #333"><div style="display:flex;justify-content:space-between"><b style="color:#FFD600">Marketplace 🛒</b><span onclick="document.getElementById('marketBox').style.display='none'">✖</span></div><div id="marketList" style="margin-top:12px"></div></div></div>
+<div id="tab-feed">
+<div class="card" style="padding:14px">
+<h3 style="color:var(--gold);font-size:14px">POST CREATE - SAFE ONLY ✓</h3>
+<input id="pTitle" placeholder="Title da">
+<textarea id="pDesc" placeholder="Caption..."></textarea>
+<input id="pImg" placeholder="Image URL - optional">
+<button class="btn btn-gold" onclick="createPost()">POST +10 COINS 🚀</button>
+</div>
+<div id="feedList"></div>
+<div id="adInFeed"></div>
+</div>
 
-<div id="awardBox"><div style="background:#111;width:100%;max-width:420px;border-radius:20px;padding:20px;border:1px solid #FFD600"><div style="display:flex;justify-content:space-between"><b style="color:#FFD600">🏆 Awards Leaderboard</b><span onclick="document.getElementById('awardBox').style.display='none'">✖</span></div><div id="awardList" style="margin-top:15px"></div><p style="font-size:11px;color:#888;margin-top:15px">Top 3 ku Gold + Ad Share da!</p></div></div>
+<div id="tab-reels" class="hidden">
+<div class="card" style="padding:14px">
+<h3 style="color:var(--gold)">🎬 Reels - Vertical</h3>
+<input id="rTitle" placeholder="Reel Title">
+<input id="rVideo" placeholder="Video URL mp4">
+<button class="btn btn-gold" onclick="addReel()">ADD REEL +20 🪙</button>
+</div>
+<div id="reelsList"></div>
+</div>
+
+<div id="tab-ads" class="hidden">
+<div class="card" style="padding:16px">
+<h2 style="color:var(--gold)">💰 PLUS AD SYSTEM - GIRI</h2>
+<p style="font-size:11px;color:#888;margin-top:4px">Ad paaru - Coin win pannu da - Makal Safe Ads only da!</p>
+<div style="background:#000;border:1px dashed #333;border-radius:12px;padding:12px;margin:12px 0;text-align:center">
+<h1 style="color:var(--gold)">🪙 <span id="adCoins">0</span> Coins</h1>
+<p style="font-size:11px;color:#888">Ads Watched: <span id="adCount">0</span> • Earned: <span id="adEarned">0</span> coins</p>
+</div>
+<div class="grid2">
+<button class="btn btn-gold" onclick="startRewardedAd(30,10)">🎬 Video Ad (30s) +10🪙</button>
+<button class="btn btn-dark" style="background:#FFD600;color:#000" onclick="startRewardedAd(15,15)">⚡ Fast Ad (15s) +15🪙</button>
+<button class="btn btn-dark" onclick="startRewardedAd(5,5)">🖼️ Banner (5s) +5🪙</button>
+<button class="btn btn-dark" onclick="startRewardedAd(60,20)">💎 Mega Ad (60s) +20🪙</button>
+</div>
+<div style="margin-top:14px;background:#000;border-radius:12px;padding:10px;border:1px solid #222">
+<p style="font-size:11px;color:#00ff88">👧 KIDS SAFE ADS ONLY ✓</p>
+<p style="font-size:10px;color:#666;margin-top:4px">• Education + Games + Study ads only da • Bad ads 100% block da • 1 min gap da - parent control da</p>
+</div>
+<div id="adHistory" style="margin-top:12px"></div>
+</div>
+</div>
+
+<div id="tab-games" class="hidden">
+<div class="card" style="padding:18px;text-align:center"><h2>🎮 TimePass</h2>
+<div class="grid2" style="margin-top:14px">
+<div class="card" style="padding:14px;cursor:pointer" onclick="playGame('tap')"><div style="font-size:28px">👆</div><h4>Tap Tap</h4><p style="font-size:10px;color:#888">50 tap = 20🪙</p></div>
+<div class="card" style="padding:14px;cursor:pointer" onclick="playGame('spin')"><div style="font-size:28px">🎡</div><h4>Spin</h4><p style="font-size:10px;color:#888">5-100🪙</p></div>
+<div class="card" style="padding:14px;cursor:pointer" onclick="playGame('quiz')"><div style="font-size:28px">🧠</div><h4>Quiz</h4><p style="font-size:10px;color:#888">15🪙</p></div>
+<div class="card" style="padding:14px;cursor:pointer" onclick="playGame('joke')"><div style="font-size:28px">😂</div><h4>Joke</h4><p style="font-size:10px;color:#888">5🪙</p></div>
+</div><div id="gameArea" style="margin-top:16px"></div></div>
+</div>
+
+<div id="tab-wallet" class="hidden">
+<div class="card" style="padding:16px"><h2 style="color:var(--gold)">💳 Wallet - 100🪙=₹10</h2>
+<h1 style="text-align:center;color:var(--gold);margin:12px 0">🪙 <span id="walletCoins">0</span> = ₹<span id="walletRupee">0</span></h1>
+<div class="grid2"><button class="btn btn-dark" onclick="redeem(100)">100→₹10</button><button class="btn btn-dark" onclick="redeem(500)">500→₹50</button></div>
+<div style="margin-top:12px"><input id="upiId" placeholder="UPI ID - giri@okaxis"><input id="upiAmount" type="number" placeholder="Amount ₹10 min"><button class="btn btn-gold" onclick="payUPI()">PAY UPI 🚀</button></div>
+<div id="payHistory" style="margin-top:12px"></div></div>
+</div>
+
+<div id="tab-safe" class="hidden">
+<div class="card" style="padding:16px"><h2 style="color:#00ff88">👧 Safe Panel</h2><p style="font-size:11px;color:#888">Parent Control - 100% Safe</p>
+<div id="safeLog" style="font-size:10px;color:#666;background:#000;padding:8px;border-radius:8px;margin-top:10px;max-height:120px;overflow-y:auto"></div>
+<button class="btn btn-gold" style="margin-top:10px" onclick="if(confirm('Delete all?')){localStorage.clear();location.reload();}">RESET ALL</button></div>
+</div>
+
+</div>
+
+<!-- FULL SCREEN AD DA -->
+<div id="adFullScreen">
+<div style="padding:10px;display:flex;justify-content:space-between;align-items:center;background:#111;border-bottom:1px solid #222">
+<span style="font-size:12px;color:#888">Ad • Safe ✓ • <span id="adTimer">30</span>s</span>
+<span style="background:#FFD600;color:#000;padding:4px 8px;border-radius:10px;font-size:11px;font-weight:900" id="adReward">+10 COINS</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center">
+<img id="adImg" src="https://picsum.photos/400/300?random=1" style="width:100%;max-width:400px;height:200px;object-fit:cover;border-radius:16px">
+<h2 id="adTitle" style="color:var(--gold);margin-top:16px">Kids Learning App 📚</h2>
+<p id="adDesc" style="color:#aaa;font-size:13px;margin-top:8px">30 sec paaru +10 coins da!</p>
+<div style="margin-top:20px;width:100%;max-width:400px"><div class="progress"><div id="adProgress" class="progress-bar" style="width:0%"></div></div><p style="font-size:10px;color:#666;margin-top:6px">Skip panna koodathu da - full paaru da!</p></div>
+</div>
+</div>
+
+<div class="bottom-nav">
+<div class="bn active" onclick="switchTab('feed')">🏠<br>Feed</div>
+<div class="bn" onclick="switchTab('reels')">🎬<br>Reels</div>
+<div class="bn" onclick="switchTab('ads')">💰<br>Ads</div>
+<div class="bn" onclick="switchTab('games')">🎮<br>Games</div>
+<div class="bn" onclick="switchTab('wallet')">💳<br>Wallet</div>
+</div>
 
 <script>
-let mode='insta', curFilter='', curUrl='';
-let chatMsgs=JSON.parse(localStorage.getItem('pixoro_chat'))||[{from:'other',text:'Dei Giri! PIXORO Insta+FB mass da! 🔥'}];
-let posts=JSON.parse(localStorage.getItem('pixoro_final'))||[
-{id:1,type:'Reels',user:'pixoro_official',cap:'FINAL WORLD REELS 🔥 Insta + FB serthu!',media:'https://www.w3schools.com/html/mov_bbb.mp4',isVideo:true,likes:4500,liked:false,saved:false,views:25600,filter:'',song:'https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c0c0f0e4f.mp3',comments:[{u:'mass_girl',t:'Vera level da!'}],followed:false,shared:32,group:'',price:''},
-{id:2,type:'Photo',user:'girl_safe',cap:'Insta Photo - Safe Mode ❤️ Filter working',media:'https://picsum.photos/500/600?random=7',isVideo:false,likes:1890,liked:false,saved:true,views:5600,filter:'clarendon',song:'',comments:[],followed:true,shared:12,group:'',price:''},
-{id:3,type:'Friends',user:'cbe_memes',cap:'FB Style Post da - Coimbatore la meetup da!',media:'https://picsum.photos/500/500?random=15',isVideo:false,likes:980,liked:false,saved:false,views:3200,filter:'',song:'',comments:[{u:'giri',t:'Naan varen da!'}],followed:false,shared:56,group:'',price:''},
-{id:4,type:'Groups',user:'coimbatore_gang',cap:'Group Post - PIXORO CBE Gang!',media:'https://picsum.photos/500/500?random=16',isVideo:false,likes:760,liked:false,saved:false,views:1800,filter:'juno',song:'',comments:[],followed:false,shared:8,group:'Coimbatore Gang',price:''},
-{id:5,type:'Market',user:'shop_cbe',cap:'iPhone 15 - Coimbatore Sale',media:'https://picsum.photos/500/500?random=17',isVideo:false,likes:56,liked:false,saved:false,views:890,filter:'',song:'',comments:[],followed:false,shared:3,group:'',price:'₹50000'}
-];
-function setMode(m){mode=m; document.getElementById('mInsta').classList.toggle('active',m==='insta'); document.getElementById('mFb').classList.toggle('active',m==='fb'); render();}
-function setF(f){curFilter=f;}
-document.getElementById('plus').onclick=()=>{showAd(); document.getElementById('uploadBox').style.display='flex';}
-document.getElementById('fileInput').onchange=e=>{let f=e.target.files[0]; if(f) curUrl=URL.createObjectURL(f); document.getElementById('typeSelect').value=f.type.includes('video')?'Reels':'Photo';}
-function save(){localStorage.setItem('pixoro_final',JSON.stringify(posts)); localStorage.setItem('pixoro_chat',JSON.stringify(chatMsgs));}
-function showAd(){let ad=document.getElementById('adMiddle'); ad.innerHTML='⏳ Loading Ad... Earning $0.10 💰'; setTimeout(()=>{ad.innerHTML='✅ Ad Watched! Earned $0.10 💰 PIXORO ADS - ca-pub-PIXORO - Google Ready';},1200);}
-function navTab(f){document.querySelectorAll('.tabs span').forEach(s=>s.classList.remove('active')); let t=[...document.querySelectorAll('.tabs span')].find(x=>x.dataset.f===f); if(t) t.classList.add('active'); document.querySelectorAll('.bottom-nav span').forEach(s=>s.classList.remove('active')); render();}
-function openChat(){document.getElementById('chatBox').style.display='flex'; renderChat();}
-function openMarket(){document.getElementById('marketBox').style.display='flex'; renderMarket();}
-function openAward(){document.getElementById('awardBox').style.display='flex'; renderAward();}
-function renderChat(){let l=document.getElementById('chatList'); l.innerHTML=''; chatMsgs.forEach(m=>{l.innerHTML+=`<div class="chat-msg ${m.from==='me'?'me':'other'}">${m.text}</div>`}); l.scrollTop=l.scrollHeight;}
-function sendChat(){let i=document.getElementById('chatInput'); if(!i.value.trim()) return; chatMsgs.push({from:'me',text:i.value}); i.value=''; save(); renderChat(); setTimeout(()=>{chatMsgs.push({from:'other',text:'Mass da Giri! PIXORO world level da! 🔥'}); save(); renderChat();},700);}
-function renderMarket(){let l=document.getElementById('marketList'); l.innerHTML=''; posts.filter(p=>p.type==='Market').forEach(p=>{l.innerHTML+=`<div class="market-item"><img src="${p.media}" style="width:80px;height:80px;border-radius:10px;object-fit:cover"><div><b>${p.cap}</b><p style="font-size:12px;color:#aaa">${p.user}</p><p style="color:#FFD600;font-weight:bold">${p.price}</p><button onclick="alert('Seller ku chat pannu da!')" style="background:#FFD600;border:none;padding:5px 10px;border-radius:15px;font-size:12px;font-weight:bold;margin-top:5px">Buy Now</button></div></div>`});}
-function renderAward(){let sorted=[...posts].sort((a,b)=>b.likes-b.likes||b.views-a.views); let l=document.getElementById('awardList'); l.innerHTML=''; sorted.slice(0,5).forEach((p,i)=>{let medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'🏅'; l.innerHTML+=`<div style="display:flex;justify-content:space-between;padding:10px;background:#1a1a1a;border-radius:10px;margin-top:8px;border:1px solid ${i<3?'#FFD600':'#333'}"><div><b>${medal} ${p.user}</b><p style="font-size:11px;color:#aaa">${p.type} • ${p.likes} Likes • ${p.views} Views</p></div><b style="color:#FFD600">#${i+1}</b></div>`});}
-function render(){
-let feed=document.getElementById('feed'); let bar=document.getElementById('storyBar'); let tab=document.querySelector('.tabs span.active').dataset.f;
-feed.innerHTML=''; bar.innerHTML=`<div class="story"><div class="story-ring"><img src="https://picsum.photos/100/100?1"></div><p style="font-size:10px">Your Story</p></div><div class="story"><div class="story-ring"><img src="https://picsum.photos/100/100?2"></div><p style="font-size:10px">girl_safe</p></div><div class="story"><div class="story-ring"><img src="https://picsum.photos/100/100?3"></div><p style="font-size:10px">cbe_group</p></div>`;
-posts.forEach(p=>{
-if(tab!=='All' && tab!=='Saved' && tab!==p.type) return; if(tab==='Saved'&&!p.saved) return;
-let media=p.isVideo?`<video class="${p.filter}" onplay="view(${p.id})" controls playsinline src="${p.media}"></video>`:`<img class="${p.filter}" src="${p.media}">`;
-let song=p.song?`<audio controls style="width:100%;margin-top:6px" src="${p.song}"></audio>`:'';
-let extra=p.group?`<p style="font-size:11px;color:#FFD600;margin-top:5px">👥 ${p.group}</p>`:(p.price?`<p style="color:#FFD600;font-weight:bold;margin-top:5px">${p.price} • 📍 CBE</p>`:'');
-let comments=p.comments.map(c=>`<p style="font-size:13px;margin-top:4px"><b>${c.u}</b> ${c.t}</p>`).join('');
-feed.innerHTML+=`<div class="post-card"><div class="post-head"><div class="head-l"><div class="avatar"></div><div><b>${p.user}</b><p style="font-size:10px;color:#aaa">${p.type}${p.group?' • '+p.group:''} • ${p.views} Views</p></div></div><button onclick="follow(${p.id})" style="background:${p.followed?'#333':'#FFD600'};color:${p.followed?'#fff':'#000'};border:none;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:bold">${p.followed?'Following':'Follow'}</button></div><p style="margin-top:8px;font-size:14px">${p.cap}</p>${media}${song}${extra}<div class="actions"><div class="act" onclick="like(${p.id})"><b>${p.liked?'❤️':'🤍'} ${p.likes}</b></div><div class="act" onclick="document.getElementById('c${p.id}').focus()">💬 ${p.comments.length}</div><div class="act" onclick="share(${p.id})">↗️ ${p.shared}</div><div class="act" onclick="saveP(${p.id})">${p.saved?'🔖':'📑'} Save</div></div><div style="margin-top:8px">${comments}</div><div style="display:flex;gap:8px;margin-top:10px"><input id="c${p.id}" placeholder="Comment..." style="flex:1;background:#222;border:none;padding:8px 12px;border-radius:20px;color:#fff"><button onclick="comment(${p.id})" style="background:#FFD600;border:none;padding:8px 14px;border-radius:20px;font-weight:bold">Post</button></div></div>`;
-});
+let coins=parseInt(localStorage.getItem('pixoro_coins')||'0');
+let posts=JSON.parse(localStorage.getItem('pixoro_posts_v3')||'[]');
+let reels=JSON.parse(localStorage.getItem('pixoro_reels')||'[]');
+let ads=JSON.parse(localStorage.getItem('pixoro_ads')||'[]');
+let pays=JSON.parse(localStorage.getItem('pixoro_pay')||'[]');
+let safeLog=JSON.parse(localStorage.getItem('pixoro_safelog')||'[]');
+if(reels.length===0){reels=[{id:1,title:'Cute Dance 💃',desc:'Safe dance da!',video:'https://videos.pexels.com/video-files/3048527/3048527-uhd_2560_1440_30fps.mp4',likes:120,liked:false},{id:2,title:'Study Trick 🧠',desc:'Trick da!',video:'https://videos.pexels.com/video-files/3191574/3191574-uhd_2560_1440_30fps.mp4',likes:89,liked:false}];}
+const BAD=['sex','porn','nude','xxx','fuck','bad'];function isSafe(t){let l=t.toLowerCase();for(let b of BAD){if(l.includes(b))return false;}return true;}
+function logSafe(m){safeLog.unshift(new Date().toLocaleTimeString()+' - '+m);if(safeLog.length>20)safeLog.pop();localStorage.setItem('pixoro_safelog',JSON.stringify(safeLog));renderSafe();}
+function updateCoins(n){coins+=n;localStorage.setItem('pixoro_coins',coins);document.querySelectorAll('#coinCount,#adCoins,#walletCoins').forEach(e=>{if(e)e.innerText=coins});document.getElementById('walletRupee').innerText=(coins/10).toFixed(0);document.getElementById('adEarned').innerText=ads.reduce((s,a)=>s+a.reward,0);document.getElementById('adCount').innerText=ads.length;}
+function switchTab(t){document.querySelectorAll('[id^=tab-]').forEach(x=>x.classList.add('hidden'));document.getElementById('tab-'+t).classList.remove('hidden');if(t==='feed')renderFeed();}
+function createPost(){let t=document.getElementById('pTitle').value,d=document.getElementById('pDesc').value,img=document.getElementById('pImg').value||'https://picsum.photos/500/300?random='+Date.now();if(!t){alert('Title kudu da');return;}if(!isSafe(t+d)){alert('Bad word block da!');logSafe('Blocked bad post');return;}posts.unshift({id:Date.now(),title:t,desc:d,img,likes:0,liked:false});localStorage.setItem('pixoro_posts_v3',JSON.stringify(posts));document.getElementById('pTitle').value='';document.getElementById('pDesc').value='';updateCoins(10);renderFeed();logSafe('Post: '+t);}
+function renderFeed(){let f=document.getElementById('feedList');if(posts.length===0){f.innerHTML='<p style="text-align:center;color:#555;margin-top:20px">No posts da - nee first!</p>';return;}f.innerHTML=posts.map((p,i)=>`<div class="card"><img src="${p.img}" style="width:100%;height:250px;object-fit:cover"><div style="padding:12px"><h4 style="color:var(--gold)">${p.title}</h4><p style="font-size:12px;color:#aaa">${p.desc}</p><button class="btn btn-dark" style="margin-top:8px;${p.liked?'background:var(--gold);color:#000':''}" onclick="likePost(${p.id})">❤️ ${p.likes} +2🪙</button></div></div>${(i+1)%3===0?`<div class="card" style="padding:10px;background:#111;border:1px solid #FFD60033"><p style="font-size:10px;color:var(--gold)">AD • SAFE ✓</p><p style="font-size:12px;margin-top:4px">📚 Learning Box - 50% OFF da! +5 coins</p><button class="btn btn-dark" style="margin-top:6px;background:var(--gold);color:#000" onclick="updateCoins(5);alert('+5 coins da!')">Claim +5🪙</button></div>`:''}`).join('');}
+function likePost(id){let p=posts.find(x=>x.id===id);if(p.liked){p.likes--;p.liked=false;updateCoins(-2);}else{p.likes++;p.liked=true;updateCoins(2);}localStorage.setItem('pixoro_posts_v3',JSON.stringify(posts));renderFeed();}
+function renderReels(){document.getElementById('reelsList').innerHTML=reels.map(r=>`<div class="card"><video src="${r.video}" style="width:100%;height:400px;object-fit:cover" controls loop muted></video><div style="padding:12px"><h4 style="color:var(--gold)">${r.title}</h4><p style="font-size:12px;color:#aaa">${r.desc}</p><button class="btn btn-dark" style="margin-top:8px;${r.liked?'background:var(--gold);color:#000':''}" onclick="likeReel(${r.id})">❤️ ${r.likes} Like +2🪙</button></div></div>`).join('');}
+function likeReel(id){let r=reels.find(x=>x.id===id);if(r.liked){r.likes--;r.liked=false;updateCoins(-2);}else{r.likes++;r.liked=true;updateCoins(2);}localStorage.setItem('pixoro_reels',JSON.stringify(reels));renderReels();}
+function addReel(){let t=document.getElementById('rTitle').value,v=document.getElementById('rVideo').value;if(!t||!v){alert('Title & URL kudu da');return;}reels.unshift({id:Date.now(),title:t,desc:'Safe reel',video:v,likes:0,liked:false});localStorage.setItem('pixoro_reels',JSON.stringify(reels));updateCoins(20);renderReels();}
+
+// AD SYSTEM MASS DA!
+const AD_LIST=[{title:'Kids Learning App 📚',desc:'Padikka super app da - 30 sec paaru!',img:'https://picsum.photos/400/300?random=11',reward:10},{title:'Cartoon Game Fun 🎮',desc:'Makal game da - safe da!',img:'https://picsum.photos/400/300?random=12',reward:15},{title:'Milk Power 🥛',desc:'Healthy milk da + coins!',img:'https://picsum.photos/400/300?random=13',reward:5},{title:'Study Books 50% OFF 🎒',desc:'Books offer da mega reward!',img:'https://picsum.photos/400/300?random=14',reward:20}];
+let adTimerInt=null, adTime=30, adReward=10;
+function startRewardedAd(sec,reward){
+  if(localStorage.getItem('pixoro_ad_lock') && Date.now()-parseInt(localStorage.getItem('pixoro_ad_lock'))<60000){alert('1 min wait da Giri - Safe ku limit da! ⏰');return;}
+  let ad=AD_LIST[Math.floor(Math.random()*AD_LIST.length)];
+  ad.reward=reward; adTime=sec; adReward=reward;
+  document.getElementById('adTitle').innerText=ad.title;
+  document.getElementById('adDesc').innerText=ad.desc+` +${reward} coins da!`;
+  document.getElementById('adImg').src=ad.img;
+  document.getElementById('adReward').innerText=`+${reward} COINS`;
+  document.getElementById('adTimer').innerText=sec;
+  document.getElementById('adFullScreen').style.display='flex';
+  document.getElementById('adProgress').style.width='0%';
+  let left=sec;
+  clearInterval(adTimerInt);
+  adTimerInt=setInterval(()=>{
+    left--; document.getElementById('adTimer').innerText=left;
+    document.getElementById('adProgress').style.width=((sec-left)/sec*100)+'%';
+    if(left<=0){clearInterval(adTimerInt);finishAd(ad);}
+  },1000);
 }
-function like(id){let p=posts.find(x=>x.id===id); p.liked=!p.liked; p.likes+=p.liked?1:-1; save(); render();}
-function saveP(id){posts.find(x=>x.id===id).saved=!posts.find(x=>x.id===id).saved; save(); render();}
-function follow(id){posts.find(x=>x.id===id).followed=!posts.find(x=>x.id===id).followed; save(); render();}
-function comment(id){let i=document.getElementById('c'+id); if(!i.value.trim()) return; posts.find(x=>x.id===id).comments.push({u:'you',t:i.value}); i.value=''; save(); render();}
-function view(id){posts.find(x=>x.id===id).views++; save();}
-function share(id){posts.find(x=>x.id===id).shared++; alert('Shared to FB+Insta da! 🔥'); save(); render();}
-function postNow(){let f=document.getElementById('fileInput').files[0]; if(!f||!curUrl){alert('File select pannu da!');return;} showAd(); let type=document.getElementById('typeSelect').value; let song=document.getElementById('songSelect').value; let cap=document.getElementById('capInput').value||'Mass Post da!'; let np={id:Date.now(),type:type,user:'you',cap:cap,media:curUrl,isVideo:type==='Reels',likes:0,liked:false,saved:false,views:1,filter:curFilter,song:song,comments:[],followed:false,shared:0,group:type==='Groups'?'Coimbatore Gang':cap,price:type==='Market'?'₹'+(Math.floor(Math.random()*50000)+500):''}; posts.unshift(np); save(); render(); document.getElementById('uploadBox').style.display='none'; curUrl=''; alert('WORLD MASS POSTED DA! 💰 Ad Earned!');}
-document.querySelectorAll('.tabs span').forEach(t=>{t.onclick=()=>{document.querySelectorAll('.tabs span').forEach(s=>s.classList.remove('active')); t.classList.add('active'); render();}});
-setTimeout(()=>{document.getElementById('splash').style.display='none'; render();},2000);
-render();
-</script></body></html>
+function finishAd(ad){
+  document.getElementById('adFullScreen').style.display='none';
+  updateCoins(ad.reward);
+  ads.unshift({title:ad.title,reward:ad.reward,time:new Date().toLocaleTimeString()});
+  localStorage.setItem('pixoro_ads',JSON.stringify(ads));
+  localStorage.setItem('pixoro_ad_lock',Date.now().toString());
+  renderAds(); logSafe(`Ad Watched: ${ad.title} +${ad.reward}`); alert(`Mass da Giri! +${ad.reward} Coins Win! 🪙 Total: ${coins}`);
+}
+function renderAds(){document.getElementById('adHistory').innerHTML=ads.slice(0,10).map(a=>`<div style="font-size:11px;background:#000;padding:8px;border-radius:8px;margin:4px 0;border:1px solid #222">🎬 ${a.title} - +${a.reward}🪙 - ${a.time}</div>`).join('')||'<p style="font-size:11px;color:#555">No ads yet da - first ad paaru da!</p>';}
+function playGame(t){let a=document.getElementById('gameArea');if(t==='tap'){let c=0;a.innerHTML=`<div class="card" style="padding:16px;text-align:center"><h3>Tap 50 times</h3><h1 id="tapCount">0</h1><button class="btn btn-gold" onclick="tapInc()">TAP DA!</button></div>`;window.tapInc=()=>{c++;document.getElementById('tapCount').innerText=c;if(c>=50){updateCoins(20);a.innerHTML='<p style="color:#00ff88;text-align:center">+20 Coins Win!</p>';}};}if(t==='spin'){let w=Math.floor(Math.random()*96)+5;updateCoins(w);a.innerHTML=`<div style="text-align:center;padding:20px"><h2 style="color:var(--gold)">+${w} Coins!</h2></div>`;}if(t==='quiz'){a.innerHTML=`<div class="card" style="padding:16px"><h4>2+2 enna da?</h4><button class="btn btn-dark" style="width:100%;margin:4px 0" onclick="updateCoins(15);document.getElementById('gameArea').innerHTML='<p style=color:#00ff88;text-align:center>+15 Coins!</p>'">4</button></div>`;}if(t==='joke'){updateCoins(5);a.innerHTML=`<div class="card" style="padding:16px;text-align:center"><p>Teacher: Homework yen? Student: Network illa Miss! 😂</p><p style="color:var(--gold)">+5 Coins!</p></div>`;}}
+function redeem(n){if(coins<n){alert('Coins pathala da');return;}updateCoins(-n);pays.unshift({type:'redeem',rupee:n/10,time:new Date().toLocaleString()});localStorage.setItem('pixoro_pay',JSON.stringify(pays));renderPay();}
+function payUPI(){let id=document.getElementById('upiId').value,am=document.getElementById('upiAmount').value;if(!id||!am){alert('UPI kudu da');return;}pays.unshift({type:'upi',rupee:am,time:new Date().toLocaleString()});localStorage.setItem('pixoro_pay',JSON.stringify(pays));renderPay();alert('UPI ₹'+am+' Request ponuchu da!');}
+function renderPay(){document.getElementById('payHistory').innerHTML=pays.map(p=>`<div style="font-size:11px;background:#000;padding:8px;border-radius:8px;margin:4px 0">${p.type} - ₹${p.rupee} - ${p.time}</div>`).join('');}
+function renderSafe(){let l=document.getElementById('safeLog');if(l)l.innerHTML=safeLog.slice(0,10).map(x=>`<div>• ${x}</div>`).join('')||'All Safe ✓';}
+
+updateCoins(0);renderFeed();renderReels();renderAds();renderPay();renderSafe();
+</script>
+</body>
+</html>
