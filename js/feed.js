@@ -1,7 +1,17 @@
-function showPosts(){
- let p=JSON.parse(localStorage.getItem("pixoro_posts")||"[]");
- let feed = document.getElementById("feed");
- if(!feed) return;
- feed.innerHTML = p.map(u=>`<div style="margin:15px 0"><img src="${u}" style="width:100%;border-radius:12px;display:block"></div>`).join("");
+import SystemAd from "./SystemAd"
+
+function Feed({ posts }) {
+  return (
+    <div>
+      {posts.map((post, index) => (
+        <div key={post.id}>
+          {/* Normal Post */}
+          <PostCard post={post} />
+
+          {/* Ovvoro 5 post ku aprom Ad kaamikkanum da! */}
+          {(index + 1) % 5 === 0 && <SystemAd />}
+        </div>
+      ))}
+    </div>
+  )
 }
-showPosts();
