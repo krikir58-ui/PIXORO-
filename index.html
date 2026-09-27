@@ -1,26 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO V1 - Profile</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIXORO V2 - AJES</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body{background:#000;color:#fff;font-family:Arial;padding:20px;text-align:center}
-h1{color:#FFD700;letter-spacing:5px;margin:20px 0 5px}
-.sub{color:#00ff88;font-size:10px;letter-spacing:2px;margin-bottom:20px}
-.box{background:#111;border:1px solid #333;padding:15px;border-radius:15px;margin-bottom:15px;text-align:left}
-.box h3{color:#FFD700;margin:0 0 10px}
+body{background:#000;color:#fff;font-family:Arial;padding:15px;text-align:center;margin:0}
+h1{color:#FFD700;letter-spacing:5px;margin:15px 0 3px;font-size:28px}
+.sub{color:#00ff88;font-size:9px;letter-spacing:2px;margin-bottom:15px}
+.box{background:#111;border:1px solid #333;padding:14px;border-radius:15px;margin-bottom:12px;text-align:left}
+.box h3{color:#FFD700;margin:0 0 10px;font-size:16px}
 input{width:100%;padding:11px;margin-bottom:8px;background:#000;border:1px solid #333;color:#fff;border-radius:8px;box-sizing:border-box}
 button{width:100%;padding:12px;background:#FFD700;color:#000;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
 .feed{display:none}
-.post{background:#111;border:1px solid #333;padding:12px;border-radius:12px;margin:12px 0}
 .pfp{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #FFD700;vertical-align:middle;margin-right:8px}
-.big-pfp{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #FFD700;display:block;margin:0 auto 10px}
+.big-pfp{width:95px;height:95px;border-radius:50%;object-fit:cover;border:3px solid #FFD700;display:block;margin:0 auto 10px}
+.post{background:#111;border:1px solid #333;padding:12px;border-radius:12px;margin:12px 0}
+/* CROPPER MODAL DA GIRI */
+#cropModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:999;flex-direction:column;align-items:center;justify-content:center;padding:15px;box-sizing:border-box}
+.crop-box{width:300px;height:300px;overflow:hidden;position:relative;border:3px solid #FFD700;border-radius:50%;background:#222;touch-action:none}
+.crop-box.post-mode{border-radius:12px;width:300px;height:380px}
+.crop-box img{position:absolute;top:0;left:0;cursor:move;max-width:none;user-select:none}
+.controls{margin-top:15px;width:300px}
+.controls input[type=range]{width:100%}
+.small-btn{padding:8px 18px;width:auto;margin:5px;border-radius:20px;font-size:13px}
 </style>
 </head>
 <body>
-<h1>PIXORO V1</h1><div class="sub">PROFILE PHOTO UPDATE DA GIRI</div>
+<h1>PIXORO V1</h1><div class="sub">AJES CROPPER - DRAG & ZOOM DA GIRI</div>
 
 <div id="authDiv">
 <div class="box"><h3>Signup</h3><input id="su_user" placeholder="giri"><input id="su_pass" type="password" placeholder="Password"><button onclick="signupUser()">Signup</button></div>
@@ -29,95 +36,126 @@ button{width:100%;padding:12px;background:#FFD700;color:#000;border:none;border-
 
 <div id="feedDiv" class="feed">
 <div class="box" style="text-align:center">
-<img id="myPfp" class="big-pfp" src="https://via.placeholder.com/90/111/FFD700?text=GIRI" onerror="this.src='https://via.placeholder.com/90'">
+<img id="myPfp" class="big-pfp" src="https://via.placeholder.com/90">
 <h3 style="text-align:center">Welcome <span id="uName"></span> 👑</h3>
-<input type="file" id="pfpFile" accept="image/*" style="font-size:12px">
-<button onclick="uploadPfp()" style="background:#00ff88;margin-top:8px">Profile Photo Change Pannu Da 📸</button>
-<button onclick="logoutUser()" style="background:#222;color:#ff4444;margin-top:8px;border:1px solid #444">Logout</button>
+<input type="file" id="pfpFile" accept="image/*" onchange="openCropper(this,'pfp')">
+<button onclick="document.getElementById('pfpFile').click()" style="background:#222;color:#00ff88;border:1px solid #333;margin-top:5px">Gallery - DP Select Pannu 📸</button>
+<button onclick="logoutUser()" style="background:#111;color:#ff4444;margin-top:8px;border:1px solid #333;font-size:12px">Logout</button>
 </div>
-
 <div class="box">
-<h3>Photo Upload 📸</h3>
-<input type="file" id="imgFile" accept="image/*" onchange="previewImage()">
-<img id="preview" style="width:100%;border-radius:10px;display:none;margin:10px 0;max-height:300px;object-fit:cover">
+<h3>Post - Photo Ajes Pannu Da 📸🔥</h3>
+<input type="file" id="imgFile" accept="image/*" onchange="openCropper(this,'post')">
+<img id="preview" style="width:100%;border-radius:12px;display:none;margin:10px 0;max-height:350px;object-fit:cover">
 <input id="cap" placeholder="Caption">
 <button onclick="createPost()">Post Podu Da 🔥</button>
 </div>
 <div id="posts"></div>
 </div>
 
+<!-- CROPPER MODAL DA -->
+<div id="cropModal">
+<h3 style="color:#FFD700;margin:0 0 10px" id="cropTitle">Photo Ajes Pannu Da - Drag Pannu, Zoom Pannu</h3>
+<div id="cropContainer" class="crop-box">
+<img id="cropImg" src="">
+</div>
+<div class="controls">
+<label style="color:#888;font-size:12px">Zoom - Perusa Chinna pannu da</label>
+<input type="range" id="zoomRange" min="0.5" max="3" step="0.05" value="1" oninput="applyZoom()">
+<div style="margin-top:12px;text-align:center">
+<button onclick="doCrop()" style="background:#00ff88" class="small-btn">OK - Ajes Done Da ✅</button>
+<button onclick="closeCropper()" style="background:#222;color:#fff" class="small-btn">Cancel</button>
+</div>
+<p style="color:#666;font-size:11px;margin-top:10px">☝️ Photo va viralaala drag panni mela keela left right nakkalam da! Zoom slider va isthu perusa pannalam da!</p>
+</div>
+</div>
+
+<canvas id="c" style="display:none"></canvas>
+
 <script>
 const SUPABASE_URL = "https://yecpltndhlzfjplzhcpm.supabase.co";
-const SUPABASE_KEY = "sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_";
+const SUPABASE_KEY = "PASTE YOUR anon KEY DA";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let selectedFile=null;
-function previewImage(){
- let file=document.getElementById('imgFile').files[0];
- if(!file) return; selectedFile=file;
- let r=new FileReader(); r.onload=e=>{document.getElementById('preview').src=e.target.result; document.getElementById('preview').style.display='block';}; r.readAsDataURL(file);
-}
-async function signupUser(){
- let u=document.getElementById('su_user').value.trim().toLowerCase();
- let p=document.getElementById('su_pass').value.trim();
- if(!u||!p) return alert("Username Password podu");
- let {error}=await sb.from('users').insert([{username:u,password:p}]);
- if(error&&!error.message.includes('duplicate')) return alert(error.message);
- localStorage.setItem('pix_user',u); location.reload();
-}
-async function loginUser(){
- let u=document.getElementById('li_user').value.trim().toLowerCase();
- let {error}=await sb.from('users').select('*').eq('username',u).single();
- if(error) return alert("User illa");
- localStorage.setItem('pix_user',u); location.reload();
-}
+let selectedFile=null, cropMode='pfp', currentScale=1, posX=0, posY=0, isDrag=false, startX, startY, imgOrigW, imgOrigH;
+let croppedBlob=null;
+
+function signupUser(){ let u=su_user.value.trim().toLowerCase(),p=su_pass.value.trim(); if(!u||!p) return alert("Poduda"); sb.from('users').insert([{username:u,password:p}]).then(e=>{ if(e.error&&!e.error.message.includes('duplicate')) return alert(e.error.message); localStorage.setItem('pix_user',u); location.reload();});}
+function loginUser(){ let u=li_user.value.trim().toLowerCase(); sb.from('users').select('*').eq('username',u).single().then(e=>{ if(e.error) return alert("User illa"); localStorage.setItem('pix_user',u); location.reload();});}
 function logoutUser(){localStorage.removeItem('pix_user');location.reload();}
-async function checkUser(){
- let u=localStorage.getItem('pix_user'); if(!u) return;
- document.getElementById('authDiv').style.display='none';
- document.getElementById('feedDiv').style.display='block';
- document.getElementById('uName').innerText=u;
- loadMyPfp(u); loadPosts();
+async function checkUser(){ let u=localStorage.getItem('pix_user'); if(!u) return; authDiv.style.display='none'; feedDiv.style.display='flex'; feedDiv.style.flexDirection='column'; uName.innerText=u; loadMyPfp(u); loadPosts();}
+async function loadMyPfp(u){ let {data}=await sb.from('users').select('profile_pic').eq('username',u).single(); if(data?.profile_pic) myPfp.src=data.profile_pic; }
+
+function openCropper(input, mode){
+ cropMode=mode; let file=input.files[0]; if(!file) return;
+ let reader=new FileReader(); reader.onload=e=>{
+  cropImg.src=e.target.result;
+  document.getElementById('cropContainer').className = mode==='pfp'? 'crop-box' : 'crop-box post-mode';
+  document.getElementById('cropTitle').innerText = mode==='pfp'? 'DP Ajes Pannu Da - Drag Pannu' : 'Post Photo Ajes Pannu Da';
+  cropModal.style.display='flex';
+  setTimeout(()=>{ initCropper(); },100);
+ }; reader.readAsDataURL(file);
 }
-async function loadMyPfp(username){
- let {data}=await sb.from('users').select('profile_pic').eq('username',username).single();
- if(data && data.profile_pic){ document.getElementById('myPfp').src=data.profile_pic; }
+function initCropper(){
+ let img=cropImg; imgOrigW=img.naturalWidth; imgOrigH=img.naturalHeight;
+ let box=document.getElementById('cropContainer'); let bw=box.clientWidth, bh=box.clientHeight;
+ let scale=Math.max(bw/imgOrigW, bh/imgOrigH); if(cropMode==='post') scale=Math.max(bw/imgOrigW, 200/imgOrigH);
+ currentScale=scale; posX=(bw - imgOrigW*scale)/2; posY=(bh - imgOrigH*scale)/2;
+ zoomRange.value=scale; zoomRange.min=scale*0.8; zoomRange.max=scale*3;
+ applyTransform();
+ setupDrag();
 }
-async function uploadPfp(){
- let file=document.getElementById('pfpFile').files[0];
- let u=localStorage.getItem('pix_user');
- if(!file) return alert("Gallery la irunthu DP select pannu da!");
- alert("DP Uploading da... ⏳");
- let fname="pfp_"+u+"_"+Date.now()+"_"+file.name;
- let {error}=await sb.storage.from('profile-pics').upload(fname,file,{upsert:true});
+function applyTransform(){ cropImg.style.width=(imgOrigW*currentScale)+'px'; cropImg.style.height=(imgOrigH*currentScale)+'px'; cropImg.style.left=posX+'px'; cropImg.style.top=posY+'px'; }
+function applyZoom(){ currentScale=parseFloat(zoomRange.value); applyTransform(); }
+function setupDrag(){
+ let img=cropImg, box=document.getElementById('cropContainer');
+ let getPos=e=> e.touches? {x:e.touches[0].clientX, y:e.touches[0].clientY} : {x:e.clientX, y:e.clientY};
+ img.onmousedown = img.ontouchstart = e=>{ isDrag=true; let p=getPos(e); startX=p.x-posX; startY=p.y-posY; e.preventDefault(); };
+ window.onmousemove = window.ontouchmove = e=>{ if(!isDrag) return; let p=getPos(e); posX=p.x-startX; posY=p.y-startY; applyTransform(); };
+ window.onmouseup = window.ontouchend = ()=>{ isDrag=false; };
+}
+function closeCropper(){ cropModal.style.display='none'; pfpFile.value=""; imgFile.value=""; }
+function doCrop(){
+ let box=document.getElementById('cropContainer'), img=cropImg, canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
+ let bw=box.clientWidth, bh=box.clientHeight;
+ let size = cropMode==='pfp'? 400 : 800;
+ if(cropMode==='pfp'){ canvas.width=size; canvas.height=size; } else { canvas.width=800; canvas.height=1000; bw=box.clientWidth; bh=box.clientHeight; }
+ // crop math
+ let sx = (-posX)/currentScale, sy = (-posY)/currentScale, sW = bw/currentScale, sH = bh/currentScale;
+ ctx.fillStyle="#000"; ctx.fillRect(0,0,canvas.width,canvas.height);
+ ctx.drawImage(img, sx, sy, sW, sH, 0,0,canvas.width,canvas.height);
+ canvas.toBlob(blob=>{
+  croppedBlob=blob;
+  let url=URL.createObjectURL(blob);
+  if(cropMode==='pfp'){ myPfp.src=url; uploadPfpBlob(blob); } else { preview.src=url; preview.style.display='block'; selectedFile=blob; }
+  closeCropper();
+ },'image/jpeg',0.9);
+}
+async function uploadPfpBlob(blob){
+ let u=localStorage.getItem('pix_user'); let fname="pfp_"+u+"_"+Date.now()+".jpg";
+ alert("DP Ajes panni Uploading da... ⏳");
+ let {error}=await sb.storage.from('profile-pics').upload(fname,blob,{upsert:true});
  if(error) return alert(error.message);
  let {data}=sb.storage.from('profile-pics').getPublicUrl(fname);
  await sb.from('users').update({profile_pic:data.publicUrl}).eq('username',u);
- document.getElementById('myPfp').src=data.publicUrl;
- alert("DP Change OK da Giri! 👑🔥");
+ alert("DP Vera Level da Giri! 👑");
 }
 async function createPost(){
- let cap=document.getElementById('cap').value.trim();
- let u=localStorage.getItem('pix_user');
- if(!selectedFile) return alert("Photo select pannu");
- alert("Uploading da... ⏳");
- let fname=Date.now()+"_"+selectedFile.name;
- let {error}=await sb.storage.from('post-images').upload(fname,selectedFile);
+ let cap=document.getElementById('cap').value.trim(), u=localStorage.getItem('pix_user');
+ if(!selectedFile) return alert("Photo select pannu da!");
+ alert("Post Uploading da... ⏳");
+ let fname=Date.now()+"_post.jpg";
+ let fileToUpload = selectedFile instanceof Blob? new File([selectedFile],"post.jpg",{type:"image/jpeg"}) : selectedFile;
+ let {error}=await sb.storage.from('post-images').upload(fname,fileToUpload);
  if(error) return alert(error.message);
  let {data}=sb.storage.from('post-images').getPublicUrl(fname);
  await sb.from('posts').insert([{username:u,image_url:data.publicUrl,caption:cap}]);
- alert("Post OK da!");
- document.getElementById('cap').value=""; document.getElementById('imgFile').value=""; document.getElementById('preview').style.display='none'; selectedFile=null;
- loadPosts();
+ alert("Post OK da!"); capEl=document.getElementById('cap'); capEl.value=""; preview.style.display='none'; selectedFile=null; imgFile.value=""; loadPosts();
 }
 async function loadPosts(){
- let {data: posts}=await sb.from('posts').select('*').order('id',{ascending:false});
- let {data: users}=await sb.from('users').select('username,profile_pic');
- let userMap={}; (users||[]).forEach(x=>userMap[x.username]=x.profile_pic);
- let h=''; (posts||[]).forEach(p=>{
-  let pfp=userMap[p.username]||'https://via.placeholder.com/40/111/FFD700?text='+p.username[0];
-  h+=`<div class="post"><img class="pfp" src="${pfp}"><b>@${p.username}</b><br><br><img src="${p.image_url}" style="width:100%;border-radius:10px"><p>${p.caption||''}</p></div>`;
- });
+ let {data:posts}=await sb.from('posts').select('*').order('id',{ascending:false});
+ let {data:users}=await sb.from('users').select('username,profile_pic');
+ let map={}; (users||[]).forEach(x=>map[x.username]=x.profile_pic);
+ let h=''; (posts||[]).forEach(p=>{ let pfp=map[p.username]||'https://via.placeholder.com/40'; h+=`<div class="post"><img class="pfp" src="${pfp}"><b>@${p.username}</b><br><br><img src="${p.image_url}" style="width:100%;border-radius:10px"><p>${p.caption||''}</p></div>`; });
  document.getElementById('posts').innerHTML=h;
 }
 checkUser();
