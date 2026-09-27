@@ -1,24 +1,30 @@
-// auth.js - FIXED - Pokka problem solved da
+// auth.js - FINAL FIXED - Case problem solved da
 async function signupUser(){
-  let u = document.getElementById('su_user').value.trim();
+  let u = document.getElementById('su_user').value.trim().toLowerCase();
   let p = document.getElementById('su_pass').value.trim();
-  if(!u || !p) return alert("Username & Password rendu podu da!");
-  let {data, error} = await sb.from('users').insert([{username: u, password: p}]).select();
-  if(error){ return alert("Error da: " + error.message); }
+  if(!u || !p) return alert("Username & Password podu da!");
+  console.log("Signup trying:", u);
+  let {data, error} = await sb.from('users').insert([{username: u, password: p, bio: 'PIXORO V1 user da'}]).select();
+  if(error){ 
+    console.log(error);
+    return alert("Signup Error da: " + error.message + " - Table irukka nu check pannu da!"); 
+  }
   localStorage.setItem('pix_user', u);
-  alert("Signup Super da Giri! 👑 Login aaguthu da!");
+  alert("Signup MASS da Giri! 👑 Ippo Feed ku porom da!");
   location.reload();
 }
 
 async function loginUser(){
-  let u = document.getElementById('li_user').value.trim();
+  let u = document.getElementById('li_user').value.trim().toLowerCase();
   if(!u) return alert("Username podu da!");
+  console.log("Login trying:", u);
   let {data, error} = await sb.from('users').select('*').eq('username', u).single();
   if(error || !data){
-    return alert("User illa da - Mela Signup pannu da! Username: " + u);
+    console.log(error);
+    return alert("User illa da - Mela Signup pannu da! Username: " + u + " - Error: " + (error?.message||'not found'));
   }
   localStorage.setItem('pix_user', u);
-  alert("Login OK da 🔥 Feed ku poguthu da!");
+  alert("Login Vera Level da 🔥");
   location.reload();
 }
 
