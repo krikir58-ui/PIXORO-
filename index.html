@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO V3 - Follow</title>
+<title>PIXORO V4 - Followers List</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 body{background:#000;color:#fff;font-family:Arial;padding:12px;text-align:center;margin:0}
@@ -23,6 +23,7 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-
 .follow-btn{background:#00ff88;color:#000;padding:6px 14px;width:auto;font-size:12px;border-radius:20px}
 .follow-btn.following{background:#222;color:#fff;border:1px solid #333}
 .stats{display:flex;justify-content:center;gap:18px;margin:8px 0;font-size:13px}
+.stats span{cursor:pointer;padding:4px 8px;border-radius:8px;background:#1a1a1a}
 .stats b{color:#FFD700}
 .comment-box{background:#0a0a0a;border-radius:10px;padding:8px;margin-top:8px}
 .comment{font-size:13px;padding:4px 0;border-bottom:1px solid #222}
@@ -34,10 +35,17 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-
 .crop-box{width:300px;height:300px;overflow:hidden;position:relative;border:3px solid #FFD700;border-radius:50%;background:#222}
 .crop-box.post-mode{border-radius:12px;height:380px}
 .crop-box img{position:absolute;top:0;left:0;cursor:move;max-width:none}
+
+/* FOLLOWERS LIST MODAL DA */
+#followModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:998;flex-direction:column;padding:12px;box-sizing:border-box}
+.follow-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.follow-header h2{color:#FFD700;margin:0}
+.follow-item{display:flex;justify-content:space-between;align-items:center;background:#111;border:1px solid #333;padding:10px;border-radius:12px;margin-bottom:8px}
+.follow-item-left{display:flex;align-items:center}
 </style>
 </head>
 <body>
-<h1>PIXORO V1</h1><div class="sub">FOLLOW SYSTEM - V3 MASS DA 🔥</div>
+<h1>PIXORO V1</h1><div class="sub">FOLLOWERS LIST - V4 MASS DA 🔥</div>
 <div id="authDiv">
 <div class="box"><h3>Signup</h3><input id="su_user" placeholder="giri"><input id="su_pass" type="password" placeholder="Password"><button onclick="signupUser()">Signup</button></div>
 <div class="box"><h3>Login</h3><input id="li_user" placeholder="giri"><button onclick="loginUser()" style="background:#222;color:#fff">Login</button></div>
@@ -46,7 +54,10 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-
 <div class="box" style="text-align:center">
 <img id="myPfp" class="big-pfp" src="https://via.placeholder.com/90">
 <h3 style="text-align:center">Welcome <span id="uName"></span> 👑</h3>
-<div class="stats"><span><b id="fCount">0</b> Followers</span><span><b id="fgCount">0</b> Following</span></div>
+<div class="stats">
+<span onclick="openFollowers()"><b id="fCount">0</b> Followers</span>
+<span onclick="openFollowing()"><b id="fgCount">0</b> Following</span>
+</div>
 <input type="file" id="pfpFile" accept="image/*" onchange="openCropper(this,'pfp')" style="display:none">
 <button onclick="document.getElementById('pfpFile').click()" style="background:#222;color:#00ff88;border:1px solid #333;font-size:12px">DP Change 📸</button>
 <button onclick="logoutUser()" style="background:#111;color:#ff4444;margin-top:6px;border:1px solid #333;font-size:11px">Logout</button>
@@ -61,6 +72,12 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-
 </div>
 <div id="posts">Loading... ⏳</div>
 </div>
+
+<div id="followModal">
+<div class="follow-header"><h2 id="followTitle">Followers</h2><button onclick="closeFollowModal()" style="width:auto;background:#222;color:#fff;padding:8px 16px;border-radius:20px">✕ Close</button></div>
+<div id="followList" style="overflow-y:auto;flex:1"></div>
+</div>
+
 <div id="cropModal">
 <h3 style="color:#FFD700" id="cropTitle">Ajes Pannu Da</h3>
 <div id="cropContainer" class="crop-box"><img id="cropImg" src=""></div>
@@ -80,6 +97,46 @@ function logoutUser(){localStorage.removeItem('pix_user');location.reload();}
 async function checkUser(){let u=localStorage.getItem('pix_user');if(!u)return;authDiv.style.display='none';feedDiv.style.display='flex';feedDiv.style.flexDirection='column';uName.innerText=u;loadMyPfp(u);loadPosts();loadFollowStats();}
 async function loadMyPfp(u){let {data}=await sb.from('users').select('profile_pic').eq('username',u).single();if(data?.profile_pic)myPfp.src=data.profile_pic;}
 async function loadFollowStats(){let u=localStorage.getItem('pix_user');let {data:fer}=await sb.from('follows').select('*').eq('following',u);let {data:fing}=await sb.from('follows').select('*').eq('follower',u);fCount.innerText=fer?.length||0;fgCount.innerText=fing?.length||0;}
+
+async function openFollowers(){let u=localStorage.getItem('pix_user');openFollowList(u,'followers');}
+async function openFollowing(){let u=localStorage.getItem('pix_user');openFollowList(u,'following');}
+async function openFollowList(targetUser, type){
+ followModal.style.display='flex';
+ followTitle.innerText = type=='followers' ? 'Followers' : 'Following';
+ followList.innerHTML='Loading...';
+ let query = type=='followers' ? {col:'following', val:targetUser} : {col:'follower', val:targetUser};
+ let {data:followData}=await sb.from('follows').select('*').eq(query.col, query.val);
+ if(!followData||followData.length==0){followList.innerHTML=`<p style="color:#666;text-align:center;margin-top:20px">No ${type} yet da 😅</p>`;return;}
+ let usernames = followData.map(f=> type=='followers' ? f.follower : f.following);
+ let {data:users}=await sb.from('users').select('username,profile_pic').in('username', usernames);
+ let {data:myFollowing}=await sb.from('follows').select('*').eq('follower', localStorage.getItem('pix_user'));
+ let myFollowingList=(myFollowing||[]).map(f=>f.following);
+ let userMap={};(users||[]).forEach(u=>userMap[u.username]=u.profile_pic);
+ let h='';
+ usernames.forEach(un=>{
+  let pfp=userMap[un]||'https://via.placeholder.com/40';
+  let isFollowing=myFollowingList.includes(un);
+  let isMe = un==localStorage.getItem('pix_user');
+  let btn = isMe ? '' : `<button class="follow-btn ${isFollowing?'following':''}" onclick="toggleFollowFromList('${un}')">${isFollowing?'✓ Following':' + Follow'}</button>`;
+  h+=`<div class="follow-item"><div class="follow-item-left"><img class="pfp" src="${pfp}"><b>@${un}</b></div>${btn}</div>`;
+ });
+ followList.innerHTML=h;
+}
+function closeFollowModal(){followModal.style.display='none';}
+async function toggleFollowFromList(targetUser){
+ let u=localStorage.getItem('pix_user');
+ if(u==targetUser) return;
+ let {data:existing}=await sb.from('follows').select('*').eq('follower',u).eq('following',targetUser);
+ if(existing && existing.length>0){ await sb.from('follows').delete().eq('follower',u).eq('following',targetUser); }
+ else { await sb.from('follows').insert([{follower:u,following:targetUser}]); }
+ // refresh list
+ let currentType = followTitle.innerText=='Followers' ? 'followers' : 'following';
+ let currentUser = localStorage.getItem('pix_user');
+ // if viewing others, keep that user, else self
+ openFollowList(currentUser, currentType);
+ loadFollowStats(); loadPosts();
+}
+
 function openCropper(input,mode){cropMode=mode;let file=input.files[0];if(!file)return;let r=new FileReader();r.onload=e=>{cropImg.src=e.target.result;cropContainer.className=mode==='pfp'?'crop-box':'crop-box post-mode';cropTitle.innerText=mode==='pfp'?'DP Ajes Pannu':'Post Ajes Pannu';cropModal.style.display='flex';setTimeout(()=>initCropper(),100);};r.readAsDataURL(file);}
 function initCropper(){let img=cropImg;imgOrigW=img.naturalWidth;imgOrigH=img.naturalHeight;let box=cropContainer,bw=box.clientWidth,bh=box.clientHeight;let scale=Math.max(bw/imgOrigW,bh/imgOrigH);currentScale=scale;posX=(bw-imgOrigW*scale)/2;posY=(bh-imgOrigH*scale)/2;zoomRange.value=scale;zoomRange.min=scale*0.8;zoomRange.max=scale*3;applyTransform();setupDrag();}
 function applyTransform(){cropImg.style.width=(imgOrigW*currentScale)+'px';cropImg.style.height=(imgOrigH*currentScale)+'px';cropImg.style.left=posX+'px';cropImg.style.top=posY+'px';}
