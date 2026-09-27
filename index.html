@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO V4 - Followers List</title>
+<title>PIXORO V5 - User Profile</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 body{background:#000;color:#fff;font-family:Arial;padding:12px;text-align:center;margin:0}
@@ -13,7 +13,7 @@ h1{color:#FFD700;letter-spacing:5px;margin:12px 0 3px;font-size:26px}
 input{width:100%;padding:10px;margin-bottom:7px;background:#000;border:1px solid #333;color:#fff;border-radius:8px;box-sizing:border-box}
 button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
 .feed{display:none}
-.pfp{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid #FFD700;vertical-align:middle;margin-right:7px}
+.pfp{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid #FFD700;vertical-align:middle;margin-right:7px;cursor:pointer}
 .big-pfp{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #FFD700;display:block;margin:0 auto 8px}
 .post{background:#111;border:1px solid #333;padding:11px;border-radius:14px;margin:11px 0}
 .action{display:flex;gap:8px;margin:8px 0}
@@ -31,21 +31,21 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-
 .c-input{display:flex;gap:6px;margin-top:6px}
 .c-input input{flex:1;margin:0}
 .c-input button{width:auto;padding:8px 14px;border-radius:20px;font-size:12px}
-#cropModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.96);z-index:999;flex-direction:column;align-items:center;justify-content:center;padding:12px;box-sizing:border-box}
+#cropModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.96);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:12px;box-sizing:border-box}
 .crop-box{width:300px;height:300px;overflow:hidden;position:relative;border:3px solid #FFD700;border-radius:50%;background:#222}
 .crop-box.post-mode{border-radius:12px;height:380px}
 .crop-box img{position:absolute;top:0;left:0;cursor:move;max-width:none}
-
-/* FOLLOWERS LIST MODAL DA */
-#followModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:998;flex-direction:column;padding:12px;box-sizing:border-box}
+#followModal, #userModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.98);z-index:998;flex-direction:column;padding:12px;box-sizing:border-box;overflow-y:auto}
 .follow-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .follow-header h2{color:#FFD700;margin:0}
 .follow-item{display:flex;justify-content:space-between;align-items:center;background:#111;border:1px solid #333;padding:10px;border-radius:12px;margin-bottom:8px}
-.follow-item-left{display:flex;align-items:center}
+.follow-item-left{display:flex;align-items:center;cursor:pointer}
+.user-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:12px}
+.user-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px}
 </style>
 </head>
 <body>
-<h1>PIXORO V1</h1><div class="sub">FOLLOWERS LIST - V4 MASS DA 🔥</div>
+<h1>PIXORO V1</h1><div class="sub">V5 USER PROFILE CLICK 👑</div>
 <div id="authDiv">
 <div class="box"><h3>Signup</h3><input id="su_user" placeholder="giri"><input id="su_pass" type="password" placeholder="Password"><button onclick="signupUser()">Signup</button></div>
 <div class="box"><h3>Login</h3><input id="li_user" placeholder="giri"><button onclick="loginUser()" style="background:#222;color:#fff">Login</button></div>
@@ -78,6 +78,21 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-
 <div id="followList" style="overflow-y:auto;flex:1"></div>
 </div>
 
+<div id="userModal">
+<div class="follow-header"><h2 id="userModalTitle">@user</h2><button onclick="closeUserModal()" style="width:auto;background:#222;color:#fff;padding:8px 16px;border-radius:20px">✕ Close</button></div>
+<div class="box" style="text-align:center">
+<img id="umPfp" class="big-pfp" src="https://via.placeholder.com/90">
+<h3 id="umName" style="text-align:center">@user</h3>
+<div class="stats">
+<span><b id="umFollowers">0</b> Followers</span>
+<span><b id="umFollowing">0</b> Following</span>
+<span><b id="umPosts">0</b> Posts</span>
+</div>
+<button id="umFollowBtn" class="follow-btn" style="width:100%;padding:10px;margin-top:8px" onclick="toggleFollowUserModal()">+ Follow</button>
+</div>
+<div id="umGrid" class="user-grid"></div>
+</div>
+
 <div id="cropModal">
 <h3 style="color:#FFD700" id="cropTitle">Ajes Pannu Da</h3>
 <div id="cropContainer" class="crop-box"><img id="cropImg" src=""></div>
@@ -90,7 +105,7 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-
 const SUPABASE_URL = "https://yecpltndhlzfjplzhcpm.supabase.co";
 const SUPABASE_KEY = "sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let selectedFile=null,cropMode='pfp',currentScale=1,posX=0,posY=0,isDrag=false,startX,startY,imgOrigW,imgOrigH;
+let selectedFile=null,cropMode='pfp',currentScale=1,posX=0,posY=0,isDrag=false,startX,startY,imgOrigW,imgOrigH,currentProfileUser=null;
 function signupUser(){let u=su_user.value.trim().toLowerCase(),p=su_pass.value.trim();if(!u||!p)return alert("Poduda");sb.from('users').insert([{username:u,password:p}]).then(e=>{if(e.error&&!e.error.message.includes('duplicate'))return alert(e.error.message);localStorage.setItem('pix_user',u);location.reload();});}
 function loginUser(){let u=li_user.value.trim().toLowerCase();sb.from('users').select('*').eq('username',u).single().then(e=>{if(e.error)return alert("User illa");localStorage.setItem('pix_user',u);location.reload();});}
 function logoutUser(){localStorage.removeItem('pix_user');location.reload();}
@@ -118,23 +133,53 @@ async function openFollowList(targetUser, type){
   let isFollowing=myFollowingList.includes(un);
   let isMe = un==localStorage.getItem('pix_user');
   let btn = isMe ? '' : `<button class="follow-btn ${isFollowing?'following':''}" onclick="toggleFollowFromList('${un}')">${isFollowing?'✓ Following':' + Follow'}</button>`;
-  h+=`<div class="follow-item"><div class="follow-item-left"><img class="pfp" src="${pfp}"><b>@${un}</b></div>${btn}</div>`;
+  h+=`<div class="follow-item"><div class="follow-item-left" onclick="openUserProfile('${un}');closeFollowModal()"><img class="pfp" src="${pfp}"><b>@${un}</b></div>${btn}</div>`;
  });
  followList.innerHTML=h;
 }
 function closeFollowModal(){followModal.style.display='none';}
 async function toggleFollowFromList(targetUser){
- let u=localStorage.getItem('pix_user');
- if(u==targetUser) return;
+ let u=localStorage.getItem('pix_user');if(u==targetUser) return;
  let {data:existing}=await sb.from('follows').select('*').eq('follower',u).eq('following',targetUser);
  if(existing && existing.length>0){ await sb.from('follows').delete().eq('follower',u).eq('following',targetUser); }
  else { await sb.from('follows').insert([{follower:u,following:targetUser}]); }
- // refresh list
- let currentType = followTitle.innerText=='Followers' ? 'followers' : 'following';
- let currentUser = localStorage.getItem('pix_user');
- // if viewing others, keep that user, else self
- openFollowList(currentUser, currentType);
- loadFollowStats(); loadPosts();
+ openFollowList(localStorage.getItem('pix_user'), followTitle.innerText=='Followers' ? 'followers' : 'following'); loadFollowStats(); loadPosts();
+}
+
+// USER PROFILE MODAL DA
+async function openUserProfile(username){
+ currentProfileUser=username;
+ userModal.style.display='flex';
+ userModalTitle.innerText='@'+username;
+ umName.innerText='@'+username;
+ umPfp.src='https://via.placeholder.com/90';
+ umGrid.innerHTML='Loading...';
+ let {data:user}=await sb.from('users').select('*').eq('username',username).single();
+ if(user?.profile_pic) umPfp.src=user.profile_pic;
+ let {data:fer}=await sb.from('follows').select('*').eq('following',username);
+ let {data:fing}=await sb.from('follows').select('*').eq('follower',username);
+ let {data:posts}=await sb.from('posts').select('*').eq('username',username).order('id',{ascending:false});
+ umFollowers.innerText=fer?.length||0; umFollowing.innerText=fing?.length||0; umPosts.innerText=posts?.length||0;
+ let me=localStorage.getItem('pix_user');
+ if(me==username){ umFollowBtn.style.display='none'; }
+ else {
+  umFollowBtn.style.display='block';
+  let {data:existing}=await sb.from('follows').select('*').eq('follower',me).eq('following',username);
+  if(existing && existing.length>0){ umFollowBtn.innerText='✓ Following'; umFollowBtn.className='follow-btn following'; }
+  else { umFollowBtn.innerText='+ Follow'; umFollowBtn.className='follow-btn'; }
+ }
+ if(!posts||posts.length==0) umGrid.innerHTML="<p style='color:#666;grid-column:1/4;text-align:center'>No posts yet da</p>";
+ else umGrid.innerHTML=posts.map(p=>`<img src="${p.image_url}">`).join('');
+}
+function closeUserModal(){userModal.style.display='none'; currentProfileUser=null;}
+async function toggleFollowUserModal(){
+ if(!currentProfileUser) return;
+ let u=localStorage.getItem('pix_user');
+ if(u==currentProfileUser) return;
+ let {data:existing}=await sb.from('follows').select('*').eq('follower',u).eq('following',currentProfileUser);
+ if(existing && existing.length>0){ await sb.from('follows').delete().eq('follower',u).eq('following',currentProfileUser); }
+ else { await sb.from('follows').insert([{follower:u,following:currentProfileUser}]); }
+ openUserProfile(currentProfileUser); loadFollowStats(); loadPosts();
 }
 
 function openCropper(input,mode){cropMode=mode;let file=input.files[0];if(!file)return;let r=new FileReader();r.onload=e=>{cropImg.src=e.target.result;cropContainer.className=mode==='pfp'?'crop-box':'crop-box post-mode';cropTitle.innerText=mode==='pfp'?'DP Ajes Pannu':'Post Ajes Pannu';cropModal.style.display='flex';setTimeout(()=>initCropper(),100);};r.readAsDataURL(file);}
@@ -164,7 +209,7 @@ async function loadPosts(){
   let iLiked=postLikes.some(l=>l.username==u);
   let isFollowing=followingList.includes(p.username);
   let followBtn = p.username==u? '' : `<button class="follow-btn ${isFollowing?'following':''}" onclick="toggleFollow('${p.username}')">${isFollowing?'✓ Following':' + Follow'}</button>`;
-  h+=`<div class="post"><div style="display:flex;justify-content:space-between;align-items:center"><div><img class="pfp" src="${pfp}"><b>@${p.username}</b></div>${followBtn}</div><br><img src="${p.image_url}" style="width:100%;border-radius:10px"><p style="margin:8px 0">${p.caption||''}</p><div class="action"><button class="like-btn ${iLiked?'liked':''}" onclick="likePost(${p.id})">${iLiked?'❤️':'🤍'} ${postLikes.length} Like</button><button class="like-btn" onclick="document.getElementById('cbox-${p.id}').focus()">💬 ${postComments.length} Comment</button></div><div class="comment-box">${postComments.map(c=>`<div class="comment"><b>@${c.username}</b> ${c.comment}</div>`).join('')}<div class="c-input"><input id="cbox-${p.id}" placeholder="Comment pannu da..."><button onclick="addComment(${p.id})" style="background:#FFD700">Send</button></div></div></div>`;
+  h+=`<div class="post"><div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;cursor:pointer" onclick="openUserProfile('${p.username}')"><img class="pfp" src="${pfp}"><b>@${p.username}</b></div>${followBtn}</div><br><img src="${p.image_url}" style="width:100%;border-radius:10px"><p style="margin:8px 0">${p.caption||''}</p><div class="action"><button class="like-btn ${iLiked?'liked':''}" onclick="likePost(${p.id})">${iLiked?'❤️':'🤍'} ${postLikes.length} Like</button><button class="like-btn" onclick="document.getElementById('cbox-${p.id}').focus()">💬 ${postComments.length} Comment</button></div><div class="comment-box">${postComments.map(c=>`<div class="comment"><b onclick="openUserProfile('${c.username}')" style="cursor:pointer">@${c.username}</b> ${c.comment}</div>`).join('')}<div class="c-input"><input id="cbox-${p.id}" placeholder="Comment pannu da..."><button onclick="addComment(${p.id})" style="background:#FFD700">Send</button></div></div></div>`;
  });
  document.getElementById('posts').innerHTML=h;
 }
@@ -183,15 +228,10 @@ async function addComment(postId){
  inp.value=""; loadPosts();
 }
 async function toggleFollow(targetUser){
- let u=localStorage.getItem('pix_user');
- if(u==targetUser) return;
+ let u=localStorage.getItem('pix_user'); if(u==targetUser) return;
  let {data:existing}=await sb.from('follows').select('*').eq('follower',u).eq('following',targetUser);
- if(existing && existing.length>0){
-  await sb.from('follows').delete().eq('follower',u).eq('following',targetUser);
- } else {
-  let {error}=await sb.from('follows').insert([{follower:u,following:targetUser}]);
-  if(error){ alert("Follow Error: "+error.message); return; }
- }
+ if(existing && existing.length>0){ await sb.from('follows').delete().eq('follower',u).eq('following',targetUser); }
+ else { let {error}=await sb.from('follows').insert([{follower:u,following:targetUser}]); if(error){ alert("Follow Error: "+error.message); return; } }
  loadPosts(); loadFollowStats();
 }
 checkUser();
