@@ -1,75 +1,94 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO V14 - REELS + CASH</title>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-3940256099942544" crossorigin="anonymous"></script>
+<title>PIXORO V1 - GIRI</title>
 <style>
-body{margin:0;background:#000;color:#fff;font-family:sans-serif}
-.reel{height:100vh;position:relative;scroll-snap-align:start}
-.reel video{width:100%;height:100%;object-fit:cover}
-.cash-badge{position:absolute;top:10px;left:10px;background:gold;color:#000;padding:6px 12px;border-radius:20px;font-weight:bold}
-.actions{position:absolute;right:10px;bottom:100px;display:flex;flex-direction:column;gap:20px}
-.actions span{font-size:28px;text-align:center}
-.actions b{font-size:12px;display:block}
+body{background:#000; color:white; font-family:Arial; margin:0; padding:0;}
+.box{background:#121212; border:1px solid #333; border-radius:12px; padding:15px; margin:10px;}
+h1{color:#FFD700; text-align:center;}
+button{background:#FFD700; color:black; border:none; padding:10px 20px; border-radius:20px; font-weight:bold;}
+#posts{padding:10px;}
+.post-card{background:#1a1a1a; border-radius:12px; margin-bottom:15px; overflow:hidden; border:1px solid #2a2a2a;}
+.ad-card{background:linear-gradient(135deg,#000,#1a1a00); border:2px solid #FFD700; border-radius:12px; padding:15px; margin-bottom:15px; text-align:center;}
 </style>
 </head>
 <body>
 
-<!-- REELS CONTAINER -->
-<div id="reels" style="height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory">
+<h1>PIXORO V1 🔥</h1>
+<div class="box"><b>BLUE TICK VERIFICATION 👑</b></div>
 
-<!-- REEL 1 -->
-<div class="reel">
-<video src="https://www.w3schools.com/html/mov_bbb.mp4" autoplay muted loop></video>
-<div class="cash-badge" id="cash1">👁️ 0 Views | 💰 ₹0.00</div>
-<div class="actions">
-<span>❤️<b id="like1">0</b></span>
-<span>💬<b>12</b></span>
-<span>↗️<b>Share</b></span>
-</div>
+<div id="authDiv" class="box">
+<h3>Login Da Giri</h3>
+<input id="li_user" placeholder="Username" style="width:90%; padding:8px;"><br><br>
+<button onclick="loginUser()">Login</button>
+<button onclick="logoutUser()">Logout</button>
 </div>
 
-<!-- TEST AD AFTER 3 REELS -->
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-app-pub-3940256099942544"
-     data-ad-slot="1033173712"
-     data-ad-format="auto"></ins>
-<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+<div id="feedDiv" class="feed">
+<div class="box"><h3>🔥 Stories - 24hrs</h3><div id="stories"></div></div>
+<div class="box" style="text-align:center;"><h3>PIXORO Feed</h3></div>
+<div class="box"><h3>🔍 Search Users</h3></div>
+<div class="box"><h3>📸 Story Pannu Da</h3><input type="file" id="storyFile"></div>
+<div class="box"><h3>Post Pannu Da 📸</h3><input type="file" id="postFile"><br><br><textarea id="postCaption" placeholder="Caption..."></textarea><br><br><button onclick="createPost()">Post</button></div>
 
+<div id="posts">Loading...</div>
 </div>
 
+<div id="storyView"></div>
+<div id="userView"></div>
+<div id="pfpView" onclick="closePfpView()"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// PIXORO V14 CASH LOGIC - 4000 Views = ₹30
-let views = 1240; // demo ku
-let rate = 30/4000; // ₹0.0075 per view
-let earned = views * rate;
-let watchTime = 0;
+const SUPABASE_URL="https://yecpltndhlzfjpxqhbtu.supabase.co";
+const SUPABASE_KEY="YOUR_SUPABASE_ANON_KEY"; // Un key ah inga podu da
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-setInterval(()=>{
-  watchTime++;
-  if(watchTime>=3){
-    views++;
-    earned = views * rate;
-    document.getElementById('cash1').innerHTML = `👁️ ${views} Views | 💰 ₹${earned.toFixed(2)} | 4K=₹30`;
-    watchTime=0;
-  }
-},1000);
+let curStories=[],curView=[],timer=null;
+let postCount = 0;
 
-// Like logic
-let likes=0;
-document.getElementById('like1').parentElement.onclick=()=>{
-  likes++;
-  document.getElementById('like1').innerText=likes;
+async function loadPosts(){
+  const {data,error} = await supabase.from('posts').select('*').order('created_at',{ascending:false});
+  const container = document.getElementById('posts');
+  if(error){container.innerHTML='Error'; return;}
+  container.innerHTML='';
+  postCount=0;
+  
+  data.forEach(post=>{
+    postCount++;
+    // POST
+    const div=document.createElement('div');
+    div.className='post-card';
+    div.innerHTML=`
+      <div style="padding:10px; display:flex; gap:10px;"><b>@${post.username||'user'}</b></div>
+      <div style="background:#FFD700; color:black; padding:5px 10px; font-weight:bold;">👁️ ${post.views||1246} Views | 💰 ₹${post.earnings||'9.34'} | 4K=₹30</div>
+      ${post.image_url?`<img src="${post.image_url}" style="width:100%;">`:''}
+      <div style="padding:10px;">${post.caption||''}</div>
+    `;
+    container.appendChild(div);
+    
+    // AD - EVERY 1 POST (TESTING) - aprom 3 nu maathu da
+    if(postCount % 1 === 0){
+      const ad=document.createElement('div');
+      ad.className='ad-card';
+      ad.innerHTML=`
+        <span style="background:#FFD700; color:black; font-size:10px; padding:3px 8px; border-radius:10px; font-weight:bold;">SPONSORED AD</span>
+        <h3 style="color:#FFD700;">🔥 Watch Ad & Earn ₹5 🔥</h3>
+        <p style="color:#aaa; font-size:12px;">Ad paaru da Giri!</p>
+        <button onclick="alert('₹5 Earned da Giri! 💰'); this.innerText='✅ Earned!'">Watch Ad Now</button>
+      `;
+      container.appendChild(ad);
+    }
+  });
 }
-</script>
 
-<!-- BLUE TICK VERIFIED - NO BANNER -->
-<script>
-if(window.location.hostname.includes("github.io")){
-  console.log("PIXORO V14 BLUE TICK VERIFIED ✅");
-}
+function loginUser(){let u=li_user.value; localStorage.setItem('pixoro_user',u); alert('Logged in da '+u); loadPosts();}
+function logoutUser(){localStorage.removeItem('pixoro_user'); alert('Logged out da');}
+async function createPost(){alert('Post create pannu da Giri!');}
+
+loadPosts();
 </script>
 
 </body>
