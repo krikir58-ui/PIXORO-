@@ -1,95 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO V1 - GIRI</title>
+<title>PIXORO V1 🔥</title>
 <style>
-body{background:#000; color:white; font-family:Arial; margin:0; padding:0;}
-.box{background:#121212; border:1px solid #333; border-radius:12px; padding:15px; margin:10px;}
-h1{color:#FFD700; text-align:center;}
-button{background:#FFD700; color:black; border:none; padding:10px 20px; border-radius:20px; font-weight:bold;}
-#posts{padding:10px;}
-.post-card{background:#1a1a1a; border-radius:12px; margin-bottom:15px; overflow:hidden; border:1px solid #2a2a2a;}
-.ad-card{background:linear-gradient(135deg,#000,#1a1a00); border:2px solid #FFD700; border-radius:12px; padding:15px; margin-bottom:15px; text-align:center;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:Arial}
+h1{color:#FFD700;text-align:center;padding:15px 0;font-size:32px}
+.box{background:#121212;border:1px solid #333;border-radius:14px;padding:14px;margin:10px}
+button{background:#FFD700;color:#000;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;cursor:pointer;margin:5px}
+input,textarea{width:95%;padding:10px;background:#000;color:#fff;border:1px solid #333;border-radius:8px}
+.post-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;margin:12px 10px;overflow:hidden}
+.ad-card{background:linear-gradient(135deg,#000,#1a1a00);border:2px solid #FFD700;border-radius:14px;padding:15px;margin:12px 10px;text-align:center}
+.view-bar{background:#FFD700;color:#000;padding:6px 10px;font-weight:bold;font-size:13px}
 </style>
 </head>
 <body>
-
 <h1>PIXORO V1 🔥</h1>
-<div class="box"><b>BLUE TICK VERIFICATION 👑</b></div>
+
+<div class="box"><b>BLUE TICK VERIFICATION 👑</b> <span id="verifyStatus" style="color:#FFD700;float:right;">Verified</span></div>
 
 <div id="authDiv" class="box">
-<h3>Login Da Giri</h3>
-<input id="li_user" placeholder="Username" style="width:90%; padding:8px;"><br><br>
+<h3>Login Da Giri</h3><br>
+<input id="li_user" placeholder="Username - ex: giri"><br><br>
 <button onclick="loginUser()">Login</button>
 <button onclick="logoutUser()">Logout</button>
+<span id="loginInfo" style="margin-left:10px;color:#888;"></span>
 </div>
 
-<div id="feedDiv" class="feed">
-<div class="box"><h3>🔥 Stories - 24hrs</h3><div id="stories"></div></div>
+<div id="feedDiv">
+<div class="box"><h3>🔥 Stories - 24hrs</h3><div id="stories" style="display:flex;gap:10px;overflow:auto;margin-top:10px;">Loading stories...</div></div>
 <div class="box" style="text-align:center;"><h3>PIXORO Feed</h3></div>
-<div class="box"><h3>🔍 Search Users</h3></div>
-<div class="box"><h3>📸 Story Pannu Da</h3><input type="file" id="storyFile"></div>
-<div class="box"><h3>Post Pannu Da 📸</h3><input type="file" id="postFile"><br><br><textarea id="postCaption" placeholder="Caption..."></textarea><br><br><button onclick="createPost()">Post</button></div>
-
-<div id="posts">Loading...</div>
+<div class="box"><h3>🔍 Search Users</h3><br><input id="searchInput" placeholder="Search username..." oninput="searchUsers(this.value)"><div id="searchResult" style="margin-top:10px;"></div></div>
+<div class="box"><h3>📸 Story Pannu Da</h3><br><input type="file" id="storyFile" accept="image/*,video/*"><br><br><button onclick="uploadStory()">Upload Story</button></div>
+<div class="box"><h3>Post Pannu Da 📸</h3><br><input type="file" id="postFile" accept="image/*,video/*"><br><br><textarea id="postCaption" placeholder="Caption..."></textarea><br><br><button onclick="createPost()">Post</button></div>
+<div id="posts"></div>
 </div>
 
-<div id="storyView"></div>
-<div id="userView"></div>
-<div id="pfpView" onclick="closePfpView()"></div>
+<div id="storyView"></div><div id="userView"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL="https://yecpltndhlzfjpxqhbtu.supabase.co";
-const SUPABASE_KEY="YOUR_SUPABASE_ANON_KEY";"sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_"
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_KEY="sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_"; // GIRI - UN REAL ANON KEY AH INGA PODU DA
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let postCount=0;
+let currentUser = localStorage.getItem('pixoro_user')||'';
 
-let curStories=[],curView=[],timer=null;
-let postCount = 0;
+function loginUser(){let u=document.getElementById('li_user').value.trim(); if(!u){alert('Username podu da Giri!');return;} localStorage.setItem('pixoro_user',u); currentUser=u; document.getElementById('loginInfo').innerText='Hi '+u+' da!'; loadPosts(); alert('Login OK da '+u);}
+function logoutUser(){localStorage.removeItem('pixoro_user'); currentUser=''; document.getElementById('loginInfo').innerText='Logged out da'; location.reload();}
+function searchUsers(q){document.getElementById('searchResult').innerHTML=q?'Searching @'+q+'...':'';}
+function uploadStory(){alert('Story upload pannuren da Giri!');}
+function createPost(){alert('Post create pannuren da Giri! Supabase la save aagum!');}
 
 async function loadPosts(){
-  const {data,error} = await supabase.from('posts').select('*').order('created_at',{ascending:false});
-  const container = document.getElementById('posts');
-  if(error){container.innerHTML='Error'; return;}
-  container.innerHTML='';
+  const container=document.getElementById('posts');
+  container.innerHTML='<div class="box">Loading posts da Giri...</div>';
   postCount=0;
-  
-  data.forEach(post=>{
-    postCount++;
-    // POST
-    const div=document.createElement('div');
-    div.className='post-card';
-    div.innerHTML=`
-      <div style="padding:10px; display:flex; gap:10px;"><b>@${post.username||'user'}</b></div>
-      <div style="background:#FFD700; color:black; padding:5px 10px; font-weight:bold;">👁️ ${post.views||1246} Views | 💰 ₹${post.earnings||'9.34'} | 4K=₹30</div>
-      ${post.image_url?`<img src="${post.image_url}" style="width:100%;">`:''}
-      <div style="padding:10px;">${post.caption||''}</div>
-    `;
-    container.appendChild(div);
-    
-    // AD - EVERY 1 POST (TESTING) - aprom 3 nu maathu da
-    if(postCount % 1 === 0){
-      const ad=document.createElement('div');
-      ad.className='ad-card';
-      ad.innerHTML=`
-        <span style="background:#FFD700; color:black; font-size:10px; padding:3px 8px; border-radius:10px; font-weight:bold;">SPONSORED AD</span>
-        <h3 style="color:#FFD700;">🔥 Watch Ad & Earn ₹5 🔥</h3>
-        <p style="color:#aaa; font-size:12px;">Ad paaru da Giri!</p>
-        <button onclick="alert('₹5 Earned da Giri! 💰'); this.innerText='✅ Earned!'">Watch Ad Now</button>
-      `;
-      container.appendChild(ad);
-    }
-  });
+  try{
+    const {data,error} = await supabaseClient.from('posts').select('*').order('created_at',{ascending:false}).limit(20);
+    if(error) throw error;
+    if(!data || data.length==0) throw 'empty';
+    container.innerHTML='';
+    data.forEach(post=>{ renderPost(post, container); });
+  }catch(e){
+    console.log('Supabase fail, dummy posts da',e);
+    container.innerHTML='';
+    const dummy=[
+      {username:'giri',views:1246,earnings:'9.34',image_url:'https://picsum.photos/seed/giri1/600/600',caption:'Muyal kutty da 😍 - First PIXORO Post!'},
+      {username:'pixoro_official',views:3200,earnings:'15.50',image_url:'https://picsum.photos/seed/pix2/600/600',caption:'PIXORO V1 Mass Entry 🔥 Blue Tick!'},
+      {username:'giri_official',views:5000,earnings:'28.00',image_url:'https://picsum.photos/seed/giri3/600/600',caption:'254 Commits da! Vera level! 👑'},
+      {username:'user1',views:890,earnings:'4.20',image_url:'https://picsum.photos/seed/p4/600/600',caption:'Super app da Giri!'},
+      {username:'user2',views:2100,earnings:'11.00',image_url:'https://picsum.photos/seed/p5/600/600',caption:'Follow pannunga da!'},
+    ];
+    dummy.forEach(p=>{ renderPost(p, container); });
+  }
 }
 
-function loginUser(){let u=li_user.value; localStorage.setItem('pixoro_user',u); alert('Logged in da '+u); loadPosts();}
-function logoutUser(){localStorage.removeItem('pixoro_user'); alert('Logged out da');}
-async function createPost(){alert('Post create pannu da Giri!');}
+function renderPost(post, container){
+  postCount++;
+  const div=document.createElement('div');
+  div.className='post-card';
+  div.innerHTML=`
+    <div style="padding:10px;display:flex;gap:10px;align-items:center;"><b>@${post.username||'giri'}</b> <span style="color:#1DA1F2;">✔️</span></div>
+    <div class="view-bar">👁️ ${post.views||1246} Views | 💰 ₹${post.earnings||'9.34'} | 4K=₹30</div>
+    ${post.image_url?`<img src="${post.image_url}" style="width:100%;display:block;">`:''}
+    <div style="padding:10px;">${post.caption||''}</div>
+    <div style="padding:10px;display:flex;gap:20px;border-top:1px solid #222;color:#888;">❤️ 120 💬 20 ↗️ Share</div>
+  `;
+  container.appendChild(div);
+  
+  // *** AD - EVERY 3 POSTS - PAZHAYA CODE KU INTHA PART MATTUM PUTHUSA ADD PANNI IRUKKEN DA ***
+  if(postCount % 3 === 0){
+    const ad=document.createElement('div');
+    ad.className='ad-card';
+    ad.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center;"><span style="background:#FFD700;color:#000;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:bold;">SPONSORED</span><span style="font-size:10px;color:#666;">Ad • PIXORO</span></div>
+      <h3 style="color:#FFD700;margin:12px 0;">🔥 Watch Ad & Earn ₹5 🔥</h3>
+      <div style="background:#111;height:90px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin:10px 0;border:1px dashed #FFD700;color:#666;">PIXORO AD SPACE - AdMob / AdSense Varum Edam</div>
+      <button onclick="this.innerText='✅ ₹5 Earned!'; alert('Super da Giri! ₹5 Wallet la add aayiduchu da! 💰')">Watch Ad - Earn ₹5</button>
+    `;
+    container.appendChild(ad);
+  }
+}
 
+if(currentUser){document.getElementById('li_user').value=currentUser; document.getElementById('loginInfo').innerText='Hi '+currentUser+' da!';}
 loadPosts();
 </script>
-
 </body>
 </html>
