@@ -13,7 +13,6 @@ h1{color:#FFD700;letter-spacing:5px;margin:20px 0 5px}
 .box h3{color:#FFD700;margin:0 0 15px}
 input{width:100%;padding:12px;margin-bottom:10px;background:#000;border:1px solid #333;color:#fff;border-radius:8px;box-sizing:border-box}
 button{width:100%;padding:13px;background:#FFD700;color:#000;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
-button:active{transform:scale(0.98)}
 .feed{display:none}
 .post{background:#111;border:1px solid #333;padding:15px;border-radius:10px;margin:15px 0}
 </style>
@@ -24,62 +23,59 @@ button:active{transform:scale(0.98)}
 <div class="sub">THANI THANI FILE - CHATGPT MARI</div>
 
 <div id="authDiv">
-  <div class="box">
-    <h3>Signup - Puthusa</h3>
-    <input id="su_user" placeholder="Username - giri">
-    <input id="su_pass" type="password" placeholder="Password">
-    <button onclick="signupUser()">Signup - Create Account</button>
-  </div>
-  <div class="box">
-    <h3>Login - Irukka User</h3>
-    <input id="li_user" placeholder="Username - giri">
-    <button onclick="loginUser()" style="background:#222;color:#fff;border:1px solid #444">Login</button>
-  </div>
+  <div class="box"><h3>Signup</h3><input id="su_user" placeholder="giri"><input id="su_pass" type="password" placeholder="Password"><button onclick="signupUser()">Signup</button></div>
+  <div class="box"><h3>Login</h3><input id="li_user" placeholder="giri"><button onclick="loginUser()" style="background:#222;color:#fff">Login</button></div>
 </div>
 
 <div id="feedDiv" class="feed">
   <div class="box"><h3>Welcome <span id="uName"></span> 👑 <button onclick="logoutUser()" style="width:auto;padding:5px 15px;float:right;background:#ff3333;color:#fff">Logout</button></h3></div>
-  <div class="box"><input id="imgUrl" placeholder="Image URL - https://..."><input id="cap" placeholder="Caption"><button onclick="createPost()">Post Podu Da 🔥</button></div>
+  <div class="box">
+    <h3>Photo Upload - Gallery la irunthu da! 📸</h3>
+    <input type="file" id="imgFile" accept="image/*" onchange="previewImage()">
+    <img id="preview" style="width:100%;border-radius:10px;display:none;margin:10px 0;max-height:300px;object-fit:cover">
+    <input id="cap" placeholder="Caption - Enna da matter?">
+    <button onclick="createPost()">Post Podu Da 🔥</button>
+  </div>
   <div id="posts"></div>
 </div>
 
 <script>
-// PIXORO SUPABASE - FIXED DA GIRI
 const SUPABASE_URL = "https://yecpltndhlzfjplzhcpm.supabase.co";
-const SUPABASE_KEY = "sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_";
+// IDA MAATHU DA GIRI! eyJ... KEY AH INGA PODU DA!
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllY3BsdG5kaGx6ZmpwbHpoY3BtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1NzE5OTksImV4cCI6MjA3NjE0Nzk5OX0.s6bI7J8V0Z0Z0Z0Z0Z0Z0Z0Z0Z0";
+// MELA IRUKKURA KEY THAPPU DA! Supabase -> Settings -> API -> anon public key ah copy panni inga paste pannu da!
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-console.log("Connected da:", SUPABASE_URL);
+
+let selectedFile = null;
+function previewImage(){
+  let file = document.getElementById('imgFile').files[0];
+  if(!file) return;
+  selectedFile = file;
+  let r = new FileReader();
+  r.onload = e => {
+    document.getElementById('preview').src = e.target.result;
+    document.getElementById('preview').style.display = 'block';
+  };
+  r.readAsDataURL(file);
+}
 
 async function signupUser(){
   let u = document.getElementById('su_user').value.trim().toLowerCase();
   let p = document.getElementById('su_pass').value.trim();
-  if(!u || !p) return alert("Username & Password podu da!");
-  let {data, error} = await sb.from('users').insert([{username:u, password:p}]).select();
-  if(error){
-    if(error.message.includes('duplicate')){ 
-      localStorage.setItem('pix_user', u);
-      alert("Already irukka da - Login panniten da!");
-      location.reload();
-      return;
-    }
-    return alert("Error: "+error.message);
-  }
-  localStorage.setItem('pix_user', u);
-  alert("Signup OK da Giri! 👑");
-  location.reload();
+  if(!u||!p) return alert("Username Password podu da");
+  let {error} = await sb.from('users').insert([{username:u,password:p}]);
+  if(error &&!error.message.includes('duplicate')) return alert(error.message);
+  localStorage.setItem('pix_user', u); location.reload();
 }
 async function loginUser(){
   let u = document.getElementById('li_user').value.trim().toLowerCase();
-  if(!u) return alert("Username podu da!");
-  let {data, error} = await sb.from('users').select('*').eq('username', u).single();
-  if(error){ return alert("User illa da - Mela Signup pannu da!"); }
-  localStorage.setItem('pix_user', u);
-  alert("Login OK da 🔥");
-  location.reload();
+  if(!u) return alert("Username podu");
+  let {error} = await sb.from('users').select('*').eq('username',u).single();
+  if(error) return alert("User illa - Signup pannu da");
+  localStorage.setItem('pix_user', u); location.reload();
 }
-function logoutUser(){ localStorage.removeItem('pix_user'); location.reload(); }
-
+function logoutUser(){localStorage.removeItem('pix_user');location.reload();}
 async function checkUser(){
   let u = localStorage.getItem('pix_user');
   if(!u) return;
@@ -89,22 +85,23 @@ async function checkUser(){
   loadPosts();
 }
 async function createPost(){
-  let img = document.getElementById('imgUrl').value.trim();
   let cap = document.getElementById('cap').value.trim();
   let u = localStorage.getItem('pix_user');
-  if(!img) return alert("Image URL podu da!");
-  let {error} = await sb.from('posts').insert([{username:u, image_url:img, caption:cap}]);
-  if(error) return alert(error.message);
-  alert("Post OK da!");
+  if(!selectedFile) return alert("Gallery la irunthu photo select pannu da!");
+  alert("Uploading da... ⏳");
+  let fileName = Date.now()+"_"+selectedFile.name;
+  let {error} = await sb.storage.from('post-images').upload(fileName, selectedFile);
+  if(error) return alert("Upload error: "+error.message+" - Bucket create panniya da?");
+  let {data} = sb.storage.from('post-images').getPublicUrl(fileName);
+  await sb.from('posts').insert([{username:u, image_url:data.publicUrl, caption:cap}]);
+  alert("Vera Level Post da Giri! 👑");
+  document.getElementById('cap').value=""; document.getElementById('imgFile').value=""; document.getElementById('preview').style.display='none'; selectedFile=null;
   loadPosts();
 }
 async function loadPosts(){
-  let {data} = await sb.from('posts').select('*').order('id', {ascending:false});
-  let html='';
-  (data||[]).forEach(p=>{
-    html+=`<div class="post"><b>@${p.username}</b><br><br><img src="${p.image_url}" style="width:100%;border-radius:8px"><p>${p.caption||''}</p></div>`;
-  });
-  document.getElementById('posts').innerHTML=html;
+  let {data} = await sb.from('posts').select('*').order('id',{ascending:false});
+  let h=''; (data||[]).forEach(p=>{ h+=`<div class="post"><b>@${p.username}</b><br><br><img src="${p.image_url}" style="width:100%;border-radius:8px"><p>${p.caption||''}</p></div>`; });
+  document.getElementById('posts').innerHTML=h;
 }
 checkUser();
 </script>
