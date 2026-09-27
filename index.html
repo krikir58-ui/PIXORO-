@@ -1,112 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO V1 🔥</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#fff;font-family:Arial}
-h1{color:#FFD700;text-align:center;padding:15px 0;font-size:32px}
-.box{background:#121212;border:1px solid #333;border-radius:14px;padding:14px;margin:10px}
-button{background:#FFD700;color:#000;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;cursor:pointer;margin:5px}
-input,textarea{width:95%;padding:10px;background:#000;color:#fff;border:1px solid #333;border-radius:8px}
-.post-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;margin:12px 10px;overflow:hidden}
-.ad-card{background:linear-gradient(135deg,#000,#1a1a00);border:2px solid #FFD700;border-radius:14px;padding:15px;margin:12px 10px;text-align:center}
-.view-bar{background:#FFD700;color:#000;padding:6px 10px;font-weight:bold;font-size:13px}
-</style>
-</head>
-<body>
-<h1>PIXORO V1 🔥</h1>
-
-<div class="box"><b>BLUE TICK VERIFICATION 👑</b> <span id="verifyStatus" style="color:#FFD700;float:right;">Verified</span></div>
-
-<div id="authDiv" class="box">
-<h3>Login Da Giri</h3><br>
-<input id="li_user" placeholder="Username - ex: giri"><br><br>
-<button onclick="loginUser()">Login</button>
-<button onclick="logoutUser()">Logout</button>
-<span id="loginInfo" style="margin-left:10px;color:#888;"></span>
-</div>
-
-<div id="feedDiv">
-<div class="box"><h3>🔥 Stories - 24hrs</h3><div id="stories" style="display:flex;gap:10px;overflow:auto;margin-top:10px;">Loading stories...</div></div>
-<div class="box" style="text-align:center;"><h3>PIXORO Feed</h3></div>
-<div class="box"><h3>🔍 Search Users</h3><br><input id="searchInput" placeholder="Search username..." oninput="searchUsers(this.value)"><div id="searchResult" style="margin-top:10px;"></div></div>
-<div class="box"><h3>📸 Story Pannu Da</h3><br><input type="file" id="storyFile" accept="image/*,video/*"><br><br><button onclick="uploadStory()">Upload Story</button></div>
-<div class="box"><h3>Post Pannu Da 📸</h3><br><input type="file" id="postFile" accept="image/*,video/*"><br><br><textarea id="postCaption" placeholder="Caption..."></textarea><br><br><button onclick="createPost()">Post</button></div>
-<div id="posts"></div>
-</div>
-
-<div id="storyView"></div><div id="userView"></div>
-
+<html><head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{margin:0; background:black; color:white; font-family:sans-serif; padding-bottom:70px;}
+.header{background:#ff0055; padding:10px; text-align:center; font-size:22px; font-weight:bold; color:yellow; position:sticky; top:0; z-index:10;}
+.card{background:#111; margin:10px; border-radius:15px; overflow:hidden; border:1px solid #222;}
+.card img{width:100%;}
+.bottom-nav{position:fixed; bottom:0; left:0; width:100%; background:#111; display:flex; justify-content:space-around; padding:10px 0; border-top:1px solid #333; z-index:20;}
+.nav-btn{font-size:24px; cursor:pointer;}
+.filter-bar{display:flex; gap:10px; overflow-x:auto; padding:10px;}
+.filter{padding:6px 12px; background:#222; border-radius:20px; cursor:pointer; white-space:nowrap;}
+canvas, video{width:100%; border-radius:15px;}
+</style></head><body>
+
+<div class="header">PIXORO V3 🔥 ALL SYSTEM</div>
+<div id="zoomBox" style="display:none;"></div>
+
+<!-- PAGES DA GIRI -->
+<div id="page-home"></div>
+<div id="page-reels" style="display:none;"></div>
+<div id="page-chat" style="display:none;"></div>
+<div id="page-profile" style="display:none;"></div>
+
+<!-- UPLOAD + FILTERS -->
+<div class="card" style="padding:10px;">
+  <input type="file" id="fileInput" accept="image/*,video/*">
+  <select id="filterSelect" style="width:100%; margin:5px 0; padding:8px; background:#222; color:white; border-radius:10px;">
+    <option value="none">No Filter</option>
+    <option value="grayscale(100%)">Black & White</option>
+    <option value="sepia(100%)">Sepia - Vintage</option>
+    <option value="contrast(150%) brightness(120%)">HD Filter</option>
+    <option value="hue-rotate(90deg)">Green Face Filter</option>
+    <option value="blur(2px) brightness(130%)">Soft Face Tracking</option>
+  </select>
+  <input id="capInput" placeholder="Caption da Giri..." style="width:100%; padding:8px; background:#222; color:white; border-radius:10px; margin:5px 0;">
+  <button onclick="upload()" style="width:100%; background:yellow; color:black; padding:10px; border-radius:10px; font-weight:bold;">POST PANNU DA GIRI 🚀</button>
+  <button onclick="openCamera()" style="width:100%; background:#ff0055; color:white; padding:10px; border-radius:10px; margin-top:5px;">📷 CAMERA + FACE TRACKING</button>
+  <video id="cam" autoplay style="display:none;"></video>
+  <canvas id="camCanvas" style="display:none;"></canvas>
+</div>
+
+<!-- BOTTOM NAV DA GIRI - HOME REELS CHAT PROFILE -->
+<div class="bottom-nav">
+  <div class="nav-btn" onclick="showPage('home')">🏠<br><small>Home</small></div>
+  <div class="nav-btn" onclick="showPage('reels')">🎬<br><small>Reels</small></div>
+  <div class="nav-btn" onclick="showPage('chat')">💬<br><small>Chat</small></div>
+  <div class="nav-btn" onclick="showPage('profile')">👤<br><small>Profile</small></div>
+</div>
+
 <script>
-const SUPABASE_URL="https://yecpltndhlzfjpxqhbtu.supabase.co";
-const SUPABASE_KEY="sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_"; // GIRI - UN REAL ANON KEY AH INGA PODU DA
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let postCount=0;
-let currentUser = localStorage.getItem('pixoro_user')||'';
+const SB_URL="https://yecpltndhlzfjplzhcpm.supabase.co"; const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllY3BsdG5kaGx6ZmpwbHpoY3BtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3ODQzMTUsImV4cCI6MjA3NDM2MDMxNX0.rU0Y1FZC2C5-8iV-Bx..."; // UN ANON KEY DA
+const sb=supabase.createClient(SB_URL, SB_KEY);
+let currentUser=localStorage.getItem("pixoro_user")||""; let currentFilter="none";
+if(!currentUser){ currentUser=prompt("Ungala name sollu da Giri!"); localStorage.setItem("pixoro_user", currentUser); }
 
-function loginUser(){let u=document.getElementById('li_user').value.trim(); if(!u){alert('Username podu da Giri!');return;} localStorage.setItem('pixoro_user',u); currentUser=u; document.getElementById('loginInfo').innerText='Hi '+u+' da!'; loadPosts(); alert('Login OK da '+u);}
-function logoutUser(){localStorage.removeItem('pixoro_user'); currentUser=''; document.getElementById('loginInfo').innerText='Logged out da'; location.reload();}
-function searchUsers(q){document.getElementById('searchResult').innerHTML=q?'Searching @'+q+'...':'';}
-function uploadStory(){alert('Story upload pannuren da Giri!');}
-function createPost(){alert('Post create pannuren da Giri! Supabase la save aagum!');}
+function showPage(p){ document.getElementById("page-home").style.display=p=='home'?'block':'none'; document.getElementById("page-reels").style.display=p=='reels'?'block':'none'; document.getElementById("page-chat").style.display=p=='chat'?'block':'none'; document.getElementById("page-profile").style.display=p=='profile'?'block':'none'; if(p=='home') loadHome(); if(p=='reels') loadReels(); if(p=='chat') loadChat(); if(p=='profile') loadProfile(currentUser); }
 
-async function loadPosts(){
-  const container=document.getElementById('posts');
-  container.innerHTML='<div class="box">Loading posts da Giri...</div>';
-  postCount=0;
-  try{
-    const {data,error} = await supabaseClient.from('posts').select('*').order('created_at',{ascending:false}).limit(20);
-    if(error) throw error;
-    if(!data || data.length==0) throw 'empty';
-    container.innerHTML='';
-    data.forEach(post=>{ renderPost(post, container); });
-  }catch(e){
-    console.log('Supabase fail, dummy posts da',e);
-    container.innerHTML='';
-    const dummy=[
-      {username:'giri',views:1246,earnings:'9.34',image_url:'https://picsum.photos/seed/giri1/600/600',caption:'Muyal kutty da 😍 - First PIXORO Post!'},
-      {username:'pixoro_official',views:3200,earnings:'15.50',image_url:'https://picsum.photos/seed/pix2/600/600',caption:'PIXORO V1 Mass Entry 🔥 Blue Tick!'},
-      {username:'giri_official',views:5000,earnings:'28.00',image_url:'https://picsum.photos/seed/giri3/600/600',caption:'254 Commits da! Vera level! 👑'},
-      {username:'user1',views:890,earnings:'4.20',image_url:'https://picsum.photos/seed/p4/600/600',caption:'Super app da Giri!'},
-      {username:'user2',views:2100,earnings:'11.00',image_url:'https://picsum.photos/seed/p5/600/600',caption:'Follow pannunga da!'},
-    ];
-    dummy.forEach(p=>{ renderPost(p, container); });
-  }
+document.getElementById("filterSelect").onchange=e=>{ currentFilter=e.target.value; document.getElementById("previewImg")?.style && (document.getElementById("previewImg").style.filter=currentFilter); };
+
+async function upload(){
+  const file=document.getElementById("fileInput").files[0]; const cap=document.getElementById("capInput").value;
+  if(!file) return alert("Photo/Video eduthuko da Giri!");
+  const fileName=Date.now()+"-"+file.name;
+  let {error}=await sb.storage.from('post-images').upload(fileName, file); if(error) return alert(error.message);
+  let {data}=sb.storage.from('post-images').getPublicUrl(fileName);
+  await sb.from('posts').insert([{image_url:data.publicUrl, caption:cap, username:currentUser, filter:currentFilter}]);
+  alert("Posted da Giri! 🔥"); loadHome();
 }
 
-function renderPost(post, container){
-  postCount++;
-  const div=document.createElement('div');
-  div.className='post-card';
-  div.innerHTML=`
-    <div style="padding:10px;display:flex;gap:10px;align-items:center;"><b>@${post.username||'giri'}</b> <span style="color:#1DA1F2;">✔️</span></div>
-    <div class="view-bar">👁️ ${post.views||1246} Views | 💰 ₹${post.earnings||'9.34'} | 4K=₹30</div>
-    ${post.image_url?`<img src="${post.image_url}" style="width:100%;display:block;">`:''}
-    <div style="padding:10px;">${post.caption||''}</div>
-    <div style="padding:10px;display:flex;gap:20px;border-top:1px solid #222;color:#888;">❤️ 120 💬 20 ↗️ Share</div>
-  `;
-  container.appendChild(div);
-  
-  // *** AD - EVERY 3 POSTS - PAZHAYA CODE KU INTHA PART MATTUM PUTHUSA ADD PANNI IRUKKEN DA ***
-  if(postCount % 3 === 0){
-    const ad=document.createElement('div');
-    ad.className='ad-card';
-    ad.innerHTML=`
-      <div style="display:flex;justify-content:space-between;align-items:center;"><span style="background:#FFD700;color:#000;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:bold;">SPONSORED</span><span style="font-size:10px;color:#666;">Ad • PIXORO</span></div>
-      <h3 style="color:#FFD700;margin:12px 0;">🔥 Watch Ad & Earn ₹5 🔥</h3>
-      <div style="background:#111;height:90px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin:10px 0;border:1px dashed #FFD700;color:#666;">PIXORO AD SPACE - AdMob / AdSense Varum Edam</div>
-      <button onclick="this.innerText='✅ ₹5 Earned!'; alert('Super da Giri! ₹5 Wallet la add aayiduchu da! 💰')">Watch Ad - Earn ₹5</button>
-    `;
-    container.appendChild(ad);
-  }
+async function loadHome(){
+  let {data:posts}=await sb.from('posts').select('*').order('created_at',{ascending:false});
+  let html=""; for(let p of posts||[]){
+    let {data:likes}=await sb.from('likes').select('*').eq('post_id',p.id);
+    let {data:comments}=await sb.from('comments').select('*').eq('post_id',p.id);
+    let {data:saves}=await sb.from('saves').select('*').eq('post_id',p.id).eq('username',currentUser);
+    let {data:views}=await sb.from('views').select('*').eq('post_id',p.id);
+    let isLiked=likes?.some(l=>l.username==currentUser);
+    html+=`<div class="card">
+      <div style="padding:10px; display:flex; justify-content:space-between;"><b onclick="loadProfile('${p.username}'); showPage('profile')" style="cursor:pointer;">👤 ${p.username}</b><span>${views?.length||0} Views 👁️</span></div>
+      <img src="${p.image_url}" style="filter:${p.filter||'none'}" onclick="zoom('${p.image_url}'); addView('${p.id}')" >
+      <div style="padding:10px;">
+        <div style="display:flex; gap:15px; font-size:20px;">
+          <span onclick="like('${p.id}')" style="cursor:pointer;">${isLiked?'❤️':'🤍'} ${likes?.length||0}</span>
+          <span>💬 ${comments?.length||0}</span>
+          <span onclick="savePost('${p.id}')" style="cursor:pointer;">${saves?.length?'💾 Saved':'🔖 Save'}</span>
+          <span onclick="share('${p.image_url}')">🚀</span>
+        </div>
+        <p><b>${p.username}</b> ${p.caption||''}</p>
+        ${(comments||[]).slice(0,2).map(c=>`<p style="font-size:13px;"><b>${c.username}:</b> ${c.comment_text}</p>`).join('')}
+        <div style="display:flex; margin-top:5px;"><input id="c-${p.id}" placeholder="Comment..." style="flex:1; background:#222; color:white; border:none; padding:8px; border-radius:10px;"><button onclick="comment('${p.id}')" style="background:yellow; border:none; border-radius:10px; margin-left:5px;">Post</button></div>
+      </div></div>`;
+  } document.getElementById("page-home").innerHTML=html; document.getElementById("page-home").style.display='block';
+}
+async function loadReels(){ let {data:posts}=await sb.from('posts').select('*').order('created_at',{ascending:false}); document.getElementById("page-reels").innerHTML=(posts||[]).filter(p=>p.image_url.includes('.mp4')||true).map(p=>`<div class="card" style="height:80vh;"><img src="${p.image_url}" style="height:100%; object-fit:cover; filter:${p.filter||'none'}" onclick="zoom('${p.image_url}')"><div style="position:relative; margin-top:-60px; background:linear-gradient(transparent, black); padding:10px;"><b>@${p.username}</b> - ${p.caption} - ❤️ Views</div></div>`).join(''); }
+async function loadChat(){
+  let {data:msgs}=await sb.from('messages').select('*').or(`from_user.eq.${currentUser},to_user.eq.${currentUser}`).order('created_at',{ascending:false}).limit(20);
+  document.getElementById("page-chat").innerHTML=`<div class="card" style="padding:10px;"><h3>💬 Chat - DM Da Giri</h3><input id="chatTo" placeholder="Yaarukku da?" style="width:100%; padding:8px; background:#222; color:white; border-radius:10px;"><input id="chatMsg" placeholder="Message..." style="width:100%; padding:8px; background:#222; color:white; border-radius:10px; margin:5px 0;"><button onclick="sendMsg()" style="width:100%; background:yellow; color:black; padding:8px; border-radius:10px;">Send Da</button><div>${(msgs||[]).map(m=>`<p><b>${m.from_user}:</b> ${m.msg} -> ${m.to_user}</p>`).join('')}</div></div>`;
+}
+async function loadProfile(username){
+  let {data:prof}=await sb.from('profiles').select('*').eq('username',username).single();
+  let {data:followers}=await sb.from('follows').select('*').eq('following',username).eq('status','accepted');
+  let {data:following}=await sb.from('follows').select('*').eq('follower',username).eq('status','accepted');
+  let {data:myPosts}=await sb.from('posts').select('*').eq('username',username);
+  let isFollowing=false; if(currentUser!=username){ let {data}=await sb.from('follows').select('*').eq('follower',currentUser).eq('following',username); isFollowing=data&&data.length>0; }
+  document.getElementById("page-profile").innerHTML=`<div class="card" style="padding:15px; text-align:center;">
+    <h2>👤 ${username} ${prof?.is_private?'🔒 Private':''}</h2><p>${prof?.bio||'Bio illa da'}</p>
+    <p><b>${myPosts?.length||0}</b> Posts | <b>${followers?.length||0}</b> Followers | <b>${following?.length||0}</b> Following</p>
+    ${username!=currentUser?`<button onclick="follow('${username}')" style="background:${isFollowing?'#333':'yellow'}; color:${isFollowing?'white':'black'}; padding:8px 20px; border-radius:20px; border:none;">${isFollowing?'Following':'Follow'}</button>`: `<button onclick="togglePrivate()" style="background:#222; color:white; padding:8px 15px; border-radius:10px; border:1px solid #555;">Make ${prof?.is_private?'Public 🌍':'Private 🔒'}</button>`}
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-top:10px;">${(myPosts||[]).map(p=>`<img src="${p.image_url}" style="width:100%; height:100px; object-fit:cover; border-radius:10px; filter:${p.filter||'none'}" onclick="zoom('${p.image_url}')">`).join('')}</div>
+  </div>`;
 }
 
-if(currentUser){document.getElementById('li_user').value=currentUser; document.getElementById('loginInfo').innerText='Hi '+currentUser+' da!';}
-loadPosts();
-</script>
-</body>
-</html>
+async function like(id){ let {data}=await sb.from('likes').select('*').eq('post_id',id).eq('username',currentUser); if(data&&data.length>0) await sb.from('likes').delete().eq('post_id',id).eq('username',currentUser); else await sb.from('likes').insert([{post_id:id, username:currentUser}]); loadHome(); }
+async function comment(id){ const v=document.getElementById("c-"+id).value; if(!v) return; await sb.from('comments').insert([{post_id:id, username:currentUser, comment_text:v}]); loadHome(); }
+async function savePost(id){ let {data}=await sb.from('saves').select('*').eq('post_id',id).eq('username',currentUser); if(data&&data.length>0) await sb.from('saves').delete().eq('post_id',id).eq('username',currentUser); else await sb.from('saves').insert([{username:currentUser, post_id:id}]); loadHome(); }
+async function addView(id){ await sb.from('views').insert([{post_id:id, username:currentUser}]); }
+function share(url){ navigator.clipboard.writeText(url); alert("Link Copied da Giri! 🚀"); }
+function zoom(url){ document.getElementById("zoomBox").innerHTML=`<div onclick="this.parentElement.style.display='none'" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); display:flex; align-items:center; justify-content:center; z-index:9999;"><img src="${url}" style="max-width:100%; max-height:100%;"></div>`; document.getElementById("zoomBox").style.display='block'; }
+async function follow(u){ let {data:target}=await sb.from('profiles').select('is_private').eq('username',u).single(); let status=target?.is_private?'pending':'accepted'; let {data:ex}=await sb.from('follows').select('*').eq('follower',currentUser).eq('following',u); if(ex&&ex.length>0) await sb.from('follows').delete().eq('follower',currentUser).eq('following',u); else await sb.from('follows').insert([{follower:currentUser, following:u, status}]); loadProfile(u); }
+async function togglePrivate(){ let {data}=await sb.from('profiles').select('is_private').eq('username',currentUser).single(); await sb.from('profiles').update({is_private:!data?.is_private}).eq('username',currentUser); loadProfile(currentUser); }
+async function sendMsg(){ const to=document.getElementById("chatTo").value; const msg=document.getElementById("chatMsg").value; if(!to||!msg) return; await sb.from('messages').insert([{from_user:currentUser, to_user:to, msg}]); alert("Message Pochu da Giri!"); loadChat(); }
+
+// CAMERA + FACE TRACKING FILTER DA GIRI
+async function openCamera(){
+  const video=document.getElementById("cam"); video.style.display='block';
+  const stream=await navigator.mediaDevices.getUserMedia({video:true}); video.srcObject=stream;
+  const canvas=document.getElementById("camCanvas"); const ctx=canvas.getContext('2d');
+  setInterval(()=>{ canvas.width=video.videoWidth; canvas.height=video.videoHeight; ctx.filter=currentFilter; ctx.drawImage(video,0,0); ctx.filter='none'; ctx.font='30px Arial'; ctx.fillText('🔥 PIXORO FACE FILTER 🔥',20,40); },100);
+}
+
+showPage('home');
+</script></body></html>
