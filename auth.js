@@ -1,34 +1,12 @@
-// auth.js - FINAL FIXED - Case problem solved da
-async function signupUser(){
-  let u = document.getElementById('su_user').value.trim().toLowerCase();
-  let p = document.getElementById('su_pass').value.trim();
-  if(!u || !p) return alert("Username & Password podu da!");
-  console.log("Signup trying:", u);
-  let {data, error} = await sb.from('users').insert([{username: u, password: p, bio: 'PIXORO V1 user da'}]).select();
-  if(error){ 
-    console.log(error);
-    return alert("Signup Error da: " + error.message + " - Table irukka nu check pannu da!"); 
-  }
-  localStorage.setItem('pix_user', u);
-  alert("Signup MASS da Giri! 👑 Ippo Feed ku porom da!");
-  location.reload();
-}
+const Auth = {
+  html: `<div class="card card-pad" style="max-width:400px;margin:20px auto;text-align:center;">
+  <h3>Login / Signup</h3><input id="email" placeholder="Email"><input id="password" type="password" placeholder="Password"><input id="username" placeholder="Username (signup ku)">
+  <div style="display:flex;gap:8px;margin-top:8px;"><button onclick="Auth.signup()" class="btn-yellow">SIGNUP 🔥</button><button onclick="Auth.login()" class="btn-white" style="flex:1;">LOGIN 🔑</button></div><p id="authMsg" style="color:#ffeb3b;margin-top:8px;"></p></div>`,
 
-async function loginUser(){
-  let u = document.getElementById('li_user').value.trim().toLowerCase();
-  if(!u) return alert("Username podu da!");
-  console.log("Login trying:", u);
-  let {data, error} = await sb.from('users').select('*').eq('username', u).single();
-  if(error || !data){
-    console.log(error);
-    return alert("User illa da - Mela Signup pannu da! Username: " + u + " - Error: " + (error?.message||'not found'));
-  }
-  localStorage.setItem('pix_user', u);
-  alert("Login Vera Level da 🔥");
-  location.reload();
-}
-
-function logoutUser(){
-  localStorage.removeItem('pix_user');
-  location.reload();
+  init(){ document.getElementById("authPage").innerHTML=this.html; this.check(); },
+  async check(){ let {data}=await sb.auth.getSession(); if(data.session){ currentUser=data.session.user; await this.loadProfile(); document.getElementById("authPage").style.display='none'; document.getElementById("mainApp").style.display='block'; App.show('home'); } },
+  async signup(){ const e=document.getElementById("email").value.trim(), p=document.getElementById("password").value.trim(), u=document.getElementById("username").value.trim().toLowerCase(); if(!e||!p||!u) return alert("Ellam venum da!"); let {data:ex}=await sb.from('profiles').select('username').eq('username',u).single(); if(ex) return document.getElementById("authMsg").innerText="Username irukku da!"; let {data,error}=await sb.auth.signUp({email:e,password:p}); if(error) return document.getElementById("authMsg").innerText=error.message; if(data.user){ await sb.from('profiles').insert([{id:data.user.id,username:u}]); document.getElementById("authMsg").innerText="Success da! Login pannu!"; } },
+  async login(){ let e=document.getElementById("email").value.trim(), p=document.getElementById("password").value.trim(); let {data,error}=await sb.auth.signInWithPassword({email:e,password:p}); if(error) return document.getElementById("authMsg").innerText=error.message; currentUser=data.user; await this.loadProfile(); document.getElementById("authPage").style.display='none'; document.getElementById("mainApp").style.display='block'; App.show('home'); },
+  async loadProfile(){ let {data}=await sb.from('profiles').select('*').eq('id',currentUser.id).single(); currentProfile=data; if(!data){ let uname=currentUser.email.split('@')[0]+Math.floor(Math.random()*100); await sb.from('profiles').insert([{id:currentUser.id,username:uname}]); let {data:d2}=await sb.from('profiles').select('*').eq('id',currentUser.id).single(); currentProfile=d2; } },
+  logout(){ sb.auth.signOut(); location.reload(); }
 }
