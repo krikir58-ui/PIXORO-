@@ -2,18 +2,13 @@
 <html>
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO V7 - No Banner</title>
+<title>PIXORO V8 - Stories</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* BANNER HIDE CODE DA - MASS */
-iframe{display:none!important;}
-div[style*="position: fixed"], div[style*="position:fixed"]{display:none!important;}
-a[href*="appsgeyser"]{display:none!important;}
-#ad,.ad,.ads,.banner{display:none!important;}
-
+iframe{display:none!important;} div[style*="position: fixed"]{display:none!important;} a[href*="appsgeyser"]{display:none!important;}
 body{background:#000;color:#fff;font-family:Arial;padding:12px 12px 40px 12px;text-align:center;margin:0}
 h1{color:#FFD700;letter-spacing:5px;margin:12px 0 3px;font-size:26px}
-.sub{color:#00ff88;font-size:9px;letter-spacing:2px;margin-bottom:12px}
+.sub{color:#ff3366;font-size:9px;letter-spacing:2px;margin-bottom:12px}
 .box{background:#111;border:1px solid #333;padding:13px;border-radius:14px;margin-bottom:10px;text-align:left}
 .box h3{color:#FFD700;margin:0 0 8px}
 input{width:100%;padding:10px;margin-bottom:7px;background:#000;border:1px solid #333;color:#fff;border-radius:8px;box-sizing:border-box}
@@ -21,6 +16,14 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-
 .feed{display:none}
 .pfp{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid #FFD700;vertical-align:middle;margin-right:7px;cursor:pointer}
 .big-pfp{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #FFD700;display:block;margin:0 auto 8px}
+.story-ring{width:62px;height:62px;border-radius:50%;padding:3px;background:linear-gradient(45deg,#FFD700,#ff3366,#ff00ff);cursor:pointer;display:inline-block;margin:0 6px}
+.story-ring img{width:100%;height:100%;border-radius:50%;border:3px solid #000;object-fit:cover;display:block}
+.story-ring.seen{background:#333}
+.story-bar{display:flex;overflow-x:auto;padding:10px 0;gap:2px;scrollbar-width:none}
+.story-bar::-webkit-scrollbar{display:none}
+.story-item{text-align:center;min-width:70px;cursor:pointer}
+.story-item b{font-size:10px;display:block;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:70px}
+.story-add{width:62px;height:62px;border-radius:50%;border:2px dashed #FFD700;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;background:#111;color:#FFD700}
 .post{background:#111;border:1px solid #333;padding:11px;border-radius:14px;margin:11px 0}
 .action{display:flex;gap:8px;margin:8px 0}
 .action button{flex:1;padding:8px;font-size:13px;border-radius:20px}
@@ -37,7 +40,7 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-
 .c-input{display:flex;gap:6px;margin-top:6px}
 .c-input input{flex:1;margin:0}
 .c-input button{width:auto;padding:8px 14px;border-radius:20px;font-size:12px}
-#cropModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.96);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:12px;box-sizing:border-box}
+#cropModal,#storyModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.96);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:12px;box-sizing:border-box}
 .crop-box{width:300px;height:300px;overflow:hidden;position:relative;border:3px solid #FFD700;border-radius:50%;background:#222}
 .crop-box.post-mode{border-radius:12px;height:380px}
 .crop-box img{position:absolute;top:0;left:0;cursor:move;max-width:none}
@@ -48,22 +51,31 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-
 .follow-item-left{display:flex;align-items:center;cursor:pointer}
 .user-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:12px}
 .user-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px}
-.search-box{position:relative}
 #searchResults{background:#111;border:1px solid #333;border-radius:12px;margin-top:6px;max-height:300px;overflow-y:auto;display:none}
+#storyView{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:10000;flex-direction:column}
+.story-progress{height:3px;background:#333;width:100%;margin:8px 0}
+.story-progress-fill{height:100%;background:#FFD700;width:0%}
 </style>
 </head>
 <body>
-<h1>PIXORO V1</h1><div class="sub">V7 NO BANNER CLEAN 👑</div>
+<h1>PIXORO V1</h1><div class="sub">V8 STORY FEATURE 🔥👑</div>
 <div id="authDiv">
 <div class="box"><h3>Signup</h3><input id="su_user" placeholder="giri"><input id="su_pass" type="password" placeholder="Password"><button onclick="signupUser()">Signup</button></div>
 <div class="box"><h3>Login</h3><input id="li_user" placeholder="giri"><button onclick="loginUser()" style="background:#222;color:#fff">Login</button></div>
 </div>
 <div id="feedDiv" class="feed">
+
+<div class="box" style="padding:8px 10px">
+<h3>🔥 Stories Da - 24hrs</h3>
+<div id="storyBar" class="story-bar">Loading stories...</div>
+</div>
+
 <div class="box search-box">
 <h3>🔍 Search Users Da</h3>
 <input id="searchInput" placeholder="giri nu type pannu da..." oninput="searchUsers()">
 <div id="searchResults"></div>
 </div>
+
 <div class="box" style="text-align:center">
 <img id="myPfp" class="big-pfp" src="https://via.placeholder.com/90">
 <h3 style="text-align:center">Welcome <span id="uName"></span> 👑</h3>
@@ -75,6 +87,15 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-
 <button onclick="document.getElementById('pfpFile').click()" style="background:#222;color:#00ff88;border:1px solid #333;font-size:12px">DP Change 📸</button>
 <button onclick="logoutUser()" style="background:#111;color:#ff4444;margin-top:6px;border:1px solid #333;font-size:11px">Logout</button>
 </div>
+
+<div class="box">
+<h3>📸 Story Pannu Da</h3>
+<input type="file" id="storyFile" accept="image/*" onchange="openCropper(this,'story')" style="display:none">
+<button onclick="document.getElementById('storyFile').click()" style="background:linear-gradient(45deg,#FFD700,#ff3366);color:#000;border:none;margin-bottom:8px">+ Add Story 🔥 (24hrs)</button>
+<img id="storyPreview" style="width:100%;border-radius:12px;display:none;margin:8px 0;max-height:350px;object-fit:cover">
+<button id="storyBtn" onclick="createStory()" style="display:none;background:#ff3366;color:#fff">Story Podu Da 🚀</button>
+</div>
+
 <div class="box">
 <h3>Post Pannu Da 📸</h3>
 <input type="file" id="imgFile" accept="image/*" onchange="openCropper(this,'post')" style="display:none">
@@ -86,53 +107,92 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-
 <div id="posts">Loading... ⏳</div>
 </div>
 
-<div id="followModal">
-<div class="follow-header"><h2 id="followTitle">Followers</h2><button onclick="closeFollowModal()" style="width:auto;background:#222;color:#fff;padding:8px 16px;border-radius:20px">✕ Close</button></div>
-<div id="followList" style="overflow-y:auto;flex:1"></div>
+<div id="storyView">
+<div class="story-progress"><div id="storyProg" class="story-progress-fill"></div></div>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:10px">
+<div style="display:flex;align-items:center" id="svUser"><img id="svPfp" class="pfp" src=""><b id="svName">@user</b> <span id="svTime" style="font-size:10px;color:#999;margin-left:6px"></span></div>
+<button onclick="closeStory()" style="width:auto;background:#222;color:#fff;padding:8px 16px;border-radius:20px">✕</button>
+</div>
+<img id="svImg" style="width:100%;flex:1;object-fit:contain;background:#000">
 </div>
 
-<div id="userModal">
-<div class="follow-header"><h2 id="userModalTitle">@user</h2><button onclick="closeUserModal()" style="width:auto;background:#222;color:#fff;padding:8px 16px;border-radius:20px">✕ Close</button></div>
-<div class="box" style="text-align:center">
-<img id="umPfp" class="big-pfp" src="https://via.placeholder.com/90">
-<h3 id="umName" style="text-align:center">@user</h3>
-<div class="stats">
-<span><b id="umFollowers">0</b> Followers</span>
-<span><b id="umFollowing">0</b> Following</span>
-<span><b id="umPosts">0</b> Posts</span>
-</div>
-<button id="umFollowBtn" class="follow-btn" style="width:100%;padding:10px;margin-top:8px" onclick="toggleFollowUserModal()">+ Follow</button>
-</div>
-<div id="umGrid" class="user-grid"></div>
-</div>
+<div id="followModal"><div class="follow-header"><h2 id="followTitle">Followers</h2><button onclick="closeFollowModal()" style="width:auto;background:#222;color:#fff;padding:8px 16px;border-radius:20px">✕ Close</button></div><div id="followList" style="overflow-y:auto;flex:1"></div></div>
+<div id="userModal"><div class="follow-header"><h2 id="userModalTitle">@user</h2><button onclick="closeUserModal()" style="width:auto;background:#222;color:#fff;padding:8px 16px;border-radius:20px">✕ Close</button></div><div class="box" style="text-align:center"><img id="umPfp" class="big-pfp" src=""><h3 id="umName">@user</h3><div class="stats"><span><b id="umFollowers">0</b> Followers</span><span><b id="umFollowing">0</b> Following</span><span><b id="umPosts">0</b> Posts</span></div><button id="umFollowBtn" class="follow-btn" style="width:100%;padding:10px;margin-top:8px" onclick="toggleFollowUserModal()">+ Follow</button></div><div id="umGrid" class="user-grid"></div></div>
 
-<div id="cropModal">
-<h3 style="color:#FFD700" id="cropTitle">Ajes Pannu Da</h3>
-<div id="cropContainer" class="crop-box"><img id="cropImg" src=""></div>
-<input type="range" id="zoomRange" min="0.5" max="3" step="0.05" value="1" oninput="applyZoom()" style="width:300px;margin-top:12px">
-<div style="margin-top:10px"><button onclick="doCrop()" style="background:#00ff88;width:auto;padding:9px 20px;border-radius:20px">OK ✅</button>
-<button onclick="closeCropper()" style="background:#222;color:#fff;width:auto;padding:9px 20px;border-radius:20px;margin-left:6px">Cancel</button></div>
-</div>
+<div id="cropModal"><h3 style="color:#FFD700" id="cropTitle">Ajes Pannu Da</h3><div id="cropContainer" class="crop-box"><img id="cropImg" src=""></div><input type="range" id="zoomRange" min="0.5" max="3" step="0.05" value="1" oninput="applyZoom()" style="width:300px;margin-top:12px"><div style="margin-top:10px"><button onclick="doCrop()" style="background:#00ff88;width:auto;padding:9px 20px;border-radius:20px">OK ✅</button><button onclick="closeCropper()" style="background:#222;color:#fff;width:auto;padding:9px 20px;border-radius:20px;margin-left:6px">Cancel</button></div></div>
 <canvas id="c" style="display:none"></canvas>
 <script>
-// BANNER KILLER DA - 1 SEC KU ORU VAAI AZHIKUM DA
-setInterval(()=>{
- document.querySelectorAll('iframe, div').forEach(el=>{
-  if(el.innerText && el.innerText.includes('Hide this banner')){ el.style.display='none'; el.remove(); }
-  if(el.innerHTML && el.innerHTML.includes('AppsGeyser')){ el.style.display='none'; }
- });
-},500);
-
+setInterval(()=>{document.querySelectorAll('iframe, div').forEach(el=>{if(el.innerText && el.innerText.includes('Hide this banner')){ el.style.display='none'; el.remove(); }if(el.innerHTML && el.innerHTML.includes('AppsGeyser')){ el.style.display='none'; }});},500);
 const SUPABASE_URL = "https://yecpltndhlzfjplzhcpm.supabase.co";
 const SUPABASE_KEY = "sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let selectedFile=null,cropMode='pfp',currentScale=1,posX=0,posY=0,isDrag=false,startX,startY,imgOrigW,imgOrigH,currentProfileUser=null;
+let selectedFile=null,storyFile=null,cropMode='pfp',currentScale=1,posX=0,posY=0,isDrag=false,startX,startY,imgOrigW,imgOrigH,currentProfileUser=null,storyTimer=null,currentStories=[],currentStoryIdx=0;
+
 function signupUser(){let u=su_user.value.trim().toLowerCase(),p=su_pass.value.trim();if(!u||!p)return alert("Poduda");sb.from('users').insert([{username:u,password:p}]).then(e=>{if(e.error&&!e.error.message.includes('duplicate'))return alert(e.error.message);localStorage.setItem('pix_user',u);location.reload();});}
 function loginUser(){let u=li_user.value.trim().toLowerCase();sb.from('users').select('*').eq('username',u).single().then(e=>{if(e.error)return alert("User illa");localStorage.setItem('pix_user',u);location.reload();});}
 function logoutUser(){localStorage.removeItem('pix_user');location.reload();}
-async function checkUser(){let u=localStorage.getItem('pix_user');if(!u)return;authDiv.style.display='none';feedDiv.style.display='flex';feedDiv.style.flexDirection='column';uName.innerText=u;loadMyPfp(u);loadPosts();loadFollowStats();}
+async function checkUser(){let u=localStorage.getItem('pix_user');if(!u)return;authDiv.style.display='none';feedDiv.style.display='flex';feedDiv.style.flexDirection='column';uName.innerText=u;loadMyPfp(u);loadPosts();loadFollowStats();loadStories();}
 async function loadMyPfp(u){let {data}=await sb.from('users').select('profile_pic').eq('username',u).single();if(data?.profile_pic)myPfp.src=data.profile_pic;}
 async function loadFollowStats(){let u=localStorage.getItem('pix_user');let {data:fer}=await sb.from('follows').select('*').eq('following',u);let {data:fing}=await sb.from('follows').select('*').eq('follower',u);fCount.innerText=fer?.length||0;fgCount.innerText=fing?.length||0;}
+
+// STORY FEATURE DA
+async function loadStories(){
+ let {data:stories}=await sb.from('stories').select('*').order('created_at',{ascending:false});
+ let {data:users}=await sb.from('users').select('username,profile_pic');
+ let userMap={};(users||[]).forEach(x=>userMap[x.username]=x.profile_pic);
+ let now=Date.now();
+ let validStories=(stories||[]).filter(s=> now - new Date(s.created_at).getTime() < 24*60*60*1000 );
+ if(validStories.length==0){ storyBar.innerHTML=`<div class="story-item" onclick="document.getElementById('storyFile').click()"><div class="story-add">+</div><b>Your Story</b></div><span style="color:#666;font-size:11px;margin-left:10px">No stories - Add pannu da 🔥</span>`; return; }
+ // group by username
+ let grouped={}; validStories.forEach(s=>{ if(!grouped[s.username]) grouped[s.username]=[]; grouped[s.username].push(s); });
+ let h=`<div class="story-item" onclick="document.getElementById('storyFile').click()"><div class="story-add">+</div><b>Your Story</b></div>`;
+ Object.keys(grouped).forEach(un=>{
+  let latest=grouped[un][0];
+  let pfp=userMap[un]||'https://via.placeholder.com/40';
+  let count=grouped[un].length;
+  h+=`<div class="story-item" onclick="viewUserStories('${un}')"><div class="story-ring"><img src="${pfp}"></div><b>@${un} ${count>1?'('+count+')':''}</b></div>`;
+ });
+ storyBar.innerHTML=h;
+ currentStories=validStories;
+}
+async function createStory(){
+ if(!storyFile){return alert("Story photo edu da");}
+ let fname=Date.now()+"_story.jpg"; let f=new File([storyFile],"story.jpg",{type:"image/jpeg"});
+ let {error}=await sb.storage.from('post-images').upload(fname,f); if(error) return alert(error.message);
+ let {data}=sb.storage.from('post-images').getPublicUrl(fname);
+ let u=localStorage.getItem('pix_user');
+ await sb.from('stories').insert([{username:u,image_url:data.publicUrl}]);
+ alert("Story OK da! 24hrs irukkum da 🔥"); storyPreview.style.display='none'; storyBtn.style.display='none'; storyFile=null; loadStories();
+}
+function viewUserStories(username){
+ let userStories=currentStories.filter(s=>s.username==username);
+ if(userStories.length==0) return;
+ let idx=0; openStoryView(userStories,idx);
+}
+function openStoryView(stories, idx){
+ currentStoriesView=stories; currentStoryIdx=idx;
+ let s=stories[idx];
+ storyView.style.display='flex';
+ svImg.src=s.image_url; svName.innerText='@'+s.username;
+ let diff=Date.now()-new Date(s.created_at).getTime(); let mins=Math.floor(diff/60000);
+ svTime.innerText= mins<60? mins+'m ago' : Math.floor(mins/60)+'h ago';
+ sb.from('users').select('profile_pic').eq('username',s.username).single().then(({data})=>{ svPfp.src=data?.profile_pic||'https://via.placeholder.com/40'; });
+ // progress bar 5 sec
+ let prog=0; clearInterval(storyTimer);
+ storyProg.style.width='0%';
+ storyTimer=setInterval(()=>{
+  prog+=1; storyProg.style.width=prog+'%';
+  if(prog>=100){ clearInterval(storyTimer); nextStory(); }
+ },50); // 5 sec = 100*50ms
+}
+function nextStory(){
+ currentStoryIdx++;
+ if(currentStoryIdx < currentStoriesView.length){ openStoryView(currentStoriesView,currentStoryIdx); }
+ else { closeStory(); }
+}
+function closeStory(){ storyView.style.display='none'; clearInterval(storyTimer); }
+let currentStoriesView=[];
+
 async function searchUsers(){
  let q=searchInput.value.trim().toLowerCase();
  if(q.length==0){ searchResults.style.display='none'; searchResults.innerHTML=''; return; }
@@ -140,23 +200,9 @@ async function searchUsers(){
  if(!users||users.length==0){ searchResults.style.display='block'; searchResults.innerHTML="<p style='color:#666;padding:10px'>User illa da 😅</p>"; return; }
  let {data:myFollowing}=await sb.from('follows').select('*').eq('follower', localStorage.getItem('pix_user'));
  let myFollowingList=(myFollowing||[]).map(f=>f.following);
- let h='';
- users.forEach(u=>{
-  let pfp=u.profile_pic||'https://via.placeholder.com/40';
-  let isMe=u.username==localStorage.getItem('pix_user');
-  let isFollowing=myFollowingList.includes(u.username);
-  let btn=isMe?'':`<button class="follow-btn ${isFollowing?'following':''}" onclick="event.stopPropagation();toggleFollowSearch('${u.username}')">${isFollowing?'✓ Following':'+ Follow'}</button>`;
-  h+=`<div class="follow-item" onclick="openUserProfile('${u.username}')"><div class="follow-item-left"><img class="pfp" src="${pfp}"><b>@${u.username}</b></div>${btn}</div>`;
- });
- searchResults.style.display='block'; searchResults.innerHTML=h;
+ let h=''; users.forEach(u=>{let pfp=u.profile_pic||'https://via.placeholder.com/40';let isMe=u.username==localStorage.getItem('pix_user');let isFollowing=myFollowingList.includes(u.username);let btn=isMe?'':`<button class="follow-btn ${isFollowing?'following':''}" onclick="event.stopPropagation();toggleFollowSearch('${u.username}')">${isFollowing?'✓ Following':'+ Follow'}</button>`;h+=`<div class="follow-item" onclick="openUserProfile('${u.username}')"><div class="follow-item-left"><img class="pfp" src="${pfp}"><b>@${u.username}</b></div>${btn}</div>`;}); searchResults.style.display='block'; searchResults.innerHTML=h;
 }
-async function toggleFollowSearch(targetUser){
- let u=localStorage.getItem('pix_user'); if(u==targetUser) return;
- let {data:existing}=await sb.from('follows').select('*').eq('follower',u).eq('following',targetUser);
- if(existing && existing.length>0){ await sb.from('follows').delete().eq('follower',u).eq('following',targetUser); }
- else { await sb.from('follows').insert([{follower:u,following:targetUser}]); }
- searchUsers(); loadFollowStats(); loadPosts();
-}
+async function toggleFollowSearch(targetUser){let u=localStorage.getItem('pix_user'); if(u==targetUser) return;let {data:existing}=await sb.from('follows').select('*').eq('follower',u).eq('following',targetUser);if(existing && existing.length>0){ await sb.from('follows').delete().eq('follower',u).eq('following',targetUser); } else { await sb.from('follows').insert([{follower:u,following:targetUser}]); } searchUsers(); loadFollowStats(); loadPosts();}
 async function openFollowers(){let u=localStorage.getItem('pix_user');openFollowList(u,'followers');}
 async function openFollowing(){let u=localStorage.getItem('pix_user');openFollowList(u,'following');}
 async function openFollowList(targetUser, type){
@@ -183,13 +229,14 @@ async function openUserProfile(username){
 }
 function closeUserModal(){userModal.style.display='none'; currentProfileUser=null;}
 async function toggleFollowUserModal(){if(!currentProfileUser) return; let u=localStorage.getItem('pix_user'); if(u==currentProfileUser) return; let {data:existing}=await sb.from('follows').select('*').eq('follower',u).eq('following',currentProfileUser); if(existing && existing.length>0){ await sb.from('follows').delete().eq('follower',u).eq('following',currentProfileUser); } else { await sb.from('follows').insert([{follower:u,following:currentProfileUser}]); } openUserProfile(currentProfileUser); loadFollowStats(); loadPosts();}
-function openCropper(input,mode){cropMode=mode;let file=input.files[0];if(!file)return;let r=new FileReader();r.onload=e=>{cropImg.src=e.target.result;cropContainer.className=mode==='pfp'?'crop-box':'crop-box post-mode';cropTitle.innerText=mode==='pfp'?'DP Ajes Pannu':'Post Ajes Pannu';cropModal.style.display='flex';setTimeout(()=>initCropper(),100);};r.readAsDataURL(file);}
+
+function openCropper(input,mode){cropMode=mode;let file=input.files[0];if(!file)return;let r=new FileReader();r.onload=e=>{cropImg.src=e.target.result;cropContainer.className=mode==='pfp'?'crop-box':'crop-box post-mode';cropTitle.innerText=mode==='pfp'?'DP Ajes Pannu': mode==='story'? 'Story Ajes Pannu' : 'Post Ajes Pannu';cropModal.style.display='flex';setTimeout(()=>initCropper(),100);};r.readAsDataURL(file);}
 function initCropper(){let img=cropImg;imgOrigW=img.naturalWidth;imgOrigH=img.naturalHeight;let box=cropContainer,bw=box.clientWidth,bh=box.clientHeight;let scale=Math.max(bw/imgOrigW,bh/imgOrigH);currentScale=scale;posX=(bw-imgOrigW*scale)/2;posY=(bh-imgOrigH*scale)/2;zoomRange.value=scale;zoomRange.min=scale*0.8;zoomRange.max=scale*3;applyTransform();setupDrag();}
 function applyTransform(){cropImg.style.width=(imgOrigW*currentScale)+'px';cropImg.style.height=(imgOrigH*currentScale)+'px';cropImg.style.left=posX+'px';cropImg.style.top=posY+'px';}
 function applyZoom(){currentScale=parseFloat(zoomRange.value);applyTransform();}
 function setupDrag(){let img=cropImg;let getPos=e=>e.touches?{x:e.touches[0].clientX,y:e.touches[0].clientY}:{x:e.clientX,y:e.clientY};img.onmousedown=img.ontouchstart=e=>{isDrag=true;let p=getPos(e);startX=p.x-posX;startY=p.y-posY;e.preventDefault();};window.onmousemove=window.ontouchmove=e=>{if(!isDrag)return;let p=getPos(e);posX=p.x-startX;posY=p.y-startY;applyTransform();};window.onmouseup=window.ontouchend=()=>{isDrag=false;};}
-function closeCropper(){cropModal.style.display='none';pfpFile.value="";imgFile.value="";}
-function doCrop(){let box=cropContainer,img=cropImg,canvas=document.getElementById('c'),ctx=canvas.getContext('2d');let bw=box.clientWidth,bh=box.clientHeight;if(cropMode==='pfp'){canvas.width=500;canvas.height=500;}else{canvas.width=800;canvas.height=1000;}let sx=(-posX)/currentScale,sy=(-posY)/currentScale,sW=bw/currentScale,sH=bh/currentScale;ctx.fillStyle="#000";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,sx,sy,sW,sH,0,0,canvas.width,canvas.height);canvas.toBlob(blob=>{if(cropMode==='pfp'){myPfp.src=URL.createObjectURL(blob);uploadPfpBlob(blob);}else{preview.src=URL.createObjectURL(blob);preview.style.display='block';selectedFile=blob;}closeCropper();},'image/jpeg',0.92);}
+function closeCropper(){cropModal.style.display='none';pfpFile.value="";imgFile.value="";storyFile.value="";}
+function doCrop(){let box=cropContainer,img=cropImg,canvas=document.getElementById('c'),ctx=canvas.getContext('2d');let bw=box.clientWidth,bh=box.clientHeight;if(cropMode==='pfp'){canvas.width=500;canvas.height=500;}else if(cropMode==='story'){canvas.width=720;canvas.height=1280;}else{canvas.width=800;canvas.height=1000;}let sx=(-posX)/currentScale,sy=(-posY)/currentScale,sW=bw/currentScale,sH=bh/currentScale;ctx.fillStyle="#000";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,sx,sy,sW,sH,0,0,canvas.width,canvas.height);canvas.toBlob(blob=>{if(cropMode==='pfp'){myPfp.src=URL.createObjectURL(blob);uploadPfpBlob(blob);}else if(cropMode==='story'){storyPreview.src=URL.createObjectURL(blob);storyPreview.style.display='block';storyBtn.style.display='block';storyFile=blob;}else{preview.src=URL.createObjectURL(blob);preview.style.display='block';selectedFile=blob;}closeCropper();},'image/jpeg',0.92);}
 async function uploadPfpBlob(blob){let u=localStorage.getItem('pix_user'),fname="pfp_"+u+"_"+Date.now()+".jpg";let {error}=await sb.storage.from('profile-pics').upload(fname,blob,{upsert:true});if(error)return alert(error.message);let {data}=sb.storage.from('profile-pics').getPublicUrl(fname);await sb.from('users').update({profile_pic:data.publicUrl}).eq('username',u);alert("DP OK da! 👑");}
 async function createPost(){let cap=document.getElementById('cap').value.trim(),u=localStorage.getItem('pix_user');if(!selectedFile)return alert("Photo select pannu");let fname=Date.now()+"_post.jpg";let f=new File([selectedFile],"post.jpg",{type:"image/jpeg"});let {error}=await sb.storage.from('post-images').upload(fname,f);if(error)return alert(error.message);let {data}=sb.storage.from('post-images').getPublicUrl(fname);await sb.from('posts').insert([{username:u,image_url:data.publicUrl,caption:cap}]);alert("Post OK da!");cap.value="";preview.style.display='none';selectedFile=null;loadPosts();}
 async function loadPosts(){
