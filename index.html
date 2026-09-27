@@ -2,10 +2,16 @@
 <html>
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO V6 - Search</title>
+<title>PIXORO V7 - No Banner</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body{background:#000;color:#fff;font-family:Arial;padding:12px;text-align:center;margin:0}
+/* BANNER HIDE CODE DA - MASS */
+iframe{display:none!important;}
+div[style*="position: fixed"], div[style*="position:fixed"]{display:none!important;}
+a[href*="appsgeyser"]{display:none!important;}
+#ad,.ad,.ads,.banner{display:none!important;}
+
+body{background:#000;color:#fff;font-family:Arial;padding:12px 12px 40px 12px;text-align:center;margin:0}
 h1{color:#FFD700;letter-spacing:5px;margin:12px 0 3px;font-size:26px}
 .sub{color:#00ff88;font-size:9px;letter-spacing:2px;margin-bottom:12px}
 .box{background:#111;border:1px solid #333;padding:13px;border-radius:14px;margin-bottom:10px;text-align:left}
@@ -47,19 +53,17 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-
 </style>
 </head>
 <body>
-<h1>PIXORO V1</h1><div class="sub">V6 SEARCH BAR 🔍</div>
+<h1>PIXORO V1</h1><div class="sub">V7 NO BANNER CLEAN 👑</div>
 <div id="authDiv">
 <div class="box"><h3>Signup</h3><input id="su_user" placeholder="giri"><input id="su_pass" type="password" placeholder="Password"><button onclick="signupUser()">Signup</button></div>
 <div class="box"><h3>Login</h3><input id="li_user" placeholder="giri"><button onclick="loginUser()" style="background:#222;color:#fff">Login</button></div>
 </div>
 <div id="feedDiv" class="feed">
-
 <div class="box search-box">
 <h3>🔍 Search Users Da</h3>
 <input id="searchInput" placeholder="giri nu type pannu da..." oninput="searchUsers()">
 <div id="searchResults"></div>
 </div>
-
 <div class="box" style="text-align:center">
 <img id="myPfp" class="big-pfp" src="https://via.placeholder.com/90">
 <h3 style="text-align:center">Welcome <span id="uName"></span> 👑</h3>
@@ -111,19 +115,24 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:none;border-
 </div>
 <canvas id="c" style="display:none"></canvas>
 <script>
+// BANNER KILLER DA - 1 SEC KU ORU VAAI AZHIKUM DA
+setInterval(()=>{
+ document.querySelectorAll('iframe, div').forEach(el=>{
+  if(el.innerText && el.innerText.includes('Hide this banner')){ el.style.display='none'; el.remove(); }
+  if(el.innerHTML && el.innerHTML.includes('AppsGeyser')){ el.style.display='none'; }
+ });
+},500);
+
 const SUPABASE_URL = "https://yecpltndhlzfjplzhcpm.supabase.co";
 const SUPABASE_KEY = "sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let selectedFile=null,cropMode='pfp',currentScale=1,posX=0,posY=0,isDrag=false,startX,startY,imgOrigW,imgOrigH,currentProfileUser=null;
-
 function signupUser(){let u=su_user.value.trim().toLowerCase(),p=su_pass.value.trim();if(!u||!p)return alert("Poduda");sb.from('users').insert([{username:u,password:p}]).then(e=>{if(e.error&&!e.error.message.includes('duplicate'))return alert(e.error.message);localStorage.setItem('pix_user',u);location.reload();});}
 function loginUser(){let u=li_user.value.trim().toLowerCase();sb.from('users').select('*').eq('username',u).single().then(e=>{if(e.error)return alert("User illa");localStorage.setItem('pix_user',u);location.reload();});}
 function logoutUser(){localStorage.removeItem('pix_user');location.reload();}
 async function checkUser(){let u=localStorage.getItem('pix_user');if(!u)return;authDiv.style.display='none';feedDiv.style.display='flex';feedDiv.style.flexDirection='column';uName.innerText=u;loadMyPfp(u);loadPosts();loadFollowStats();}
 async function loadMyPfp(u){let {data}=await sb.from('users').select('profile_pic').eq('username',u).single();if(data?.profile_pic)myPfp.src=data.profile_pic;}
 async function loadFollowStats(){let u=localStorage.getItem('pix_user');let {data:fer}=await sb.from('follows').select('*').eq('following',u);let {data:fing}=await sb.from('follows').select('*').eq('follower',u);fCount.innerText=fer?.length||0;fgCount.innerText=fing?.length||0;}
-
-// SEARCH FUNCTION DA
 async function searchUsers(){
  let q=searchInput.value.trim().toLowerCase();
  if(q.length==0){ searchResults.style.display='none'; searchResults.innerHTML=''; return; }
@@ -148,7 +157,6 @@ async function toggleFollowSearch(targetUser){
  else { await sb.from('follows').insert([{follower:u,following:targetUser}]); }
  searchUsers(); loadFollowStats(); loadPosts();
 }
-
 async function openFollowers(){let u=localStorage.getItem('pix_user');openFollowList(u,'followers');}
 async function openFollowing(){let u=localStorage.getItem('pix_user');openFollowList(u,'following');}
 async function openFollowList(targetUser, type){
@@ -165,7 +173,6 @@ async function openFollowList(targetUser, type){
 }
 function closeFollowModal(){followModal.style.display='none';}
 async function toggleFollowFromList(targetUser){let u=localStorage.getItem('pix_user');if(u==targetUser) return;let {data:existing}=await sb.from('follows').select('*').eq('follower',u).eq('following',targetUser);if(existing && existing.length>0){ await sb.from('follows').delete().eq('follower',u).eq('following',targetUser); } else { await sb.from('follows').insert([{follower:u,following:targetUser}]); } openFollowList(localStorage.getItem('pix_user'), followTitle.innerText=='Followers'? 'followers' : 'following'); loadFollowStats(); loadPosts();}
-
 async function openUserProfile(username){
  currentProfileUser=username; userModal.style.display='flex'; userModalTitle.innerText='@'+username; umName.innerText='@'+username; umPfp.src='https://via.placeholder.com/90'; umGrid.innerHTML='Loading...'; searchResults.style.display='none';
  let {data:user}=await sb.from('users').select('*').eq('username',username).single(); if(user?.profile_pic) umPfp.src=user.profile_pic;
@@ -176,7 +183,6 @@ async function openUserProfile(username){
 }
 function closeUserModal(){userModal.style.display='none'; currentProfileUser=null;}
 async function toggleFollowUserModal(){if(!currentProfileUser) return; let u=localStorage.getItem('pix_user'); if(u==currentProfileUser) return; let {data:existing}=await sb.from('follows').select('*').eq('follower',u).eq('following',currentProfileUser); if(existing && existing.length>0){ await sb.from('follows').delete().eq('follower',u).eq('following',currentProfileUser); } else { await sb.from('follows').insert([{follower:u,following:currentProfileUser}]); } openUserProfile(currentProfileUser); loadFollowStats(); loadPosts();}
-
 function openCropper(input,mode){cropMode=mode;let file=input.files[0];if(!file)return;let r=new FileReader();r.onload=e=>{cropImg.src=e.target.result;cropContainer.className=mode==='pfp'?'crop-box':'crop-box post-mode';cropTitle.innerText=mode==='pfp'?'DP Ajes Pannu':'Post Ajes Pannu';cropModal.style.display='flex';setTimeout(()=>initCropper(),100);};r.readAsDataURL(file);}
 function initCropper(){let img=cropImg;imgOrigW=img.naturalWidth;imgOrigH=img.naturalHeight;let box=cropContainer,bw=box.clientWidth,bh=box.clientHeight;let scale=Math.max(bw/imgOrigW,bh/imgOrigH);currentScale=scale;posX=(bw-imgOrigW*scale)/2;posY=(bh-imgOrigH*scale)/2;zoomRange.value=scale;zoomRange.min=scale*0.8;zoomRange.max=scale*3;applyTransform();setupDrag();}
 function applyTransform(){cropImg.style.width=(imgOrigW*currentScale)+'px';cropImg.style.height=(imgOrigH*currentScale)+'px';cropImg.style.left=posX+'px';cropImg.style.top=posY+'px';}
