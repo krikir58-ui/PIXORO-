@@ -1,69 +1,112 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO V1 - Thani Thani File</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIXORO V1</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="style.css">
+<style>
+body{background:#000;color:#fff;font-family:Arial;padding:20px;text-align:center}
+h1{color:#FFD700;letter-spacing:5px;margin:20px 0 5px}
+.sub{color:#00ff88;font-size:10px;letter-spacing:2px;margin-bottom:30px}
+.box{background:#111;border:1px solid #333;padding:20px;border-radius:15px;margin-bottom:20px;text-align:left}
+.box h3{color:#FFD700;margin:0 0 15px}
+input{width:100%;padding:12px;margin-bottom:10px;background:#000;border:1px solid #333;color:#fff;border-radius:8px;box-sizing:border-box}
+button{width:100%;padding:13px;background:#FFD700;color:#000;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
+button:active{transform:scale(0.98)}
+.feed{display:none}
+.post{background:#111;border:1px solid #333;padding:15px;border-radius:10px;margin:15px 0}
+</style>
 </head>
 <body>
 
-<!-- AUTH PAGE - Login/Signup thani page da -->
-<div id="authPage" class="view" style="padding:20px">
-  <h1 style="color:#FFD600;letter-spacing:8px;text-align:center;margin-top:40px">PIXORO V1</h1>
-  <p style="text-align:center;color:#00ff88;font-size:10px;letter-spacing:3px">THANI THANI FILE - CHATGPT MARI</p>
-  
-  <div class="card" style="margin-top:30px">
-    <h3 style="color:#FFD600">Signup - Puthusa</h3>
-    <input id="su_user" placeholder="Username">
-    <input id="su_pass" placeholder="Password" type="password">
-    <button class="btn" onclick="signupUser()">Signup - Create Account</button>
-  </div>
+<h1>PIXORO V1</h1>
+<div class="sub">THANI THANI FILE - CHATGPT MARI</div>
 
-  <div class="card">
-    <h3 style="color:#FFD600">Login - Irukka User</h3>
-    <input id="li_user" placeholder="Username">
-    <button class="btn" style="background:#111;color:#fff;border:1px solid #333" onclick="loginUser()">Login</button>
+<div id="authDiv">
+  <div class="box">
+    <h3>Signup - Puthusa</h3>
+    <input id="su_user" placeholder="Username - giri">
+    <input id="su_pass" type="password" placeholder="Password">
+    <button onclick="signupUser()">Signup - Create Account</button>
+  </div>
+  <div class="box">
+    <h3>Login - Irukka User</h3>
+    <input id="li_user" placeholder="Username - giri">
+    <button onclick="loginUser()" style="background:#222;color:#fff;border:1px solid #444">Login</button>
   </div>
 </div>
 
-<!-- MAIN APP - Login panna aprom varum da -->
-<div id="mainApp" class="hidden">
-  <div class="header"><div class="logo">PIXORO V1</div><button onclick="logoutUser()" style="background:#222;color:#fff;border:none;padding:6px 10px;border-radius:10px;font-size:10px">Logout</button></div>
-  
-  <div id="v-feed" class="view">
-    <div class="card">
-      <input id="new_post_img" placeholder="Image URL - https://picsum.photos/500/600">
-      <input id="new_post_cap" placeholder="Caption">
-      <button class="btn" onclick="createPost()">Post Create + Feed la varum</button>
-    </div>
-    <div id="feedList"></div>
-  </div>
-
-  <div id="v-profile" class="view hidden">
-    <div class="card" style="text-align:center">
-      <img id="p_pic" src="https://picsum.photos/80/80?1" style="width:72px;height:72px;border-radius:50%;border:3px solid #FFD600">
-      <h3 id="p_username" style="color:#FFD600;margin-top:8px">Username</h3>
-      <p id="p_bio" style="color:#888;font-size:11px">Bio</p>
-      <input id="edit_bio" placeholder="New Bio">
-      <button class="btn" onclick="updateProfile()">Update Profile</button>
-    </div>
-  </div>
-
-  <div class="tabs">
-    <div class="tb a" onclick="document.getElementById('v-feed').classList.remove('hidden');document.getElementById('v-profile').classList.add('hidden')">🏠<br>Feed</div>
-    <div class="tb" onclick="document.getElementById('v-feed').classList.add('hidden');document.getElementById('v-profile').classList.remove('hidden');loadProfile()">👤<br>Profile</div>
-  </div>
+<div id="feedDiv" class="feed">
+  <div class="box"><h3>Welcome <span id="uName"></span> 👑 <button onclick="logoutUser()" style="width:auto;padding:5px 15px;float:right;background:#ff3333;color:#fff">Logout</button></h3></div>
+  <div class="box"><input id="imgUrl" placeholder="Image URL - https://..."><input id="cap" placeholder="Caption"><button onclick="createPost()">Post Podu Da 🔥</button></div>
+  <div id="posts"></div>
 </div>
 
-<script src="supabase.js"></script>
-<script src="auth.js"></script>
-<script src="profile.js"></script>
-<script src="feed.js"></script>
 <script>
-// Check login
-let u = localStorage.getItem('pix_user');
-if(u){ document.getElementById('authPage').classList.add('hidden'); document.getElementById('mainApp').classList.remove('hidden'); loadProfile(); loadFeed(); }
+// PIXORO SUPABASE - FIXED DA GIRI
+const SUPABASE_URL = "https://yecpltndhlzfjplzhcpm.supabase.co";
+const SUPABASE_KEY = "sb_publishable_byUfZPczrxfKYKTmUNco5w_oqabYQJ_UkPpXo";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+console.log("Connected da:", SUPABASE_URL);
+
+async function signupUser(){
+  let u = document.getElementById('su_user').value.trim().toLowerCase();
+  let p = document.getElementById('su_pass').value.trim();
+  if(!u || !p) return alert("Username & Password podu da!");
+  let {data, error} = await sb.from('users').insert([{username:u, password:p}]).select();
+  if(error){
+    if(error.message.includes('duplicate')){ 
+      localStorage.setItem('pix_user', u);
+      alert("Already irukka da - Login panniten da!");
+      location.reload();
+      return;
+    }
+    return alert("Error: "+error.message);
+  }
+  localStorage.setItem('pix_user', u);
+  alert("Signup OK da Giri! 👑");
+  location.reload();
+}
+async function loginUser(){
+  let u = document.getElementById('li_user').value.trim().toLowerCase();
+  if(!u) return alert("Username podu da!");
+  let {data, error} = await sb.from('users').select('*').eq('username', u).single();
+  if(error){ return alert("User illa da - Mela Signup pannu da!"); }
+  localStorage.setItem('pix_user', u);
+  alert("Login OK da 🔥");
+  location.reload();
+}
+function logoutUser(){ localStorage.removeItem('pix_user'); location.reload(); }
+
+async function checkUser(){
+  let u = localStorage.getItem('pix_user');
+  if(!u) return;
+  document.getElementById('authDiv').style.display='none';
+  document.getElementById('feedDiv').style.display='block';
+  document.getElementById('uName').innerText=u;
+  loadPosts();
+}
+async function createPost(){
+  let img = document.getElementById('imgUrl').value.trim();
+  let cap = document.getElementById('cap').value.trim();
+  let u = localStorage.getItem('pix_user');
+  if(!img) return alert("Image URL podu da!");
+  let {error} = await sb.from('posts').insert([{username:u, image_url:img, caption:cap}]);
+  if(error) return alert(error.message);
+  alert("Post OK da!");
+  loadPosts();
+}
+async function loadPosts(){
+  let {data} = await sb.from('posts').select('*').order('id', {ascending:false});
+  let html='';
+  (data||[]).forEach(p=>{
+    html+=`<div class="post"><b>@${p.username}</b><br><br><img src="${p.image_url}" style="width:100%;border-radius:8px"><p>${p.caption||''}</p></div>`;
+  });
+  document.getElementById('posts').innerHTML=html;
+}
+checkUser();
 </script>
 </body>
 </html>
