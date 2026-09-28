@@ -1,35 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PIXORO</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIXORO 📸</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  body{background:#fafafa}
+ .post-card{background:white; border:1px solid #dbdbdb; border-radius:12px; margin-bottom:20px}
+ .story-ring{background: linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5); padding:2px; border-radius:50%}
+</style>
 </head>
-<body>
-  <header><h2>PIXORO 📸</h2>
-    <input id="searchInput" placeholder="Search...">
-    <button id="logoutBtn">Logout</button>
-  </header>
+<body class="max-w-[500px] mx-auto bg-white min-h-screen">
 
-  <div id="stories"></div>
-
-  <div id="authBox">
-    <input id="email" placeholder="email">
-    <input id="password" type="password" placeholder="password">
-    <button id="signupBtn">Signup</button>
-    <button id="loginBtn">Login</button>
+<!-- HEADER - Instagram Style -->
+<header class="sticky top-0 z-50 bg-white border-b px-4 py-3 flex justify-between items-center">
+  <h1 class="text-2xl font-black tracking-tight">PIXORO <span class="text-sm">📸</span></h1>
+  <div class="flex gap-2 items-center">
+    <div class="relative">
+      <input id="searchInput" type="text" placeholder="Search..." class="bg-[#efefef] rounded-full px-4 py-1.5 text-sm w-32 md:w-48 outline-none">
+      <i class="fa fa-search absolute right-3 top-2.5 text-gray-400 text-xs"></i>
+    </div>
+    <button id="logoutBtn" class="text-sm font-semibold">Logout</button>
   </div>
+</header>
 
-  <div id="uploadBox">
-    <input type="file" id="fileInput">
-    <input id="caption" placeholder="caption...">
-    <button id="postBtn">Post</button>
+<!-- STORIES -->
+<div id="stories" class="flex gap-4 p-4 overflow-x-auto border-b bg-white">
+  <div class="flex flex-col items-center gap-1">
+    <div class="story-ring"><div class="bg-white p-0.5 rounded-full"><img src="https://i.pravatar.cc/100?u=giri" class="w-14 h-14 rounded-full"></div></div>
+    <span class="text-[11px]">Your Story</span>
   </div>
+  <div id="stories-list" class="flex gap-4"></div>
+</div>
 
-  <div id="feed"></div>
+<!-- AUTH - Clean Instagram Login -->
+<div id="authBox" class="m-4 p-6 bg-white border rounded-xl text-center">
+  <h2 class="text-xl font-bold mb-4">Login to PIXORO</h2>
+  <input id="emailInput" type="email" value="girikri3@gmail.com" placeholder="Email" class="w-full border bg-[#fafafa] rounded px-3 py-2.5 text-sm mb-2">
+  <input id="passwordInput" type="password" placeholder="Password" class="w-full border bg-[#fafafa] rounded px-3 py-2.5 text-sm mb-3">
+  <div class="flex gap-2">
+    <button id="signupBtn" class="flex-1 bg-white border font-semibold py-2 rounded text-sm">Signup</button>
+    <button id="loginBtn" class="flex-1 bg-[#0095f6] text-white font-semibold py-2 rounded text-sm">Login</button>
+  </div>
+</div>
 
-  <script type="module" src="./js/app.js"></script>
+<!-- UPLOAD - Instagram Create -->
+<div class="m-4 p-4 bg-white border rounded-xl">
+  <div class="flex gap-3 items-center mb-3">
+    <img src="https://i.pravatar.cc/100?u=giri" class="w-8 h-8 rounded-full">
+    <input id="captionInput" type="text" placeholder="Write a caption..." class="flex-1 outline-none text-sm">
+    <button id="uploadBtn" class="text-[#0095f6] font-bold text-sm">Post</button>
+  </div>
+  <label class="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
+    <i class="fa fa-image text-lg"></i> Choose Photo
+    <input id="fileInput" type="file" accept="image/*" class="hidden">
+    <span id="fileName" class="text-xs">No file chosen</span>
+  </label>
+</div>
+
+<!-- FEED - Instagram Posts -->
+<div id="feed" class="pb-20">
+  <div class="text-center py-20 text-gray-400">
+    <i class="fa fa-camera text-4xl mb-2"></i>
+    <p class="text-sm">No posts yet. Be first to post da Giri! 🔥</p>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="fixed bottom-0 w-full max-w-[500px] bg-white border-t flex justify-around py-3 text-xl">
+  <i class="fa fa-house"></i>
+  <i class="fa fa-magnifying-glass"></i>
+  <i class="fa fa-clapperboard"></i>
+  <i class="fa fa-heart"></i>
+  <i class="fa fa-user"></i>
+</nav>
+
+<script type="module" src="js/app.js"></script>
+<script>
+  document.getElementById('fileInput')?.addEventListener('change', e=>{
+    document.getElementById('fileName').textContent = e.target.files[0]?.name || 'No file chosen'
+  })
+</script>
 </body>
 </html>
