@@ -9,11 +9,13 @@ import { loadProfile } from './profile.js'
 
 console.log('PIXORO Full Ready da Giri 🔥')
 
-initAuth()
-loadFeed()
-loadStories()
-initLikes()
-initSearch()
-initUpload()
-initReels()
-loadProfile()
+document.addEventListener('DOMContentLoaded', () => {
+  initAuth()
+  loadFeed()
+  loadStories()
+  initLikes()
+  initSearch()
+  initUpload()
+  initReels()
+  loadProfile()
+})
