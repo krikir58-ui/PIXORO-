@@ -1,2 +1,0 @@
-async function loadProfile(){let u=localStorage.getItem('pix_user');let{data}=await sb.from('users').select('*').eq('username',u).single();if(data){document.getElementById('p_username').innerText=data.username;document.getElementById('p_bio').innerText=data.bio||'No bio';}}
-async function updateProfile(){let u=localStorage.getItem('pix_user');let b=document.getElementById('edit_bio').value;let{error}=await sb.from('users').update({bio:b}).eq('username',u);if(error)return alert(error.message);alert("Profile Update OK da ✅");loadProfile();}
