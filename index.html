@@ -1,60 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pixoro</title>
-<link rel="preload" as="image" href="https://i.pravatar.cc/150?u=giri">
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PIXORO</title>
 <style>
-  *{ -webkit-tap-highlight-color: transparent }
-  #splash{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity.25s}
- .story-ring{background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);padding:2px;border-radius:50%}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;display:flex;justify-content:center}
+#app{width:100%;max-width:470px;min-height:100vh;background:#fff;position:relative}
+#splash{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center}
+.logo{width:80px;height:80px;border-radius:20px;background:linear-gradient(45deg,#feda75,#d62976,#4f5bd5);display:flex;align-items:center;justify-content:center;font-size:36px;color:#fff}
+.ring{background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);padding:2px;border-radius:50%}
+.top{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #efefef;display:flex;justify-content:space-between;padding:10px 12px}
+.stories{display:flex;gap:12px;padding:10px;overflow-x:auto;border-bottom:1px solid #efefef}
+.post{border-bottom:1px solid #efefef}
+.icons{display:flex;gap:14px;font-size:22px;padding:10px 12px}
+.counts{padding:0 12px 10px;font-size:14px;font-weight:600}
+.bottom{position:fixed;bottom:0;width:100%;max-width:470px;background:#000;color:#fff;display:flex;justify-content:space-around;padding:12px 0;font-size:20px;z-index:10}
+#noti{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#000;color:#fff;font-size:12px;padding:6px 14px;border-radius:20px;z-index:100;display:none}
+.modal{position:fixed;inset:0;z-index:50;display:none}.modal.on{display:flex}
 </style>
-</head>
-<body class="bg-white flex justify-center">
-
-<!-- SPLASH 0.4 SEC MATTUM -->
-<div id="splash"><div class="w-[80px] h-[80px] rounded-[20px] bg-gradient-to-br from-[#feda75] via-[#d62976] to-[#4f5bd5] flex items-center justify-center"><i class="fa-solid fa-camera text-white text-[36px]"></i></div></div>
-
-<div id="mainApp" class="w-full max-w-[470px] bg-white min-h-screen">
-<header class="sticky top-0 z-40 bg-white border-b px-4 py-2 flex justify-between items-center"><h1 class="font-black text-xl">PIXORO 📸</h1><div class="flex gap-4"><i class="fa-regular fa-heart"></i><i class="fa-regular fa-paper-plane"></i></div></header>
-<div class="flex gap-3 p-2 overflow-x-auto border-b" id="stories"></div>
-<div class="p-2 flex gap-2 border-b"><img src="https://i.pravatar.cc/150?u=giri" class="w-8 h-8 rounded-full"><input id="quickCaption" placeholder="What's on your mind?" class="flex-1 outline-none text-sm"><button onclick="openUpload()" class="bg-[#0095f6] text-white px-4 py-1 rounded-full text-xs font-bold">Post</button></div>
-<div id="feed" class="pb-16"></div>
-<nav class="fixed bottom-0 w-full max-w-[470px] bg-black text-white flex justify-around py-3 text-xl z-40"><i class="fa-solid fa-house"></i><i class="fa-solid fa-magnifying-glass"></i><div onclick="openUpload()" class="border border-white px-2 rounded"><i class="fa-solid fa-plus"></i></div><i class="fa-solid fa-clapperboard"></i><i class="fa-regular fa-user"></i></nav>
-<div id="uploadModal" class="hidden fixed inset-0 bg-white z-[100] flex flex-col"><div class="flex justify-between p-3 border-b"><button onclick="closeUpload()">✕</button><h3 class="font-bold">New post</h3><button onclick="shareNow()" class="text-[#0095f6] font-bold">Share</button></div><div class="flex-1 bg-black flex items-center justify-center"><img id="previewImg" class="hidden w-full h-full object-contain"><p id="noPhoto" class="text-white/50 text-sm">Tap + to select photo</p></div><textarea id="captionInput" placeholder="Caption @mention #tag" class="p-3 outline-none text-sm border-t" rows="2"></textarea></div>
-<div id="profileModal" class="hidden fixed inset-0 bg-black/90 z-[110] flex items-center justify-center p-4" onclick="this.classList.add('hidden')"><img id="profileModalImg" class="w-[280px] h-[280px] rounded-full border-4 border-white"></div>
-<div id="noti" class="hidden fixed top-16 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-4 py-2 rounded-full z-[200]"></div>
+</head><body>
+<div id="splash"><div class="logo">📸</div></div>
+<div id="app">
+<div class="top"><b>PIXORO 📸</b><div>❤️ ✈️</div></div>
+<div class="stories" id="stories"></div>
+<div style="display:flex;gap:8px;padding:10px;border-bottom:1px solid #efefef"><img src="https://i.pravatar.cc/80?u=giri" style="width:32px;height:32px;border-radius:50%"><input id="quickCap" placeholder="What's on mind? @mention" style="flex:1;border:0;outline:none;font-size:14px"><button onclick="openUpload()" style="background:#0095f6;color:#fff;border:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700">Post</button></div>
+<div id="feed" style="padding-bottom:60px"></div>
+<div class="bottom"><span>🏠</span><span>🔍</span><span onclick="openUpload()" style="border:1px solid #fff;padding:2px 10px;border-radius:6px">+</span><span>🎬</span><span>👤</span></div>
+<div id="uploadModal" class="modal" style="background:#fff;flex-direction:column"><div style="display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #efefef"><span onclick="closeUpload()">✕</span><b>New post</b><span onclick="shareNow()" style="color:#0095f6;font-weight:700">Share</span></div><div style="flex:1;background:#000;display:flex;align-items:center;justify-content:center;position:relative" onclick="document.getElementById('fileInput').click()"><img id="previewImg" style="display:none;width:100%;height:100%;object-fit:contain"><p id="noPhoto" style="color:#fff;opacity:.6;font-size:13px">Tap + to select photo</p></div><textarea id="captionInput" placeholder="Caption @mention #tag" style="padding:10px;border:0;outline:none;font-size:14px;border-top:1px solid #efefef" rows="2"></textarea></div>
+<div id="profileModal" class="modal" style="background:rgba(0,0,0,.9);align-items:center;justify-content:center;padding:20px" onclick="this.classList.remove('on')"><img id="profileModalImg" style="width:280px;height:280px;border-radius:50%;border:4px solid #fff"></div>
+<div id="noti"></div>
 <input type="file" id="fileInput" accept="image/*" hidden>
 </div>
-
 <script>
-// === 1. INSTANT LOAD - NO WAIT ===
-let posts = JSON.parse(localStorage.getItem('pixoro_posts')||'[]');
-let likes = JSON.parse(localStorage.getItem('pixoro_likes')||'{}');
-let follows = JSON.parse(localStorage.getItem('pixoro_follows')||'{}');
-if(posts.length==0){ posts=[{id:1,img:'https://picsum.photos/400/400?random=1',caption:'PIXORO speed mass 🔥 @whitezzz__04',user:'girikri',likes:99,time:'now',tags:[]}]; }
-
-// Render immediately - don't wait
-function renderFeed(){ document.getElementById('feed').innerHTML=posts.map(p=>`
-<div class="border-b"><div class="flex items-center gap-2 p-3" onclick="openProfile('https://i.pravatar.cc/150?u=${p.user}')"><div class="story-ring p-[2px]"><img loading="lazy" src="https://i.pravatar.cc/80?u=${p.user}" class="w-7 h-7 rounded-full bg-white p-[2px]"></div><span class="text-sm font-semibold">${p.user}</span></div><img loading="lazy" src="${p.img}" class="w-full aspect-square object-cover" ondblclick="likePost(${p.id})"><div class="p-3 flex gap-4 text-xl"><i id="heart-${p.id}" onclick="likePost(${p.id})" class="${likes[p.id]?'fa-solid fa-heart text-red-500':'fa-regular fa-heart'}"></i><i class="fa-regular fa-paper-plane" onclick="navigator.clipboard.writeText(location.href)"></i></div><p class="px-3 pb-3 text-sm"><b>${p.user}</b> ${p.caption}</p></div>`).join(''); }
-function renderStories(){ document.getElementById('stories').innerHTML=['whitezzz__04','don_deepak_k_','sweety_sw'].map(u=>`<div class="flex flex-col items-center min-w-[60px]"><div class="story-ring"><img loading="lazy" src="https://i.pravatar.cc/80?u=${u}" class="w-14 h-14 rounded-full bg-white p-[2px]"></div><span class="text-[10px]">${u.slice(0,8)}</span></div>`).join(''); }
+let posts=JSON.parse(localStorage.getItem('pixoro_posts')||'[]');
+let likes=JSON.parse(localStorage.getItem('pixoro_likes')||'{}');
+let follows=JSON.parse(localStorage.getItem('pixoro_follows')||'{}');
+let views=JSON.parse(localStorage.getItem('pixoro_views')||'{}');
+let storyViews=JSON.parse(localStorage.getItem('pixoro_sviews')||'{}');
+if(posts.length==0){posts=[{id:1,img:'https://picsum.photos/400/400?random=1',caption:'PIXORO speed mass da @whitezzz__04 🔥',user:'girikri',likes:128,views:542,time:'now'}];}
+function renderFeed(){
+ const f=document.getElementById('feed');
+ f.innerHTML=posts.map(p=>{
+  const v=(views[p.id]||p.views||0)+1; views[p.id]=v; localStorage.setItem('pixoro_views',JSON.stringify(views));
+  const isL=likes[p.id]; const isF=follows[p.user];
+  return `<div class="post">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px">
+   <div style="display:flex;gap:8px;align-items:center" onclick="openProfile('https://i.pravatar.cc/80?u=${p.user}')"><div class="ring"><img loading="eager" src="https://i.pravatar.cc/80?u=${p.user}" style="width:32px;height:32px;border-radius:50%;background:#fff;padding:2px"></div><div><div style="font-size:14px;font-weight:600">${p.user} <span style="color:#0095f6;font-size:11px">${isF?'• Following':'• Follow'}</span></div><div style="font-size:10px;color:#888">${p.time} • ${v} views</div></div></div>
+   <span onclick="toggleFollow('${p.user}')">⋯</span>
+  </div>
+  <img loading="eager" src="${p.img}" style="width:100%;aspect-ratio:1;object-fit:cover" ondblclick="likePost(${p.id})">
+  <div class="icons"><span onclick="likePost(${p.id})">${isL?'❤️':'🤍'}</span><span>💬</span><span onclick="sharePost()">✈️</span><span style="margin-left:auto" onclick="savePost(${p.id})">🔖</span></div>
+  <div class="counts"><span id="likeCount-${p.id}">${p.likes + (isL?1:0)} likes</span> • <span>${v} views</span> • <span>${(storyViews[p.user]||0)+12} story views</span><br><span style="font-weight:400"><b>${p.user}</b> ${p.caption}</span>
+  <div style="margin-top:6px;display:flex;gap:6px"><button onclick="toggleFollow('${p.user}')" style="font-size:11px;border:1px solid #ddd;padding:4px 10px;border-radius:20px;background:${isF?'#000':'#fff'};color:${isF?'#fff':'#000'}">${isF?'Following':'Follow'}</button><button onclick="likePost(${p.id})" style="font-size:11px;border:1px solid #ddd;padding:4px 10px;border-radius:20px">Like ❤️</button><button onclick="sharePost()" style="font-size:11px;border:1px solid #ddd;padding:4px 10px;border-radius:20px">Share</button></div>
+  </div></div>`
+ }).join('');
+ localStorage.setItem('pixoro_views',JSON.stringify(views));
+}
+function renderStories(){
+ const s=document.getElementById('stories');
+ const users=['whitezzz__04','don_deepak_k_','sweety_sw'];
+ s.innerHTML=users.map(u=>{
+  const sv=storyViews[u]||Math.floor(Math.random()*200)+50;
+  return `<div style="display:flex;flex-direction:column;align-items:center;min-width:60px" onclick="openStory('${u}')"><div class="ring"><img src="https://i.pravatar.cc/80?u=${u}" style="width:56px;height:56px;border-radius:50%;background:#fff;padding:2px"></div><span style="font-size:10px;margin-top:4px">${u.slice(0,8)}</span><span style="font-size:9px;color:#888">${sv} views</span></div>`
+ }).join('');
+}
+window.likePost=(id)=>{ likes[id]=!likes[id]; localStorage.setItem('pixoro_likes',JSON.stringify(likes)); renderFeed(); showNoti(likes[id]?'❤️ Liked • '+(posts.find(p=>p.id==id).likes+1)+' likes':'Unliked'); };
+window.toggleFollow=(u)=>{ follows[u]=!follows[u]; localStorage.setItem('pixoro_follows',JSON.stringify(follows)); renderFeed(); showNoti(follows[u]?'Following '+u:'Unfollowed'); };
+window.sharePost=()=>{ navigator.clipboard.writeText(location.href); showNoti('🔗 Link copied • Share count +1'); };
+window.savePost=()=>showNoti('Saved 🔖');
+window.openProfile=(img)=>{ document.getElementById('profileModalImg').src=img; document.getElementById('profileModal').classList.add('on'); };
+window.openStory=(u)=>{ storyViews[u]=(storyViews[u]||50)+1; localStorage.setItem('pixoro_sviews',JSON.stringify(storyViews)); showNoti(`👁️ ${u} story • ${storyViews[u]} views`); renderStories(); };
+window.openUpload=()=>document.getElementById('uploadModal').classList.add('on');
+window.closeUpload=()=>document.getElementById('uploadModal').classList.remove('on');
+document.getElementById('fileInput').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ window._img=ev.target.result; document.getElementById('previewImg').src=ev.target.result; document.getElementById('previewImg').style.display='block'; document.getElementById('noPhoto').style.display='none'; openUpload(); }; r.readAsDataURL(f); });
+window.shareNow=()=>{ const cap=document.getElementById('captionInput').value||document.getElementById('quickCap').value||'Mass post'; const img=window._img||document.getElementById('previewImg').src; if(!img || img=='') return alert('Photo select pannu da!'); posts.unshift({id:Date.now(), img, caption:cap, user:'girikri', likes:0, views:1, time:'now'}); localStorage.setItem('pixoro_posts',JSON.stringify(posts)); closeUpload(); renderFeed(); showNoti('Posted 🚀'); window._img=null; };
+function showNoti(t){ const n=document.getElementById('noti'); n.textContent=t; n.style.display='block'; setTimeout(()=>n.style.display='none',1800); }
+// SPEED - render instantly then hide splash in 300ms
 renderFeed(); renderStories();
-
-// Splash hide in 400ms - Instagram speed
-setTimeout(()=>{ const s=document.getElementById('splash'); s.style.opacity='0'; setTimeout(()=>s.remove(),250); }, 400);
-
-document.getElementById('fileInput').addEventListener('change', e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ document.getElementById('previewImg').src=ev.target.result; document.getElementById('previewImg').classList.remove('hidden'); document.getElementById('noPhoto').classList.add('hidden'); openUpload(); }; r.readAsDataURL(f); });
-window.openUpload=()=>document.getElementById('uploadModal').classList.remove('hidden');
-window.closeUpload=()=>document.getElementById('uploadModal').classList.add('hidden');
-window.shareNow=()=>{ const cap=document.getElementById('captionInput').value||document.getElementById('quickCaption').value||'Mass post'; const img=document.getElementById('previewImg').src; if(!img) return alert('Photo select pannu da!'); posts.unshift({id:Date.now(),img, caption:cap, user:'girikri', likes:0, time:'now'}); localStorage.setItem('pixoro_posts', JSON.stringify(posts)); closeUpload(); renderFeed(); showNoti('Posted 🚀'); };
-window.likePost=(id)=>{ likes[id]=!likes[id]; localStorage.setItem('pixoro_likes', JSON.stringify(likes)); renderFeed(); };
-window.openProfile=(img)=>{ document.getElementById('profileModalImg').src=img; document.getElementById('profileModal').classList.remove('hidden'); };
-function showNoti(t){ const n=document.getElementById('noti'); n.textContent=t; n.classList.remove('hidden'); setTimeout(()=>n.classList.add('hidden'),1500); }
-
-// Service worker for cache - makes 2nd open instant
-if('serviceWorker' in navigator){ navigator.serviceWorker.register('data:text/javascript;base64,'+btoa('self.addEventListener("fetch",e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});')); }
-</script>
-</body>
-</html>
+setTimeout(()=>{ const s=document.getElementById('splash'); s.style.opacity='0'; s.style.transition='opacity.2s'; setTimeout(()=>s.remove(),200); },300);
+</script></body></html>
