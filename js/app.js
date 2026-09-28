@@ -5,13 +5,15 @@ import { initLikes } from './likes.js'
 import { initSearch } from './search.js'
 import { initUpload } from './upload.js'
 import { initReels } from './reels.js'
+import { loadProfile } from './profile.js'
 
-console.log('PIXORO Full Instagram Ready da Giri 🔥')
+console.log('PIXORO Full Ready da Giri 🔥')
 
-initAuth()      // Login/Signup
-loadFeed()      // Home Feed
-loadStories()   // Stories
-initLikes()     // Like ❤️
-initSearch()    // Search 🔍
-initUpload()    // Upload
-initReels()     // Reels
+initAuth()
+loadFeed()
+loadStories()
+initLikes()
+initSearch()
+initUpload()
+initReels()
+loadProfile()
