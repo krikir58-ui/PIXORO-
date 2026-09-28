@@ -6,12 +6,12 @@ import { initSearch } from './search.js'
 import { initUpload } from './upload.js'
 import { initReels } from './reels.js'
 
-console.log('PIXORO Full Ready da Giri 🔥')
+console.log('PIXORO Full Instagram Ready da Giri 🔥')
 
-initAuth()
-loadFeed()
-loadStories()
-initLikes()
-initSearch()
-initUpload()
-initReels()
+initAuth()      // Login/Signup
+loadFeed()      // Home Feed
+loadStories()   // Stories
+initLikes()     // Like ❤️
+initSearch()    // Search 🔍
+initUpload()    // Upload
+initReels()     // Reels
