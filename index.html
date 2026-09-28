@@ -1,220 +1,72 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO MASS</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>PIXORO</title>
 <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:'Poppins',sans-serif;background:#fff;display:flex;justify-content:center}
+body{font-family:'Poppins',sans-serif;background:#fff;display:flex;justify-content:center;overflow-x:hidden}
 #app{width:100%;max-width:470px;min-height:100vh;background:#fff;position:relative}
-.insta{font-family:'Grand Hotel',cursive;font-size:32px;letter-spacing:1px}
+.insta{font-family:'Grand Hotel',cursive;font-size:34px}
 #splash{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center}
-.logo{width:80px;height:80px;border-radius:22px;background:linear-gradient(45deg,#feda75,#d62976,#4f5bd5);display:flex;align-items:center;justify-content:center;font-size:36px;color:#fff;animation:pop.6s}
-@keyframes pop{0%{transform:scale(.5)}100%{transform:scale(1)}}
-.ring{background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);padding:2.5px;border-radius:50%}
-.top{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #efefef;display:flex;justify-content:space-between;padding:10px 12px;align-items:center}
+.logo{width:80px;height:80px;border-radius:22px;background:linear-gradient(45deg,#feda75,#d62976,#4f5bd5);display:flex;align-items:center;justify-content:center;font-size:36px;color:#fff}
+.ring{background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);padding:2.5px;border-radius:50%;display:inline-block}
+.top{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #efefef;display:flex;justify-content:space-between;padding:10px 12px;align-items:center}
 .stories{display:flex;gap:14px;padding:12px;overflow-x:auto;border-bottom:1px solid #efefef}
-.post{border-bottom:1px solid #efefef}
-.icons{display:flex;gap:16px;font-size:24px;padding:10px 12px}
-.count{padding:0 12px 12px;font-size:14px;font-weight:700;line-height:18px}
-.count span{font-weight:400}
-.bottom{position:fixed;bottom:0;width:100%;max-width:470px;background:#000;color:#fff;display:flex;justify-content:space-around;padding:12px 0;font-size:22px;z-index:10}
-.modal{position:fixed;inset:0;z-index:100;display:none;background:#fff;overflow-y:auto}.modal.on{display:flex;flex-direction:column}
+.post{border-bottom:1px solid #efefef;background:#fff}
+.icons{display:flex;gap:16px;font-size:24px;padding:10px 12px;align-items:center}
+.count{padding:0 12px 12px;font-size:13px;font-weight:700}
+.bottom{position:fixed;bottom:0;width:100%;max-width:470px;background:#000;color:#fff;display:flex;justify-content:space-around;padding:12px 0;font-size:22px;z-index:20}
+.modal{position:fixed;inset:0;z-index:100;display:none;background:#fff;flex-direction:column}.modal.on{display:flex}
 #noti{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#000;color:#fff;font-size:12px;padding:7px 16px;border-radius:20px;z-index:200;display:none}
-.badge{background:#efefef;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.badge{background:#efefef;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700}
+img{display:block;max-width:100%}
 </style>
 </head><body>
 <div id="splash"><div class="logo">📸</div></div>
 <div id="app">
-<div class="top"><div class="insta">Pixoro</div><div style="display:flex;gap:14px;font-size:20px">❤️ ✈️</div></div>
+<div class="top"><div class="insta">Pixoro</div><div style="display:flex;gap:14px">❤️ ✈️</div></div>
 <div class="stories" id="stories"></div>
-<div style="display:flex;gap:8px;padding:12px;border-bottom:1px solid #efefef;align-items:center"><img src="https://i.pravatar.cc/80?u=giri" style="width:32px;height:32px;border-radius:50%"><input id="quickCap" placeholder="What's on mind? @mention" style="flex:1;border:0;outline:none;font-size:14px;font-family:Poppins"><button onclick="openUpload()" style="background:#0095f6;color:#fff;border:0;padding:7px 16px;border-radius:20px;font-size:12px;font-weight:700">Post</button></div>
+<div style="display:flex;gap:8px;padding:12px;border-bottom:1px solid #efefef;align-items:center"><img src="https://i.pravatar.cc/80?u=giri" style="width:32px;height:32px;border-radius:50%"><input id="quickCap" placeholder="What's on mind?" style="flex:1;border:0;outline:none;font-size:14px;font-family:Poppins"><button onclick="openUpload()" style="background:#0095f6;color:#fff;border:0;padding:7px 16px;border-radius:20px;font-size:12px;font-weight:700">Post</button></div>
 <div id="feed" style="padding-bottom:65px"></div>
-<div class="bottom"><span onclick="showHome()">🏠</span><span>🔍</span><span onclick="openUpload()" style="border:1px solid #fff;padding:2px 14px;border-radius:8px">+</span><span>🎬</span><span onclick="openProfilePage('girikri')">👤</span></div>
+<div class="bottom"><span>🏠</span><span>🔍</span><span onclick="openUpload()" style="border:1px solid #fff;padding:2px 14px;border-radius:8px">+</span><span>🎬</span><span onclick="openProfilePage('girikri')">👤</span></div>
 
-<!-- UPLOAD -->
-<div id="uploadModal" class="modal"><div style="display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #efefef"><span onclick="closeUpload()">✕</span><b>New post</b><span onclick="shareNow()" style="color:#0095f6;font-weight:700">Share</span></div><div style="flex:1;background:#000;display:flex;align-items:center;justify-content:center" onclick="document.getElementById('fileInput').click()"><img id="previewImg" style="display:none;width:100%;height:100%;object-fit:contain"><p id="noPhoto" style="color:#fff;opacity:.6">Tap + to select</p></div><textarea id="captionInput" placeholder="Caption @mention #tag" style="padding:12px;border:0;outline:none;font-size:14px;border-top:1px solid #efefef" rows="2"></textarea></div>
+<!-- UPLOAD MODAL - FIXED -->
+<div id="uploadModal" class="modal"><div style="display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #efefef"><span onclick="closeUpload()">✕</span><b>New post</b><span onclick="shareNow()" style="color:#0095f6;font-weight:700">Share</span></div><div style="flex:1;background:#111;display:flex;align-items:center;justify-content:center" onclick="document.getElementById('fileInput').click()"><div id="previewBox" style="display:none;width:100%;height:100%"><img id="previewImg" style="width:100%;height:100%;object-fit:contain"></div><p id="noPhoto" style="color:#fff;opacity:.7">Tap + to select photo</p></div><textarea id="captionInput" placeholder="Caption @mention #tag" style="padding:12px;border:0;outline:none;font-size:14px;border-top:1px solid #efefef" rows="2"></textarea></div>
 
-<!-- PROFILE MASS PAGE -->
-<div id="profilePage" class="modal" style="background:#fff">
-<div style="padding:12px;border-bottom:1px solid #efefef;display:flex;justify-content:space-between;align-items:center"><span onclick="closeProfilePage()" style="font-size:20px">←</span><b id="pUser" style="font-family:Grand Hotel;font-size:24px">girikri</b><span>⋯</span></div>
-<div style="padding:16px;display:flex;gap:16px;align-items:center">
-<div class="ring"><img id="pImg" src="" style="width:86px;height:86px;border-radius:50%;background:#fff;padding:3px"></div>
-<div style="flex:1;display:flex;justify-content:space-around;text-align:center">
-<div><div id="pPosts" style="font-weight:700;font-size:16px">0</div><div style="font-size:12px">Posts</div></div>
-<div onclick="showFollowers()"><div id="pFollowers" style="font-weight:700;font-size:16px">0</div><div style="font-size:12px">Followers</div></div>
-<div onclick="showFollowing()"><div id="pFollowing" style="font-weight:700;font-size:16px">0</div><div style="font-size:12px">Following</div></div>
-</div>
-</div>
-<div style="padding:0 16px">
-<p style="font-weight:700;font-size:14px" id="pName">Giri 🔥</p>
-<p style="font-size:13px;color:#555">Coimbatore boy 😎 | PIXORO Founder | DM for collab</p>
-<p style="font-size:12px;margin-top:6px"><b>1.2K</b> Likes • <b id="pViews">0</b> Views • <b id="pStoryV">0</b> Story views</p>
-<div style="display:flex;gap:8px;margin-top:12px">
-<button id="followBtn" onclick="toggleFollow(currentP)" style="flex:1;background:#000;color:#fff;border:0;padding:8px;border-radius:8px;font-weight:700;font-size:13px">Follow</button>
-<button style="flex:1;background:#efefef;border:0;padding:8px;border-radius:8px;font-weight:700;font-size:13px">Message</button>
-<button style="background:#efefef;border:0;padding:8px 12px;border-radius:8px">👤+</button>
-</div>
-<div id="followReq" style="display:none;margin-top:10px;background:#ffedf0;padding:8px 12px;border-radius:8px;font-size:12px">🔔 <b>whitezzz__04</b> requested to follow you <span style="color:#0095f6;font-weight:700;float:right">Accept / Reject</span></div>
-</div>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:16px" id="pGrid"></div>
+<!-- PROFILE PAGE -->
+<div id="profilePage" class="modal" style="background:#fff;overflow-y:auto"><div style="padding:12px;border-bottom:1px solid #efefef;display:flex;justify-content:space-between"><span onclick="closeProfilePage()" style="font-size:20px">←</span><b id="pUser" style="font-family:Grand Hotel;font-size:24px">girikri</b><span>⋯</span></div><div style="padding:16px;display:flex;gap:16px;align-items:center"><div class="ring"><img id="pImg" src="https://i.pravatar.cc/150?u=giri" style="width:86px;height:86px;border-radius:50%;background:#fff;padding:3px"></div><div style="flex:1;display:flex;justify-content:space-around;text-align:center"><div><div id="pPosts" style="font-weight:700">0</div><div style="font-size:12px">Posts</div></div><div><div id="pFollowers" style="font-weight:700">128</div><div style="font-size:12px">Followers</div></div><div><div id="pFollowing" style="font-weight:700">0</div><div style="font-size:12px">Following</div></div></div></div><div style="padding:0 16px"><p style="font-weight:700;font-size:14px" id="pName">Giri 🔥</p><p style="font-size:13px;color:#555">Coimbatore | PIXORO Founder</p><p style="font-size:12px;margin-top:6px"><b id="pViews">0</b> Views • <b id="pLikes">0</b> Likes</p><div style="display:flex;gap:8px;margin-top:12px"><button id="followBtn" onclick="toggleFollow(currentP)" style="flex:1;background:#000;color:#fff;border:0;padding:8px;border-radius:8px;font-weight:700">Follow</button><button style="flex:1;background:#efefef;border:0;padding:8px;border-radius:8px;font-weight:700">Message</button></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:16px" id="pGrid"></div></div>
+<div id="noti"></div><input type="file" id="fileInput" accept="image/*" hidden>
 </div>
 
-<div id="noti"></div>
-<input type="file" id="fileInput" accept="image/*" hidden>
-</div>
 <script>
 let posts=JSON.parse(localStorage.getItem('pixoro_posts')||'[]');
 let likes=JSON.parse(localStorage.getItem('pixoro_likes')||'{}');
 let follows=JSON.parse(localStorage.getItem('pixoro_follows')||'{}');
-let views=JSON.parse(localStorage.getItem('pixoro_views')||'{}'); // oru post ku yaar yaar paathanga
-let viewedIds=JSON.parse(localStorage.getItem('pixoro_viewedIds')||'[]'); // naan paatha list
-let storyViewed=JSON.parse(localStorage.getItem('pixoro_storyViewed')||'{}');
-let deviceId = localStorage.getItem('pixoro_device') || 'user_'+Date.now();
-localStorage.setItem('pixoro_device', deviceId);
-
-if(posts.length==0){posts=[{id:1,img:'https://picsum.photos/400/400?random=1',caption:'Mass post @whitezzz__04',user:'girikri',likes:0,views:0,viewers:[],time:'now'}];}
-
+let viewedIds=JSON.parse(localStorage.getItem('pixoro_viewedIds')||'[]');
+let deviceId=localStorage.getItem('pixoro_device')||'dev_'+Date.now(); localStorage.setItem('pixoro_device',deviceId);
+if(posts.length==0){posts=[{id:1,img:'https://picsum.photos/seed/pixoro1/600/600',caption:'Mass entry da 🔥 @whitezzz__04',user:'girikri',likes:128,viewers:[],time:'now'},{id:2,img:'https://picsum.photos/seed/pixoro2/600/600',caption:'Coimbatore vibes 😎',user:'whitezzz__04',likes:89,viewers:[],time:'2h'}]; localStorage.setItem('pixoro_posts',JSON.stringify(posts));}
+let currentP='girikri';
 function renderFeed(){
- const f=document.getElementById('feed');
- f.innerHTML=posts.map(p=>{
-  const totalViews = (p.viewers?.length||0) + (views[p.id]?.length||0);
-  const totalLikes = p.likes + (likes[p.id]?1:0);
-  const isL = likes[p.id]; const isF = follows[p.user];
-  return `<div class="post" data-id="${p.id}">
-  <div style="display:flex;justify-content:space-between;padding:10px 12px">
-   <div style="display:flex;gap:8px;align-items:center" onclick="openProfilePage('${p.user}')"><div class="ring"><img src="https://i.pravatar.cc/80?u=${p.user}" style="width:32px;height:32px;border-radius:50%;padding:2px;background:#fff"></div><div><div style="font-size:14px;font-weight:700">${p.user} <span style="color:#0095f6;font-size:11px">${isF?'• Following':'• Requested'}</span></div><div style="font-size:10px;color:#888">${p.time} • ${totalViews} views</div></div></div><span>⋯</span>
-  </div>
-  <img src="${p.img}" style="width:100%;aspect-ratio:1;object-fit:cover" ondblclick="likePost(${p.id})">
-  <div class="icons"><span onclick="likePost(${p.id})">${isL?'❤️':'🤍'}</span><span>💬</span><span onclick="sharePost()">✈️</span><span style="margin-left:auto">🔖</span></div>
-  <div class="count"><span id="like-${p.id}">${totalLikes} likes</span> • <span id="view-${p.id}">${totalViews} views</span><br><b>${p.user}</b> ${p.caption}
-  <div style="display:flex;gap:6px;margin-top:8px"><span class="badge" onclick="likePost(${p.id})">❤️ ${totalLikes}</span><span class="badge">👁️ ${totalViews}</span><span class="badge" onclick="toggleFollow('${p.user}')">${isF?'Following':'Follow +1'}</span></div>
-  </div></div>`
- }).join('');
- // INSTAGRAM VIEW LOGIC - post 50% screen la varumbothu tha view count da!
- observePosts();
+ document.getElementById('feed').innerHTML=posts.map(p=>{
+  const v=p.viewers?.length||0; const l=p.likes+(likes[p.id]?1:0); const isL=likes[p.id]; const isF=follows[p.user];
+  return `<div class="post" data-id="${p.id}"><div style="display:flex;justify-content:space-between;padding:10px 12px"><div style="display:flex;gap:8px;align-items:center" onclick="openProfilePage('${p.user}')"><div class="ring"><img src="https://i.pravatar.cc/80?u=${p.user}" style="width:32px;height:32px;border-radius:50%;padding:2px;background:#fff"></div><div><div style="font-size:14px;font-weight:700">${p.user} ${isF?'<span style=color:#0095f6;font-size:11px>• Following</span>':''}</div><div style="font-size:10px;color:#888">${p.time} • ${v} views</div></div></div><span>⋯</span></div><img src="${p.img}" loading="eager" style="width:100%;aspect-ratio:1;object-fit:cover;background:#f5f5f5" ondblclick="likePost(${p.id})"><div class="icons"><span onclick="likePost(${p.id})">${isL?'❤️':'🤍'}</span><span>💬</span><span onclick="sharePost()">✈️</span><span style="margin-left:auto">🔖</span></div><div class="count"><span id="like-${p.id}">${l} likes</span> • <span id="view-${p.id}">${v} views</span><br><b>${p.user}</b> ${p.caption}<br><div style="display:flex;gap:6px;margin-top:8px"><span class="badge" onclick="likePost(${p.id})">❤️ Like ${l}</span><span class="badge">👁️ View ${v}</span><span class="badge" onclick="toggleFollow('${p.user}')">${isF?'Following':'Follow'}</span></div></div></div>`;
+ }).join(''); observePosts();
 }
-
 function observePosts(){
- const observer = new IntersectionObserver((entries)=>{
-  entries.forEach(entry=>{
-   if(entry.isIntersecting){
-    const id = parseInt(entry.target.dataset.id);
-    const p = posts.find(x=>x.id==id);
-    if(!p) return;
-    if(!p.viewers) p.viewers=[];
-    // oru device ku oru time tha view varanum da Giri!
-    if(!viewedIds.includes(id) &&!p.viewers.includes(deviceId)){
-     p.viewers.push(deviceId);
-     viewedIds.push(id);
-     localStorage.setItem('pixoro_posts',JSON.stringify(posts));
-     localStorage.setItem('pixoro_viewedIds',JSON.stringify(viewedIds));
-     const vEl = document.getElementById(`view-${id}`);
-     if(vEl) vEl.textContent = p.viewers.length + ' views';
-     showNoti(`👁️ +1 view • ${p.user} post paatha da!`);
-    }
-   }
-  });
- },{threshold:0.5}); // 50% post therinja tha view da - Instagram logic da!
- document.querySelectorAll('.post').forEach(p=>observer.observe(p));
+ const obs=new IntersectionObserver((es)=>{ es.forEach(e=>{ if(e.isIntersecting){ const id=parseInt(e.target.dataset.id); const p=posts.find(x=>x.id==id); if(!p.viewers) p.viewers=[]; if(!viewedIds.includes(id)&&!p.viewers.includes(deviceId)){ p.viewers.push(deviceId); viewedIds.push(id); localStorage.setItem('pixoro_posts',JSON.stringify(posts)); localStorage.setItem('pixoro_viewedIds',JSON.stringify(viewedIds)); document.getElementById(`view-${id}`).textContent=p.viewers.length+' views'; } } }); },{threshold:0.6}); document.querySelectorAll('.post').forEach(el=>obs.observe(el));
 }
-
-window.likePost=(id)=>{
- if(likes[id]){ showNoti('Already liked da - one time tha da!'); return; } // oru time tha like da!
- likes[id]=true; localStorage.setItem('pixoro_likes',JSON.stringify(likes));
- posts.find(p=>p.id==id).likes +=1;
- localStorage.setItem('pixoro_posts',JSON.stringify(posts));
- renderFeed(); showNoti('❤️ +1 like added da!');
-};
-
-window.toggleFollow=(u)=>{
- if(follows[u]){ showNoti('Already following da - one time tha!'); return; }
- follows[u]=true; // oru time tha follow count varum da!
- localStorage.setItem('pixoro_follows',JSON.stringify(follows));
- showNoti(`✅ Follow +1 • Following ${u} da!`);
- renderFeed(); openProfilePage(u);
-};
-
-window.openStory=(u)=>{
- if(storyViewed[u]){ showNoti(`Already viewed ${u} story da - one time tha!`); return; }
- storyViewed[u]=true;
- localStorage.setItem('pixoro_storyViewed',JSON.stringify(storyViewed));
- // story views +1
- let sv = JSON.parse(localStorage.getItem('pixoro_sviews')||'{}');
- sv[u] = (sv[u]||87)+1;
- localStorage.setItem('pixoro_sviews',JSON.stringify(sv));
- renderStories(); showNoti(`👁️ ${u} story +1 view da!`);
-};
-
-//... matha functions same than da Giri
-
-function renderStories(){
- const s=document.getElementById('stories');
- const users=['whitezzz__04','don_deepak_k_','sweety_s'];
- s.innerHTML=users.map(u=>{
-  const sv = JSON.parse(localStorage.getItem('pixoro_sviews')||'{}')[u]||50;
-  const viewed = storyViewed[u]? 'opacity:.5' : '';
-  return `<div style="display:flex;flex-direction:column;align-items:center;min-width:64px;${viewed}" onclick="openStory('${u}')"><div class="ring"><img src="https://i.pravatar.cc/80?u=${u}" style="width:60px;height:60px;border-radius:50%;padding:3px;background:#fff"></div><span style="font-size:11px">${u.slice(0,9)} ${storyViewed[u]?'✓':''}</span><span style="font-size:10px;color:#888">${sv} views</span></div>`
- }).join('');
-}
-
-function renderFeed(){
- const f=document.getElementById('feed');
- f.innerHTML=posts.map(p=>{
-  const v=(views[p.id]||p.views||0)+1; views[p.id]=v;
-  const isL=likes[p.id]; const isF=follows[p.user];
-  const totalLikes=p.likes + (isL?1:0);
-  return `<div class="post">
-  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px">
-   <div style="display:flex;gap:8px;align-items:center" onclick="openProfilePage('${p.user}')"><div class="ring"><img src="https://i.pravatar.cc/80?u=${p.user}" style="width:32px;height:32px;border-radius:50%;background:#fff;padding:2px"></div><div><div style="font-size:14px;font-weight:700">${p.user} <span style="color:#0095f6;font-size:11px">${isF?'• Following':'• Follow'}</span></div><div style="font-size:10px;color:#888">${p.time} • ${v} views</div></div></div>
-   <span>⋯</span>
-  </div>
-  <img src="${p.img}" style="width:100%;aspect-ratio:1;object-fit:cover" ondblclick="likePost(${p.id})">
-  <div class="icons"><span onclick="likePost(${p.id})">${isL?'❤️':'🤍'}</span><span onclick="focusComment(${p.id})">💬</span><span onclick="sharePost()">✈️</span><span style="margin-left:auto" onclick="savePost()">🔖</span></div>
-  <div class="count">${totalLikes} likes • ${v} views • 12 story views<br><span><b>${p.user}</b> ${p.caption}</span><br>
-  <div style="display:flex;gap:6px;margin-top:8px"><span class="badge" onclick="likePost(${p.id})">❤️ Like ${totalLikes}</span><span class="badge">💬 Comment</span><span class="badge" onclick="sharePost()">✈️ Share</span><span class="badge" onclick="openProfilePage('${p.user}')">👤 Profile</span></div>
-  </div></div>`
- }).join('');
- localStorage.setItem('pixoro_views',JSON.stringify(views));
-}
-function renderStories(){
- const s=document.getElementById('stories');
- const users=['whitezzz__04','don_deepak_k_','sweety_s'];
- s.innerHTML=users.map(u=>{
-  const sv=storyViews[u]||Math.floor(Math.random()*100)+40;
-  return `<div style="display:flex;flex-direction:column;align-items:center;min-width:64px" onclick="openStory('${u}')"><div class="ring"><img src="https://i.pravatar.cc/80?u=${u}" style="width:60px;height:60px;border-radius:50%;background:#fff;padding:3px"></div><span style="font-size:11px;margin-top:4px">${u.slice(0,9)}</span><span style="font-size:10px;color:#888">${sv} views</span></div>`
- }).join('');
-}
-
-window.openProfilePage=(user)=>{
- currentP=user; document.getElementById('profilePage').classList.add('on');
- document.getElementById('pUser').innerText=user; document.getElementById('pImg').src=`https://i.pravatar.cc/150?u=${user}`;
- const userPosts=posts.filter(p=>p.user==user);
- document.getElementById('pPosts').innerText=userPosts.length;
- document.getElementById('pFollowing').innerText=Object.keys(follows).length;
- document.getElementById('pFollowers').innerText=(followersCount[user]||128) + (follows[user]?1:0);
- let totalV=0, totalL=0; userPosts.forEach(p=>{ totalV+=views[p.id]||p.views||0; totalL+=p.likes+(likes[p.id]?1:0); });
- document.getElementById('pViews').innerText=totalV; document.getElementById('pName').innerText=user+' 🔥';
- document.getElementById('pStoryV').innerText=storyViews[user]||89;
- document.getElementById('pGrid').innerHTML=userPosts.map(p=>`<img src="${p.img}" style="width:100%;aspect-ratio:1;object-fit:cover">`).join('') || '<p style="grid-column:1/4;text-align:center;padding:20px;color:#999">No posts yet</p>';
- document.getElementById('followBtn').innerText=follows[user]?'Following':'Follow'; document.getElementById('followBtn').style.background=follows[user]?'#efefef':'#000'; document.getElementById('followBtn').style.color=follows[user]?'#000':'#fff';
- document.getElementById('followReq').style.display=user=='girikri'?'block':'none';
-}
+function renderStories(){ document.getElementById('stories').innerHTML=['whitezzz__04','don_deepak_k_','sweety_sw'].map(u=>`<div style="display:flex;flex-direction:column;align-items:center;min-width:64px" onclick="showNoti('Story viewed +1 👁️')"><div class="ring"><img src="https://i.pravatar.cc/80?u=${u}" style="width:60px;height:60px;border-radius:50%;padding:3px;background:#fff"></div><span style="font-size:11px;margin-top:4px">${u.slice(0,9)}</span><span style="font-size:10px;color:#888">50 views</span></div>`).join(''); }
+window.likePost=(id)=>{ if(likes[id]){ showNoti('Already liked - 1 time only!'); return; } likes[id]=true; localStorage.setItem('pixoro_likes',JSON.stringify(likes)); posts.find(p=>p.id==id).likes++; localStorage.setItem('pixoro_posts',JSON.stringify(posts)); renderFeed(); showNoti('❤️ +1 Like'); };
+window.toggleFollow=(u)=>{ if(follows[u]){ showNoti('Already following!'); return; } follows[u]=true; localStorage.setItem('pixoro_follows',JSON.stringify(follows)); renderFeed(); if(document.getElementById('profilePage').classList.contains('on')) openProfilePage(u); showNoti('Follow +1 ✅'); };
+window.openProfilePage=(u)=>{ currentP=u; document.getElementById('profilePage').classList.add('on'); document.getElementById('pUser').innerText=u; document.getElementById('pImg').src=`https://i.pravatar.cc/150?u=${u}`; const up=posts.filter(p=>p.user==u); document.getElementById('pPosts').innerText=up.length; let tv=0,tl=0; up.forEach(p=>{ tv+=p.viewers?.length||0; tl+=p.likes+(likes[p.id]?1:0); }); document.getElementById('pViews').innerText=tv; document.getElementById('pLikes').innerText=tl; document.getElementById('pFollowing').innerText=Object.keys(follows).length; document.getElementById('pFollowers').innerText=128+(follows[u]?1:0); document.getElementById('pGrid').innerHTML=up.map(p=>`<img src="${p.img}" style="width:100%;aspect-ratio:1;object-fit:cover;background:#f2f2f2">`).join('')||'<p style=grid-column:1/4;text-align:center;padding:20px;color:#999>No posts</p>'; document.getElementById('followBtn').innerText=follows[u]?'Following':'Follow'; };
 window.closeProfilePage=()=>document.getElementById('profilePage').classList.remove('on');
-window.showHome=()=>closeProfilePage();
-window.showFollowers=()=>showNoti('👥 Followers: 128 • girikri + 127 others');
-window.showFollowing=()=>showNoti('👤 Following: '+(Object.keys(follows).length)+' people');
-window.likePost=(id)=>{ likes[id]=!likes[id]; localStorage.setItem('pixoro_likes',JSON.stringify(likes)); renderFeed(); if(currentP) openProfilePage(currentP); showNoti(likes[id]?'❤️ Liked':'Unliked'); };
-window.toggleFollow=(u)=>{ const was=follows[u]; follows[u]=!follows[u]; if(!was) followersCount[u]=(followersCount[u]||128)+1; else followersCount[u]=(followersCount[u]||129)-1; localStorage.setItem('pixoro_follows',JSON.stringify(follows)); localStorage.setItem('pixoro_followers',JSON.stringify(followersCount)); renderFeed(); openProfilePage(u); showNoti(follows[u]?'✅ Follow request sent • Following now':'Unfollowed'); };
-window.sharePost=()=>{ navigator.clipboard.writeText(location.href); showNoti('🔗 Link copied • Share +1'); };
-window.savePost=()=>showNoti('Saved 🔖');
-window.openStory=(u)=>{ storyViews[u]=(storyViews[u]||50)+1; localStorage.setItem('pixoro_sviews',JSON.stringify(storyViews)); renderStories(); showNoti(`👁️ ${u} story • ${storyViews[u]} views`); };
 window.openUpload=()=>document.getElementById('uploadModal').classList.add('on');
 window.closeUpload=()=>document.getElementById('uploadModal').classList.remove('on');
-window.focusComment=()=>showNoti('💬 Comment soon da!');
-document.getElementById('fileInput').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ window._img=ev.target.result; document.getElementById('previewImg').src=ev.target.result; document.getElementById('previewImg').style.display='block'; document.getElementById('noPhoto').style.display='none'; openUpload(); }; r.readAsDataURL(f); });
-window.shareNow=()=>{ const cap=document.getElementById('captionInput').value||document.getElementById('quickCap').value||'Mass post'; const img=window._img||document.getElementById('previewImg').src; if(!img || img=='') return alert('Photo select pannu da!'); posts.unshift({id:Date.now(), img, caption:cap, user:'girikri', likes:0, views:1, time:'now'}); localStorage.setItem('pixoro_posts',JSON.stringify(posts)); closeUpload(); renderFeed(); showNoti('Posted 🚀'); window._img=null; };
-function showNoti(t){ const n=document.getElementById('noti'); n.textContent=t; n.style.display='block'; setTimeout(()=>n.style.display='none',2000); }
+window.sharePost=()=>{ navigator.clipboard.writeText(location.href); showNoti('Link copied 🔗'); };
+document.getElementById('fileInput').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ window._img=ev.target.result; document.getElementById('previewImg').src=ev.target.result; document.getElementById('previewBox').style.display='block'; document.getElementById('noPhoto').style.display='none'; openUpload(); }; r.readAsDataURL(f); });
+window.shareNow=()=>{ const cap=document.getElementById('captionInput').value||document.getElementById('quickCap').value||'Mass post 🔥'; if(!window._img) return alert('Photo select pannu da!'); posts.unshift({id:Date.now(),img:window._img,caption:cap,user:'girikri',likes:0,viewers:[],time:'now'}); localStorage.setItem('pixoro_posts',JSON.stringify(posts)); closeUpload(); renderFeed(); showNoti('Posted 🚀'); window._img=null; document.getElementById('previewBox').style.display='none'; document.getElementById('noPhoto').style.display='block'; };
+function showNoti(t){ const n=document.getElementById('noti'); n.textContent=t; n.style.display='block'; setTimeout(()=>n.style.display='none',1800); }
 renderFeed(); renderStories();
-setTimeout(()=>{ const s=document.getElementById('splash'); s.style.opacity='0'; s.style.transition='opacity.2s'; setTimeout(()=>s.remove(),200); },300);
+setTimeout(()=>{ const s=document.getElementById('splash'); s.style.opacity='0'; s.style.transition='opacity.2s'; setTimeout(()=>s.remove(),200); },350);
 </script></body></html>
