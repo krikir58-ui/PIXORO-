@@ -1,4 +1,0 @@
-const Search = {
-  async search(q){ if(!q){ document.getElementById("searchResult").innerHTML=""; return; } let {data}=await sb.from('profiles').select('*').ilike('username',`%${q}%`).limit(10); document.getElementById("searchResult").innerHTML=(data||[]).map(u=>`<div onclick="App.viewProfile('${u.id}')" style="display:flex;gap:10px;align-items:center;background:#222;padding:10px;border-radius:10px;margin:5px 0;cursor:pointer;"><img src="${u.avatar_url||'https://via.placeholder.com/40'}" style="width:40px;height:40px;border-radius:50%;"><div><b>@${u.username} ${u.is_verified?'✅':''}</b><br><small>${u.bio||''}</small></div></div>`).join(''); },
-  html:`<div class="card card-pad"><input id="searchInput" placeholder="Search username..." oninput="Search.search(this.value)"><div id="searchResult" style="margin-top:10px;"></div></div>`
-}
