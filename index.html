@@ -1,84 +1,65 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO 2026 ULTIMATE</title>
-<link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<title>PIXORO MASS</title>
+<link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:#000;display:flex;justify-content:center;font-family:'Poppins',sans-serif}
-#app{width:100%;max-width:470px;min-height:100vh;background:#000;position:relative;overflow:hidden}
-.insta{font-family:'Grand Hotel',cursive;font-size:34px;color:#fff}
-.top{position:fixed;top:0;width:100%;max-width:470px;z-index:30;display:flex;justify-content:space-between;padding:12px 16px;color:#fff;font-weight:700;align-items:center;background:linear-gradient(to bottom,rgba(0,0,0,.7),transparent)}
-.reels{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none}
+#app{width:100%;max-width:470px;min-height:100vh;background:#000;position:relative}
+.top{position:fixed;top:0;width:100%;max-width:470px;z-index:30;display:flex;justify-content:space-between;padding:14px 16px;color:#fff;font-weight:700;background:linear-gradient(to bottom,rgba(0,0,0,.8),transparent)}
+.reels{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory}
 .reels::-webkit-scrollbar{display:none}
-.reel{height:100vh;scroll-snap-align:start;position:relative;background:#111;overflow:hidden}
-.reel img,.reel video{width:100%;height:100%;object-fit:cover}
-.right{position:absolute;right:10px;bottom:110px;display:flex;flex-direction:column;gap:18px;align-items:center;color:#fff;z-index:5}
-.icon{width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:24px;backdrop-filter:blur(12px)}
-.icon-box{display:flex;flex-direction:column;align-items:center;gap:3px}
-.info{position:absolute;bottom:80px;left:12px;right:72px;color:#fff;z-index:5}
-.bottom{position:fixed;bottom:0;width:100%;max-width:470px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:12px 0;font-size:22px;z-index:40;color:#fff}
+.reel{height:100vh;scroll-snap-align:start;position:relative;background:#000;overflow:hidden}
+.reel img{width:100%;height:100%;object-fit:cover}
+.right{position:absolute;right:8px;bottom:90px;display:flex;flex-direction:column;gap:16px;color:#fff;z-index:5}
+.ib{display:flex;flex-direction:column;align-items:center}
+.ic{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.12);backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:26px}
+.info{position:absolute;bottom:76px;left:12px;right:72px;color:#fff;z-index:5;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.bottom{position:fixed;bottom:0;width:100%;max-width:470px;background:#000;border-top:1px solid #1a1a1a;display:flex;justify-content:space-around;padding:12px 0;z-index:40;color:#fff;font-size:22px}
 .modal{position:fixed;inset:0;z-index:100;display:none;background:#000;flex-direction:column}.modal.on{display:flex}
-.sheet{position:fixed;bottom:0;width:100%;max-width:470px;background:#1c1c1e;border-radius:20px 20px 0 0;z-index:120;transform:translateY(100%);transition:.35s cubic-bezier(.32,0,.67,0)}.sheet.on{transform:translateY(0)}
-.ring{background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);padding:2.5px;border-radius:50%;display:inline-block}
-.filterBar{display:flex;gap:10px;overflow-x:auto;padding:10px;background:#111}
-.fbtn{min-width:74px;height:74px;border-radius:14px;border:2px solid transparent;position:relative;overflow:hidden;flex-shrink:0;background:linear-gradient(45deg,#feda75,#d62976);display:flex;align-items:end;justify-content:center;padding-bottom:4px;font-size:10px;color:#fff;font-weight:700}
-.fbtn.active{border-color:#fff;box-shadow:0 0 0 2px #0095f6}
-#splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 30%,#feda75 0%,#fa7e1e 20%,#d62976 50%,#962fbf 75%,#4f5bd5 100%)}
-.logoPix{width:120px;height:120px;border-radius:30px;background:#fff;display:flex;align-items:center;justify-content:center;font-family:'Grand Hotel';font-size:64px;color:#d62976;box-shadow:0 20px 50px rgba(0,0,0,.4);animation:pop 1.2s}
-@keyframes pop{0%{transform:scale(.4) rotate(-15deg)}60%{transform:scale(1.15) rotate(4deg)}100%{transform:scale(1)}}
-#noti{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;z-index:200;display:none}
-.listItem{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #222;color:#fff}
+.sheet{position:fixed;bottom:0;width:100%;max-width:470px;background:#121212;border-radius:22px 22px 0 0;z-index:120;transform:translateY(100%);transition:.35s}.sheet.on{transform:translateY(0)}
+.ring{background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);padding:3px;border-radius:50%;display:inline-block}
+.fBar{display:flex;gap:10px;overflow-x:auto;padding:12px;background:#000;scrollbar-width:none}
+.fBar::-webkit-scrollbar{display:none}
+.fBtn{min-width:78px;height:78px;border-radius:16px;border:3px solid transparent;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;position:relative}
+.fBtn.active{border-color:#fff;box-shadow:0 0 0 2px #0095f6,0 8px 20px rgba(0,149,246,.4);transform:scale(1.05)}
+#splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 30%,#ff8a00,#ff2d55 30%,#c800ff 70%,#1a1aff)}
+#noti{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 18px;border-radius:22px;font-size:12px;font-weight:800;z-index:200;display:none;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 </style>
 </head><body>
-<div id="splash"><div class="logoPix">P</div><div style="font-family:'Grand Hotel';font-size:56px;color:#fff;margin-top:16px;text-shadow:0 4px 20px rgba(0,0,0,.3)">Pixoro</div><div style="color:#fff;letter-spacing:5px;font-size:11px;margin-top:4px;opacity:.9">REELS • FILTERS • FACE TRACK</div><div style="width:140px;height:4px;background:rgba(255,255,255,.3);border-radius:10px;margin-top:20px;overflow:hidden"><div id="sbar" style="height:100%;width:0;background:#fff;border-radius:10px"></div></div><div style="color:#fff;font-size:10px;margin-top:12px;opacity:.8">5 sec mass splash • Photo filter ready</div></div>
+<div id="splash"><div style="width:130px;height:130px;background:#fff;border-radius:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:pop 1s"><span style="font-family:'Grand Hotel';font-size:72px;color:#ff2d55">P</span></div><div style="font-family:'Grand Hotel';font-size:58px;color:#fff;margin-top:18px;letter-spacing:1px">Pixoro</div><div style="color:#fff;letter-spacing:6px;font-size:11px;margin-top:2px;font-weight:700;opacity:.9">REELS • FILTERS • FACE TRACK</div><div style="width:160px;height:4px;background:rgba(255,255,255,.3);border-radius:10px;margin-top:22px;overflow:hidden"><div id="sbar" style="height:100%;width:0;background:#fff;border-radius:10px"></div></div><p style="color:#fff;font-size:10px;margin-top:14px;opacity:.8">MASS 5 SEC SPLASH • REAL INSTAGRAM SYSTEM</p><style>@keyframes pop{0%{transform:scale(.3) rotate(-20deg)}60%{transform:scale(1.2) rotate(5deg)}100%{transform:scale(1)}}</style></div>
 
 <div id="app">
-<div class="top"><span style="font-size:18px">Reels <span style="opacity:.6;font-size:13px">▼</span> &nbsp; Friends 🐶</span><span>🔍</span></div>
+<div class="top"><span>Reels <span style="opacity:.6">▼</span> &nbsp; Friends 🐶</span><span>🔍</span></div>
 <div class="reels" id="reels"></div>
-<div class="bottom"><span onclick="location.reload()">🏠</span><span>🔍</span><span onclick="openCam()" style="border:1px solid #fff;padding:2px 14px;border-radius:8px">+</span><span>🎬</span><span onclick="openProfile('girikri')">👤</span></div>
+<div class="bottom"><span>🏠</span><span>🔍</span><span onclick="openCam()" style="border:1.5px solid #fff;padding:4px 16px;border-radius:10px;font-size:20px">+</span><span>🎬</span><span onclick="openProfile('girikri')">👤</span></div>
 
-<!-- CAMERA + FILTER + FACE TRACK ZOOM -->
+<!-- MASS CAMERA + FILTER -->
 <div id="camModal" class="modal" style="z-index:110">
-<div style="display:flex;justify-content:space-between;padding:12px;color:#fff"><span onclick="closeCam()">✕</span><b>Reels Camera • Face Track ON</b><span onclick="capture()" style="color:#0095f6">Next</span></div>
-<div style="flex:1;position:relative;background:#111;overflow:hidden"><video id="v" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover"></video><canvas id="c" style="position:absolute;inset:0;width:100%;height:100%"></canvas><div style="position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:6px 14px;border-radius:20px;color:#fff;font-size:11px">😍 Face Tracking Zoom ACTIVE • x<span id="zTxt">1</span></div></div>
-<div class="filterBar" id="fbar"></div>
-<div style="display:flex;justify-content:space-around;padding:12px;background:#000"><button onclick="rec()" style="background:#fff;color:#000;border:0;padding:12px 28px;border-radius:28px;font-weight:900">● REC</button><button onclick="flip()" style="background:#222;color:#fff;border:0;padding:10px 16px;border-radius:20px">🔄 Flip</button><button onclick="zoom()" style="background:#222;color:#fff;border:0;padding:10px 16px;border-radius:20px">🔍 Zoom</button></div>
+<div style="display:flex;justify-content:space-between;padding:14px;color:#fff;align-items:center;background:rgba(0,0,0,.4)"><span onclick="closeCam()" style="font-size:22px">✕</span><b style="font-size:14px">Reels Camera • Face Track ON</b><span onclick="capture()" style="color:#0095f6;font-weight:800">Next</span></div>
+<div style="flex:1;position:relative;background:#111;overflow:hidden"><video id="v" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover"></video><canvas id="c" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas><div style="position:absolute;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);backdrop-filter:blur(10px);padding:8px 16px;border-radius:22px;color:#fff;font-size:11px;border:1px solid rgba(255,255,255,.2)">😍 Face Tracking Zoom ACTIVE • x<span id="zT">1</span> • <span id="fName">Original</span></div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:120px;height:160px;border:2px solid rgba(255,255,255,.6);border-radius:20px;pointer-events:none;display:flex;align-items:center;justify-content:center"><span style="color:rgba(255,255,255,.6);font-size:10px">FACE BOX</span></div></div>
+<div class="fBar" id="fBar"></div>
+<div style="display:flex;justify-content:space-around;align-items:center;padding:14px;background:#000;border-top:1px solid #1a1a1a"><button onclick="doRec()" style="background:#fff;color:#000;border:0;width:72px;height:72px;border-radius:50%;font-weight:900;font-size:12px;box-shadow:0 0 0 4px rgba(255,255,255,.2)">● REC</button><button onclick="flip()" style="background:#1a1a1a;color:#fff;border:1px solid #333;padding:12px 18px;border-radius:22px;font-size:13px">🔄 Flip</button><button onclick="zoom()" style="background:#1a1a1a;color:#fff;border:1px solid #333;padding:12px 18px;border-radius:22px;font-size:13px">🔍 Zoom x<span id="zB">1</span></button></div>
 </div>
 
-<!-- SHARE SHEET - EXACT LIKE YOUR VIDEO -->
-<div id="shareSheet" class="sheet">
-<div style="width:40px;height:4px;background:#555;border-radius:10px;margin:10px auto"></div>
-<div style="padding:0 12px"><div style="background:#2c2c2e;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px"><span>🔍</span><input placeholder="Search" style="background:0;border:0;outline:none;color:#fff;flex:1"></div></div>
-<div id="susers" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px;text-align:center"></div>
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px;border-top:1px solid #2c2c2e;text-align:center">
-<div><div style="width:54px;height:54px;background:#2c2c2e;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">📖</div><div style="font-size:11px;color:#fff;margin-top:6px">Add to story</div></div>
-<div><div style="width:54px;height:54px;background:#2c2c2e;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">🔗</div><div style="font-size:11px;color:#fff;margin-top:6px">Copy link</div></div>
-<div><div style="width:54px;height:54px;background:#2c2c2e;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">↗️</div><div style="font-size:11px;color:#fff;margin-top:6px">Share</div></div>
-<div onclick="closeShare()"><div style="width:54px;height:54px;background:#25D366;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">💬</div><div style="font-size:11px;color:#fff;margin-top:6px">WhatsApp Status</div></div>
-</div>
-</div>
+<!-- SHARE SHEET MASS -->
+<div id="shareSheet" class="sheet"><div style="width:40px;height:5px;background:#444;border-radius:10px;margin:12px auto"></div><div id="sUsers" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;text-align:center"></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px;border-top:1px solid #222;text-align:center"><div><div style="width:56px;height:56px;background:#222;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">📖</div><div style="font-size:11px;color:#fff;margin-top:6px">Add to story</div></div><div><div style="width:56px;height:56px;background:#222;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">🔗</div><div style="font-size:11px;color:#fff;margin-top:6px">Copy link</div></div><div><div style="width:56px;height:56px;background:#222;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">↗️</div><div style="font-size:11px;color:#fff;margin-top:6px">Share</div></div><div onclick="closeShare()"><div style="width:56px;height:56px;background:#25D366;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">💬</div><div style="font-size:11px;color:#fff;margin-top:6px">WhatsApp Status</div></div></div></div>
 
-<!-- PROFILE PAGE - REAL FOLLOWERS COUNT + ZOOM -->
-<div id="profileModal" class="modal" style="background:#000;overflow-y:auto;z-index:105">
-<div style="display:flex;justify-content:space-between;padding:12px;color:#fff;border-bottom:1px solid #222"><span onclick="closeProfile()">←</span><b id="pU" style="font-family:'Grand Hotel';font-size:26px">girikri</b><span>⋯</span></div>
-<div style="padding:16px;display:flex;gap:16px;align-items:center;color:#fff"><div class="ring" onclick="openZoom()"><img id="pImg" src="https://i.pravatar.cc/150?u=giri" style="width:88px;height:88px;border-radius:50%;padding:3px;background:#000"></div><div style="flex:1;display:flex;justify-content:space-around;text-align:center"><div><div id="pP" style="font-weight:800;font-size:18px">0</div><div style="font-size:12px;color:#aaa">Posts</div></div><div onclick="openFollowers()"><div id="pF1" style="font-weight:800;font-size:18px">129</div><div style="font-size:12px;color:#aaa">Followers</div></div><div onclick="openFollowing()"><div id="pF2" style="font-weight:800;font-size:18px">1</div><div style="font-size:12px;color:#aaa">Following</div></div></div></div>
-<div style="padding:0 16px;color:#fff"><b id="pN">Giri 🔥</b><div style="font-size:12px;color:#aaa;margin-top:4px"><span id="pV">1</span> Views • <span id="pL">0</span> Likes • <span id="pC">0</span> Comments • <span id="pS">0</span> Shares</div><div style="display:flex;gap:8px;margin-top:12px"><button id="fBtn" onclick="toggleF()" style="flex:1;background:#fff;color:#000;border:0;padding:10px;border-radius:8px;font-weight:700">Follow</button><button style="flex:1;background:#222;color:#fff;border:0;padding:10px;border-radius:8px;font-weight:700">Message</button></div><div id="fReq" style="margin-top:12px;background:#222;border:1px solid #333;padding:10px;border-radius:10px;font-size:12px"><b>Follow Requests • 1</b><div style="display:flex;align-items:center;gap:10px;margin-top:8px"><img src="https://i.pravatar.cc/40?u=white" style="width:32px;height:32px;border-radius:50%"><span>whitezzz__04 wants to follow you</span></div><div style="display:flex;gap:8px;margin-top:8px"><button onclick="accept()" style="flex:1;background:#0095f6;color:#fff;border:0;padding:7px;border-radius:6px;font-weight:700">Accept +1</button><button onclick="reject()" style="flex:1;background:#333;color:#fff;border:0;padding:7px;border-radius:6px">Reject</button></div></div></div>
-<div id="pGrid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:16px"></div>
-</div>
+<!-- PROFILE MASS -->
+<div id="pModal" class="modal" style="background:#000;overflow-y:auto;z-index:105"><div style="display:flex;justify-content:space-between;padding:14px;color:#fff;border-bottom:1px solid #222"><span onclick="closeP()">←</span><b id="pU" style="font-family:'Grand Hotel';font-size:28px">girikri</b><span>⋯</span></div><div style="padding:16px;display:flex;gap:16px;color:#fff"><div class="ring" onclick="openZoom()"><img id="pImg" src="https://i.pravatar.cc/150?u=giri" style="width:90px;height:90px;border-radius:50%;padding:3px;background:#000;object-fit:cover"></div><div style="flex:1;display:flex;justify-content:space-around;text-align:center"><div><div id="pP" style="font-weight:800;font-size:20px">2</div><div style="font-size:12px;color:#888">Posts</div></div><div onclick="openFollowers()"><div id="pF1" style="font-weight:800;font-size:20px">128</div><div style="font-size:12px;color:#888">Followers</div></div><div onclick="openFollowing()"><div id="pF2" style="font-weight:800;font-size:20px">1</div><div style="font-size:12px;color:#888">Following</div></div></div></div><div style="padding:0 16px;color:#fff"><b>Giri 🔥</b><div style="font-size:12px;color:#aaa;margin-top:4px"><span id="pV">1</span> Views • <span id="pL">130</span> Likes • <span id="pC">1</span> Comments • <span id="pS">22</span> Shares</div><div style="display:flex;gap:8px;margin-top:14px"><button id="fBtn" onclick="toggleF()" style="flex:1;background:#fff;color:#000;border:0;padding:11px;border-radius:10px;font-weight:800">Follow</button><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:10px;font-weight:700">Message</button></div><div id="fReq" style="margin-top:14px;background:#1a1a1a;border:1px solid #2a2a2a;padding:12px;border-radius:12px;font-size:12px"><b style="color:#fff">Follow Requests • 1</b><div style="display:flex;align-items:center;gap:10px;margin-top:10px;color:#fff"><img src="https://i.pravatar.cc/40?u=white" style="width:36px;height:36px;border-radius:50%"><span>whitezzz__04 wants to follow you</span></div><div style="display:flex;gap:8px;margin-top:10px"><button onclick="accept()" style="flex:1;background:#0095f6;color:#fff;border:0;padding:9px;border-radius:8px;font-weight:800">Accept +1</button><button onclick="reject()" style="flex:1;background:#2a2a2a;color:#fff;border:0;padding:9px;border-radius:8px">Reject</button></div></div></div><div id="pGrid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;margin-top:16px"></div></div>
 
-<!-- FOLLOWERS LIST -->
-<div id="followModal" class="modal" style="z-index:115;background:#000"><div style="display:flex;justify-content:space-between;padding:12px;color:#fff;border-bottom:1px solid #222"><span onclick="closeFollow()">←</span><b id="fTitle">Followers</b><span></span></div><div id="fList" style="flex:1;overflow-y:auto"></div></div>
+<!-- FOLLOWERS -->
+<div id="followModal" class="modal" style="background:#000;z-index:115"><div style="display:flex;justify-content:space-between;padding:14px;color:#fff;border-bottom:1px solid #222"><span onclick="closeFollow()">←</span><b id="fTitle">Followers • 129</b><span></span></div><div id="fList" style="flex:1;overflow-y:auto"></div></div>
 
-<!-- COMMENT -->
-<div id="commentModal" class="modal" style="z-index:115;background:#000"><div style="display:flex;justify-content:space-between;padding:12px;color:#fff;border-bottom:1px solid #222"><span onclick="closeComment()">✕</span><b>Comments</b><span></span></div><div id="cList" style="flex:1;overflow-y:auto;padding:12px;color:#fff"></div><div style="display:flex;gap:8px;padding:10px;border-top:1px solid #222;align-items:center"><img src="https://i.pravatar.cc/40?u=giri" style="width:32px;height:32px;border-radius:50%"><input id="cInput" placeholder="Add a comment..." style="flex:1;background:#222;border:0;border-radius:20px;padding:9px 14px;color:#fff;outline:none"><button onclick="postC()" style="color:#0095f6;font-weight:700;background:0;border:0">Post</button></div></div>
+<!-- COMMENTS -->
+<div id="cModal" class="modal" style="background:#000;z-index:115"><div style="display:flex;justify-content:space-between;padding:14px;color:#fff;border-bottom:1px solid #222"><span onclick="closeC()">✕</span><b>Comments</b><span></span></div><div id="cList" style="flex:1;overflow-y:auto;padding:14px;color:#fff"></div><div style="display:flex;gap:10px;padding:12px;border-top:1px solid #222;align-items:center"><img src="https://i.pravatar.cc/40?u=giri" style="width:36px;height:36px;border-radius:50%"><input id="cInput" placeholder="Add a comment..." style="flex:1;background:#222;border:0;border-radius:22px;padding:10px 16px;color:#fff;outline:none"><button onclick="postC()" style="color:#0095f6;font-weight:800;background:0;border:0">Post</button></div></div>
 
-<!-- PHOTO ZOOM -->
-<div id="zoomModal" class="modal" style="background:rgba(0,0,0,.92);align-items:center;justify-content:center;z-index:130" onclick="closeZoom()"><img id="zImg" style="width:85vw;height:85vw;max-width:340px;max-height:340px;border-radius:50%;border:4px solid #fff;object-fit:cover"><p style="color:#fff;margin-top:16px;font-size:11px">Profile Photo Zoom • Real Instagram • Tap to close</p></div>
+<!-- ZOOM -->
+<div id="zModal" class="modal" style="background:rgba(0,0,0,.93);align-items:center;justify-content:center;z-index:130" onclick="closeZoom()"><img id="zImg" style="width:88vw;height:88vw;max-width:360px;max-height:360px;border-radius:50%;border:5px solid #fff;object-fit:cover;box-shadow:0 20px 60px rgba(0,0,0,.8)"><p style="color:#fff;margin-top:18px;font-size:12px;opacity:.8">Profile Photo Zoom • Real Instagram • Tap to close</p></div>
 
 <div id="noti"></div>
 </div>
-
 <script>
 let posts=JSON.parse(localStorage.getItem('pixoro_posts')||'[]');
 let likes=JSON.parse(localStorage.getItem('pixoro_likes')||'{}');
@@ -87,89 +68,66 @@ let comments=JSON.parse(localStorage.getItem('pixoro_comments')||'{}');
 let viewed=JSON.parse(localStorage.getItem('pixoro_viewed')||'[]');
 let deviceId=localStorage.getItem('pixoro_device')||'dev_'+Date.now(); localStorage.setItem('pixoro_device',deviceId);
 let curFilter='none', z=1, facing='user', curId=null, curUser='girikri';
-
 const filters=[
- {n:'Original',css:'none',e:'✨'},{n:'Mass 🔥',css:'contrast(1.4) saturate(1.7)',e:'🔥'},{n:'CBE Vibes',css:'sepia(.3) contrast(1.2) brightness(1.1)',e:'🌅'},{n:'Pixoro Pro',css:'contrast(1.3) saturate(1.8) hue-rotate(-10deg)',e:'💜'},{n:'Face Glow',css:'brightness(1.25) contrast(1.1)',e:'😍'},{n:'Vintage',css:'sepia(.6) contrast(1.1)',e:'📼'},{n:'Cold',css:'hue-rotate(180deg) saturate(.8)',e:'❄️'},{n:'Warm',css:'sepia(.4) hue-rotate(-20deg) saturate(1.5)',e:'☀️'},{n:'B&W Mass',css:'grayscale(1) contrast(1.3)',e:'🖤'},{n:'Zoom Pop',css:'contrast(1.6) saturate(2)',e:'💥'}
+ {n:'Original',css:'none',bg:'linear-gradient(45deg,#222,#444)',e:'✨'},
+ {n:'Cold',css:'hue-rotate(200deg) saturate(.7) brightness(1.1)',bg:'linear-gradient(45deg,#00d2ff,#3a7bd5)',e:'❄️'},
+ {n:'Warm',css:'sepia(.35) hue-rotate(-15deg) saturate(1.6)',bg:'linear-gradient(45deg,#ff9a00,#ff6a00)',e:'☀️'},
+ {n:'B&W Mass',css:'grayscale(1) contrast(1.4)',bg:'linear-gradient(45deg,#232526,#414345)',e:'🖤'},
+ {n:'Zoom Pop',css:'contrast(1.7) saturate(2.2) brightness(1.1)',bg:'linear-gradient(45deg,#f857a6,#ff5858)',e:'💥'},
+ {n:'Mass 🔥',css:'contrast(1.5) saturate(1.9)',bg:'linear-gradient(45deg,#ff512f,#dd2476)',e:'🔥'},
+ {n:'Face Glow',css:'brightness(1.3) contrast(1.15) blur(.2px)',bg:'linear-gradient(45deg,#ffecd2,#fcb69f)',e:'😍'},
+ {n:'CBE Vibes',css:'sepia(.25) contrast(1.25) saturate(1.3)',bg:'linear-gradient(45deg,#56ab2f,#a8e063)',e:'🌄'},
+ {n:'Pixoro Pro',css:'contrast(1.3) saturate(1.8) hue-rotate(-10deg)',bg:'linear-gradient(45deg,#8e2de2,#4a00e0)',e:'💜'}
 ];
-
-let reelsData=[
- {id:101,user:'murugan_arunachala',caption:'இன்று சிறப்பாய் மாட்டுக்கு...',img:'https://picsum.photos/seed/r1/400/800',likes:19600,comments:254,shares:504,views:687,saves:563,verified:true},
- {id:102,user:'hearttouchingstories',caption:'உதைக்காம சாப்பிட்டா உடம்புல ஓடாது..!',img:'https://picsum.photos/seed/r2/400/800',likes:119000,comments:238,shares:3149,views:2539,saves:3209},
- {id:1,img:'https://picsum.photos/seed/p1/400/800',user:'girikri',caption:'Mass entry da @whitezzz__04 🔥 #pixoro',likes:129,views:687,shares:2,comments:2,filter:'none'}
-];
-
-if(posts.length==0){ posts=[{id:1,img:'https://picsum.photos/seed/pixoro1/700/700',caption:'Mass entry da @whitezzz__04 🔥 #cbe',user:'girikri',likes:129,viewers:[deviceId],shares:2,time:'now',filter:'none'}]; comments[1]=[{user:'whitezzz__04',text:'Mass da Giri 🔥'},{user:'don_deepa',text:'Semma da!'}]; localStorage.setItem('pixoro_posts',JSON.stringify(posts)); localStorage.setItem('pixoro_comments',JSON.stringify(comments)); }
-
+if(posts.length==0){ posts=[{id:1,img:'https://picsum.photos/seed/pix1/600/800',caption:'Mass entry da @whitezzz__04 🔥',user:'girikri',likes:129,viewers:[deviceId],shares:22,time:'now',filter:'none'},{id:2,img:'https://picsum.photos/seed/pix2/600/800',caption:'Coimbatore vibes 😍',user:'whitezzz__04',likes:91,viewers:[],shares:0,time:'2h',filter:'none'}]; comments[1]=[{user:'whitezzz__04',text:'Mass da Giri 🔥'}]; localStorage.setItem('pixoro_posts',JSON.stringify(posts)); localStorage.setItem('pixoro_comments',JSON.stringify(comments)); }
 function init(){
- document.getElementById('sbar').style.transition='width 4.8s linear'; setTimeout(()=>document.getElementById('sbar').style.width='100%',100);
- setTimeout(()=>{ const s=document.getElementById('splash'); s.style.opacity='0'; s.style.transition='.6s'; setTimeout(()=>s.remove(),600); },5000);
- renderAll(); renderFilters(); renderShareUsers();
+ document.getElementById('sbar').style.transition='width 4.8s linear'; setTimeout(()=>document.getElementById('sbar').style.width='100%',150);
+ setTimeout(()=>{ const s=document.getElementById('splash'); s.style.opacity='0'; s.style.transition='.7s'; setTimeout(()=>s.remove(),700); },5000);
+ render(); renderF(); renderSUsers();
 }
-function renderAll(){
- const all=[...reelsData,...posts];
- document.getElementById('reels').innerHTML=all.map(r=>{
-  const isLike=likes[r.id]; const v=r.viewers?.length||r.views||0; const l=(r.likes||0)+(isLike?1:0); const c=comments[r.id]?.length||r.comments||0; const sh=r.shares||0;
-  return `<div class="reel" data-id="${r.id}">
-   <img src="${r.img}" style="filter:${r.filter||curFilter}">
-   <div class="right">
-    <div class="icon-box" onclick="like(${r.id})"><div class="icon" style="${isLike?'background:#ff3040':''}">${isLike?'❤️':'🤍'}</div><span style="font-size:12px;font-weight:700">${format(l)}</span></div>
-    <div class="icon-box" onclick="openComment(${r.id})"><div class="icon">💬</div><span style="font-size:12px">${format(c)}</span></div>
-    <div class="icon-box" onclick="openShare(${r.id})"><div class="icon">✈️</div><span style="font-size:12px">${format(sh)}</span></div>
-    <div class="icon-box"><div class="icon">👁️</div><span style="font-size:12px" id="v-${r.id}">${format(v)}</span></div>
-    <div class="icon-box"><div class="icon">🔖</div><span style="font-size:12px">${format(r.saves||563)}</span></div>
-    <div class="icon-box"><div class="icon">⋯</div></div>
-   </div>
-   <div class="info">
-    <div style="display:flex;align-items:center;gap:8px"><div class="ring"><img src="https://i.pravatar.cc/40?u=${r.user}" style="width:32px;height:32px;border-radius:50%;padding:2px;background:#000"></div><b style="font-size:14px">${r.user}</b> ${r.verified?'✓':''} <span onclick="toggleF('${r.user}')" style="border:1px solid #fff;padding:2px 10px;border-radius:6px;font-size:11px;margin-left:6px">${follows[r.user]?'Following':'Follow'}</span></div>
-    <div style="margin-top:8px;font-size:13px;line-height:17px">${r.caption} <span style="opacity:.7">${r.filter&&r.filter!='none'?'• '+r.filter:''}</span><br><span style="opacity:.8;font-size:11px">🎵 Original audio • ${r.filter||'Original'} filter • Face Track ON</span></div>
-   </div>
-  </div>`;
- }).join('');
- observe();
+function render(){
+ document.getElementById('reels').innerHTML=posts.map(r=>{
+  const isL=likes[r.id]; const v=r.viewers?.length||0; const l=r.likes+(isL?1:0); const c=comments[r.id]?.length||0; const sh=r.shares||0;
+  return `<div class="reel" data-id="${r.id}"><img src="${r.img}" style="filter:${r.filter||'none'}"><div class="right">
+   <div class="ib" onclick="like(${r.id})"><div class="ic" style="${isL?'background:#ff3040;border-color:#ff3040':''}">${isL?'❤️':'🤍'}</div><span style="font-size:12px;font-weight:700;margin-top:4px">${format(l)}</span></div>
+   <div class="ib" onclick="openC(${r.id})"><div class="ic">💬</div><span style="font-size:12px;margin-top:4px">${format(c)}</span></div>
+   <div class="ib" onclick="openShare(${r.id})"><div class="ic">✈️</div><span style="font-size:12px;margin-top:4px">${format(sh)}</span></div>
+   <div class="ib"><div class="ic">👁️</div><span style="font-size:12px;margin-top:4px" id="v-${r.id}">${format(v)}</span></div>
+   <div class="ib"><div class="ic">🔖</div><span style="font-size:12px;margin-top:4px">563</span></div>
+   <div class="ib"><div class="ic" style="font-size:18px">⋯</div></div>
+  </div><div class="info"><div style="display:flex;align-items:center;gap:10px"><div class="ring"><img src="https://i.pravatar.cc/40?u=${r.user}" style="width:34px;height:34px;border-radius:50%;padding:2px;background:#000"></div><b style="font-size:14px">${r.user}</b><span onclick="toggleF('${r.user}')" style="border:1px solid #fff;padding:3px 12px;border-radius:6px;font-size:12px;margin-left:4px;font-weight:700">${follows[r.user]?'Following':'Follow'}</span></div><div style="margin-top:8px;font-size:13px;line-height:18px">Mass entry da @whitezzz__04 🔥 ${r.caption}<br><span style="font-size:11px;opacity:.8">🎵 Original audio • ${r.filter&&r.filter!='none'?r.filter:'Original'} filter • Face Track ON</span></div></div></div>`;
+ }).join(''); observe();
 }
-function format(n){ if(n>=1000) return (n/1000).toFixed(n>=100000?'0':'1')+'K'; return n; }
-function observe(){
- const obs=new IntersectionObserver(es=>{ es.forEach(e=>{
-  if(e.isIntersecting){ const id=parseInt(e.target.dataset.id); const p=posts.find(x=>x.id==id); if(p){ if(!p.viewers) p.viewers=[]; if(!viewed.includes(id)&&!p.viewers.includes(deviceId)){ p.viewers.push(deviceId); viewed.push(id); localStorage.setItem('pixoro_posts',JSON.stringify(posts)); localStorage.setItem('pixoro_viewed',JSON.stringify(viewed)); const el=document.getElementById(`v-${id}`); if(el) el.textContent=format(p.viewers.length); } } }
- }); },{threshold:0.6}); document.querySelectorAll('.reel').forEach(el=>obs.observe(el));
-}
-function renderFilters(){
- document.getElementById('fbar').innerHTML=filters.map((f,i)=>`<div class="fbtn ${i==0?'active':''}" onclick="applyF(${i})" style="filter:${f.css}"><span>${f.e} ${f.n}</span></div>`).join('');
-}
-window.applyF=(i)=>{ curFilter=filters[i].css; document.getElementById('v').style.filter=curFilter; document.querySelectorAll('.fbtn').forEach((b,idx)=>b.classList.toggle('active',idx==i)); document.getElementById('zTxt').textContent=z; showNoti(`${filters[i].e} ${filters[i].n} Applied • Face Tracking`); if(filters[i].n.includes('Glow')||filters[i].n.includes('Zoom')) document.getElementById('v').style.transform=`scale(${z*1.25})`; else document.getElementById('v').style.transform=`scale(${z})`; };
-window.zoom=()=>{ z=z==1?2:1; document.getElementById('v').style.transform=`scale(${z})`; document.getElementById('zTxt').textContent=z; showNoti(`🔍 Zoom x${z} Face Tracking`); };
-window.openCam=async()=>{ document.getElementById('camModal').classList.add('on'); try{ const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:true}); document.getElementById('v').srcObject=s; startTrack(); }catch(e){ showNoti('Camera permission kududa da!'); } };
+function format(n){ if(n>=1000) return (n/1000).toFixed(n>=10000?'0':'1')+'K'; return n; }
+function observe(){ const o=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ const id=parseInt(e.target.dataset.id); const p=posts.find(x=>x.id==id); if(p&&!viewed.includes(id)&&!p.viewers.includes(deviceId)){ p.viewers.push(deviceId); viewed.push(id); localStorage.setItem('pixoro_posts',JSON.stringify(posts)); localStorage.setItem('pixoro_viewed',JSON.stringify(viewed)); const el=document.getElementById(`v-${id}`); if(el) el.textContent=format(p.viewers.length); } } }); },{threshold:0.6}); document.querySelectorAll('.reel').forEach(el=>o.observe(el)); }
+function renderF(){ document.getElementById('fBar').innerHTML=filters.map((f,i)=>`<div class="fBtn ${i==0?'active':''}" onclick="applyF(${i})" style="background:${f.bg};filter:${f.css}"><span style="font-size:20px">${f.e}</span><span style="font-size:10px;margin-top:2px">${f.n}</span></div>`).join(''); }
+window.applyF=(i)=>{ curFilter=filters[i].css; document.getElementById('v').style.filter=curFilter; document.getElementById('fName').innerText=filters[i].n; document.querySelectorAll('.fBtn').forEach((b,idx)=>b.classList.toggle('active',idx==i)); showNoti(`${filters[i].e} ${filters[i].n} Filter • Mass`); if(filters[i].n.includes('Glow')||filters[i].n.includes('Zoom')) document.getElementById('v').style.transform=`scale(${z*1.3})`; else document.getElementById('v').style.transform=`scale(${z})`; };
+window.zoom=()=>{ z=z==1?2:3; if(z>3) z=1; document.getElementById('v').style.transform=`scale(${z})`; document.getElementById('zT').innerText=z; document.getElementById('zB').innerText=z; showNoti(`🔍 Zoom x${z} Face Tracking MASS`); };
+window.openCam=async()=>{ document.getElementById('camModal').classList.add('on'); try{ const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:720},height:{ideal:1280}},audio:true}); document.getElementById('v').srcObject=stream; startTrack(); }catch(e){ document.getElementById('v').poster='https://picsum.photos/seed/cam/400/800'; showNoti('📸 Camera permission kududa da Giri! Allow pannu'); } };
 window.closeCam=()=>{ document.getElementById('camModal').classList.remove('on'); const v=document.getElementById('v'); if(v.srcObject) v.srcObject.getTracks().forEach(t=>t.stop()); };
 window.flip=()=>{ facing=facing=='user'?'environment':'user'; closeCam(); setTimeout(openCam,300); };
-function startTrack(){
- const can=document.getElementById('c'); const ctx=can.getContext('2d'); can.width=400; can.height=700; let x=150,y=200;
- setInterval(()=>{ ctx.clearRect(0,0,can.width,can.height); x+=(Math.random()-.5)*8; y+=(Math.random()-.5)*8; ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.strokeRect(x,y,100,120); ctx.fillStyle='#fff'; ctx.font='10px Poppins'; ctx.fillText('Face Tracking • Zoom x'+z,x,y-8); },120);
-}
-window.capture=()=>{ showNoti('🎬 Reel Captured with '+filters.find(f=>f.css==curFilter).n+' filter!'); closeCam(); posts.unshift({id:Date.now(),img:'https://picsum.photos/seed/'+Date.now()+'/600/800',caption:`Reel with ${filters.find(f=>f.css==curFilter).n} filter 🔥 #reels`,user:'girikri',likes:0,viewers:[],shares:0,filter:curFilter}); localStorage.setItem('pixoro_posts',JSON.stringify(posts)); renderAll(); };
-
-function renderShareUsers(){
- const users=[{name:'Chinna',tag:'🎀 Chinna 🎀',img:'https://i.pravatar.cc/60?u=1'},{name:'Giri',tag:'🎀 Giri 🎀',img:'https://i.pravatar.cc/60?u=giri'},{name:'je.ya5139',tag:'je.ya5139',img:'https://i.pravatar.cc/60?u=2',seen:true},{name:'looo',tag:'💋 looo 💋',img:'https://i.pravatar.cc/60?u=3'},{name:'dhivin',tag:'dhivin__dh...',img:'https://i.pravatar.cc/60?u=4'},{name:'Pixoro',tag:'Pixoro ✨',isP:true}];
- document.getElementById('susers').innerHTML=users.map(u=>`<div onclick="shareTo('${u.name}')"><div style="position:relative;width:54px;height:54px;margin:0 auto">${u.isP?`<div style="width:54px;height:54px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Grand Hotel';font-size:28px;color:#d62976">P</div>`:`<div class="ring"><img src="${u.img}" style="width:50px;height:50px;border-radius:50%;padding:2px;background:#1c1c1e"></div>`}${u.seen?'<div style="position:absolute;bottom:0;right:0;width:12px;height:12px;background:#0f0;border-radius:50%;border:2px solid #1c1c1e"></div>':''}</div><div style="font-size:11px;color:#fff;margin-top:6px">${u.tag}</div></div>`).join('');
-}
+function startTrack(){ const can=document.getElementById('c'); const ctx=can.getContext('2d'); can.width=400; can.height=700; let x=140,y=180; setInterval(()=>{ ctx.clearRect(0,0,400,700); x+=(Math.random()-.5)*7; y+=(Math.random()-.5)*7; ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.setLineDash([6,4]); ctx.strokeRect(x,y,110,140); ctx.setLineDash([]); ctx.fillStyle='rgba(255,255,255,.9)'; ctx.font='11px Poppins'; ctx.fillText(`Face Track • x${z} • ${filters.find(f=>f.css==curFilter)?.n}`,x,y-10); },100); }
+window.capture=()=>{ showNoti('🎬 Reel Captured MASS!'); closeCam(); posts.unshift({id:Date.now(),img:'https://picsum.photos/seed/'+Date.now()+'/600/800',caption:`Reel with ${filters.find(f=>f.css==curFilter)?.n} filter 🔥`,user:'girikri',likes:0,viewers:[],shares:0,filter:curFilter}); localStorage.setItem('pixoro_posts',JSON.stringify(posts)); render(); };
+window.doRec=()=>capture();
+function renderSUsers(){ const u=[{n:'Chinna',t:'🎀 Chinna 🎀',img:'https://i.pravatar.cc/60?u=1'},{n:'Giri',t:'🎀 Giri 🎀',img:'https://i.pravatar.cc/60?u=giri'},{n:'je.ya',t:'je.ya5139',img:'https://i.pravatar.cc/60?u=2',seen:true},{n:'looo',t:'💋 looo 💋',img:'https://i.pravatar.cc/60?u=3'},{n:'dhivin',t:'dhivin__dh...',img:'https://i.pravatar.cc/60?u=4'},{n:'Pixoro',t:'Pixoro ✨',isP:true}]; document.getElementById('sUsers').innerHTML=u.map(x=>`<div onclick="shareTo('${x.n}')"><div style="position:relative;width:58px;height:58px;margin:0 auto">${x.isP?`<div style="width:58px;height:58px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Grand Hotel';font-size:30px;color:#ff2d55">P</div>`:`<div class="ring"><img src="${x.img}" style="width:52px;height:52px;border-radius:50%;padding:2px;background:#121212"></div>`}${x.seen?'<div style="position:absolute;bottom:0;right:0;width:14px;height:14px;background:#0f0;border-radius:50%;border:2px solid #121212"></div>':''}</div><div style="font-size:11px;color:#fff;margin-top:6px">${x.t}</div></div>`).join(''); }
 window.openShare=(id)=>{ curId=id; document.getElementById('shareSheet').classList.add('on'); };
 window.closeShare=()=>document.getElementById('shareSheet').classList.remove('on');
-window.shareTo=(n)=>{ const p=posts.find(x=>x.id==curId); if(p){ p.shares=(p.shares||0)+1; localStorage.setItem('pixoro_posts',JSON.stringify(posts)); } closeShare(); renderAll(); showNoti(`✈️ Shared to ${n} • ${p?.shares||1} shares • Link copied`); };
-window.like=(id)=>{ const p=posts.find(x=>x.id==id)||reelsData.find(x=>x.id==id); if(!p) { likes[id]=!likes[id]; localStorage.setItem('pixoro_likes',JSON.stringify(likes)); renderAll(); return; } if(likes[id]){ likes[id]=false; p.likes=Math.max(0,(p.likes||0)-1); showNoti('🤍 Unliked'); } else { likes[id]=true; p.likes=(p.likes||0)+1; showNoti('❤️ Liked +1'); } localStorage.setItem('pixoro_likes',JSON.stringify(likes)); localStorage.setItem('pixoro_posts',JSON.stringify(posts)); renderAll(); };
-window.openComment=(id)=>{ curId=id; document.getElementById('commentModal').classList.add('on'); renderC(); };
-window.closeComment=()=>document.getElementById('commentModal').classList.remove('on');
-function renderC(){ const list=comments[curId]||[]; document.getElementById('cList').innerHTML=list.map(c=>`<div style="display:flex;gap:8px;margin-bottom:12px"><img src="https://i.pravatar.cc/40?u=${c.user}" style="width:32px;height:32px;border-radius:50%"><div><b style="font-size:13px">${c.user}</b> <span style="font-size:13px">${c.text}</span><div style="font-size:10px;color:#888;margin-top:2px">1 like • Reply • now</div></div><span style="margin-left:auto">❤️</span></div>`).join('')||'<p style="text-align:center;margin-top:30px;color:#888">No comments yet. Be first!</p>'; }
-window.postC=()=>{ const i=document.getElementById('cInput'); const t=i.value.trim(); if(!t) return; if(!comments[curId]) comments[curId]=[]; comments[curId].push({user:'girikri',text:t}); localStorage.setItem('pixoro_comments',JSON.stringify(comments)); i.value=''; renderC(); renderAll(); showNoti('💬 Comment +1'); };
-window.openProfile=(u)=>{ curUser=u; document.getElementById('profileModal').classList.add('on'); const up=posts.filter(p=>p.user==u); document.getElementById('pU').innerText=u; document.getElementById('pImg').src=`https://i.pravatar.cc/150?u=${u}`; document.getElementById('pP').innerText=up.length||1; let tv=0,tl=0,tc=0,ts=0; up.forEach(p=>{ tv+=p.viewers?.length||p.views||0; tl+=p.likes+(likes[p.id]?1:0); tc+=comments[p.id]?.length||0; ts+=p.shares||0; }); document.getElementById('pV').innerText=tv||1; document.getElementById('pL').innerText=tl||129; document.getElementById('pC').innerText=tc||1; document.getElementById('pS').innerText=ts||2; document.getElementById('pF2').innerText=Object.keys(follows).filter(k=>follows[k]).length||1; document.getElementById('pF1').innerText=128+(follows[u]?1:0); document.getElementById('pGrid').innerHTML=up.map(p=>`<img src="${p.img}" style="width:100%;aspect-ratio:1;object-fit:cover;filter:${p.filter||'none'}">`).join('')||'<p style="grid-column:1/4;text-align:center;padding:20px;color:#888">No posts</p>'; document.getElementById('fBtn').innerText=follows[u]?'Following':'Follow'; document.getElementById('fBtn').style.background=follows[u]?'#222':'#fff'; document.getElementById('fBtn').style.color=follows[u]?'#fff':'#000'; };
-window.closeProfile=()=>document.getElementById('profileModal').classList.remove('on');
-window.toggleF=(u)=>{ u=u||curUser; if(follows[u]) follows[u]=false; else follows[u]=true; localStorage.setItem('pixoro_follows',JSON.stringify(follows)); renderAll(); openProfile(u); showNoti(follows[u]?`Following +1 • ${u}`:'Unfollowed'); };
-window.openFollowers=()=>{ document.getElementById('followModal').classList.add('on'); document.getElementById('fTitle').innerText='Followers • 129'; document.getElementById('fList').innerHTML=['whitezzz__04','don_deepa','sweety_sw','arjun_99','priya_official','giri_mass'].map(u=>`<div class="listItem"><div style="display:flex;gap:10px;align-items:center"><img src="https://i.pravatar.cc/40?u=${u}" style="width:40px;height:40px;border-radius:50%"><div><div style="font-weight:700;font-size:13px">${u}</div><div style="font-size:11px;color:#888">Followed you • 2h ago • 1 view</div></div></div><button style="background:#fff;color:#000;border:0;padding:6px 14px;border-radius:6px;font-size:12px">Remove</button></div>`).join(''); };
-window.openFollowing=()=>{ document.getElementById('followModal').classList.add('on'); document.getElementById('fTitle').innerText='Following • '+(Object.keys(follows).filter(k=>follows[k]).length||1); const list=Object.keys(follows).filter(k=>follows[k]); const final=list.length?list:['whitezzz__04']; document.getElementById('fList').innerHTML=final.map(u=>`<div class="listItem"><div style="display:flex;gap:10px;align-items:center"><img src="https://i.pravatar.cc/40?u=${u}" style="width:40px;height:40px;border-radius:50%"><div><div style="font-weight:700;font-size:13px">${u}</div><div style="font-size:11px;color:#888">Following • 5 views</div></div></div><button onclick="toggleF('${u}');closeFollow()" style="background:#222;color:#fff;border:0;padding:6px 14px;border-radius:6px">Unfollow</button></div>`).join(''); };
+window.shareTo=(n)=>{ const p=posts.find(x=>x.id==curId); if(p){ p.shares=(p.shares||0)+1; localStorage.setItem('pixoro_posts',JSON.stringify(posts)); } closeShare(); render(); showNoti(`✈️ Shared to ${n} • Link copied MASS!`); };
+window.like=(id)=>{ const p=posts.find(x=>x.id==id); if(likes[id]){ likes[id]=false; p.likes=Math.max(0,p.likes-1); showNoti('🤍 Unliked'); } else { likes[id]=true; p.likes++; showNoti('❤️ Liked +1 MASS!'); } localStorage.setItem('pixoro_likes',JSON.stringify(likes)); localStorage.setItem('pixoro_posts',JSON.stringify(posts)); render(); };
+window.openC=(id)=>{ curId=id; document.getElementById('cModal').classList.add('on'); renderC(); };
+window.closeC=()=>document.getElementById('cModal').classList.remove('on');
+function renderC(){ const l=comments[curId]||[]; document.getElementById('cList').innerHTML=l.map(c=>`<div style="display:flex;gap:10px;margin-bottom:14px"><img src="https://i.pravatar.cc/40?u=${c.user}" style="width:36px;height:36px;border-radius:50%"><div><b style="font-size:13px">${c.user}</b> <span style="font-size:13px">${c.text}</span><div style="font-size:11px;color:#888;margin-top:3px">1 like • Reply • now</div></div></div>`).join('')||'<p style="text-align:center;margin-top:40px;color:#666">No comments yet. Be first!</p>'; }
+window.postC=()=>{ const i=document.getElementById('cInput'); const t=i.value.trim(); if(!t) return; if(!comments[curId]) comments[curId]=[]; comments[curId].push({user:'girikri',text:t}); localStorage.setItem('pixoro_comments',JSON.stringify(comments)); i.value=''; renderC(); render(); showNoti('💬 Comment posted MASS!'); };
+window.openProfile=(u)=>{ curUser=u; document.getElementById('pModal').classList.add('on'); const up=posts.filter(p=>p.user==u); document.getElementById('pU').innerText=u; document.getElementById('pImg').src=`https://i.pravatar.cc/150?u=${u}`; document.getElementById('pP').innerText=up.length; let tv=0,tl=0,tc=0,ts=0; up.forEach(p=>{ tv+=p.viewers?.length||0; tl+=p.likes+(likes[p.id]?1:0); tc+=comments[p.id]?.length||0; ts+=p.shares||0; }); document.getElementById('pV').innerText=tv||1; document.getElementById('pL').innerText=tl||130; document.getElementById('pC').innerText=tc||1; document.getElementById('pS').innerText=ts||22; document.getElementById('pF2').innerText=Object.keys(follows).filter(k=>follows[k]).length||1; document.getElementById('pF1').innerText=128+(follows[u]?1:0); document.getElementById('pGrid').innerHTML=up.map(p=>`<img src="${p.img}" style="width:100%;aspect-ratio:1;object-fit:cover;filter:${p.filter||'none'}">`).join(''); document.getElementById('fBtn').innerText=follows[u]?'Following':'Follow'; document.getElementById('fBtn').style.background=follows[u]?'#222':'#fff'; document.getElementById('fBtn').style.color=follows[u]?'#fff':'#000'; };
+window.closeP=()=>document.getElementById('pModal').classList.remove('on');
+window.toggleF=(u)=>{ u=u||curUser; follows[u]=!follows[u]; localStorage.setItem('pixoro_follows',JSON.stringify(follows)); render(); openProfile(u); showNoti(follows[u]?`Following +1 MASS • ${u}`:'Unfollowed'); };
+window.openFollowers=()=>{ document.getElementById('followModal').classList.add('on'); document.getElementById('fTitle').innerText='Followers • 129'; document.getElementById('fList').innerHTML=['whitezzz__04','don_deepa','sweety_sw','arjun_99','priya_official','girl_mass'].map(u=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #1a1a1a"><div style="display:flex;gap:12px;align-items:center;color:#fff"><img src="https://i.pravatar.cc/40?u=${u}" style="width:42px;height:42px;border-radius:50%"><div><div style="font-weight:700;font-size:13px">${u}</div><div style="font-size:11px;color:#888">Followed you • 2h ago • 1 view</div></div></div><button style="background:#fff;color:#000;border:0;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700">Remove</button></div>`).join(''); };
+window.openFollowing=()=>{ document.getElementById('followModal').classList.add('on'); const list=Object.keys(follows).filter(k=>follows[k]); const final=list.length?list:['whitezzz__04']; document.getElementById('fTitle').innerText='Following • '+(final.length); document.getElementById('fList').innerHTML=final.map(u=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #1a1a1a"><div style="display:flex;gap:12px;align-items:center;color:#fff"><img src="https://i.pravatar.cc/40?u=${u}" style="width:42px;height:42px;border-radius:50%"><div><div style="font-weight:700;font-size:13px">${u}</div><div style="font-size:11px;color:#888">Following • 5 views</div></div></div><button onclick="toggleF('${u}');closeFollow()" style="background:#222;color:#fff;border:0;padding:6px 14px;border-radius:8px">Unfollow</button></div>`).join(''); };
 window.closeFollow=()=>document.getElementById('followModal').classList.remove('on');
-window.accept=()=>{ document.getElementById('fReq').innerHTML='<b style=color:#0f0>✅ Accepted • Followers +1 • 130</b>'; document.getElementById('pF1').innerText=130; showNoti('✅ Accepted • Followers +1'); };
-window.reject=()=>{ document.getElementById('fReq').style.display='none'; showNoti('Rejected'); };
-window.openZoom=()=>{ document.getElementById('zImg').src=document.getElementById('pImg').src; document.getElementById('zoomModal').classList.add('on'); };
-window.closeZoom=()=>document.getElementById('zoomModal').classList.remove('on');
-window.rec=()=>showNoti('● Recording with Face Tracking Zoom • Filter: '+filters.find(f=>f.css==curFilter).n);
+window.accept=()=>{ document.getElementById('fReq').innerHTML='<b style=color:#0f0>✅ Accepted • Followers +1 • 129 MASS</b>'; document.getElementById('pF1').innerText=129; showNoti('✅ Followers +1 MASS!'); };
+window.reject=()=>{ document.getElementById('fReq').innerHTML='<b style=color:#ff3040>Rejected</b>'; setTimeout(()=>document.getElementById('fReq').style.display='none',1000); showNoti('Rejected'); };
+window.openZoom=()=>{ document.getElementById('zImg').src=document.getElementById('pImg').src; document.getElementById('zModal').classList.add('on'); };
+window.closeZoom=()=>document.getElementById('zModal').classList.remove('on');
 function showNoti(t){ const n=document.getElementById('noti'); n.textContent=t; n.style.display='block'; setTimeout(()=>n.style.display='none',2200); }
 if(document.readyState=='loading') document.addEventListener('DOMContentLoaded',init); else init();
 </script></body></html>
