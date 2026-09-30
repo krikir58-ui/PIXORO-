@@ -1,16 +1,15 @@
-import { supabase } from '../supabase.js'
-export async function uploadPost(){
-  const fileInput = document.getElementById('fileInput')
-  const file = fileInput.files[0]
-  if(!file) return alert('File select pannu da!')
-  const name = Date.now()+'-'+file.name
-  const {error} = await supabase.storage.from('posts-images').upload(name,file)
-  if(error) return alert(error.message)
-  const {data} = supabase.storage.from('posts-images').getPublicUrl(name)
-  await supabase.from('posts').insert({image_url:data.publicUrl, caption:'PIXORO Post'})
-  alert('Posted da! 🔥'); location.reload()
-}
-export function initUpload(){
-  document.getElementById('uploadBtn')?.addEventListener('click',uploadPost)
-  window.uploadPost = uploadPost
+import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { db } from "./firebase.js";
+export async function uploadRealPost(file, caption, email){
+  const url = URL.createObjectURL(file);
+  await addDoc(collection(db, "reels"), {
+    videoUrl: url,
+    caption: caption,
+    email: email,
+    likes: 0,
+    comments: 0,
+    views: 0,
+    createdAt: serverTimestamp()
+  });
+  alert("Real ah post ayiduchu da Giri! 🔥");
 }
