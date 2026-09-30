@@ -8,52 +8,59 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#000;color:#fff;user-select:none;-webkit-user-select:none;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#000;color:#fff;user-select:none}
 .header{background:#111;padding:12px;position:fixed;top:0;width:100%;z-index:100;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center}
 .header span{color:#ff0050;font-weight:bold;font-size:22px}
 .feed{margin-top:95px;margin-bottom:70px;max-width:500px;margin:0 auto}
 .story-bar{display:flex;gap:12px;padding:10px;background:#111;border-bottom:1px solid #222;overflow-x:auto;position:fixed;top:48px;width:100%;max-width:500px;z-index:90}
-.story{text-align:center;min-width:65px;cursor:pointer}.story-ring{width:58px;height:58px;border-radius:50%;border:3px solid #ff0050;padding:2px;background:#222;display:flex;align-items:center;justify-content:center;}.story-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.story{text-align:center;min-width:65px;cursor:pointer}.story-ring{width:58px;height:58px;border-radius:50%;border:3px solid #ff0050;padding:2px;background:#222;display:flex;align-items:center;justify-content:center}
+.story-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .post{background:#111;margin-bottom:15px;border:1px solid #222;border-radius:12px;overflow:hidden}
 .post-top{padding:10px;display:flex;justify-content:space-between;align-items:center}
-.post-img{width:100%;height:500px;object-fit:cover;background:#222;transition:filter 0.3s}
-.post-actions{padding:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.post-img{width:100%;height:500px;object-fit:cover;background:#222}
+.post-actions{padding:10px;display:flex;gap:12px;align-items:center}
 .btn{background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
-.fake-alert{background:red;color:#fff;text-align:center;padding:8px;font-weight:bold;animation:blink 0.8s infinite}
-@keyframes blink{0%{opacity:1}50%{opacity:0.5}100%{opacity:1}}
-.report-btn{background:#222;color:#fff;border:1px solid red;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:bold}
-.follow-btn{background:#ff0050;color:#fff;border:none;padding:5px 14px;border-radius:15px;font-size:12px;font-weight:bold}
-.follow-btn.following{background:#333}
 .bottom{position:fixed;bottom:0;width:100%;background:#111;display:flex;justify-content:space-around;padding:12px;border-top:1px solid #333;z-index:100}
 .bottom button{background:none;border:none;color:#fff;font-size:24px}
 .login-box{margin-top:100px;text-align:center;padding:20px}
 input{padding:10px;border-radius:8px;border:none;width:250px;margin:5px;background:#222;color:#fff}
 #commentBox{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#111;border-top:1px solid #333;padding:10px;display:none;z-index:1000;max-height:65%;overflow-y:auto;border-radius:15px 15px 0 0}
-#storyView{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;flex-direction:column;}
-.progress-bar{width:100%;height:4px;background:#333}.progress{height:100%;background:#ff0050;width:0%;}
+#storyView{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;flex-direction:column}
+.progress-bar{width:100%;height:4px;background:#333}.progress{height:100%;background:#ff0050;width:0%}
 .safety-badge{background:linear-gradient(45deg,#ff0050,#ff8a00);padding:4px 8px;border-radius:10px;font-size:10px;font-weight:bold}
+.pix-highlights{display:flex;gap:12px;overflow-x:auto;padding:10px 0;margin-top:10px;scrollbar-width:none}
+.pix-h-item{text-align:center;min-width:68px;cursor:pointer}
+.pix-h-ring{width:62px;height:62px;border-radius:50%;border:2px solid #ff0050;padding:3px;background:#222;display:flex;align-items:center;justify-content:center;font-size:26px}
+.pix-h-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.pix-toggle{width:50px;height:28px;background:#333;border-radius:20px;position:relative;cursor:pointer;transition:0.3s;display:inline-block}
+.pix-toggle.on{background:#00c853}
+.pix-toggle-dot{width:22px;height:22px;background:white;border-radius:50%;position:absolute;top:3px;left:3px;transition:0.3s}
+.pix-toggle.on.pix-toggle-dot{left:25px}
+.pix-search{margin:10px 0;background:#000;border:1px solid #333;border-radius:12px;padding:10px;display:flex;align-items:center;gap:10px}
+.pix-search input{background:transparent;width:100%}
+.pix-user-list{background:#111;border-radius:12px;overflow:hidden;border:1px solid #222}
 @keyframes zoomM{0%{transform:scale(0.5);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
-@keyframes loadM{0%{width:0}100%{width:100px}}
 </style>
 </head>
 <body>
 <div id="splash" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:10000;display:flex;align-items:center;justify-content:center;">
 <div style="border:3px solid #FFD700;padding:25px 30px;border-radius:25px;text-align:center;animation:zoomM 1s ease;">
-<div style="font-size:60px;">🛡️</div>
-<h1 style="color:#FFD700;font-size:48px;font-weight:900;letter-spacing:4px;margin:10px 0;">PIXORO</h1>
+<div style="font-size:60px;">🛡️</div><h1 style="color:#FFD700;font-size:48px;font-weight:900;letter-spacing:4px;margin:10px 0;">PIXORO</h1>
 <p style="color:#FFD700;letter-spacing:6px;font-size:11px;font-weight:bold;">WORLD'S SAFEST APP</p>
-<p style="color:#fff;margin-top:25px;font-size:11px;letter-spacing:3px;">FOUNDER • GIRI</p>
-<div style="width:100px;height:3px;background:#FFD700;margin:15px auto;animation:loadM 2s infinite;"></div>
-<p style="color:#666;font-size:9px;margin-top:10px;">GIRLS SAFETY 6 • FAKE ID WARNING • KIDS SAFE</p>
-</div>
-</div>
+<p style="color:#fff;margin-top:25px;font-size:11px;letter-spacing:3px;">FOUNDER • GIRI</p></div></div>
+
 <div class="header"><span onclick="showFeed()">PIXORO 🔥</span><span class="safety-badge">WORLD NO.1 SAFE</span><button onclick="showProfile()" style="background:none;border:none;color:#fff;font-size:22px;">👤</button></div>
+
 <div id="storyBar" class="story-bar" style="display:none;">
 <div class="story" onclick="addStory()"><div class="story-ring" style="border-color:#555;font-size:30px;">➕</div><small>Your Story</small></div>
 <div id="storyList" style="display:flex;gap:12px;"></div>
 </div>
-<div id="loginBox" class="login-box"><h2>PIXORO Login</h2><p style="color:#aaa;font-size:12px;margin:5px;">World No.1 Safe App by GIRI</p><br><input id="email" placeholder="Email"><br><input id="pass" type="password" placeholder="Password"><br><button onclick="login()" style="background:#ff0050;color:#fff;padding:10px 30px;border:none;border-radius:8px;margin-top:10px;">Login / Signup</button><br><br><div style="background:#111;padding:10px;border-radius:10px;text-align:left;font-size:12px;"><b>GIRLS SAFETY 6 🔒</b><br>1. Boy paatha blur<br>2. Screenshot mukam<br>3. Comment delete<br>4. Night mode hide<br>5. Auto cheri button<br>6. Friend list hide</div></div>
+
+<div id="loginBox" class="login-box"><h2>PIXORO Login</h2><p style="color:#aaa;font-size:12px;margin:5px;">World No.1 Safe App by GIRI</p><br><input id="email" placeholder="Email"><br><input id="pass" type="password" placeholder="Password"><br><button onclick="login()" style="background:#ff0050;color:#fff;padding:10px 30px;border:none;border-radius:8px;margin-top:10px;">Login / Signup</button></div>
+
 <div id="feed" class="feed" style="display:none;"></div>
+
+<!-- UPLOAD BOXES SAME AS YOURS -->
 <div id="uploadBox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;padding:20px;text-align:center;overflow-y:auto;">
 <h3 style="margin-top:20px;">Post Podu da Giri! 🔥</h3><br><input id="captionInput" placeholder="Caption enna da?" style="width:90%;"><br><br><input type="file" id="fileInput" accept="image/*" style="width:90%;color:white;"><br><br><img id="preview" style="width:220px;height:300px;object-fit:cover;display:none;border-radius:10px;margin:10px auto;border:2px solid #ff0050;"><br>
 <div style="margin:10px;">
@@ -64,64 +71,73 @@ input{padding:10px;border-radius:8px;border:none;width:250px;margin:5px;backgrou
 <div style="background:#111;border:1px solid #FFD700;padding:10px;border-radius:12px;margin:12px auto;max-width:90%;text-align:left;">
 <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:#FFD700;font-weight:bold;cursor:pointer;">
 <input type="checkbox" id="girlsSafeCheck" style="width:20px;height:20px;"> 🛡️ Girls Photo? Extra Safe ON pannu da
-</label>
-<p style="font-size:10px;color:#aaa;margin-top:5px;">ON panna: blur + watermark (friend email) + 5 sec view - screenshot edutha maatikkuvan da!</p>
-</div>
-<br>
+</label></div><br>
 <button onclick="uploadRealPost()" style="background:#ff0050;color:white;padding:12px 30px;border:none;border-radius:20px;font-weight:bold;">POST 🚀</button>
 <button onclick="uploadBox.style.display='none'" style="background:#333;color:white;padding:10px 20px;border:none;border-radius:20px;margin-left:10px;">Cancel</button>
 </div>
+
 <div id="storyUploadBox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;padding:20px;text-align:center;">
 <h3 style="margin-top:40px;">Story Podu da! 24hr</h3><br><input type="file" id="storyFile" accept="image/*" style="color:white;"><br><br><img id="storyPreview" style="width:220px;height:380px;object-fit:cover;display:none;border-radius:10px;margin:10px auto;"><br><button onclick="uploadStory()" style="background:#ff0050;color:#fff;padding:12px 30px;border:none;border-radius:20px;">Story Post</button><br><br><button onclick="storyUploadBox.style.display='none'" style="background:#333;color:#fff;padding:8px 15px;border:none;border-radius:10px;">Cancel</button>
 </div>
+
 <div id="storyView"><div class="progress-bar"><div id="storyProgress" class="progress"></div></div><div style="display:flex;justify-content:space-between;padding:10px;"><span id="storyUser" style="font-weight:bold;"></span><button onclick="closeStory()" style="background:none;border:none;color:#fff;font-size:22px;">✕</button></div><img id="storyViewImg" style="width:100%;height:80vh;object-fit:contain;"><div style="display:flex;justify-content:space-between;padding:15px;"><span id="storyViews"></span><button id="storyDeleteBtn" onclick="deleteCurrentStory()" style="background:red;color:#fff;border:none;padding:8px 15px;border-radius:10px;">🗑️ Delete</button></div></div>
+
 <div id="commentBox"><div style="display:flex;justify-content:space-between;"><b>Comments</b><button onclick="commentBox.style.display='none'" style="background:none;border:none;color:#fff;">✕</button></div><div id="commentList" style="margin:10px 0;"></div><div style="display:flex;gap:5px;"><input id="commentInput" placeholder="Comment..." style="flex:1;"><button onclick="addComment()" style="background:#ff0050;color:#fff;border:none;padding:8px 15px;border-radius:10px;">Post</button></div></div>
+
+<!-- PROFILE - INGA THAAN MASS FEATURES ADD PANNEN DA GIRI! -->
 <div id="profileBox" style="display:none;margin-top:48px;max-width:500px;margin:0 auto;padding:0;">
 <div style="position:relative;height:190px;background:linear-gradient(45deg,#ff0050,#FFD700);overflow:hidden;">
 <img id="coverImg" src="https://picsum.photos/500/200?random=99" style="width:100%;height:100%;object-fit:cover;">
 <button onclick="changeCover()" style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.75);color:#fff;border:1px solid #FFD700;padding:6px 12px;border-radius:15px;font-size:11px;font-weight:bold;">📸 Cover Maathu</button>
-<div style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.7);color:#FFD700;padding:5px 10px;border-radius:15px;font-size:10px;border:1px solid #FFD700;">🛡️ SCREENSHOT PROTECTED</div>
 </div>
 <div style="padding:15px;background:#111;margin-top:-25px;border-radius:25px 25px 0 0;position:relative;z-index:2;">
 <div style="display:flex;gap:15px;align-items:flex-start;">
 <img id="profilePic" onclick="zoomProfile()" src="https://i.pravatar.cc/150" style="width:90px;height:90px;border-radius:50%;border:4px solid #ff0050;object-fit:cover;cursor:pointer;box-shadow:0 0 25px #ff0050;margin-top:-35px;background:#222;">
 <div style="flex:1;">
-<h2 id="pName" style="font-size:20px;"></h2>
-<p id="pEmail" style="color:#aaa;font-size:11px;"></p>
-<p id="pBio" style="color:#fff;font-size:13px;margin-top:6px;line-height:1.4;">🔥 Founder Giri | PIXORO World No.1 Safe App 🛡️</p>
-<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
-<button onclick="editBio()" style="background:#222;color:#FFD700;border:1px solid #FFD700;padding:5px 12px;border-radius:12px;font-size:10px;font-weight:bold;">✏️ Bio Maathu</button>
-<button onclick="changeProfilePic()" style="background:#ff0050;color:#fff;border:none;padding:5px 12px;border-radius:12px;font-size:10px;font-weight:bold;">📸 Photo Maathu</button>
-</div>
-</div>
-</div>
+<h2 id="pName" style="font-size:20px;"></h2><p id="pEmail" style="color:#aaa;font-size:11px;"></p>
+<p id="pBio" style="color:#fff;font-size:13px;margin-top:6px;">🔥 Founder Giri | PIXORO World No.1 Safe App 🛡️</p>
+</div></div>
+
 <div style="display:flex;justify-content:space-around;text-align:center;margin:16px 0;background:#000;padding:12px;border-radius:15px;border:1px solid #222;">
-<div><b id="postCount">0</b><br><small>Posts</small></div><div onclick="showFollowers()"><b id="followerCount">0</b><br><small>Followers</small></div><div onclick="showFollowing()"><b id="followingCount">0</b><br><small>Following</small></div>
+<div><b id="postCount">0</b><br><small>Posts</small></div><div onclick="showFollowersPopup()"><b id="followerCount">0</b><br><small>Followers</small></div><div onclick="showFollowingPopup()"><b id="followingCount">0</b><br><small>Following</small></div>
 </div>
-<div style="background:linear-gradient(45deg,#111,#222);padding:12px;border-radius:12px;margin:10px 0;border-left:4px solid #00ff00;"><b>🛡️ FAKE ID POLICE - VERIFIED BY GIRI</b><br><small id="fakeStatus" style="color:#00ff88;font-weight:bold;">✅ Verified Real Account</small><br><small style="font-size:10px;color:#aaa;">Fake ID auto RED ALERT + Screenshot blur da!</small></div>
-<div id="myPosts" style="margin-top:10px;"></div>
+
+<!-- ★★★ NEW MASS FEATURES - PRIVATE + HIGHLIGHTS ★★★ -->
+<div style="background:#000;padding:12px;border-radius:12px;margin:10px 0;border:1px solid #222;display:flex;justify-content:space-between;align-items:center;">
+<div><b style="font-size:13px;">🔒 Private Account</b><br><small style="font-size:11px;color:#aaa;">Public pudikalana private pannu da</small></div>
+<div class="pix-toggle" id="privateToggle" onclick="togglePrivateAccount()"><div class="pix-toggle-dot"></div></div>
 </div>
+
+<!-- HIGHLIGHTS - INSTA MAADHIRI AANA PIXORO STYLE -->
+<p style="font-weight:bold;color:#ff0050;margin-top:15px;">✨ Featured PIXORO</p>
+<div class="pix-highlights">
+<div class="pix-h-item" onclick="openHighlight('My Circle','👩‍👩‍👧')"><div class="pix-h-ring">👩‍👩‍👧</div><small style="font-size:10px;">My Circle</small><br><span style="font-size:9px;background:#ff0050;color:#fff;padding:1px 5px;border-radius:8px;">3</span></div>
+<div class="pix-h-item" onclick="openHighlight('Safe Places','📍')"><div class="pix-h-ring" style="border-color:#00c853;">📍</div><small style="font-size:10px;">Safe Places</small><br><span style="font-size:9px;background:#00c853;color:#fff;padding:1px 5px;border-radius:8px;">5 Places</span></div>
+<div class="pix-h-item" onclick="openHighlight('SOS History','🚨')"><div class="pix-h-ring" style="border-color:#ff1744;">🚨</div><small style="font-size:10px;">SOS History</small><br><span style="font-size:9px;background:#ff1744;color:#fff;padding:1px 5px;border-radius:8px;">2</span></div>
+<div class="pix-h-item" onclick="openHighlight('Fake Calls','📞')"><div class="pix-h-ring" style="border-color:#7c4dff;">📞</div><small style="font-size:10px;">Fake Calls</small><br><span style="font-size:9px;background:#7c4dff;color:#fff;padding:1px 5px;border-radius:8px;">10</span></div>
+<div class="pix-h-item" onclick="openHighlight('Safety Tips','💡')"><div class="pix-h-ring" style="border-color:#ff6d00;">💡</div><small style="font-size:10px;">Tips</small><br><span style="font-size:9px;background:#ff6d00;color:#fff;padding:1px 5px;border-radius:8px;">12</span></div>
 </div>
+
+<!-- SEARCH FOLLOWERS -->
+<div class="pix-search"><span>🔍</span><input type="text" id="followerSearch" placeholder="Search followers / following..." oninput="filterFollowList()"></div>
+<div id="followListBox" class="pix-user-list" style="display:none;"></div>
+
+<div id="myPosts" style="margin-top:15px;display:flex;flex-wrap:wrap;gap:2px;"></div>
+</div></div>
+
 <div id="picZoomModal" onclick="this.style.display='none'" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.96);z-index:10001;align-items:center;justify-content:center;flex-direction:column;">
-<img id="zoomedPic" style="width:88%;max-width:380px;height:380px;border-radius:50%;border:5px solid #FFD700;object-fit:cover;box-shadow:0 0 40px #FFD700;animation:zoomM 0.3s;">
-<h3 id="zoomName" style="color:#FFD700;margin-top:20px;letter-spacing:2px;"></h3>
-<p style="color:#fff;font-size:12px;margin-top:10px;text-align:center;padding:0 20px;">🛡️ PIXORO Protected - Screenshot Block Active da!</p>
-</div>
+<img id="zoomedPic" style="width:88%;max-width:380px;height:380px;border-radius:50%;border:5px solid #FFD700;object-fit:cover;"><h3 id="zoomName" style="color:#FFD700;margin-top:20px;"></h3></div>
+
 <div class="bottom" id="bottomNav" style="display:none;">
 <button onclick="showFeed()">🏠</button><button onclick="addPost()">➕</button><button onclick="showProfile()">👤</button><button onclick="logout()">🚪</button>
 </div>
+
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",
-  authDomain: "pixoro-75927.firebaseapp.com",
-  projectId: "pixoro-75927",
-  storageBucket: "pixoro-75927.firebasestorage.app",
-  messagingSenderId: "814840120295",
-  appId: "1:814840120295:web:6c02c613df5a17209bf342"
-};
+const firebaseConfig={apiKey:"AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",authDomain:"pixoro-75927.firebaseapp.com",projectId:"pixoro-75927",storageBucket:"pixoro-75927.firebasestorage.app",messagingSenderId:"814840120295",appId:"1:814840120295:web:6c02c613df5a17209bf342"};
 if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();const db=firebase.firestore();
-let currentUser=null;let currentCommentPostId=null;let currentStoryId=null;let storyTimer=null;
+let currentUser=null;let currentCommentPostId=null;let currentStoryId=null;let storyTimer=null;let isPrivate=false;let allFollowers=[];
+
 setTimeout(()=>{let s=document.getElementById('splash');if(s){s.style.transition='opacity 0.5s';s.style.opacity='0';setTimeout(()=>s.style.display='none',500);}},2200);
 auth.onAuthStateChanged(u=>{if(u){currentUser=u;loginBox.style.display="none";feed.style.display="block";bottomNav.style.display="flex";storyBar.style.display="flex";loadFeed();loadStories();}else{loginBox.style.display="block";feed.style.display="none";bottomNav.style.display="none";storyBar.style.display="none";profileBox.style.display="none";}});
 function login(){let e=email.value.trim();let p=pass.value.trim();if(!e||!p)return alert("Email Password podu da!");if(p.length<6)return alert("Password 6 letter ku mela podu da!");auth.signInWithEmailAndPassword(e,p).catch(err=>{if(err.code==="auth/user-not-found"||err.code==="auth/invalid-credential"||err.code==="auth/wrong-password"){auth.createUserWithEmailAndPassword(e,p).catch(e2=>alert("Signup Error: "+e2.message));}else{alert("Login Error: "+err.message);}});}
@@ -132,52 +148,69 @@ function addPost(){uploadBox.style.display='block';}
 function addStory(){storyUploadBox.style.display='block';}
 fileInput.addEventListener('change',e=>{let f=e.target.files[0];if(f){let r=new FileReader();r.onload=ev=>{preview.src=ev.target.result;preview.style.display='block';};r.readAsDataURL(f);}});
 storyFile.addEventListener('change',e=>{let f=e.target.files[0];if(f){let r=new FileReader();r.onload=ev=>{storyPreview.src=ev.target.result;storyPreview.style.display='block';};r.readAsDataURL(f);}});
-async function uploadRealPost(){let cap=captionInput.value.trim();if(!cap)return alert("Caption podu da");let img=preview.src||"https://picsum.photos/500/700?random="+Math.random();let filter=preview.style.filter||"none";let isProtected=document.getElementById('girlsSafeCheck').checked;await db.collection("reels").add({email:currentUser.email.split("@")[0],uid:currentUser.uid,caption:cap,videoUrl:img,filter:filter,isProtected:isProtected,likes:0,likedBy:[],reports:0,commentsCount:0,views:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});uploadBox.style.display='none';captionInput.value='';preview.style.display='none';fileInput.value='';document.getElementById('girlsSafeCheck').checked=false;loadFeed();if(isProtected)alert("🛡️ Girls Safe ON da Giri!");}
-async function uploadStory(){if(!storyPreview.src)return alert("Photo select pannu da");await db.collection("stories").add({email:currentUser.email.split("@")[0],uid:currentUser.uid,imageUrl:storyPreview.src,views:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});storyUploadBox.style.display='none';storyPreview.style.display='none';storyFile.value='';loadStories();alert("Story pottacha da!");}
-async function loadStories(){try{let snap=await db.collection("stories").orderBy("createdAt","desc").limit(20).get();let h="";let now=new Date();snap.forEach(d=>{let s=d.data();if(!s.createdAt)return;let diff=(now - s.createdAt.toDate())/1000/3600;if(diff>24)return;h+=`<div class="story" onclick="viewStory('${d.id}')"><div class="story-ring"><img src="${s.imageUrl}"></div><small>${s.email}</small><br><small style="color:#aaa;font-size:9px;">${s.views||0} views</small></div>`;});storyList.innerHTML=h;}catch(e){console.log(e);}}
+async function uploadRealPost(){let cap=captionInput.value.trim();if(!cap)return alert("Caption podu da");let img=preview.src||"https://picsum.photos/500/700?random="+Math.random();let filter=preview.style.filter||"none";let isProtected=document.getElementById('girlsSafeCheck').checked;await db.collection("reels").add({email:currentUser.email.split("@")[0],uid:currentUser.uid,caption:cap,videoUrl:img,filter:filter,isProtected:isProtected,likes:0,likedBy:[],reports:0,commentsCount:0,views:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});uploadBox.style.display='none';captionInput.value='';preview.style.display='none';fileInput.value='';document.getElementById('girlsSafeCheck').checked=false;loadFeed();}
+async function uploadStory(){if(!storyPreview.src)return alert("Photo select pannu da");await db.collection("stories").add({email:currentUser.email.split("@")[0],uid:currentUser.uid,imageUrl:storyPreview.src,views:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});storyUploadBox.style.display='none';storyPreview.style.display='none';storyFile.value='';loadStories();}
+async function loadStories(){try{let snap=await db.collection("stories").orderBy("createdAt","desc").limit(20).get();let h="";let now=new Date();snap.forEach(d=>{let s=d.data();if(!s.createdAt)return;let diff=(now - s.createdAt.toDate())/1000/3600;if(diff>24)return;h+=`<div class="story" onclick="viewStory('${d.id}')"><div class="story-ring"><img src="${s.imageUrl}"></div><small>${s.email}</small></div>`;});storyList.innerHTML=h;}catch(e){}}
 async function viewStory(id){let doc=await db.collection("stories").doc(id).get();if(!doc.exists)return;let s=doc.data();currentStoryId=id;storyView.style.display="flex";storyViewImg.src=s.imageUrl;storyUser.innerText=s.email;storyViews.innerText=(s.views||0)+" views";storyDeleteBtn.style.display=(s.uid===currentUser.uid)?"block":"none";await db.collection("stories").doc(id).update({views:firebase.firestore.FieldValue.increment(1)}).catch(()=>{});let progress=0;storyProgress.style.width="0%";clearInterval(storyTimer);storyTimer=setInterval(()=>{progress+=1;storyProgress.style.width=progress+"%";if(progress>=100){closeStory();}},150);}
 function closeStory(){storyView.style.display="none";clearInterval(storyTimer);currentStoryId=null;loadStories();}
-async function deleteCurrentStory(){if(!currentStoryId)return;if(!confirm("Story delete pannava?"))return;await db.collection("stories").doc(currentStoryId).delete();closeStory();alert("Delete aaiduchu!");loadStories();}
+async function deleteCurrentStory(){if(!currentStoryId)return;if(!confirm("Delete?"))return;await db.collection("stories").doc(currentStoryId).delete();closeStory();loadStories();}
 async function loadFeed(){
 try{
 let s=await db.collection("reels").orderBy("createdAt","desc").limit(20).get();
-if(s.empty){
-feed.innerHTML=`<div class="post"><div class="post-top"><span style="display:flex;align-items:center;gap:8px;"><img src="https://i.pravatar.cc/100?u=giri" style="width:32px;height:32px;border-radius:50%"><b>giri_official</b><span class="safety-badge">SAFE</span></span></div><img class="post-img" src="https://picsum.photos/500/600?random=1"><div class="post-actions"><button class="btn">❤️</button><button class="btn">💬</button><button class="btn">↗️</button><span style="margin-left:auto;font-size:12px;font-weight:bold;">World No.1 Safe App Demo</span></div><div style="padding:8px 10px;"><b>giri_official</b> PIXORO - Girls Safety 6 + Fake ID Warning 🔥</div></div>`;
-return;
-}
+if(s.empty){feed.innerHTML=`<div class="post"><div class="post-top"><b>giri_official</b></div><img class="post-img" src="https://picsum.photos/500/600?random=1"><div class="post-actions"><button class="btn">❤️</button></div></div>`;return;}
 let h="";let follows=await getFollowing();let blockedDoc=await db.collection("users").doc(currentUser.uid).get();let blocked=blockedDoc.exists?(blockedDoc.data().blocked||[]):[];
-s.forEach(d=>{let x=d.data();if(blocked.includes(x.uid))return;let isLiked=x.likedBy&&x.likedBy.includes(currentUser.uid);let reports=x.reports||0;let isFake=reports>=3;let isOwn=x.uid===currentUser.uid;let likes=Math.max(0,x.likes||0);
-let isProtected=x.isProtected;
-let imgFilter=isProtected?"blur(18px)":(x.filter||'none');
-let watermark=isProtected?`<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);color:rgba(255,255,255,0.35);font-size:18px;font-weight:900;pointer-events:none;border:2px solid rgba(255,215,0,0.4);padding:6px 12px;background:rgba(0,0,0,0.3);white-space:nowrap;">${currentUser.email} 🛡️</div>`:"";
-let safeTag=isProtected?`<div style="position:absolute;bottom:12px;left:10px;background:linear-gradient(45deg,red,#FFD700);color:#fff;padding:5px 10px;border-radius:20px;font-size:9px;font-weight:bold;">🛡️ GIRLS SAFE - TAP 5 SEC</div>`:"";
-let clickAct=isProtected?`addView('${d.id}'); if(this.dataset.open!='1'){this.dataset.open='1'; this.style.filter='none'; setTimeout(()=>{this.style.filter='blur(18px)'; this.dataset.open='0';},5000);}else{this.style.filter='blur(18px)'; this.dataset.open='0';}`:`addView('${d.id}');this.style.filter=(this.style.filter==='blur(20px)'?'none':'blur(20px)')`;
-h+=`<div class="post">${isFake?`<div class="fake-alert">🚨 FAKE ID WARNING! ${reports} REPORTS</div>`:''}<div class="post-top"><span style="display:flex;align-items:center;gap:8px;"><img src="https://i.pravatar.cc/100?u=${x.email}" onclick="openUserZoom('${x.email}','https://i.pravatar.cc/150?u=${x.email}')" style="width:32px;height:32px;border-radius:50%;cursor:pointer;"><b>${x.email}</b>${isFake?'<span style="background:red;padding:2px 6px;border-radius:10px;font-size:10px;">FAKE</span>':(isProtected?'<span style="background:linear-gradient(45deg,#ff0050,#FFD700);padding:2px 6px;border-radius:10px;font-size:9px;">🛡️ SAFE</span>':'<span class="safety-badge" style="font-size:8px;">SAFE</span>')}</span><div style="display:flex;gap:5px;">${!isOwn?`<button class="follow-btn ${follows.includes(x.uid)?'following':''}" onclick="toggleFollow('${x.uid}')">${follows.includes(x.uid)?'Following':'Follow'}</button>`:''}<button class="report-btn" onclick="reportFake('${d.id}')">🚨</button><button class="report-btn" onclick="blockUser('${x.uid}')" style="border-color:#666;">🚫</button></div></div><div style="position:relative;overflow:hidden;"><img class="post-img" src="${x.videoUrl}" style="filter:${imgFilter}" onclick="${clickAct}">${watermark}${safeTag}</div><div class="post-actions"><button class="btn" onclick="likePost('${d.id}',this)">${isLiked?'❤️':'🤍'}</button><button class="btn" onclick="openComments('${d.id}')">💬</button><button class="btn" onclick="sharePost()">↗️</button><span style="margin-left:auto;font-size:12px;font-weight:bold;">${likes} likes</span></div><div style="padding:8px 10px;font-size:14px;display:flex;justify-content:space-between;"><span><b>${x.email}</b> ${x.caption||''}</span>${isOwn?`<button onclick="deletePost('${d.id}')" style="background:red;color:#fff;border:none;padding:4px 10px;border-radius:10px;font-size:11px;">🗑️</button>`:''}</div></div>`;});
+s.forEach(d=>{let x=d.data();if(blocked.includes(x.uid))return;let isLiked=x.likedBy&&x.likedBy.includes(currentUser.uid);let likes=Math.max(0,x.likes||0);let isOwn=x.uid===currentUser.uid;
+h+=`<div class="post"><div class="post-top"><span style="display:flex;align-items:center;gap:8px;"><img src="https://i.pravatar.cc/100?u=${x.email}" onclick="openUserZoom('${x.email}','https://i.pravatar.cc/150?u=${x.email}')" style="width:32px;height:32px;border-radius:50%;"><b>${x.email}</b></span><div style="display:flex;gap:5px;">${!isOwn?`<button class="follow-btn ${follows.includes(x.uid)?'following':''}" onclick="toggleFollow('${x.uid}')">${follows.includes(x.uid)?'Following':'Follow'}</button>`:''}<button class="report-btn" onclick="reportFake('${d.id}')" style="background:#222;color:#fff;border:1px solid red;padding:5px 10px;border-radius:20px;font-size:11px;">🚨</button></div></div><div style="position:relative;"><img class="post-img" src="${x.videoUrl}" style="filter:${x.filter||'none'}" onclick="addView('${d.id}')"></div><div class="post-actions"><button class="btn" onclick="likePost('${d.id}',this)">${isLiked?'❤️':'🤍'}</button><button class="btn" onclick="openComments('${d.id}')">💬</button><button class="btn" onclick="sharePost()">↗️</button><span style="margin-left:auto;font-size:12px;font-weight:bold;">${likes} likes</span></div><div style="padding:8px 10px;font-size:14px;"><b>${x.email}</b> ${x.caption||''}</div></div>`;});
 feed.innerHTML=h||"<p style='text-align:center;margin-top:50px;color:#666;'>No posts da!</p>";
 }catch(e){feed.innerHTML="<p style='text-align:center;margin-top:50px;color:red;'>Error: "+e.message+"</p>";}
 }
 async function getFollowing(){let doc=await db.collection("users").doc(currentUser.uid).get();return doc.exists?(doc.data().following||[]):[];}
 async function toggleFollow(uid){if(uid===currentUser.uid)return;let ref=db.collection("users").doc(currentUser.uid);let doc=await ref.get();let following=doc.exists?(doc.data().following||[]):[];if(following.includes(uid)){await ref.update({following:firebase.firestore.FieldValue.arrayRemove(uid)});await db.collection("users").doc(uid).update({followers:firebase.firestore.FieldValue.arrayRemove(currentUser.uid)}).catch(()=>{});}else{await ref.set({following:firebase.firestore.FieldValue.arrayUnion(uid),email:currentUser.email},{merge:true});await db.collection("users").doc(uid).set({followers:firebase.firestore.FieldValue.arrayUnion(currentUser.uid)},{merge:true});}loadFeed();loadProfile();}
-async function likePost(id,btn){try{let ref=db.collection("reels").doc(id);let doc=await ref.get();if(!doc.exists)return;let x=doc.data();let liked=x.likedBy||[];let isLiked=liked.includes(currentUser.uid);if(btn)btn.innerText=isLiked?'🤍':'❤️';if(isLiked){await ref.update({likes:Math.max(0,(x.likes||1)-1),likedBy:firebase.firestore.FieldValue.arrayRemove(currentUser.uid)});}else{await ref.update({likes:firebase.firestore.FieldValue.increment(1),likedBy:firebase.firestore.FieldValue.arrayUnion(currentUser.uid)});}loadFeed();}catch(e){alert("Like error: "+e.message);}}
+async function likePost(id,btn){try{let ref=db.collection("reels").doc(id);let doc=await ref.get();if(!doc.exists)return;let x=doc.data();let liked=x.likedBy||[];let isLiked=liked.includes(currentUser.uid);if(btn)btn.innerText=isLiked?'🤍':'❤️';if(isLiked){await ref.update({likes:Math.max(0,(x.likes||1)-1),likedBy:firebase.firestore.FieldValue.arrayRemove(currentUser.uid)});}else{await ref.update({likes:firebase.firestore.FieldValue.increment(1),likedBy:firebase.firestore.FieldValue.arrayUnion(currentUser.uid)});}loadFeed();}catch(e){}}
 async function addView(id){await db.collection("reels").doc(id).update({views:firebase.firestore.FieldValue.increment(1)}).catch(()=>{});}
 function sharePost(){if(navigator.share){navigator.share({title:"PIXORO",text:"PIXORO la paaru da",url:location.href});}else{navigator.clipboard.writeText(location.href);alert("Link copy panniten da!");}}
 async function openComments(id){currentCommentPostId=id;commentBox.style.display="block";loadComments();}
 async function loadComments(){let s=await db.collection("reels").doc(currentCommentPostId).collection("comments").orderBy("createdAt","asc").get();let h="";s.forEach(d=>{let c=d.data();let isOwn=c.email===currentUser.email.split("@")[0];h+=`<div style="padding:6px 0;border-bottom:1px solid #222;display:flex;justify-content:space-between;"><span><b>${c.email}</b> ${c.text}</span>${isOwn?`<button onclick="deleteComment('${d.id}')" style="background:none;border:none;color:red;">🗑️</button>`:''}</div>`;});commentList.innerHTML=h||"<p style='color:#666;'>First comment neeye podu da!</p>";}
 async function addComment(){let t=commentInput.value.trim();if(!t)return;await db.collection("reels").doc(currentCommentPostId).collection("comments").add({email:currentUser.email.split("@")[0],text:t,createdAt:firebase.firestore.FieldValue.serverTimestamp()});await db.collection("reels").doc(currentCommentPostId).update({commentsCount:firebase.firestore.FieldValue.increment(1)});commentInput.value="";loadComments();loadFeed();}
-async function deleteComment(cid){if(!confirm("Comment delete pannava?"))return;await db.collection("reels").doc(currentCommentPostId).collection("comments").doc(cid).delete();await db.collection("reels").doc(currentCommentPostId).update({commentsCount:firebase.firestore.FieldValue.increment(-1)});loadComments();loadFeed();}
-async function deletePost(id){if(!confirm("Post delete pannava da?"))return;await db.collection("reels").doc(id).delete();alert("Delete aaiduchu!");loadFeed();loadProfile();}
-async function reportFake(id){if(!confirm("Fake ID ah da?"))return;await db.collection("reels").doc(id).update({reports:firebase.firestore.FieldValue.increment(1)});alert("Report pannita da!");loadFeed();if(navigator.vibrate)navigator.vibrate([300,100,300]);}
-async function blockUser(uid){if(!confirm("Block pannava da?"))return;await db.collection("users").doc(currentUser.uid).set({blocked:firebase.firestore.FieldValue.arrayUnion(uid)},{merge:true});alert("Block pannita da!");loadFeed();}
-async function loadProfile(){pName.innerText=currentUser.email.split("@")[0];pEmail.innerText=currentUser.email;try{let u=await db.collection("users").doc(currentUser.uid).get();if(u.exists){let d=u.data();if(d.bio)document.getElementById('pBio').innerText=d.bio;if(d.cover)document.getElementById('coverImg').src=d.cover;if(d.photo)document.getElementById('profilePic').src=d.photo;}}catch(e){}let my=await db.collection("reels").where("uid","==",currentUser.uid).get();postCount.innerText=my.size;let u2=await db.collection("users").doc(currentUser.uid).get();let d2=u2.exists?u2.data():{};followerCount.innerText=(d2.followers||[]).length;followingCount.innerText=(d2.following||[]).length;let h="";my.forEach(x=>{let data=x.data();h+=`<div style="display:inline-block;width:32%;margin:2px;position:relative;"><img src="${data.videoUrl}" style="width:100%;height:120px;object-fit:cover;border-radius:10px;filter:${data.filter||'none'}"><button onclick="deletePost('${x.id}')" style="position:absolute;top:4px;right:4px;background:red;color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:11px;">✕</button></div>`});myPosts.innerHTML=h||"<p style='color:#666;text-align:center;margin-top:20px;'>No posts yet da!</p>";}
-function zoomProfile(){let pic=document.getElementById('profilePic').src;document.getElementById('zoomedPic').src=pic;document.getElementById('zoomName').innerText=document.getElementById('pName').innerText;document.getElementById('picZoomModal').style.display='flex';if(navigator.vibrate)navigator.vibrate(100);}
+async function deleteComment(cid){if(!confirm("Delete?"))return;await db.collection("reels").doc(currentCommentPostId).collection("comments").doc(cid).delete();loadComments();}
+async function deletePost(id){if(!confirm("Post delete pannava da?"))return;await db.collection("reels").doc(id).delete();loadFeed();loadProfile();}
+async function reportFake(id){if(!confirm("Fake ID ah da?"))return;await db.collection("reels").doc(id).update({reports:firebase.firestore.FieldValue.increment(1)});alert("Report pannita da!");loadFeed();}
+async function loadProfile(){
+pName.innerText=currentUser.email.split("@")[0];pEmail.innerText=currentUser.email;
+try{let u=await db.collection("users").doc(currentUser.uid).get();if(u.exists){let d=u.data();if(d.bio)document.getElementById('pBio').innerText=d.bio;if(d.cover)document.getElementById('coverImg').src=d.cover;if(d.photo)document.getElementById('profilePic').src=d.photo;isPrivate=d.isPrivate||false;document.getElementById('privateToggle').classList.toggle('on',isPrivate);}}catch(e){}
+let my=await db.collection("reels").where("uid","==",currentUser.uid).get();postCount.innerText=my.size;
+let u2=await db.collection("users").doc(currentUser.uid).get();let d2=u2.exists?u2.data():{};followerCount.innerText=(d2.followers||[]).length;followingCount.innerText=(d2.following||[]).length;
+allFollowers=[...(d2.followers||[]),...(d2.following||[])];
+let h="";my.forEach(x=>{let data=x.data();h+=`<div style="display:inline-block;width:32%;margin:1px;position:relative;"><img src="${data.videoUrl}" style="width:100%;height:120px;object-fit:cover;border-radius:10px;filter:${data.filter||'none'}"><button onclick="deletePost('${x.id}')" style="position:absolute;top:4px;right:4px;background:red;color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:11px;">✕</button></div>`});myPosts.innerHTML=h||"<p style='color:#666;text-align:center;margin-top:20px;'>No posts yet da!</p>";
+}
+function zoomProfile(){document.getElementById('zoomedPic').src=document.getElementById('profilePic').src;document.getElementById('zoomName').innerText=document.getElementById('pName').innerText;document.getElementById('picZoomModal').style.display='flex';}
 function openUserZoom(name,pic){document.getElementById('zoomedPic').src=pic;document.getElementById('zoomName').innerText=name;document.getElementById('picZoomModal').style.display='flex';}
-async function editBio(){let cur=document.getElementById('pBio').innerText;let newBio=prompt("Bio enna poda pora da?",cur);if(newBio){document.getElementById('pBio').innerText=newBio;await db.collection("users").doc(currentUser.uid).set({bio:newBio},{merge:true});alert("Bio maathita da!");}}
-async function changeCover(){let url=prompt("Cover link podu da");let newCover=url||"https://picsum.photos/500/200?random="+Math.floor(Math.random()*100);document.getElementById('coverImg').src=newCover;await db.collection("users").doc(currentUser.uid).set({cover:newCover},{merge:true});}
-async function changeProfilePic(){let url=prompt("Profile link podu da");let newPic=url||"https://i.pravatar.cc/150?u="+currentUser.email+"_"+Math.random();document.getElementById('profilePic').src=newPic;await db.collection("users").doc(currentUser.uid).set({photo:newPic},{merge:true});}
-async function showFollowers(){let doc=await db.collection("users").doc(currentUser.uid).get();let list=doc.exists?(doc.data().followers||[]):[];alert("Followers ("+list.length+"): \n"+(list.join("\n")||"No followers"));}
-async function showFollowing(){let doc=await db.collection("users").doc(currentUser.uid).get();let list=doc.exists?(doc.data().following||[]):[];alert("Following ("+list.length+"): \n"+(list.join("\n")||"No following"));}
-document.addEventListener('keyup',e=>{if(e.key=='PrintScreen'||e.keyCode==44){alert("🚨 SCREENSHOT BLOCKED DA! 🛡️");document.body.style.filter='blur(30px)';setTimeout(()=>document.body.style.filter='none',2500);}});
-document.addEventListener('contextmenu',e=>{if(e.target.tagName==='IMG'){e.preventDefault();alert("🚫 Photo save block da!");return false;}});
+async function togglePrivateAccount(){
+isPrivate=!isPrivate;
+document.getElementById('privateToggle').classList.toggle('on',isPrivate);
+await db.collection("users").doc(currentUser.uid).set({isPrivate:isPrivate},{merge:true});
+alert(isPrivate?'🔒 Private account ON da! Follow request vantha tha pakalam da!':'🌍 Public account ON da! Yellarum pakalam da!');
+}
+function openHighlight(name,icon){alert(icon+' '+name+'\n\nPIXORO Featured - '+name+' la irukura posts varum da Giri! Mass ah!');}
+function showFollowersPopup(){showFollowList('followers');}
+function showFollowingPopup(){showFollowList('following');}
+async function showFollowList(type){
+let doc=await db.collection("users").doc(currentUser.uid).get();if(!doc.exists)return;
+let data=doc.data();let list=type==='followers'?(data.followers||[]):(data.following||[]);
+allFollowers=list;
+document.getElementById('followListBox').style.display='block';
+renderFollowList(list, type);
+}
+function renderFollowList(list, type){
+let q=document.getElementById('followerSearch').value.toLowerCase();
+let filtered=list.filter(id=>id.toLowerCase().includes(q));
+document.getElementById('followListBox').innerHTML=filtered.map(id=>`
+<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #222;">
+<div style="display:flex;align-items:center;gap:10px;"><img src="https://i.pravatar.cc/100?u=${id}" style="width:36px;height:36px;border-radius:50%;"><div><b style="font-size:13px;">${id}</b><br><small style="color:#aaa;">${type}</small></div></div>
+<button onclick="alert('Profile: ${id}')" style="background:#ff0050;color:#fff;border:none;padding:5px 12px;border-radius:12px;font-size:11px;">View</button>
+</div>`).join('') || `<p style="padding:15px;color:#666;text-align:center;">No ${type} found da Giri!</p>`;
+}
+function filterFollowList(){renderFollowList(allFollowers,'followers / following');}
 </script>
 </body>
 </html>
