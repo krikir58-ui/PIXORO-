@@ -1,204 +1,54 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO REAL</title>
-<link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PIXORO - Insta Single File</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:#000;display:flex;justify-content:center;font-family:'Poppins',sans-serif}
-#app{width:100%;max-width:470px;min-height:100vh;background:#000;position:relative}
-.top{position:fixed;top:0;width:100%;max-width:470px;z-index:30;display:flex;justify-content:space-between;padding:14px 16px;color:#fff;font-weight:700;background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent)}
-.reels{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory}.reels::-webkit-scrollbar{display:none}
-.reel{height:100vh;scroll-snap-align:start;position:relative;background:#000}.reel img{width:100%;height:100%;object-fit:cover}
-.right{position:absolute;right:8px;bottom:90px;display:flex;flex-direction:column;gap:14px;color:#fff;z-index:5}
-.ic{width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.14);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:22px}
-.info{position:absolute;bottom:76px;left:12px;right:72px;color:#fff;z-index:5;text-shadow:0 1px 4px rgba(0,0,0,.8)}
-.bottom{position:fixed;bottom:0;width:100%;max-width:470px;background:#000;border-top:1px solid #1a1a1a;display:flex;justify-content:space-around;padding:12px 0;z-index:40;color:#fff;font-size:22px}
-.modal{position:fixed;inset:0;z-index:100;display:none;background:#000;flex-direction:column}.modal.on{display:flex}
-.ring{background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);padding:3px;border-radius:50%;display:inline-block}
-.stories{display:flex;gap:12px;padding:12px;overflow-x:auto;background:#000;border-bottom:1px solid #1a1a1a}.stories::-webkit-scrollbar{display:none}
-.fBar{display:flex;gap:10px;overflow-x:auto;padding:12px;background:#000}.fBar::-webkit-scrollbar{display:none}
-.fBtn{min-width:78px;height:78px;border-radius:16px;border:3px solid transparent;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:10px;background:#222}
-.fBtn.active{border-color:#fff;box-shadow:0 0 0 2px #0095f6}
-#splash{position:fixed;inset:0;z-index:9999;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column}
-.loginBg{position:fixed;inset:0;z-index:9998;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+body{background:#000;color:#fff;font-family:sans-serif;margin:0;padding-bottom:80px}
+.post{max-width:420px;margin:15px auto;background:#121212;border:1px solid #262626;border-radius:14px;overflow:hidden}
+.post img, .post video{width:100%}
+.nav{position:fixed;bottom:0;width:100%;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px}
 </style>
-</head><body>
-
-<!-- ONLY PIXORO NAME - 5 SEC - NEE KETTA MAATHIRI -->
-<div id="splash"><div style="font-family:'Grand Hotel';font-size:88px;color:#fff;letter-spacing:2px">Pixoro</div><div style="width:90px;height:3px;background:#1a1a1a;border-radius:10px;margin-top:18px;overflow:hidden"><div id="sbar" style="height:100%;width:0;background:#fff;transition:width 5s linear"></div></div></div>
-
-<!-- REAL LOGIN -->
-<div id="loginPage" class="loginBg" style="display:none"><div style="font-family:'Grand Hotel';font-size:58px;color:#fff;margin-bottom:28px">Pixoro</div><input id="logEmail" placeholder="Email - krikir58@gmail.com" value="krikir58@gmail.com" style="width:100%;max-width:320px;background:#121212;border:1px solid #2a2a2a;color:#fff;padding:14px;border-radius:12px;outline:none;margin-bottom:10px"><input id="logPass" type="password" placeholder="Password - 6 digit" value="123456" style="width:100%;max-width:320px;background:#121212;border:1px solid #2a2a2a;color:#fff;padding:14px;border-radius:12px;outline:none;margin-bottom:14px"><button onclick="realLogin()" style="width:100%;max-width:320px;background:#0095f6;color:#fff;border:0;padding:14px;border-radius:12px;font-weight:800">Log in - Real Firebase</button><button onclick="realRegister()" style="width:100%;max-width:320px;background:#222;color:#fff;border:1px solid #333;padding:12px;border-radius:12px;margin-top:10px">Create Account - Real DB</button><p style="color:#555;font-size:10px;margin-top:16px;text-align:center">Project: pixoro-75927 • Firestore • Storage • Auth<br>Private/Public • Story 24h • @mention • No +1 Popup</p></div>
-
-<div id="app" style="display:none">
-<div class="top"><span>Reels ▼ &nbsp; Friends 🐶</span><span id="uName" style="font-size:11px;opacity:.8"></span></div>
-<div style="padding-top:52px"><div class="stories" id="stories"></div></div>
-<div class="reels" id="reels"></div>
-<div class="bottom"><span>🏠</span><span>🔍</span><span onclick="openUpload()" style="border:1.5px solid #fff;padding:4px 16px;border-radius:10px">+</span><span>🎬</span><span onclick="openProfile()">👤</span></div>
-
-<!-- REAL UPLOAD -->
-<div id="uploadModal" class="modal" style="z-index:110"><div style="display:flex;justify-content:space-between;padding:14px;color:#fff;border-bottom:1px solid #222"><span onclick="closeUpload()">✕</span><b>New Post • Reel • Story 24h</b><span onclick="realUpload()" style="color:#0095f6;font-weight:800">Share</span></div><div style="flex:1;background:#111;display:flex;align-items:center;justify-content:center;flex-direction:column" onclick="fileIn.click()"><div id="prevBox" style="display:none;width:100%;height:100%"><img id="prevImg" style="width:100%;height:100%;object-fit:contain"></div><p id="noP" style="color:#fff">📸 Tap to select real photo/video</p><p style="color:#666;font-size:11px;margin-top:6px">Real Firebase Storage ku pogum - Vera phone la varum</p></div><div style="padding:12px"><textarea id="capIn" placeholder="Caption @whitezzz__04 #mass - mention real" style="width:100%;background:#121212;border:1px solid #222;color:#fff;padding:12px;border-radius:12px;outline:none" rows="2"></textarea><div style="display:flex;gap:8px;margin-top:10px"><button onclick="setType('post')" id="bPost" style="flex:1;background:#fff;color:#000;border:0;padding:10px;border-radius:8px;font-weight:700">Post</button><button onclick="setType('reel')" id="bReel" style="flex:1;background:#222;color:#fff;border:1px solid #333;padding:10px;border-radius:8px">Reel</button><button onclick="setType('story')" id="bStory" style="flex:1;background:#222;color:#fff;border:1px solid #333;padding:10px;border-radius:8px">Story 24h</button></div></div></div>
-
-<!-- CAMERA -->
-<div id="camModal" class="modal" style="z-index:111"><div style="display:flex;justify-content:space-between;padding:14px;color:#fff"><span onclick="closeCam()">✕</span><b style="font-size:12px">Face Track • Filter • Zoom</b><span onclick="capture()" style="color:#0095f6;font-weight:800">Next</span></div><div style="flex:1;position:relative;background:#111"><video id="v" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover"></video><canvas id="c" style="position:absolute;inset:0;width:100%;height:100%"></canvas><div style="position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:6px 14px;border-radius:20px;color:#fff;font-size:11px">Face Tracking ACTIVE • x<span id="zT">1</span> • <span id="fName">Original</span></div></div><div class="fBar" id="fBar"></div><div style="display:flex;justify-content:space-around;padding:14px;background:#000;border-top:1px solid #1a1a1a"><button onclick="capture()" style="background:#fff;color:#000;border:0;width:70px;height:70px;border-radius:50%;font-weight:900">● REC</button><button onclick="flip()" style="background:#1a1a1a;color:#fff;border:1px solid #333;padding:10px 16px;border-radius:20px">🔄 Flip</button><button onclick="zoom()" style="background:#1a1a1a;color:#fff;border:1px solid #333;padding:10px 16px;border-radius:20px">🔍 Zoom</button></div></div>
-
-<!-- PROFILE REAL -->
-<div id="pModal" class="modal" style="background:#000;overflow-y:auto;z-index:105"><div style="display:flex;justify-content:space-between;padding:14px;color:#fff;border-bottom:1px solid #222"><span onclick="closeP()">←</span><b id="pU" style="font-family:'Grand Hotel';font-size:26px">pixoro</b><span onclick="togglePrivate()" id="privBtn" style="font-size:11px;border:1px solid #333;padding:5px 10px;border-radius:8px">Public</span></div><div style="padding:16px;display:flex;gap:16px;color:#fff"><div class="ring"><img id="pImg" src="https://i.pravatar.cc/150?u=pixoro" style="width:88px;height:88px;border-radius:50%;padding:3px;background:#000"></div><div style="flex:1;display:flex;justify-content:space-around;text-align:center"><div><div id="pP" style="font-weight:800;font-size:18px">0</div><div style="font-size:11px;color:#888">Posts</div></div><div><div id="pF1" style="font-weight:800;font-size:18px">128</div><div style="font-size:11px;color:#888">Followers</div></div><div><div id="pF2" style="font-weight:800;font-size:18px">1</div><div style="font-size:11px;color:#888">Following</div></div></div></div><div style="padding:0 16px;color:#fff"><b id="pName">Pixoro Real</b><div style="font-size:11px;color:#666;margin-top:4px" id="pStats">Firestore Real • No +1 Popup • Story 24h</div><div style="display:flex;gap:8px;margin-top:12px"><button style="flex:1;background:#222;color:#fff;border:1px solid #333;padding:11px;border-radius:10px">Edit Profile</button><button onclick="openChat()" style="flex:1;background:#222;color:#fff;border:1px solid #333;padding:11px;border-radius:10px">Message - Chat</button></div></div><div id="pGrid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:16px"></div></div>
-
-<div id="cModal" class="modal" style="z-index:115"><div style="display:flex;justify-content:space-between;padding:14px;color:#fff;border-bottom:1px solid #222"><span onclick="document.getElementById('cModal').classList.remove('on')">✕</span><b>Comments - Real DB</b><span></span></div><div id="cList" style="flex:1;overflow-y:auto;padding:14px;color:#fff"></div><div style="display:flex;gap:10px;padding:12px;border-top:1px solid #222"><input id="cIn" placeholder="Add comment @whitezzz__04 real mention" style="flex:1;background:#222;border:0;border-radius:22px;padding:10px 16px;color:#fff;outline:none"><button onclick="postC()" style="color:#0095f6;font-weight:800;background:0;border:0">Post</button></div></div>
-</div>
-<input type="file" id="fileIn" accept="image/*,video/*" hidden>
+</head>
+<body>
+<h2 style="text-align:center">PIXORO 🔥</h2>
+<div id="feed"></div>
+<div class="nav"><span>🏠 Home</span><span>❤️ Likes</span><span>👤 You</span></div>
 
 <script type="module">
+// FIREBASE + ELLA JS SERTHU 1 FILE LA DA GIRI
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, doc, setDoc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, increment, setDoc, getDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",
-  authDomain: "pixoro-75927.firebaseapp.com",
-  projectId: "pixoro-75927",
-  storageBucket: "pixoro-75927.firebasestorage.app",
-  messagingSenderId: "814840120295",
-  appId: "1:814840120295:web:6c02c613df5a17209bf342",
-  measurementId: "G-H3NR8P270D"
-};
+const firebaseConfig = { apiKey: "AIzaSyCwOxSyjqp2OoT2PoxSyjqp2OoT2PoxSyHojksr5r58vQ10", authDomain: "pixoro-75927.firebaseapp.com", projectId: "pixoro-75927" };
+const db = getFirestore(initializeApp(firebaseConfig));
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
-
-let posts=[], stories=[], curFilter='none', z=1, facing='user', curId=null, upType='post', upFile=null, upImg=null, curUser=null;
-const filters=[
- {n:'Original',css:'none'},{n:'Mass 🔥',css:'contrast(1.4) saturate(1.7)'},{n:'CBE',css:'sepia(.25) contrast(1.2)'},{n:'Pro 💜',css:'contrast(1.3) saturate(1.8) hue-rotate(-10deg)'},{n:'Glow',css:'brightness(1.25)'},{n:'Warm',css:'sepia(.35) saturate(1.5)'},{n:'B&W',css:'grayscale(1) contrast(1.3)'},{n:'Zoom Pop',css:'contrast(1.6) saturate(2)'}
-];
-
-setTimeout(()=>document.getElementById('sbar').style.width='100%',100);
-setTimeout(()=>{
- document.getElementById('splash').style.opacity='0'; document.getElementById('splash').style.transition='.6s';
- setTimeout(()=>{
-  document.getElementById('splash').remove();
-  onAuthStateChanged(auth, async (user)=>{
-   if(user){ curUser=user; document.getElementById('app').style.display='block'; document.getElementById('uName').innerText=user.email.split('@')[0]; loadReal(); }
-   else { document.getElementById('loginPage').style.display='flex'; }
+// REAL FEED + REAL LIKE ELLAM INGA THAN DA
+const feedEl = document.getElementById("feed");
+const q = query(collection(db, "reels"), orderBy("createdAt","desc"));
+onSnapshot(q, snap=>{
+  feedEl.innerHTML="";
+  snap.forEach(d=>{
+    const p = {id:d.id, ...d.data()};
+    feedEl.innerHTML += `
+      <div class="post">
+        <div style="padding:10px"><b>${p.email||'giri'}</b></div>
+        ${p.videoUrl? (p.isVideo? `<video src="${p.videoUrl}" controls></video>` : `<img src="${p.videoUrl}">`) : ''}
+        <div style="padding:12px;display:flex;gap:15px">
+          <span onclick="likePost('${p.id}')" style="cursor:pointer">❤️ ${p.likes||0}</span>
+          <span>💬 ${p.comments||0}</span>
+          <span>👁️ ${p.views||0}</span>
+        </div>
+        <div style="padding:0 12px 12px"><b>${p.email||'giri'}</b> ${p.caption||''}</div>
+      </div>`;
   });
- },600);
-},5000);
+});
 
-window.realRegister = async ()=>{
- const e=document.getElementById('logEmail').value; const p=document.getElementById('logPass').value;
- if(p.length<6) return alert('Password 6 digit venum da!');
- try{
-  const cred=await createUserWithEmailAndPassword(auth,e,p);
-  await setDoc(doc(db,"users",cred.user.uid),{username:e.split('@')[0], followers:128, following:1, isPrivate:false, email:e, createdAt:serverTimestamp()});
-  alert('Account Created Real da Giri! Firestore la save aachu da!');
- }catch(err){ alert(err.message); }
-};
-window.realLogin = async ()=>{
- const e=document.getElementById('logEmail').value; const p=document.getElementById('logPass').value;
- try{ await signInWithEmailAndPassword(auth,e,p); }catch(err){ alert(err.message+' - Create Account pannu da!'); }
-};
-
-async function loadReal(){
- const qPosts=query(collection(db,"posts"), orderBy("time","desc"));
- const snap=await getDocs(qPosts);
- posts=snap.docs.map(d=>({id:d.id,...d.data()}));
- if(posts.length==0){
-  posts=[{id:'1', imgUrl:'https://picsum.photos/seed/pixreal1/600/800', caption:'Mass entry @whitezzz__04 🔥 Real Firebase da', user:'girikri', likes:128, views:1, shares:22, filter:'none'},
-         {id:'2', imgUrl:'https://picsum.photos/seed/pixreal2/600/800', caption:'Coimbatore vibes 😍', user:'whitezzz__04', likes:91, views:5, shares:2, filter:'none'}];
- }
- renderReels(); renderFilters(); loadStoriesReal();
+// REAL LIKE FUNCTION DA
+window.likePost = async (id)=>{
+  const postRef = doc(db, "reels", id);
+  await updateDoc(postRef, { likes: increment(1) });
 }
-
-function renderReels(){
- document.getElementById('reels').innerHTML=posts.map(r=>{
-  return `<div class="reel"><img src="${r.imgUrl||r.img}" style="filter:${r.filter||'none'}" loading="lazy"><div class="right">
-   <div onclick="likeReal('${r.id}', ${r.likes||0})"><div class="ic">❤️</div><div style="font-size:12px;font-weight:700;text-align:center;margin-top:4px">${r.likes||0}</div></div>
-   <div onclick="openC('${r.id}')"><div class="ic">💬</div><div style="font-size:12px;text-align:center;margin-top:4px">${r.comments||0}</div></div>
-   <div onclick="shareReal('${r.id}')"><div class="ic">✈️</div><div style="font-size:12px;text-align:center;margin-top:4px">${r.shares||0}</div></div>
-   <div><div class="ic">👁️</div><div style="font-size:12px;text-align:center;margin-top:4px">${r.views||1}</div></div>
-   <div><div class="ic">🔖</div><div style="font-size:11px;text-align:center;margin-top:4px">Save</div></div>
-  </div><div class="info"><div style="display:flex;gap:8px;align-items:center"><div class="ring"><img src="https://i.pravatar.cc/40?u=${r.user}" style="width:32px;height:32px;border-radius:50%;padding:2px;background:#000"></div><b>${r.user}</b><span style="border:1px solid #fff;padding:3px 8px;border-radius:6px;font-size:11px">Follow</span></div><div style="margin-top:6px;font-size:13px">${r.caption}<br><span style="font-size:11px;opacity:.7">🎵 Original • ${r.filter||'Original'} • ${r.mentions||''} • Face Track ON</span></div></div></div>`;
- }).join('');
-}
-function renderFilters(){ document.getElementById('fBar').innerHTML=filters.map((f,i)=>`<div class="fBtn ${i==0?'active':''}" onclick="applyF(${i})" style="filter:${f.css}"><span style="font-size:16px">✨</span><span style="margin-top:2px">${f.n}</span></div>`).join(''); }
-window.applyF=(i)=>{ curFilter=filters[i].css; document.getElementById('v').style.filter=curFilter; document.getElementById('fName').innerText=filters[i].n; document.querySelectorAll('.fBtn').forEach((b,idx)=>b.classList.toggle('active',idx==i)); };
-window.zoom=()=>{ z=z==1?2:1; document.getElementById('v').style.transform=`scale(${z})`; document.getElementById('zT').innerText=z; };
-window.openUpload=()=>document.getElementById('uploadModal').classList.add('on');
-window.closeUpload=()=>document.getElementById('uploadModal').classList.remove('on');
-window.setType=(t)=>{ upType=t; document.querySelectorAll('#bPost,#bReel,#bStory').forEach(b=>{ b.style.background='#222'; b.style.color='#fff'; }); document.getElementById(t=='post'?'bPost':t=='reel'?'bReel':'bStory').style.background='#fff'; document.getElementById(t=='post'?'bPost':t=='reel'?'bReel':'bStory').style.color='#000'; };
-document.getElementById('fileIn').addEventListener('change',e=>{ upFile=e.target.files[0]; const r=new FileReader(); r.onload=ev=>{ upImg=ev.target.result; document.getElementById('prevImg').src=upImg; document.getElementById('prevBox').style.display='block'; document.getElementById('noP').style.display='none'; }; r.readAsDataURL(upFile); });
-window.realUpload=async()=>{
- if(!upFile &&!upImg) return alert('Photo select pannu da Giri!');
- const cap=document.getElementById('capIn').value||'Mass 🔥 @whitezzz__04';
- let url=upImg;
- if(upFile){
-  const fileRef=ref(storage, `${upType}/${Date.now()}_${upFile.name||'cam.jpg'}`);
-  await uploadBytes(fileRef, upFile);
-  url=await getDownloadURL(fileRef);
- }
- const data={ user:curUser.email.split('@')[0], imgUrl:url, caption:cap, filter:curFilter, likes:0, views:1, shares:0, time:Date.now(), expireAt: upType=='story'?Date.now()+24*60*60*1000:null, mentions:(cap.match(/@\w+/g)||[]).join(' ') };
- await addDoc(collection(db, upType=='story'?'stories':'posts'), data);
- closeUpload(); document.getElementById('prevBox').style.display='none'; document.getElementById('noP').style.display='block'; document.getElementById('capIn').value=''; upFile=null; upImg=null;
- alert(`${upType.toUpperCase()} REAL uploaded da! Firebase Storage + Firestore da! No +1 popup da!`);
- loadReal();
-};
-window.likeReal=async(id, curLikes)=>{
- // NO +1 POPUP - Nee keta maathiri - Direct Firestore update mattum
- const refDoc=doc(db,"posts",id);
- await updateDoc(refDoc, {likes: increment(1)});
- // Local update - no popup
- posts.find(p=>p.id==id).likes=(curLikes||0)+1;
- renderReels();
-};
-window.shareReal=async(id)=>{
- const refDoc=doc(db,"posts",id);
- await updateDoc(refDoc, {shares: increment(1)});
- loadReal();
-};
-window.openProfile=()=>{ document.getElementById('pModal').classList.add('on'); document.getElementById('pU').innerText=curUser.email.split('@')[0]; document.getElementById('pP').innerText=posts.filter(p=>p.user==curUser.email.split('@')[0]).length; document.getElementById('pGrid').innerHTML=posts.filter(p=>p.user==curUser.email.split('@')[0]).map(p=>`<img src="${p.imgUrl||p.img}" style="width:100%;aspect-ratio:1;object-fit:cover;filter:${p.filter||'none'}">`).join(''); };
-window.closeP=()=>document.getElementById('pModal').classList.remove('on');
-window.togglePrivate=async()=>{
- const udoc=doc(db,"users",curUser.uid);
- try{
-  const snap=await getDocs(query(collection(db,"users"), where("email","==",curUser.email)));
-  let isPriv=false; snap.forEach(d=>{ isPriv=d.data().isPrivate; });
-  await updateDoc(udoc, {isPrivate:!isPriv});
-  document.getElementById('privBtn').innerText=!isPriv?'Private':'Public';
-  alert(!isPriv?'Account Private aachu da - Follow Request varum da':'Account Public aachu da');
- }catch(e){ alert('Private/Public toggle - Users collection la isPrivate field update pannuren da!'); }
-};
-async function loadStoriesReal(){
- try{
-  const q=query(collection(db,"stories"), where("expireAt",">",Date.now()));
-  const snap=await getDocs(q); stories=snap.docs.map(d=>d.data());
- }catch(e){ stories=[]; }
- document.getElementById('stories').innerHTML=[...new Set([...stories.map(s=>s.user), 'whitezzz__04','don_deepa', curUser.email.split('@')[0]])].map(u=>{
-  const has=stories.some(s=>s.user==u);
-  return `<div style="display:flex;flex-direction:column;align-items:center;min-width:66px"><div class="${has?'ring':''}" style="${!has?'border:1px solid #333;border-radius:50%;padding:3px':''}"><img src="https://i.pravatar.cc/80?u=${u}" style="width:58px;height:58px;border-radius:50%;padding:${has?'3px':''};background:#000"></div><span style="font-size:10px;color:#fff;margin-top:4px">${u.slice(0,8)}</span>${has?'<span style="font-size:8px;color:#0f0">24h</span>':''}</div>`;
- }).join('');
-}
-window.openC=async(id)=>{
- curId=id;
- document.getElementById('cModal').classList.add('on');
- const q=query(collection(db,"comments"), where("postId","==",id));
- const snap=await getDocs(q);
- const comms=snap.docs.map(d=>d.data());
- document.getElementById('cList').innerHTML=comms.length?comms.map(c=>`<div style="display:flex;gap:10px;margin-bottom:12px"><img src="https://i.pravatar.cc/40?u=${c.user}" style="width:32px;height:32px;border-radius:50%"><div><b style="font-size:13px">${c.user}</b> <span style="font-size:13px">${c.text}</span><div style="font-size:10px;color:#666;margin-top:2px">${c.mentions||''}</div></div></div>`).join(''):`<div style="text-align:center;color:#666;margin-top:30px">No comments yet<br>Be first @mention @whitezzz__04</div>`;
-};
-window.postC=async()=>{
- const t=document.getElementById('cIn').value.trim(); if(!t) return;
- await addDoc(collection(db,"comments"), {postId:curId, user:curUser.email.split('@')[0], text:t, mentions:(t.match(/@\w+/g)||[]).join(' '), time:Date.now()});
- document.getElementById('cIn').value=''; openC(curId);
-};
-window.openChat=()=>alert('Chat Real - Firestore Realtime - Next update la full chat UI varum da Giri! Private account la message request varum da!');
-window.openCam=async()=>{ document.getElementById('camModal').classList.add('on'); try{ const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:true}); document.getElementById('v').srcObject=s; startTrack(); }catch(e){} };
-window.closeCam=()=>{ document.getElementById('camModal').classList.remove('on'); const v=document.getElementById('v'); if(v.srcObject) v.srcObject.getTracks().forEach(t=>t.stop()); };
-window.flip=()=>{ facing=facing=='user'?'environment':'user'; closeCam(); setTimeout(()=>openCam(),300); };
-function startTrack(){ const can=document.getElementById('c'); const ctx=can.getContext('2d'); can.width=400; can.height=700; let x=140,y=180; setInterval(()=>{ ctx.clearRect(0,0,400,700); x+=(Math.random()-.5)*6; y+=(Math.random()-.5)*6; ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.strokeRect(x,y,110,140); ctx.fillStyle='#fff'; ctx.font='10px Poppins'; ctx.fillText(`Face Track x${z} • ${filters.find(f=>f.css==curFilter)?.n}`,x,y-8); },120); }
-window.capture=()=>{ upImg='https://picsum.photos/seed/'+Date.now()+'/600/800'; upFile=null; closeCam(); openUpload(); document.getElementById('prevImg').src=upImg; document.getElementById('prevBox').style.display='block'; document.getElementById('noP').style.display='none'; };
 </script>
-</body></html>
+</body>
+</html>
