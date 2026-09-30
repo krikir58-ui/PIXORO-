@@ -1,8 +1,9 @@
-import { supabase } from '../supabase.js'
-export async function loadFeed(){
-  const {data} = await supabase.from('posts').select('*').order('created_at',{ascending:false})
-  if(!data) return
-  document.getElementById('feed').innerHTML = data.map(p=>`
-    <div class="post-card"><img src="${p.image_url}"><p>${p.caption}</p>
-    <button onclick="likePost('${p.id}')">❤️ Like</button></div>`).join('')
+import { collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { db } from "./firebase.js";
+export function loadRealFeed(callback){
+  const q = query(collection(db, "reels"), orderBy("createdAt","desc"));
+  return onSnapshot(q, (snap)=>{
+    const reels = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    callback(reels);
+  });
 }
