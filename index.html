@@ -17,7 +17,7 @@
 .post{background:#111;margin-bottom:15px;border:1px solid #222;border-radius:12px;overflow:hidden}
 .post-top{padding:10px;display:flex;justify-content:space-between;align-items:center}
 .post-img{width:100%;height:520px;object-fit:cover;background:#222}
-.post-actions{padding:10px;display:flex;gap:18px;align-items:center}
+.post-actions{padding:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .btn{background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
 .fake-alert{background:red;color:#fff;text-align:center;padding:8px;font-weight:bold;animation:blink 0.8s infinite}
 @keyframes blink{0%{opacity:1}50%{opacity:0.6}100%{opacity:1}}
@@ -29,6 +29,9 @@
 .login-box{margin-top:100px;text-align:center;padding:20px}
 input{padding:10px;border-radius:8px;border:none;width:250px;margin:5px;background:#222;color:#fff}
 #commentBox{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#111;border-top:1px solid #333;padding:10px;display:none;z-index:1000;max-height:65%;overflow-y:auto;border-radius:15px 15px 0 0}
+#storyView{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;flex-direction:column;}
+.progress-bar{width:100%;height:4px;background:#333}.progress{height:100%;background:#ff0050;width:0%;}
+.filter-btn{padding:6px 12px;border-radius:15px;border:1px solid #444;background:#222;color:#fff;margin:3px;font-size:12px}
 </style>
 </head>
 <body>
@@ -43,12 +46,33 @@ input{padding:10px;border-radius:8px;border:none;width:250px;margin:5px;backgrou
 
 <div id="feed" class="feed" style="display:none;"></div>
 
-<div id="uploadBox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;padding:20px;text-align:center;">
-<h3 style="margin-top:40px;">Post Podu da Giri! 🔥</h3><br><input id="captionInput" placeholder="Caption enna da?" style="width:90%;"><br><br><input type="file" id="fileInput" accept="image/*" style="width:90%;color:white;"><br><br><img id="preview" style="width:220px;height:300px;object-fit:cover;display:none;border-radius:10px;margin:10px auto;border:2px solid #ff0050;"><br><button onclick="uploadRealPost()" style="background:#ff0050;color:white;padding:12px 30px;border:none;border-radius:20px;font-weight:bold;">POST 🚀</button><br><button onclick="uploadBox.style.display='none'" style="background:#333;color:white;padding:10px 20px;border:none;border-radius:20px;margin-left:10px;">Cancel</button>
+<div id="uploadBox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;padding:20px;text-align:center;overflow-y:auto;">
+<h3 style="margin-top:20px;">Post Podu da Giri! 🔥</h3><br><input id="captionInput" placeholder="Caption enna da?" style="width:90%;"><br><br>
+<input type="file" id="fileInput" accept="image/*" style="width:90%;color:white;"><br><br>
+<img id="preview" style="width:220px;height:300px;object-fit:cover;display:none;border-radius:10px;margin:10px auto;border:2px solid #ff0050;"><br>
+<div id="filterBox" style="display:none;">
+<button class="filter-btn" onclick="preview.style.filter='none'">Original</button>
+<button class="filter-btn" onclick="preview.style.filter='grayscale(100%)'">B&W</button>
+<button class="filter-btn" onclick="preview.style.filter='sepia(100%)'">Sepia</button>
+<button class="filter-btn" onclick="preview.style.filter='contrast(1.5) brightness(1.2)'">Bright</button>
+<button class="filter-btn" onclick="preview.style.filter='blur(1px) contrast(1.2)'">Blur</button>
+</div><br>
+<button onclick="uploadRealPost()" style="background:#ff0050;color:white;padding:12px 30px;border:none;border-radius:20px;font-weight:bold;">POST 🚀</button>
+<button onclick="uploadBox.style.display='none'" style="background:#333;color:white;padding:10px 20px;border:none;border-radius:20px;margin-left:10px;">Cancel</button>
 </div>
 
 <div id="storyUploadBox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;padding:20px;text-align:center;">
 <h3 style="margin-top:40px;">Story Podu da! 24hr than irukkum</h3><br><input type="file" id="storyFile" accept="image/*" style="color:white;"><br><br><img id="storyPreview" style="width:220px;height:380px;object-fit:cover;display:none;border-radius:10px;margin:10px auto;"><br><button onclick="uploadStory()" style="background:#ff0050;color:#fff;padding:12px 30px;border:none;border-radius:20px;">Story Post</button><br><br><button onclick="storyUploadBox.style.display='none'" style="background:#333;color:#fff;padding:8px 15px;border:none;border-radius:10px;">Cancel</button>
+</div>
+
+<div id="storyView">
+<div class="progress-bar"><div id="storyProgress" class="progress"></div></div>
+<div style="display:flex;justify-content:space-between;padding:10px;"><span id="storyUser" style="font-weight:bold;"></span><button onclick="closeStory()" style="background:none;border:none;color:#fff;font-size:22px;">✕</button></div>
+<img id="storyViewImg" style="width:100%;height:80vh;object-fit:contain;">
+<div style="display:flex;justify-content:space-between;padding:15px;">
+<span id="storyViews"></span>
+<button id="storyDeleteBtn" onclick="deleteCurrentStory()" style="background:red;color:#fff;border:none;padding:8px 15px;border-radius:10px;">🗑️ Delete Story</button>
+</div>
 </div>
 
 <div id="commentBox"><div style="display:flex;justify-content:space-between;"><b>Comments</b><button onclick="commentBox.style.display='none'" style="background:none;border:none;color:#fff;">✕</button></div><div id="commentList" style="margin:10px 0;"></div><div style="display:flex;gap:5px;"><input id="commentInput" placeholder="Comment podu da..." style="flex:1;"><button onclick="addComment()" style="background:#ff0050;color:#fff;border:none;padding:8px 15px;border-radius:10px;">Post</button></div></div>
@@ -56,7 +80,9 @@ input{padding:10px;border-radius:8px;border:none;width:250px;margin:5px;backgrou
 <div id="profileBox" style="display:none;margin-top:60px;max-width:500px;margin:0 auto;padding:15px;">
 <h2 id="pName"></h2><p id="pEmail" style="color:#aaa;font-size:12px;"></p>
 <div style="display:flex;justify-content:space-around;text-align:center;margin:15px 0;background:#111;padding:10px;border-radius:10px;border:1px solid #222;">
-<div><b id="postCount">0</b><br><small>Posts</small></div><div><b id="followerCount">0</b><br><small>Followers</small></div><div><b id="followingCount">0</b><br><small>Following</small></div>
+<div><b id="postCount">0</b><br><small>Posts</small></div>
+<div onclick="showFollowers()" style="cursor:pointer;"><b id="followerCount">0</b><br><small>Followers</small></div>
+<div onclick="showFollowing()" style="cursor:pointer;"><b id="followingCount">0</b><br><small>Following</small></div>
 </div><div id="myPosts"></div>
 </div>
 
@@ -75,7 +101,7 @@ const firebaseConfig = {
 };
 if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();const db=firebase.firestore();
-let currentUser=null;let currentCommentPostId=null;
+let currentUser=null;let currentCommentPostId=null;let currentStoryId=null;let storyTimer=null;
 
 auth.onAuthStateChanged(u=>{if(u){currentUser=u;loginBox.style.display="none";feed.style.display="block";bottomNav.style.display="flex";storyBar.style.display="flex";loadFeed();loadStories();}else{loginBox.style.display="block";feed.style.display="none";bottomNav.style.display="none";storyBar.style.display="none";profileBox.style.display="none";}});
 function login(){let e=email.value.trim();let p=pass.value.trim();if(!e||!p)return alert("Email podu da");auth.signInWithEmailAndPassword(e,p).catch(()=>auth.createUserWithEmailAndPassword(e,p));}
@@ -84,40 +110,64 @@ function showFeed(){feed.style.display="block";profileBox.style.display="none";s
 function showProfile(){feed.style.display="none";storyBar.style.display="none";profileBox.style.display="block";loadProfile();}
 function addPost(){uploadBox.style.display='block';}
 function addStory(){storyUploadBox.style.display='block';}
-fileInput.addEventListener('change',e=>{let f=e.target.files[0];if(f){let r=new FileReader();r.onload=ev=>{preview.src=ev.target.result;preview.style.display='block';};r.readAsDataURL(f);}});
+fileInput.addEventListener('change',e=>{let f=e.target.files[0];if(f){let r=new FileReader();r.onload=ev=>{preview.src=ev.target.result;preview.style.display='block';filterBox.style.display='block';};r.readAsDataURL(f);}});
 storyFile.addEventListener('change',e=>{let f=e.target.files[0];if(f){let r=new FileReader();r.onload=ev=>{storyPreview.src=ev.target.result;storyPreview.style.display='block';};r.readAsDataURL(f);}});
 
-async function uploadRealPost(){let cap=captionInput.value.trim();if(!cap)return alert("Caption podu da");let img=preview.src||"https://picsum.photos/500/700?random="+Math.random();await db.collection("reels").add({email:currentUser.email.split("@")[0],uid:currentUser.uid,caption:cap,videoUrl:img,likes:0,likedBy:[],reports:0,commentsCount:0,createdAt:new Date()});uploadBox.style.display='none';captionInput.value='';preview.style.display='none';fileInput.value='';loadFeed();}
-async function uploadStory(){if(!storyPreview.src)return alert("Photo select pannu da");await db.collection("stories").add({email:currentUser.email.split("@")[0],uid:currentUser.uid,imageUrl:storyPreview.src,createdAt:new Date()});storyUploadBox.style.display='none';storyPreview.style.display='none';storyFile.value='';loadStories();alert("Story pottacha da!");}
+async function uploadRealPost(){let cap=captionInput.value.trim();if(!cap)return alert("Caption podu da");let img=preview.src||"https://picsum.photos/500/700?random="+Math.random();let filter=preview.style.filter||"none";await db.collection("reels").add({email:currentUser.email.split("@")[0],uid:currentUser.uid,caption:cap,videoUrl:img,filter:filter,likes:0,likedBy:[],reports:0,commentsCount:0,views:0,createdAt:new Date()});uploadBox.style.display='none';captionInput.value='';preview.style.display='none';filterBox.style.display='none';fileInput.value='';loadFeed();}
+async function uploadStory(){if(!storyPreview.src)return alert("Photo select pannu da");await db.collection("stories").add({email:currentUser.email.split("@")[0],uid:currentUser.uid,imageUrl:storyPreview.src,views:0,createdAt:new Date()});storyUploadBox.style.display='none';storyPreview.style.display='none';storyFile.value='';loadStories();alert("Story pottacha da!");}
 
-async function loadStories(){let snap=await db.collection("stories").orderBy("createdAt","desc").get();let h="";let now=new Date();snap.forEach(d=>{let s=d.data();if(!s.createdAt)return;let diff=(now - s.createdAt.toDate())/1000/3600;if(diff>24)return;h+=`<div class="story" onclick="viewStory('${d.id}')"><div class="story-ring"><img src="${s.imageUrl}"></div><small>${s.email}</small></div>`;});storyList.innerHTML=h;}
-async function viewStory(id){let doc=await db.collection("stories").doc(id).get();let s=doc.data();let w=window.open("","_blank");w.document.write(`<body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;"><img src="${s.imageUrl}" style="max-width:100%;max-height:85%;border-radius:10px;"><h3 style="color:#fff;margin-top:10px;">${s.email} - Story</h3><p style="color:#aaa;">24hr la delete aaidum da</p></body>`);}
+async function loadStories(){let snap=await db.collection("stories").orderBy("createdAt","desc").get();let h="";let now=new Date();snap.forEach(d=>{let s=d.data();if(!s.createdAt)return;let diff=(now - s.createdAt.toDate())/1000/3600;if(diff>24)return;h+=`<div class="story" onclick="viewStory('${d.id}')"><div class="story-ring"><img src="${s.imageUrl}"></div><small>${s.email}</small><br><small style="color:#aaa;font-size:10px;">${s.views||0} views</small></div>`;});storyList.innerHTML=h;}
+
+// POKKUNU STORY PLAY 15 SEC - INSTA MAADHIRI DA
+async function viewStory(id){
+let doc=await db.collection("stories").doc(id).get();if(!doc.exists)return;let s=doc.data();
+currentStoryId=id;
+storyView.style.display="flex";
+storyViewImg.src=s.imageUrl;
+storyUser.innerText=s.email;
+storyViews.innerText=(s.views||0)+" views";
+storyDeleteBtn.style.display=(s.uid===currentUser.uid)?"block":"none";
+await db.collection("stories").doc(id).update({views:firebase.firestore.FieldValue.increment(1)}).catch(()=>{});
+let progress=0;
+storyProgress.style.width="0%";
+clearInterval(storyTimer);
+storyTimer=setInterval(()=>{
+progress+=1;
+storyProgress.style.width=progress+"%";
+if(progress>=100){closeStory();}
+},150); // 15 sec = 150ms *100
+}
+function closeStory(){storyView.style.display="none";clearInterval(storyTimer);currentStoryId=null;loadStories();}
+async function deleteCurrentStory(){if(!currentStoryId)return;if(!confirm("Story delete pannava da?"))return;await db.collection("stories").doc(currentStoryId).delete();closeStory();alert("Story delete aaiduchu da!");loadStories();}
+async function deleteStoryFromList(id){if(!confirm("Delete story ah?"))return;await db.collection("stories").doc(id).delete();loadStories();}
 
 async function loadFeed(){
 let s=await db.collection("reels").orderBy("createdAt","desc").get();let h="";let follows=await getFollowing();
-s.forEach(d=>{let x=d.data();let isLiked=x.likedBy&&x.likedBy.includes(currentUser.uid);let reports=x.reports||0;let isFake=reports>=3;let isOwn=x.uid===currentUser.uid;let likes=Math.max(0,x.likes||0);
-h+=`<div class="post">${isFake?`<div class="fake-alert">🚨 FAKE ID WARNING! ${reports} reports - Nambaatha da! Idhu Fake da! 🚨</div>`:''}<div class="post-top"><span style="display:flex;align-items:center;gap:8px;"><img src="https://i.pravatar.cc/100?u=${x.email}" style="width:32px;height:32px;border-radius:50%"><b>${x.email}</b>${isFake?'<span style="background:red;color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;">FAKE</span>':''}</span><div style="display:flex;gap:6px;">${!isOwn?`<button class="follow-btn ${follows.includes(x.uid)?'following':''}" onclick="toggleFollow('${x.uid}')">${follows.includes(x.uid)?'Following':'Follow'}</button>`:''}<button class="report-btn" onclick="reportFake('${d.id}')">🚨</button></div></div><img class="post-img" src="${x.videoUrl}"><div class="post-actions"><button class="btn" onclick="likePost('${d.id}')">${isLiked?'❤️':'🤍'}</button><button class="btn" onclick="openComments('${d.id}')">💬</button><button class="btn" onclick="sharePost()">↗️</button><span style="margin-left:auto;font-size:13px;font-weight:bold;">${likes} likes • ${x.commentsCount||0} comments • ${reports} reports</span></div><div style="padding:8px 10px;font-size:14px;"><b>${x.email}</b> ${x.caption||''}</div></div>`;});
+let blockedDoc=await db.collection("users").doc(currentUser.uid).get();let blocked=blockedDoc.exists?(blockedDoc.data().blocked||[]):[];
+s.forEach(d=>{let x=d.data();if(blocked.includes(x.uid))return;let isLiked=x.likedBy&&x.likedBy.includes(currentUser.uid);let reports=x.reports||0;let isFake=reports>=3;let isOwn=x.uid===currentUser.uid;let likes=Math.max(0,x.likes||0);
+h+=`<div class="post">${isFake?`<div class="fake-alert">🚨 FAKE ID WARNING! ${reports} reports - Nambaatha da! 🚨</div>`:''}<div class="post-top"><span style="display:flex;align-items:center;gap:8px;"><img src="https://i.pravatar.cc/100?u=${x.email}" style="width:32px;height:32px;border-radius:50%"><b>${x.email}</b>${isFake?'<span style="background:red;color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;">FAKE</span>':''}</span><div style="display:flex;gap:6px;">${!isOwn?`<button class="follow-btn ${follows.includes(x.uid)?'following':''}" onclick="toggleFollow('${x.uid}')">${follows.includes(x.uid)?'Following':'Follow'}</button>`:''}${!isOwn?`<button class="report-btn" onclick="reportFake('${d.id}')">🚨</button>`:''}${!isOwn?`<button class="report-btn" onclick="blockUser('${x.uid}')" style="border-color:#666;">🚫 Block</button>`:''}</div></div><img class="post-img" src="${x.videoUrl}" style="filter:${x.filter||'none'}" onclick="addView('${d.id}')" ><div class="post-actions"><button class="btn" onclick="likePost('${d.id}')">${isLiked?'❤️':'🤍'}</button><button class="btn" onclick="openComments('${d.id}')">💬</button><button class="btn" onclick="sharePost()">↗️</button><span style="margin-left:auto;font-size:13px;font-weight:bold;">${likes} likes • ${x.commentsCount||0} comments • ${x.views||0} views • ${reports} reports</span></div><div style="padding:8px 10px;font-size:14px;display:flex;justify-content:space-between;"><span><b>${x.email}</b> ${x.caption||''}</span>${isOwn?`<button onclick="deletePost('${d.id}')" style="background:red;color:#fff;border:none;padding:4px 10px;border-radius:10px;font-size:11px;">🗑️ Delete</button>`:''}</div></div>`;});
 if(!h)h="<p style='text-align:center;margin-top:50px;color:#666;'>No posts da Giri! + thottu podu da!</p>";feed.innerHTML=h;
 }
 async function getFollowing(){let doc=await db.collection("users").doc(currentUser.uid).get();return doc.exists?(doc.data().following||[]):[];}
-async function toggleFollow(uid){if(uid===currentUser.uid)return;let ref=db.collection("users").doc(currentUser.uid);let doc=await ref.get();let following=doc.exists?(doc.data().following||[]):[];if(following.includes(uid)){await ref.update({following:firebase.firestore.FieldValue.arrayRemove(uid)});await db.collection("users").doc(uid).update({followers:firebase.firestore.FieldValue.arrayRemove(currentUser.uid)}).catch(()=>{});}else{await ref.set({following:firebase.firestore.FieldValue.arrayUnion(uid),email:currentUser.email},{merge:true});await db.collection("users").doc(uid).set({followers:firebase.firestore.FieldValue.arrayUnion(currentUser.uid)},{merge:true});}loadFeed();}
+async function toggleFollow(uid){if(uid===currentUser.uid)return;let ref=db.collection("users").doc(currentUser.uid);let doc=await ref.get();let following=doc.exists?(doc.data().following||[]):[];if(following.includes(uid)){await ref.update({following:firebase.firestore.FieldValue.arrayRemove(uid)});await db.collection("users").doc(uid).update({followers:firebase.firestore.FieldValue.arrayRemove(currentUser.uid)}).catch(()=>{});}else{await ref.set({following:firebase.firestore.FieldValue.arrayUnion(uid),email:currentUser.email},{merge:true});await db.collection("users").doc(uid).set({followers:firebase.firestore.FieldValue.arrayUnion(currentUser.uid)},{merge:true});}loadFeed();loadProfile();}
 
 async function likePost(id){
 let ref=db.collection("reels").doc(id);let doc=await ref.get();if(!doc.exists)return;let x=doc.data();let liked=x.likedBy||[];let isLiked=liked.includes(currentUser.uid);
-if(isLiked){ // UNLIKE - 0 ku keela poga koodathu
-  let newLikes=Math.max(0,(x.likes||1)-1);
-  await ref.update({likes:newLikes,likedBy:firebase.firestore.FieldValue.arrayRemove(currentUser.uid)});
-}else{ // LIKE
-  await ref.update({likes:firebase.firestore.FieldValue.increment(1),likedBy:firebase.firestore.FieldValue.arrayUnion(currentUser.uid)});
-}
+if(isLiked){let newLikes=Math.max(0,(x.likes||1)-1);await ref.update({likes:newLikes,likedBy:firebase.firestore.FieldValue.arrayRemove(currentUser.uid)});}else{await ref.update({likes:firebase.firestore.FieldValue.increment(1),likedBy:firebase.firestore.FieldValue.arrayUnion(currentUser.uid)});}
 loadFeed();
 }
+async function addView(id){await db.collection("reels").doc(id).update({views:firebase.firestore.FieldValue.increment(1)}).catch(()=>{});}
 function sharePost(){if(navigator.share){navigator.share({title:"PIXORO",text:"PIXORO la paaru da",url:location.href});}else{navigator.clipboard.writeText(location.href);alert("Link copy panniten da Giri!");}}
 async function openComments(id){currentCommentPostId=id;commentBox.style.display="block";loadComments();}
-async function loadComments(){let s=await db.collection("reels").doc(currentCommentPostId).collection("comments").orderBy("createdAt","asc").get();let h="";s.forEach(d=>{let c=d.data();h+=`<div style="padding:6px 0;border-bottom:1px solid #222;"><b>${c.email}</b> ${c.text}</div>`;});commentList.innerHTML=h||"<p style='color:#666;'>First comment neeye podu da!</p>";}
+async function loadComments(){let s=await db.collection("reels").doc(currentCommentPostId).collection("comments").orderBy("createdAt","asc").get();let h="";s.forEach(d=>{let c=d.data();let isOwn=c.email===currentUser.email.split("@")[0];h+=`<div style="padding:6px 0;border-bottom:1px solid #222;display:flex;justify-content:space-between;"><span><b>${c.email}</b> ${c.text}</span>${isOwn?`<button onclick="deleteComment('${d.id}')" style="background:none;border:none;color:red;">🗑️</button>`:''}</div>`;});commentList.innerHTML=h||"<p style='color:#666;'>First comment neeye podu da!</p>";}
 async function addComment(){let t=commentInput.value.trim();if(!t)return;await db.collection("reels").doc(currentCommentPostId).collection("comments").add({email:currentUser.email.split("@")[0],text:t,createdAt:new Date()});await db.collection("reels").doc(currentCommentPostId).update({commentsCount:firebase.firestore.FieldValue.increment(1)});commentInput.value="";loadComments();loadFeed();}
+async function deleteComment(cid){if(!confirm("Comment delete pannava da?"))return;await db.collection("reels").doc(currentCommentPostId).collection("comments").doc(cid).delete();await db.collection("reels").doc(currentCommentPostId).update({commentsCount:firebase.firestore.FieldValue.increment(-1)});loadComments();loadFeed();}
+async function deletePost(id){if(!confirm("Post delete pannava da Giri?"))return;await db.collection("reels").doc(id).delete();alert("Post delete aaiduchu da!");loadFeed();loadProfile();}
 async function reportFake(id){if(!confirm("Idhu Fake ID ah da? Report pannava?"))return;await db.collection("reels").doc(id).update({reports:firebase.firestore.FieldValue.increment(1)});alert("Report pannita da! 3 vantha Red Warning varum da!");loadFeed();if(navigator.vibrate)navigator.vibrate([300,100,300]);}
-async function loadProfile(){pName.innerText=currentUser.email.split("@")[0];pEmail.innerText=currentUser.email;let my=await db.collection("reels").where("uid","==",currentUser.uid).get();postCount.innerText=my.size;let u=await db.collection("users").doc(currentUser.uid).get();let d=u.exists?u.data():{};followerCount.innerText=(d.followers||[]).length;followingCount.innerText=(d.following||[]).length;let h="";my.forEach(x=>{h+=`<div style="display:inline-block;width:32%;margin:1px;"><img src="${x.data().videoUrl}" style="width:100%;height:120px;object-fit:cover;"></div>`});myPosts.innerHTML=h||"<p style='color:#666;'>No posts yet da</p>";}
+async function blockUser(uid){if(!confirm("Block pannava da? Avan post inime theriyathu da!"))return;await db.collection("users").doc(currentUser.uid).set({blocked:firebase.firestore.FieldValue.arrayUnion(uid)},{merge:true});alert("Block pannita da Giri!");loadFeed();}
+async function loadProfile(){pName.innerText=currentUser.email.split("@")[0];pEmail.innerText=currentUser.email;let my=await db.collection("reels").where("uid","==",currentUser.uid).get();postCount.innerText=my.size;let u=await db.collection("users").doc(currentUser.uid).get();let d=u.exists?u.data():{};followerCount.innerText=(d.followers||[]).length;followingCount.innerText=(d.following||[]).length;let h="";my.forEach(x=>{let data=x.data();h+=`<div style="display:inline-block;width:32%;margin:1px;position:relative;"><img src="${data.videoUrl}" style="width:100%;height:120px;object-fit:cover;filter:${data.filter||'none'}"><button onclick="deletePost('${x.id}')" style="position:absolute;top:2px;right:2px;background:red;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:10px;">✕</button></div>`});myPosts.innerHTML=h||"<p style='color:#666;'>No posts yet da</p>";}
+async function showFollowers(){let doc=await db.collection("users").doc(currentUser.uid).get();let list=doc.exists?(doc.data().followers||[]):[];alert("Followers ("+list.length+"): \n"+(list.join("\n")||"No followers yet da"));}
+async function showFollowing(){let doc=await db.collection("users").doc(currentUser.uid).get();let list=doc.exists?(doc.data().following||[]):[];alert("Following ("+list.length+"): \n"+(list.join("\n")||"No following yet da"));}
 </script>
 </body>
 </html>
