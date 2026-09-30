@@ -31,7 +31,6 @@ input{padding:10px;border-radius:8px;border:none;width:250px;margin:5px;backgrou
 .pix-highlights{display:flex;gap:12px;overflow-x:auto;padding:10px 0;margin-top:10px;scrollbar-width:none}
 .pix-h-item{text-align:center;min-width:68px;cursor:pointer}
 .pix-h-ring{width:62px;height:62px;border-radius:50%;border:2px solid #ff0050;padding:3px;background:#222;display:flex;align-items:center;justify-content:center;font-size:26px}
-.pix-h-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .pix-toggle{width:50px;height:28px;background:#333;border-radius:20px;position:relative;cursor:pointer;transition:0.3s;display:inline-block}
 .pix-toggle.on{background:#00c853}
 .pix-toggle-dot{width:22px;height:22px;background:white;border-radius:50%;position:absolute;top:3px;left:3px;transition:0.3s}
@@ -40,6 +39,12 @@ input{padding:10px;border-radius:8px;border:none;width:250px;margin:5px;backgrou
 .pix-search input{background:transparent;width:100%}
 .pix-user-list{background:#111;border-radius:12px;overflow:hidden;border:1px solid #222}
 @keyframes zoomM{0%{transform:scale(0.5);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+/* REAL SAFETY ADD-ONS - PUTHUSA */
+#sosFloat{position:fixed;bottom:85px;right:15px;width:65px;height:65px;background:linear-gradient(45deg,red,#ff0050);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 0 20px red;z-index:999;animation:pulse 1.5s infinite;cursor:pointer;border:3px solid #fff}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+.live-dot{width:10px;height:10px;background:#00ff00;border-radius:50%;display:inline-block;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+#fakeCallScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:10002;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 </style>
 </head>
 <body>
@@ -51,6 +56,11 @@ input{padding:10px;border-radius:8px;border:none;width:250px;margin:5px;backgrou
 
 <div class="header"><span onclick="showFeed()">PIXORO 🔥</span><span class="safety-badge">WORLD NO.1 SAFE</span><button onclick="showProfile()" style="background:none;border:none;color:#fff;font-size:22px;">👤</button></div>
 
+<!-- LIVE BAR - PUTHUSA ADD PANNEN DA -->
+<div id="liveBar" style="display:none;position:fixed;top:48px;width:100%;max-width:500px;background:#00c853;color:#fff;padding:8px;text-align:center;z-index:95;font-size:12px;font-weight:bold;">
+<span class="live-dot"></span> LIVE ON - <span id="liveTime">00:00</span> | <button onclick="stopLive()" style="background:#fff;color:#00c853;border:none;padding:2px 8px;border-radius:10px;font-size:10px;">STOP</button>
+</div>
+
 <div id="storyBar" class="story-bar" style="display:none;">
 <div class="story" onclick="addStory()"><div class="story-ring" style="border-color:#555;font-size:30px;">➕</div><small>Your Story</small></div>
 <div id="storyList" style="display:flex;gap:12px;"></div>
@@ -60,7 +70,6 @@ input{padding:10px;border-radius:8px;border:none;width:250px;margin:5px;backgrou
 
 <div id="feed" class="feed" style="display:none;"></div>
 
-<!-- UPLOAD BOXES SAME AS YOURS -->
 <div id="uploadBox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;padding:20px;text-align:center;overflow-y:auto;">
 <h3 style="margin-top:20px;">Post Podu da Giri! 🔥</h3><br><input id="captionInput" placeholder="Caption enna da?" style="width:90%;"><br><br><input type="file" id="fileInput" accept="image/*" style="width:90%;color:white;"><br><br><img id="preview" style="width:220px;height:300px;object-fit:cover;display:none;border-radius:10px;margin:10px auto;border:2px solid #ff0050;"><br>
 <div style="margin:10px;">
@@ -84,7 +93,6 @@ input{padding:10px;border-radius:8px;border:none;width:250px;margin:5px;backgrou
 
 <div id="commentBox"><div style="display:flex;justify-content:space-between;"><b>Comments</b><button onclick="commentBox.style.display='none'" style="background:none;border:none;color:#fff;">✕</button></div><div id="commentList" style="margin:10px 0;"></div><div style="display:flex;gap:5px;"><input id="commentInput" placeholder="Comment..." style="flex:1;"><button onclick="addComment()" style="background:#ff0050;color:#fff;border:none;padding:8px 15px;border-radius:10px;">Post</button></div></div>
 
-<!-- PROFILE - INGA THAAN MASS FEATURES ADD PANNEN DA GIRI! -->
 <div id="profileBox" style="display:none;margin-top:48px;max-width:500px;margin:0 auto;padding:0;">
 <div style="position:relative;height:190px;background:linear-gradient(45deg,#ff0050,#FFD700);overflow:hidden;">
 <img id="coverImg" src="https://picsum.photos/500/200?random=99" style="width:100%;height:100%;object-fit:cover;">
@@ -102,13 +110,11 @@ input{padding:10px;border-radius:8px;border:none;width:250px;margin:5px;backgrou
 <div><b id="postCount">0</b><br><small>Posts</small></div><div onclick="showFollowersPopup()"><b id="followerCount">0</b><br><small>Followers</small></div><div onclick="showFollowingPopup()"><b id="followingCount">0</b><br><small>Following</small></div>
 </div>
 
-<!-- ★★★ NEW MASS FEATURES - PRIVATE + HIGHLIGHTS ★★★ -->
 <div style="background:#000;padding:12px;border-radius:12px;margin:10px 0;border:1px solid #222;display:flex;justify-content:space-between;align-items:center;">
 <div><b style="font-size:13px;">🔒 Private Account</b><br><small style="font-size:11px;color:#aaa;">Public pudikalana private pannu da</small></div>
 <div class="pix-toggle" id="privateToggle" onclick="togglePrivateAccount()"><div class="pix-toggle-dot"></div></div>
 </div>
 
-<!-- HIGHLIGHTS - INSTA MAADHIRI AANA PIXORO STYLE -->
 <p style="font-weight:bold;color:#ff0050;margin-top:15px;">✨ Featured PIXORO</p>
 <div class="pix-highlights">
 <div class="pix-h-item" onclick="openHighlight('My Circle','👩‍👩‍👧')"><div class="pix-h-ring">👩‍👩‍👧</div><small style="font-size:10px;">My Circle</small><br><span style="font-size:9px;background:#ff0050;color:#fff;padding:1px 5px;border-radius:8px;">3</span></div>
@@ -118,18 +124,33 @@ input{padding:10px;border-radius:8px;border:none;width:250px;margin:5px;backgrou
 <div class="pix-h-item" onclick="openHighlight('Safety Tips','💡')"><div class="pix-h-ring" style="border-color:#ff6d00;">💡</div><small style="font-size:10px;">Tips</small><br><span style="font-size:9px;background:#ff6d00;color:#fff;padding:1px 5px;border-radius:8px;">12</span></div>
 </div>
 
-<!-- SEARCH FOLLOWERS -->
 <div class="pix-search"><span>🔍</span><input type="text" id="followerSearch" placeholder="Search followers / following..." oninput="filterFollowList()"></div>
 <div id="followListBox" class="pix-user-list" style="display:none;"></div>
 
 <div id="myPosts" style="margin-top:15px;display:flex;flex-wrap:wrap;gap:2px;"></div>
 </div></div>
 
+<!-- REAL SAFETY FLOAT BUTTON + FAKE CALL SCREEN -->
+<div id="sosFloat" onclick="triggerSOS()">🚨</div>
+<div id="fakeCallScreen">
+<img src="https://i.pravatar.cc/150?img=5" style="width:120px;height:120px;border-radius:50%;border:4px solid #00ff00;margin-bottom:20px;">
+<h2 style="color:#fff;">Amma Calling...</h2><p style="color:#aaa;margin:10px;">📍 Coimbatore</p>
+<div style="display:flex;gap:30px;margin-top:40px;">
+<button onclick="answerFakeCall()" style="width:70px;height:70px;border-radius:50%;background:#00c853;border:none;font-size:30px;">📞</button>
+<button onclick="document.getElementById('fakeCallScreen').style.display='none'" style="width:70px;height:70px;border-radius:50%;background:red;border:none;font-size:30px;">✕</button>
+</div>
+<p style="color:#666;margin-top:20px;font-size:11px;">PIXORO Fake Call - Boy kitta irunthu escape da!</p>
+</div>
+
 <div id="picZoomModal" onclick="this.style.display='none'" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.96);z-index:10001;align-items:center;justify-content:center;flex-direction:column;">
 <img id="zoomedPic" style="width:88%;max-width:380px;height:380px;border-radius:50%;border:5px solid #FFD700;object-fit:cover;"><h3 id="zoomName" style="color:#FFD700;margin-top:20px;"></h3></div>
 
 <div class="bottom" id="bottomNav" style="display:none;">
-<button onclick="showFeed()">🏠</button><button onclick="addPost()">➕</button><button onclick="showProfile()">👤</button><button onclick="logout()">🚪</button>
+<button onclick="showFeed()">🏠</button>
+<button onclick="startLive()">📍</button>
+<button onclick="addPost()">➕</button>
+<button onclick="triggerFakeCall()">📞</button>
+<button onclick="showProfile()">👤</button>
 </div>
 
 <script>
@@ -137,6 +158,7 @@ const firebaseConfig={apiKey:"AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",authDomai
 if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();const db=firebase.firestore();
 let currentUser=null;let currentCommentPostId=null;let currentStoryId=null;let storyTimer=null;let isPrivate=false;let allFollowers=[];
+let liveWatchId=null;let liveSeconds=0;let liveTimer=null;let lastShake=0;
 
 setTimeout(()=>{let s=document.getElementById('splash');if(s){s.style.transition='opacity 0.5s';s.style.opacity='0';setTimeout(()=>s.style.display='none',500);}},2200);
 auth.onAuthStateChanged(u=>{if(u){currentUser=u;loginBox.style.display="none";feed.style.display="block";bottomNav.style.display="flex";storyBar.style.display="flex";loadFeed();loadStories();}else{loginBox.style.display="block";feed.style.display="none";bottomNav.style.display="none";storyBar.style.display="none";profileBox.style.display="none";}});
@@ -189,17 +211,15 @@ async function togglePrivateAccount(){
 isPrivate=!isPrivate;
 document.getElementById('privateToggle').classList.toggle('on',isPrivate);
 await db.collection("users").doc(currentUser.uid).set({isPrivate:isPrivate},{merge:true});
-alert(isPrivate?'🔒 Private account ON da! Follow request vantha tha pakalam da!':'🌍 Public account ON da! Yellarum pakalam da!');
+alert(isPrivate?'🔒 Private ON da!':'🌍 Public ON da!');
 }
-function openHighlight(name,icon){alert(icon+' '+name+'\n\nPIXORO Featured - '+name+' la irukura posts varum da Giri! Mass ah!');}
+function openHighlight(name,icon){alert(icon+' '+name+' - Mass ah varum da Giri!');}
 function showFollowersPopup(){showFollowList('followers');}
 function showFollowingPopup(){showFollowList('following');}
 async function showFollowList(type){
 let doc=await db.collection("users").doc(currentUser.uid).get();if(!doc.exists)return;
 let data=doc.data();let list=type==='followers'?(data.followers||[]):(data.following||[]);
-allFollowers=list;
-document.getElementById('followListBox').style.display='block';
-renderFollowList(list, type);
+allFollowers=list;document.getElementById('followListBox').style.display='block';renderFollowList(list, type);
 }
 function renderFollowList(list, type){
 let q=document.getElementById('followerSearch').value.toLowerCase();
@@ -208,9 +228,45 @@ document.getElementById('followListBox').innerHTML=filtered.map(id=>`
 <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #222;">
 <div style="display:flex;align-items:center;gap:10px;"><img src="https://i.pravatar.cc/100?u=${id}" style="width:36px;height:36px;border-radius:50%;"><div><b style="font-size:13px;">${id}</b><br><small style="color:#aaa;">${type}</small></div></div>
 <button onclick="alert('Profile: ${id}')" style="background:#ff0050;color:#fff;border:none;padding:5px 12px;border-radius:12px;font-size:11px;">View</button>
-</div>`).join('') || `<p style="padding:15px;color:#666;text-align:center;">No ${type} found da Giri!</p>`;
+</div>`).join('') || `<p style="padding:15px;color:#666;text-align:center;">No ${type} found da!</p>`;
 }
 function filterFollowList(){renderFollowList(allFollowers,'followers / following');}
+
+// ===== REAL SAFETY - PUTHUSA ADD PANNEN DA - POLICE KU CALL POGATHU =====
+function triggerSOS(){
+ if(!currentUser) return;
+ if(confirm("🚨 SOS ANUPPAVA DA GIRI?\nFriends ku location mattum pogum da - Police ku direct call pogathu da!")){
+  if(navigator.geolocation){
+   navigator.geolocation.getCurrentPosition(async pos=>{
+    let lat=pos.coords.latitude;let lon=pos.coords.longitude;
+    let link=`https://maps.google.com/?q=${lat},${lon}`;
+    await db.collection("sos").add({uid:currentUser.uid,email:currentUser.email,lat:lat,lon:lon,link:link,time:firebase.firestore.FieldValue.serverTimestamp()});
+    alert("🚨 SOS SENT DA! Link: "+link+"\n\nIthu friends ku thaanda - police ku nee 100 ku call pannanum da!");
+    if(navigator.vibrate) navigator.vibrate([500,200,500]);
+   },()=>{alert("📍 Location ON pannu da!");});
+  }
+ }
+}
+function startLive(){
+ if(!navigator.geolocation) return alert("Location support illa da");
+ document.getElementById('liveBar').style.display='block';liveSeconds=0;
+ liveTimer=setInterval(()=>{liveSeconds++;let m=String(Math.floor(liveSeconds/60)).padStart(2,'0');let s=String(liveSeconds%60).padStart(2,'0');document.getElementById('liveTime').innerText=m+":"+s;},1000);
+ liveWatchId=navigator.geolocation.watchPosition(async pos=>{
+  await db.collection("live").doc(currentUser.uid).set({email:currentUser.email,lat:pos.coords.latitude,lon:pos.coords.longitude,updated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+ });
+ alert("📍 LIVE ON da Giri!");
+}
+function stopLive(){if(liveWatchId) navigator.geolocation.clearWatch(liveWatchId);if(liveTimer) clearInterval(liveTimer);document.getElementById('liveBar').style.display='none';db.collection("live").doc(currentUser.uid).delete().catch(()=>{});alert("Live OFF da");}
+function triggerFakeCall(){document.getElementById('fakeCallScreen').style.display='flex';if(navigator.vibrate) navigator.vibrate([400,200,400]);}
+function answerFakeCall(){document.getElementById('fakeCallScreen').style.display='none';alert("📞 Amma: Enga irukka da? Veetuku va da! (Escape pannalam da)");}
+// SHAKE SOS
+if(window.DeviceMotionEvent){
+ window.addEventListener('devicemotion', e=>{
+  let acc=e.accelerationIncludingGravity; if(!acc) return;
+  let force=Math.abs(acc.x+acc.y+acc.z);
+  if(force>45){let now=Date.now();if(now-lastShake>3000){lastShake=now;if(navigator.vibrate) navigator.vibrate([300,100,300]);triggerSOS();}}
+ });
+}
 </script>
 </body>
 </html>
