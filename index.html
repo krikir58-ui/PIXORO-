@@ -3,169 +3,222 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PIXORO</title>
+<title>PIXORO - WEEK 2 Account</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,Segoe UI}body{background:#000;color:#fff}
-.header{background:#000;height:60px;padding:0 16px;position:fixed;top:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);z-index:100;border-bottom:1px solid #111;display:flex;justify-content:space-between;align-items:center}
+.header{height:60px;padding:0 14px;position:fixed;top:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);z-index:100;background:#000;border-bottom:1px solid #111;display:flex;justify-content:space-between;align-items:center}
 .logo{font-family:'Grand Hotel',cursive;font-size:30px}
-.feed{margin-top:106px;margin-bottom:65px;max-width:500px;margin-left:auto;margin-right:auto}
-.story-bar{display:flex;gap:14px;padding:10px;background:#000;border-bottom:1px solid #111;overflow-x:auto;position:fixed;top:60px;width:100%;max-width:500px;left:50%;transform:translateX(-50%);z-index:90}
-.s-item{text-align:center;min-width:66px}.s-ring{width:62px;height:62px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)}.s-ring-inner{width:100%;height:100%;background:#000;border-radius:50%;padding:2px}.s-ring-inner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
-
-/* FEED - INSTAGRAM 4:5 COVER */
-.post{background:#000;border-bottom:1px solid #111;margin-bottom:8px}
+.feed{margin-top:60px;margin-bottom:80px;max-width:500px;margin:auto}
+.post{background:#000;border-bottom:1px solid #111;padding-bottom:8px}
 .post-top{padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
-.post-img-wrap{width:100%;aspect-ratio:4/5;background:#111;overflow:hidden;position:relative}
-.post-img{width:100%;height:100%;object-fit:cover;display:block} /* COVER = FULL SCREEN MAARI */
-.post-actions{padding:10px 12px;display:flex;gap:16px;align-items:center}
-
-.bottom{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#000;height:55px;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #111;z-index:100}
-.bottom button{background:none;border:none;color:#fff;font-size:22px;width:48px;height:48px}
-.bottom button.active{color:#fff;font-weight:bold}
-
-.login-box{margin-top:120px;text-align:center;padding:20px}input{padding:12px;border-radius:8px;border:1px solid #222;width:100%;max-width:300px;margin:6px;background:#121212;color:#fff}
-#commentBox{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#121212;padding:14px;display:none;z-index:1000;max-height:60%;overflow-y:auto;border-radius:16px 16px 0 0}
-
-#storyView,#addStoryPage,#storyEditor,#settingsPage,#reelsPage,#clashPage,#searchBox,#tagModal,#locationModal,#musicModal{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;flex-direction:column;overflow-y:auto}
-
-/* REELS FULL SCREEN - INSTAGRAM MAARI */
-#reelsPage{scroll-snap-type:y mandatory;overflow-y:scroll;z-index:200;background:#000}
-.reel-item{position:relative;width:100%;height:100vh;scroll-snap-align:start;background:#000;overflow:hidden}
-.reel-item img.reel-media{width:100%;height:100%;object-fit:cover} /* FULL SCREEN COVER */
-.reel-right{position:absolute;right:10px;bottom:90px;display:flex;flex-direction:column;gap:22px;align-items:center;z-index:5}
-.reel-bottom{position:absolute;bottom:0;left:0;width:100%;padding:14px 14px 20px 14px;background:linear-gradient(transparent,rgba(0,0,0,0.9));z-index:4}
-.heart-pop{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:80px;z-index:10;pointer-events:none;animation:heartPop.9s ease forwards}
-@keyframes heartPop{0%{transform:translate(-50%,-50%) scale(0)}20%{transform:translate(-50%,-50%) scale(1.3)}100%{transform:translate(-50%,-50%) scale(0)}}
+.post-img-wrap{width:100%;aspect-ratio:4/5;background:#111;overflow:hidden}
+.post-img{width:100%;height:100%;object-fit:cover}
+.post-actions{display:flex;gap:18px;padding:10px 14px}
+.action-btn{background:none;border:none;color:#fff;font-size:22px}
+.bottom{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#000;height:60px;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #111;z-index:100}
+.bottom button{background:none;border:none;color:#888;font-size:22px;width:48px;height:48px}.bottom button.active{color:#fff}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:#000}
+.login-card{width:100%;max-width:350px;text-align:center;border:1px solid #111;padding:28px 20px;border-radius:2px;background:#000}
+input{width:100%;padding:12px;background:#121212;border:1px solid #222;border-radius:3px;color:#fff;margin:5px 0;outline:none}
+.blue-btn{width:100%;background:#0095f6;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:700;margin-top:10px;cursor:pointer}
+#profileBox{display:none;margin-top:60px;max-width:500px;margin-left:auto;margin-right:auto}
+.profile-head{padding:16px;display:flex;gap:20px;align-items:center}
+.stats{display:flex;flex:1;justify-content:space-around;text-align:center}
+.edit-btn{width:100%;background:#222;color:#fff;border:none;padding:7px;border-radius:6px;margin-top:12px;font-weight:600}
+.follow-btn-main{background:#0095f6;color:#fff;border:none;padding:7px 20px;border-radius:8px;font-weight:700}
 </style>
 </head>
 <body>
 <div id="splash" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:10000;display:flex;align-items:center;justify-content:center;"><h1 style="font-family:'Grand Hotel',cursive;font-size:60px;">Pixoro</h1></div>
 
-<div class="header"><div class="logo" onclick="showFeed()">Pixoro</div><div style="display:flex;gap:16px;"><span onclick="showSearch()" style="font-size:20px;">⌕</span><span onclick="showReels()" style="font-size:20px;">🎬</span><span onclick="openSettings()" style="font-size:18px;">☰</span></div></div>
+<!-- WEEK 1 BASE READY - NO AD -->
+<div class="header" id="mainHeader" style="display:none;"><div class="logo" onclick="showFeed()">Pixoro</div><div style="display:flex;gap:16px;"><span onclick="showSearch()">🔍</span><span onclick="openSettings()">☰</span></div></div>
 
-<div id="storyBar" class="story-bar" style="display:none;">
-<div class="s-item" onclick="openAddStory()"><div class="s-ring" style="background:#222;"><div class="s-ring-inner"><img id="yourStoryThumb" src="https://i.pravatar.cc/100?u=me"></div></div><small style="font-size:10px;">Your story</small></div>
-<div id="storyList" style="display:flex;gap:14px;"></div>
+<!-- WEEK 2 ACCOUNT - LOGIN / SIGNUP -->
+<div id="loginBox" class="login-wrap">
+<div class="login-card">
+<h1 style="font-family:'Grand Hotel',cursive;font-size:50px;margin-bottom:20px;">Pixoro</h1>
+<input id="email" type="email" placeholder="Email" oninput="this.value=this.value.replace(/\s/g,'').toLowerCase()">
+<input id="pass" type="password" placeholder="Password">
+<input id="displayName" type="text" placeholder="Username (Signup ku mattum)" style="display:none;">
+<p id="toggleText" style="font-size:12px;color:#888;margin-top:12px;cursor:pointer;" onclick="toggleSignup()">New user? <span style="color:#0095f6;">Signup pannu da</span></p>
+<button id="loginBtn" onclick="handleAccount()" class="blue-btn">Log in</button>
+<p id="loginError" style="color:#ff3040;font-size:12px;margin-top:10px;display:none;"></p>
+<p style="font-size:10px;color:#555;margin-top:16px;">WEEK 2 - Account System ✅<br>No Ad - Clean Base</p>
 </div>
-
-<div id="loginBox" class="login-box"><h1 style="font-family:'Grand Hotel',cursive;font-size:50px;">Pixoro</h1><br><input id="email" type="email" placeholder="Email" oninput="this.value=this.value.replace(/\s/g,'').toLowerCase()"><br><input id="pass" type="password" placeholder="Password"><br><button id="loginBtn" onclick="login()" style="background:#0095f6;color:#fff;padding:12px;width:100%;max-width:300px;border:none;border-radius:8px;margin-top:12px;font-weight:600;">Log in</button><p id="loginError" style="color:#ff3040;font-size:12px;margin-top:10px;display:none;"></p></div>
+</div>
 
 <div id="feed" class="feed" style="display:none;"></div>
 
-<div id="searchBox"><div style="display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid #111;position:sticky;top:0;background:#000;"><button onclick="searchBox.style.display='none';showFeed()" style="background:none;border:none;color:#fff;font-size:20px;">←</button><div style="flex:1;background:#111;border-radius:8px;padding:10px 14px;display:flex;gap:8px;"><span>⌕</span><input id="searchInput" placeholder="Search" oninput="doSearch()" style="background:transparent;border:none;color:#fff;outline:none;width:100%;"></div></div><div id="searchResults" style="padding:12px;"></div></div>
-
-<div id="clashPage"><div style="display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid #111;position:sticky;top:0;background:#000;"><button onclick="clashPage.style.display='none';showFeed()" style="background:none;border:none;color:#fff;font-size:22px;">←</button><b>Clash</b></div><div id="clashList" style="padding:12px;"></div></div>
-<div id="settingsPage"><div style="display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid #111;"><button onclick="settingsPage.style.display='none'" style="background:none;border:none;color:#fff;font-size:22px;">←</button><b>Settings</b></div><div style="padding:20px;"><button onclick="logout()" style="width:100%;background:#111;border:1px solid #222;color:#ff3040;padding:14px;border-radius:8px;">Log out</button></div></div>
-
-<div id="addStoryPage"><div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #111;"><button onclick="addStoryPage.style.display='none'" style="background:none;border:none;color:#fff;">✕</button><b>New story</b></div><div style="padding:40px;text-align:center;"><button onclick="storyFile.click()" style="background:#fff;color:#000;padding:12px 24px;border:none;border-radius:8px;">Select photo</button><input type="file" id="storyFile" accept="image/*" style="display:none;" onchange="onStorySelect(event)"></div></div>
-<div id="storyEditor" style="background:#000;"><img id="editorImg" style="width:100%;height:100%;object-fit:contain;background:#000;position:absolute;top:0;left:0;"><div style="position:absolute;top:0;left:0;width:100%;display:flex;justify-content:space-between;padding:16px;z-index:10;"><button onclick="closeStoryEditor()" style="background:none;border:none;color:#fff;font-size:20px;">←</button><button onclick="uploadStoryFinal()" style="background:none;border:none;color:#0095f6;font-weight:700;">Share →</button></div></div>
-<div id="storyView"><div style="display:flex;gap:2px;padding:6px;position:absolute;top:0;width:100%;z-index:10;" id="progressWrap"></div><div style="display:flex;justify-content:space-between;padding:40px 12px 10px 12px;position:absolute;top:0;width:100%;z-index:5;background:linear-gradient(rgba(0,0,0,0.8),transparent);"><div style="display:flex;gap:8px;align-items:center;"><img id="svPic" src="" style="width:30px;height:30px;border-radius:50%;"><span id="svName" style="font-size:13px;font-weight:600;"></span></div><button onclick="closeStory()" style="background:none;border:none;color:#fff;">✕</button></div><img id="svImg" style="width:100%;height:100%;object-fit:contain;background:#000;"><div onclick="prevStory()" style="position:absolute;left:0;top:0;width:50%;height:100%;z-index:4;"></div><div onclick="nextStory()" style="position:absolute;right:0;top:0;width:50%;height:100%;z-index:4;"></div></div>
-
-<div id="uploadBox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;overflow-y:auto;">
-<div style="display:flex;align-items:center;justify-content:space-between;padding:0 14px;height:60px;border-bottom:1px solid #111;position:sticky;top:0;background:#000;"><button onclick="uploadBox.style.display='none'" style="background:none;border:none;color:#fff;font-size:22px;">✕</button><b>New post</b><button onclick="uploadRealPost()" style="background:none;border:none;color:#0095f6;font-weight:700;">Share</button></div>
-<div style="width:100%;aspect-ratio:4/5;background:#111;overflow:hidden;"><img id="preview" style="width:100%;height:100%;object-fit:cover;display:none;"></div>
-<div style="padding:16px;"><input id="captionInput" placeholder="Write a caption..." style="width:100%;background:transparent;border:none;color:#fff;outline:none;padding:8px 0;"><div style="margin-top:16px;border-top:1px solid #111;"><div onclick="openLocation()" style="padding:16px 0;display:flex;justify-content:space-between;border-bottom:1px solid #111;"><span>Add location</span><span id="locationText" style="color:#666;">›</span></div><div onclick="openMusicTag()" style="padding:16px 0;display:flex;justify-content:space-between;"><span>Add music</span><span id="musicText" style="color:#1DB954;">›</span></div></div></div>
-<input type="file" id="fileInput" accept="image/*" style="display:none;">
+<!-- PROFILE - WEEK 2 MAIN -->
+<div id="profileBox">
+<div style="display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid #111;position:sticky;top:0;background:#000;"><button onclick="showFeed()" style="background:none;border:none;color:#fff;font-size:20px;">←</button><b id="profileUsername">pixoro4</b></div>
+<div class="profile-head">
+<img id="profilePic" src="https://i.pravatar.cc/100" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
+<div class="stats">
+<div><b id="postCount">0</b><br><small style="color:#888;font-size:12px;">Posts</small></div>
+<div onclick="showFollowers()"><b id="followerCount">0</b><br><small style="color:#888;font-size:12px;">Followers</small></div>
+<div onclick="showFollowing()"><b id="followingCount">0</b><br><small style="color:#888;font-size:12px;">Following</small></div>
+</div>
+</div>
+<div style="padding:0 16px;">
+<b id="pName" style="font-size:14px;"></b>
+<p id="pBio" style="font-size:13px;margin-top:2px;color:#ddd;">Tiruchuli to World 🌍</p>
+<p id="pEmail" style="font-size:11px;color:#666;margin-top:4px;"></p>
+<button id="profileActionBtn" class="edit-btn" onclick="editProfile()">Edit profile</button>
+</div>
+<div style="display:flex;border-top:1px solid #111;margin-top:16px;"><div style="flex:1;padding:12px;text-align:center;border-bottom:1px solid #fff;">POSTS</div><div style="flex:1;padding:12px;text-align:center;color:#666;">TAGGED</div></div>
+<div id="myPosts" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;"></div>
 </div>
 
-<div id="locationModal" style="background:#000;"><div style="display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid #111;"><button onclick="locationModal.style.display='none'" style="background:none;border:none;color:#fff;font-size:20px;">←</button><input id="locationSearch" placeholder="Search location" oninput="searchLocation()" style="flex:1;background:#111;border:none;border-radius:8px;padding:10px 14px;color:#fff;outline:none;"></div><div id="locationResults"><div onclick="selectLocation('Tiruchuli')" style="padding:14px;border-bottom:1px solid #111;">Tiruchuli</div><div onclick="selectLocation('Coimbatore')" style="padding:14px;border-bottom:1px solid #111;">Coimbatore</div></div></div>
-<div id="musicModal" style="background:#000;"><div style="display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid #111;"><button onclick="musicModal.style.display='none';pauseSong()" style="background:none;border:none;color:#fff;font-size:20px;">←</button><b>Music</b></div><div style="padding:12px;"><input id="songSearch" placeholder="Search songs" oninput="searchTamilSongs()" style="width:100%;background:#111;border:none;border-radius:8px;padding:10px 14px;color:#fff;outline:none;"><div id="tamilSongsList" style="margin-top:12px;"></div></div><audio id="songPreviewPlayer" style="display:none;"></audio></div>
-<div id="commentBox"><div style="display:flex;justify-content:space-between;margin-bottom:12px;"><b>Comments</b><button onclick="commentBox.style.display='none'" style="background:none;border:none;color:#fff;">✕</button></div><div id="commentList"></div><div style="display:flex;gap:8px;margin-top:12px;border-top:1px solid #222;padding-top:12px;"><input id="commentInput" placeholder="Add a comment..." style="flex:1;background:transparent;border:none;color:#fff;outline:none;"><button onclick="addComment()" style="background:none;border:none;color:#0095f6;font-weight:700;">Post</button></div></div>
-<div id="profileBox" style="display:none;margin-top:60px;max-width:500px;margin-left:auto;margin-right:auto;padding:16px;"><div style="display:flex;gap:20px;align-items:center;"><img id="profilePic" src="https://i.pravatar.cc/100" style="width:80px;height:80px;border-radius:50%;"><div style="flex:1;display:flex;justify-content:space-around;text-align:center;"><div><b id="postCount">0</b><br><small style="color:#888;">Posts</small></div><div><b id="followerCount">0</b><br><small style="color:#888;">Followers</small></div><div><b id="followingCount">0</b><br><small style="color:#888;">Following</small></div></div></div><div style="margin-top:10px;"><b id="pName"></b><p id="pEmail" style="color:#888;font-size:12px;"></p></div><div id="myPosts" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;margin-top:12px;"></div></div>
-
-<div id="reelsPage"></div>
+<div id="commentBox" style="position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#121212;padding:14px;display:none;z-index:1000;max-height:60%;overflow-y:auto;border-radius:16px 16px 0 0;"><div style="display:flex;justify-content:space-between;"><b>Comments</b><button onclick="commentBox.style.display='none'" style="background:none;border:none;color:#fff;">✕</button></div><div id="commentList" style="margin-top:10px;"></div><div style="display:flex;gap:8px;margin-top:12px;border-top:1px solid #222;padding-top:12px;"><input id="commentInput" placeholder="Add a comment..." style="flex:1;background:transparent;border:none;color:#fff;outline:none;"><button onclick="addComment()" style="background:none;border:none;color:#0095f6;font-weight:700;">Post</button></div></div>
+<div id="settingsPage" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;flex-direction:column;"><div style="display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid #111;"><button onclick="settingsPage.style.display='none'" style="background:none;border:none;color:#fff;font-size:22px;">←</button><b>Settings</b></div><div style="padding:20px;"><button onclick="logout()" style="width:100%;background:#111;border:1px solid #222;color:#ff3040;padding:14px;border-radius:8px;">Log out</button></div></div>
 
 <div class="bottom" id="bottomNav" style="display:none;">
 <button onclick="showFeed()" id="navHome" class="active">⌂</button>
 <button onclick="showSearch()" id="navSearch">⌕</button>
-<button onclick="addPost()" style="font-size:28px;">+</button>
-<button onclick="showReels()" id="navReels">▶</button>
+<button onclick="addPost()" style="font-size:28px;color:#fff;">+</button>
 <button onclick="showProfile()" id="navProfile">◯</button>
+<button onclick="openSettings()">☰</button>
 </div>
+
+<input type="file" id="fileInput" accept="image/*" style="display:none;">
+<div id="uploadBox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;"><div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #111;"><button onclick="uploadBox.style.display='none'" style="background:none;border:none;color:#fff;">✕</button><b>New post</b><button onclick="uploadRealPost()" style="background:none;border:none;color:#0095f6;font-weight:700;">Share</button></div><div style="width:100%;aspect-ratio:4/5;background:#111;"><img id="preview" style="width:100%;height:100%;object-fit:cover;display:none;"></div><div style="padding:16px;"><input id="captionInput" placeholder="Write a caption..." style="width:100%;background:transparent;border:none;color:#fff;outline:none;"></div></div>
 
 <script>
 const firebaseConfig={apiKey:"AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",authDomain:"pixoro-75927.firebaseapp.com",projectId:"pixoro-75927",storageBucket:"pixoro-75927.firebasestorage.app",messagingSenderId:"814840120295",appId:"1:814840120295:web:6c02c613df5a17209bf342"};
 if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();const db=firebase.firestore();
-let currentUser=null,currentCommentPostId=null,storiesData=[],currentStoryIndex=0,storyTimer=null,tempStoryImage=null,selectedLocation="",selectedSong=null,currentPlayingUrl=null;
-const tamilSongsDB=[
-{id:1,title:"Oru Paattale",movie:"Tourist Family",artist:"S.P.B",url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
-{id:2,title:"Vaathi Coming",movie:"Master",url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"},
-{id:3,title:"Arabic Kuthu",movie:"Beast",url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"},
-];
-setTimeout(()=>{let s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(()=>s.style.display='none',400);}},800);
-auth.onAuthStateChanged(u=>{
-if(u){currentUser=u;loginBox.style.display="none";profileBox.style.display="none";feed.style.display="block";bottomNav.style.display="flex";storyBar.style.display="flex";searchBox.style.display="none";clashPage.style.display="none";reelsPage.style.display="none";loadFeed();loadStories();}else{loginBox.style.display="block";feed.style.display="none";bottomNav.style.display="none";storyBar.style.display="none";}
+let currentUser=null,isSignupMode=false,currentCommentPostId=null,viewingUid=null;
+
+setTimeout(()=>{let s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(()=>s.style.display='none',400);}},600);
+
+function toggleSignup(){isSignupMode=!isSignupMode;document.getElementById('displayName').style.display=isSignupMode?'block':'none';document.getElementById('loginBtn').innerText=isSignupMode?'Sign up':'Log in';document.getElementById('toggleText').innerHTML=isSignupMode?'Already have account? <span style="color:#0095f6;">Log in pannu da</span>':'New user? <span style="color:#0095f6;">Signup pannu da</span>';}
+
+auth.onAuthStateChanged(async u=>{
+if(u){currentUser=u;viewingUid=u.uid;loginBox.style.display="none";mainHeader.style.display="flex";bottomNav.style.display="flex";feed.style.display="block";profileBox.style.display="none";await ensureUserDoc(u);loadFeed();loadProfileStats(u.uid);}else{loginBox.style.display="flex";mainHeader.style.display="none";bottomNav.style.display="none";feed.style.display="none";profileBox.style.display="none";}
 });
-function login(){let e=email.value.trim().replace(/\s/g,'').toLowerCase();let p=pass.value.trim();let errEl=document.getElementById('loginError');let btn=document.getElementById('loginBtn');if(!e||!p){errEl.style.display='block';errEl.innerText="Email + Password";return;}errEl.style.display='none';btn.innerText="...";btn.disabled=true;auth.signInWithEmailAndPassword(e,p).catch(err=>{if(err.code==="auth/invalid-credential"||err.code==="auth/user-not-found"){auth.createUserWithEmailAndPassword(e,p).then(()=>{}).catch(e2=>{errEl.style.display='block';errEl.innerText=e2.message;btn.innerText="Log in";btn.disabled=false;});}else{errEl.style.display='block';errEl.innerText=err.message;btn.innerText="Log in";btn.disabled=false;}});}
-function logout(){if(confirm("Logout?"))auth.signOut();}
+
+async function ensureUserDoc(user){
+let ref=db.collection("users").doc(user.uid);
+let snap=await ref.get();
+if(!snap.exists){
+let username=user.email.split("@")[0];
+if(document.getElementById('displayName').value.trim()) username=document.getElementById('displayName').value.trim();
+await ref.set({email:user.email,username:username,bio:"Tiruchuli to World 🌍",photo:"https://i.pravatar.cc/150?u="+user.uid,followers:0,following:0,posts:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+}
+}
+
+async function handleAccount(){
+let e=email.value.trim().toLowerCase();let p=pass.value.trim();let errEl=document.getElementById('loginError');let btn=document.getElementById('loginBtn');
+if(!e||!p){errEl.style.display='block';errEl.innerText="Email + Password podu da";return;}
+errEl.style.display='none';btn.innerText="Wait...";btn.disabled=true;
+try{
+if(isSignupMode){await auth.createUserWithEmailAndPassword(e,p);}else{await auth.signInWithEmailAndPassword(e,p);}
+}catch(err){errEl.style.display='block';errEl.innerText=err.message;btn.innerText=isSignupMode?'Sign up':'Log in';btn.disabled=false;}
+}
+
+function logout(){auth.signOut();}
 function clearNav(){document.querySelectorAll('.bottom button').forEach(b=>b.classList.remove('active'))}
-function showFeed(){clearNav();navHome.classList.add('active');feed.style.display="block";profileBox.style.display="none";searchBox.style.display="none";storyBar.style.display="flex";settingsPage.style.display="none";clashPage.style.display="none";reelsPage.style.display="none";bottomNav.style.display="flex";loadFeed();}
-function showSearch(){clearNav();navSearch.classList.add('active');feed.style.display="none";profileBox.style.display="none";storyBar.style.display="none";searchBox.style.display="flex";settingsPage.style.display="none";clashPage.style.display="none";reelsPage.style.display="none";bottomNav.style.display="flex";}
-function showProfile(){clearNav();navProfile.classList.add('active');feed.style.display="none";storyBar.style.display="none";searchBox.style.display="none";profileBox.style.display="block";settingsPage.style.display="none";clashPage.style.display="none";reelsPage.style.display="none";bottomNav.style.display="flex";loadProfile();}
+function showFeed(){clearNav();navHome.classList.add('active');feed.style.display="block";profileBox.style.display="none";viewingUid=currentUser.uid;loadFeed();}
+function showSearch(){alert("Week 8 la Discovery varum da Giri!");}
+function showProfile(){clearNav();navProfile.classList.add('active');viewingUid=currentUser.uid;feed.style.display="none";profileBox.style.display="block";loadProfileStats(viewingUid);}
 function openSettings(){settingsPage.style.display='flex';}
 function addPost(){fileInput.click();}
 fileInput.addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{preview.src=ev.target.result;preview.style.display='block';uploadBox.style.display='block';};r.readAsDataURL(f);});
-function openLocation(){locationModal.style.display='flex';}
-function openMusicTag(){musicModal.style.display='flex';loadTamilSongs(tamilSongsDB);}
-function searchLocation(){let q=locationSearch.value.toLowerCase();let places=["Tiruchuli","Coimbatore","Chennai","Madurai"];let f=places.filter(p=>p.toLowerCase().includes(q));locationResults.innerHTML=f.map(p=>`<div onclick="selectLocation('${p}')" style="padding:14px;border-bottom:1px solid #111;">${p}</div>`).join('');}
-function selectLocation(loc){selectedLocation=loc;locationText.innerText=loc;locationText.style.color='#fff';locationModal.style.display='none';}
-function loadTamilSongs(songs){let h="";songs.forEach(s=>{h+=`<div style="display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #111;"><div style="width:40px;height:40px;background:#111;border-radius:4px;display:flex;align-items:center;justify-content:center;">🎵</div><div style="flex:1;"><b style="font-size:13px;">${s.title}</b><br><small style="color:#888;font-size:11px;">${s.movie}</small></div><button onclick="previewSong('${s.url}',this)" style="background:none;border:none;color:#fff;">▶</button><button onclick="selectTamilSong(${s.id})" style="background:#fff;color:#000;border:none;padding:6px 12px;border-radius:4px;font-weight:700;font-size:11px;margin-left:8px;">Add</button></div>`;});tamilSongsList.innerHTML=h;}
-function searchTamilSongs(){let q=songSearch.value.toLowerCase();let f=tamilSongsDB.filter(s=>s.title.toLowerCase().includes(q)||s.movie.toLowerCase().includes(q));loadTamilSongs(f);}
-function previewSong(url,btn){let p=songPreviewPlayer;if(currentPlayingUrl===url&&!p.paused){p.pause();btn.innerText='▶';currentPlayingUrl=null;return;}p.src=url;p.play();btn.innerText='⏸';currentPlayingUrl=url;p.onended=()=>btn.innerText='▶';}
-function pauseSong(){songPreviewPlayer.pause();}
-function selectTamilSong(id){let s=tamilSongsDB.find(x=>x.id===id);selectedSong=s;musicModal.style.display='none';pauseSong();musicText.innerText=s.title;musicText.style.color='#fff';}
-async function uploadRealPost(){let cap=captionInput.value.trim();let img=preview.src;if(!img||img.length<10)return alert("Photo select pannu");await db.collection("reels").add({email:currentUser.email.split("@")[0],uid:currentUser.uid,caption:cap,videoUrl:img,location:selectedLocation,song:selectedSong,likes:0,likedBy:[],createdAt:firebase.firestore.FieldValue.serverTimestamp()});uploadBox.style.display='none';captionInput.value='';preview.style.display='none';preview.src='';selectedLocation="";selectedSong=null;locationText.innerText='›';musicText.innerText='›';loadFeed();}
-async function loadFeed(){try{let s=await db.collection("reels").orderBy("createdAt","desc").limit(30).get();let h="";for(let doc of s.docs){let x=doc.data();let uDoc=await db.collection("users").doc(x.uid).get();let u=uDoc.exists?uDoc.data():{};h+=`<div class="post"><div class="post-top"><div style="display:flex;gap:10px;align-items:center;"><img src="${u.photo||'https://i.pravatar.cc/100?u='+x.email}" style="width:32px;height:32px;border-radius:50%;"><b style="font-size:13px;">${x.email}</b></div><span>⋯</span></div><div class="post-img-wrap" ondblclick="doubleTapLike('${doc.id}',this)"><img class="post-img" src="${x.videoUrl}"></div><div class="post-actions"><button style="background:none;border:none;font-size:22px;" onclick="likePost('${doc.id}',this)">${x.likedBy&&x.likedBy.includes(currentUser.uid)?'❤️':'♡'}</button><button style="background:none;border:none;font-size:22px;" onclick="openComments('${doc.id}')">◯</button><button style="background:none;border:none;font-size:18px;" onclick="sharePost()">↗</button></div><div style="padding:0 12px 4px 12px;"><b style="font-size:13px;">${x.likes||0} likes</b></div><div style="padding:0 12px 12px 12px;font-size:13px;"><b>${x.email}</b> ${x.caption||''} ${x.location?'📍'+x.location:''} ${x.song?'🎵'+x.song.title:''}</div></div>`;}feed.innerHTML=h||"<p style='text-align:center;margin-top:80px;color:#333;'>No posts yet</p>";}catch(e){feed.innerHTML=e.message;}}
-function doubleTapLike(id,el){let heart=document.createElement('div');heart.className='heart-pop';heart.innerText='❤️';el.appendChild(heart);setTimeout(()=>heart.remove(),900);likePost(id,null);}
-async function likePost(id,btn){let ref=db.collection("reels").doc(id);let doc=await ref.get();let x=doc.data();let liked=x.likedBy&&x.likedBy.includes(currentUser.uid);if(btn)btn.innerText=liked?'♡':'❤️';if(liked)await ref.update({likes:firebase.firestore.FieldValue.increment(-1),likedBy:firebase.firestore.FieldValue.arrayRemove(currentUser.uid)});else await ref.update({likes:firebase.firestore.FieldValue.increment(1),likedBy:firebase.firestore.FieldValue.arrayUnion(currentUser.uid)});}
-function sharePost(){navigator.clipboard.writeText(location.href);alert("Link copied");}
-async function openComments(id){currentCommentPostId=id;commentBox.style.display="block";let s=await db.collection("reels").doc(id).collection("comments").orderBy("createdAt","asc").get();let h="";s.forEach(d=>{h+=`<div style="padding:8px 0;"><b style="font-size:13px;">${d.data().email}</b> ${d.data().text}</div>`;});commentList.innerHTML=h||"No comments";}
-async function addComment(){let t=commentInput.value.trim();if(!t)return;await db.collection("reels").doc(currentCommentPostId).collection("comments").add({email:currentUser.email.split("@")[0],text:t,createdAt:firebase.firestore.FieldValue.serverTimestamp()});commentInput.value="";openComments(currentCommentPostId);}
-async function loadProfile(){pName.innerText=currentUser.email.split("@")[0];pEmail.innerText=currentUser.email;let my=await db.collection("reels").where("uid","==",currentUser.uid).get();postCount.innerText=my.size;let u=await db.collection("users").doc(currentUser.uid).get();let d=u.exists?u.data():{};if(d.photo)profilePic.src=d.photo;let h="";my.forEach(x=>{h+=`<div style="aspect-ratio:1/1;background:#111;"><img src="${x.data().videoUrl}" style="width:100%;height:100%;object-fit:cover;"></div>`});myPosts.innerHTML=h;}
-function openClash(){clearNav();feed.style.display="none";profileBox.style.display="none";searchBox.style.display="none";storyBar.style.display="none";clashPage.style.display="flex";reelsPage.style.display="none";loadClashes();}
-async function loadClashes(){let snap=await db.collection("clashes").limit(10).get();let h="";snap.forEach(doc=>{let c=doc.data();h+=`<div style="background:#111;border-radius:8px;padding:8px;margin-bottom:10px;display:flex;gap:4px;"><div style="flex:1;"><img src="${c.postA.img}" style="width:100%;height:180px;object-fit:cover;border-radius:4px;"></div><div style="flex:1;"><img src="${c.postB.img}" style="width:100%;height:180px;object-fit:cover;border-radius:4px;"></div></div>`;});clashList.innerHTML=h||"No clash";}
-function showReels(){clearNav();navReels.classList.add('active');feed.style.display="none";profileBox.style.display="none";searchBox.style.display="none";storyBar.style.display="none";clashPage.style.display="none";reelsPage.style.display='flex';bottomNav.style.display="none";loadReels();}
-async function loadReels(){
-let rp=document.getElementById('reelsPage');
-let snap=await db.collection("reels").orderBy("createdAt","desc").limit(20).get();
-if(snap.empty){rp.innerHTML=`<div style="height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;background:#000;"><p style="color:#666;">No reels da</p><button onclick="showFeed()" style="margin-top:12px;background:#fff;color:#000;padding:8px 20px;border-radius:20px;border:none;">Back to feed</button></div>`;return;}
-let h=`<div style="position:fixed;top:0;left:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);display:flex;justify-content:space-between;padding:14px;z-index:10;background:linear-gradient(rgba(0,0,0,0.8),transparent);"><b>Reels</b><button onclick="showFeed()" style="background:none;border:none;color:#fff;font-size:20px;">✕</button></div>`;
-snap.forEach(doc=>{
-let x=doc.data();
-h+=`<div class="reel-item" ondblclick="reelDoubleTap(this,'${doc.id}')">
-<img class="reel-media" src="${x.videoUrl}">
-<div class="reel-right">
-<div style="text-align:center;" onclick="reelLike('${doc.id}')"><div style="font-size:28px;">${x.likedBy&&x.likedBy.includes(currentUser.uid)?'❤️':'♡'}</div><b style="font-size:12px;">${x.likes||0}</b></div>
-<div style="text-align:center;" onclick="openComments('${doc.id}')"><div style="font-size:22px;">💬</div><b style="font-size:11px;">0</b></div>
-<div style="text-align:center;" onclick="sharePost()"><div style="font-size:22px;">↗</div></div>
-</div>
-<div class="reel-bottom">
-<div style="display:flex;align-items:center;gap:8px;"><b style="font-size:14px;">${x.email}</b><span style="font-size:12px;color:#aaa;">${x.location||''}</span></div>
-<div style="font-size:13px;margin-top:4px;">${x.caption||''}</div>
-${x.song?`<div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:12px;"><span>♪</span><span>${x.song.title} • ${x.song.movie}</span></div>`:''}
-</div>
-</div>`;
-});
-rp.innerHTML=h;
+async function uploadRealPost(){let cap=captionInput.value.trim();let img=preview.src;if(!img)return alert("Photo select pannu");await db.collection("reels").add({email:currentUser.email.split("@")[0],uid:currentUser.uid,caption:cap,videoUrl:img,likes:0,likedBy:[],createdAt:firebase.firestore.FieldValue.serverTimestamp()});await db.collection("users").doc(currentUser.uid).update({posts:firebase.firestore.FieldValue.increment(1)});uploadBox.style.display='none';captionInput.value='';preview.style.display='none';showFeed();}
+
+// WEEK 2 ACCOUNT - PROFILE + FOLLOW
+async function loadProfileStats(uid){
+viewingUid=uid;
+let uSnap=await db.collection("users").doc(uid).get();
+if(!uSnap.exists)return;
+let u=uSnap.data();
+pName.innerText=u.username;profileUsername.innerText=u.username;pEmail.innerText=u.email;pBio.innerText=u.bio||"Tiruchuli to World 🌍";profilePic.src=u.photo;postCount.innerText=u.posts||0;followerCount.innerText=u.followers||0;followingCount.innerText=u.following||0;
+
+// Own profile vs others
+let actionBtn=document.getElementById('profileActionBtn');
+if(uid===currentUser.uid){actionBtn.innerText="Edit profile";actionBtn.className="edit-btn";actionBtn.onclick=editProfile;}else{
+let isFollowing=await checkIsFollowing(uid);
+actionBtn.innerText=isFollowing?"Following":"Follow";actionBtn.className=isFollowing?"edit-btn":"follow-btn-main";actionBtn.onclick=()=>toggleFollow(uid);
 }
-function reelDoubleTap(el,id){let heart=document.createElement('div');heart.className='heart-pop';heart.innerText='❤️';el.appendChild(heart);setTimeout(()=>heart.remove(),900);reelLike(id);}
-async function reelLike(id){let ref=db.collection("reels").doc(id);let doc=await ref.get();let x=doc.data();let liked=x.likedBy&&x.likedBy.includes(currentUser.uid);if(liked)await ref.update({likes:firebase.firestore.FieldValue.increment(-1),likedBy:firebase.firestore.FieldValue.arrayRemove(currentUser.uid)});else await ref.update({likes:firebase.firestore.FieldValue.increment(1),likedBy:firebase.firestore.FieldValue.arrayUnion(currentUser.uid)});loadReels();}
-function openAddStory(){addStoryPage.style.display='flex';}
-function onStorySelect(ev){let f=ev.target.files[0];if(!f)return;let r=new FileReader();r.onload=e=>{tempStoryImage=e.target.result;editorImg.src=e.target.result;storyEditor.style.display='flex';addStoryPage.style.display='none';};r.readAsDataURL(f);}
-function closeStoryEditor(){storyEditor.style.display='none';}
-async function uploadStoryFinal(){if(!tempStoryImage)return;await db.collection("stories").add({email:currentUser.email.split("@")[0],uid:currentUser.uid,imageUrl:tempStoryImage,createdAt:firebase.firestore.FieldValue.serverTimestamp()});storyEditor.style.display='none';loadStories();}
-async function loadStories(){try{let snap=await db.collection("stories").orderBy("createdAt","desc").limit(30).get();storiesData=[];let now=new Date();snap.forEach(d=>{let s=d.data();if(!s.createdAt)return;if((now-s.createdAt.toDate())/1000/3600>24)return;storiesData.push({id:d.id,...s});});let h="";storiesData.forEach((s,i)=>{h+=`<div class="s-item" onclick="viewStoryAt(${i})"><div class="s-ring"><div class="s-ring-inner"><img src="${s.imageUrl}"></div></div><small style="font-size:10px;">${s.email}</small></div>`;});storyList.innerHTML=h;}catch(e){}}
-function viewStoryAt(i){currentStoryIndex=i;showStory();}
-function showStory(){let s=storiesData[currentStoryIndex];storyView.style.display='flex';svImg.src=s.imageUrl;svName.innerText=s.email;svPic.src=s.imageUrl;progressWrap.innerHTML=storiesData.map((_,idx)=>`<div style="flex:1;height:2px;background:rgba(255,255,255,0.3);margin-right:2px;"><div id="pf-${idx}" style="height:100%;background:#fff;width:${idx<currentStoryIndex?'100%':'0%'}"></div></div>`).join('');let pr=0;clearInterval(storyTimer);storyTimer=setInterval(()=>{pr+=2;let el=document.getElementById(`pf-${currentStoryIndex}`);if(el)el.style.width=pr+'%';if(pr>=100)nextStory();},60);}
-function nextStory(){clearInterval(storyTimer);if(currentStoryIndex<storiesData.length-1){currentStoryIndex++;showStory();}else closeStory();}
-function prevStory(){clearInterval(storyTimer);if(currentStoryIndex>0){currentStoryIndex--;showStory();}else showStory();}
-function closeStory(){storyView.style.display='none';clearInterval(storyTimer);}
-async function doSearch(){let q=searchInput.value.toLowerCase().trim();if(!q){searchResults.innerHTML="";return;}let snap=await db.collection("reels").orderBy("createdAt","desc").limit(30).get();let h="";snap.forEach(d=>{let x=d.data();if(x.email.toLowerCase().includes(q)||(x.caption||"").toLowerCase().includes(q)){h+=`<div style="display:flex;gap:10px;padding:10px;border-bottom:1px solid #111;"><img src="${x.videoUrl}" style="width:50px;height:50px;object-fit:cover;border-radius:4px;"><div><b style="font-size:13px;">${x.email}</b><br><small style="color:#666;">${x.caption||''}</small></div></div>`;}});searchResults.innerHTML=h||"No results";}
+
+let myPostsSnap=await db.collection("reels").where("uid","==",uid).get();
+let h="";myPostsSnap.forEach(d=>{h+=`<div style="aspect-ratio:1/1;background:#111;"><img src="${d.data().videoUrl}" style="width:100%;height:100%;object-fit:cover;"></div>`;});
+myPosts.innerHTML=h||"<p style='text-align:center;color:#333;padding:20px;'>No posts</p>";
+}
+
+async function checkIsFollowing(targetUid){
+let snap=await db.collection("users").doc(currentUser.uid).collection("following").doc(targetUid).get();
+return snap.exists;
+}
+
+async function toggleFollow(targetUid){
+let followingRef=db.collection("users").doc(currentUser.uid).collection("following").doc(targetUid);
+let followerRef=db.collection("users").doc(targetUid).collection("followers").doc(currentUser.uid);
+let isFollowing=await checkIsFollowing(targetUid);
+if(isFollowing){
+await followingRef.delete();await followerRef.delete();
+await db.collection("users").doc(currentUser.uid).update({following:firebase.firestore.FieldValue.increment(-1)});
+await db.collection("users").doc(targetUid).update({followers:firebase.firestore.FieldValue.increment(-1)});
+}else{
+await followingRef.set({uid:targetUid,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+await followerRef.set({uid:currentUser.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+await db.collection("users").doc(currentUser.uid).update({following:firebase.firestore.FieldValue.increment(1)});
+await db.collection("users").doc(targetUid).update({followers:firebase.firestore.FieldValue.increment(1)});
+}
+loadProfileStats(targetUid);
+}
+
+async function editProfile(){
+let newBio=prompt("Bio enna da?",document.getElementById('pBio').innerText);
+if(newBio!==null){await db.collection("users").doc(currentUser.uid).update({bio:newBio});loadProfileStats(currentUser.uid);}
+}
+
+async function loadFeed(){
+try{
+let s=await db.collection("reels").orderBy("createdAt","desc").limit(20).get();
+let h="";
+for(let doc of s.docs){
+let x=doc.data();
+let uSnap=await db.collection("users").doc(x.uid).get();
+let u=uSnap.exists?uSnap.data():{username:x.email};
+let isLiked=x.likedBy&&x.likedBy.includes(currentUser.uid);
+let isOwn=x.uid===currentUser.uid;
+h+=`<div class="post">
+<div class="post-top">
+<div style="display:flex;gap:10px;align-items:center;cursor:pointer;" onclick="viewUserProfile('${x.uid}')">
+<img src="${u.photo||'https://i.pravatar.cc/100?u='+x.email}" style="width:32px;height:32px;border-radius:50%;">
+<b style="font-size:13px;">${u.username||x.email}</b>
+</div>
+${!isOwn?`<button onclick="toggleFollow('${x.uid}')" style="background:${await checkIsFollowing(x.uid)?'#222':'#0095f6'};color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;">${await checkIsFollowing(x.uid)?'Following':'Follow'}</button>`:`<span>⋯</span>`}
+</div>
+<div class="post-img-wrap" ondblclick="doubleTapLike('${doc.id}',this)"><img class="post-img" src="${x.videoUrl}"></div>
+<div class="post-actions">
+<button class="action-btn" onclick="likePost('${doc.id}',this)">${isLiked?'❤️':'🤍'}</button>
+<button class="action-btn" onclick="openComments('${doc.id}')">💬</button>
+<button class="action-btn" onclick="sharePost()">↗️</button>
+</div>
+<div style="padding:0 14px 2px 14px;"><b style="font-size:13px;">${x.likes||0} likes</b></div>
+<div style="padding:2px 14px 12px 14px;font-size:13px;"><b>${u.username||x.email}</b> ${x.caption||''}</div>
+</div>`;
+}
+feed.innerHTML=h||"<p style='text-align:center;margin-top:80px;color:#444;'>No posts yet - + tap pannu da Giri</p>";
+}catch(e){feed.innerHTML=e.message;}
+}
+
+function viewUserProfile(uid){viewingUid=uid;feed.style.display="none";profileBox.style.display="block";loadProfileStats(uid);}
+function doubleTapLike(id,el){let heart=document.createElement('div');heart.className='heart-pop';heart.innerText='❤️';heart.style.cssText="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:80px;animation:heartPop.9s ease forwards;";el.appendChild(heart);setTimeout(()=>heart.remove(),900);likePost(id,null);}
+async function likePost(id,btn){let ref=db.collection("reels").doc(id);let doc=await ref.get();let x=doc.data();let liked=x.likedBy&&x.likedBy.includes(currentUser.uid);if(btn)btn.innerText=liked?'🤍':'❤️';if(liked)await ref.update({likes:firebase.firestore.FieldValue.increment(-1),likedBy:firebase.firestore.FieldValue.arrayRemove(currentUser.uid)});else await ref.update({likes:firebase.firestore.FieldValue.increment(1),likedBy:firebase.firestore.FieldValue.arrayUnion(currentUser.uid)});}
+function sharePost(){navigator.clipboard.writeText(location.href);alert("Link copied da");}
+async function openComments(id){currentCommentPostId=id;commentBox.style.display="block";let s=await db.collection("reels").doc(id).collection("comments").orderBy("createdAt","asc").get();let h="";s.forEach(d=>{h+=`<div style="padding:6px 0;"><b style="font-size:13px;">${d.data().email}</b> ${d.data().text}</div>`;});commentList.innerHTML=h||"No comments"; }
+async function addComment(){let t=commentInput.value.trim();if(!t)return;await db.collection("reels").doc(currentCommentPostId).collection("comments").add({email:currentUser.email.split("@")[0],text:t,createdAt:firebase.firestore.FieldValue.serverTimestamp()});commentInput.value="";openComments(currentCommentPostId);}
+function showFollowers(){alert("Followers list - Week 9 la full varum da");}
+function showFollowing(){alert("Following list - Week 9 la full varum da");}
 </script>
 </body>
 </html>
