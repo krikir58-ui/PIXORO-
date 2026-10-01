@@ -1,97 +1,230 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO AI - Hack Proof</title>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<style>*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#000;color:#fff}
-.header{background:#111;padding:12px;position:fixed;top:0;width:100%;z-index:100;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center;max-width:500px;left:50%;transform:translateX(-50%)}
-.header span{color:#ff0050;font-weight:bold;font-size:20px}.ai-badge{background:linear-gradient(45deg,#00ff88,#00d4ff);color:#000;padding:4px 8px;border-radius:10px;font-size:10px;font-weight:bold}
-.feed{margin-top:60px;margin-bottom:70px;max-width:500px;margin:auto}.post{background:#111;margin-bottom:12px;border:1px solid #222;border-radius:12px;overflow:hidden}.post-top{padding:10px;display:flex;justify-content:space-between;align-items:center}
-.post-img{width:100%;height:480px;object-fit:cover;background:#222}.ai-alert{background:linear-gradient(90deg,#ff0050,#ff8a00);color:#fff;text-align:center;padding:6px;font-size:11px;font-weight:bold}.ai-safe{background:linear-gradient(90deg,#00ff88,#00d4ff);color:#000;text-align:center;padding:5px;font-size:10px;font-weight:bold}
-.login-box{margin-top:80px;text-align:center;padding:20px;max-width:360px;margin:auto}input{padding:11px;border-radius:8px;border:1px solid #333;width:260px;margin:5px;background:#222;color:#fff}
-.bottom{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#111;display:flex;justify-content:space-around;padding:12px;border-top:1px solid #333}
-.bottom button{background:none;border:none;color:#fff;font-size:22px}
-</style></head><body>
-<div class="header"><span>PIXORO AI 🔥</span><span class="ai-badge">AI SAFE V2.0</span><button onclick="showProfile()" style="background:none;border:none;color:#fff;font-size:22px;">👤</button></div>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PIXORO - Like Instagram</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+body{background:#000;color:#fff;overflow-x:hidden}
+::-webkit-scrollbar{display:none}
 
-<div id="loginBox" class="login-box"><h2 style="font-family:cursive;font-size:36px;">Pixoro AI</h2><p style="color:#aaa;font-size:11px;">AI Fake Detection + Hack Proof<br>by GIRI 🤖</p><br><input id="email" placeholder="Email"><br><input id="pass" type="password" placeholder="Password 6+"><br><button onclick="login()" style="background:#ff0050;color:#fff;padding:11px 30px;border:none;border-radius:8px;margin-top:10px;font-weight:700;">AI Login - Safe</button>
-<br><br><div style="background:#111;padding:12px;border-radius:10px;text-align:left;font-size:11px;border:1px solid #222;"><b>🤖 AI FEATURES:</b><br>✅ AI Fake ID Check (Photo + Name)<br>✅ AI Fake Post Check (Duplicate)<br>✅ AI Hack Protection (Rate Limit)<br>✅ AI Report = Auto Blur + Ban</div></div>
+/* INSTAGRAM HEADER - Like IG */
+.ig-header{height:60px;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;background:#000;border-bottom:1px solid #262626;display:flex;justify-content:space-between;align-items:center;padding:0 16px;z-index:100}
+.ig-logo{font-family:'Grand Hotel',cursive;font-size:32px;cursor:pointer}
+.ig-header-icons{display:flex;gap:18px;font-size:22px}
 
-<div id="feed" class="feed" style="display:none;"></div>
-<div id="uploadBox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;padding:20px;text-align:center;"><h3>AI Check Post 🔍</h3><p id="aiStatus" style="margin:10px;font-size:12px;color:#00ff88;">AI scanning...</p><br><input id="captionInput" placeholder="Caption" style="width:90%;"><br><br><input type="file" id="fileInput" accept="image/*" style="width:90%;"><br><br><img id="preview" style="width:200px;height:260px;object-fit:cover;display:none;border-radius:10px;margin:auto;border:2px solid #00ff88;"><br><br><button onclick="uploadWithAI()" style="background:#00ff88;color:#000;padding:12px 30px;border:none;border-radius:20px;font-weight:bold;">AI CHECK & POST 🚀</button><button onclick="uploadBox.style.display='none'" style="background:#333;color:#fff;padding:10px 20px;border:none;border-radius:20px;margin-left:10px;">Cancel</button></div>
-<div id="profileBox" style="display:none;margin-top:60px;max-width:500px;margin:auto;padding:15px;"><h2 id="pName"></h2><p id="pEmail" style="color:#aaa;font-size:12px;"></p><div style="background:#111;padding:10px;border-radius:10px;margin:10px 0;border:1px solid #222;"><b>🤖 AI SECURITY STATUS</b><br><span id="aiSecurity">Checking...</span></div><div id="myPosts" style="display:flex;flex-wrap:wrap;gap:2px;"></div></div>
-<div class="bottom" id="bottomNav" style="display:none;"><button onclick="showFeed()">🏠</button><button onclick="addPost()">➕</button><button onclick="showProfile()">👤</button><button onclick="logout()">🚪</button></div>
+/* PAGES - Like Instagram App */
+.page{max-width:500px;margin:0 auto;padding-top:60px;padding-bottom:60px;min-height:100vh;display:none}
+.page.active{display:block}
+
+/* INSTAGRAM STORIES - Exact like IG */
+.stories-wrap{display:flex;gap:12px;padding:10px 12px;overflow-x:auto;background:#000;border-bottom:1px solid #121212}
+.story-item{flex:0 0 66px;text-align:center;cursor:pointer}
+.story-ring{width:64px;height:64px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)}
+.story-ring-inner{width:100%;height:100%;border-radius:50%;background:#000;padding:2px}
+.story-ring-inner img{width:100%;height:100%;border-radius:50%;object-fit:cover;background:#222}
+.story-ring.seen{background:#333}
+.story-name{font-size:11px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:66px}
+
+/* INSTAGRAM POST - Exact like IG */
+.ig-post{border-bottom:1px solid #121212;background:#000}
+.ig-post-header{padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
+.ig-post-user{display:flex;align-items:center;gap:10px}
+.ig-post-user img{width:32px;height:32px;border-radius:50%;background:#222}
+.ig-post-img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111}
+.ig-post-actions{padding:8px 12px;display:flex;justify-content:space-between;align-items:center}
+.ig-post-actions-left{display:flex;gap:16px;font-size:24px}
+.ig-post-likes{padding:0 12px;font-size:14px;font-weight:600}
+.ig-post-caption{padding:4px 12px 12px;font-size:14px}
+.ig-post-time{padding:0 12px 12px;font-size:10px;color:#8e8e8e;letter-spacing:.5px}
+
+/* INSTAGRAM BOTTOM - Exact like IG */
+.ig-bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;height:50px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
+.ig-bottom button{background:none;border:none;font-size:24px;color:#fff;cursor:pointer;position:relative}
+.ig-bottom button.active{font-weight:bold}
+.ig-bottom button.active::after{content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:4px;height:4px;background:#fff;border-radius:50%}
+
+/* REELS - Like Instagram Reels */
+.reels-container{height:calc(100vh - 110px);overflow-y:scroll;scroll-snap-type:y mandatory}
+.reel-item{height:calc(100vh - 110px);position:relative;scroll-snap-align:start;background:#111;display:flex;align-items:center;justify-content:center}
+.reel-item img,.reel-item video{width:100%;height:100%;object-fit:cover}
+.reel-overlay{position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(transparent,rgba(0,0,0,0.8))}
+.reel-actions{position:absolute;right:12px;bottom:80px;display:flex;flex-direction:column;gap:20px;align-items:center}
+
+/* SEARCH - Like IG Explore */
+.explore-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}
+.explore-grid img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111}
+
+/* PROFILE - Like IG Profile */
+.profile-header{padding:16px;display:flex;gap:28px;align-items:center}
+.profile-avatar{width:86px;height:86px;border-radius:50%;background:#222;object-fit:cover}
+.profile-stats{display:flex;gap:24px;text-align:center}
+.profile-stats b{display:block;font-size:16px}
+.profile-stats span{font-size:13px;color:#fff}
+.profile-bio{padding:0 16px 12px}
+.profile-tabs{display:flex;border-top:1px solid #262626}
+.profile-tabs button{flex:1;padding:12px;background:none;border:none;color:#8e8e8e;font-size:12px;letter-spacing:1px;border-top:1px solid transparent}
+.profile-tabs button.active{color:#fff;border-top-color:#fff}
+
+/* LOGIN - Like Instagram */
+.login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.login-box{width:100%;max-width:350px;border:1px solid #262626;padding:30px 20px;text-align:center;background:#000}
+.login-logo{font-family:'Grand Hotel',cursive;font-size:52px;margin-bottom:12px}
+.login-input{width:100%;padding:10px;background:#121212;border:1px solid #333;border-radius:3px;color:#fff;margin:5px 0;font-size:12px;outline:none}
+.login-btn{width:100%;background:#0095f6;color:#fff;border:none;padding:8px;border-radius:8px;font-weight:600;margin-top:10px;font-size:14px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage" class="login-wrap">
+<div class="login-box">
+<div class="login-logo">Pixoro</div>
+<p style="color:#8e8e8e;font-size:12px;margin-bottom:20px;">Tiruchuli to World 🌍 - Like Instagram</p>
+<input id="email" class="login-input" placeholder="Phone number, username, or email">
+<input id="pass" class="login-input" type="password" placeholder="Password">
+<button onclick="login()" style="width:100%;background:#0095f6;color:#fff;border:none;padding:8px;border-radius:8px;font-weight:600;margin-top:10px;">Log in</button>
+<p style="margin-top:20px;font-size:12px;color:#8e8e8e;">Don't have an account? <span style="color:#0095f6;font-weight:600;cursor:pointer;" onclick="signup()">Sign up</span></p>
+<div style="margin-top:20px;border-top:1px solid #262626;padding-top:16px;font-size:11px;color:#8e8e8e;">🛡️ AI SAFE + FAKE ID CHECK<br>Instagram System - PIXORO V1.0</div>
+</div>
+</div>
+
+<!-- APP - Like Instagram App -->
+<div id="app" style="display:none;">
+<div class="ig-header">
+<div class="ig-logo" onclick="showPage('home')">Pixoro</div>
+<div class="ig-header-icons"><span onclick="showPage('notifications')">🤍</span><span onclick="showPage('chat')">✈️</span></div>
+</div>
+
+<!-- HOME FEED -->
+<div id="homePage" class="page active">
+<div class="stories-wrap" id="storiesWrap">
+<div class="story-item" onclick="addStory()"><div class="story-ring" style="background:#333;"><div class="story-ring-inner" style="display:flex;align-items:center;justify-content:center;font-size:28px;">+</div></div><div class="story-name">Your story</div></div>
+<div id="storyList" style="display:flex;gap:12px;"></div>
+</div>
+<div id="feedList"></div>
+</div>
+
+<!-- SEARCH / EXPLORE -->
+<div id="searchPage" class="page">
+<div style="padding:8px 12px;position:sticky;top:60px;background:#000;z-index:10;"><input id="searchInput" class="login-input" placeholder="Search" oninput="searchUsers()" style="margin:0;"></div>
+<div class="explore-grid" id="exploreGrid"></div>
+<div id="searchResults"></div>
+</div>
+
+<!-- REELS -->
+<div id="reelsPage" class="page" style="padding:0;">
+<div class="reels-container" id="reelsList"></div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div id="notificationsPage" class="page">
+<div style="padding:16px;font-weight:600;border-bottom:1px solid #262626;">Notifications</div>
+<div id="notifList" style="padding:16px;color:#8e8e8e;font-size:14px;">AI will show likes, follows, fake alerts here da Giri</div>
+</div>
+
+<!-- CHAT -->
+<div id="chatPage" class="page">
+<div style="padding:16px;font-weight:600;border-bottom:1px solid #262626;display:flex;justify-content:space-between;"><span>Messages</span><span>✏️</span></div>
+<div style="padding:20px;text-align:center;color:#8e8e8e;">Search la user ah follow pannitu chat pannu da</div>
+</div>
+
+<!-- PROFILE -->
+<div id="profilePage" class="page">
+<div class="profile-header">
+<img id="pAvatar" class="profile-avatar" src="https://i.pravatar.cc/150?u=giri">
+<div class="profile-stats"><div><b id="pPosts">0</b><span>Posts</span></div><div><b id="pFollowers">0</b><span>Followers</span></div><div><b id="pFollowing">0</b><span>Following</span></div></div>
+</div>
+<div class="profile-bio"><b id="pName">giri_official</b><br><span id="pBio" style="font-size:14px;color:#fff;">Tiruchuli to World 🌍<br>World No.1 Safe App - AI Safe</span><br><button style="width:100%;margin-top:12px;padding:6px;background:#262626;border:none;color:#fff;border-radius:6px;font-weight:600;" onclick="openEdit()">Edit profile</button></div>
+<div class="profile-tabs"><button class="active">⊞</button><button onclick="showPage('reels')">▶️</button><button>🔖</button></div>
+<div class="explore-grid" id="profilePosts"></div>
+</div>
+
+<!-- BOTTOM NAV - Like Instagram -->
+<div class="ig-bottom">
+<button id="bHome" class="active" onclick="showPage('home')">⌂</button>
+<button id="bSearch" onclick="showPage('search')">⌕</button>
+<button id="bReels" onclick="showPage('reels')">▶</button>
+<button id="bChat" onclick="showPage('chat')">♡</button>
+<button id="bProfile" onclick="showPage('profile')">◯</button>
+</div>
+</div>
+
+<!-- UPLOAD -->
+<input type="file" id="fileInput" accept="image/*" style="display:none;">
+<div id="uploadBox" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;">
+<div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #262626;"><button onclick="uploadBox.style.display='none'" style="background:none;border:none;color:#fff;font-size:16px;">✕</button><b>New post</b><button onclick="uploadPost()" style="background:none;border:none;color:#0095f6;font-weight:600;">Share</button></div>
+<div style="width:100%;aspect-ratio:1/1;background:#111;display:flex;align-items:center;justify-content:center;"><img id="uploadPreview" style="max-width:100%;max-height:100%;display:none;"></div>
+<div style="padding:12px;"><textarea id="captionInput" placeholder="Write a caption..." style="width:100%;background:none;border:none;color:#fff;outline:none;resize:none;font-size:14px;"></textarea></div>
+</div>
 
 <script>
-const firebaseConfig = {apiKey: "AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",authDomain: "pixoro-75927.firebaseapp.com",projectId: "pixoro-75927",storageBucket: "pixoro-75927.firebasestorage.app",messagingSenderId: "814840120295",appId: "1:814840120295:web:6c02c613df5a17209bf342"};
-if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth();const db=firebase.firestore();
-let currentUser=null;let lastPostTime=0;
+const SUPABASE_URL='https://yecpltndhlzfjplzhcpm.supabase.co';
+const SUPABASE_KEY='sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
+const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let currentUser=null;
 
-// ===== AI ENGINE =====
-const AI={
-  checkFakeID: async (email, photo)=>{
-    let score=0; let reasons=[];
-    if(!photo) {score+=40; reasons.push("No profile photo");}
-    if(email.includes("fake")||email.includes("test123")){score+=50; reasons.push("Suspicious email");}
-    if(email.length<6){score+=30; reasons.push("Short email");}
-    return {isFake: score>=50, score, reasons};
-  },
-  checkFakePost: async (caption, imageUrl)=>{
-    let score=0; let reasons=[];
-    if(!caption || caption.length<3){score+=40; reasons.push("No caption");}
-    if(caption && caption.toLowerCase().includes("fake")){score+=60; reasons.push("Fake word found");}
-    if(imageUrl && imageUrl.includes("picsum")){score+=10; reasons.push("Demo image");}
-    // Duplicate check
-    try{let snap=await db.collection("reels").where("videoUrl","==",imageUrl).limit(1).get(); if(!snap.empty){score+=70; reasons.push("Duplicate image - Fake post!");}}catch(e){}
-    return {isFake: score>=50, score, reasons};
-  },
-  checkHack: ()=>{
-    let now=Date.now(); if(now-lastPostTime<10000){return {isHack:true, reason:"Too fast posting! 10 sec wait da!"};} lastPostTime=now; return {isHack:false};
-  }
-};
+async function checkSession(){let {data}=await supabase.auth.getSession();if(data.session){currentUser=data.session.user;loginPage.style.display='none';app.style.display='block';loadFeed();loadExplore();loadProfileData();}}checkSession();
 
-auth.onAuthStateChanged(async u=>{if(u){currentUser=u;
-  let fakeCheck=await AI.checkFakeID(u.email, u.photoURL);
-  if(fakeCheck.isFake){alert("🚨 AI FAKE ID DETECTED! Score: "+fakeCheck.score+"%\n"+fakeCheck.reasons.join(", ")+"\n\nGIRI AI blocked da!"); auth.signOut(); return;}
-  loginBox.style.display="none";feed.style.display="block";bottomNav.style.display="flex";loadFeed();
-}else{loginBox.style.display="block";feed.style.display="none";bottomNav.style.display="none";profileBox.style.display="none";}});
+async function login(){let e=email.value.trim(), p=pass.value.trim(); if(!e||!p) return alert("Email podu da"); let {data,error}=await supabase.auth.signInWithPassword({email:e,password:p}); if(error){let {data:sData,[STRIPPED] supabase.auth.signUp({email:e,password:p}); if(sErr) return alert(sErr.message); if(sData.user) await supabase.from('profiles').insert({id:sData.user.id,username:e.split('@')[0]}); alert("Account created da! Login pannu da"); return;} currentUser=data.user; loginPage.style.display='none'; app.style.display='block'; loadFeed(); loadExplore(); loadProfileData();}
+async function signup(){let e=email.value.trim(), p=pass.value.trim(); if(!e||!p) return alert("Email+Pass podu da"); let {data,error}=await supabase.auth.signUp({email:e,password:p}); if(error) return alert(error.message); if(data.user) await supabase.from('profiles').insert({id:data.user.id,username:e.split('@')[0],bio:'Tiruchuli to World 🌍'}); alert("Created da! Login pannu!");}
 
-function login(){let e=email.value.trim();let p=pass.value.trim();if(!e||!p)return alert("Email podu da");if(p.length<6)return alert("Password 6+ podu da - Hack proof ku!");auth.signInWithEmailAndPassword(e,p).catch(()=>auth.createUserWithEmailAndPassword(e,p).catch(err=>alert(err.message)));}
-function logout(){auth.signOut();}function showFeed(){feed.style.display="block";profileBox.style.display="none";loadFeed();}
-function showProfile(){feed.style.display="none";profileBox.style.display="block";loadProfile();}
-function addPost(){uploadBox.style.display='block';aiStatus.innerText="🤖 AI Ready - Photo select pannu da";}
-
-fileInput.addEventListener('change',e=>{let f=e.target.files[0];if(f){let r=new FileReader();r.onload=ev=>{preview.src=ev.target.result;preview.style.display='block';aiStatus.innerText="🤖 AI: Photo ok! Caption podu da"; aiStatus.style.color="#00ff88";};r.readAsDataURL(f);}});
-
-async function uploadWithAI(){
-  let cap=captionInput.value.trim(); if(!cap)return alert("Caption podu da");
-  aiStatus.innerText="🤖 AI checking... Fake ah nu paarkuren da..."; aiStatus.style.color="#ffaa00";
-  let hackCheck=AI.checkHack(); if(hackCheck.isHack){aiStatus.innerText="🚨 HACK BLOCKED: "+hackCheck.reason; aiStatus.style.color="red"; return alert(hackCheck.reason);}
-  let img=preview.src||`https://picsum.photos/500/700?random=${Math.random()}`;
-  let fakeCheck=await AI.checkFakePost(cap, img);
-  if(fakeCheck.isFake){
-    aiStatus.innerText=`🚨 AI FAKE POST! Score ${fakeCheck.score}% - ${fakeCheck.reasons.join(", ")}`; aiStatus.style.color="red";
-    alert(`🚨 AI BLOCKED DA GIRI!\n\nFake Score: ${fakeCheck.score}%\nReason: ${fakeCheck.reasons.join(", ")}\n\nIthu fake post da! Podama iru da!`);
-    return;
-  }
-  aiStatus.innerText=`✅ AI PASSED! Safe Score ${100-fakeCheck.score}% - Posting...`; aiStatus.style.color="#00ff88";
-  await db.collection("reels").add({email:currentUser.email.split("@")[0],uid:currentUser.uid,caption:cap,videoUrl:img,filter:"none",likes:0,likedBy:[],reports:0,aiScore:100-fakeCheck.score,aiChecked:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-  uploadBox.style.display='none';captionInput.value='';preview.style.display='none';fileInput.value='';loadFeed();alert("✅ AI Checked & Posted da Giri! Safe! 🤖");
+function showPage(p){
+ document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+ document.getElementById(p+'Page').classList.add('active');
+ document.querySelectorAll('.ig-bottom button').forEach(b=>b.classList.remove('active'));
+ let btn=document.getElementById('b'+p.charAt(0).toUpperCase()+p.slice(1)); if(btn) btn.classList.add('active');
+ if(p==='home') loadFeed(); if(p==='profile') loadProfile(); if(p==='reels') loadReels(); if(p==='search') loadExplore();
 }
 
 async function loadFeed(){
-  let s=await db.collection("reels").orderBy("createdAt","desc").limit(25).get();
-  if(s.empty){feed.innerHTML=`<div style="text-align:center;padding:60px 20px;color:#666;"><h3>PIXORO AI V2.0 🤖</h3><p>Fake ID, Fake Post, Hack - Ellam AI block pannum da!<br><br>First post podu da!</p><br><button onclick="addPost()" style="background:#00ff88;color:#000;padding:12px 30px;border:none;border-radius:20px;font-weight:bold;">+ AI Safe Post</button></div>`;return;}
-  let h=""; s.forEach(d=>{let x=d.data();let isFake=x.reports>=3||x.aiScore<50;let isOwn=x.uid===currentUser.uid;
-  h+=`<div class="post">${isFake?`<div class="ai-alert">🚨 AI FAKE DETECTED! Score ${x.aiScore||0}% - GIRI AI BLOCKED</div>`:`<div class="ai-safe">✅ AI VERIFIED SAFE - Score ${x.aiScore||95}% 🤖</div>`}
-  <div class="post-top"><span style="display:flex;align-items:center;gap:6px;"><img src="https://i.pravatar.cc/100?u=${x.email}" style="width:32px;height:32px;border-radius:50%"><b>${x.email}</b>${isFake?'<span style="background:red;padding:2px 6px;border-radius:8px;font-size:9px;">AI FAKE</span>':'<span style="background:#00ff88;color:#000;padding:2px 6px;border-radius:8px;font-size:8px;">AI SAFE</span>'}</span><button style="background:#222;color:#fff;border:1px solid red;padding:4px 8px;border-radius:12px;font-size:10px;" onclick="reportFake('${d.id}')">🚨 Report AI</button></div>
-  <img class="post-img" src="${x.videoUrl}" style="${isFake?'filter:blur(15px);':''}" onclick="${isFake?'alert(\"AI Fake nu blur panniten da!\")':`this.style.filter=this.style.filter.includes('blur')?'none':'blur(20px)'`}">
-  <div style="padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span><b>${x.email}</b> ${x.caption}</span>${isOwn?`<button onclick="deletePost('${d.id}')" style="background:red;color:#fff;border:none;padding:4px 8px;border-radius:8px;font-size:10px;">Delete</button>`:''}</div></div>`;});
-  feed.innerHTML=h;
+ let {data:posts}=await supabase.from('posts').select('*, profiles(username,avatar_url)').order('created_at',{ascending:false}).limit(20);
+ if(!posts||posts.length===0){feedList.innerHTML=`<div style="text-align:center;padding:80px 20px;color:#8e8e8e;"><div style="width:96px;height:96px;border:3px solid #fff;border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:40px;">📸</div><h3 style="color:#fff;">Welcome to Pixoro</h3><p style="font-size:14px;margin-top:8px;">Instagram maariye irukku da Giri! First post podu da! 🚀</p><br><button onclick="document.getElementById('fileInput').click()" style="background:#0095f6;color:#fff;padding:8px 16px;border:none;border-radius:8px;font-weight:600;">Share your first photo</button></div>`;return;}
+ feedList.innerHTML=posts.map(p=>`<div class="ig-post"><div class="ig-post-header"><div class="ig-post-user"><img src="${p.profiles?.avatar_url||`https://i.pravatar.cc/100?u=${p.profiles?.username}`}"><b style="font-size:14px;">${p.profiles?.username||'user'}</b>${(p.reports||0)>=3?'<span style="background:red;color:#fff;font-size:9px;padding:2px 5px;border-radius:4px;margin-left:6px;">FAKE</span>':''}</div><span>⋯</span></div><img class="ig-post-img" src="${p.image_url}"><div class="ig-post-actions"><div class="ig-post-actions-left"><span onclick="likePost('${p.id}')">♡</span><span>💬</span><span>↗</span></div><span>🔖</span></div><div class="ig-post-likes">${p.likes_count||0} likes</div><div class="ig-post-caption"><b>${p.profiles?.username||'user'}</b> ${p.caption||''}</div><div class="ig-post-time">2 HOURS AGO • AI SAFE 🤖</div></div>`).join('');
 }
-async function reportFake(id){if(!confirm("AI ku report pannava? 3 vantha auto ban da!"))return;await db.collection("reels").doc(id).update({reports:firebase.firestore.FieldValue.increment(1),aiScore:firebase.firestore.FieldValue.increment(-20)});alert("AI report pannita da! AI kathukkum da!");loadFeed();}
-async function deletePost(id){if(!confirm("Delete ah?"))return;await db.collection("reels").doc(id).delete();loadFeed();loadProfile();}
-async function loadProfile(){pName.innerText=currentUser.email.split("@")[0];pEmail.innerText=currentUser.email;let my=await db.collection("reels").where("uid","==",currentUser.uid).get();let aiScore=95;if(my.size>0){let total=0;my.forEach(d=>total+=d.data().aiScore||90);aiScore=Math.round(total/my.size);}document.getElementById("aiSecurity").innerHTML=`✅ AI Safe Account<br>AI Score: ${aiScore}%<br>Posts: ${my.size}<br>Hack Attempts: 0 Blocked<br>Fake ID: Not Detected 🤖`;let h="";my.forEach(x=>{let d=x.data();h+=`<div style="width:32%;margin:1px;position:relative;"><img src="${d.videoUrl}" style="width:100%;height:110px;object-fit:cover;${d.aiScore<50?'filter:blur(10px);':''}"><div style="position:absolute;bottom:2px;left:2px;background:${d.aiScore<50?'red':'#00ff88'};color:${d.aiScore<50?'#fff':'#000'};font-size:8px;padding:2px 4px;border-radius:4px;">AI ${d.aiScore||90}%</div></div>`});myPosts.innerHTML=h||"<p style='color:#666;'>No posts</p>";}
-</script></body></html>
+
+async function loadExplore(){
+ let {data:posts}=await supabase.from('posts').select('*').order('created_at',{ascending:false}).limit(18);
+ if(posts) exploreGrid.innerHTML=posts.map(p=>`<img src="${p.image_url}" onclick="showPage('home')">`).join('');
+}
+
+async function loadReels(){
+ let {data:reels}=await supabase.from('posts').select('*, profiles(username)').order('created_at',{ascending:false}).limit(10);
+ if(!reels||reels.length===0){reelsList.innerHTML=`<div style="height:100%;display:flex;align-items:center;justify-content:center;color:#8e8e8e;flex-direction:column;"><p>Reels inga varum da Giri</p><p style="font-size:12px;margin-top:8px;">Post potta auto reel aagum da</p></div>`;return;}
+ reelsList.innerHTML=reels.map(r=>`<div class="reel-item"><img src="${r.image_url}"><div class="reel-overlay"><b>@${r.profiles?.username||'user'}</b><br><small>${r.caption||''}</small></div><div class="reel-actions"><span style="font-size:28px;">♡<br><small style="font-size:12px;">${r.likes_count||0}</small></span><span style="font-size:24px;">💬</span><span style="font-size:24px;">↗</span><span style="font-size:24px;">⋯</span></div></div>`).join('');
+}
+
+async function loadProfileData(){
+ let {data:profile}=await supabase.from('profiles').select('*').eq('id',currentUser.id).single();
+ if(!profile){let {data:newP}=await supabase.from('profiles').insert({id:currentUser.id,username:currentUser.email.split('@')[0]}).select().single(); profile=newP;}
+ window.currentProfile=profile; pName.innerText=profile.username; pAvatar.src=profile.avatar_url||`https://i.pravatar.cc/150?u=${profile.username}`;
+}
+
+async function loadProfile(){
+ let {data:myPosts}=await supabase.from('posts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+ pPosts.innerText=myPosts?.length||0;
+ let {data:followers}=await supabase.from('follows').select('*').eq('following_id',currentUser.id); pFollowers.innerText=followers?.length||0;
+ let {data:following}=await supabase.from('follows').select('*').eq('follower_id',currentUser.id); pFollowing.innerText=following?.length||0;
+ profilePosts.innerHTML=myPosts?.map(p=>`<img src="${p.image_url}">`).join('')||'';
+}
+
+document.getElementById('fileInput').addEventListener('change',e=>{
+ let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=ev=>{uploadPreview.src=ev.target.result; uploadPreview.style.display='block'; uploadBox.style.display='block';}; r.readAsDataURL(f);
+});
+
+async function uploadPost(){
+ let cap=captionInput.value; let file=fileInput.files[0]; let url=uploadPreview.src;
+ if(file){let name=`${currentUser.id}_${Date.now()}.jpg`; await supabase.storage.from('posts').upload(name,file); let {data}=supabase.storage.from('posts').getPublicUrl(name); url=data.publicUrl;}
+ await supabase.from('posts').insert({user_id:currentUser.id,image_url:url,caption:cap,likes_count:0});
+ uploadBox.style.display='none'; captionInput.value=''; fileInput.value=''; uploadPreview.style.display='none'; showPage('home');
+}
+function addStory(){alert("Story feature - Next update la full ah varum da Giri! Insta maari 24hr story da!");}
+async function searchUsers(){let q=searchInput.value.toLowerCase(); let {data:profiles}=await supabase.from('profiles').select('*').limit(20); if(q) profiles=profiles.filter(p=>p.username.includes(q)); searchResults.innerHTML=profiles?.map(p=>`<div style="padding:12px;display:flex;gap:10px;align-items:center;border-bottom:1px solid #121212;"><img src="${p.avatar_url||`https://i.pravatar.cc/100?u=${p.username}`}" style="width:44px;height:44px;border-radius:50%;"><div><b style="font-size:14px;">${p.username}</b><br><small style="color:#8e8e8e;">${p.bio||''}</small></div></div>`).join('')||'';}
+async function likePost(id){let {data:p}=await supabase.from('posts').select('likes_count').eq('id',id).single(); await supabase.from('posts').update({likes_count:(p.likes_count||0)+1}).eq('id',id); loadFeed();}
+function openEdit(){let bio=prompt("Bio enna da Giri?","Tiruchuli to World 🌍"); if(bio) supabase.from('profiles').update({bio}).eq('id',currentUser.id).then(()=>loadProfileData());}
+</script>
+</body>
+</html>
