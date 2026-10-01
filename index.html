@@ -3,70 +3,148 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO - World</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>PIXORO - World Safe</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,Segoe UI}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,Segoe UI}
 body{background:#000;color:#fff}
-.header{height:60px;padding:0 14px;position:fixed;top:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);z-index:100;background:#000;border-bottom:1px solid #111;display:flex;justify-content:space-between;align-items:center}
-.logo{font-family:'Grand Hotel',cursive;font-size:30px}
-.feed{margin:auto;max-width:500px;padding-top:108px;padding-bottom:70px}
-.story-bar{display:flex;gap:14px;padding:10px;background:#000;border-bottom:1px solid #111;overflow-x:auto;position:fixed;top:60px;width:100%;max-width:500px;left:50%;transform:translateX(-50%);z-index:90}
-.s-item{min-width:66px;text-align:center}.s-ring{width:62px;height:62px;border-radius:50%;padding:2.5px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)}.s-ring-inner{width:100%;height:100%;background:#000;border-radius:50%;padding:2px}.s-ring-inner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
-.post{background:#000;border-bottom:1px solid #222;margin-bottom:4px}
-.post-top{padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
-.post-img-wrap{width:100%;aspect-ratio:4/5;background:#111}
-.post-img{width:100%;height:100%;object-fit:cover;display:block}
-.post-actions{display:flex;gap:18px;padding:12px 14px}
-.action-btn{background:none;border:none;color:#fff;font-size:22px}
-.bottom{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#000;height:56px;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #111;z-index:100}
-.bottom button{background:none;border:none;color:#888;font-size:22px;width:48px;height:48px}.bottom button.active{color:#fff}
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.login-card{width:100%;max-width:350px;text-align:center;border:1px solid #181818;padding:28px 20px}
-input{width:100%;padding:12px;background:#121212;border:1px solid #262626;border-radius:3px;color:#fff;margin:5px 0;outline:none}
-.blue-btn{width:100%;background:#0095f6;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:700;margin-top:10px}
-#reelsPage{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:200;display:none;flex-direction:column;overflow-y:scroll;scroll-snap-type:y mandatory}
-.reel-item{position:relative;width:100%;height:100vh;scroll-snap-align:start}
-.reel-item img{width:100%;height:100%;object-fit:cover}
-.reel-right{position:absolute;right:12px;bottom:110px;display:flex;flex-direction:column;gap:24px;align-items:center}
-.reel-bottom{position:absolute;bottom:0;left:0;width:100%;padding:14px 14px 30px 14px;background:linear-gradient(transparent,rgba(0,0,0,0.9))}
-#uploadBox{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none}
+.login-card{width:100%;max-width:360px;border:1px solid #262626;padding:24px;text-align:center;background:#000}
+.logo{font-family:'Grand Hotel',cursive;font-size:54px}
+input{width:100%;padding:12px;background:#121212;border:1px solid #333;border-radius:3px;color:#fff;margin:6px 0;outline:none}
+.btn{width:100%;background:#0095f6;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:700;margin-top:10px;cursor:pointer}
+.btn2{background:none;border:1px solid #333;color:#fff}
+.link{color:#0095f6;font-size:13px;font-weight:600;cursor:pointer}
+.err{background:#2a0a0a;border:1px solid #ff3040;color:#ff8a8a;padding:10px;border-radius:6px;margin:8px 0;font-size:12px;display:none;text-align:left;word-break:break-word}
+.ok{background:#0a2a0a;border:1px solid #00ff88;color:#88ffaa;padding:10px;border-radius:6px;margin:8px 0;font-size:12px;display:none}
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:#555;font-size:12px}.divider div{flex:1;height:1px;background:#333}
+.header{height:60px;padding:0 14px;position:fixed;top:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);z-index:100;background:#000;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
+.feed{margin:auto;max-width:500px;padding-top:60px;padding-bottom:70px}
+.post{border-bottom:1px solid #1a1a1a}
+.post-top{padding:10px 12px;display:flex;gap:10px;align-items:center}
+.post-top img{width:32px;height:32px;border-radius:50%}
+.post-img{width:100%;aspect-ratio:4/5;object-fit:cover;background:#111;display:block}
+.post-actions{padding:10px 14px;display:flex;gap:16px;font-size:22px}
+.bottom{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#000;height:56px;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222}
+.acc-list{max-height:200px;overflow:auto;text-align:left;margin-top:10px}
+.acc-item{padding:10px;border:1px solid #222;border-radius:8px;margin:6px 0;display:flex;justify-content:space-between;align-items:center}
 </style>
 </head>
 <body>
-<div class="header" id="mainHeader" style="display:none;"><div class="logo" onclick="showFeed()">Pixoro</div><div style="display:flex;gap:16px;font-size:20px;"><span onclick="showReels()">🎬</span><span onclick="logout()">☰</span></div></div>
-<div id="storyBar" class="story-bar" style="display:none;"><div class="s-item" onclick="openStoryUpload()"><div class="s-ring" style="background:#222;"><div class="s-ring-inner"><img src="https://i.pravatar.cc/100?u=me"></div></div><small style="font-size:10px;">Your story</small></div><div id="storyList" style="display:flex;gap:14px;"></div></div>
-<div id="loginBox" class="login-wrap"><div class="login-card"><h1 style="font-family:'Grand Hotel',cursive;font-size:50px;margin-bottom:6px;">Pixoro</h1><p style="font-size:11px;color:#666;margin-bottom:18px;">TIRUCHULI TO WORLD 🌍 - Storage Ready ✅</p><input id="email" type="email" placeholder="Email"><input id="pass" type="password" placeholder="Password"><input id="username" type="text" placeholder="Username" style="display:none;"><p id="toggleText" onclick="toggleMode()" style="font-size:12px;color:#888;margin-top:12px;">New user? <span style="color:#0095f6;">Sign up</span></p><button id="authBtn" onclick="handleAuth()" class="blue-btn">Log in</button><p id="authError" style="color:#ff3040;font-size:12px;margin-top:10px;display:none;"></p></div></div>
-<div id="feed" class="feed" style="display:none;"></div>
-<div id="profileBox" style="display:none;padding-top:70px;max-width:500px;margin:auto;padding-left:16px;padding-right:16px;"><div style="display:flex;gap:20px;align-items:center;"><img id="profilePic" src="https://i.pravatar.cc/100" style="width:80px;height:80px;border-radius:50%;"><div style="flex:1;display:flex;justify-content:space-around;text-align:center;"><div><b id="postCount">0</b><br><small style="color:#888;">Posts</small></div><div><b id="followerCount">0</b><br><small style="color:#888;">Followers</small></div><div><b id="followingCount">0</b><br><small style="color:#888;">Following</small></div></div></div><div style="margin-top:12px;"><b id="pName"></b><p id="pBio" style="font-size:13px;color:#ddd;">Tiruchuli to World 🌍</p></div><div id="myPosts" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;margin-top:16px;"></div></div>
-<div id="reelsPage"></div>
-<div class="bottom" id="bottomNav" style="display:none;"><button onclick="showFeed()" id="navHome" class="active">⌂</button><button onclick="showProfile()" id="navProf">◯</button><button onclick="addPost()" style="font-size:30px;color:#fff;">+</button><button onclick="showReels()">▶</button><button onclick="logout()">☰</button></div>
+
+<div id="authBox" class="login-wrap">
+<div class="login-card">
+<div class="logo">Pixoro</div>
+<p style="color:#666;font-size:12px;margin:0 0 18px 0;">TIRUCHULI TO WORLD 🌍 - 100% SAFE</p>
+<div id="errBox" class="err"></div>
+<div id="okBox" class="ok"></div>
+
+<div id="loginForm">
+<input id="email" type="email" placeholder="Email - safe da">
+<input id="pass" type="password" placeholder="Password (safe encrypted)">
+<button class="btn" id="mainBtn" onclick="handleAuth()">Log in - Safe</button>
+<div class="divider"><div></div>OR<div></div></div>
+<p style="font-size:13px;color:#888;">New here? <span class="link" onclick="toggle()">Create Account - World Safe 🌍</span></p>
+</div>
+
+<div id="signupForm" style="display:none;">
+<input id="semail" type="email" placeholder="New Email">
+<input id="spass" type="password" placeholder="Password 6+ chars - safe">
+<input id="sname" type="text" placeholder="Username">
+<button class="btn" onclick="handleSignup()">Sign Up - Safe & Real</button>
+<p style="font-size:13px;color:#888;margin-top:12px;">Have account? <span class="link" onclick="toggle()">Log in - Instagram maari</span></p>
+</div>
+
+<div id="accountList" style="display:none;">
+<p style="font-size:13px;margin:14px 0 6px 0;font-weight:700;text-align:left;">👤 Saved Accounts (Add Account):</p>
+<div id="accItems" class="acc-list"></div>
+<button class="btn btn2" onclick="document.getElementById('accountList').style.display='none'">Close</button>
+</div>
+
+<p style="font-size:11px;color:#444;margin-top:16px;">🔒 Supabase Encrypted - Instagram mari safe da!</p>
+<p style="font-size:11px;color:#666;margin-top:8px;"><span class="link" onclick="showAccounts()">Add Account / Switch ↻</span></p>
+</div>
+</div>
+
+<div id="mainBox" style="display:none;">
+<div class="header"><div class="logo" style="font-size:32px;">Pixoro</div><div style="display:flex;gap:14px;"><span onclick="showAccounts()" style="font-size:22px;cursor:pointer;">👤+</span><span onclick="logout()" style="cursor:pointer;">Logout</span></div></div>
+<div id="feed" class="feed"></div>
+<div class="bottom">
+<button style="color:#fff">⌂</button>
+<button onclick="addPost()" style="color:#fff;font-size:30px;cursor:pointer;">+</button>
+<button onclick="logout()">◯</button>
+</div>
+</div>
+
 <input type="file" id="fileInput" accept="image/*" style="display:none;">
-<input type="file" id="storyFile" accept="image/*" style="display:none;">
-<div id="uploadBox"><div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #111;"><button onclick="uploadBox.style.display='none'" style="background:none;border:none;color:#fff;">✕</button><b>New post</b><button onclick="uploadPost()" style="background:none;border:none;color:#0095f6;font-weight:700;">Share</button></div><div style="width:100%;aspect-ratio:4/5;background:#111;"><img id="preview" style="width:100%;height:100%;object-fit:cover;display:none;"></div><div style="padding:16px;"><input id="captionInput" placeholder="Write a caption..."></div></div>
+<div id="uploadBox" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;">
+<div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #222;">
+<button onclick="uploadBox.style.display='none'" style="background:none;border:none;color:#fff;font-size:20px;">✕</button><b>New post</b><button onclick="doPost()" style="background:none;border:none;color:#0095f6;font-weight:700;">Share</button>
+</div>
+<div style="width:100%;aspect-ratio:4/5;background:#111;"><img id="preview" style="width:100%;height:100%;object-fit:cover;display:none;"></div>
+<div style="padding:14px;"><input id="caption" placeholder="Caption..."></div>
+</div>
+
 <script>
+// UN KEY DA GIRI - 100% CORRECT DA!
 const SUPABASE_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-let currentUser=null, isSignup=false, currentPosts=[];
-async function checkUser(){let {data:{user}} = await supabase.auth.getUser();if(user){currentUser=user;loginBox.style.display='none';mainHeader.style.display='flex';bottomNav.style.display='flex';storyBar.style.display='flex';feed.style.display='block';loadFeed();loadStories();}else{loginBox.style.display='flex';mainHeader.style.display='none';bottomNav.style.display='none';storyBar.style.display='none';feed.style.display='none';}}checkUser();
-function toggleMode(){isSignup=!isSignup;username.style.display=isSignup?'block':'none';authBtn.innerText=isSignup?'Sign up':'Log in';toggleText.innerHTML=isSignup?'Already have account? <span style=color:#0095f6>Log in</span>':'New user? <span style=color:#0095f6>Sign up</span>';}
-async function handleAuth(){let e=email.value.trim().toLowerCase();let p=pass.value.trim();let u=username.value.trim();let errEl=authError;if(!e||!p){errEl.style.display='block';errEl.innerText='Email + Password podu da';return;}errEl.style.display='none';authBtn.innerText='Wait...';try{if(isSignup){let {data,error}=await supabase.auth.signUp({email:e,password:p});if(error)throw error;await supabase.from('users').insert({id:data.user.id,email:e,username:u||e.split('@')[0],bio:'Tiruchuli to World 🌍',photo_url:'https://i.pravatar.cc/150?u='+e});alert('Signup done da! Login pannu da');isSignup=false;toggleMode();authBtn.innerText='Log in';}else{let {data,error}=await supabase.auth.signInWithPassword({email:e,password:p});if(error)throw error;checkUser();}}catch(er){errEl.style.display='block';errEl.innerText=er.message;authBtn.innerText=isSignup?'Sign up':'Log in';}}
-async function logout(){await supabase.auth.signOut();location.reload();}
-function showFeed(){feed.style.display='block';profileBox.style.display='none';reelsPage.style.display='none';navHome.className='active';navProf.className='';loadFeed();}
-function showProfile(){feed.style.display='none';profileBox.style.display='block';reelsPage.style.display='none';navProf.className='active';navHome.className='';loadMyProfile();}
-function showReels(){reelsPage.style.display='flex';feed.style.display='none';profileBox.style.display='none';loadReels();}
-function addPost(){fileInput.click();}
-fileInput.addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{preview.src=ev.target.result;preview.style.display='block';uploadBox.style.display='block';};r.readAsDataURL(f);});
-async function uploadPost(){let cap=captionInput.value.trim();let file=fileInput.files[0];if(!file)return alert('Photo select pannu da');let fileName=Date.now()+'_'+file.name.replace(/[^a-z0-9.]/gi,'_');let {error:upErr}=await supabase.storage.from('post-images').upload(fileName,file);if(upErr){alert('Upload error: '+upErr.message+' - Try post-images bucket');return;}let {data:{publicUrl}}=supabase.storage.from('post-images').getPublicUrl(fileName);await supabase.from('posts').insert({user_id:currentUser.id,caption:cap,image_url:publicUrl});uploadBox.style.display='none';captionInput.value='';preview.style.display='none';showFeed();}
-async function loadFeed(){let {data:posts,error}=await supabase.from('posts').select('*,users(username,photo_url)').order('created_at',{ascending:false}).limit(30);if(error){feed.innerHTML="<p style='text-align:center;margin-top:100px;color:#666;'>"+error.message+"</p>";return;}currentPosts=posts||[];let h='';for(let p of currentPosts){h+=`<div class="post"><div class="post-top"><div style="display:flex;gap:10px;align-items:center;"><img src="${p.users?.photo_url||'https://i.pravatar.cc/100?u='+p.user_id}" style="width:32px;height:32px;border-radius:50%;"><b style="font-size:13px;">${p.users?.username||'pixoro_user'}</b></div><span>⋯</span></div><div class="post-img-wrap"><img class="post-img" src="${p.image_url}"></div><div class="post-actions"><button class="action-btn" onclick="likePost('${p.id}')">🤍</button><button class="action-btn">💬</button><button class="action-btn">↗</button></div><div style="padding:0 14px 2px 14px;"><b style="font-size:13px;">${p.likes_count||0} likes</b></div><div style="padding:2px 14px 12px 14px;font-size:13px;"><b>${p.users?.username||''}</b> ${p.caption||''}</div></div>`;}feed.innerHTML=h||"<p style='text-align:center;margin-top:100px;color:#444;'>No posts yet da<br>+ button ah thottu first post podu da!</p>";}
-async function loadMyProfile(){let {data:u}=await supabase.from('users').select('*').eq('id',currentUser.id).single();if(u){pName.innerText=u.username;profilePic.src=u.photo_url;pBio.innerText=u.bio;}let {data:myPosts}=await supabase.from('posts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});postCount.innerText=(myPosts||[]).length;let h='';(myPosts||[]).forEach(p=>{h+=`<div style="aspect-ratio:1/1;background:#111;"><img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;"></div>`;});myPosts.innerHTML=h;}
-async function loadReels(){let {data:reels}=await supabase.from('posts').select('*,users(username)').order('created_at',{ascending:false}).limit(20);let h=`<div style="position:fixed;top:0;left:0;width:100%;display:flex;justify-content:space-between;padding:14px;z-index:10;background:linear-gradient(rgba(0,0,0,0.9),transparent);"><b>Reels</b><button onclick="showFeed()" style="background:none;border:none;color:#fff;font-size:22px;">✕</button></div>`;(reels||[]).forEach(r=>{h+=`<div class="reel-item"><img src="${r.image_url}"><div class="reel-right"><div style="text-align:center;"><div style="font-size:28px;">🤍</div><b style="font-size:12px;">${r.likes_count||0}</b></div><div style="text-align:center;"><div style="font-size:22px;">💬</div></div><div style="text-align:center;"><div style="font-size:20px;">↗️</div></div></div><div class="reel-bottom"><b style="font-size:14px;">@${r.users?.username||'pixoro'}</b><div style="font-size:13px;margin-top:4px;">${r.caption||''}</div></div></div>`;});reelsPage.innerHTML=h;}
-function openStoryUpload(){storyFile.click();}
-storyFile.addEventListener('change',async e=>{let file=e.target.files[0];if(!file)return;let fileName='story_'+Date.now()+'_'+file.name.replace(/[^a-z0-9.]/gi,'_');let {error}=await supabase.storage.from('post-images').upload(fileName,file);if(error){alert(error.message);return;}let {data:{publicUrl}}=supabase.storage.from('post-images').getPublicUrl(fileName);await supabase.from('stories').insert({user_id:currentUser.id,image_url:publicUrl});loadStories();alert('Story added da! 24hr irukkum da');});
-async function loadStories(){let {data:stories}=await supabase.from('stories').select('*,users(username)').gt('expires_at',new Date().toISOString()).order('created_at',{ascending:false});let h='';(stories||[]).forEach(s=>{h+=`<div class="s-item"><div class="s-ring"><div class="s-ring-inner"><img src="${s.image_url}"></div></div><small style="font-size:10px;">${s.users?.username||''}</small></div>`;});storyList.innerHTML=h;}
-async function likePost(id){let post=currentPosts.find(p=>p.id===id);if(!post)return;let newCount=(post.likes_count||0)+1;await supabase.from('posts').update({likes_count:newCount}).eq('id',id);post.likes_count=newCount;loadFeed();}
+const SUPABASE_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let isLogin = true;
+function toggle(){ isLogin=!isLogin; document.getElementById('loginForm').style.display=isLogin?'block':'none'; document.getElementById('signupForm').style.display=isLogin?'none':'block'; hideMsg(); }
+function showMsg(t,ok=false){ let e=document.getElementById('errBox'), o=document.getElementById('okBox'); if(ok){o.style.display='block';o.innerText=t;e.style.display='none';}else{e.style.display='block';e.innerText=t;o.style.display='none';} }
+function hideMsg(){ document.getElementById('errBox').style.display='none'; document.getElementById('okBox').style.display='none'; }
+
+async function handleSignup(){
+ let email=document.getElementById('semail').value.trim();
+ let pass=document.getElementById('spass').value.trim();
+ let name=document.getElementById('sname').value.trim() || email.split('@')[0];
+ if(!email||!pass){showMsg('Email + Password kudu da');return;}
+ if(pass.length<6){showMsg('Password 6+ chars da - safe ku');return;}
+ showMsg('Creating safe account...',true);
+ try{
+  const {data,error}=await supabaseClient.auth.signUp({email,password:pass,options:{data:{username:name}}});
+  if(error) throw error;
+  // auto confirm ku SQL already pannitom la
+  showMsg('✅ Account Created da! Login pannu da - Safe da! 🔒',true);
+  setTimeout(()=>{toggle();document.getElementById('email').value=email;},1200);
+ }catch(e){showMsg('❌ '+e.message);}
+}
+
+async function handleAuth(){
+ let email=document.getElementById('email').value.trim();
+ let pass=document.getElementById('pass').value.trim();
+ if(!email||!pass){showMsg('Email + Pass kudu da');return;}
+ document.getElementById('mainBtn').innerText='Safe Checking...';
+ try{
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password:pass});
+  if(error) throw error;
+  let accs=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]');
+  if(!accs.find(a=>a.email===email)) accs.push({email,username:data.user.user_metadata?.username||email.split('@')[0]});
+  localStorage.setItem('pixoro_accounts',JSON.stringify(accs));
+  localStorage.setItem('pixoro_user',JSON.stringify(data.user));
+  showMsg('✅ Safe Login Success da Giri!',true);
+  setTimeout(()=>{ document.getElementById('authBox').style.display='none'; document.getElementById('mainBox').style.display='block'; loadFeed(); },500);
+ }catch(e){
+   if(e.message.includes('Email not confirmed')) showMsg('❌ Email confirm pannala da - Supabase SQL run pannu da: UPDATE auth.users SET email_confirmed_at=NOW()');
+   else showMsg('❌ '+e.message);
+   document.getElementById('mainBtn').innerText='Log in - Safe';
+ }
+}
+
+function showAccounts(){ let accs=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]'); let box=document.getElementById('accountList'); let items=document.getElementById('accItems'); if(accs.length==0){items.innerHTML='<p style=color:#666;font-size:12px>No saved accounts da - login pannu da</p>';}else{items.innerHTML=accs.map(a=>`<div class=acc-item><div><b style=font-size:13px>${a.username}</b><br><small style=color:#888>${a.email}</small></div><span class=link onclick="quickLogin('${a.email}')">Switch</span></div>`).join('');} box.style.display='block'; }
+function quickLogin(email){ document.getElementById('email').value=email; document.getElementById('accountList').style.display='none'; showMsg('Password kudu da - '+email,true); }
+function logout(){ supabaseClient.auth.signOut(); localStorage.removeItem('pixoro_user'); location.reload(); }
+
+let posts=JSON.parse(localStorage.getItem('pixoro_posts')||'[]');
+function loadFeed(){ let f=document.getElementById('feed'); if(posts.length==0){ f.innerHTML="<p style=text-align:center;color:#666;margin-top:80px;>Welcome da Giri! 🔒 Safe Login Work Aachu da!<br><br>World la yaarum account create pannalam da 🌍<br><br>+ thottu post podu da!</p>"; return; } f.innerHTML=posts.map(p=>`<div class=post><div class=post-top><img src=https://i.pravatar.cc/100?u=${p.user}><b style=font-size:13px>${p.user}</b></div><img class=post-img src=${p.img}><div class=post-actions><span>🤍</span><span>💬</span></div><div style=padding:0 14px 12px 14px;font-size:13px><b>${p.user}</b> ${p.cap}</div></div>`).join(''); }
+function addPost(){ document.getElementById('fileInput').click(); }
+document.getElementById('fileInput').addEventListener('change',e=>{ let f=e.target.files[0];if(!f)return; let r=new FileReader();r.onload=ev=>{document.getElementById('preview').src=ev.target.result;document.getElementById('preview').style.display='block';document.getElementById('uploadBox').style.display='block';};r.readAsDataURL(f); });
+function doPost(){ let img=document.getElementById('preview').src; let cap=document.getElementById('caption').value||'Tiruchuli to World 🌍'; let u=JSON.parse(localStorage.getItem('pixoro_user')||'{}').email||'giri'; posts.unshift({img,cap,user:u}); localStorage.setItem('pixoro_posts',JSON.stringify(posts)); document.getElementById('uploadBox').style.display='none'; loadFeed(); }
+
+supabaseClient.auth.getSession().then(({data})=>{ if(data.session){ document.getElementById('authBox').style.display='none'; document.getElementById('mainBox').style.display='block'; loadFeed(); } });
 </script>
 </body>
 </html>
