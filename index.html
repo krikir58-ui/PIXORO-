@@ -2,303 +2,212 @@
 <html>
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PIXORO - World Architecture</title>
+<title>PIXORO - World No.1 Safe App</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,Segoe UI}body{background:#000;color:#fff}
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.login-card{width:100%;max-width:360px;border:1px solid #262626;padding:28px 24px;text-align:center}
-.logo{font-family:'Grand Hotel',cursive;font-size:52px}
-input,textarea{width:100%;padding:11px;background:#121212;border:1px solid #333;border-radius:6px;color:#fff;margin:6px 0;outline:none}
-.btn{width:100%;background:#0095f6;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:700;margin-top:10px;cursor:pointer}
-.link{color:#0095f6;font-size:13px;font-weight:600;cursor:pointer}
-.err{background:#2a0a0a;border:1px solid #ff3040;color:#ff8a8a;padding:8px;border-radius:6px;margin:8px 0;font-size:11px;display:none}
-.ok{background:#0a2a0a;border:1px solid #00ff88;color:#88ffaa;padding:8px;border-radius:6px;margin:8px 0;font-size:11px;display:none}
-.header{height:60px;padding:0 14px;position:fixed;top:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);z-index:100;background:#000;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
-.page{margin:auto;max-width:500px;padding-top:60px;padding-bottom:60px;min-height:100vh}
-.bottom{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#000;height:52px;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222;z-index:100}
-.bottom button{background:none;border:none;color:#555;font-size:22px;cursor:pointer}.bottom button.active{color:#fff}
-.avatar{width:84px;height:84px;border-radius:50%;object-fit:cover;background:#222}
-.story-bar{display:flex;gap:12px;padding:10px 14px;overflow-x:auto;border-bottom:1px solid #111}
-.story{flex:0 0 62px;text-align:center}.story img{width:56px;height:56px;border-radius:50%;border:2px solid #ff3040;padding:2px}
-.feed-tabs{display:flex;border-bottom:1px solid #222}.feed-tabs button{flex:1;padding:12px;background:none;border:none;color:#888;font-weight:600;border-bottom:2px solid transparent}.feed-tabs button.active{color:#fff;border-color:#fff}
-.post{border-bottom:1px solid #111}.post-top{padding:10px 14px;display:flex;gap:10px;align-items:center}.post-img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111}
-.reel{height:calc(100vh - 112px);position:relative;background:#111;display:flex;align-items:center;justify-content:center}.reel video{width:100%;height:100%;object-fit:cover}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#000;color:#fff}
+.header{background:#111;padding:12px;position:fixed;top:0;width:100%;z-index:100;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center;max-width:500px;left:50%;transform:translateX(-50%)}
+.header span{color:#ff0050;font-weight:bold;font-size:22px}
+.feed{margin-top:95px;margin-bottom:70px;max-width:500px;margin:0 auto}
+.story-bar{display:flex;gap:12px;padding:10px;background:#111;border-bottom:1px solid #222;overflow-x:auto;position:fixed;top:48px;width:100%;max-width:500px;z-index:90;left:50%;transform:translateX(-50%)}
+.story{text-align:center;min-width:65px;cursor:pointer}.story-ring{width:58px;height:58px;border-radius:50%;border:3px solid #ff0050;padding:2px;background:#222;display:flex;align-items:center;justify-content:center}.story-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.post{background:#111;margin-bottom:15px;border:1px solid #222;border-radius:12px;overflow:hidden}
+.post-top{padding:10px;display:flex;justify-content:space-between;align-items:center}
+.post-img{width:100%;height:500px;object-fit:cover;background:#222;transition:filter 0.3s;cursor:pointer}
+.post-actions{padding:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.btn{background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
+.fake-alert{background:red;color:#fff;text-align:center;padding:8px;font-weight:bold;animation:blink 0.8s infinite}
+@keyframes blink{0%{opacity:1}50%{opacity:0.5}100%{opacity:1}}
+.report-btn{background:#222;color:#fff;border:1px solid red;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:bold;cursor:pointer}
+.follow-btn{background:#ff0050;color:#fff;border:none;padding:5px 14px;border-radius:15px;font-size:12px;font-weight:bold;cursor:pointer}.follow-btn.following{background:#333}
+.bottom{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#111;display:flex;justify-content:space-around;padding:12px;border-top:1px solid #333;z-index:100}
+.bottom button{background:none;border:none;color:#fff;font-size:24px;cursor:pointer}
+.login-box{margin-top:100px;text-align:center;padding:20px;max-width:360px;margin-left:auto;margin-right:auto}
+input{padding:11px;border-radius:8px;border:1px solid #333;width:260px;margin:5px;background:#222;color:#fff;outline:none}
+#commentBox{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#111;border-top:1px solid #333;padding:10px;display:none;z-index:1000;max-height:65%;overflow-y:auto;border-radius:15px 15px 0 0}
+#storyView{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;flex-direction:column}
+.progress-bar{width:100%;height:4px;background:#333}.progress{height:100%;background:#ff0050;width:0%}
+.safety-badge{background:linear-gradient(45deg,#ff0050,#ff8a00);padding:4px 8px;border-radius:10px;font-size:10px;font-weight:bold}
 </style>
 </head>
 <body>
+<div class="header"><span onclick="showFeed()">PIXORO 🔥</span><span class="safety-badge">WORLD NO.1 SAFE</span><button onclick="showProfile()" style="background:none;border:none;color:#fff;font-size:22px;">👤</button></div>
 
-<!-- MODULE: AUTH -->
-<div id="authBox" class="login-wrap">
-<div class="login-card">
-<div class="logo">Pixoro</div>
-<p style="color:#666;font-size:11px;margin-bottom:14px;">WORLD ARCHITECTURE V2.0 🌍</p>
-<div id="errBox" class="err"></div><div id="okBox" class="ok"></div>
-<div id="loginForm">
-<input id="email" placeholder="Email"><input id="pass" type="password" placeholder="Password">
-<button class="btn" id="mainBtn" onclick="MOD_AUTH.login()">Log in - Safe</button>
-<p style="margin-top:12px;font-size:13px;color:#888;">New? <span class="link" onclick="MOD_AUTH.toggle()">Sign up</span></p>
-</div>
-<div id="signupForm" style="display:none;">
-<input id="semail" placeholder="Email"><input id="spass" type="password" placeholder="Pass 6+"><input id="sname" placeholder="Username unique">
-<button class="btn" onclick="MOD_AUTH.signup()">Sign up - World Safe</button>
-<p style="margin-top:12px;font-size:13px;color:#888;">Have? <span class="link" onclick="MOD_AUTH.toggle()">Log in</span></p>
-</div>
-</div>
+<div id="storyBar" class="story-bar" style="display:none;">
+<div class="story" onclick="addStory()"><div class="story-ring" style="border-color:#555;font-size:30px;">➕</div><small>Your Story</small></div>
+<div id="storyList" style="display:flex;gap:12px;"></div>
 </div>
 
-<!-- MODULE: APP -->
-<div id="mainBox" style="display:none;">
-<div class="header"><div class="logo" style="font-size:32px;">Pixoro</div><div style="display:flex;gap:12px;"><span onclick="APP.showPage('notifications')" style="cursor:pointer;">🔔</span><span onclick="APP.showPage('chat')" style="cursor:pointer;">💬</span><span onclick="MOD_AUTH.logout()" style="cursor:pointer;font-size:12px;color:#888;">Logout</span></div></div>
+<div id="loginBox" class="login-box"><h2 style="font-family:'Grand Hotel',cursive;font-size:42px;">Pixoro</h2><p style="color:#aaa;font-size:12px;margin:5px;">World No.1 Safe App by GIRI 🌍</p><br><input id="email" placeholder="Email"><br><input id="pass" type="password" placeholder="Password"><br><button onclick="login()" style="background:#ff0050;color:#fff;padding:11px 30px;border:none;border-radius:8px;margin-top:10px;font-weight:700;cursor:pointer;">Login / Signup - Safe 🔒</button><br><br><div style="background:#111;padding:12px;border-radius:10px;text-align:left;font-size:12px;border:1px solid #222;"><b>GIRLS SAFETY 6 🔒</b><br>1. Boy paatha blur<br>2. Screenshot mukam (block)<br>3. Comment delete<br>4. Night mode hide<br>5. Auto cheri button<br>6. Friend list hide<br><br><b style="color:#ff0050;">FAKE ID WARNING by GIRI</b><br>3 Reports = FAKE tag + RED ALERT</div></div>
 
-<!-- MODULE: STORIES + FEED -->
-<div id="feedPage" class="page">
-<!-- STORIES BAR -->
-<div class="story-bar" id="storyBar"><div class="story"><img src="https://i.pravatar.cc/100?u=you"><br><small style="font-size:10px;">Your story</small></div></div>
-<!-- FEED TABS -->
-<div class="feed-tabs"><button class="active" onclick="MOD_FEED.switchTab('foryou',this)">For You</button><button onclick="MOD_FEED.switchTab('following',this)">Following</button><button onclick="MOD_FEED.switchTab('trending',this)">Trending</button></div>
-<div id="feedList"></div>
-</div>
+<div id="feed" class="feed" style="display:none;"></div>
 
-<!-- MODULE: REELS -->
-<div id="reelsPage" class="page" style="display:none;">
-<div id="reelsList"></div>
+<div id="uploadBox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;padding:20px;text-align:center;overflow-y:auto;">
+<h3 style="margin-top:20px;">Post Podu da Giri! 🔥</h3><br><input id="captionInput" placeholder="Caption enna da?" style="width:90%;"><br><br><input type="file" id="fileInput" accept="image/*" style="width:90%;color:white;"><br><br><img id="preview" style="width:220px;height:300px;object-fit:cover;display:none;border-radius:10px;margin:10px auto;border:2px solid #ff0050;"><br>
+<div style="margin:10px;">
+<button onclick="setFilter('none')" style="padding:6px 10px;background:#222;color:#fff;border-radius:10px;margin:2px;border:1px solid #333;">Original</button>
+<button onclick="setFilter('blur(20px)')" style="padding:6px 10px;background:#222;color:#fff;border-radius:10px;margin:2px;border:1px solid #333;">Boy Blur</button>
+<button onclick="setFilter('grayscale(100%)')" style="padding:6px 10px;background:#222;color:#fff;border-radius:10px;margin:2px;border:1px solid #333;">B&W</button>
+</div><br>
+<button onclick="uploadRealPost()" style="background:#ff0050;color:white;padding:12px 30px;border:none;border-radius:20px;font-weight:bold;cursor:pointer;">POST 🚀</button>
+<button onclick="uploadBox.style.display='none'" style="background:#333;color:white;padding:10px 20px;border:none;border-radius:20px;margin-left:10px;">Cancel</button>
 </div>
 
-<!-- MODULE: SEARCH / DISCOVERY -->
-<div id="searchPage" class="page" style="display:none;">
-<div style="padding:12px;position:sticky;top:60px;background:#000;z-index:10;"><input id="searchInput" placeholder="Search user, hashtag..." oninput="MOD_DISCOVERY.search()"></div>
-<div id="searchResult"></div>
+<div id="storyUploadBox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;padding:20px;text-align:center;">
+<h3 style="margin-top:40px;">Story Podu da! 24hr ⭕</h3><br><input type="file" id="storyFile" accept="image/*" style="color:white;"><br><br><img id="storyPreview" style="width:220px;height:380px;object-fit:cover;display:none;border-radius:10px;margin:10px auto;"><br><button onclick="uploadStory()" style="background:#ff0050;color:#fff;padding:12px 30px;border:none;border-radius:20px;cursor:pointer;">Story Post</button><br><br><button onclick="storyUploadBox.style.display='none'" style="background:#333;color:#fff;padding:8px 15px;border:none;border-radius:10px;">Cancel</button>
 </div>
 
-<!-- MODULE: CHAT -->
-<div id="chatPage" class="page" style="display:none;">
-<div style="padding:14px;border-bottom:1px solid #222;"><b>Messages</b></div>
-<div id="chatList" style="padding:14px;color:#666;font-size:13px;">No messages yet - Search la user ah follow pannitu chat pannu da</div>
+<div id="storyView"><div class="progress-bar"><div id="storyProgress" class="progress"></div></div><div style="display:flex;justify-content:space-between;padding:10px;"><span id="storyUser" style="font-weight:bold;"></span><button onclick="closeStory()" style="background:none;border:none;color:#fff;font-size:22px;">✕</button></div><img id="storyViewImg" style="width:100%;height:80vh;object-fit:contain;"><div style="display:flex;justify-content:space-between;padding:15px;"><span id="storyViews"></span><button id="storyDeleteBtn" onclick="deleteCurrentStory()" style="background:red;color:#fff;border:none;padding:8px 15px;border-radius:10px;">🗑️ Delete</button></div></div>
+
+<div id="commentBox"><div style="display:flex;justify-content:space-between;"><b>Comments <span style="font-size:10px;color:#aaa;">(Thappana comment delete pannalam)</span></b><button onclick="commentBox.style.display='none'" style="background:none;border:none;color:#fff;">✕</button></div><div id="commentList" style="margin:10px 0;"></div><div style="display:flex;gap:5px;"><input id="commentInput" placeholder="Comment..." style="flex:1;"><button onclick="addComment()" style="background:#ff0050;color:#fff;border:none;padding:8px 15px;border-radius:10px;">Post</button></div></div>
+
+<div id="profileBox" style="display:none;margin-top:60px;max-width:500px;margin:0 auto;padding:15px;">
+<h2 id="pName"></h2><p id="pEmail" style="color:#aaa;font-size:12px;"></p>
+<div style="display:flex;justify-content:space-around;text-align:center;margin:15px 0;background:#111;padding:10px;border-radius:10px;border:1px solid #222;">
+<div><b id="postCount">0</b><br><small>Posts</small></div><div onclick="showFollowers()"><b id="followerCount">0</b><br><small>Followers</small></div><div onclick="showFollowing()"><b id="followingCount">0</b><br><small>Following</small></div>
+</div>
+<div style="background:#111;padding:10px;border-radius:10px;margin:10px 0;border:1px solid #222;"><b>🛡️ FAKE ID WARNING</b><br><small>World First Idea by GIRI<br>3 Reports = FAKE tag + RED ALERT + Blur</small></div>
+<div id="myPosts" style="display:flex;flex-wrap:wrap;gap:2px;"></div>
 </div>
 
-<!-- MODULE: NOTIFICATIONS -->
-<div id="notificationsPage" class="page" style="display:none;">
-<div style="padding:14px;border-bottom:1px solid #222;"><b>Notifications 🔔</b></div>
-<div id="notifList" style="padding:14px;color:#666;font-size:13px;">Likes, Follows, Comments notifications inga varum da</div>
-</div>
-
-<!-- MODULE: PROFILE -->
-<div id="profilePage" class="page" style="display:none;">
-<div style="padding:20px 16px;display:flex;gap:18px;align-items:center;">
-<img id="pAvatar" class="avatar" src="">
-<div style="flex:1;display:flex;justify-content:space-around;text-align:center;"><div><b id="pPosts">0</b><br><span style="font-size:11px;color:#888;">posts</span></div><div><b id="pFollowers">0</b><br><span style="font-size:11px;color:#888;">followers</span></div><div><b id="pFollowing">0</b><br><span style="font-size:11px;color:#888;">following</span></div></div>
-</div>
-<div style="padding:0 16px;">
-<b id="pUsername">@user</b><p id="pBio" style="font-size:13px;color:#ccc;margin-top:4px;"></p>
-<button class="btn" style="background:#222;border:1px solid #333;margin-top:12px;" onclick="MOD_PROFILE.openEdit()">Edit Profile - Photo, Bio, Private/Public</button>
-</div>
-<div class="feed-tabs" style="margin-top:16px;"><button class="active">Posts</button><button>Reels</button><button>Saved 🔖</button></div>
-<div id="profilePosts"></div>
-</div>
-
-<!-- MODULE: EDIT PROFILE -->
-<div id="editBox" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;">
-<div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #222;"><button onclick="editBox.style.display='none'" style="background:none;border:none;color:#fff;">✕</button><b>Edit Profile</b><button onclick="MOD_PROFILE.save()" style="background:none;border:none;color:#0095f6;font-weight:700;">Done</button></div>
-<div style="padding:20px;text-align:center;max-width:500px;margin:auto;">
-<img id="editAvatar" class="avatar" style="width:88px;height:88px;margin-bottom:10px;"><br>
-<input type="file" id="avatarFile" accept="image/*" style="display:none;" onchange="MOD_PROFILE.preview(event)">
-<button onclick="avatarFile.click()" style="background:none;border:none;color:#0095f6;font-size:13px;">Change photo</button>
-<div style="text-align:left;margin-top:20px;">
-<label style="font-size:11px;color:#888;">Username (unique)</label><input id="editUsername">
-<label style="font-size:11px;color:#888;">Bio</label><textarea id="editBio" rows="3"></textarea>
-<label style="font-size:11px;color:#888;">Private Account</label><div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #222;border-radius:8px;margin-top:6px;"><span style="font-size:12px;">Only followers can see</span><div id="privateToggle" style="width:44px;height:24px;background:#333;border-radius:20px;position:relative;cursor:pointer;" onclick="MOD_PROFILE.togglePrivate()"><i style="position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s;display:block;"></i></div></div>
-</div>
-</div>
-</div>
-
-<div class="bottom">
-<button id="bFeed" class="active" onclick="APP.showPage('feed')">⌂</button>
-<button id="bReels" onclick="APP.showPage('reels')">🎬</button>
-<button onclick="APP.openUpload()" style="color:#fff;font-size:28px;">+</button>
-<button id="bSearch" onclick="APP.showPage('search')">⌕</button>
-<button id="bProfile" onclick="APP.showPage('profile')">◯</button>
-</div>
-</div>
-
-<!-- MODULE: UPLOAD (Camera/Photo/Video) -->
-<input type="file" id="postFile" accept="image/*,video/*" style="display:none;">
-<div id="uploadBox" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;display:none;">
-<div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #222;"><button onclick="uploadBox.style.display='none'" style="background:none;border:none;color:#fff;">✕</button><b id="uploadTitle">New post</b><button onclick="MOD_UPLOAD.share()" style="background:none;border:none;color:#0095f6;font-weight:700;">Share</button></div>
-<div style="width:100%;aspect-ratio:4/5;background:#111;display:flex;align-items:center;justify-content:center;"><img id="uploadPreview" style="max-width:100%;max-height:100%;display:none;"><video id="uploadVideo" style="max-width:100%;max-height:100%;display:none;" controls></video></div>
-<div style="padding:14px;"><textarea id="uploadCaption" placeholder="Caption, hashtags..."></textarea><p style="font-size:11px;color:#666;margin-top:8px;">Will save to: <span id="uploadType">Posts</span> • Supabase Storage</p></div>
+<div class="bottom" id="bottomNav" style="display:none;">
+<button onclick="showFeed()">🏠</button><button onclick="addPost()">➕</button><button onclick="showProfile()">👤</button><button onclick="logout()">🚪</button>
 </div>
 
 <script>
-// ========== CONFIG ==========
 const SUPABASE_URL='https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPABASE_KEY='sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let currentUser=null, currentProfile=null;
+const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let currentUser=null, currentProfile=null, currentCommentPostId=null, currentStoryId=null, storyTimer=null, currentFilter='none';
 
-// ========== MODULE: APP CORE ==========
-const APP={
- showPage(p){
-  ['feed','reels','search','chat','notifications','profile'].forEach(x=>{
-   let el=document.getElementById(x+'Page'); if(el) el.style.display=x===p?'block':'none';
-   let b=document.getElementById('b'+x.charAt(0).toUpperCase()+x.slice(1)); if(b) b.className=p===x?'active':'';
-  });
-  if(p==='feed') MOD_FEED.load();
-  if(p==='profile') MOD_PROFILE.load();
-  if(p==='search') MOD_DISCOVERY.search();
-  if(p==='reels') MOD_REELS.load();
- },
- openUpload(){
-  let t=prompt('Enna upload pannalam da?\n1=Post (Photo)\n2=Reel (Video)\n3=Story (24hr)','1');
-  let type=t==='2'?'reels':t==='3'?'stories':'posts';
-  document.getElementById('uploadType').innerText=type;
-  document.getElementById('uploadBox').dataset.type=type;
-  document.getElementById('postFile').accept=type==='reels'?'video/*':'image/*';
-  document.getElementById('postFile').click();
- }
-};
+async function checkSession(){let {data}=await supabase.auth.getSession();if(data.session){currentUser=data.session.user;await loadProfileData();loginBox.style.display="none";feed.style.display="block";bottomNav.style.display="flex";storyBar.style.display="flex";loadFeed();loadStories();}}
+checkSession();
 
-// ========== MODULE: AUTH ==========
-const MOD_AUTH={
- isLogin:true,
- toggle(){this.isLogin=!this.isLogin;loginForm.style.display=this.isLogin?'block':'none';signupForm.style.display=this.isLogin?'none':'block';},
- async signup(){
-  let email=semail.value.trim(), pass=spass.value.trim(), username=sname.value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
-  if(!email||!pass||!username){errBox.style.display='block';errBox.innerText='All fields kudu da';return;}
-  let {data:exists}=await supabaseClient.from('profiles').select('username').eq('username',username).maybeSingle();
-  if(exists){errBox.style.display='block';errBox.innerText='Username taken da';return;}
-  let {data,error}=await supabaseClient.auth.signUp({email,password:pass,options:{data:{username}}});
-  if(error){errBox.style.display='block';errBox.innerText=error.message;return;}
-  if(data.user) await supabaseClient.from('profiles').insert({id:data.user.id,username,bio:'Tiruchuli to World 🌍'});
-  okBox.style.display='block';okBox.innerText='✅ Created da! Login pannu da';
-  setTimeout(()=>{this.toggle();email.value=email;},1000);
- },
- async login(){
-  let e=email.value.trim(), p=pass.value.trim();
-  mainBtn.innerText='Checking...';
-  let {data,error}=await supabaseClient.auth.signInWithPassword({email:e,password:p});
-  if(error){errBox.style.display='block';errBox.innerText=error.message;mainBtn.innerText='Log in';return;}
-  currentUser=data.user; authBox.style.display='none'; mainBox.style.display='block'; await MOD_PROFILE.load(); APP.showPage('feed');
- },
- logout(){supabaseClient.auth.signOut();location.reload();}
-};
-
-// ========== MODULE: FEED ==========
-const MOD_FEED={
- currentTab:'foryou',
- switchTab(tab,btn){
-  this.currentTab=tab; document.querySelectorAll('.feed-tabs button').forEach(b=>b.className=''); btn.className='active'; this.load();
- },
- async load(){
-  let {data:posts}=await supabaseClient.from('posts').select('*, profiles(username,avatar_url)').order('created_at',{ascending:false}).limit(20);
-  let list=document.getElementById('feedList');
-  if(!posts||posts.length===0){list.innerHTML='<p style="text-align:center;color:#555;margin-top:40px;">No posts da - + thottu post podu da Giri! 📸</p>';return;}
-  list.innerHTML=posts.map(p=>`<div class="post"><div class="post-top"><img src="${p.profiles?.avatar_url||`https://i.pravatar.cc/100?u=${p.profiles?.username}`}" style="width:32px;height:32px;border-radius:50%;"><b style="font-size:13px;">${p.profiles?.username||'user'}</b></div><img class="post-img" src="${p.image_url}"><div style="padding:10px 14px;display:flex;gap:14px;font-size:20px;"><span>❤️ ${p.likes_count||0}</span><span>💬</span><span>↗ Share</span><span style="margin-left:auto;">🔖 Save</span></div><div style="padding:0 14px 12px 14px;font-size:13px;"><b>${p.profiles?.username}</b> ${p.caption||''}</div></div>`).join('');
- }
-};
-
-// ========== MODULE: REELS ==========
-const MOD_REELS={
- async load(){
-  let {data:reels}=await supabaseClient.from('reels').select('*, profiles(username)').order('created_at',{ascending:false}).limit(10);
-  let el=document.getElementById('reelsList');
-  if(!reels||reels.length===0){el.innerHTML='<p style="text-align:center;color:#555;margin-top:80px;">No reels da - + thottu Reel upload pannu da 🎬</p>';return;}
-  el.innerHTML=reels.map(r=>`<div class="reel"><video src="${r.video_url}" loop autoplay muted></video><div style="position:absolute;bottom:20px;left:14px;right:14px;"><b>@${r.profiles?.username}</b><br><small>${r.caption||''}</small><br><small>❤️ ${r.likes_count} • 💬 • ↗ • Follow</small></div></div>`).join('');
- }
-};
-
-// ========== MODULE: DISCOVERY ==========
-const MOD_DISCOVERY={
- async search(){
-  let q=document.getElementById('searchInput').value.toLowerCase();
-  let {data:profiles}=await supabaseClient.from('profiles').select('*').limit(20);
-  if(!profiles) return;
-  if(q) profiles=profiles.filter(p=>p.username.includes(q));
-  let html='';
-  for(let pr of profiles){
-   if(pr.id===currentUser?.id) continue;
-   let {data:isF}=await supabaseClient.from('follows').select('id').eq('follower_id',currentUser.id).eq('following_id',pr.id).maybeSingle();
-   let btn=isF?`<button style="padding:6px 14px;border-radius:8px;background:#333;color:#fff;border:none;" onclick="MOD_DISCOVERY.unfollow('${pr.id}')">Following</button>`:`<button style="padding:6px 14px;border-radius:8px;background:#0095f6;color:#fff;border:none;" onclick="MOD_DISCOVERY.follow('${pr.id}')">Follow</button>`;
-   html+=`<div style="padding:12px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #111;"><div style="display:flex;gap:10px;align-items:center;"><img src="${pr.avatar_url||`https://i.pravatar.cc/100?u=${pr.username}`}" style="width:38px;height:38px;border-radius:50%;"><div><b style="font-size:13px;">${pr.username}</b><br><small style="color:#888;">${pr.bio?.substring(0,20)} ${pr.is_private?'🔒':''}</small></div></div>${btn}</div>`;
+async function login(){
+ let e=email.value.trim(), p=pass.value.trim();
+ if(!e||!p) return alert("Email + Password podu da Giri");
+ try{
+  let {data,error}=await supabase.auth.signInWithPassword({email:e,password:p});
+  if(error){
+   let {data:sData,error:sErr}=await supabase.auth.signUp({email:e,password:p});
+   if(sErr) throw sErr;
+   if(sData.user) await supabase.from('profiles').insert({id:sData.user.id,username:e.split('@')[0],bio:'Tiruchuli to World 🌍'}).then(()=>{},()=>{});
+   alert("Account created da Giri! Login pannu da 🔒"); return;
   }
-  document.getElementById('searchResult').innerHTML=html;
- },
- async follow(id){await supabaseClient.from('follows').insert({follower_id:currentUser.id,following_id:id});this.search();},
- async unfollow(id){await supabaseClient.from('follows').delete().eq('follower_id',currentUser.id).eq('following_id',id);this.search();}
-};
+  currentUser=data.user; await loadProfileData();
+  loginBox.style.display="none";feed.style.display="block";bottomNav.style.display="flex";storyBar.style.display="flex";loadFeed();loadStories();
+ }catch(err){alert(err.message);}
+}
+function logout(){supabase.auth.signOut();location.reload();}
+function showFeed(){feed.style.display="block";profileBox.style.display="none";storyBar.style.display="flex";loadFeed();}
+function showProfile(){feed.style.display="none";storyBar.style.display="none";profileBox.style.display="block";loadProfile();}
+function addPost(){uploadBox.style.display='block';}
+function addStory(){storyUploadBox.style.display='block';}
+function setFilter(f){currentFilter=f;preview.style.filter=f;}
 
-// ========== MODULE: PROFILE ==========
-const MOD_PROFILE={
- async load(){
-  if(!currentUser){let {data}=await supabaseClient.auth.getSession();currentUser=data.session?.user;if(!currentUser)return;}
-  let {data:profile}=await supabaseClient.from('profiles').select('*').eq('id',currentUser.id).single();
-  if(!profile){let uname=currentUser.user_metadata?.username||currentUser.email.split('@')[0];let {data:newP}=await supabaseClient.from('profiles').insert({id:currentUser.id,username:uname}).select().single();profile=newP;}
-  currentProfile=profile;
-  pUsername.innerText='@'+profile.username; pBio.innerText=profile.bio||''; pAvatar.src=profile.avatar_url||`https://i.pravatar.cc/150?u=${profile.username}`;
-  privateToggle.firstChild.style.left=profile.is_private?'23px':'3px'; privateToggle.style.background=profile.is_private?'#0095f6':'#333';
-  let {count:fc}=await supabaseClient.from('follows').select('*',{count:'exact',head:true}).eq('following_id',currentUser.id);
-  let {count:fgc}=await supabaseClient.from('follows').select('*',{count:'exact',head:true}).eq('follower_id',currentUser.id);
-  let {count:pc}=await supabaseClient.from('posts').select('*',{count:'exact',head:true}).eq('user_id',currentUser.id);
-  pFollowers.innerText=fc||0; pFollowing.innerText=fgc||0; pPosts.innerText=pc||0;
-  let {data:myPosts}=await supabaseClient.from('posts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-  document.getElementById('profilePosts').innerHTML=myPosts?.map(p=>`<img src="${p.image_url}" style="width:33.33%;aspect-ratio:1/1;object-fit:cover;border:1px solid #000;">`).join('')||'';
- },
- openEdit(){
-  editBox.style.display='block'; editAvatar.src=pAvatar.src; editUsername.value=currentProfile.username; editBio.value=currentProfile.bio||'';
- },
- newAvatar:null,
- preview(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{editAvatar.src=ev.target.result;MOD_PROFILE.newAvatar=ev.target.result;};r.readAsDataURL(f);},
- togglePrivate(){currentProfile.is_private=!currentProfile.is_private;privateToggle.firstChild.style.left=currentProfile.is_private?'23px':'3px';privateToggle.style.background=currentProfile.is_private?'#0095f6':'#333';},
- async save(){
-  let uname=editUsername.value.trim().toLowerCase().replace(/[^a-z0-9_]/g,''), bio=editBio.value.trim();
-  let avatar_url=currentProfile.avatar_url;
-  if(MOD_PROFILE.newAvatar){
-   let blob=await (await fetch(MOD_PROFILE.newAvatar)).blob();
-   let name=`${currentUser.id}_${Date.now()}.jpg`;
-   await supabaseClient.storage.from('avatars').upload(name,blob,{upsert:true});
-   let {data}=supabaseClient.storage.from('avatars').getPublicUrl(name); avatar_url=data.publicUrl;
+fileInput.addEventListener('change',e=>{let f=e.target.files[0];if(f){let r=new FileReader();r.onload=ev=>{preview.src=ev.target.result;preview.style.display='block';preview.style.filter=currentFilter;};r.readAsDataURL(f);}});
+storyFile.addEventListener('change',e=>{let f=e.target.files[0];if(f){let r=new FileReader();r.onload=ev=>{storyPreview.src=ev.target.result;storyPreview.style.display='block';};r.readAsDataURL(f);}});
+
+async function uploadRealPost(){
+ let cap=captionInput.value.trim(); if(!cap) return alert("Caption podu da");
+ let file=fileInput.files[0];
+ let imageUrl=preview.src;
+ if(file){
+  let name=`${currentUser.id}_${Date.now()}_${file.name}`;
+  let {error}=await supabase.storage.from('posts').upload(name,file);
+  if(error){alert(error.message);return;}
+  let {data}=supabase.storage.from('posts').getPublicUrl(name); imageUrl=data.publicUrl;
+ }
+ if(!imageUrl||imageUrl.startsWith('data:') &&!file) imageUrl=`https://picsum.photos/500/700?random=${Math.random()}`;
+ await supabase.from('posts').insert({user_id:currentUser.id,image_url:imageUrl,caption:cap,filter_type:currentFilter,likes_count:0,reports:0,views:0});
+ uploadBox.style.display='none';captionInput.value='';preview.style.display='none';fileInput.value='';currentFilter='none';preview.style.filter='none';loadFeed();
+}
+
+async function uploadStory(){
+ let file=storyFile.files[0]; if(!file &&!storyPreview.src) return alert("Photo select pannu da");
+ let url=storyPreview.src;
+ if(file){let name=`${currentUser.id}_${Date.now()}_${file.name}`;await supabase.storage.from('stories').upload(name,file);let {data}=supabase.storage.from('stories').getPublicUrl(name);url=data.publicUrl;}
+ await supabase.from('stories').insert({user_id:currentUser.id,media_url:url,views:0});
+ storyUploadBox.style.display='none';storyPreview.style.display='none';storyFile.value='';loadStories();alert("Story pottacha da! ⭕");
+}
+
+async function loadStories(){
+ let {data:stories}=await supabase.from('stories').select('*, profiles(username)').order('created_at',{ascending:false}).limit(20);
+ if(!stories) return;
+ let now=new Date(); let h="";
+ for(let s of stories){
+  let created=new Date(s.created_at); let diff=(now-created)/1000/3600; if(diff>24) continue;
+  h+=`<div class="story" onclick="viewStory('${s.id}')"><div class="story-ring"><img src="${s.media_url}"></div><small>${s.profiles?.username||'user'}</small><br><small style="color:#aaa;font-size:9px;">${s.views||0} views</small></div>`;
+ }
+ storyList.innerHTML=h;
+}
+async function viewStory(id){
+ let {data:s}=await supabase.from('stories').select('*, profiles(username)').eq('id',id).single(); if(!s) return;
+ currentStoryId=id; storyView.style.display="flex"; storyViewImg.src=s.media_url; storyUser.innerText=s.profiles?.username||'user'; storyViews.innerText=(s.views||0)+" views";
+ storyDeleteBtn.style.display=(s.user_id===currentUser.id)?"block":"none";
+ await supabase.from('stories').update({views:(s.views||0)+1}).eq('id',id);
+ let progress=0; storyProgress.style.width="0%"; clearInterval(storyTimer);
+ storyTimer=setInterval(()=>{progress+=1;storyProgress.style.width=progress+"%";if(progress>=100){closeStory();}},150);
+}
+function closeStory(){storyView.style.display="none";clearInterval(storyTimer);currentStoryId=null;loadStories();}
+async function deleteCurrentStory(){if(!currentStoryId)return;if(!confirm("Story delete pannava?"))return;await supabase.from('stories').delete().eq('id',currentStoryId);closeStory();loadStories();}
+
+async function loadProfileData(){
+ if(!currentUser) return;
+ let {data:profile}=await supabase.from('profiles').select('*').eq('id',currentUser.id).single();
+ if(!profile){let uname=currentUser.email.split('@')[0];let {data:newP}=await supabase.from('profiles').insert({id:currentUser.id,username:uname,bio:'Tiruchuli to World 🌍'}).select().single();profile=newP;}
+ currentProfile=profile;
+}
+
+async function loadFeed(){
+ try{
+  let {data:posts,error}=await supabase.from('posts').select('*, profiles(username,avatar_url)').order('created_at',{ascending:false}).limit(30);
+  if(error) throw error;
+  if(!posts||posts.length===0){
+   feed.innerHTML=`<div class="post"><div class="post-top"><span style="display:flex;align-items:center;gap:8px;"><img src="https://i.pravatar.cc/100?u=giri" style="width:32px;height:32px;border-radius:50%"><b>giri_official</b><span class="safety-badge">SAFE</span></span></div><img class="post-img" src="https://picsum.photos/500/600?random=1"><div class="post-actions"><button class="btn">❤️</button><button class="btn">💬</button><button class="btn">↗️</button><span style="margin-left:auto;font-size:12px;font-weight:bold;">World No.1 Safe App Demo - Add Post pannu da!</span></div><div style="padding:8px 10px;"><b>giri_official</b> PIXORO - Girls Safety 6 + Fake ID Warning + Kids Safe Mode 🔥</div></div><div style="text-align:center;padding:20px;"><button onclick="addPost()" style="background:#ff0050;color:#fff;padding:12px 30px;border:none;border-radius:20px;font-weight:bold;">+ First Post Podu da Giri! 🚀</button></div>`;
+   return;
   }
-  await supabaseClient.from('profiles').update({username:uname,bio,avatar_url,is_private:currentProfile.is_private}).eq('id',currentUser.id);
-  editBox.style.display='none';MOD_PROFILE.newAvatar=null;await MOD_PROFILE.load();
- }
-};
+  let follows=await getFollowing();
+  let h="";
+  for(let x of posts){
+   let reports=x.reports||0; let isFake=reports>=3;
+   let isOwn=x.user_id===currentUser.id;
+   let likes=x.likes_count||0;
+   let filter=x.filter_type||'none';
+   h+=`<div class="post">${isFake?`<div class="fake-alert">🚨 FAKE ID WARNING! ${reports} REPORTS - Nambaatha da! Idhu Fake da! OWNER: GIRI 🚨</div>`:''}<div class="post-top"><span style="display:flex;align-items:center;gap:8px;"><img src="${x.profiles?.avatar_url||`https://i.pravatar.cc/100?u=${x.profiles?.username}`}" style="width:32px;height:32px;border-radius:50%"><b>${x.profiles?.username||'user'}</b>${isFake?'<span style="background:red;padding:2px 6px;border-radius:10px;font-size:10px;">FAKE ID</span>':'<span class="safety-badge" style="font-size:8px;">VERIFIED SAFE</span>'}</span><div style="display:flex;gap:5px;">${!isOwn?`<button class="follow-btn ${follows.includes(x.user_id)?'following':''}" onclick="toggleFollow('${x.user_id}')">${follows.includes(x.user_id)?'Following':'Follow'}</button>`:''}<button class="report-btn" onclick="reportFake('${x.id}')">🚨</button><button class="report-btn" onclick="blockUser('${x.user_id}')" style="border-color:#666;">🚫</button></div></div><img class="post-img" src="${x.image_url}" style="filter:${filter}" onclick="addView('${x.id}'); this.style.filter=(this.style.filter.includes('blur')?'none':'blur(20px)')" ><div class="post-actions"><button class="btn" onclick="likePost('${x.id}')">🤍</button><button class="btn" onclick="openComments('${x.id}')">💬</button><button class="btn" onclick="sharePost()">↗️</button><span style="margin-left:auto;font-size:12px;font-weight:bold;">${likes} likes • ${x.comments_count||0} cmt • ${x.views||0} views</span></div><div style="padding:8px 10px;font-size:14px;display:flex;justify-content:space-between;"><span><b>${x.profiles?.username||'user'}</b> ${x.caption||''}</span>${isOwn?`<button onclick="deletePost('${x.id}')" style="background:red;color:#fff;border:none;padding:4px 10px;border-radius:10px;font-size:11px;">🗑️ Delete</button>`:''}</div></div>`;
+  }
+  feed.innerHTML=h;
+ }catch(e){feed.innerHTML="<p style='text-align:center;margin-top:50px;color:red;'>Error da Giri!<br>"+e.message+"</p>";}
+}
 
-// ========== MODULE: UPLOAD ==========
-const MOD_UPLOAD={
- async share(){
-  let type=document.getElementById('uploadBox').dataset.type||'posts';
-  let caption=document.getElementById('uploadCaption').value;
-  let file=document.getElementById('postFile').files[0];
-  if(!file){alert('File select pannu da');return;}
-  document.getElementById('uploadTitle').innerText='Uploading...';
-  let bucket=type, fileName=`${currentUser.id}_${Date.now()}_${file.name}`;
-  let {error}=await supabaseClient.storage.from(bucket).upload(fileName,file);
-  if(error){alert('Upload error: '+error.message);return;}
-  let {data:urlData}=supabaseClient.storage.from(bucket).getPublicUrl(fileName);
-  let url=urlData.publicUrl;
-  if(type==='posts') await supabaseClient.from('posts').insert({user_id:currentUser.id,image_url:url,caption});
-  if(type==='reels') await supabaseClient.from('reels').insert({user_id:currentUser.id,video_url:url,caption});
-  if(type==='stories') await supabaseClient.from('stories').insert({user_id:currentUser.id,media_url:url});
-  document.getElementById('uploadBox').style.display='none';
-  document.getElementById('uploadTitle').innerText='New post';
-  document.getElementById('uploadCaption').value='';
-  APP.showPage(type==='reels'?'reels':'feed');
- }
-};
+async function getFollowing(){let {data}=await supabase.from('follows').select('following_id').eq('follower_id',currentUser.id);return data?.map(d=>d.following_id)||[];}
+async function toggleFollow(uid){if(uid===currentUser.id)return;let {data:exists}=await supabase.from('follows').select('id').eq('follower_id',currentUser.id).eq('following_id',uid).maybeSingle();if(exists){await supabase.from('follows').delete().eq('id',exists.id);}else{await supabase.from('follows').insert({follower_id:currentUser.id,following_id:uid});}loadFeed();loadProfile();}
+async function likePost(id){let {data:post}=await supabase.from('posts').select('likes_count').eq('id',id).single();await supabase.from('posts').update({likes_count:(post.likes_count||0)+1}).eq('id',id);loadFeed();}
+async function addView(id){let {data:post}=await supabase.from('posts').select('views').eq('id',id).single();await supabase.from('posts').update({views:(post.views||0)+1}).eq('id',id);}
+function sharePost(){if(navigator.share){navigator.share({title:"PIXORO",text:"PIXORO la paaru da",url:location.href});}else{navigator.clipboard.writeText(location.href);alert("Link copy panniten da!");}}
 
-// FILE INPUT HANDLER
-document.getElementById('postFile').addEventListener('change',e=>{
- let file=e.target.files[0];if(!file)return;
- let type=document.getElementById('uploadBox').dataset.type;
- let preview=document.getElementById('uploadPreview'), video=document.getElementById('uploadVideo');
- if(file.type.startsWith('video')){preview.style.display='none';video.style.display='block';video.src=URL.createObjectURL(file);}
- else{video.style.display='none';preview.style.display='block';preview.src=URL.createObjectURL(file);}
- document.getElementById('uploadBox').style.display='block';
-});
+async function openComments(id){currentCommentPostId=id;commentBox.style.display="block";loadComments();}
+async function loadComments(){let {data:comments}=await supabase.from('comments').select('*, profiles(username)').eq('post_id',currentCommentPostId).order('created_at',{ascending:true});let h="";for(let c of comments||[]){let isOwn=c.user_id===currentUser.id;h+=`<div style="padding:6px 0;border-bottom:1px solid #222;display:flex;justify-content:space-between;"><span><b>${c.profiles?.username||'user'}</b> ${c.text}</span>${isOwn?`<button onclick="deleteComment('${c.id}')" style="background:none;border:none;color:red;">🗑️</button>`:''}</div>`;}commentList.innerHTML=h||"<p style='color:#666;'>First comment neeye podu da!</p>";}
+async function addComment(){let t=commentInput.value.trim();if(!t)return;await supabase.from('comments').insert({post_id:currentCommentPostId,user_id:currentUser.id,text:t});commentInput.value="";let {data:post}=await supabase.from('posts').select('comments_count').eq('id',currentCommentPostId).single();await supabase.from('posts').update({comments_count:(post.comments_count||0)+1}).eq('id',currentCommentPostId);loadComments();loadFeed();}
+async function deleteComment(cid){if(!confirm("Comment delete pannava?"))return;await supabase.from('comments').delete().eq('id',cid);loadComments();}
+async function deletePost(id){if(!confirm("Post delete pannava da Giri?"))return;await supabase.from('posts').delete().eq('id',id);alert("Delete aaiduchu!");loadFeed();loadProfile();}
+async function reportFake(id){if(!confirm("Idhu Fake ID ah da? Report pannava?"))return;let {data:post}=await supabase.from('posts').select('reports').eq('id',id).single();await supabase.from('posts').update({reports:(post.reports||0)+1}).eq('id',id);alert("Report pannita da! 3 vantha RED ALERT varum da! - GIRI SAFETY!");loadFeed();if(navigator.vibrate)navigator.vibrate([300,100,300]);}
+async function blockUser(uid){if(!confirm("Block pannava da?"))return;await supabase.from('follows').delete().eq('follower_id',currentUser.id).eq('following_id',uid);alert("Block pannita da!");loadFeed();}
 
-// AUTO LOGIN
-(async()=>{let {data}=await supabaseClient.auth.getSession();if(data.session){currentUser=data.session.user;authBox.style.display='none';mainBox.style.display='block';await MOD_PROFILE.load();APP.showPage('feed');}})();
+async function loadProfile(){
+ pName.innerText=currentProfile?.username||currentUser.email.split('@')[0];
+ pEmail.innerText=currentUser.email;
+ let {data:myPosts}=await supabase.from('posts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+ postCount.innerText=myPosts?.length||0;
+ let {data:followers}=await supabase.from('follows').select('*',{count:'exact'}).eq('following_id',currentUser.id);
+ let {data:following}=await supabase.from('follows').select('*',{count:'exact'}).eq('follower_id',currentUser.id);
+ followerCount.innerText=followers?.length||0; followingCount.innerText=following?.length||0;
+ let h="";(myPosts||[]).forEach(p=>{h+=`<div style="display:inline-block;width:32%;margin:1px;position:relative;"><img src="${p.image_url}" style="width:100%;height:120px;object-fit:cover;filter:${p.filter_type||'none'}"><button onclick="deletePost('${p.id}')" style="position:absolute;top:2px;right:2px;background:red;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:10px;">✕</button></div>`});
+ myPosts.innerHTML=h||"<p style='color:#666;'>No posts yet da - + thottu podu da!</p>";
+}
+function showFollowers(){alert("Followers - Supabase la paaru da Giri!");}
+function showFollowing(){alert("Following - Supabase la paaru da!");}
 </script>
 </body>
 </html>
