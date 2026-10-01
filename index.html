@@ -1,248 +1,304 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO - PRO</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PIXORO - World Architecture</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,Segoe UI}body{background:#000;color:#fff}
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.login-card{width:100%;max-width:360px;border:1px solid #262626;padding:24px;text-align:center}
+.login-card{width:100%;max-width:360px;border:1px solid #262626;padding:28px 24px;text-align:center}
 .logo{font-family:'Grand Hotel',cursive;font-size:52px}
-input,textarea{width:100%;padding:11px;background:#121212;border:1px solid #333;border-radius:6px;color:#fff;margin:5px 0;outline:none}
+input,textarea{width:100%;padding:11px;background:#121212;border:1px solid #333;border-radius:6px;color:#fff;margin:6px 0;outline:none}
 .btn{width:100%;background:#0095f6;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:700;margin-top:10px;cursor:pointer}
 .link{color:#0095f6;font-size:13px;font-weight:600;cursor:pointer}
-.err{background:#2a0a0a;border:1px solid #ff3040;color:#ff8a8a;padding:10px;border-radius:6px;margin:8px 0;font-size:12px;display:none}
-.ok{background:#0a2a0a;border:1px solid #00ff88;color:#88ffaa;padding:10px;border-radius:6px;margin:8px 0;font-size:12px;display:none}
+.err{background:#2a0a0a;border:1px solid #ff3040;color:#ff8a8a;padding:8px;border-radius:6px;margin:8px 0;font-size:11px;display:none}
+.ok{background:#0a2a0a;border:1px solid #00ff88;color:#88ffaa;padding:8px;border-radius:6px;margin:8px 0;font-size:11px;display:none}
 .header{height:60px;padding:0 14px;position:fixed;top:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);z-index:100;background:#000;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
-.page{margin:auto;max-width:500px;padding-top:60px;padding-bottom:70px}
-.bottom{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#000;height:56px;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222;z-index:100}
-.bottom button{background:none;border:none;color:#888;font-size:22px;cursor:pointer}.bottom button.active{color:#fff}
-.profile-top{padding:20px 14px;display:flex;gap:18px;align-items:center}
-.avatar{width:86px;height:86px;border-radius:50%;object-fit:cover;background:#222;border:1px solid #333}
-.stat{flex:1;display:flex;justify-content:space-around;text-align:center}
-.stat b{display:block;font-size:18px}.stat span{font-size:12px;color:#888}
-.toggle{width:44px;height:24px;background:#333;border-radius:20px;position:relative;cursor:pointer;transition:.2s}.toggle.on{background:#0095f6}.toggle i{position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s}.toggle.on i{left:23px}
-.user-row{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #111}
-.user-row img{width:36px;height:36px;border-radius:50%}
-.followBtn{padding:6px 14px;border-radius:8px;font-weight:700;font-size:12px;border:none;cursor:pointer}.followBtn.follow{background:#0095f6;color:#fff}.followBtn.unfollow{background:#222;color:#fff;border:1px solid #333}
+.page{margin:auto;max-width:500px;padding-top:60px;padding-bottom:60px;min-height:100vh}
+.bottom{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#000;height:52px;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222;z-index:100}
+.bottom button{background:none;border:none;color:#555;font-size:22px;cursor:pointer}.bottom button.active{color:#fff}
+.avatar{width:84px;height:84px;border-radius:50%;object-fit:cover;background:#222}
+.story-bar{display:flex;gap:12px;padding:10px 14px;overflow-x:auto;border-bottom:1px solid #111}
+.story{flex:0 0 62px;text-align:center}.story img{width:56px;height:56px;border-radius:50%;border:2px solid #ff3040;padding:2px}
+.feed-tabs{display:flex;border-bottom:1px solid #222}.feed-tabs button{flex:1;padding:12px;background:none;border:none;color:#888;font-weight:600;border-bottom:2px solid transparent}.feed-tabs button.active{color:#fff;border-color:#fff}
+.post{border-bottom:1px solid #111}.post-top{padding:10px 14px;display:flex;gap:10px;align-items:center}.post-img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111}
+.reel{height:calc(100vh - 112px);position:relative;background:#111;display:flex;align-items:center;justify-content:center}.reel video{width:100%;height:100%;object-fit:cover}
 </style>
 </head>
 <body>
 
-<!-- AUTH -->
+<!-- MODULE: AUTH -->
 <div id="authBox" class="login-wrap">
 <div class="login-card">
 <div class="logo">Pixoro</div>
-<p style="color:#666;font-size:11px;margin-bottom:14px;">TIRUCHULI TO WORLD 🌍 - PRO</p>
+<p style="color:#666;font-size:11px;margin-bottom:14px;">WORLD ARCHITECTURE V2.0 🌍</p>
 <div id="errBox" class="err"></div><div id="okBox" class="ok"></div>
 <div id="loginForm">
 <input id="email" placeholder="Email"><input id="pass" type="password" placeholder="Password">
-<button class="btn" id="mainBtn" onclick="login()">Log in</button>
-<p style="margin-top:12px;font-size:13px;color:#888;">No account? <span class="link" onclick="toggleAuth()">Sign up - Real Safe</span></p>
+<button class="btn" id="mainBtn" onclick="MOD_AUTH.login()">Log in - Safe</button>
+<p style="margin-top:12px;font-size:13px;color:#888;">New? <span class="link" onclick="MOD_AUTH.toggle()">Sign up</span></p>
 </div>
 <div id="signupForm" style="display:none;">
-<input id="semail" placeholder="Email"><input id="spass" type="password" placeholder="Password 6+ chars"><input id="sname" placeholder="Username (unique) ex: giri_tiru">
-<button class="btn" onclick="signup()">Create Account - Safe</button>
-<p style="margin-top:12px;font-size:13px;color:#888;">Have account? <span class="link" onclick="toggleAuth()">Log in</span></p>
+<input id="semail" placeholder="Email"><input id="spass" type="password" placeholder="Pass 6+"><input id="sname" placeholder="Username unique">
+<button class="btn" onclick="MOD_AUTH.signup()">Sign up - World Safe</button>
+<p style="margin-top:12px;font-size:13px;color:#888;">Have? <span class="link" onclick="MOD_AUTH.toggle()">Log in</span></p>
 </div>
 </div>
 </div>
 
-<!-- MAIN -->
+<!-- MODULE: APP -->
 <div id="mainBox" style="display:none;">
-<div class="header"><div class="logo" style="font-size:32px;">Pixoro</div><div style="display:flex;gap:14px;align-items:center;"><span id="topUser" style="font-size:12px;color:#888;"></span><span onclick="logout()" style="cursor:pointer;font-size:12px;">Logout</span></div></div>
+<div class="header"><div class="logo" style="font-size:32px;">Pixoro</div><div style="display:flex;gap:12px;"><span onclick="APP.showPage('notifications')" style="cursor:pointer;">🔔</span><span onclick="APP.showPage('chat')" style="cursor:pointer;">💬</span><span onclick="MOD_AUTH.logout()" style="cursor:pointer;font-size:12px;color:#888;">Logout</span></div></div>
 
-<!-- FEED -->
+<!-- MODULE: STORIES + FEED -->
 <div id="feedPage" class="page">
-<p style="text-align:center;color:#666;margin-top:80px;">Feed coming... Profile check pannu da 👇</p>
+<!-- STORIES BAR -->
+<div class="story-bar" id="storyBar"><div class="story"><img src="https://i.pravatar.cc/100?u=you"><br><small style="font-size:10px;">Your story</small></div></div>
+<!-- FEED TABS -->
+<div class="feed-tabs"><button class="active" onclick="MOD_FEED.switchTab('foryou',this)">For You</button><button onclick="MOD_FEED.switchTab('following',this)">Following</button><button onclick="MOD_FEED.switchTab('trending',this)">Trending</button></div>
+<div id="feedList"></div>
 </div>
 
-<!-- SEARCH / FOLLOW -->
+<!-- MODULE: REELS -->
+<div id="reelsPage" class="page" style="display:none;">
+<div id="reelsList"></div>
+</div>
+
+<!-- MODULE: SEARCH / DISCOVERY -->
 <div id="searchPage" class="page" style="display:none;">
-<div style="padding:12px;"><input id="searchInput" placeholder="Search username..." oninput="searchUser()"></div>
+<div style="padding:12px;position:sticky;top:60px;background:#000;z-index:10;"><input id="searchInput" placeholder="Search user, hashtag..." oninput="MOD_DISCOVERY.search()"></div>
 <div id="searchResult"></div>
 </div>
 
-<!-- PROFILE -->
-<div id="profilePage" class="page" style="display:none;">
-<div class="profile-top">
-<img id="pAvatar" class="avatar" src="https://i.pravatar.cc/150?u=default">
-<div class="stat">
-<div><b id="pPosts">0</b><span>Posts</span></div>
-<div><b id="pFollowers">0</b><span>Followers</span></div>
-<div><b id="pFollowing">0</b><span>Following</span></div>
-</div>
-</div>
-<div style="padding:0 14px;">
-<b id="pUsername">@giri</b>
-<p id="pBio" style="font-size:13px;color:#ccc;margin-top:4px;">Tiruchuli to World 🌍</p>
-<button class="btn" style="background:#222;border:1px solid #333;margin-top:12px;" onclick="openEdit()">Edit Profile - Photo, Bio</button>
-<div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding:10px;border:1px solid #222;border-radius:8px;">
-<div><b style="font-size:13px;">Private Account</b><br><small style="color:#888;font-size:11px;">Only followers can see</small></div>
-<div class="toggle" id="privateToggle" onclick="togglePrivate()"><i></i></div>
-</div>
-</div>
+<!-- MODULE: CHAT -->
+<div id="chatPage" class="page" style="display:none;">
+<div style="padding:14px;border-bottom:1px solid #222;"><b>Messages</b></div>
+<div id="chatList" style="padding:14px;color:#666;font-size:13px;">No messages yet - Search la user ah follow pannitu chat pannu da</div>
 </div>
 
-<!-- EDIT PROFILE MODAL -->
+<!-- MODULE: NOTIFICATIONS -->
+<div id="notificationsPage" class="page" style="display:none;">
+<div style="padding:14px;border-bottom:1px solid #222;"><b>Notifications 🔔</b></div>
+<div id="notifList" style="padding:14px;color:#666;font-size:13px;">Likes, Follows, Comments notifications inga varum da</div>
+</div>
+
+<!-- MODULE: PROFILE -->
+<div id="profilePage" class="page" style="display:none;">
+<div style="padding:20px 16px;display:flex;gap:18px;align-items:center;">
+<img id="pAvatar" class="avatar" src="">
+<div style="flex:1;display:flex;justify-content:space-around;text-align:center;"><div><b id="pPosts">0</b><br><span style="font-size:11px;color:#888;">posts</span></div><div><b id="pFollowers">0</b><br><span style="font-size:11px;color:#888;">followers</span></div><div><b id="pFollowing">0</b><br><span style="font-size:11px;color:#888;">following</span></div></div>
+</div>
+<div style="padding:0 16px;">
+<b id="pUsername">@user</b><p id="pBio" style="font-size:13px;color:#ccc;margin-top:4px;"></p>
+<button class="btn" style="background:#222;border:1px solid #333;margin-top:12px;" onclick="MOD_PROFILE.openEdit()">Edit Profile - Photo, Bio, Private/Public</button>
+</div>
+<div class="feed-tabs" style="margin-top:16px;"><button class="active">Posts</button><button>Reels</button><button>Saved 🔖</button></div>
+<div id="profilePosts"></div>
+</div>
+
+<!-- MODULE: EDIT PROFILE -->
 <div id="editBox" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;">
-<div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #222;"><button onclick="editBox.style.display='none'" style="background:none;border:none;color:#fff;">✕</button><b>Edit Profile</b><button onclick="saveEdit()" style="background:none;border:none;color:#0095f6;font-weight:700;">Done</button></div>
-<div style="padding:20px;text-align:center;">
-<img id="editAvatar" class="avatar" style="width:90px;height:90px;margin-bottom:12px;" src="">
-<input type="file" id="avatarFile" accept="image/*" style="display:none;" onchange="previewAvatar(event)">
-<button class="link" style="background:none;border:none;" onclick="avatarFile.click()">Change Profile Photo</button>
+<div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #222;"><button onclick="editBox.style.display='none'" style="background:none;border:none;color:#fff;">✕</button><b>Edit Profile</b><button onclick="MOD_PROFILE.save()" style="background:none;border:none;color:#0095f6;font-weight:700;">Done</button></div>
+<div style="padding:20px;text-align:center;max-width:500px;margin:auto;">
+<img id="editAvatar" class="avatar" style="width:88px;height:88px;margin-bottom:10px;"><br>
+<input type="file" id="avatarFile" accept="image/*" style="display:none;" onchange="MOD_PROFILE.preview(event)">
+<button onclick="avatarFile.click()" style="background:none;border:none;color:#0095f6;font-size:13px;">Change photo</button>
 <div style="text-align:left;margin-top:20px;">
-<label style="font-size:12px;color:#888;">Username (unique)</label><input id="editUsername">
-<label style="font-size:12px;color:#888;">Bio</label><textarea id="editBio" rows="3" placeholder="Bio..."></textarea>
+<label style="font-size:11px;color:#888;">Username (unique)</label><input id="editUsername">
+<label style="font-size:11px;color:#888;">Bio</label><textarea id="editBio" rows="3"></textarea>
+<label style="font-size:11px;color:#888;">Private Account</label><div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #222;border-radius:8px;margin-top:6px;"><span style="font-size:12px;">Only followers can see</span><div id="privateToggle" style="width:44px;height:24px;background:#333;border-radius:20px;position:relative;cursor:pointer;" onclick="MOD_PROFILE.togglePrivate()"><i style="position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s;display:block;"></i></div></div>
 </div>
 </div>
 </div>
 
 <div class="bottom">
-<button id="bFeed" class="active" onclick="showPage('feed')">⌂</button>
-<button id="bSearch" onclick="showPage('search')">⌕</button>
-<button id="bProfile" onclick="showPage('profile')">◯</button>
+<button id="bFeed" class="active" onclick="APP.showPage('feed')">⌂</button>
+<button id="bReels" onclick="APP.showPage('reels')">🎬</button>
+<button onclick="APP.openUpload()" style="color:#fff;font-size:28px;">+</button>
+<button id="bSearch" onclick="APP.showPage('search')">⌕</button>
+<button id="bProfile" onclick="APP.showPage('profile')">◯</button>
 </div>
+</div>
+
+<!-- MODULE: UPLOAD (Camera/Photo/Video) -->
+<input type="file" id="postFile" accept="image/*,video/*" style="display:none;">
+<div id="uploadBox" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;display:none;">
+<div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #222;"><button onclick="uploadBox.style.display='none'" style="background:none;border:none;color:#fff;">✕</button><b id="uploadTitle">New post</b><button onclick="MOD_UPLOAD.share()" style="background:none;border:none;color:#0095f6;font-weight:700;">Share</button></div>
+<div style="width:100%;aspect-ratio:4/5;background:#111;display:flex;align-items:center;justify-content:center;"><img id="uploadPreview" style="max-width:100%;max-height:100%;display:none;"><video id="uploadVideo" style="max-width:100%;max-height:100%;display:none;" controls></video></div>
+<div style="padding:14px;"><textarea id="uploadCaption" placeholder="Caption, hashtags..."></textarea><p style="font-size:11px;color:#666;margin-top:8px;">Will save to: <span id="uploadType">Posts</span> • Supabase Storage</p></div>
 </div>
 
 <script>
+// ========== CONFIG ==========
 const SUPABASE_URL='https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPABASE_KEY='sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let currentUser=null, currentProfile=null;
-let isLogin=true;
-function toggleAuth(){isLogin=!isLogin;loginForm.style.display=isLogin?'block':'none';signupForm.style.display=isLogin?'none':'block';}
-function showMsg(t,ok=false){errBox.style.display=ok?'none':'block';okBox.style.display=ok?'block':'none';(ok?okBox:errBox).innerText=t;}
-function hideMsg(){errBox.style.display='none';okBox.style.display='none';}
 
-async function signup(){
- let email=semail.value.trim(), pass=spass.value.trim(), username=sname.value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
- if(!email||!pass||!username){showMsg('Email + Pass + Username kudu da');return;}
- if(username.length<3){showMsg('Username 3+ chars da');return;}
- showMsg('Checking unique username...',true);
- // check unique
- let {data:exists}=await supabaseClient.from('profiles').select('username').eq('username',username).maybeSingle();
- if(exists){showMsg('Username already taken da - vera try pannu da!');return;}
- try{
+// ========== MODULE: APP CORE ==========
+const APP={
+ showPage(p){
+  ['feed','reels','search','chat','notifications','profile'].forEach(x=>{
+   let el=document.getElementById(x+'Page'); if(el) el.style.display=x===p?'block':'none';
+   let b=document.getElementById('b'+x.charAt(0).toUpperCase()+x.slice(1)); if(b) b.className=p===x?'active':'';
+  });
+  if(p==='feed') MOD_FEED.load();
+  if(p==='profile') MOD_PROFILE.load();
+  if(p==='search') MOD_DISCOVERY.search();
+  if(p==='reels') MOD_REELS.load();
+ },
+ openUpload(){
+  let t=prompt('Enna upload pannalam da?\n1=Post (Photo)\n2=Reel (Video)\n3=Story (24hr)','1');
+  let type=t==='2'?'reels':t==='3'?'stories':'posts';
+  document.getElementById('uploadType').innerText=type;
+  document.getElementById('uploadBox').dataset.type=type;
+  document.getElementById('postFile').accept=type==='reels'?'video/*':'image/*';
+  document.getElementById('postFile').click();
+ }
+};
+
+// ========== MODULE: AUTH ==========
+const MOD_AUTH={
+ isLogin:true,
+ toggle(){this.isLogin=!this.isLogin;loginForm.style.display=this.isLogin?'block':'none';signupForm.style.display=this.isLogin?'none':'block';},
+ async signup(){
+  let email=semail.value.trim(), pass=spass.value.trim(), username=sname.value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+  if(!email||!pass||!username){errBox.style.display='block';errBox.innerText='All fields kudu da';return;}
+  let {data:exists}=await supabaseClient.from('profiles').select('username').eq('username',username).maybeSingle();
+  if(exists){errBox.style.display='block';errBox.innerText='Username taken da';return;}
   let {data,error}=await supabaseClient.auth.signUp({email,password:pass,options:{data:{username}}});
-  if(error) throw error;
-  if(data.user){
-   await supabaseClient.from('profiles').insert({id:data.user.id,username,bio:'Tiruchuli to World 🌍'});
-  }
-  showMsg('✅ Account created da! Login pannu da Giri! 🔒',true);
-  setTimeout(()=>{toggleAuth();email.value=email;},1200);
- }catch(e){showMsg('❌ '+e.message);}
-}
-
-async function login(){
- let e=email.value.trim(), p=pass.value.trim();
- if(!e||!p){showMsg('Email+Pass kudu da');return;}
- mainBtn.innerText='Safe login...';
- try{
+  if(error){errBox.style.display='block';errBox.innerText=error.message;return;}
+  if(data.user) await supabaseClient.from('profiles').insert({id:data.user.id,username,bio:'Tiruchuli to World 🌍'});
+  okBox.style.display='block';okBox.innerText='✅ Created da! Login pannu da';
+  setTimeout(()=>{this.toggle();email.value=email;},1000);
+ },
+ async login(){
+  let e=email.value.trim(), p=pass.value.trim();
+  mainBtn.innerText='Checking...';
   let {data,error}=await supabaseClient.auth.signInWithPassword({email:e,password:p});
-  if(error) throw error;
-  currentUser=data.user;
-  await loadProfile();
-  authBox.style.display='none';mainBox.style.display='block';
- }catch(err){showMsg('❌ '+err.message);mainBtn.innerText='Log in';}
-}
+  if(error){errBox.style.display='block';errBox.innerText=error.message;mainBtn.innerText='Log in';return;}
+  currentUser=data.user; authBox.style.display='none'; mainBox.style.display='block'; await MOD_PROFILE.load(); APP.showPage('feed');
+ },
+ logout(){supabaseClient.auth.signOut();location.reload();}
+};
 
-async function loadProfile(){
- if(!currentUser){ let {data}=await supabaseClient.auth.getSession(); currentUser=data.session?.user; if(!currentUser) return; }
- let {data:profile}=await supabaseClient.from('profiles').select('*').eq('id',currentUser.id).single();
- if(!profile){ // create if missing
-   let uname=currentUser.user_metadata?.username||currentUser.email.split('@')[0];
-   let {data:newP}=await supabaseClient.from('profiles').insert({id:currentUser.id,username:uname}).select().single();
-   profile=newP;
+// ========== MODULE: FEED ==========
+const MOD_FEED={
+ currentTab:'foryou',
+ switchTab(tab,btn){
+  this.currentTab=tab; document.querySelectorAll('.feed-tabs button').forEach(b=>b.className=''); btn.className='active'; this.load();
+ },
+ async load(){
+  let {data:posts}=await supabaseClient.from('posts').select('*, profiles(username,avatar_url)').order('created_at',{ascending:false}).limit(20);
+  let list=document.getElementById('feedList');
+  if(!posts||posts.length===0){list.innerHTML='<p style="text-align:center;color:#555;margin-top:40px;">No posts da - + thottu post podu da Giri! 📸</p>';return;}
+  list.innerHTML=posts.map(p=>`<div class="post"><div class="post-top"><img src="${p.profiles?.avatar_url||`https://i.pravatar.cc/100?u=${p.profiles?.username}`}" style="width:32px;height:32px;border-radius:50%;"><b style="font-size:13px;">${p.profiles?.username||'user'}</b></div><img class="post-img" src="${p.image_url}"><div style="padding:10px 14px;display:flex;gap:14px;font-size:20px;"><span>❤️ ${p.likes_count||0}</span><span>💬</span><span>↗ Share</span><span style="margin-left:auto;">🔖 Save</span></div><div style="padding:0 14px 12px 14px;font-size:13px;"><b>${p.profiles?.username}</b> ${p.caption||''}</div></div>`).join('');
  }
- currentProfile=profile;
- pUsername.innerText='@'+profile.username;
- pBio.innerText=profile.bio||'';
- pAvatar.src=profile.avatar_url||`https://i.pravatar.cc/150?u=${profile.username}`;
- topUser.innerText='@'+profile.username;
- privateToggle.className='toggle'+(profile.is_private?' on':'');
- // followers count
- let {count:fc}=await supabaseClient.from('follows').select('*',{count:'exact',head:true}).eq('following_id',currentUser.id);
- let {count:fgc}=await supabaseClient.from('follows').select('*',{count:'exact',head:true}).eq('follower_id',currentUser.id);
- pFollowers.innerText=fc||0; pFollowing.innerText=fgc||0;
-}
+};
 
-function showPage(p){
- feedPage.style.display=p=='feed'?'block':'none';
- searchPage.style.display=p=='search'?'block':'none';
- profilePage.style.display=p=='profile'?'block':'none';
- bFeed.className=p=='feed'?'active':''; bSearch.className=p=='search'?'active':''; bProfile.className=p=='profile'?'active':'';
- if(p=='profile') loadProfile();
- if(p=='search') searchUser();
-}
-
-async function searchUser(){
- let q=searchInput.value.trim().toLowerCase();
- let {data:profiles}=await supabaseClient.from('profiles').select('*').limit(20);
- if(q) profiles=profiles.filter(pr=>pr.username.includes(q));
- let html='';
- for(let pr of profiles){
-  if(pr.id===currentUser?.id) continue;
-  let {data:isFollowing}=await supabaseClient.from('follows').select('id').eq('follower_id',currentUser.id).eq('following_id',pr.id).maybeSingle();
-  let btn=isFollowing?`<button class="followBtn unfollow" onclick="unfollow('${pr.id}')">Following</button>`:`<button class="followBtn follow" onclick="follow('${pr.id}')">Follow</button>`;
-  html+=`<div class="user-row"><div style="display:flex;gap:10px;align-items:center;"><img src="${pr.avatar_url||`https://i.pravatar.cc/100?u=${pr.username}`}"><div><b style="font-size:13px;">${pr.username}</b><br><small style="color:#888;">${pr.bio?.substring(0,20)||''}${pr.is_private?' 🔒':''}</small></div></div>${btn}</div>`;
+// ========== MODULE: REELS ==========
+const MOD_REELS={
+ async load(){
+  let {data:reels}=await supabaseClient.from('reels').select('*, profiles(username)').order('created_at',{ascending:false}).limit(10);
+  let el=document.getElementById('reelsList');
+  if(!reels||reels.length===0){el.innerHTML='<p style="text-align:center;color:#555;margin-top:80px;">No reels da - + thottu Reel upload pannu da 🎬</p>';return;}
+  el.innerHTML=reels.map(r=>`<div class="reel"><video src="${r.video_url}" loop autoplay muted></video><div style="position:absolute;bottom:20px;left:14px;right:14px;"><b>@${r.profiles?.username}</b><br><small>${r.caption||''}</small><br><small>❤️ ${r.likes_count} • 💬 • ↗ • Follow</small></div></div>`).join('');
  }
- searchResult.innerHTML=html||'<p style="text-align:center;color:#555;margin-top:20px;">No users da</p>';
-}
+};
 
-async function follow(id){
- await supabaseClient.from('follows').insert({follower_id:currentUser.id,following_id:id});
- searchUser(); loadProfile();
-}
-async function unfollow(id){
- await supabaseClient.from('follows').delete().eq('follower_id',currentUser.id).eq('following_id',id);
- searchUser(); loadProfile();
-}
+// ========== MODULE: DISCOVERY ==========
+const MOD_DISCOVERY={
+ async search(){
+  let q=document.getElementById('searchInput').value.toLowerCase();
+  let {data:profiles}=await supabaseClient.from('profiles').select('*').limit(20);
+  if(!profiles) return;
+  if(q) profiles=profiles.filter(p=>p.username.includes(q));
+  let html='';
+  for(let pr of profiles){
+   if(pr.id===currentUser?.id) continue;
+   let {data:isF}=await supabaseClient.from('follows').select('id').eq('follower_id',currentUser.id).eq('following_id',pr.id).maybeSingle();
+   let btn=isF?`<button style="padding:6px 14px;border-radius:8px;background:#333;color:#fff;border:none;" onclick="MOD_DISCOVERY.unfollow('${pr.id}')">Following</button>`:`<button style="padding:6px 14px;border-radius:8px;background:#0095f6;color:#fff;border:none;" onclick="MOD_DISCOVERY.follow('${pr.id}')">Follow</button>`;
+   html+=`<div style="padding:12px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #111;"><div style="display:flex;gap:10px;align-items:center;"><img src="${pr.avatar_url||`https://i.pravatar.cc/100?u=${pr.username}`}" style="width:38px;height:38px;border-radius:50%;"><div><b style="font-size:13px;">${pr.username}</b><br><small style="color:#888;">${pr.bio?.substring(0,20)} ${pr.is_private?'🔒':''}</small></div></div>${btn}</div>`;
+  }
+  document.getElementById('searchResult').innerHTML=html;
+ },
+ async follow(id){await supabaseClient.from('follows').insert({follower_id:currentUser.id,following_id:id});this.search();},
+ async unfollow(id){await supabaseClient.from('follows').delete().eq('follower_id',currentUser.id).eq('following_id',id);this.search();}
+};
 
-async function togglePrivate(){
- let newVal=!currentProfile.is_private;
- await supabaseClient.from('profiles').update({is_private:newVal}).eq('id',currentUser.id);
- currentProfile.is_private=newVal;
- privateToggle.className='toggle'+(newVal?' on':'');
-}
-
-function openEdit(){
- editBox.style.display='block';
- editAvatar.src=pAvatar.src;
- editUsername.value=currentProfile.username;
- editBio.value=currentProfile.bio||'';
-}
-let newAvatarUrl=null;
-function previewAvatar(e){
- let file=e.target.files[0]; if(!file)return;
- let reader=new FileReader(); reader.onload=ev=>{editAvatar.src=ev.target.result; newAvatarUrl=ev.target.result;}; reader.readAsDataURL(file);
-}
-async function saveEdit(){
- let uname=editUsername.value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
- let bio=editBio.value.trim();
- if(uname!==currentProfile.username){
-  let {data:exists}=await supabaseClient.from('profiles').select('id').eq('username',uname).maybeSingle();
-  if(exists){alert('Username taken da - vera username podu da Giri!');return;}
+// ========== MODULE: PROFILE ==========
+const MOD_PROFILE={
+ async load(){
+  if(!currentUser){let {data}=await supabaseClient.auth.getSession();currentUser=data.session?.user;if(!currentUser)return;}
+  let {data:profile}=await supabaseClient.from('profiles').select('*').eq('id',currentUser.id).single();
+  if(!profile){let uname=currentUser.user_metadata?.username||currentUser.email.split('@')[0];let {data:newP}=await supabaseClient.from('profiles').insert({id:currentUser.id,username:uname}).select().single();profile=newP;}
+  currentProfile=profile;
+  pUsername.innerText='@'+profile.username; pBio.innerText=profile.bio||''; pAvatar.src=profile.avatar_url||`https://i.pravatar.cc/150?u=${profile.username}`;
+  privateToggle.firstChild.style.left=profile.is_private?'23px':'3px'; privateToggle.style.background=profile.is_private?'#0095f6':'#333';
+  let {count:fc}=await supabaseClient.from('follows').select('*',{count:'exact',head:true}).eq('following_id',currentUser.id);
+  let {count:fgc}=await supabaseClient.from('follows').select('*',{count:'exact',head:true}).eq('follower_id',currentUser.id);
+  let {count:pc}=await supabaseClient.from('posts').select('*',{count:'exact',head:true}).eq('user_id',currentUser.id);
+  pFollowers.innerText=fc||0; pFollowing.innerText=fgc||0; pPosts.innerText=pc||0;
+  let {data:myPosts}=await supabaseClient.from('posts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  document.getElementById('profilePosts').innerHTML=myPosts?.map(p=>`<img src="${p.image_url}" style="width:33.33%;aspect-ratio:1/1;object-fit:cover;border:1px solid #000;">`).join('')||'';
+ },
+ openEdit(){
+  editBox.style.display='block'; editAvatar.src=pAvatar.src; editUsername.value=currentProfile.username; editBio.value=currentProfile.bio||'';
+ },
+ newAvatar:null,
+ preview(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{editAvatar.src=ev.target.result;MOD_PROFILE.newAvatar=ev.target.result;};r.readAsDataURL(f);},
+ togglePrivate(){currentProfile.is_private=!currentProfile.is_private;privateToggle.firstChild.style.left=currentProfile.is_private?'23px':'3px';privateToggle.style.background=currentProfile.is_private?'#0095f6':'#333';},
+ async save(){
+  let uname=editUsername.value.trim().toLowerCase().replace(/[^a-z0-9_]/g,''), bio=editBio.value.trim();
+  let avatar_url=currentProfile.avatar_url;
+  if(MOD_PROFILE.newAvatar){
+   let blob=await (await fetch(MOD_PROFILE.newAvatar)).blob();
+   let name=`${currentUser.id}_${Date.now()}.jpg`;
+   await supabaseClient.storage.from('avatars').upload(name,blob,{upsert:true});
+   let {data}=supabaseClient.storage.from('avatars').getPublicUrl(name); avatar_url=data.publicUrl;
+  }
+  await supabaseClient.from('profiles').update({username:uname,bio,avatar_url,is_private:currentProfile.is_private}).eq('id',currentUser.id);
+  editBox.style.display='none';MOD_PROFILE.newAvatar=null;await MOD_PROFILE.load();
  }
- let avatar_url=currentProfile.avatar_url;
- if(newAvatarUrl){
-  // upload to storage
-  try{
-   let blob=await (await fetch(newAvatarUrl)).blob();
-   let fileName=`${currentUser.id}_${Date.now()}.jpg`;
-   let {error}=await supabaseClient.storage.from('avatars').upload(fileName,blob,{upsert:true});
-   if(!error){ let {data}=supabaseClient.storage.from('avatars').getPublicUrl(fileName); avatar_url=data.publicUrl; }
-  }catch{}
+};
+
+// ========== MODULE: UPLOAD ==========
+const MOD_UPLOAD={
+ async share(){
+  let type=document.getElementById('uploadBox').dataset.type||'posts';
+  let caption=document.getElementById('uploadCaption').value;
+  let file=document.getElementById('postFile').files[0];
+  if(!file){alert('File select pannu da');return;}
+  document.getElementById('uploadTitle').innerText='Uploading...';
+  let bucket=type, fileName=`${currentUser.id}_${Date.now()}_${file.name}`;
+  let {error}=await supabaseClient.storage.from(bucket).upload(fileName,file);
+  if(error){alert('Upload error: '+error.message);return;}
+  let {data:urlData}=supabaseClient.storage.from(bucket).getPublicUrl(fileName);
+  let url=urlData.publicUrl;
+  if(type==='posts') await supabaseClient.from('posts').insert({user_id:currentUser.id,image_url:url,caption});
+  if(type==='reels') await supabaseClient.from('reels').insert({user_id:currentUser.id,video_url:url,caption});
+  if(type==='stories') await supabaseClient.from('stories').insert({user_id:currentUser.id,media_url:url});
+  document.getElementById('uploadBox').style.display='none';
+  document.getElementById('uploadTitle').innerText='New post';
+  document.getElementById('uploadCaption').value='';
+  APP.showPage(type==='reels'?'reels':'feed');
  }
- await supabaseClient.from('profiles').update({username:uname,bio,avatar_url}).eq('id',currentUser.id);
- editBox.style.display='none'; newAvatarUrl=null; await loadProfile();
-}
+};
 
-function logout(){supabaseClient.auth.signOut();location.reload();}
+// FILE INPUT HANDLER
+document.getElementById('postFile').addEventListener('change',e=>{
+ let file=e.target.files[0];if(!file)return;
+ let type=document.getElementById('uploadBox').dataset.type;
+ let preview=document.getElementById('uploadPreview'), video=document.getElementById('uploadVideo');
+ if(file.type.startsWith('video')){preview.style.display='none';video.style.display='block';video.src=URL.createObjectURL(file);}
+ else{video.style.display='none';preview.style.display='block';preview.src=URL.createObjectURL(file);}
+ document.getElementById('uploadBox').style.display='block';
+});
 
-(async()=>{let {data}=await supabaseClient.auth.getSession();if(data.session){currentUser=data.session.user;authBox.style.display='none';mainBox.style.display='block';await loadProfile();showPage('profile');}})();
+// AUTO LOGIN
+(async()=>{let {data}=await supabaseClient.auth.getSession();if(data.session){currentUser=data.session.user;authBox.style.display='none';mainBox.style.display='block';await MOD_PROFILE.load();APP.showPage('feed');}})();
 </script>
 </body>
 </html>
