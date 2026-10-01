@@ -1,150 +1,248 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXORO - World Safe</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIXORO - PRO</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,Segoe UI}
-body{background:#000;color:#fff}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,Segoe UI}body{background:#000;color:#fff}
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.login-card{width:100%;max-width:360px;border:1px solid #262626;padding:24px;text-align:center;background:#000}
-.logo{font-family:'Grand Hotel',cursive;font-size:54px}
-input{width:100%;padding:12px;background:#121212;border:1px solid #333;border-radius:3px;color:#fff;margin:6px 0;outline:none}
+.login-card{width:100%;max-width:360px;border:1px solid #262626;padding:24px;text-align:center}
+.logo{font-family:'Grand Hotel',cursive;font-size:52px}
+input,textarea{width:100%;padding:11px;background:#121212;border:1px solid #333;border-radius:6px;color:#fff;margin:5px 0;outline:none}
 .btn{width:100%;background:#0095f6;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:700;margin-top:10px;cursor:pointer}
-.btn2{background:none;border:1px solid #333;color:#fff}
 .link{color:#0095f6;font-size:13px;font-weight:600;cursor:pointer}
-.err{background:#2a0a0a;border:1px solid #ff3040;color:#ff8a8a;padding:10px;border-radius:6px;margin:8px 0;font-size:12px;display:none;text-align:left;word-break:break-word}
+.err{background:#2a0a0a;border:1px solid #ff3040;color:#ff8a8a;padding:10px;border-radius:6px;margin:8px 0;font-size:12px;display:none}
 .ok{background:#0a2a0a;border:1px solid #00ff88;color:#88ffaa;padding:10px;border-radius:6px;margin:8px 0;font-size:12px;display:none}
-.divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:#555;font-size:12px}.divider div{flex:1;height:1px;background:#333}
 .header{height:60px;padding:0 14px;position:fixed;top:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);z-index:100;background:#000;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
-.feed{margin:auto;max-width:500px;padding-top:60px;padding-bottom:70px}
-.post{border-bottom:1px solid #1a1a1a}
-.post-top{padding:10px 12px;display:flex;gap:10px;align-items:center}
-.post-top img{width:32px;height:32px;border-radius:50%}
-.post-img{width:100%;aspect-ratio:4/5;object-fit:cover;background:#111;display:block}
-.post-actions{padding:10px 14px;display:flex;gap:16px;font-size:22px}
-.bottom{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#000;height:56px;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222}
-.acc-list{max-height:200px;overflow:auto;text-align:left;margin-top:10px}
-.acc-item{padding:10px;border:1px solid #222;border-radius:8px;margin:6px 0;display:flex;justify-content:space-between;align-items:center}
+.page{margin:auto;max-width:500px;padding-top:60px;padding-bottom:70px}
+.bottom{position:fixed;bottom:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);background:#000;height:56px;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #222;z-index:100}
+.bottom button{background:none;border:none;color:#888;font-size:22px;cursor:pointer}.bottom button.active{color:#fff}
+.profile-top{padding:20px 14px;display:flex;gap:18px;align-items:center}
+.avatar{width:86px;height:86px;border-radius:50%;object-fit:cover;background:#222;border:1px solid #333}
+.stat{flex:1;display:flex;justify-content:space-around;text-align:center}
+.stat b{display:block;font-size:18px}.stat span{font-size:12px;color:#888}
+.toggle{width:44px;height:24px;background:#333;border-radius:20px;position:relative;cursor:pointer;transition:.2s}.toggle.on{background:#0095f6}.toggle i{position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s}.toggle.on i{left:23px}
+.user-row{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #111}
+.user-row img{width:36px;height:36px;border-radius:50%}
+.followBtn{padding:6px 14px;border-radius:8px;font-weight:700;font-size:12px;border:none;cursor:pointer}.followBtn.follow{background:#0095f6;color:#fff}.followBtn.unfollow{background:#222;color:#fff;border:1px solid #333}
 </style>
 </head>
 <body>
 
+<!-- AUTH -->
 <div id="authBox" class="login-wrap">
 <div class="login-card">
 <div class="logo">Pixoro</div>
-<p style="color:#666;font-size:12px;margin:0 0 18px 0;">TIRUCHULI TO WORLD 🌍 - 100% SAFE</p>
-<div id="errBox" class="err"></div>
-<div id="okBox" class="ok"></div>
-
+<p style="color:#666;font-size:11px;margin-bottom:14px;">TIRUCHULI TO WORLD 🌍 - PRO</p>
+<div id="errBox" class="err"></div><div id="okBox" class="ok"></div>
 <div id="loginForm">
-<input id="email" type="email" placeholder="Email - safe da">
-<input id="pass" type="password" placeholder="Password (safe encrypted)">
-<button class="btn" id="mainBtn" onclick="handleAuth()">Log in - Safe</button>
-<div class="divider"><div></div>OR<div></div></div>
-<p style="font-size:13px;color:#888;">New here? <span class="link" onclick="toggle()">Create Account - World Safe 🌍</span></p>
+<input id="email" placeholder="Email"><input id="pass" type="password" placeholder="Password">
+<button class="btn" id="mainBtn" onclick="login()">Log in</button>
+<p style="margin-top:12px;font-size:13px;color:#888;">No account? <span class="link" onclick="toggleAuth()">Sign up - Real Safe</span></p>
 </div>
-
 <div id="signupForm" style="display:none;">
-<input id="semail" type="email" placeholder="New Email">
-<input id="spass" type="password" placeholder="Password 6+ chars - safe">
-<input id="sname" type="text" placeholder="Username">
-<button class="btn" onclick="handleSignup()">Sign Up - Safe & Real</button>
-<p style="font-size:13px;color:#888;margin-top:12px;">Have account? <span class="link" onclick="toggle()">Log in - Instagram maari</span></p>
+<input id="semail" placeholder="Email"><input id="spass" type="password" placeholder="Password 6+ chars"><input id="sname" placeholder="Username (unique) ex: giri_tiru">
+<button class="btn" onclick="signup()">Create Account - Safe</button>
+<p style="margin-top:12px;font-size:13px;color:#888;">Have account? <span class="link" onclick="toggleAuth()">Log in</span></p>
 </div>
-
-<div id="accountList" style="display:none;">
-<p style="font-size:13px;margin:14px 0 6px 0;font-weight:700;text-align:left;">👤 Saved Accounts (Add Account):</p>
-<div id="accItems" class="acc-list"></div>
-<button class="btn btn2" onclick="document.getElementById('accountList').style.display='none'">Close</button>
-</div>
-
-<p style="font-size:11px;color:#444;margin-top:16px;">🔒 Supabase Encrypted - Instagram mari safe da!</p>
-<p style="font-size:11px;color:#666;margin-top:8px;"><span class="link" onclick="showAccounts()">Add Account / Switch ↻</span></p>
 </div>
 </div>
 
+<!-- MAIN -->
 <div id="mainBox" style="display:none;">
-<div class="header"><div class="logo" style="font-size:32px;">Pixoro</div><div style="display:flex;gap:14px;"><span onclick="showAccounts()" style="font-size:22px;cursor:pointer;">👤+</span><span onclick="logout()" style="cursor:pointer;">Logout</span></div></div>
-<div id="feed" class="feed"></div>
-<div class="bottom">
-<button style="color:#fff">⌂</button>
-<button onclick="addPost()" style="color:#fff;font-size:30px;cursor:pointer;">+</button>
-<button onclick="logout()">◯</button>
+<div class="header"><div class="logo" style="font-size:32px;">Pixoro</div><div style="display:flex;gap:14px;align-items:center;"><span id="topUser" style="font-size:12px;color:#888;"></span><span onclick="logout()" style="cursor:pointer;font-size:12px;">Logout</span></div></div>
+
+<!-- FEED -->
+<div id="feedPage" class="page">
+<p style="text-align:center;color:#666;margin-top:80px;">Feed coming... Profile check pannu da 👇</p>
+</div>
+
+<!-- SEARCH / FOLLOW -->
+<div id="searchPage" class="page" style="display:none;">
+<div style="padding:12px;"><input id="searchInput" placeholder="Search username..." oninput="searchUser()"></div>
+<div id="searchResult"></div>
+</div>
+
+<!-- PROFILE -->
+<div id="profilePage" class="page" style="display:none;">
+<div class="profile-top">
+<img id="pAvatar" class="avatar" src="https://i.pravatar.cc/150?u=default">
+<div class="stat">
+<div><b id="pPosts">0</b><span>Posts</span></div>
+<div><b id="pFollowers">0</b><span>Followers</span></div>
+<div><b id="pFollowing">0</b><span>Following</span></div>
+</div>
+</div>
+<div style="padding:0 14px;">
+<b id="pUsername">@giri</b>
+<p id="pBio" style="font-size:13px;color:#ccc;margin-top:4px;">Tiruchuli to World 🌍</p>
+<button class="btn" style="background:#222;border:1px solid #333;margin-top:12px;" onclick="openEdit()">Edit Profile - Photo, Bio</button>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding:10px;border:1px solid #222;border-radius:8px;">
+<div><b style="font-size:13px;">Private Account</b><br><small style="color:#888;font-size:11px;">Only followers can see</small></div>
+<div class="toggle" id="privateToggle" onclick="togglePrivate()"><i></i></div>
+</div>
 </div>
 </div>
 
-<input type="file" id="fileInput" accept="image/*" style="display:none;">
-<div id="uploadBox" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;">
-<div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #222;">
-<button onclick="uploadBox.style.display='none'" style="background:none;border:none;color:#fff;font-size:20px;">✕</button><b>New post</b><button onclick="doPost()" style="background:none;border:none;color:#0095f6;font-weight:700;">Share</button>
+<!-- EDIT PROFILE MODAL -->
+<div id="editBox" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;">
+<div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #222;"><button onclick="editBox.style.display='none'" style="background:none;border:none;color:#fff;">✕</button><b>Edit Profile</b><button onclick="saveEdit()" style="background:none;border:none;color:#0095f6;font-weight:700;">Done</button></div>
+<div style="padding:20px;text-align:center;">
+<img id="editAvatar" class="avatar" style="width:90px;height:90px;margin-bottom:12px;" src="">
+<input type="file" id="avatarFile" accept="image/*" style="display:none;" onchange="previewAvatar(event)">
+<button class="link" style="background:none;border:none;" onclick="avatarFile.click()">Change Profile Photo</button>
+<div style="text-align:left;margin-top:20px;">
+<label style="font-size:12px;color:#888;">Username (unique)</label><input id="editUsername">
+<label style="font-size:12px;color:#888;">Bio</label><textarea id="editBio" rows="3" placeholder="Bio..."></textarea>
 </div>
-<div style="width:100%;aspect-ratio:4/5;background:#111;"><img id="preview" style="width:100%;height:100%;object-fit:cover;display:none;"></div>
-<div style="padding:14px;"><input id="caption" placeholder="Caption..."></div>
+</div>
+</div>
+
+<div class="bottom">
+<button id="bFeed" class="active" onclick="showPage('feed')">⌂</button>
+<button id="bSearch" onclick="showPage('search')">⌕</button>
+<button id="bProfile" onclick="showPage('profile')">◯</button>
+</div>
 </div>
 
 <script>
-// UN KEY DA GIRI - 100% CORRECT DA!
-const SUPABASE_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
+const SUPABASE_URL='https://yecpltndhlzfjplzhcpm.supabase.co';
+const SUPABASE_KEY='sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let currentUser=null, currentProfile=null;
+let isLogin=true;
+function toggleAuth(){isLogin=!isLogin;loginForm.style.display=isLogin?'block':'none';signupForm.style.display=isLogin?'none':'block';}
+function showMsg(t,ok=false){errBox.style.display=ok?'none':'block';okBox.style.display=ok?'block':'none';(ok?okBox:errBox).innerText=t;}
+function hideMsg(){errBox.style.display='none';okBox.style.display='none';}
 
-let isLogin = true;
-function toggle(){ isLogin=!isLogin; document.getElementById('loginForm').style.display=isLogin?'block':'none'; document.getElementById('signupForm').style.display=isLogin?'none':'block'; hideMsg(); }
-function showMsg(t,ok=false){ let e=document.getElementById('errBox'), o=document.getElementById('okBox'); if(ok){o.style.display='block';o.innerText=t;e.style.display='none';}else{e.style.display='block';e.innerText=t;o.style.display='none';} }
-function hideMsg(){ document.getElementById('errBox').style.display='none'; document.getElementById('okBox').style.display='none'; }
-
-async function handleSignup(){
- let email=document.getElementById('semail').value.trim();
- let pass=document.getElementById('spass').value.trim();
- let name=document.getElementById('sname').value.trim() || email.split('@')[0];
- if(!email||!pass){showMsg('Email + Password kudu da');return;}
- if(pass.length<6){showMsg('Password 6+ chars da - safe ku');return;}
- showMsg('Creating safe account...',true);
+async function signup(){
+ let email=semail.value.trim(), pass=spass.value.trim(), username=sname.value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+ if(!email||!pass||!username){showMsg('Email + Pass + Username kudu da');return;}
+ if(username.length<3){showMsg('Username 3+ chars da');return;}
+ showMsg('Checking unique username...',true);
+ // check unique
+ let {data:exists}=await supabaseClient.from('profiles').select('username').eq('username',username).maybeSingle();
+ if(exists){showMsg('Username already taken da - vera try pannu da!');return;}
  try{
-  const {data,error}=await supabaseClient.auth.signUp({email,password:pass,options:{data:{username:name}}});
+  let {data,error}=await supabaseClient.auth.signUp({email,password:pass,options:{data:{username}}});
   if(error) throw error;
-  // auto confirm ku SQL already pannitom la
-  showMsg('✅ Account Created da! Login pannu da - Safe da! 🔒',true);
-  setTimeout(()=>{toggle();document.getElementById('email').value=email;},1200);
+  if(data.user){
+   await supabaseClient.from('profiles').insert({id:data.user.id,username,bio:'Tiruchuli to World 🌍'});
+  }
+  showMsg('✅ Account created da! Login pannu da Giri! 🔒',true);
+  setTimeout(()=>{toggleAuth();email.value=email;},1200);
  }catch(e){showMsg('❌ '+e.message);}
 }
 
-async function handleAuth(){
- let email=document.getElementById('email').value.trim();
- let pass=document.getElementById('pass').value.trim();
- if(!email||!pass){showMsg('Email + Pass kudu da');return;}
- document.getElementById('mainBtn').innerText='Safe Checking...';
+async function login(){
+ let e=email.value.trim(), p=pass.value.trim();
+ if(!e||!p){showMsg('Email+Pass kudu da');return;}
+ mainBtn.innerText='Safe login...';
  try{
-  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password:pass});
+  let {data,error}=await supabaseClient.auth.signInWithPassword({email:e,password:p});
   if(error) throw error;
-  let accs=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]');
-  if(!accs.find(a=>a.email===email)) accs.push({email,username:data.user.user_metadata?.username||email.split('@')[0]});
-  localStorage.setItem('pixoro_accounts',JSON.stringify(accs));
-  localStorage.setItem('pixoro_user',JSON.stringify(data.user));
-  showMsg('✅ Safe Login Success da Giri!',true);
-  setTimeout(()=>{ document.getElementById('authBox').style.display='none'; document.getElementById('mainBox').style.display='block'; loadFeed(); },500);
- }catch(e){
-   if(e.message.includes('Email not confirmed')) showMsg('❌ Email confirm pannala da - Supabase SQL run pannu da: UPDATE auth.users SET email_confirmed_at=NOW()');
-   else showMsg('❌ '+e.message);
-   document.getElementById('mainBtn').innerText='Log in - Safe';
- }
+  currentUser=data.user;
+  await loadProfile();
+  authBox.style.display='none';mainBox.style.display='block';
+ }catch(err){showMsg('❌ '+err.message);mainBtn.innerText='Log in';}
 }
 
-function showAccounts(){ let accs=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]'); let box=document.getElementById('accountList'); let items=document.getElementById('accItems'); if(accs.length==0){items.innerHTML='<p style=color:#666;font-size:12px>No saved accounts da - login pannu da</p>';}else{items.innerHTML=accs.map(a=>`<div class=acc-item><div><b style=font-size:13px>${a.username}</b><br><small style=color:#888>${a.email}</small></div><span class=link onclick="quickLogin('${a.email}')">Switch</span></div>`).join('');} box.style.display='block'; }
-function quickLogin(email){ document.getElementById('email').value=email; document.getElementById('accountList').style.display='none'; showMsg('Password kudu da - '+email,true); }
-function logout(){ supabaseClient.auth.signOut(); localStorage.removeItem('pixoro_user'); location.reload(); }
+async function loadProfile(){
+ if(!currentUser){ let {data}=await supabaseClient.auth.getSession(); currentUser=data.session?.user; if(!currentUser) return; }
+ let {data:profile}=await supabaseClient.from('profiles').select('*').eq('id',currentUser.id).single();
+ if(!profile){ // create if missing
+   let uname=currentUser.user_metadata?.username||currentUser.email.split('@')[0];
+   let {data:newP}=await supabaseClient.from('profiles').insert({id:currentUser.id,username:uname}).select().single();
+   profile=newP;
+ }
+ currentProfile=profile;
+ pUsername.innerText='@'+profile.username;
+ pBio.innerText=profile.bio||'';
+ pAvatar.src=profile.avatar_url||`https://i.pravatar.cc/150?u=${profile.username}`;
+ topUser.innerText='@'+profile.username;
+ privateToggle.className='toggle'+(profile.is_private?' on':'');
+ // followers count
+ let {count:fc}=await supabaseClient.from('follows').select('*',{count:'exact',head:true}).eq('following_id',currentUser.id);
+ let {count:fgc}=await supabaseClient.from('follows').select('*',{count:'exact',head:true}).eq('follower_id',currentUser.id);
+ pFollowers.innerText=fc||0; pFollowing.innerText=fgc||0;
+}
 
-let posts=JSON.parse(localStorage.getItem('pixoro_posts')||'[]');
-function loadFeed(){ let f=document.getElementById('feed'); if(posts.length==0){ f.innerHTML="<p style=text-align:center;color:#666;margin-top:80px;>Welcome da Giri! 🔒 Safe Login Work Aachu da!<br><br>World la yaarum account create pannalam da 🌍<br><br>+ thottu post podu da!</p>"; return; } f.innerHTML=posts.map(p=>`<div class=post><div class=post-top><img src=https://i.pravatar.cc/100?u=${p.user}><b style=font-size:13px>${p.user}</b></div><img class=post-img src=${p.img}><div class=post-actions><span>🤍</span><span>💬</span></div><div style=padding:0 14px 12px 14px;font-size:13px><b>${p.user}</b> ${p.cap}</div></div>`).join(''); }
-function addPost(){ document.getElementById('fileInput').click(); }
-document.getElementById('fileInput').addEventListener('change',e=>{ let f=e.target.files[0];if(!f)return; let r=new FileReader();r.onload=ev=>{document.getElementById('preview').src=ev.target.result;document.getElementById('preview').style.display='block';document.getElementById('uploadBox').style.display='block';};r.readAsDataURL(f); });
-function doPost(){ let img=document.getElementById('preview').src; let cap=document.getElementById('caption').value||'Tiruchuli to World 🌍'; let u=JSON.parse(localStorage.getItem('pixoro_user')||'{}').email||'giri'; posts.unshift({img,cap,user:u}); localStorage.setItem('pixoro_posts',JSON.stringify(posts)); document.getElementById('uploadBox').style.display='none'; loadFeed(); }
+function showPage(p){
+ feedPage.style.display=p=='feed'?'block':'none';
+ searchPage.style.display=p=='search'?'block':'none';
+ profilePage.style.display=p=='profile'?'block':'none';
+ bFeed.className=p=='feed'?'active':''; bSearch.className=p=='search'?'active':''; bProfile.className=p=='profile'?'active':'';
+ if(p=='profile') loadProfile();
+ if(p=='search') searchUser();
+}
 
-supabaseClient.auth.getSession().then(({data})=>{ if(data.session){ document.getElementById('authBox').style.display='none'; document.getElementById('mainBox').style.display='block'; loadFeed(); } });
+async function searchUser(){
+ let q=searchInput.value.trim().toLowerCase();
+ let {data:profiles}=await supabaseClient.from('profiles').select('*').limit(20);
+ if(q) profiles=profiles.filter(pr=>pr.username.includes(q));
+ let html='';
+ for(let pr of profiles){
+  if(pr.id===currentUser?.id) continue;
+  let {data:isFollowing}=await supabaseClient.from('follows').select('id').eq('follower_id',currentUser.id).eq('following_id',pr.id).maybeSingle();
+  let btn=isFollowing?`<button class="followBtn unfollow" onclick="unfollow('${pr.id}')">Following</button>`:`<button class="followBtn follow" onclick="follow('${pr.id}')">Follow</button>`;
+  html+=`<div class="user-row"><div style="display:flex;gap:10px;align-items:center;"><img src="${pr.avatar_url||`https://i.pravatar.cc/100?u=${pr.username}`}"><div><b style="font-size:13px;">${pr.username}</b><br><small style="color:#888;">${pr.bio?.substring(0,20)||''}${pr.is_private?' 🔒':''}</small></div></div>${btn}</div>`;
+ }
+ searchResult.innerHTML=html||'<p style="text-align:center;color:#555;margin-top:20px;">No users da</p>';
+}
+
+async function follow(id){
+ await supabaseClient.from('follows').insert({follower_id:currentUser.id,following_id:id});
+ searchUser(); loadProfile();
+}
+async function unfollow(id){
+ await supabaseClient.from('follows').delete().eq('follower_id',currentUser.id).eq('following_id',id);
+ searchUser(); loadProfile();
+}
+
+async function togglePrivate(){
+ let newVal=!currentProfile.is_private;
+ await supabaseClient.from('profiles').update({is_private:newVal}).eq('id',currentUser.id);
+ currentProfile.is_private=newVal;
+ privateToggle.className='toggle'+(newVal?' on':'');
+}
+
+function openEdit(){
+ editBox.style.display='block';
+ editAvatar.src=pAvatar.src;
+ editUsername.value=currentProfile.username;
+ editBio.value=currentProfile.bio||'';
+}
+let newAvatarUrl=null;
+function previewAvatar(e){
+ let file=e.target.files[0]; if(!file)return;
+ let reader=new FileReader(); reader.onload=ev=>{editAvatar.src=ev.target.result; newAvatarUrl=ev.target.result;}; reader.readAsDataURL(file);
+}
+async function saveEdit(){
+ let uname=editUsername.value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+ let bio=editBio.value.trim();
+ if(uname!==currentProfile.username){
+  let {data:exists}=await supabaseClient.from('profiles').select('id').eq('username',uname).maybeSingle();
+  if(exists){alert('Username taken da - vera username podu da Giri!');return;}
+ }
+ let avatar_url=currentProfile.avatar_url;
+ if(newAvatarUrl){
+  // upload to storage
+  try{
+   let blob=await (await fetch(newAvatarUrl)).blob();
+   let fileName=`${currentUser.id}_${Date.now()}.jpg`;
+   let {error}=await supabaseClient.storage.from('avatars').upload(fileName,blob,{upsert:true});
+   if(!error){ let {data}=supabaseClient.storage.from('avatars').getPublicUrl(fileName); avatar_url=data.publicUrl; }
+  }catch{}
+ }
+ await supabaseClient.from('profiles').update({username:uname,bio,avatar_url}).eq('id',currentUser.id);
+ editBox.style.display='none'; newAvatarUrl=null; await loadProfile();
+}
+
+function logout(){supabaseClient.auth.signOut();location.reload();}
+
+(async()=>{let {data}=await supabaseClient.auth.getSession();if(data.session){currentUser=data.session.user;authBox.style.display='none';mainBox.style.display='block';await loadProfile();showPage('profile');}})();
 </script>
 </body>
 </html>
