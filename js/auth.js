@@ -1,11 +1,22 @@
 import { supabase } from '../supabase.js'
 
-// Instagram style - export da!
 export async function signup() {
   const emailVal = document.getElementById('email').value
   const passVal = document.getElementById('password').value
-  const { error } = await supabase.auth.signUp({ email: emailVal, password: passVal })
-  alert(error ? error.message : 'Check mail da Giri! 📧')
+  
+  if(!emailVal || !passVal){
+    alert('Email & Password podu da Giri!')
+    return
+  }
+  
+  const { data, error } = await supabase.auth.signUp({ email: emailVal, password: passVal })
+  
+  if(error){
+    alert(error.message)
+  } else {
+    alert('Account create aayiduchu da Giri! ✅')
+    location.reload()
+  }
 }
 
 export async function login() {
@@ -21,14 +32,17 @@ export async function logout() {
   location.reload()
 }
 
-// Ella button ah connect pannura function da - Instagram method!
 export function initAuth() {
   document.getElementById('signupBtn')?.addEventListener('click', signup)
   document.getElementById('loginBtn')?.addEventListener('click', login)
   document.getElementById('logoutBtn')?.addEventListener('click', logout)
-
-  // Old window method kooda backup ku vechuren da - ippo work aagum!
   window.signup = signup
   window.login = login
   window.logout = logout
 }
+
+// AUTO START DA - ITHAAN MAIN FIX DA!
+document.addEventListener('DOMContentLoaded', () => {
+  initAuth()
+})
+initAuth()
