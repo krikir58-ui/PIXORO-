@@ -29,9 +29,8 @@ body{background:#000;color:#fff;overflow-x:hidden}
 .ig-post-actions-left{display:flex;gap:16px;font-size:24px}
 .ig-post-likes{padding:0 12px;font-size:14px;font-weight:600}
 .ig-post-caption{padding:4px 12px 12px;font-size:14px}
-.ig-post-time{padding:0 12px 12px;font-size:10px;color:#8e8e8e;letter-spacing:.5px}
 .ig-bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;height:50px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
-.ig-bottom button{background:none;border:none;font-size:24px;color:#fff;cursor:pointer;position:relative}
+.ig-bottom button{background:none;border:none;font-size:24px;color:#fff;cursor:pointer}
 .ig-bottom button.active{font-weight:bold}
 .explore-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}
 .explore-grid img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111}
@@ -42,8 +41,8 @@ body{background:#000;color:#fff;overflow-x:hidden}
 .profile-stats span{font-size:13px;color:#fff}
 .profile-bio{padding:0 16px 12px}
 .profile-tabs{display:flex;border-top:1px solid #262626}
-.profile-tabs button{flex:1;padding:12px;background:none;border:none;color:#8e8e8e;font-size:12px;letter-spacing:1px;border-top:1px solid transparent}
-.profile-tabs button.active{color:#fff;border-top-color:#fff}
+.profile-tabs button{flex:1;padding:12px;background:none;border:none;color:#8e8e8e;font-size:12px}
+.profile-tabs button.active{color:#fff;border-top:1px solid #fff}
 .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
 .login-box{width:100%;max-width:350px;border:1px solid #262626;padding:30px 20px;text-align:center;background:#000}
 .login-logo{font-family:'Grand Hotel',cursive;font-size:52px;margin-bottom:12px}
@@ -52,7 +51,6 @@ body{background:#000;color:#fff;overflow-x:hidden}
 .reel-item{height:calc(100vh - 110px);position:relative;scroll-snap-align:start;background:#111;display:flex;align-items:center;justify-content:center}
 .reel-item img{width:100%;height:100%;object-fit:cover}
 .reel-overlay{position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(transparent,rgba(0,0,0,0.8))}
-.reel-actions{position:absolute;right:12px;bottom:80px;display:flex;flex-direction:column;gap:20px;align-items:center}
 </style>
 </head>
 <body>
@@ -63,15 +61,18 @@ body{background:#000;color:#fff;overflow-x:hidden}
 <input id="email" class="login-input" placeholder="Email">
 <input id="pass" class="login-input" type="password" placeholder="Password">
 <button onclick="login()" style="width:100%;background:#0095f6;color:#fff;border:none;padding:8px;border-radius:8px;font-weight:600;margin-top:10px;">Log in</button>
-<p style="margin-top:20px;font-size:12px;color:#8e8e8e;">Don't have an account? <span style="color:#0095f6;font-weight:600;cursor:pointer;" onclick="signup()">Sign up</span></p>
+<p style="margin-top:20px;font-size:12px;color:#8e8e8e;">Don't have account? <span style="color:#0095f6;font-weight:600;cursor:pointer;" onclick="signup()">Sign up</span></p>
 </div>
 </div>
 <div id="app" style="display:none;">
-<div class="ig-header"><div class="ig-logo" onclick="showPage('home')">Pixoro</div><div class="ig-header-icons"><span onclick="showPage('notifications')">🤍</span><span onclick="showPage('chat')">✈️</span></div></div>
-<div id="homePage" class="page active"><div class="stories-wrap"><div class="story-item" onclick="addStory()"><div class="story-ring" style="background:#333;"><div class="story-ring-inner" style="display:flex;align-items:center;justify-content:center;font-size:28px;">+</div></div><div class="story-name">Your story</div></div><div id="storyList" style="display:flex;gap:12px;"></div></div><div id="feedList"></div></div>
+<div class="ig-header">
+<div class="ig-logo" onclick="showPage('home')">Pixoro</div>
+<div class="ig-header-icons"><span onclick="document.getElementById('fileInput').click()" style="border:1px solid #fff;padding:2px 8px;border-radius:6px;font-size:14px;">+ Post</span><span onclick="showPage('notifications')">🤍</span></div>
+</div>
+<div id="homePage" class="page active"><div class="stories-wrap"><div class="story-item" onclick="document.getElementById('fileInput').click()"><div class="story-ring" style="background:#333;"><div class="story-ring-inner" style="display:flex;align-items:center;justify-content:center;font-size:28px;">+</div></div><div class="story-name">Your story</div></div></div><div id="feedList"></div></div>
 <div id="searchPage" class="page"><div style="padding:8px 12px;position:sticky;top:60px;background:#000;z-index:10;"><input id="searchInput" class="login-input" placeholder="Search" oninput="searchUsers()" style="margin:0;"></div><div class="explore-grid" id="exploreGrid"></div><div id="searchResults"></div></div>
 <div id="reelsPage" class="page" style="padding:0;"><div class="reels-container" id="reelsList"></div></div>
-<div id="notificationsPage" class="page"><div style="padding:16px;font-weight:600;border-bottom:1px solid #262626;">Notifications</div><div id="notifList" style="padding:16px;color:#8e8e8e;">AI will show here da Giri</div></div>
+<div id="notificationsPage" class="page"><div style="padding:16px;font-weight:600;border-bottom:1px solid #262626;">Notifications</div><div id="notifList" style="padding:16px;color:#8e8e8e;">AI will show here da</div></div>
 <div id="chatPage" class="page"><div style="padding:16px;font-weight:600;border-bottom:1px solid #262626;">Messages</div></div>
 <div id="profilePage" class="page"><div class="profile-header"><img id="pAvatar" class="profile-avatar" src="https://i.pravatar.cc/150?u=giri"><div class="profile-stats"><div><b id="pPosts">0</b><span>Posts</span></div><div><b id="pFollowers">0</b><span>Followers</span></div><div><b id="pFollowing">0</b><span>Following</span></div></div></div><div class="profile-bio"><b id="pName">giri_official</b><br><span id="pBio" style="font-size:14px;">Tiruchuli to World 🌍</span><br><button style="width:100%;margin-top:12px;padding:6px;background:#262626;border:none;color:#fff;border-radius:6px;" onclick="openEdit()">Edit profile</button></div><div class="profile-tabs"><button class="active">⊞</button><button onclick="showPage('reels')">▶️</button><button>🔖</button></div><div class="explore-grid" id="profilePosts"></div></div>
 <div class="ig-bottom"><button id="bHome" class="active" onclick="showPage('home')">⌂</button><button id="bSearch" onclick="showPage('search')">⌕</button><button id="bReels" onclick="showPage('reels')">▶</button><button id="bChat" onclick="showPage('chat')">♡</button><button id="bProfile" onclick="showPage('profile')">◯</button></div>
@@ -88,40 +89,45 @@ const SUPABASE_KEY='sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let currentUser=null;
 async function checkSession(){let {data}=await supabase.auth.getSession();if(data.session){currentUser=data.session.user;document.getElementById('loginPage').style.display='none';document.getElementById('app').style.display='block';loadFeed();loadExplore();loadProfileData();}}checkSession();
-
-async function login(){
- let e=document.getElementById('email').value.trim();
- let p=document.getElementById('pass').value.trim();
- if(!e||!p) return alert("Email & Password podu da Giri!");
- let {data,error}=await supabase.auth.signInWithPassword({email:e,password:p});
- if(error) return alert("Login failed da: "+error.message);
- currentUser=data.user;
- document.getElementById('loginPage').style.display='none';
- document.getElementById('app').style.display='block';
- loadFeed();loadExplore();loadProfileData();
-}
-async function signup(){
- let e=document.getElementById('email').value.trim();
- let p=document.getElementById('pass').value.trim();
- if(!e||!p) return alert("Email & Password podu da Giri!");
- if(p.length<6) return alert("Password 6 ezhuthukku mela podu da!");
- let {data,error}=await supabase.auth.signUp({email:e,password:p});
- if(error) return alert("Signup failed: "+error.message);
- if(data.user){
-  await supabase.from('profiles').insert({id:data.user.id,username:e.split('@')[0],bio:'Tiruchuli to World 🌍'});
-  alert("Account create aayiduchu da Giri ✅ Ippo Login pannu da!");
- }
-}
+async function login(){let e=document.getElementById('email').value.trim();let p=document.getElementById('pass').value.trim();if(!e||!p) return alert("Email & Password podu da!");let {data,error}=await supabase.auth.signInWithPassword({email:e,password:p});if(error) return alert("Login failed: "+error.message);currentUser=data.user;document.getElementById('loginPage').style.display='none';document.getElementById('app').style.display='block';loadFeed();loadExplore();loadProfileData();}
+async function signup(){let e=document.getElementById('email').value.trim();let p=document.getElementById('pass').value.trim();if(!e||!p) return alert("Email & Pass podu!");let {data,error}=await supabase.auth.signUp({email:e,password:p});if(error) return alert(error.message);if(data.user){await supabase.from('profiles').insert({id:data.user.id,username:e.split('@')[0],bio:'Tiruchuli to World 🌍'});alert("Account create aayiduchu! Login pannu!");}}
 function showPage(p){document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));document.getElementById(p+'Page').classList.add('active');document.querySelectorAll('.ig-bottom button').forEach(b=>b.classList.remove('active'));let btn=document.getElementById('b'+p.charAt(0).toUpperCase()+p.slice(1));if(btn)btn.classList.add('active');if(p==='home')loadFeed();if(p==='profile')loadProfile();if(p==='reels')loadReels();if(p==='search')loadExplore();}
 async function loadFeed(){let {data:posts}=await supabase.from('posts').select('*, profiles(username,avatar_url)').order('created_at',{ascending:false}).limit(20);let feedList=document.getElementById('feedList');if(!posts||posts.length===0){feedList.innerHTML=`<div style="text-align:center;padding:80px 20px;color:#8e8e8e;"><h3 style="color:#fff;">Welcome to Pixoro</h3><p style="margin-top:8px;">First post podu da Giri 🚀</p><br><button onclick="document.getElementById('fileInput').click()" style="background:#0095f6;color:#fff;padding:8px 16px;border:none;border-radius:8px;">Share first photo</button></div>`;return;}feedList.innerHTML=posts.map(p=>`<div class="ig-post"><div class="ig-post-header"><div class="ig-post-user"><img src="${p.profiles?.avatar_url||`https://i.pravatar.cc/100?u=${p.profiles?.username}`}"><b style="font-size:14px;">${p.profiles?.username||'user'}</b></div><span>⋯</span></div><img class="ig-post-img" src="${p.image_url}"><div class="ig-post-actions"><div class="ig-post-actions-left"><span onclick="likePost('${p.id}')">♡</span><span>💬</span><span>↗</span></div><span>🔖</span></div><div class="ig-post-likes">${p.likes_count||0} likes</div><div class="ig-post-caption"><b>${p.profiles?.username||'user'}</b> ${p.caption||''}</div></div>`).join('');}
 async function loadExplore(){let {data:posts}=await supabase.from('posts').select('*').order('created_at',{ascending:false}).limit(18);if(posts)document.getElementById('exploreGrid').innerHTML=posts.map(p=>`<img src="${p.image_url}" onclick="showPage('home')">`).join('');}
 async function loadReels(){let {data:reels}=await supabase.from('posts').select('*, profiles(username)').order('created_at',{ascending:false}).limit(10);let reelsList=document.getElementById('reelsList');if(!reels||reels.length===0){reelsList.innerHTML=`<div style="height:100%;display:flex;align-items:center;justify-content:center;color:#8e8e8e;"><p>Reels inga varum da Giri</p></div>`;return;}reelsList.innerHTML=reels.map(r=>`<div class="reel-item"><img src="${r.image_url}"><div class="reel-overlay"><b>@${r.profiles?.username||'user'}</b><br><small>${r.caption||''}</small></div></div>`).join('');}
 async function loadProfileData(){if(!currentUser)return;let {data:profile}=await supabase.from('profiles').select('*').eq('id',currentUser.id).single();if(!profile){let {data:newP}=await supabase.from('profiles').insert({id:currentUser.id,username:currentUser.email.split('@')[0]}).select().single();profile=newP;}document.getElementById('pName').innerText=profile.username;document.getElementById('pAvatar').src=profile.avatar_url||`https://i.pravatar.cc/150?u=${profile.username}`;}
-async function loadProfile(){if(!currentUser)return;let {data:myPosts}=await supabase.from('posts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});document.getElementById('pPosts').innerText=myPosts?.length||0;let {data:followers}=await supabase.from('follows').select('*').eq('following_id',currentUser.id);document.getElementById('pFollowers').innerText=followers?.length||0;let {data:following}=await supabase.from('follows').select('*').eq('follower_id',currentUser.id);document.getElementById('pFollowing').innerText=following?.length||0;document.getElementById('profilePosts').innerHTML=myPosts?.map(p=>`<img src="${p.image_url}">`).join('')||'';}
+async function loadProfile(){if(!currentUser)return;let {data:myPosts}=await supabase.from('posts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});document.getElementById('pPosts').innerText=myPosts?.length||0;document.getElementById('profilePosts').innerHTML=myPosts?.map(p=>`<img src="${p.image_url}">`).join('')||'';}
 document.getElementById('fileInput').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{document.getElementById('uploadPreview').src=ev.target.result;document.getElementById('uploadPreview').style.display='block';document.getElementById('uploadBox').style.display='block';};r.readAsDataURL(f);});
-async function uploadPost(){let cap=document.getElementById('captionInput').value;let file=document.getElementById('fileInput').files[0];let url=document.getElementById('uploadPreview').src;if(file){let name=`${currentUser.id}_${Date.now()}.jpg`;await supabase.storage.from('posts').upload(name,file);let {data}=supabase.storage.from('posts').getPublicUrl(name);url=data.publicUrl;}await supabase.from('posts').insert({user_id:currentUser.id,image_url:url,caption:cap,likes_count:0});document.getElementById('uploadBox').style.display='none';document.getElementById('captionInput').value='';document.getElementById('fileInput').value='';document.getElementById('uploadPreview').style.display='none';showPage('home');}
-function addStory(){alert("Story next update la da Giri!");}
-async function searchUsers(){let q=document.getElementById('searchInput').value.toLowerCase();let {data:profiles}=await supabase.from('profiles').select('*').limit(20);if(q)profiles=profiles.filter(p=>p.username.includes(q));document.getElementById('searchResults').innerHTML=profiles?.map(p=>`<div style="padding:12px;display:flex;gap:10px;align-items:center;border-bottom:1px solid #121212;"><img src="${p.avatar_url||`https://i.pravatar.cc/100?u=${p.username}`}" style="width:44px;height:44px;border-radius:50%;"><div><b>${p.username}</b></div></div>`).join('')||'';}
+async function uploadPost(){
+  let cap=document.getElementById('captionInput').value;
+  let url=document.getElementById('uploadPreview').src;
+  if(!url||url.length<10) return alert("Photo select pannu da Giri!");
+  try{
+    let file=document.getElementById('fileInput').files[0];
+    if(file){
+      try{
+        let name=`${currentUser.id}_${Date.now()}.jpg`;
+        let {error:upErr}=await supabase.storage.from('posts').upload(name,file);
+        if(!upErr){
+          let {data}=supabase.storage.from('posts').getPublicUrl(name);
+          url=data.publicUrl;
+        }
+      }catch(stErr){ console.log("Storage skip, using base64 da",stErr); }
+    }
+    let {data,error}=await supabase.from('posts').insert({user_id:currentUser.id,image_url:url,caption:cap,likes_count:0}).select();
+    if(error) throw error;
+    document.getElementById('uploadBox').style.display='none';
+    document.getElementById('captionInput').value='';
+    document.getElementById('fileInput').value='';
+    document.getElementById('uploadPreview').style.display='none';
+    alert("Post success da Giri! 🚀");
+    showPage('home');
+  }catch(e){
+    alert("Post Error da Giri: "+e.message+"\n\nSupabase SQL Editor la policy run pannu da!");
+  }
+}
+function addStory(){document.getElementById('fileInput').click();}
+async function searchUsers(){let q=document.getElementById('searchInput').value.toLowerCase();let {data:profiles}=await supabase.from('profiles').select('*').limit(20);if(q)profiles=profiles.filter(p=>p.username.toLowerCase().includes(q));document.getElementById('searchResults').innerHTML=profiles?.map(p=>`<div style="padding:12px;display:flex;gap:10px;align-items:center;border-bottom:1px solid #121212;"><img src="${p.avatar_url||`https://i.pravatar.cc/100?u=${p.username}`}" style="width:44px;height:44px;border-radius:50%;"><div><b>${p.username}</b></div></div>`).join('')||'';}
 async function likePost(id){let {data:p}=await supabase.from('posts').select('likes_count').eq('id',id).single();await supabase.from('posts').update({likes_count:(p.likes_count||0)+1}).eq('id',id);loadFeed();}
 function openEdit(){let bio=prompt("Bio enna da?","Tiruchuli to World 🌍");if(bio)supabase.from('profiles').update({bio}).eq('id',currentUser.id).then(()=>loadProfileData());}
 </script>
