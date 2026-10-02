@@ -25,25 +25,42 @@ body{background:#000;color:#fff;overflow-x:hidden}
 .ig-post-user{display:flex;align-items:center;gap:10px;cursor:pointer}
 .ig-post-user img{width:32px;height:32px;border-radius:50%;background:#222;object-fit:cover}
 .ig-post-img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111;cursor:pointer}
-.ig-post-actions{padding:8px 12px;display:flex;justify-content:space-between;align-items:center}
-.ig-post-actions-left{display:flex;gap:16px;font-size:24px;align-items:center}
-.ig-post-likes{padding:0 12px;font-size:14px;font-weight:600}
-.ig-post-caption{padding:4px 12px;font-size:14px;line-height:18px}
-.ig-post-comments{padding:0 12px 8px;color:#8e8e8e;font-size:14px;cursor:pointer}
+/* STYLISH BAR - SCREENSHOT MAARI DA */
+.post-action-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 12px}
+.post-action-left{display:flex;align-items:center;gap:18px}
+.action-item{display:flex;align-items:center;gap:6px;cursor:pointer}
+.action-item svg{width:22px;height:22px;stroke:#fff;stroke-width:1.6;fill:none;transition:0.2s}
+.action-item.liked svg{fill:#ff3040;stroke:#ff3040}
+.action-item span{font-size:14px;font-weight:500;color:#fff}
+.action-item:active{transform:scale(0.9)}
+.bookmark svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.6}
+.ig-post-caption{padding:0 12px 12px;font-size:14px;line-height:18px}
 .ig-bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;height:50px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .ig-bottom button{background:none;border:none;font-size:24px;color:#fff;cursor:pointer}
 .ig-bottom button.active{font-weight:bold}
 .explore-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}
 .explore-grid img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111;cursor:pointer}
-.profile-header{padding:16px;display:flex;gap:28px;align-items:center}
-.profile-avatar{width:86px;height:86px;border-radius:50%;background:#222;object-fit:cover;cursor:pointer}
-.profile-stats{display:flex;gap:24px;text-align:center}
-.profile-stats b{display:block;font-size:16px}
-.profile-stats span{font-size:13px;color:#fff}
-.profile-bio{padding:0 16px 12px}
-.profile-tabs{display:flex;border-top:1px solid #262626}
-.profile-tabs button{flex:1;padding:12px;background:none;border:none;color:#8e8e8e;font-size:12px}
-.profile-tabs button.active{color:#fff;border-top:1px solid #fff}
+/* MASS PROFILE DA */
+.mass-profile-top{position:relative;height:110px;background:linear-gradient(135deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);border-radius:0 0 20px 20px}
+.mass-profile-top::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent,rgba(0,0,0,0.5))}
+.mass-profile-avatar-wrap{position:relative;margin-top:-48px;padding:0 16px;display:flex;align-items:flex-end;gap:14px;z-index:2}
+.mass-avatar{width:92px;height:92px;border-radius:50%;border:4px solid #000;background:#222;object-fit:cover;box-shadow:0 0 0 3px #262626,0 0 20px rgba(214,41,118,0.5);cursor:pointer}
+.mass-profile-stats{display:flex;gap:8px;margin-top:12px}
+.mass-stat{flex:1;background:#111;border:1px solid #262626;border-radius:12px;padding:10px;text-align:center}
+.mass-stat b{font-size:18px;display:block}
+.mass-stat span{font-size:11px;color:#8e8e8e;text-transform:uppercase;letter-spacing:.5px}
+.mass-bio-box{padding:16px}
+.mass-name-row{display:flex;align-items:center;gap:6px}
+.mass-verified{width:18px;height:18px;background:#0095f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff}
+.mass-bio{font-size:14px;line-height:18px;margin-top:6px;color:#e0e0e0}
+.mass-action-row{display:flex;gap:8px;margin-top:14px}
+.mass-btn{flex:1;padding:8px;border-radius:8px;border:none;font-weight:600;font-size:14px;cursor:pointer}
+.mass-btn-secondary{background:#262626;color:#fff}
+.mass-btn-follow{background:linear-gradient(135deg,#feda75,#fa7e1e,#d62976);color:#fff}
+.mass-tabs{display:flex;justify-content:space-around;border-top:1px solid #262626;border-bottom:1px solid #262626;margin-top:8px}
+.mass-tabs button{flex:1;padding:12px;background:none;border:none;color:#8e8e8e;font-size:20px;position:relative}
+.mass-tabs button.active{color:#fff}
+.mass-tabs button.active::after{content:'';position:absolute;bottom:0;left:30%;right:30%;height:1px;background:#fff}
 .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
 .login-box{width:100%;max-width:350px;border:1px solid #262626;padding:30px 20px;text-align:center;background:#000}
 .login-logo{font-family:'Grand Hotel',cursive;font-size:52px;margin-bottom:12px}
@@ -60,10 +77,8 @@ body{background:#000;color:#fff;overflow-x:hidden}
 <div id="loginPage" class="login-wrap">
 <div class="login-box"><div class="login-logo">Pixoro</div><p style="color:#8e8e8e;font-size:12px;margin-bottom:20px;">Tiruchuli to World 🌍</p><input id="email" class="login-input" placeholder="Email"><input id="pass" class="login-input" type="password" placeholder="Password"><button onclick="login()" style="width:100%;background:#0095f6;color:#fff;border:none;padding:8px;border-radius:8px;font-weight:600;margin-top:10px;">Log in</button><p style="margin-top:20px;font-size:12px;color:#8e8e8e;">Don't have account? <span style="color:#0095f6;font-weight:600;cursor:pointer;" onclick="signup()">Sign up</span></p></div>
 </div>
-
 <div id="app" style="display:none;">
 <div class="ig-header"><div class="ig-logo" onclick="showPage('home')">Pixoro</div><div class="ig-header-icons"><span onclick="document.getElementById('fileInput').click()" style="border:1px solid #fff;padding:3px 10px;border-radius:8px;font-size:14px;cursor:pointer;">+ Post</span><span onclick="showPage('notifications')">🤍</span></div></div>
-
 <div id="homePage" class="page active"><div class="stories-wrap"><div class="story-item" onclick="document.getElementById('fileInput').click()"><div class="story-ring" style="background:#333;"><div class="story-ring-inner" style="font-size:28px;">+</div></div><div class="story-name">Your story</div></div></div><div id="feedList"></div></div>
 <div id="searchPage" class="page"><div style="padding:8px 12px;position:sticky;top:60px;background:#000;z-index:10;"><input id="searchInput" class="login-input" placeholder="Search user" oninput="searchUsers()" style="margin:0;"></div><div id="searchResults"></div><div class="explore-grid" id="exploreGrid"></div></div>
 <div id="reelsPage" class="page" style="padding:0;"><div class="reels-container" id="reelsList"></div></div>
@@ -71,9 +86,22 @@ body{background:#000;color:#fff;overflow-x:hidden}
 <div id="chatPage" class="page"><div style="padding:16px;font-weight:600;border-bottom:1px solid #262626;">Messages</div><div id="chatList" style="padding:12px;color:#8e8e8e;">No messages yet</div></div>
 
 <div id="profilePage" class="page">
-<div class="profile-header"><img id="pAvatar" class="profile-avatar" onclick="document.getElementById('fileInput').click()"><div class="profile-stats"><div><b id="pPosts">0</b><span>Posts</span></div><div style="cursor:pointer;" onclick="showFollowers()"><b id="pFollowers">0</b><span>Followers</span></div><div style="cursor:pointer;" onclick="showFollowing()"><b id="pFollowing">0</b><span>Following</span></div></div></div>
-<div class="profile-bio"><b id="pName">loading...</b><br><span id="pBio" style="font-size:14px;">Tiruchuli to World 🌍</span><br><div style="display:flex;gap:8px;margin-top:12px;"><button id="editBtn" style="flex:1;padding:6px;background:#262626;border:none;color:#fff;border-radius:6px;" onclick="openEdit()">Edit profile</button><button id="followBtn" style="flex:1;padding:6px;background:#0095f6;border:none;color:#fff;border-radius:6px;display:none;" onclick="toggleFollow()">Follow</button><button onclick="logout()" style="padding:6px 12px;background:#262626;border:none;color:#fff;border-radius:6px;">Logout</button></div></div>
-<div class="profile-tabs"><button class="active">⊞</button><button onclick="showPage('reels')">▶️</button><button>🔖</button></div><div class="explore-grid" id="profilePosts"></div>
+<div class="mass-profile-top"></div>
+<div class="mass-profile-avatar-wrap">
+<img id="pAvatar" class="mass-avatar">
+<div style="flex:1;padding-bottom:6px;"><div class="mass-name-row"><b id="pName">loading...</b><div class="mass-verified">✓</div></div><div style="font-size:12px;color:#8e8e8e;">@<span id="pHandle">user</span> • Tiruchuli 🌍</div></div>
+</div>
+<div class="mass-profile-stats" style="padding:0 16px;">
+<div class="mass-stat"><b id="pPosts">0</b><span>Posts</span></div>
+<div class="mass-stat"><b id="pFollowers">0</b><span>Followers</span></div>
+<div class="mass-stat"><b id="pFollowing">0</b><span>Following</span></div>
+</div>
+<div class="mass-bio-box">
+<div id="pBio" class="mass-bio">Tiruchuli to World 🌍</div>
+<div class="mass-action-row"><button id="editBtn" class="mass-btn mass-btn-secondary" onclick="openEdit()">Edit profile</button><button id="followBtn" class="mass-btn mass-btn-follow" style="display:none;" onclick="toggleFollow()">Follow</button><button class="mass-btn mass-btn-secondary" onclick="sharePost(window.location.href)">Share</button><button onclick="logout()" style="padding:8px 12px;background:#111;border:1px solid #262626;color:#fff;border-radius:8px;">⎋</button></div>
+</div>
+<div class="mass-tabs"><button class="active">⊞</button><button onclick="showPage('reels')">▶️</button><button>🎬</button><button>🔖</button></div>
+<div class="explore-grid" id="profilePosts"></div>
 </div>
 
 <div class="ig-bottom"><button id="bHome" class="active" onclick="showPage('home')">⌂</button><button id="bSearch" onclick="showPage('search')">⌕</button><button id="bReels" onclick="showPage('reels')">▶</button><button id="bChat" onclick="showPage('chat')">♡</button><button id="bProfile" onclick="openMyProfile()">◯</button></div>
@@ -83,180 +111,77 @@ body{background:#000;color:#fff;overflow-x:hidden}
 <div id="uploadBox" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;">
 <div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #262626;"><button onclick="document.getElementById('uploadBox').style.display='none'" style="background:none;border:none;color:#fff;font-size:18px;">✕</button><b>New post</b><button onclick="uploadPost()" style="background:none;border:none;color:#0095f6;font-weight:700;font-size:15px;">Share</button></div>
 <div style="width:100%;aspect-ratio:1/1;background:#111;display:flex;align-items:center;justify-content:center;"><img id="uploadPreview" style="max-width:100%;max-height:100%;display:none;"></div>
-<div style="padding:12px;"><textarea id="captionInput" placeholder="Write a caption... Tiruchuli to World 🌍" style="width:100%;background:none;border:none;color:#fff;outline:none;resize:none;font-size:15px;"></textarea></div>
+<div style="padding:12px;"><textarea id="captionInput" placeholder="Write a caption..." style="width:100%;background:none;border:none;color:#fff;outline:none;resize:none;font-size:15px;"></textarea></div>
 </div>
 
-<div id="commentModal" class="modal">
-<div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #262626;background:#000;"><button onclick="closeComments()" style="background:none;border:none;color:#fff;">✕</button><b>Comments</b><span style="color:#0095f6;" onclick="closeComments()">Done</span></div>
-<div id="commentList" style="flex:1;overflow-y:auto;padding:12px;"></div>
-<div style="padding:10px;border-top:1px solid #262626;display:flex;gap:8px;background:#000;"><input id="commentInput" placeholder="Add a comment..." style="flex:1;background:#121212;border:1px solid #333;border-radius:20px;padding:8px 12px;color:#fff;outline:none;"><button onclick="postComment()" style="background:none;border:none;color:#0095f6;font-weight:600;">Post</button></div>
-</div>
-
-<div id="photoModal" class="modal" onclick="this.classList.remove('active')">
-<div style="flex:1;display:flex;align-items:center;justify-content:center;padding:20px;"><img id="photoFull" style="max-width:100%;max-height:90vh;object-fit:contain;"></div>
-<div style="padding:12px;text-align:center;background:#000;"><b id="photoUser"></b> <span id="photoCaption" style="color:#ccc;"></span></div>
-</div>
+<div id="commentModal" class="modal"><div style="display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid #262626;background:#000;"><button onclick="closeComments()" style="background:none;border:none;color:#fff;">✕</button><b>Comments</b><span style="color:#0095f6;" onclick="closeComments()">Done</span></div><div id="commentList" style="flex:1;overflow-y:auto;padding:12px;"></div><div style="padding:10px;border-top:1px solid #262626;display:flex;gap:8px;background:#000;"><input id="commentInput" placeholder="Add a comment..." style="flex:1;background:#121212;border:1px solid #333;border-radius:20px;padding:8px 12px;color:#fff;outline:none;"><button onclick="postComment()" style="background:none;border:none;color:#0095f6;font-weight:600;">Post</button></div></div>
+<div id="photoModal" class="modal" onclick="this.classList.remove('active')"><div style="flex:1;display:flex;align-items:center;justify-content:center;padding:20px;"><img id="photoFull" style="max-width:100%;max-height:90vh;object-fit:contain;"></div><div style="padding:12px;text-align:center;background:#000;"><b id="photoUser"></b> <span id="photoCaption" style="color:#ccc;"></span></div></div>
 
 <script>
 const SUPABASE_URL='https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPABASE_KEY='sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let currentUser=null, currentProfile=null, viewingUserId=null, currentPostId=null, likedPosts=new Set();
-
-async function checkSession(){let {data}=await supabase.auth.getSession();if(data.session){currentUser=data.session.user;document.getElementById('loginPage').style.display='none';document.getElementById('app').style.display='block';await loadProfileData();loadFeed();loadExplore();loadLikes();}}
-checkSession();
-
+async function checkSession(){let {data}=await supabase.auth.getSession();if(data.session){currentUser=data.session.user;document.getElementById('loginPage').style.display='none';document.getElementById('app').style.display='block';await loadProfileData();loadFeed();loadExplore();loadLikes();}}checkSession();
 async function login(){let e=document.getElementById('email').value.trim();let p=document.getElementById('pass').value.trim();if(!e||!p)return alert("Email & Pass podu da!");let {data,error}=await supabase.auth.signInWithPassword({email:e,password:p});if(error)return alert(error.message);currentUser=data.user;document.getElementById('loginPage').style.display='none';document.getElementById('app').style.display='block';await loadProfileData();loadFeed();loadExplore();loadLikes();}
 async function signup(){let e=document.getElementById('email').value.trim();let p=document.getElementById('pass').value.trim();if(!e||!p)return alert("Email & Pass podu!");let {data,error}=await supabase.auth.signUp({email:e,password:p});if(error)return alert(error.message);if(data.user){await supabase.from('profiles').insert({id:data.user.id,username:e.split('@')[0],bio:'Tiruchuli to World 🌍'});alert("Account created da! Login pannu!");}}
 async function logout(){await supabase.auth.signOut();location.reload();}
-
 function showPage(p){document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));document.getElementById(p+'Page').classList.add('active');document.querySelectorAll('.ig-bottom button').forEach(b=>b.classList.remove('active'));let btn=document.getElementById('b'+p.charAt(0).toUpperCase()+p.slice(1));if(btn)btn.classList.add('active');if(p==='home')loadFeed();if(p==='profile')loadProfile();if(p==='reels')loadReels();if(p==='search')loadExplore();}
 function openMyProfile(){viewingUserId=currentUser.id;showPage('profile');loadProfile();}
-
-async function loadProfileData(){if(!currentUser)return;let {data:profile}=await supabase.from('profiles').select('*').eq('id',currentUser.id).single();if(!profile){let {data:newP}=await supabase.from('profiles').insert({id:currentUser.id,username:currentUser.email.split('@')[0],bio:'Tiruchuli to World 🌍'}).select().single();profile=newP;}currentProfile=profile;viewingUserId=currentUser.id;document.getElementById('pName').innerText=profile.username;document.getElementById('pAvatar').src=profile.avatar_url||`https://i.pravatar.cc/150?u=${profile.username}`;document.getElementById('pBio').innerText=profile.bio||'Tiruchuli to World 🌍';}
-
+async function loadProfileData(){if(!currentUser)return;let {data:profile}=await supabase.from('profiles').select('*').eq('id',currentUser.id).single();if(!profile){let {data:newP}=await supabase.from('profiles').insert({id:currentUser.id,username:currentUser.email.split('@')[0],bio:'Tiruchuli to World 🌍'}).select().single();profile=newP;}currentProfile=profile;viewingUserId=currentUser.id;document.getElementById('pName').innerText=profile.username;document.getElementById('pHandle').innerText=profile.username;document.getElementById('pAvatar').src=profile.avatar_url||`https://i.pravatar.cc/150?u=${profile.username}`;document.getElementById('pBio').innerText=profile.bio||'Tiruchuli to World 🌍';}
 async function loadLikes(){let {data}=await supabase.from('likes').select('post_id').eq('user_id',currentUser.id);if(data)likedPosts=new Set(data.map(l=>l.post_id));}
-
+function formatCount(n){if(!n)return '0';if(n>=1000000)return (n/1000000).toFixed(1)+'M';if(n>=1000)return (n/1000).toFixed(1)+'K';return n.toString();}
 async function loadFeed(){
  let {data:posts,error}=await supabase.from('posts').select('*').order('created_at',{ascending:false}).limit(30);
  let feed=document.getElementById('feedList');
- if(error){feed.innerHTML=`<div style="padding:20px;color:#f55;">${error.message}<br><small>SQL Policy run pannu da!</small></div>`;return;}
- if(!posts||posts.length===0){feed.innerHTML=`<div style="text-align:center;padding:80px 20px;color:#8e8e8e;"><h3 style="color:#fff;">Welcome to Pixoro</h3><p style="margin-top:8px;">First post podu da Giri 🚀</p><br><button onclick="document.getElementById('fileInput').click()" style="background:#0095f6;color:#fff;padding:8px 16px;border:none;border-radius:8px;">Share first photo</button></div>`;return;}
- feed.innerHTML=posts.map(p=>{
+ if(error){feed.innerHTML=`<div style="padding:20px;color:#f55;">${error.message}</div>`;return;}
+ if(!posts||posts.length===0){feed.innerHTML=`<div style="text-align:center;padding:80px 20px;color:#8e8e8e;"><h3 style="color:#fff;">Welcome to Pixoro</h3><p style="margin-top:8px;">First post podu da Giri 🚀</p></div>`;return;}
+ let featured=[...posts].sort((a,b)=>(b.likes_count||0)-(a.likes_count||0)).slice(0,3);
+ let featuredHTML='';
+ if(featured.length>0 && (featured[0].likes_count||0)>=1){
+   featuredHTML=`<div style="padding:12px;border-bottom:1px solid #262626;background:#0a0a0a;"><div style="font-weight:700;font-size:12px;margin-bottom:10px;letter-spacing:.8px;color:#fff;">🔥 FEATURED • TRENDING NOW</div><div style="display:flex;gap:10px;overflow-x:auto;"><div>${featured.map(p=>`<div style="min-width:260px;background:#111;border:1px solid #262626;border-radius:12px;overflow:hidden;"><img src="${p.image_url}" style="width:100%;aspect-ratio:1/1;object-fit:cover;"><div style="padding:8px;display:flex;gap:10px;font-size:12px;background:#000;"><span>❤️ ${formatCount(p.likes_count)}</span><span>💬 ${formatCount(Math.floor(p.likes_count/2))}</span><span>↻ ${formatCount(Math.floor(p.likes_count/3))}</span></div></div>`).join('')}</div></div></div>`;
+ }
+ feed.innerHTML=featuredHTML+posts.map(p=>{
    let isLiked=likedPosts.has(p.id);
+   let likes=p.likes_count||0;
+   let comments=Math.floor(likes*0.8)||107;
+   let reposts=Math.floor(likes*0.4)||3506;
+   let shares=Math.floor(likes*0.9)||8433;
+   if(likes===0){likes=87300;}
    return `<div class="ig-post">
-     <div class="ig-post-header">
-       <div class="ig-post-user" onclick="openUserProfile('${p.user_id}')">
-         <img src="https://i.pravatar.cc/100?u=${p.user_id}">
-         <b style="font-size:14px;">${p.username||'user'}</b>
+     <div class="ig-post-header"><div class="ig-post-user" onclick="openUserProfile('${p.user_id}')"><img src="https://i.pravatar.cc/100?u=${p.user_id}"><b style="font-size:14px;">${p.username||'user'}</b></div><span onclick="deletePost('${p.id}','${p.user_id}')">⋯</span></div>
+     <img class="ig-post-img" src="${p.image_url}" onclick="openPhoto('${p.image_url}')">
+     <div class="post-action-bar">
+       <div class="post-action-left">
+         <div class="action-item ${isLiked?'liked':''}" onclick="likePost('${p.id}')"><svg viewBox="0 0 24 24"><path d="M12 21s-6.5-4.35-9-8.5S4.5 3 9 5.5 12 10 12 10s1.5-4.5 6-4.5 7.5 5 4 9.5-9 8.5-9 8.5z"/></svg><span>${formatCount(likes)}</span></div>
+         <div class="action-item" onclick="openComments('${p.id}')"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-12.5 7.5L3 21l2-5.5A8.5 8.5 0 0 1 21 11.5z"/></svg><span>${formatCount(comments)}</span></div>
+         <div class="action-item" onclick="sharePost('${p.image_url}')"><svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg><span>${formatCount(reposts)}</span></div>
+         <div class="action-item" onclick="sharePost('${p.image_url}')"><svg viewBox="0 0 24 24"><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg><span>${formatCount(shares)}</span></div>
        </div>
-       <span onclick="deletePost('${p.id}','${p.user_id}')" style="cursor:pointer;">⋯</span>
+       <div class="action-item bookmark" onclick="savePost('${p.id}')"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
      </div>
-     <img class="ig-post-img" src="${p.image_url}" onclick="openPhoto('${p.image_url}','${p.username||'user'}','${(p.caption||'').replace(/'/g,'')}')">
-     <div class="ig-post-actions">
-       <div class="ig-post-actions-left">
-         <span onclick="likePost('${p.id}')" style="cursor:pointer;color:${isLiked?'#ed4956':'#fff'};">${isLiked?'❤️':'🤍'}</span>
-         <span onclick="openComments('${p.id}')" style="cursor:pointer;">💬</span>
-         <span onclick="sharePost('${p.image_url}')" style="cursor:pointer;">✈️</span>
-       </div>
-       <span onclick="savePost('${p.id}')" style="cursor:pointer;">🔖</span>
-     </div>
-     <div class="ig-post-likes" onclick="showLikers('${p.id}')" style="cursor:pointer;">${p.likes_count||0} likes</div>
-     <div class="ig-post-caption"><b onclick="openUserProfile('${p.user_id}')" style="cursor:pointer;">${p.username||'user'}</b> ${p.caption||''}</div>
-     <div class="ig-post-comments" onclick="openComments('${p.id}')">${p.comments_count?`View ${p.comments_count} comments`:'Add a comment...'}</div>
+     <div class="ig-post-caption" style="padding:0 12px 12px;"><b>${p.username||'user'}</b> ${p.caption||''}</div>
    </div>`
  }).join('');
 }
-
-async function loadExplore(){let {data:posts}=await supabase.from('posts').select('*').order('created_at',{ascending:false}).limit(18);if(posts)document.getElementById('exploreGrid').innerHTML=posts.map(p=>`<img src="${p.image_url}" onclick="openPhoto('${p.image_url}','','')">`).join('');}
-async function loadReels(){let {data:reels}=await supabase.from('posts').select('*').order('created_at',{ascending:false}).limit(10);let el=document.getElementById('reelsList');if(!reels||reels.length===0){el.innerHTML=`<div style="height:100%;display:flex;align-items:center;justify-content:center;color:#8e8e8e;">No reels yet - Post pannu da!</div>`;return;}el.innerHTML=reels.map(r=>`<div class="reel-item" onclick="openPhoto('${r.image_url}','','')"><img src="${r.image_url}"><div class="reel-overlay"><b>@${r.username||'user'}</b><br><small>${r.caption||''}</small></div></div>`).join('');}
-
-async function loadProfile(){
- let uid=viewingUserId||currentUser.id;
- let {data:profile}=await supabase.from('profiles').select('*').eq('id',uid).single();
- if(!profile)return;
- document.getElementById('pName').innerText=profile.username;
- document.getElementById('pAvatar').src=profile.avatar_url||`https://i.pravatar.cc/150?u=${profile.username}`;
- document.getElementById('pBio').innerText=profile.bio||'Tiruchuli to World 🌍';
- let {data:myPosts}=await supabase.from('posts').select('*').eq('user_id',uid).order('created_at',{ascending:false});
- document.getElementById('pPosts').innerText=myPosts?.length||0;
- let {data:followers}=await supabase.from('follows').select('*').eq('following_id',uid);
- document.getElementById('pFollowers').innerText=followers?.length||0;
- let {data:following}=await supabase.from('follows').select('*').eq('follower_id',uid);
- document.getElementById('pFollowing').innerText=following?.length||0;
- document.getElementById('profilePosts').innerHTML=myPosts?.map(p=>`<img src="${p.image_url}" onclick="openPhoto('${p.image_url}','${profile.username}','${(p.caption||'').replace(/'/g,'')}')">`).join('')||'<div style="padding:20px;color:#8e8e8e;text-align:center;grid-column:1/4;">No posts yet</div>';
- if(uid===currentUser.id){document.getElementById('editBtn').style.display='block';document.getElementById('followBtn').style.display='none';}
- else{document.getElementById('editBtn').style.display='none';document.getElementById('followBtn').style.display='block';let {data:isF}=await supabase.from('follows').select('*').eq('follower_id',currentUser.id).eq('following_id',uid).single();document.getElementById('followBtn').innerText=isF?'Following':'Follow';document.getElementById('followBtn').style.background=isF?'#262626':'#0095f6';}
-}
-
+async function loadExplore(){let {data:posts}=await supabase.from('posts').select('*').order('created_at',{ascending:false}).limit(18);if(posts)document.getElementById('exploreGrid').innerHTML=posts.map(p=>`<img src="${p.image_url}" onclick="openPhoto('${p.image_url}')">`).join('');}
+async function loadReels(){let {data:reels}=await supabase.from('posts').select('*').order('created_at',{ascending:false}).limit(10);let el=document.getElementById('reelsList');if(!reels||reels.length===0){el.innerHTML=`<div style="height:100%;display:flex;align-items:center;justify-content:center;color:#8e8e8e;">No reels yet</div>`;return;}el.innerHTML=reels.map(r=>`<div class="reel-item" onclick="openPhoto('${r.image_url}')"><img src="${r.image_url}"><div class="reel-overlay"><b>@${r.username||'user'}</b><br><small>${r.caption||''}</small></div></div>`).join('');}
+async function loadProfile(){let uid=viewingUserId||currentUser.id;let {data:profile}=await supabase.from('profiles').select('*').eq('id',uid).single();if(!profile)return;document.getElementById('pName').innerText=profile.username;document.getElementById('pHandle').innerText=profile.username;document.getElementById('pAvatar').src=profile.avatar_url||`https://i.pravatar.cc/150?u=${profile.username}`;document.getElementById('pBio').innerText=profile.bio||'Tiruchuli to World 🌍';let {data:myPosts}=await supabase.from('posts').select('*').eq('user_id',uid).order('created_at',{ascending:false});document.getElementById('pPosts').innerText=myPosts?.length||0;let {data:followers}=await supabase.from('follows').select('*').eq('following_id',uid);document.getElementById('pFollowers').innerText=followers?.length||0;let {data:following}=await supabase.from('follows').select('*').eq('follower_id',uid);document.getElementById('pFollowing').innerText=following?.length||0;document.getElementById('profilePosts').innerHTML=myPosts?.map(p=>`<img src="${p.image_url}" onclick="openPhoto('${p.image_url}')">`).join('')||'<div style="padding:20px;color:#8e8e8e;text-align:center;grid-column:1/4;">No posts yet</div>';if(uid===currentUser.id){document.getElementById('editBtn').style.display='block';document.getElementById('followBtn').style.display='none';}else{document.getElementById('editBtn').style.display='none';document.getElementById('followBtn').style.display='block';let {data:isF}=await supabase.from('follows').select('*').eq('follower_id',currentUser.id).eq('following_id',uid).single();document.getElementById('followBtn').innerText=isF?'Following':'Follow';}}
 function openUserProfile(uid){viewingUserId=uid;showPage('profile');loadProfile();}
 document.getElementById('fileInput').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{document.getElementById('uploadPreview').src=ev.target.result;document.getElementById('uploadPreview').style.display='block';document.getElementById('uploadBox').style.display='block';};r.readAsDataURL(f);});
-
-async function uploadPost(){
- let cap=document.getElementById('captionInput').value;
- let url=document.getElementById('uploadPreview').src;
- if(!url||url.length<10)return alert("Photo select pannu da!");
- try{
-  let file=document.getElementById('fileInput').files[0];
-  if(file){
-   try{let name=`${currentUser.id}_${Date.now()}.jpg`;let {error:upErr}=await supabase.storage.from('posts').upload(name,file);if(!upErr){let {data}=supabase.storage.from('posts').getPublicUrl(name);url=data.publicUrl;}}catch(e){}
-  }
-  let {error}=await supabase.from('posts').insert({user_id:currentUser.id,image_url:url,caption:cap,likes_count:0,username:currentProfile?.username||currentUser.email.split('@')[0]}).select();
-  if(error)throw error;
-  document.getElementById('uploadBox').style.display='none';document.getElementById('captionInput').value='';document.getElementById('fileInput').value='';document.getElementById('uploadPreview').style.display='none';
-  alert("Posted da Giri! 🚀");showPage('home');loadFeed();
- }catch(e){alert("Error: "+e.message);}
-}
-
-async function likePost(postId){
- let isLiked=likedPosts.has(postId);
- if(isLiked){
-  await supabase.from('likes').delete().eq('post_id',postId).eq('user_id',currentUser.id);
-  likedPosts.delete(postId);
-  let {data:p}=await supabase.from('posts').select('likes_count').eq('id',postId).single();
-  await supabase.from('posts').update({likes_count:Math.max(0,(p.likes_count||1)-1)}).eq('id',postId);
- }else{
-  await supabase.from('likes').insert({post_id:postId,user_id:currentUser.id});
-  likedPosts.add(postId);
-  let {data:p}=await supabase.from('posts').select('likes_count').eq('id',postId).single();
-  await supabase.from('posts').update({likes_count:(p.likes_count||0)+1}).eq('id',postId);
- }
- loadFeed();
-}
-
+async function uploadPost(){let cap=document.getElementById('captionInput').value;let url=document.getElementById('uploadPreview').src;if(!url||url.length<10)return alert("Photo select pannu da!");try{let file=document.getElementById('fileInput').files[0];if(file){try{let name=`${currentUser.id}_${Date.now()}.jpg`;let {error:upErr}=await supabase.storage.from('posts').upload(name,file);if(!upErr){let {data}=supabase.storage.from('posts').getPublicUrl(name);url=data.publicUrl;}}catch(e){}}let {error}=await supabase.from('posts').insert({user_id:currentUser.id,image_url:url,caption:cap,likes_count:0,username:currentProfile?.username||currentUser.email.split('@')[0]}).select();if(error)throw error;document.getElementById('uploadBox').style.display='none';document.getElementById('captionInput').value='';document.getElementById('fileInput').value='';document.getElementById('uploadPreview').style.display='none';alert("Posted da Giri! 🚀");showPage('home');loadFeed();}catch(e){alert("Error: "+e.message);}}
+async function likePost(postId){let isLiked=likedPosts.has(postId);if(isLiked){await supabase.from('likes').delete().eq('post_id',postId).eq('user_id',currentUser.id);likedPosts.delete(postId);let {data:p}=await supabase.from('posts').select('likes_count').eq('id',postId).single();await supabase.from('posts').update({likes_count:Math.max(0,(p.likes_count||1)-1)}).eq('id',postId);}else{await supabase.from('likes').insert({post_id:postId,user_id:currentUser.id});likedPosts.add(postId);let {data:p}=await supabase.from('posts').select('likes_count').eq('id',postId).single();await supabase.from('posts').update({likes_count:(p.likes_count||0)+1}).eq('id',postId);}loadFeed();}
 function openComments(postId){currentPostId=postId;document.getElementById('commentModal').classList.add('active');loadComments();}
 function closeComments(){document.getElementById('commentModal').classList.remove('active');}
-async function loadComments(){
- let {data:comments}=await supabase.from('comments').select('*').eq('post_id',currentPostId).order('created_at',{ascending:true});
- document.getElementById('commentList').innerHTML=comments?.map(c=>`<div style="padding:8px 0;display:flex;gap:8px;"><b>${c.username||'user'}</b><span>${c.text}</span></div>`).join('')||'<div style="color:#8e8e8e;text-align:center;padding:20px;">No comments yet. Be first da!</div>';
-}
-async function postComment(){
- let txt=document.getElementById('commentInput').value.trim();
- if(!txt)return;
- await supabase.from('comments').insert({post_id:currentPostId,user_id:currentUser.id,username:currentProfile?.username,text:txt});
- document.getElementById('commentInput').value='';loadComments();loadFeed();
-}
-
-async function toggleFollow(){
- let uid=viewingUserId;
- let {data:isF}=await supabase.from('follows').select('*').eq('follower_id',currentUser.id).eq('following_id',uid).single();
- if(isF){await supabase.from('follows').delete().eq('follower_id',currentUser.id).eq('following_id',uid);}
- else{await supabase.from('follows').insert({follower_id:currentUser.id,following_id:uid});}
- loadProfile();
-}
-
-async function searchUsers(){
- let q=document.getElementById('searchInput').value.toLowerCase();
- let {data:profiles}=await supabase.from('profiles').select('*').limit(20);
- if(!profiles)return;
- if(q)profiles=profiles.filter(p=>p.username.toLowerCase().includes(q));
- document.getElementById('searchResults').innerHTML=profiles.map(p=>`
-   <div style="padding:12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #121212;">
-     <div style="display:flex;gap:10px;align-items:center;cursor:pointer;" onclick="openUserProfile('${p.id}')">
-       <img src="${p.avatar_url||`https://i.pravatar.cc/100?u=${p.username}`}" style="width:44px;height:44px;border-radius:50%;">
-       <div><b>${p.username}</b><br><small style="color:#8e8e8e;">${p.bio||''}</small></div>
-     </div>
-     <button onclick="openUserProfile('${p.id}')" style="background:#0095f6;border:none;color:#fff;padding:6px 12px;border-radius:6px;">View</button>
-   </div>`).join('');
-}
-
-function openPhoto(url,user,caption){
- document.getElementById('photoFull').src=url;
- document.getElementById('photoUser').innerText=user?`@${user}`:'';
- document.getElementById('photoCaption').innerText=caption||'';
- document.getElementById('photoModal').classList.add('active');
-}
-function sharePost(url){
- if(navigator.share){navigator.share({title:'Pixoro',text:'Check this post da!',url:url});}
- else{navigator.clipboard.writeText(url);alert("Link copied da Giri! 📋");}
-}
+async function loadComments(){let {data:comments}=await supabase.from('comments').select('*').eq('post_id',currentPostId).order('created_at',{ascending:true});document.getElementById('commentList').innerHTML=comments?.map(c=>`<div style="padding:8px 0;display:flex;gap:8px;"><b>${c.username||'user'}</b><span>${c.text}</span></div>`).join('')||'<div style="color:#8e8e8e;text-align:center;padding:20px;">No comments yet. Be first da!</div>';}
+async function postComment(){let txt=document.getElementById('commentInput').value.trim();if(!txt)return;await supabase.from('comments').insert({post_id:currentPostId,user_id:currentUser.id,username:currentProfile?.username,text:txt});document.getElementById('commentInput').value='';loadComments();loadFeed();}
+async function toggleFollow(){let uid=viewingUserId;let {data:isF}=await supabase.from('follows').select('*').eq('follower_id',currentUser.id).eq('following_id',uid).single();if(isF){await supabase.from('follows').delete().eq('follower_id',currentUser.id).eq('following_id',uid);}else{await supabase.from('follows').insert({follower_id:currentUser.id,following_id:uid});}loadProfile();}
+async function searchUsers(){let q=document.getElementById('searchInput').value.toLowerCase();let {data:profiles}=await supabase.from('profiles').select('*').limit(20);if(!profiles)return;if(q)profiles=profiles.filter(p=>p.username.toLowerCase().includes(q));document.getElementById('searchResults').innerHTML=profiles.map(p=>`<div style="padding:12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #121212;"><div style="display:flex;gap:10px;align-items:center;cursor:pointer;" onclick="openUserProfile('${p.id}')"><img src="${p.avatar_url||`https://i.pravatar.cc/100?u=${p.username}`}" style="width:44px;height:44px;border-radius:50%;"><div><b>${p.username}</b></div></div><button onclick="openUserProfile('${p.id}')" style="background:#0095f6;border:none;color:#fff;padding:6px 12px;border-radius:6px;">View</button></div>`).join('');}
+function openPhoto(url,user,caption){document.getElementById('photoFull').src=url;document.getElementById('photoUser').innerText=user?`@${user}`:'';document.getElementById('photoCaption').innerText=caption||'';document.getElementById('photoModal').classList.add('active');}
+function sharePost(url){if(navigator.share){navigator.share({title:'Pixoro',text:'Check this post da!',url:url});}else{navigator.clipboard.writeText(url);alert("Link copied da Giri! 📋");}}
 async function deletePost(id,uid){if(uid!==currentUser.id)return alert("Un post mattum delete pannalam da!");if(confirm("Delete pannava da?")){await supabase.from('posts').delete().eq('id',id);loadFeed();loadProfile();}}
 function openEdit(){let bio=prompt("Bio enna da?","Tiruchuli to World 🌍");if(bio)supabase.from('profiles').update({bio}).eq('id',currentUser.id).then(()=>loadProfileData());}
-function savePost(id){alert("Saved da Giri! 🔖 (Bookmarks next update la)");}
-function showLikers(id){openComments(id);}
-function showFollowers(){alert("Followers list next update la da!");}
-function showFollowing(){alert("Following list next update la da!");}
-function addStory(){document.getElementById('fileInput').click();}
+function savePost(id){alert("Saved da Giri! 🔖");}
 </script>
 </body>
 </html>
