@@ -10,99 +10,41 @@ body{background:#000;color:#fff}
 .btn{width:100%;padding:12px;background:#0095f6;border:none;border-radius:10px;color:#fff;font-weight:700}
 .head{height:52px;background:#000;border-bottom:1px solid #222;display:flex;align-items:center;padding:0 14px;position:fixed;top:0;width:100%;max-width:500px;left:50%;transform:translateX(-50%);z-index:10}
 .pages{max-width:500px;margin:52px auto 60px}
-.story{display:flex;gap:12px;padding:12px;overflow-x:auto;border-bottom:1px solid #222}
+#storyBox{display:flex;gap:12px;padding:12px;overflow-x:auto;border-bottom:1px solid #222}
 .s{min-width:64px;text-align:center}
 .r{width:60px;height:60px;border-radius:50%;background:linear-gradient(45deg,#feda75,#d62976);padding:2px;display:flex}
-.r div{width:100%;height:100%;background:#111;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px}
-.post{border-bottom:1px solid #222}
+.r div{width:100%;height:100%;background:#111;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden}
+.r img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.post{border-bottom:1px solid #222;position:relative}
 .post-top{padding:10px 12px;display:flex;align-items:center;gap:10px}
 .post-top img{width:32px;height:32px;border-radius:50%}
 .post-img{width:100%;aspect-ratio:4/5;object-fit:cover;background:#111}
 .post-cap{padding:8px 12px 14px;font-size:14px}
 .bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;height:52px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;font-size:22px}
+#exploreBox{display:flex;flex-wrap:wrap;gap:2px;padding:2px}
+#searchBox{padding:10px;display:none}
+#searchBox input{width:100%;padding:10px;background:#111;border:1px solid #333;border-radius:20px;color:#fff}
 </style></head><body>
 
-<div id="login" class="login">
+<div id="loginBox" class="login">
 <div class="box">
 <h1>Pixoro</h1>
 <p style="color:#666;font-size:12px;margin:6px 0 14px">Tiruchuli to World 🌍</p>
-<input id="u" class="input" placeholder="Username" value="Giri">
-<button class="btn" onclick="go()">Login</button>
+<input id="usernameInput" class="input" placeholder="Username" value="Giri">
+<button class="btn" onclick="window.login()">Login</button>
 </div></div>
 
-<div id="app" style="display:none">
+<div id="mainApp" style="display:none">
 <div class="head"><b style="font-family:cursive;font-size:24px">Pixoro</b><span style="margin-left:auto">♡</span></div>
 <div class="pages">
-<div class="story">
-<div class="s" onclick="document.getElementById('file').click()"><div class="r"><div>+</div></div><small id="sn">@Giri</small></div>
-<div class="s"><div class="r"><div>😎</div></div><small>@krikir58</small></div>
-<div class="s"><div class="r"><div>🌍</div></div><small>@pixoro</small></div>
+<div id="searchBox"><input id="searchInput" placeholder="Search #hashtag..."></div>
+<div id="storyBox"></div>
+<div id="exploreBox"></div>
+<div id="feedList"></div>
 </div>
-<div id="feed"></div>
-</div>
-<div class="bottom"><span>⌂</span><span>⌕</span><span style="background:#fff;color:#000;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center" onclick="document.getElementById('file').click()">+</span><span>♡</span><span id="pb">◯</span></div>
+<div class="bottom"><span onclick="location.reload()">⌂</span><span id="searchBtn">⌕</span><span style="background:#fff;color:#000;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center" onclick="document.getElementById('fileInput').click()">+</span><span>♡</span><span id="profileBtn">◯</span></div>
 </div>
 
-<input type="file" id="file" accept="image/*" style="display:none">
-
-<script>
-function clean(s){
-  if(!s) return "Giri";
-  s = String(s).trim();
-  if(s.includes('{') || s.includes('"') || s.includes(':')) return "Giri";
-  if(s.includes('@')) s = s.split('@')[0];
-  return s.replace(/[^a-zA-Z0-9_]/g,'').slice(0,20) || "Giri";
-}
-function go(){
-  let safe = clean(document.getElementById('u').value || "Giri");
-  localStorage.setItem('pixoro_user_clean', safe);
-  localStorage.setItem('pixoro_logged', 'true');
-  localStorage.removeItem('pixoro_user');
-  localStorage.removeItem('pixoro_world_posts');
-  document.getElementById('login').style.display='none';
-  document.getElementById('app').style.display='block';
-  init();
-}
-function init(){
-  let u = clean(localStorage.getItem('pixoro_user_clean') || 'Giri');
-  document.getElementById('sn').innerText = '@'+u;
-  document.getElementById('pb').innerText = u[0].toUpperCase();
-  load();
-}
-function load(){
-  let posts = []; try{posts=JSON.parse(localStorage.getItem('pixoro_posts')||'[]')}catch(e){}
-  posts = posts.filter(p=>!String(p.username).includes('{'));
-  let demo = [
-    {username:'Giri',img:'https://picsum.photos/500/600?random=11',cap:'Tiruchuli to World 🌍'},
-    {username:'krikir58',img:'https://picsum.photos/500/600?random=12',cap:'Welcome to Pixoro 🔥'}
-  ];
-  let all = [...posts,...demo];
-  document.getElementById('feed').innerHTML = all.map(p=>`
-    <div class="post">
-      <div class="post-top"><img src="https://i.pravatar.cc/100?u=${p.username}"><b>@${clean(p.username)}</b></div>
-      <img class="post-img" src="${p.img}">
-      <div class="post-cap"><b>@${clean(p.username)}</b> ${p.cap}</div>
-    </div>
-  `).join('');
-}
-document.getElementById('file').addEventListener('change', e=>{
-  let f = e.target.files[0]; if(!f) return;
-  let r = new FileReader();
-  r.onload = ev=>{
-    let u = clean(localStorage.getItem('pixoro_user_clean')||'Giri');
-    let posts = []; try{posts=JSON.parse(localStorage.getItem('pixoro_posts')||'[]')}catch(e){}
-    posts.unshift({username:u, img:ev.target.result, cap:'Tiruchuli to World 🌍'});
-    localStorage.setItem('pixoro_posts', JSON.stringify(posts.slice(0,30)));
-    load();
-  };
-  r.readAsDataURL(f);
-});
-try{
-  if(localStorage.getItem('pixoro_logged')==='true'){
-    document.getElementById('login').style.display='none';
-    document.getElementById('app').style.display='block';
-    init();
-  }
-}catch(e){}
-</script>
+<input type="file" id="fileInput" accept="image/*" style="display:none">
+<script type="module" src="./js/app.js"></script>
 </body></html>
