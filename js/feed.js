@@ -6,24 +6,23 @@ export function loadRealFeed(callback){
   return onSnapshot(q, (snap)=>{
     const reels = snap.docs.map(d=>{
       const data = d.data();
-      // Giri secret fix - Password ah hide pannu!
-      let cleanUser = data.username || data.user || "pixoro";
+      let cleanUser = data.username || data.user || data.email || "pixoro";
       try {
-        if (typeof cleanUser === 'string' && cleanUser.includes('"u"')) {
+        if(typeof cleanUser === 'string' && cleanUser.includes('"u"')){
           const parsed = JSON.parse(cleanUser);
-          cleanUser = parsed.u; // Giri mattum, password illa!
+          cleanUser = parsed.u || parsed.username || "";
+          // Empty na email la irunthu eduthukko
+          if(!cleanUser && data.email) cleanUser = data.email.split('@')[0];
+          if(!cleanUser) cleanUser = "Giri";
         }
       } catch(e){}
-      
-      return {id:d.id, ...data, username: cleanUser};
+      // Final safety - Giri mattum than varanum
+      if(!cleanUser || cleanUser.includes('{')) cleanUser = "Giri";
+      return {id:d.id,...data, username: cleanUser};
     });
     if(callback) callback(reels);
-    else {
-      // Direct render if no callback
-      window.renderReels && window.renderReels(reels);
-    }
+    else window.renderReels && window.renderReels(reels);
   });
 }
-
 // Old name ku support
 export const loadFeed = loadRealFeed;
