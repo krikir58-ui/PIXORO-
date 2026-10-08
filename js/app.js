@@ -1,15 +1,28 @@
 import { initAuth } from './auth.js';
 import { loadFeed } from './feed.js';
 import { initScreenshotAlert } from './safety.js';
-import { loadStories } from './stories.js';
-import './likes.js';
-import { loadReels } from './reels.js';
-import { loadExplore, initSearch } from './explore.js';
 
 initAuth();
 loadFeed();
-loadStories();
-loadReels();
-loadExplore();
-initSearch();
-initScreenshotAlert(); // Girls Safety ON! 🔒
+initScreenshotAlert();
+
+// Baki ellam iruntha mattum load pannu - Illana skip pannu
+try{
+  const { loadStories } = await import('./stories.js');
+  loadStories();
+}catch(e){ console.log('stories.js illa'); }
+
+try{
+  const { loadReels } = await import('./reels.js');
+  loadReels();
+}catch(e){ console.log('reels.js illa'); }
+
+try{
+  const { loadExplore, initSearch } = await import('./explore.js');
+  loadExplore();
+  initSearch();
+}catch(e){ console.log('explore.js illa'); }
+
+try{
+  await import('./likes.js');
+}catch(e){ console.log('likes.js illa'); }
