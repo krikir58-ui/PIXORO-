@@ -11,18 +11,16 @@ export function loadRealFeed(callback){
         if(typeof cleanUser === 'string' && cleanUser.includes('"u"')){
           const parsed = JSON.parse(cleanUser);
           cleanUser = parsed.u || parsed.username || "";
-          // Empty na email la irunthu eduthukko
           if(!cleanUser && data.email) cleanUser = data.email.split('@')[0];
           if(!cleanUser) cleanUser = "Giri";
         }
       } catch(e){}
-      // Final safety - Giri mattum than varanum
-      if(!cleanUser || cleanUser.includes('{')) cleanUser = "Giri";
+      if(!cleanUser || cleanUser.includes('{') || cleanUser.includes('"')) cleanUser = "Giri";
+      if(cleanUser.includes('@')) cleanUser = cleanUser.split('@')[0];
       return {id:d.id,...data, username: cleanUser};
     });
     if(callback) callback(reels);
     else window.renderReels && window.renderReels(reels);
   });
 }
-// Old name ku support
 export const loadFeed = loadRealFeed;
