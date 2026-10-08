@@ -1,23 +1,10 @@
-import { supabase } from '../supabase.js';
-
-// Story paatha udane yaarukkum theriyama save aayidum - Secret!
-export async function viewStory(storyId, ownerId) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user.id === ownerId) return; // Un story ah neeye paatha count koodathu da
-
-  await supabase.from('story_views').insert({
-    story_id: storyId,
-    viewer_id: user.id,
-    viewed_at: new Date().toISOString()
-  });
-  console.log("Secret view logged 👁️");
+import { getCurrentUser } from "./auth.js";
+export function loadStories(){
+  let bar = document.getElementById('storyBar'); if(!bar) return;
+  let user = getCurrentUser();
+  let yourLabel = document.getElementById('yourStoryLabel'); if(yourLabel) yourLabel.innerText = '@'+user;
+  let safeBase = `<div class="story-item" onclick="document.getElementById('fileInput').click()"><div class="story-ring" style="background:#333;display:flex;align-items:center;justify-content:center;font-size:24px">+</div><small id="yourStoryLabel">@${user}</small></div>`;
+  let demo = [{user:'krikir58', img:'https://i.pravatar.cc/150?u=krikir58'}];
+  bar.innerHTML = safeBase + demo.map(s=>`<div class="story-item"><div class="story-ring"><img src="${s.img}"></div><small>@${s.user}</small></div>`).join('');
 }
-
-// Owner mattum paarkalam yaar paathanga nu!
-export async function getStoryViewers(storyId) {
-  const { data } = await supabase
-    .from('story_views')
-    .select('viewer_id, profiles(username)')
-    .eq('story_id', storyId);
-  return data;
-  }
+window.loadStories = loadStories;
