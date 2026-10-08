@@ -1,26 +1,13 @@
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { db } from "./firebase.js";
-
-export async function uploadRealPost(file, caption, email){
-  let username = "Giri";
-  if(email && email.includes('@')){
-    username = email.split('@')[0];
-  }
-  const stored = localStorage.getItem('username') || localStorage.getItem('pixoro_user');
-  if(stored &&!stored.includes('{') &&!stored.includes('"')){
-    username = stored;
-  }
-  if(!username || username.includes('{')) username = "Giri";
-  const url = URL.createObjectURL(file);
-  await addDoc(collection(db, "reels"), {
-    videoUrl: url,
-    caption: caption,
-    email: email || "",
-    username: username,
-    likes: 0,
-    comments: 0,
-    views: 0,
-    createdAt: serverTimestamp()
-  });
-  alert("Post ayiduchu da Giri! Username: " + username);
+import { getCurrentUser } from "./auth.js";
+export async function uploadPost(file, caption){
+  let safeUser = getCurrentUser(); if(!safeUser || safeUser.includes('{')) safeUser = "Giri";
+  let url = URL.createObjectURL(file);
+  let post = { id: Date.now(), username: safeUser, user: safeUser, cap: caption, img: url, likes: 1, location: 'Tiruchuli • V2 SECURE' };
+  let posts = []; try{ posts = JSON.parse(localStorage.getItem('pixoro_v2_posts')||'[]'); }catch(e){}
+  posts.unshift(post);
+  localStorage.setItem('pixoro_v2_posts', JSON.stringify(posts.slice(0,50)));
+  alert('✅ V2 Secure Upload @'+safeUser);
+  return post;
 }
+window.uploadPost = uploadPost;
+window.uploadWorldPost = uploadPost;
