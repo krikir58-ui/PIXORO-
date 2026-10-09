@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixoro Reels 🎬</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+body{background:#000;color:#fff;overflow:hidden}
+.reels{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch}
+.reel{height:100vh;position:relative;scroll-snap-align:start;background:#000;display:flex;align-items:center;justify-content:center}
+.reel video{width:100%;height:100%;object-fit:cover}
+.top{position:fixed;top:0;left:0;right:0;padding:15px 15px;display:flex;justify-content:space-between;z-index:100;background:linear-gradient(rgba(0,0,0,0.8), transparent);font-weight:bold}
+.overlay{position:absolute;bottom:0;left:0;right:60px;padding:0 15px 100px;z-index:10}
+.actions{position:absolute;right:12px;bottom:110px;display:flex;flex-direction:column;gap:28px;text-align:center;z-index:10}
+.act{font-size:30px;cursor:pointer;line-height:1}
+.act span{display:block;font-size:12px;margin-top:4px;font-weight:bold}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100}
+.nav a{color:#777;text-decoration:none;font-size:24px}.nav a.active{color:#fff}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a href="index.html" style="color:#fff;text-decoration:none">← Pixoro</a>
+  <span>Reels 🎬</span>
+  <span>📷</span>
+</div>
+
+<div id="reels" class="reels">Loading... ⏳</div>
+
+<div class="nav">
+  <a href="index.html">🏠</a>
+  <a href="reels.html" class="active">🎬</a>
+  <a href="#">➕</a>
+  <a href="#">❤️</a>
+  <a href="#">👤</a>
+</div>
+
+<script>
+const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+async function load(){
+  const {data} = await supa.from('reels').select('*').order('created_at',{ascending:false})
+  if(!data || data.length==0){ document.getElementById('reels').innerHTML='<p style="padding:80px;text-align:center;color:#888">No reels da - Add video!</p>'; return}
+  document.getElementById('reels').innerHTML = data.map(r=>`
+    <div class="reel">
+      <video src="${r.video_url}" loop autoplay muted playsinline onclick="this.paused?this.play():this.pause()"></video>
+      <div class="actions">
+        <div class="act" onclick="like(${r.id},${r.likes||0})">❤️<span id="l-${r.id}">${r.likes||0}</span></div>
+        <div class="act">💬<span>12</span></div>
+        <div class="act">✈️<span>Share</span></div>
+        <div class="act">⋯</div>
+        <div class="act" style="border:2px solid #fff;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;margin:0 auto">🎵</div>
+      </div>
+      <div class="overlay">
+        <b>@${r.username} ${r.username.toLowerCase()=='giri'?'🔵':''}</b>
+        <div style="margin-top:6px;font-size:14px;line-height:1.3">${r.caption||''}</div>
+        <div style="margin-top:10px;font-size:13px">🎵 Original audio - Tiruchuli • ${r.username}</div>
+      </div>
+    </div>
+  `).join('')
+}
+async function like(id,cur){
+  await supa.from('reels').update({likes:cur+1}).eq('id',id)
+  document.getElementById('l-'+id).innerText=cur+1
+}
+load()
+</script>
+</body>
+</html>
