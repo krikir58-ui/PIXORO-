@@ -12,7 +12,6 @@
 #storyView{display:none;position:fixed;inset:0;background:#000;z-index:9999;align-items:center;justify-content:center;flex-direction:column}
 .cmtBox{display:flex;gap:6px;padding:8px 12px}.cmtBox input{flex:1;background:#111;border:1px solid #333;border-radius:20px;padding:8px 12px;color:#fff;outline:none}
 @keyframes heartBlast{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(1.3);opacity:1}100%{transform:translate(-50%,-50%) scale(1.5);opacity:0}}
-/* 🔵 GIRI INSTA MASS ADDITION */
 .follow-btn{background:#000;color:#fff;border:1.5px solid #fff;padding:6px 16px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;transition:0.2s}
 .follow-btn.following{background:#fff;color:#000;border-color:#fff}
 .heart-btn,.cmt-btn,.share-btn{background:none;border:0;cursor:pointer;padding:0;display:flex;align-items:center}
@@ -47,24 +46,38 @@
 
 <script src="js/splash.js"></script>
 <script>
-const supa = window.supabase.createClient('https://yecpltndhlzfjplndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_'.replace('ndhlzfjpl','')) // key hidden fix
+const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME = 'Giri'
 function openPlus(){document.getElementById('plusModal').style.display='flex'}
 function closePlus(){document.getElementById('plusModal').style.display='none'}
 function blastHeart(){let h=document.createElement('div');h.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;z-index:9999;animation:heartBlast 1s ease-out;pointer-events:none';h.innerHTML='❤️🔵';document.body.appendChild(h);setTimeout(()=>h.remove(),1000);if(navigator.vibrate)navigator.vibrate(100)}
 async function loadStories(){
+ try{
  const {data}=await supa.from('stories').select('*').order('created_at',{ascending:false})
  let h=`<div class="sItem" onclick="location.href='story-upload.html'"><div style="width:62px;height:62px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px dashed #555">➕</div><div style="font-size:11px;margin-top:4px">Your Story</div></div>`
  if(data) h+=data.map(s=>`<div class="sItem" onclick="viewStory('${s.image_url}','${s.username}')"><div class="sRing"><img src="${s.image_url}"></div><div style="font-size:11px;margin-top:4px">${s.username}</div></div>`).join('')
  document.getElementById('storyBar').innerHTML=h
+ }catch(e){console.log('story error',e)}
 }
 function viewStory(u,n){document.getElementById('sImg').src=u;document.getElementById('sUser').innerText='@'+n+' 🔵';document.getElementById('storyView').style.display='flex';setTimeout(()=>document.getElementById('storyView').style.display='none',5000)}
+
 async function loadPosts(){
- const {data:posts}=await supa.from('posts').select('*')
- const {data:likes}=await supa.from('likes').select('*')
- const {data:comments}=await supa.from('comments').select('*')
- const {data:follows}=await supa.from('follows').select('*').eq('follower',ME)
- if(!posts || posts.length==0){document.getElementById('feed').innerHTML='<p style="text-align:center;padding:30px;color:#777">No posts da 🔵</p>';return}
+ console.log('🔵 Loading posts da Giri...');
+ let {data:posts, error:pErr} = await supa.from('posts').select('*').order('created_at',{ascending:false})
+ console.log('posts:',posts,'err:',pErr)
+ if(pErr){
+   document.getElementById('feed').innerHTML=`<p style="text-align:center;padding:30px;color:#f55">Error: ${pErr.message}<br><br>Supabase RLS check pannu da</p>`;
+   return;
+ }
+ if(!posts || posts.length==0){
+   document.getElementById('feed').innerHTML='<p style="text-align:center;padding:30px;color:#777">No posts da 🔵<br><small>Upload success aana aprom inga varum</small></p>';return
+ }
+
+ let likes=[], comments=[], follows=[];
+ try{ let r=await supa.from('likes').select('*'); if(r.data) likes=r.data }catch(e){}
+ try{ let r=await supa.from('comments').select('*'); if(r.data) comments=r.data }catch(e){}
+ try{ let r=await supa.from('follows').select('*').eq('follower',ME); if(r.data) follows=r.data }catch(e){}
+
  let rankedPosts = posts.map(p=>{
    const lCount = likes ? likes.filter(l=>l.post_id==p.id).length : 0
    const cCount = comments ? comments.filter(c=>c.post_id==p.id).length : 0
@@ -105,15 +118,18 @@ async function loadPosts(){
  document.getElementById('feed').innerHTML=html
 }
 async function likePost(id){
- const {data}=await supa.from('likes').select('*').eq('post_id',id).eq('username',ME)
- if(data && data.length>0){ await supa.from('likes').delete().eq('post_id',id).eq('username',ME) } else { await supa.from('likes').insert({post_id:id,username:ME}); blastHeart() }
- loadPosts()
+ try{
+   const {data}=await supa.from('likes').select('*').eq('post_id',id).eq('username',ME)
+   if(data && data.length>0){ await supa.from('likes').delete().eq('post_id',id).eq('username',ME) } else { await supa.from('likes').insert({post_id:id,username:ME}); blastHeart() }
+   loadPosts()
+ }catch(e){ alert('Likes table illa da, Supabase la create pannu'); }
 }
 async function addComment(id){
  const inp=document.getElementById('cmt-'+id); const txt=inp.value.trim(); if(!txt)return
- await supa.from('comments').insert({post_id:id,username:ME,comment:txt}); inp.value=''; loadPosts()
+ try{ await supa.from('comments').insert({post_id:id,username:ME,comment:txt}); inp.value=''; loadPosts() }
+ catch(e){ alert('Comments table illa da') }
 }
 function sharePost(url){ if(navigator.share){navigator.share({title:'Pixoro',text:'Check this on Pixoro 🔵',url:location.href})} else {prompt('Share this link da Giri! Copy pannu 👇',location.href)} }
-async function followUser(name){ if(name==ME)return alert('Nee unna follow panna mudiyathu da 😅'); const {data}=await supa.from('follows').select('*').eq('follower',ME).eq('following',name); if(data && data.length>0){await supa.from('follows').delete().eq('follower',ME).eq('following',name)} else {await supa.from('follows').insert({follower:ME,following:name})} loadPosts() }
+async function followUser(name){ if(name==ME)return alert('Nee unna follow panna mudiyathu da 😅'); try{ const {data}=await supa.from('follows').select('*').eq('follower',ME).eq('following',name); if(data && data.length>0){await supa.from('follows').delete().eq('follower',ME).eq('following',name)} else {await supa.from('follows').insert({follower:ME,following:name})} loadPosts() }catch(e){ alert('Follows table illa da') } }
 loadStories();loadPosts();
 </script></body></html>
