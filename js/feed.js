@@ -1,76 +1,59 @@
-import { supabase } from './supabase.js';
-import { clean, getUser } from './auth.js';
+// 🔵 PIXORO SMART FEED ALGORITHM - Instagram maari da Giri!
 
-export async function loadFeed(filter=null){
-  let { data: posts } = await supabase.from('posts').select('*').order('created_at',{ascending:false}).limit(30);
-  if(!posts) posts=[];
+async function loadFeed() {
+  // Supabase la irunthu data edukkrom
+  const { data: posts } = await supabase.from('posts').select('*')
+  const { data: likes } = await supabase.from('likes').select('*')
+  const { data: comments } = await supabase.from('comments').select('*')
+  const { data: follows } = await supabase.from('follows').select('*').eq('follower', 'Giri')
 
-  // Follow list edukkurom
-  let me = getUser();
-  let { data: myFollows } = await supabase.from('follows').select('following').eq('follower', me);
-  let following = (myFollows||[]).map(f=>f.following);
-
-  let html = '';
-  for(let p of posts){
-    let { data: likes } = await supabase.from('likes').select('*').eq('post_id', p.id);
-    let { data: cmts } = await supabase.from('comments').select('*').eq('post_id', p.id).order('created_at',{ascending:true}).limit(5);
-    let likeCount = likes?.length || 0;
-    let isLiked = likes?.some(l=>l.username===me);
-    let isFollowing = following.includes(p.username);
-
-    html+=`
-    <div class="post">
-      <div class="post-top">
-        <img src="https://i.pravatar.cc/100?u=${p.username}">
-        <b>@${clean(p.username)}</b>
-        ${p.username!==me ? `<button onclick="window.doFollow('${p.username}')" style="margin-left:auto; background:${isFollowing?'#222':'#0095f6'}; color:#fff; border:none; padding:5px 12px; border-radius:6px; font-size:12px">${isFollowing?'Following':'Follow'}</button>` : ''}
-      </div>
-      <img class="post-img" src="${p.img}" ondblclick="window.doLike('${p.id}')">
-      <div class="post-cap">
-        <div style="display:flex; gap:14px; font-size:22px; margin-bottom:6px">
-          <span onclick="window.doLike('${p.id}')" style="cursor:pointer">${isLiked?'❤️':'🤍'} ${likeCount}</span>
-          <span onclick="window.openComment('${p.id}')" style="cursor:pointer">💬 ${cmts?.length||''}</span>
-          <span onclick="window.doShare('${p.id}')" style="cursor:pointer">✈️</span>
-        </div>
-        <b>@${clean(p.username)}</b> ${p.cap||''}
-        <div id="c-${p.id}" style="margin-top:6px; font-size:13px; opacity:0.9">
-          ${(cmts||[]).map(c=>`<div><b>@${clean(c.username)}</b> ${c.text}</div>`).join('')}
-        </div>
-        <div style="display:flex; gap:6px; margin-top:6px">
-          <input id="inp-${p.id}" placeholder="Add comment..." style="flex:1; background:#111; border:1px solid #222; color:#fff; padding:6px 10px; border-radius:20px; font-size:12px">
-          <button onclick="window.addComment('${p.id}')" style="background:#0095f6; border:none; color:#fff; padding:6px 12px; border-radius:20px; font-size:12px">Post</button>
-        </div>
-      </div>
-    </div>`;
+  if (!posts || posts.length === 0) {
+    document.getElementById('feed').innerHTML = '<p style="text-align:center;padding:30px">No posts yet da Giri! First post podu! 🔵</p>'
+    return
   }
-  document.getElementById('feedList').innerHTML = html;
+
+  // 🔥 ALGORITHM START - Ithu thaan Instagram secret da!
+  let rankedPosts = posts.map(p => {
+    const lCount = likes ? likes.filter(l => l.post_id == p.id).length : 0
+    const cCount = comments ? comments.filter(c => c.post_id == p.id).length : 0
+    const hoursAgo = (new Date() - new Date(p.created_at)) / (1000 * 60 * 60)
+
+    let score = 0
+    score += lCount * 2        // Like ku 2 point
+    score += cCount * 3        // Comment ku 3 point
+    if (follows && follows.some(f => f.following == p.username)) score += 10 // Follow panravanga +10
+    if (p.username == 'Giri') score += 5 // Un post ku bonus
+    score -= hoursAgo * 0.5    // Palasa post ku minus
+    if (p.caption && p.caption.includes('#')) score += 8 // Hashtag ku +8
+
+    return { ...p, score, lCount, cCount }
+  })
+
+  // Score padi sort - Perusa irukka mela varum!
+  rankedPosts.sort((a, b) => b.score - a.score)
+
+  // HTML Build
+  let html = ''
+  for (let p of rankedPosts) {
+    const isLiked = likes ? likes.some(l => l.post_id == p.id && l.username == 'Giri') : false
+    const pCmts = comments ? comments.filter(c => c.post_id == p.id) : []
+    const badge = p.score > 10 ? '🔥 TRENDING' : ''
+
+    html += `
+    <div class="post">
+      <div class="postTop"><b>@${p.username} ${p.username=='Giri'?'✔️':''} ${badge}</b>
+      <button onclick="followUser('${p.username}')">Follow</button></div>
+      <img class="main" src="${p.image_url}" ondblclick="likePost(${p.id})">
+      <div class="actions">
+        <span onclick="likePost(${p.id})">${isLiked?'❤️':'🤍'}</span>
+        <span>💬</span><span>✈️</span>
+      </div>
+      <div style="padding:0 12px"><b>${p.lCount} likes</b><br>${p.caption||''}</div>
+      <div style="padding:5px 12px;font-size:13px;color:#aaa">${pCmts.map(c=>`<div><b>${c.username}</b> ${c.comment}</div>`).join('')}</div>
+    </div>`
+  }
+  document.getElementById('feed').innerHTML = html
 }
 
-// Global functions
-window.doLike = async (postId)=>{
-  let u=getUser();
-  let { data } = await supabase.from('likes').select('*').eq('post_id', postId).eq('username', u);
-  if(data && data.length>0){ await supabase.from('likes').delete().eq('post_id', postId).eq('username', u); }
-  else{ await supabase.from('likes').insert([{post_id:postId, username:u}]); }
-  loadFeed();
-};
-
-window.addComment = async (postId)=>{
-  let inp=document.getElementById('inp-'+postId); let txt=inp.value.trim(); if(!txt) return;
-  await supabase.from('comments').insert([{post_id:postId, username:getUser(), text:txt}]);
-  inp.value=''; loadFeed();
-};
-
-window.doShare = async (postId)=>{
-  if(navigator.share){ navigator.share({title:'Pixoro', text:'Check this on Pixoro 🔥', url: location.href}); }
-  else{ navigator.clipboard.writeText(location.href); alert('Link copied da Giri! 📋'); }
-};
-
-window.doFollow = async (username)=>{
-  let me=getUser(); let { data } = await supabase.from('follows').select('*').eq('follower',me).eq('following',username);
-  if(data && data.length>0){ await supabase.from('follows').delete().eq('follower',me).eq('following',username); }
-  else{ await supabase.from('follows').insert([{follower:me, following:username}]); }
-  loadFeed();
-};
-
-window.openComment = (id)=>{ document.getElementById('inp-'+id)?.focus(); };
+// Page load aana algorithm run aagum
+loadFeed()
