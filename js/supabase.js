@@ -1,8 +1,7 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
-
-const URL = 'https://yecpltndhlzfjplzhcpm.supabase.co'
-const KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_'
-
-export const supabase = createClient(URL, KEY)
-
-console.log('Pixoro Connected - Tiruchuli to World 🌍', URL)
+// Supabase Connection - Pixoro 🔵
+const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
+const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
+if(!window.supa){
+  window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+}
+console.log('Supabase connected 🔵');
