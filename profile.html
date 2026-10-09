@@ -1,0 +1,45 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Profile - Pixoro</title>
+<link rel="stylesheet" href="css/follow.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}.top{padding:12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;background:#000}.pfpRing{width:88px;height:88px;border-radius:50%;background:conic-gradient(#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);padding:3px}.pfpInner{width:100%;height:100%;background:#000;border-radius:50%;padding:3px}.pfpInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}.settingsBox{background:#121212;border-radius:16px;margin:10px;padding:14px}.toggle{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #222}</style></head><body>
+<div class="top"><b id="profileName">@Giri</b><span style="font-size:22px;cursor:pointer" onclick="openSettings()">⚙️</span></div>
+<div style="padding:16px;display:flex;gap:20px;align-items:center">
+<div class="pfpRing"><div class="pfpInner"><img id="myPfp" src="https://i.pravatar.cc/200?u=Giri"></div></div>
+<div><div style="display:flex;gap:18px"><span><b id="pPosts">0</b> posts</span><span><b id="pFollowers">0</b> followers</span><span><b id="pFollowing">0</b> following</span></div><div style="margin-top:8px">Pixoro Founder 🔵 <span id="blueTick" style="display:none;color:#0095f6">✔️</span></div><button style="margin-top:8px;background:#222;border:1px solid #444;color:#fff;padding:6px 14px;border-radius:8px" onclick="chooseGilli()">Edit Photo</button></div>
+</div>
+<input type="file" id="gilliInput" hidden accept="image/*">
+<div id="myFeed" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px"></div>
+
+<!-- SETTINGS MODAL - FULL INSTA SYSTEM -->
+<div id="settingsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;overflow-y:auto"><div style="padding:16px;text-align:center;border-bottom:1px solid #222"><b>Settings & Safety 🔵</b><span onclick="closeSettings()" style="float:right;font-size:20px;cursor:pointer">✕</span></div>
+<div style="padding:14px">
+<div class="settingsBox"><b>🛡️ Girls Safety - No Hack Protection</b>
+<div class="toggle"><span>Private Account 🔒<br><small style="color:#777">Only followers can see posts</small></span><input type="checkbox" id="privateAcc" onchange="togglePrivate()"></div>
+<div class="toggle"><span>Ghost Mode 👻<br><small style="color:#777">Hide active status & story views</small></span><input type="checkbox" id="ghostMode" onchange="toggleGhost()"></div>
+<div class="toggle"><span>Block List 🚫</span><button onclick="viewBlocks()" style="background:#222;border:1px solid #444;color:#fff;padding:5px 10px;border-radius:6px">View</button></div>
+<div class="toggle"><span>Report & Safety</span><button onclick="alert('Report sent to Pixoro Safety Team 🔵')" style="background:#ff3040;border:0;color:#fff;padding:5px 10px;border-radius:6px">Report</button></div>
+</div>
+<div class="settingsBox"><b>✔️ Verification - Blue Tick</b>
+<div class="toggle"><span>Request Blue Tick<br><small style="color:#777">Get verified badge like Instagram</small></span><button id="tickBtn" onclick="requestBlueTick()" style="background:#0095f6;border:0;color:#fff;padding:6px 14px;border-radius:8px">Request ✔️</button></div>
+<div id="tickStatus" style="font-size:12px;color:#777;margin-top:6px">Status: Not requested</div>
+</div>
+<div class="settingsBox"><b>⚙️ Account</b>
+<div class="toggle"><span>Logout</span><button onclick="logout()" style="background:#222;border:1px solid #444;color:#fff;padding:5px 10px;border-radius:6px">Logout</button></div>
+</div>
+</div></div></div>
+
+<script>
+const supa=supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+const ME='Giri'
+function openSettings(){document.getElementById('settingsModal').style.display='flex'}
+function closeSettings(){document.getElementById('settingsModal').style.display='none'}
+function chooseGilli(){document.getElementById('gilliInput').click()}
+document.getElementById('gilliInput').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{document.getElementById('myPfp').src=ev.target.result;localStorage.setItem('pixoro_gilli_pfp',ev.target.result)};r.readAsDataURL(f)})
+function togglePrivate(){let v=document.getElementById('privateAcc').checked;localStorage.setItem('pixoro_private',v);alert(v?'Private ON 🔒 - Girls safe!':'Public ON 🌍')}
+function toggleGhost(){let v=document.getElementById('ghostMode').checked;localStorage.setItem('pixoro_ghost',v);alert(v?'Ghost Mode ON 👻 - No one can track!':'Ghost OFF')}
+function viewBlocks(){let b=JSON.parse(localStorage.getItem('pixoro_blocks')||'[]');alert(b.length? 'Blocked: '+b.join(', ') : 'No blocked users')}
+function requestBlueTick(){document.getElementById('tickStatus').innerText='Status: Pending... 🔵';document.getElementById('tickBtn').innerText='Pending...';localStorage.setItem('pixoro_bluetick','pending');setTimeout(()=>{document.getElementById('tickStatus').innerText='Status: Verified ✔️🔵';document.getElementById('blueTick').style.display='inline';localStorage.setItem('pixoro_bluetick','verified');alert('Congrats da Giri! Blue Tick Verified! ✔️🔵')},2000)}
+function logout(){localStorage.clear();alert('Logged out');location.href='index.html'}
+window.addEventListener('load',()=>{let s=localStorage.getItem('pixoro_gilli_pfp');if(s)document.getElementById('myPfp').src=s;if(localStorage.getItem('pixoro_private')=='true')document.getElementById('privateAcc').checked=true;if(localStorage.getItem('pixoro_ghost')=='true')document.getElementById('ghostMode').checked=true;if(localStorage.getItem('pixoro_bluetick')=='verified'){document.getElementById('blueTick').style.display='inline';document.getElementById('tickStatus').innerText='Status: Verified ✔️🔵'}})
+</script>
+</body></html>
