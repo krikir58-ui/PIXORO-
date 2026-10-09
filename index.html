@@ -7,16 +7,18 @@
 <style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}.top{padding:12px 15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:50}
 .storyBar{display:flex;gap:12px;padding:12px 10px;overflow-x:auto;border-bottom:1px solid #222}.sItem{text-align:center;min-width:62px;cursor:pointer}.sRing{width:62px;height:62px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)}.sRing img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #000}
 .post{border-bottom:1px solid #222;padding-bottom:10px}.postTop{padding:10px 12px;display:flex;align-items:center;justify-content:space-between}
-.post img.main{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111}.actions{padding:10px 12px;display:flex;gap:15px;font-size:22px;align-items:center}.actions span{cursor:pointer}
+.post img.main{width:100%!important;aspect-ratio:1/1!important;object-fit:cover!important;background:#111!important;border-radius:0!important;display:block!important}
+.actions{padding:10px 12px;display:flex;gap:18px;font-size:22px;align-items:center}
 .nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100;max-width:450px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%}.nav a{color:#777;text-decoration:none;font-size:24px;cursor:pointer}.nav a.active{color:#fff}
 #storyView{display:none;position:fixed;inset:0;background:#000;z-index:9999;align-items:center;justify-content:center;flex-direction:column}
 .cmtBox{display:flex;gap:6px;padding:8px 12px}.cmtBox input{flex:1;background:#111;border:1px solid #333;border-radius:20px;padding:8px 12px;color:#fff;outline:none}
 @keyframes heartBlast{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(1.3);opacity:1}100%{transform:translate(-50%,-50%) scale(1.5);opacity:0}}
 .follow-btn{background:#000;color:#fff;border:1.5px solid #fff;padding:6px 16px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;transition:0.2s}
 .follow-btn.following{background:#fff;color:#000;border-color:#fff}
-.heart-btn,.cmt-btn,.share-btn{background:none;border:0;cursor:pointer;padding:0;display:flex;align-items:center}
-.heart-btn svg{transition:0.2s}
-.heart-btn.liked svg{fill:#ff3040;stroke:#ff3040;animation:likePop 0.3s ease}
+.heart-btn,.cmt-btn,.share-btn{background:none;border:0;cursor:pointer;padding:0;display:flex;align-items:center;transition:0.2s}
+.heart-btn svg,.cmt-btn svg,.share-btn svg{transition:0.2s}
+.heart-btn.liked svg{fill:#ff3040!important;stroke:#ff3040!important;animation:likePop 0.3s ease}
+.cmt-btn:active svg,.share-btn:active svg{transform:scale(1.2)}
 @keyframes likePop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
 </style></head><body>
 
@@ -62,16 +64,9 @@ async function loadStories(){
 function viewStory(u,n){document.getElementById('sImg').src=u;document.getElementById('sUser').innerText='@'+n+' 🔵';document.getElementById('storyView').style.display='flex';setTimeout(()=>document.getElementById('storyView').style.display='none',5000)}
 
 async function loadPosts(){
- console.log('🔵 Loading posts da Giri...');
  let {data:posts, error:pErr} = await supa.from('posts').select('*').order('created_at',{ascending:false})
- console.log('posts:',posts,'err:',pErr)
- if(pErr){
-   document.getElementById('feed').innerHTML=`<p style="text-align:center;padding:30px;color:#f55">Error: ${pErr.message}<br><br>Supabase RLS check pannu da</p>`;
-   return;
- }
- if(!posts || posts.length==0){
-   document.getElementById('feed').innerHTML='<p style="text-align:center;padding:30px;color:#777">No posts da 🔵<br><small>Upload success aana aprom inga varum</small></p>';return
- }
+ if(pErr){ document.getElementById('feed').innerHTML=`<p style="text-align:center;padding:30px;color:#f55">Error: ${pErr.message}</p>`; return; }
+ if(!posts || posts.length==0){ document.getElementById('feed').innerHTML='<p style="text-align:center;padding:30px;color:#777">No posts da 🔵</p>';return }
 
  let likes=[], comments=[], follows=[];
  try{ let r=await supa.from('likes').select('*'); if(r.data) likes=r.data }catch(e){}
@@ -79,39 +74,35 @@ async function loadPosts(){
  try{ let r=await supa.from('follows').select('*').eq('follower',ME); if(r.data) follows=r.data }catch(e){}
 
  let rankedPosts = posts.map(p=>{
-   const lCount = likes ? likes.filter(l=>l.post_id==p.id).length : 0
-   const cCount = comments ? comments.filter(c=>c.post_id==p.id).length : 0
+   const lCount = likes.filter(l=>l.post_id==p.id).length
+   const cCount = comments.filter(c=>c.post_id==p.id).length
    const hoursAgo = (new Date() - new Date(p.created_at)) / (1000*60*60)
-   let score = 0
-   score += lCount * 2
-   score += cCount * 3
-   const isFollowing = follows ? follows.some(f=>f.following==p.username) : false
-   if(isFollowing) score += 10
-   if(p.username==ME) score += 5
-   score -= hoursAgo * 0.5
-   if(p.caption && p.caption.includes('#')) score += 8
-   return {...p, score, lCount, cCount, isFollowing}
+   let score = lCount*2 + cCount*3 - hoursAgo*0.5
+   if(follows.some(f=>f.following==p.username)) score+=10
+   if(p.username==ME) score+=5
+   return {...p, score, lCount, cCount, isFollowing:follows.some(f=>f.following==p.username)}
  })
  rankedPosts.sort((a,b)=>b.score - a.score)
  let html=''
  for(let p of rankedPosts){
-  const isLiked = likes ? likes.some(l=>l.post_id==p.id && l.username==ME) : false
-  const pCmts = comments ? comments.filter(c=>c.post_id==p.id) : []
-  const badge = p.score>10 ? '🔥' : p.isFollowing ? '⭐' : ''
+  const isLiked = likes.some(l=>l.post_id==p.id && l.username==ME)
+  const pCmts = comments.filter(c=>c.post_id==p.id)
   html+=`<div class="post">
-   <div class="postTop"><b>@${p.username} ${p.username==ME?'✔️':''} ${badge}</b><button onclick="followUser('${p.username}')" class="follow-btn ${p.isFollowing?'following':''}">${p.isFollowing?'Following':'Follow'}</button></div>
+   <div class="postTop"><b>@${p.username} ${p.username==ME?'✔️':''} ${p.score>10?'🔥':''}</b><button onclick="followUser('${p.username}')" class="follow-btn ${p.isFollowing?'following':''}">${p.isFollowing?'Following':'Follow'}</button></div>
    <img class="main" src="${p.image_url}" ondblclick="likePost(${p.id});blastHeart()">
    <div class="actions">
      <button onclick="likePost(${p.id})" class="heart-btn ${isLiked?'liked':''}">
-       <svg viewBox="0 0 24 24" width="26" height="26" fill="${isLiked?'#ff3040':'none'}" stroke="${isLiked?'#ff3040':'#fff'}" stroke-width="2">
-         <path d="M12 21s-6.5-4.35-9-8.5S3 4 8.5 4 12 7.5 12 7.5 15 4 20.5 4 21 8.5 18 12.5 12 21 12 21z"/>
-       </svg>
+       <svg viewBox="0 0 24 24" width="26" height="26" fill="${isLiked?'#ff3040':'none'}" stroke="${isLiked?'#ff3040':'#fff'}" stroke-width="2"><path d="M12 21s-6.5-4.35-9-8.5S3 4 8.5 4 12 7.5 12 7.5 15 4 20.5 4 21 8.5 18 12.5 12 21 12 21z"/></svg>
      </button>
-     <button onclick="document.getElementById('cmt-${p.id}').focus()" style="background:none;border:0;font-size:22px;cursor:pointer">💬</button>
-     <button onclick="sharePost('${p.image_url}')" style="background:none;border:0;font-size:22px;cursor:pointer">✈️</button>
+     <button onclick="document.getElementById('cmt-${p.id}').focus()" class="cmt-btn">
+       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+     </button>
+     <button onclick="sharePost('${p.image_url}')" class="share-btn">
+       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+     </button>
    </div>
-   <div style="padding:0 12px"><b>${p.lCount} likes</b> ${p.score>10?'<span style="background:#ff3040;padding:2px 6px;border-radius:4px;font-size:11px;margin-left:6px">TRENDING</span>':''}<br><b>@${p.username}</b> ${p.caption||''}</div>
-   <div style="padding:5px 12px;font-size:13px;color:#aaa">${pCmts.map(c=>`<div><b>${c.username}</b> ${c.comment}</div>`).join('')}</div>
+   <div style="padding:0 12px"><b>${p.lCount} likes</b><br><b>@${p.username}</b> ${p.caption||''}</div>
+   <div style="padding:5px 12px 0 12px;font-size:13px;color:#ddd">${pCmts.map(c=>`<div style="margin:3px 0"><b>${c.username}</b> ${c.comment}</div>`).join('')}</div>
    <div class="cmtBox"><input id="cmt-${p.id}" placeholder="Add a comment..."><button onclick="addComment(${p.id})" style="background:none;border:0;color:#0095f6;font-weight:bold;cursor:pointer">Post</button></div>
   </div>`
  }
@@ -122,14 +113,14 @@ async function likePost(id){
    const {data}=await supa.from('likes').select('*').eq('post_id',id).eq('username',ME)
    if(data && data.length>0){ await supa.from('likes').delete().eq('post_id',id).eq('username',ME) } else { await supa.from('likes').insert({post_id:id,username:ME}); blastHeart() }
    loadPosts()
- }catch(e){ alert('Likes table illa da, Supabase la create pannu'); }
+ }catch(e){ alert('Likes table ku policy add pannu da!') }
 }
 async function addComment(id){
  const inp=document.getElementById('cmt-'+id); const txt=inp.value.trim(); if(!txt)return
  try{ await supa.from('comments').insert({post_id:id,username:ME,comment:txt}); inp.value=''; loadPosts() }
- catch(e){ alert('Comments table illa da') }
+ catch(e){ alert('Comment Error: '+e.message+' - SQL la policy run pannu da!') }
 }
-function sharePost(url){ if(navigator.share){navigator.share({title:'Pixoro',text:'Check this on Pixoro 🔵',url:location.href})} else {prompt('Share this link da Giri! Copy pannu 👇',location.href)} }
-async function followUser(name){ if(name==ME)return alert('Nee unna follow panna mudiyathu da 😅'); try{ const {data}=await supa.from('follows').select('*').eq('follower',ME).eq('following',name); if(data && data.length>0){await supa.from('follows').delete().eq('follower',ME).eq('following',name)} else {await supa.from('follows').insert({follower:ME,following:name})} loadPosts() }catch(e){ alert('Follows table illa da') } }
+function sharePost(url){ if(navigator.share){navigator.share({title:'Pixoro',text:'Check this on Pixoro 🔵',url:location.href})} else {prompt('Copy pannu da Giri 👇',location.href)} }
+async function followUser(name){ if(name==ME)return; try{ const {data}=await supa.from('follows').select('*').eq('follower',ME).eq('following',name); if(data && data.length>0){await supa.from('follows').delete().eq('follower',ME).eq('following',name)} else {await supa.from('follows').insert({follower:ME,following:name})} loadPosts() }catch(e){} }
 loadStories();loadPosts();
 </script></body></html>
