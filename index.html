@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro 🔵</title>
 <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="comments.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}
 .top{padding:12px 15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:50}
@@ -13,31 +14,10 @@
 .heart-btn.liked svg{fill:#ff3040!important;stroke:#ff3040!important;animation:likePop 0.3s ease}
 @keyframes likePop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
 @keyframes heartBlast{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(1.3);opacity:1}100%{transform:translate(-50%,-50%) scale(1.5);opacity:0}}
-/* COMMENT SHEET - INSTAGRAM STYLE */
-#commentModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:flex-end;justify-content:center}
-#commentSheet{background:#121212;width:100%;max-width:450px;height:82vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;animation:slideUp 0.3s ease}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.cmtHeader{padding:14px;text-align:center;border-bottom:1px solid #222;font-weight:bold;position:relative}
-.cmtList{flex:1;overflow-y:auto;padding:10px 12px}
-.cmtRow{display:flex;gap:10px;margin:14px 0}
-.cmtAvatar{width:32px;height:32px;border-radius:50%;background:#333;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px}
-.cmtContent{flex:1}
-.cmtUser{font-size:13px;font-weight:600}.cmtText{font-size:14px;margin:2px 0}.cmtMeta{display:flex;gap:14px;margin-top:4px;font-size:12px;color:#aaa}
-.cmtMeta b{cursor:pointer;color:#aaa}
-.cmtLike{width:20px;display:flex;align-items:flex-start;padding-top:4px;cursor:pointer}
-.cmtInputArea{background:#121212;border-top:1px solid #222;padding:8px 10px}
-.replyTag{font-size:12px;color:#aaa;padding:4px 10px;display:flex;justify-content:space-between}
-.emojiBar{display:flex;gap:12px;padding:8px 10px;overflow-x:auto;font-size:22px;border-top:1px solid #222}
-.cmtBox{display:flex;gap:8px;align-items:center;padding:6px 0}
-.cmtBox input{flex:1;background:#222;border:1px solid #333;border-radius:20px;padding:10px 14px;color:#fff;outline:none}
-.sendBtn{background:#0095f6;color:#fff;border:0;width:32px;height:32px;border-radius:50%;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center}
 </style></head><body>
-
 <div class="top"><b style="font-size:22px;font-family:cursive">Pixoro 🔵</b><span>📩</span></div>
 <div id="storyBar" class="storyBar"></div><div id="feed"></div><div style="height:70px"></div>
 <div class="nav"><a class="active">🏠</a><a href="reels.html">🎬</a><a>➕</a><a>🔎</a><a>👤</a></div>
-
-<!-- COMMENT BOTTOM SHEET -->
 <div id="commentModal" onclick="if(event.target==this)closeComments()">
   <div id="commentSheet">
     <div class="cmtHeader">Comments <span onclick="closeComments()" style="position:absolute;right:15px;top:12px;font-size:20px;cursor:pointer">✕</span></div>
@@ -55,22 +35,17 @@
     </div>
   </div>
 </div>
-
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME='Giri'
-let allPosts=[], allLikes=[], allComments=[], curPostId=null, replyTo=null
-
+let allPosts=[], allLikes=[], allComments=[]
 function blastHeart(){let h=document.createElement('div');h.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;z-index:9999;animation:heartBlast 1s ease-out;pointer-events:none';h.innerHTML='❤️🔵';document.body.appendChild(h);setTimeout(()=>h.remove(),1000);if(navigator.vibrate)navigator.vibrate(100)}
-
 async function loadAll(){
  let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false})
  let {data:likes}=await supa.from('likes').select('*')
  let {data:comments}=await supa.from('comments').select('*').order('created_at',{ascending:true})
- allPosts=posts||[]; allLikes=likes||[]; allComments=comments||[];
- renderFeed()
+ allPosts=posts||[]; allLikes=likes||[]; allComments=comments||[]; renderFeed()
 }
-
 function renderFeed(){
  let html=''
  for(let p of allPosts){
@@ -90,50 +65,13 @@ function renderFeed(){
  }
  document.getElementById('feed').innerHTML=html
 }
-
-function openComments(postId){
- curPostId=postId; document.getElementById('commentModal').style.display='flex'; renderComments()
-}
-function closeComments(){document.getElementById('commentModal').style.display='none'; cancelReply()}
-function cancelReply(){replyTo=null;document.getElementById('replyTag').style.display='none';document.getElementById('cmtInput').placeholder='What do you think of this?'}
-function setReply(user){
- replyTo=user; document.getElementById('replyTag').style.display='flex'; document.getElementById('replyTxt').innerText='Replying to '+user; document.getElementById('cmtInput').value='@'+user+' '; document.getElementById('cmtInput').focus()
-}
-function addEmoji(e){document.getElementById('cmtInput').value+=e; document.getElementById('cmtInput').focus()}
-
-function renderComments(){
- let cmts=allComments.filter(c=>c.post_id==curPostId)
- let html=''
- for(let c of cmts){
-  let time='4d' // simple
-  html+=`<div class="cmtRow">
-    <div class="cmtAvatar">${c.username[0]}</div>
-    <div class="cmtContent">
-      <div class="cmtUser">${c.username} <span style="color:#777;font-weight:400;margin-left:6px">${time}</span></div>
-      <div class="cmtText">${c.comment}</div>
-      <div class="cmtMeta"><b onclick="setReply('${c.username}')">Reply</b></div>
-    </div>
-    <div class="cmtLike" onclick="likeComment(${c.id})">♡</div>
-  </div>`
- }
- if(cmts.length==0) html='<p style="text-align:center;color:#777;margin-top:30px">No comments yet<br><small>Be first to comment 🔵</small></p>'
- document.getElementById('cmtList').innerHTML=html
-}
-
-async function postComment(){
- let txt=document.getElementById('cmtInput').value.trim(); if(!txt||!curPostId)return
- await supa.from('comments').insert({post_id:curPostId, username:ME, comment:txt})
- document.getElementById('cmtInput').value=''; cancelReply()
- let {data}=await supa.from('comments').select('*').order('created_at',{ascending:true})
- allComments=data||[]; renderComments(); renderFeed()
-}
 async function likePost(id){
  let liked=allLikes.some(l=>l.post_id==id && l.username==ME)
  if(liked){ await supa.from('likes').delete().eq('post_id',id).eq('username',ME) } else { await supa.from('likes').insert({post_id:id,username:ME}); blastHeart() }
  let {data}=await supa.from('likes').select('*'); allLikes=data||[]; renderFeed()
 }
 function sharePost(){ if(navigator.share){navigator.share({title:'Pixoro',text:'Check this on Pixoro 🔵',url:location.href})} else {prompt('Copy link da Giri 👇',location.href)} }
-async function likeComment(cid){ /* simple like count */ alert('Comment like soon da! ❤️') }
-
 loadAll()
-</script></body></html>
+</script>
+<script src="comments.js"></script>
+</body></html>
