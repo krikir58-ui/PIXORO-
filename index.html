@@ -26,6 +26,52 @@ button{width:100%;padding:14px;border-radius:10px;border:none;background:#0095f6
 .hidden{display:none}
 </style>
 </head>
+  <!-- STORY BAR START -->
+<div id="storyBar" style="display:flex;gap:12px;padding:12px 10px;overflow-x:auto;background:#000;border-bottom:1px solid #222;scrollbar-width:none"></div>
+
+<div id="storyView" style="display:none;position:fixed;inset:0;background:#000;z-index:9999;align-items:center;justify-content:center;flex-direction:column">
+  <div style="position:absolute;top:10px;left:0;right:0;height:3px;background:#333;display:flex;gap:3px;padding:0 5px" id="storyProgress"></div>
+  <div style="position:absolute;top:20px;left:15px;right:15px;display:flex;justify-content:space-between;align-items:center;z-index:10">
+    <b id="storyUser" style="color:#fff"></b>
+    <span onclick="document.getElementById('storyView').style.display='none'" style="color:#fff;font-size:28px;cursor:pointer">&times;</span>
+  </div>
+  <img id="storyImg" style="max-width:100%;max-height:85vh;object-fit:contain">
+</div>
+
+<script>
+const supa2 = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+async function loadStories(){
+  const {data} = await supa2.from('stories').select('*').order('created_at',{ascending:false}).limit(20)
+  if(!data) return
+  document.getElementById('storyBar').innerHTML = `
+    <div style="text-align:center;min-width:62px" onclick="addStory()">
+      <div style="width:62px;height:62px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px dashed #555;cursor:pointer">➕</div>
+      <div style="font-size:11px;margin-top:4px;color:#fff">Your Story</div>
+    </div>
+  ` + data.map(s=>`
+    <div style="text-align:center;min-width:62px;cursor:pointer" onclick="viewStory('${s.image_url}','${s.username}')">
+      <div style="width:62px;height:62px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)">
+        <img src="${s.image_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #000;background:#000">
+      </div>
+      <div style="font-size:11px;margin-top:4px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62px">${s.username}</div>
+    </div>
+  `).join('')
+}
+function viewStory(url,user){
+  document.getElementById('storyImg').src=url
+  document.getElementById('storyUser').innerText='@'+user+' 🔵'
+  document.getElementById('storyView').style.display='flex'
+  document.getElementById('storyProgress').innerHTML='<div style="flex:1;height:100%;background:#fff;border-radius:2px"></div>'
+  setTimeout(()=>{ document.getElementById('storyView').style.display='none' },5000)
+}
+function addStory(){
+  const url = prompt('Story Image URL paste pannu da Giri! 📸\n(Unsplash link / any image link)')
+  if(!url) return
+  supa2.from('stories').insert({username:'Giri', image_url:url}).then(()=>{ alert('Story Added! 🔥'); loadStories() })
+}
+loadStories()
+</script>
+<!-- STORY BAR END -->
 <body>
 
 <div id="loginBox" class="box">
