@@ -3,168 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pixoro - Tiruchuli to World 🌍</title>
+<title>Pixoro 🔵</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-body{background:#000;color:#fff;min-height:100vh}
-.box{background:#111;border:1px solid #333;border-radius:20px;padding:30px;width:90%;max-width:350px;text-align:center;margin:50px auto}
-.logo{font-family:cursive;font-size:42px}
-.sub{color:#888;font-size:14px;margin-bottom:25px}
-input{width:100%;padding:14px;border-radius:10px;border:1px solid #333;background:#000;color:#fff;margin-bottom:12px;outline:none}
-button{width:100%;padding:14px;border-radius:10px;border:none;background:#0095f6;color:#fff;font-weight:bold;cursor:pointer}
-.feed{max-width:450px;margin:0 auto}
-.post{background:#111;border:1px solid #262626;border-radius:12px;margin:15px 10px;overflow:hidden}
-.post-top{padding:10px;display:flex;align-items:center;gap:8px}
-.post img.main{width:100%}
-.actions{padding:10px;display:flex;gap:15px;font-size:24px}
-.likes{padding:0 12px;font-weight:bold;font-size:14px}
-.comments{padding:5px 12px;font-size:14px;color:#ccc}
-.cmt-box{display:flex;gap:5px;padding:10px}
-.cmt-box input{flex:1;margin:0;padding:10px;border-radius:20px;background:#000}
-.cmt-box button{width:auto;padding:10px 18px;border-radius:20px}
-.hidden{display:none}
+body{background:#000;color:#fff;max-width:450px;margin:0 auto}
+.top{padding:12px 15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:50}
+.storyBar{display:flex;gap:12px;padding:12px 10px;overflow-x:auto;border-bottom:1px solid #222;scrollbar-width:none}
+.storyBar::-webkit-scrollbar{display:none}
+.sItem{text-align:center;min-width:62px;cursor:pointer}
+.sRing{width:62px;height:62px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)}
+.sRing img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #000;background:#111}
+.sName{font-size:11px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62px}
+.post{border-bottom:1px solid #222;padding-bottom:10px}
+.postTop{padding:10px 12px;display:flex;align-items:center;gap:8px}
+.post img.main{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111}
+.actions{padding:10px 12px;display:flex;gap:15px;font-size:24px}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100;max-width:450px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%}
+.nav a{color:#777;text-decoration:none;font-size:24px}.nav a.active{color:#fff}
+#storyView{display:none;position:fixed;inset:0;background:#000;z-index:9999;align-items:center;justify-content:center;flex-direction:column}
 </style>
 </head>
-  <!-- STORY BAR START -->
-<div id="storyBar" style="display:flex;gap:12px;padding:12px 10px;overflow-x:auto;background:#000;border-bottom:1px solid #222;scrollbar-width:none"></div>
-
-<div id="storyView" style="display:none;position:fixed;inset:0;background:#000;z-index:9999;align-items:center;justify-content:center;flex-direction:column">
-  <div style="position:absolute;top:10px;left:0;right:0;height:3px;background:#333;display:flex;gap:3px;padding:0 5px" id="storyProgress"></div>
-  <div style="position:absolute;top:20px;left:15px;right:15px;display:flex;justify-content:space-between;align-items:center;z-index:10">
-    <b id="storyUser" style="color:#fff"></b>
-    <span onclick="document.getElementById('storyView').style.display='none'" style="color:#fff;font-size:28px;cursor:pointer">&times;</span>
-  </div>
-  <img id="storyImg" style="max-width:100%;max-height:85vh;object-fit:contain">
-</div>
-
-<script>
-const supa2 = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-async function loadStories(){
-  const {data} = await supa2.from('stories').select('*').order('created_at',{ascending:false}).limit(20)
-  if(!data) return
-  document.getElementById('storyBar').innerHTML = `
-    <div style="text-align:center;min-width:62px" onclick="addStory()">
-      <div style="width:62px;height:62px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px dashed #555;cursor:pointer">➕</div>
-      <div style="font-size:11px;margin-top:4px;color:#fff">Your Story</div>
-    </div>
-  ` + data.map(s=>`
-    <div style="text-align:center;min-width:62px;cursor:pointer" onclick="viewStory('${s.image_url}','${s.username}')">
-      <div style="width:62px;height:62px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)">
-        <img src="${s.image_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #000;background:#000">
-      </div>
-      <div style="font-size:11px;margin-top:4px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62px">${s.username}</div>
-    </div>
-  `).join('')
-}
-function viewStory(url,user){
-  document.getElementById('storyImg').src=url
-  document.getElementById('storyUser').innerText='@'+user+' 🔵'
-  document.getElementById('storyView').style.display='flex'
-  document.getElementById('storyProgress').innerHTML='<div style="flex:1;height:100%;background:#fff;border-radius:2px"></div>'
-  setTimeout(()=>{ document.getElementById('storyView').style.display='none' },5000)
-}
-function addStory(){
-  const url = prompt('Story Image URL paste pannu da Giri! 📸\n(Unsplash link / any image link)')
-  if(!url) return
-  supa2.from('stories').insert({username:'Giri', image_url:url}).then(()=>{ alert('Story Added! 🔥'); loadStories() })
-}
-loadStories()
-</script>
-<!-- STORY BAR END -->
 <body>
 
-<div id="loginBox" class="box">
-  <div class="logo">Pixoro</div>
-  <div class="sub">Tiruchuli to World 🌍</div>
-  <input id="username" placeholder="Username - Giri" value="Giri">
-  <button onclick="doLogin()">Login</button>
+<div class="top"><b style="font-size:22px;font-family:cursive">Pixoro 🔵</b><span>📩</span></div>
+
+<div id="storyBar" class="storyBar">Loading stories...</div>
+
+<div id="feed"></div>
+
+<div style="height:70px"></div>
+<div class="nav">
+<a href="index.html" class="active">🏠</a>
+<a href="reels.html">🎬</a>
+<a href="#">➕</a>
+<a href="#">❤️</a>
+<a href="#">👤</a>
 </div>
 
-<div id="feedBox" class="feed hidden">
-  <h2 style="padding:15px">Pixoro 🔵 <span id="uname" style="font-size:16px;color:#888"></span></h2>
-  <div id="posts">Loading...</div>
-  <button onclick="logout()" style="margin:15px;background:#222">Logout</button>
+<div id="storyView">
+  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#333;margin:5px;display:flex"><div id="sProg" style="flex:1;background:#fff"></div></div>
+  <div style="position:absolute;top:20px;left:15px;right:15px;display:flex;justify-content:space-between"><b id="sUser"></b><span onclick="document.getElementById('storyView').style.display='none'" style="font-size:28px;cursor:pointer">&times;</span></div>
+  <img id="sImg" style="max-width:100%;max-height:85vh;object-fit:contain">
 </div>
 
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 
-function doLogin(){
-  const u = username.value.trim()
-  if(!u) return alert('Username podu da!')
-  localStorage.setItem('pixoro_user',u)
-  showFeed()
+async function loadStories(){
+  const {data} = await supa.from('stories').select('*').order('created_at',{ascending:false})
+  let html = `<div class="sItem" onclick="addStory()"><div style="width:62px;height:62px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px dashed #555">➕</div><div class="sName">Your Story</div></div>`
+  if(data) html += data.map(s=>`<div class="sItem" onclick="viewStory('${s.image_url}','${s.username}')"><div class="sRing"><img src="${s.image_url}"></div><div class="sName">${s.username}</div></div>`).join('')
+  document.getElementById('storyBar').innerHTML = html
 }
-function showFeed(){
-  const u = localStorage.getItem('pixoro_user')
-  if(!u) return
-  loginBox.classList.add('hidden')
-  feedBox.classList.remove('hidden')
-  uname.innerText='@'+u
-  loadPosts()
+function viewStory(url,user){
+  document.getElementById('sImg').src=url
+  document.getElementById('sUser').innerText='@'+user+' 🔵'
+  document.getElementById('storyView').style.display='flex'
+  setTimeout(()=>document.getElementById('storyView').style.display='none',5000)
 }
-function logout(){ localStorage.removeItem('pixoro_user'); location.reload() }
+async function addStory(){
+  const url = prompt('Story image URL paste pannu da Giri 📸')
+  if(!url) return
+  await supa.from('stories').insert({username:'Giri',image_url:url})
+  loadStories()
+}
 
 async function loadPosts(){
-  const { data } = await supa.from('posts').select('*').order('created_at',{ascending:false})
-  if(!data || data.length==0){ posts.innerHTML='<p style="padding:20px;color:#888">Post illa - Supabase > posts la img add pannu da</p>'; return }
-  posts.innerHTML = data.map(p=>`
+  const {data} = await supa.from('posts').select('*').order('created_at',{ascending:false})
+  if(!data) return
+  document.getElementById('feed').innerHTML = data.map(p=>`
     <div class="post">
-      <div class="post-top"><img src="https://i.pravatar.cc/100?u=${p.username}" style="width:32px;height:32px;border-radius:50%"><b>@${p.username} ${p.username.toLowerCase()=='giri'?'🔵':''}</b></div>
-      <img class="main" src="${p.img}">
-      <div class="actions">
-        <span id="like-${p.id}" onclick="like(${p.id})" style="cursor:pointer">🤍</span>
-        <span onclick="document.getElementById('cmt-${p.id}').focus()" style="cursor:pointer">💬</span>
-        <span onclick="share(${p.id})" style="cursor:pointer">✈️</span>
-      </div>
-      <div class="likes" id="likes-${p.id}"></div>
-      <div style="padding:0 12px;font-size:14px"><b>@${p.username}</b> ${p.cap||''}</div>
-      <div class="comments" id="comments-${p.id}"></div>
-      <div class="cmt-box"><input id="cmt-${p.id}" placeholder="Add a comment..."><button onclick="addCmt(${p.id})">Post</button></div>
-    </div>`).join('')
-  data.forEach(p=>{ loadLikes(p.id); loadCmts(p.id); checkLiked(p.id) })
+      <div class="postTop"><b>@${p.username||'Giri'} 🔵</b></div>
+      <img class="main" src="${p.image_url}">
+      <div class="actions"><span>❤️</span><span>💬</span><span>✈️</span></div>
+      <div style="padding:0 12px"><b>@${p.username||'Giri'}</b> ${p.caption||''}</div>
+    </div>
+  `).join('')
 }
 
-async function like(pid){
-  const u=localStorage.getItem('pixoro_user')
-  const el=document.getElementById('like-'+pid)
-  const isLiked = el.innerText==='❤️'
-  if(isLiked){ await supa.from('likes').delete().eq('post_id',pid).eq('username',u); el.innerText='🤍' }
-  else { await supa.from('likes').insert({post_id:pid,username:u}); el.innerText='❤️' }
-  loadLikes(pid)
-}
-async function loadLikes(pid){
-  const {data}=await supa.from('likes').select('*').eq('post_id',pid)
-  document.getElementById('likes-'+pid).innerText = data && data.length>0 ? `${data.length} likes` : ''
-}
-async function checkLiked(pid){
-  const u=localStorage.getItem('pixoro_user')
-  const {data}=await supa.from('likes').select('*').eq('post_id',pid).eq('username',u)
-  if(data && data.length>0) document.getElementById('like-'+pid).innerText='❤️'
-}
-async function addCmt(pid){
-  const u=localStorage.getItem('pixoro_user')
-  const inp=document.getElementById('cmt-'+pid)
-  if(!inp.value.trim()) return
-  await supa.from('comments').insert({post_id:pid,username:u,text:inp.value})
-  inp.value=''; loadCmts(pid)
-}
-async function loadCmts(pid){
-  const {data}=await supa.from('comments').select('*').eq('post_id',pid).order('created_at')
-  if(data) document.getElementById('comments-'+pid).innerHTML=data.map(c=>`<div><b>@${c.username}</b> ${c.text}</div>`).join('')
-}
-function share(id){ navigator.clipboard.writeText(location.href+'?post='+id); alert('Link copied da! 🚀') }
-
-if(localStorage.getItem('pixoro_user')) showFeed()
+loadStories(); loadPosts();
 </script>
-  <div style="position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:999;max-width:450px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%">
-<a href="index.html" style="text-decoration:none;font-size:24px">🏠</a>
-<a href="reels.html" style="text-decoration:none;font-size:24px">🎬</a>
-<a href="upload.html" style="text-decoration:none;font-size:24px">➕</a>
-<a href="#" style="text-decoration:none;font-size:24px">❤️</a>
-<a href="#" style="text-decoration:none;font-size:24px">👤</a>
-</div>
-<div style="height:80px"></div>
 </body>
 </html>
