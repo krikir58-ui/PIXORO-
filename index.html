@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro 🔵</title>
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="comments.css">
-<link rel="stylesheet" href="follow.css">
+<link rel="stylesheet" href="css/comments.css">
+<link rel="stylesheet" href="css/follow.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}
 .top{padding:12px 15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:50}
-.storyBar{display:flex;gap:12px;padding:12px 10px;overflow-x:auto;border-bottom:1px solid #222}
 .post{border-bottom:1px solid #222;padding-bottom:10px}.postTop{padding:10px 12px;display:flex;align-items:center;justify-content:space-between}
 .post img.main{width:100%!important;aspect-ratio:1/1!important;object-fit:cover!important;display:block!important}
 .actions{padding:10px 12px;display:flex;gap:18px;align-items:center}
@@ -18,7 +17,7 @@
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 </style></head><body>
 <div class="top"><b style="font-size:22px;font-family:cursive">Pixoro 🔵</b><span>📩</span></div>
-<div id="storyBar" class="storyBar"></div><div id="feed"></div><div style="height:70px"></div>
+<div id="feed"></div><div style="height:70px"></div>
 <div class="nav"><a class="active">🏠</a><a href="reels.html">🎬</a><a>➕</a><a>🔎</a><a>👤</a></div>
 
 <!-- Comment Sheet -->
@@ -32,11 +31,9 @@
   </div>
 </div>
 
-<!-- Comment Options -->
 <div id="cmtOptionModal" onclick="if(event.target==this)closeCmtOptions()"><div id="cmtOptBox"><div style="width:40px;height:4px;background:#555;border-radius:10px;margin:8px auto"></div><div id="cmtOptContent"></div></div></div>
 
-<!-- Follow Modal -->
-<div id="followModal" onclick="if(event.target==this)closeFollowModal()"><div id="followSheet"><div style="padding:14px;text-align:center;border-bottom:1px solid #222;position:relative"><b id="followTitle">Followers</b><span onclick="closeFollowModal()" style="position:absolute;right:15px;top:12px;font-size:20px;cursor:pointer">✕</span><div class="followHeader"><span id="tabFollowers" onclick="switchFollowTab('followers')">Followers</span><span id="tabFollowing" onclick="switchFollowTab('following')">Following</span></div></div><div id="followList" class="followList"></div></div></div>
+<div id="followModal" onclick="if(event.target==this)closeFollowModal()"><div id="followSheet"><div style="padding:14px;text-align:center;border-bottom:1px solid #222;position:relative"><b id="followTitle">Followers</b><span onclick="closeFollowModal()" style="position:absolute;right:15px;top:12px;font-size:20px;cursor:pointer">✕</span><div class="followHeader"><span id="tabFollowers" onclick="switchFollowTab('followers')">Followers</span><span id="tabFollowing" onclick="switchFollowTab('following')">Following</span><span id="tabRequests" onclick="switchFollowTab('requests')">Requests</span></div></div><div id="followList" class="followList"></div></div></div>
 
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
@@ -78,8 +75,8 @@ async function likePost(id){
 function sharePost(){ if(navigator.share){navigator.share({title:'Pixoro',url:location.href})} else {prompt('Copy link:',location.href)} }
 loadAll()
 </script>
-<script src="follow.js"></script>
-<script src="comments.js"></script>
-<script src="realtime.js"></script>
+<script src="js/follow.js"></script>
+<script src="js/comments.js"></script>
+<script src="js/realtime.js"></script>
 <script>setTimeout(()=>{enableRealtime()},1000)</script>
 </body></html>
