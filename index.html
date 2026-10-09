@@ -1,88 +1,63 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pixoro 🔵</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro 🔵</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-body{background:#000;color:#fff;max-width:450px;margin:0 auto}
-.top{padding:12px 15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:50}
-.storyBar{display:flex;gap:12px;padding:12px 10px;overflow-x:auto;border-bottom:1px solid #222;scrollbar-width:none}
-.storyBar::-webkit-scrollbar{display:none}
-.sItem{text-align:center;min-width:62px;cursor:pointer}
-.sRing{width:62px;height:62px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)}
-.sRing img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #000;background:#111}
-.sName{font-size:11px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62px}
-.post{border-bottom:1px solid #222;padding-bottom:10px}
-.postTop{padding:10px 12px;display:flex;align-items:center;gap:8px}
-.post img.main{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111}
-.actions{padding:10px 12px;display:flex;gap:15px;font-size:24px}
-.nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100;max-width:450px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%}
-.nav a{color:#777;text-decoration:none;font-size:24px}.nav a.active{color:#fff}
+<style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}.top{padding:12px 15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:50}
+.storyBar{display:flex;gap:12px;padding:12px 10px;overflow-x:auto;border-bottom:1px solid #222}.sItem{text-align:center;min-width:62px;cursor:pointer}.sRing{width:62px;height:62px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)}.sRing img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #000}
+.post{border-bottom:1px solid #222;padding-bottom:10px}.postTop{padding:10px 12px;display:flex;align-items:center;justify-content:space-between}
+.post img.main{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111}.actions{padding:10px 12px;display:flex;gap:15px;font-size:22px;align-items:center}.actions span{cursor:pointer}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100;max-width:450px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%}.nav a{color:#777;text-decoration:none;font-size:24px}.nav a.active{color:#fff}
 #storyView{display:none;position:fixed;inset:0;background:#000;z-index:9999;align-items:center;justify-content:center;flex-direction:column}
-</style>
-</head>
-<body>
-
+.cmtBox{display:flex;gap:6px;padding:8px 12px}.cmtBox input{flex:1;background:#111;border:1px solid #333;border-radius:20px;padding:8px 12px;color:#fff;outline:none}
+</style></head><body>
 <div class="top"><b style="font-size:22px;font-family:cursive">Pixoro 🔵</b><span>📩</span></div>
-
-<div id="storyBar" class="storyBar">Loading stories...</div>
-
-<div id="feed"></div>
-
-<div style="height:70px"></div>
-<div class="nav">
-<a href="index.html" class="active">🏠</a>
-<a href="reels.html">🎬</a>
-<a href="#">➕</a>
-<a href="#">❤️</a>
-<a href="#">👤</a>
-</div>
-
-<div id="storyView">
-  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#333;margin:5px;display:flex"><div id="sProg" style="flex:1;background:#fff"></div></div>
-  <div style="position:absolute;top:20px;left:15px;right:15px;display:flex;justify-content:space-between"><b id="sUser"></b><span onclick="document.getElementById('storyView').style.display='none'" style="font-size:28px;cursor:pointer">&times;</span></div>
-  <img id="sImg" style="max-width:100%;max-height:85vh;object-fit:contain">
-</div>
-
+<div id="storyBar" class="storyBar"></div><div id="feed"></div><div style="height:70px"></div>
+<div class="nav"><a href="index.html" class="active">🏠</a><a href="reels.html">🎬</a><a href="upload.html">➕</a><a href="#">❤️</a><a href="#">👤</a></div>
+<div id="storyView"><div style="position:absolute;top:20px;left:15px;right:15px;display:flex;justify-content:space-between"><b id="sUser"></b><span onclick="document.getElementById('storyView').style.display='none'" style="font-size:28px;cursor:pointer">&times;</span></div><img id="sImg" style="max-width:100%;max-height:85vh;object-fit:contain"></div>
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-
+const ME = 'Giri'
 async function loadStories(){
-  const {data} = await supa.from('stories').select('*').order('created_at',{ascending:false})
-  let html = `<div class="sItem" onclick="addStory()"><div style="width:62px;height:62px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px dashed #555">➕</div><div class="sName">Your Story</div></div>`
-  if(data) html += data.map(s=>`<div class="sItem" onclick="viewStory('${s.image_url}','${s.username}')"><div class="sRing"><img src="${s.image_url}"></div><div class="sName">${s.username}</div></div>`).join('')
-  document.getElementById('storyBar').innerHTML = html
+ const {data}=await supa.from('stories').select('*').order('created_at',{ascending:false})
+ let h=`<div class="sItem" onclick="addStory()"><div style="width:62px;height:62px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px dashed #555">➕</div><div style="font-size:11px;margin-top:4px">Your Story</div></div>`
+ if(data) h+=data.map(s=>`<div class="sItem" onclick="viewStory('${s.image_url}','${s.username}')"><div class="sRing"><img src="${s.image_url}"></div><div style="font-size:11px;margin-top:4px">${s.username}</div></div>`).join('')
+ document.getElementById('storyBar').innerHTML=h
 }
-function viewStory(url,user){
-  document.getElementById('sImg').src=url
-  document.getElementById('sUser').innerText='@'+user+' 🔵'
-  document.getElementById('storyView').style.display='flex'
-  setTimeout(()=>document.getElementById('storyView').style.display='none',5000)
-}
-async function addStory(){
-  const url = prompt('Story image URL paste pannu da Giri 📸')
-  if(!url) return
-  await supa.from('stories').insert({username:'Giri',image_url:url})
-  loadStories()
-}
-
+function viewStory(u,n){document.getElementById('sImg').src=u;document.getElementById('sUser').innerText='@'+n+' 🔵';document.getElementById('storyView').style.display='flex';setTimeout(()=>document.getElementById('storyView').style.display='none',5000)}
+async function addStory(){const url=prompt('Story Image URL 📸');if(!url)return;await supa.from('stories').insert({username:ME,image_url:url});loadStories()}
 async function loadPosts(){
-  const {data} = await supa.from('posts').select('*').order('created_at',{ascending:false})
-  if(!data) return
-  document.getElementById('feed').innerHTML = data.map(p=>`
-    <div class="post">
-      <div class="postTop"><b>@${p.username||'Giri'} 🔵</b></div>
-      <img class="main" src="${p.image_url}">
-      <div class="actions"><span>❤️</span><span>💬</span><span>✈️</span></div>
-      <div style="padding:0 12px"><b>@${p.username||'Giri'}</b> ${p.caption||''}</div>
-    </div>
-  `).join('')
+ const {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false})
+ const {data:likes}=await supa.from('likes').select('*')
+ const {data:comments}=await supa.from('comments').select('*')
+ let html=''
+ for(let p of posts){
+  const lCount = likes ? likes.filter(l=>l.post_id==p.id).length : 0
+  const isLiked = likes ? likes.some(l=>l.post_id==p.id && l.username==ME) : false
+  const pCmts = comments ? comments.filter(c=>c.post_id==p.id) : []
+  html+=`<div class="post">
+   <div class="postTop"><b>@${p.username} 🔵</b><button onclick="followUser('${p.username}')" style="background:#0095f6;border:0;color:#fff;padding:5px 12px;border-radius:6px;font-weight:bold;cursor:pointer">Follow</button></div>
+   <img class="main" src="${p.image_url}" ondblclick="likePost(${p.id})">
+   <div class="actions">
+     <span onclick="likePost(${p.id})" style="color:${isLiked?'red':'#fff'}">${isLiked?'❤️':'🤍'}</span>
+     <span onclick="document.getElementById('cmt-${p.id}').focus()">💬</span>
+     <span onclick="sharePost('${p.image_url}')">✈️</span>
+   </div>
+   <div style="padding:0 12px"><b>${lCount} likes</b><br><b>@${p.username}</b> ${p.caption||''}</div>
+   <div style="padding:5px 12px;font-size:13px;color:#aaa">${pCmts.map(c=>`<div><b>${c.username}</b> ${c.comment}</div>`).join('')}</div>
+   <div class="cmtBox"><input id="cmt-${p.id}" placeholder="Add a comment..."><button onclick="addComment(${p.id})" style="background:none;border:0;color:#0095f6;font-weight:bold;cursor:pointer">Post</button></div>
+  </div>`
+ }
+ document.getElementById('feed').innerHTML=html
 }
-
-loadStories(); loadPosts();
-</script>
-</body>
-</html>
+async function likePost(id){
+ const {data}=await supa.from('likes').select('*').eq('post_id',id).eq('username',ME)
+ if(data && data.length>0){ await supa.from('likes').delete().eq('post_id',id).eq('username',ME) } else { await supa.from('likes').insert({post_id:id,username:ME}) }
+ loadPosts()
+}
+async function addComment(id){
+ const inp=document.getElementById('cmt-'+id); const txt=inp.value.trim(); if(!txt)return
+ await supa.from('comments').insert({post_id:id,username:ME,comment:txt}); inp.value=''; loadPosts()
+}
+function sharePost(url){ if(navigator.share){navigator.share({title:'Pixoro',text:'Check this on Pixoro 🔵',url:location.href})} else {prompt('Share this link da Giri! Copy pannu 👇',location.href); alert('Link copied! ✈️')} }
+async function followUser(name){ if(name==ME)return alert('Nee unna follow panna mudiyathu da 😅'); await supa.from('follows').insert({follower:ME,following:name}); alert('Following @'+name+' ✅🔵') }
+loadStories();loadPosts();
+</script></body></html>
