@@ -7,16 +7,23 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-body{background:#000;color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh}
-.box{background:#111;border:1px solid #333;border-radius:20px;padding:30px;width:90%;max-width:350px;text-align:center}
-.logo{font-family:cursive;font-size:42px;margin-bottom:5px}
+body{background:#000;color:#fff;min-height:100vh}
+.box{background:#111;border:1px solid #333;border-radius:20px;padding:30px;width:90%;max-width:350px;text-align:center;margin:50px auto}
+.logo{font-family:cursive;font-size:42px}
 .sub{color:#888;font-size:14px;margin-bottom:25px}
 input{width:100%;padding:14px;border-radius:10px;border:1px solid #333;background:#000;color:#fff;margin-bottom:12px;outline:none}
-button{width:100%;padding:14px;border-radius:10px;border:none;background:#0095f6;color:#fff;font-weight:bold;font-size:16px;cursor:pointer}
-.post{border:1px solid #333;border-radius:12px;margin:15px 0;overflow:hidden;text-align:left}
-.post img{width:100%}
+button{width:100%;padding:14px;border-radius:10px;border:none;background:#0095f6;color:#fff;font-weight:bold;cursor:pointer}
+.feed{max-width:450px;margin:0 auto}
+.post{background:#111;border:1px solid #262626;border-radius:12px;margin:15px 10px;overflow:hidden}
 .post-top{padding:10px;display:flex;align-items:center;gap:8px}
-.feed{display:none;max-width:400px;width:100%;margin:0 auto}
+.post img.main{width:100%}
+.actions{padding:10px;display:flex;gap:15px;font-size:24px}
+.likes{padding:0 12px;font-weight:bold;font-size:14px}
+.comments{padding:5px 12px;font-size:14px;color:#ccc}
+.cmt-box{display:flex;gap:5px;padding:10px}
+.cmt-box input{flex:1;margin:0;padding:10px;border-radius:20px;background:#000}
+.cmt-box button{width:auto;padding:10px 18px;border-radius:20px}
+.hidden{display:none}
 </style>
 </head>
 <body>
@@ -24,62 +31,86 @@ button{width:100%;padding:14px;border-radius:10px;border:none;background:#0095f6
 <div id="loginBox" class="box">
   <div class="logo">Pixoro</div>
   <div class="sub">Tiruchuli to World 🌍</div>
-  <input id="username" placeholder="Username - Giri nu type pannu da" value="Giri">
-  <button onclick="login()">Login</button>
-  <p id="msg" style="margin-top:10px;color:#f55;font-size:13px"></p>
+  <input id="username" placeholder="Username - Giri" value="Giri">
+  <button onclick="doLogin()">Login</button>
 </div>
 
-<div id="feedBox" class="feed">
-  <h2 style="padding:15px">Pixoro Feed 🔵 <span id="uname"></span></h2>
-  <div id="posts"></div>
-  <button onclick="logout()" style="margin:20px;background:#333">Logout</button>
+<div id="feedBox" class="feed hidden">
+  <h2 style="padding:15px">Pixoro 🔵 <span id="uname" style="font-size:16px;color:#888"></span></h2>
+  <div id="posts">Loading...</div>
+  <button onclick="logout()" style="margin:15px;background:#222">Logout</button>
 </div>
 
 <script>
-const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co'
-const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_'
-const supa = window.supabase.createClient(SUPA_URL, SUPA_KEY)
+const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 
-async function login(){
-  const u = document.getElementById('username').value.trim()
-  if(!u){ document.getElementById('msg').innerText='Username podu da!'; return }
-  localStorage.setItem('pixoro_user', u)
-  document.getElementById('loginBox').style.display='none'
-  document.getElementById('feedBox').style.display='block'
-  document.getElementById('uname').innerText='@'+u
+function doLogin(){
+  const u = username.value.trim()
+  if(!u) return alert('Username podu da!')
+  localStorage.setItem('pixoro_user',u)
+  showFeed()
+}
+function showFeed(){
+  const u = localStorage.getItem('pixoro_user')
+  if(!u) return
+  loginBox.classList.add('hidden')
+  feedBox.classList.remove('hidden')
+  uname.innerText='@'+u
   loadPosts()
 }
+function logout(){ localStorage.removeItem('pixoro_user'); location.reload() }
 
 async function loadPosts(){
-  const { data, error } = await supa.from('posts').select('*').order('created_at',{ascending:false})
-  if(error){ document.getElementById('posts').innerHTML='<p style="padding:20px;color:red">'+error.message+'</p>'; return }
-  if(!data || data.length===0){
-    document.getElementById('posts').innerHTML='<p style="padding:20px;color:#888">Post illa da - Supabase la Table Editor > posts la oru row add pannu da! img, username, cap podu!</p>'
-    return
-  }
-  document.getElementById('posts').innerHTML = data.map(p=>`
+  const { data } = await supa.from('posts').select('*').order('created_at',{ascending:false})
+  if(!data || data.length==0){ posts.innerHTML='<p style="padding:20px;color:#888">Post illa - Supabase > posts la img add pannu da</p>'; return }
+  posts.innerHTML = data.map(p=>`
     <div class="post">
-      <div class="post-top">
-        <img src="https://i.pravatar.cc/100?u=${p.username}" style="width:30px;height:30px;border-radius:50%">
-        <b>@${p.username} ${p.username.toLowerCase()==='giri' || p.verified ? '<span style="background:#0095f6;color:#fff;border-radius:50%;padding:2px 6px;font-size:11px">✓</span>' : ''}</b>
+      <div class="post-top"><img src="https://i.pravatar.cc/100?u=${p.username}" style="width:32px;height:32px;border-radius:50%"><b>@${p.username} ${p.username.toLowerCase()=='giri'?'🔵':''}</b></div>
+      <img class="main" src="${p.img}">
+      <div class="actions">
+        <span id="like-${p.id}" onclick="like(${p.id})" style="cursor:pointer">🤍</span>
+        <span onclick="document.getElementById('cmt-${p.id}').focus()" style="cursor:pointer">💬</span>
+        <span onclick="share(${p.id})" style="cursor:pointer">✈️</span>
       </div>
-      <img src="${p.img}">
-      <div style="padding:10px"><b>@${p.username}</b> ${p.cap || ''}</div>
-    </div>
-  `).join('')
+      <div class="likes" id="likes-${p.id}"></div>
+      <div style="padding:0 12px;font-size:14px"><b>@${p.username}</b> ${p.cap||''}</div>
+      <div class="comments" id="comments-${p.id}"></div>
+      <div class="cmt-box"><input id="cmt-${p.id}" placeholder="Add a comment..."><button onclick="addCmt(${p.id})">Post</button></div>
+    </div>`).join('')
+  data.forEach(p=>{ loadLikes(p.id); loadCmts(p.id); checkLiked(p.id) })
 }
 
-function logout(){
-  localStorage.removeItem('pixoro_user')
-  location.reload()
+async function like(pid){
+  const u=localStorage.getItem('pixoro_user')
+  const el=document.getElementById('like-'+pid)
+  const isLiked = el.innerText==='❤️'
+  if(isLiked){ await supa.from('likes').delete().eq('post_id',pid).eq('username',u); el.innerText='🤍' }
+  else { await supa.from('likes').insert({post_id:pid,username:u}); el.innerText='❤️' }
+  loadLikes(pid)
 }
+async function loadLikes(pid){
+  const {data}=await supa.from('likes').select('*').eq('post_id',pid)
+  document.getElementById('likes-'+pid).innerText = data && data.length>0 ? `${data.length} likes` : ''
+}
+async function checkLiked(pid){
+  const u=localStorage.getItem('pixoro_user')
+  const {data}=await supa.from('likes').select('*').eq('post_id',pid).eq('username',u)
+  if(data && data.length>0) document.getElementById('like-'+pid).innerText='❤️'
+}
+async function addCmt(pid){
+  const u=localStorage.getItem('pixoro_user')
+  const inp=document.getElementById('cmt-'+pid)
+  if(!inp.value.trim()) return
+  await supa.from('comments').insert({post_id:pid,username:u,text:inp.value})
+  inp.value=''; loadCmts(pid)
+}
+async function loadCmts(pid){
+  const {data}=await supa.from('comments').select('*').eq('post_id',pid).order('created_at')
+  if(data) document.getElementById('comments-'+pid).innerHTML=data.map(c=>`<div><b>@${c.username}</b> ${c.text}</div>`).join('')
+}
+function share(id){ navigator.clipboard.writeText(location.href+'?post='+id); alert('Link copied da! 🚀') }
 
-// Auto login
-const saved = localStorage.getItem('pixoro_user')
-if(saved){
-  document.getElementById('username').value=saved
-  login()
-}
+if(localStorage.getItem('pixoro_user')) showFeed()
 </script>
 </body>
 </html>
