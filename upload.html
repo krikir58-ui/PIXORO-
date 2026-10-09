@@ -1,35 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Upload Photo - Pixoro</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Upload - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 body{background:#000;color:#fff;font-family:sans-serif;max-width:400px;margin:auto;padding:20px}
-input,textarea{width:100%;background:#111;border:1px solid #333;padding:12px;border-radius:10px;color:#fff;margin:10px 0;box-sizing:border-box}
-button{background:#0095f6;border:0;color:#fff;padding:12px;width:100%;border-radius:10px;font-weight:bold;font-size:16px}
+input,textarea,button{width:100%;background:#111;border:1px solid #333;padding:12px;border-radius:10px;color:#fff;margin:10px 0;box-sizing:border-box}
+button{background:#0095f6;border:0;font-weight:bold;font-size:16px}
+#log{background:#111;padding:10px;border-radius:10px;font-size:12px;white-space:pre-wrap;color:#0f0;margin-top:10px}
 </style>
 </head>
 <body>
-<h2>📸 New Post</h2>
+<h2>📸 Pixoro Upload - DEBUG MODE</h2>
 <input type="file" id="file" accept="image/*">
-<textarea id="cap" placeholder="Caption type pannu da..."></textarea>
+<textarea id="cap" placeholder="Caption..."></textarea>
 <button onclick="up()">Share Post</button>
-<p id="st" style="text-align:center;color:#aaa"></p>
-<button onclick="location.href='index.html'" style="background:#222;margin-top:10px">Back</button>
+<button onclick="location.href='index.html'" style="background:#222">Back to Home</button>
+<div id="log">Ready da Giri... file select pannu 🔵</div>
 <script>
 const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 async function up(){
-let f=document.getElementById('file').files[0];
-if(!f){alert('Photo select pannu da!');return;}
-document.getElementById('st').innerText='Uploading... ⏳';
-let name=Date.now()+'_'+f.name;
-let {error}=await supa.storage.from('posts').upload(name,f);
-if(error){document.getElementById('st').innerText='Error: '+error.message;return;}
-let {data}=supa.storage.from('posts').getPublicUrl(name);
-await supa.from('posts').insert({image_url:data.publicUrl,caption:document.getElementById('cap').value,username:'Giri'});
-document.getElementById('st').innerText='Posted ✅';setTimeout(()=>location.href='index.html',1000);
+ let f=document.getElementById('file').files[0];
+ if(!f){alert('Photo select pannu da!');return;}
+ let log=document.getElementById('log');
+ log.innerText='Uploading... '+f.name+'\nSize:'+f.size;
+ try{
+  let name=Date.now()+'_'+f.name.replace(/[^a-z0-9.]/gi,'_');
+  log.innerText+='\n\n1. Bucket check pannuren...';
+  let {data:bList} = await supa.storage.listBuckets();
+  log.innerText+='\nBuckets: '+(bList?bList.map(b=>b.name).join(', '):'none');
+
+  log.innerText+='\n\n2. File upload pannuren posts bucket ku...';
+  let {data:upData, error:upErr} = await supa.storage.from('posts').upload(name,f,{cacheControl:'3600',upsert:true});
+  if(upErr){log.innerText+='\n❌ UPLOAD ERROR:\n'+JSON.stringify(upErr,null,2); alert('Upload Error: '+upErr.message); return;}
+  log.innerText+='\n✅ Upload OK: '+upData.path;
+
+  let {data:urlData}=supa.storage.from('posts').getPublicUrl(name);
+  let publicUrl=urlData.publicUrl;
+  log.innerText+='\n\n3. URL: '+publicUrl;
+
+  log.innerText+='\n\n4. Table la insert pannuren...';
+  let {data:insData, error:insErr}=await supa.from('posts').insert({image_url:publicUrl,caption:document.getElementById('cap').value,username:'Giri'}).select();
+  if(insErr){log.innerText+='\n❌ TABLE INSERT ERROR:\n'+JSON.stringify(insErr,null,2)+'\n\nHint: Table column name image_url thaana nu check pannu!'; alert('DB Error: '+insErr.message); return;}
+
+  log.innerText+='\n✅ SUCCESS DA GIRI! Post saved!\n'+JSON.stringify(insData,null,2);
+  setTimeout(()=>location.href='index.html',1500);
+ }catch(e){
+  log.innerText+='\n❌ CATCH ERROR: '+e.message+'\n'+e.stack;
+ }
 }
 </script>
 </body>
