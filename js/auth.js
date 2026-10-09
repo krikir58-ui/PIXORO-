@@ -1,25 +1,25 @@
-export function clean(s){
-  if(!s) return "Giri";
-  s = String(s).trim();
-  if(s.includes('{') || s.includes('"') || s.includes(':')) return "Giri";
-  return s.replace(/[^a-zA-Z0-9_]/g,'').slice(0,20) || "Giri";
-}
-export function getUser(){ return clean(localStorage.getItem('pixoro_user_clean')||'Giri'); }
+import { supabase } from './supabase.js'
 
-export function initAuth(){
-  window.login = ()=>{
-    let safe = clean(document.getElementById('usernameInput').value);
-    localStorage.setItem('pixoro_user_clean', safe);
-    localStorage.setItem('pixoro_logged','true');
-    document.getElementById('loginBox').style.display='none';
-    document.getElementById('mainApp').style.display='block';
-    document.getElementById('profileBtn').innerText = safe[0].toUpperCase();
-    location.reload();
-  };
-  if(localStorage.getItem('pixoro_logged')==='true'){
-    document.getElementById('loginBox').style.display='none';
-    document.getElementById('mainApp').style.display='block';
-    let u = getUser();
-    document.getElementById('profileBtn').innerText = u[0].toUpperCase();
-  }
+export async function signup(email, password, username){
+  const { data, error } = await supabase.auth.signUp({ email, password })
+  if(error) { alert(error.message); return }
+  await supabase.from('profiles').insert({ id: data.user.id, username, verified: username==='Giri' })
+  alert('Signup Success da Giri! 🔵')
+  location.href = 'feed.html'
+}
+
+export async function login(email, password){
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  if(error) { alert(error.message); return }
+  location.href = 'feed.html'
+}
+
+export async function getUser(){
+  const { data } = await supabase.auth.getUser()
+  return data.user
+}
+
+export async function logout(){
+  await supabase.auth.signOut()
+  location.href = '../index.html'
 }
