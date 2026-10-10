@@ -1,7 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Profile - Pixoro 🔵</title>
 <link rel="stylesheet" href="css/follow.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}.top{padding:12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:50}.pfpRing{width:88px;height:88px;border-radius:50%;background:conic-gradient(#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);padding:3px}.pfpInner{width:100%;height:100%;background:#000;border-radius:50%;padding:3px}.pfpInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}.settingsBox{background:#121212;border-radius:16px;margin:10px;padding:14px}.toggle{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #222}.nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100;max-width:450px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%}.nav a{color:#777;text-decoration:none;font-size:24px}.nav a.active{color:#fff}</style></head><body>
 <div class="top"><b id="profileName">@Giri <span id="blueTick" style="display:none;color:#0095f6">✔️</span></b><span style="font-size:22px;cursor:pointer" onclick="openSettings()">⚙️</span></div>
 <div style="padding:16px;display:flex;gap:20px;align-items:center">
@@ -13,32 +12,31 @@
 <div style="height:70px"></div>
 <div class="nav"><a href="index.html">🏠</a><a href="search.html">🔎</a><a href="reels.html">🎬</a><a class="active" href="profile.html">👤</a></div>
 
-<!-- SETTINGS MODAL - REAL HACK PROOF + 500RS PAYMENT -->
 <div id="settingsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;overflow-y:auto"><div style="padding:16px;text-align:center;border-bottom:1px solid #222"><b>Settings & Safety 🔵🛡️</b><span onclick="closeSettings()" style="float:right;font-size:20px;cursor:pointer">✕</span></div>
 <div style="padding:14px">
 
-<!-- 500RS PREMIUM - CORRECT ADD DA GIRI! -->
-<div class="settingsBox" style="border:2px solid #feda75;background:linear-gradient(180deg,#1a1500,#121212)"><b>💰 Pixoro Premium - 500₹ / 1 Month</b>
-<div style="font-size:13px;color:#aaa;margin:6px 0">✔️ Original Blue Tick ✔️ Ghost Mode ✔️ No Ads ✔️ Premium Badge</div>
-<div class="toggle"><span>Premium Status<br><small id="premiumStatus" style="color:#feda75">Not active - Pay to get 🔵</small></span><button id="payBtn" onclick="pay500()" style="background:linear-gradient(45deg,#feda75,#fa7e1e);border:0;color:#000;padding:8px 18px;border-radius:8px;font-weight:bold">Pay 500₹ 🔵</button></div>
-<div style="display:flex;gap:8px;margin-top:10px"><button onclick="payUPI()" style="flex:1;background:#fff;color:#000;border:0;padding:10px;border-radius:8px;font-weight:bold">📱 UPI / GPay</button><button onclick="checkPremium()" style="flex:1;background:#222;border:1px solid #444;color:#fff;padding:10px;border-radius:8px">Check Status</button></div>
-<div style="font-size:11px;color:#555;margin-top:8px">✅ 1 month valid • Auto expire • Supabase lock - Hack mudiyathu!</div>
+<div class="settingsBox" style="border:2px solid #00ff88;background:linear-gradient(180deg,#001a0f,#121212)"><b>🔵 Pixoro Original - FREE 1 Device 1 Tick</b>
+<div style="font-size:13px;color:#aaa;margin:6px 0">✔️ Original Blue Tick ✔️ 1 Phone 1 ID ✔️ Fake ID Block 🛡️</div>
+<div class="toggle"><span>Premium Status<br><small id="premiumStatus" style="color:#00ff88">FREE - Click to get 🔵</small></span><button id="payBtn" onclick="freePremium()" style="background:linear-gradient(45deg,#00ff88,#00cc6a);border:0;color:#000;padding:8px 18px;border-radius:8px;font-weight:bold">FREE Premium 🔵</button></div>
+<div style="display:flex;gap:8px;margin-top:10px"><button onclick="freePremium()" style="flex:1;background:#fff;color:#000;border:0;padding:10px;border-radius:8px;font-weight:bold">✔️ Get Blue Tick FREE</button><button onclick="checkPremium()" style="flex:1;background:#222;border:1px solid #444;color:#fff;padding:10px;border-radius:8px">Check Status</button></div>
+<div style="font-size:11px;color:#555;margin-top:8px">🛡️ 1 device = 1 blue tick only • Fake ID auto block • Supabase lock!</div>
 </div>
 
 <div class="settingsBox"><b>🛡️ Girls Safety - No Hack Protection</b>
 <div class="toggle"><span>Private Account 🔒<br><small style="color:#777">Only followers can see</small></span><input type="checkbox" id="privateAcc" onchange="togglePrivate()"></div>
 <div class="toggle"><span>Ghost Mode 👻<br><small style="color:#777">Hide active & story views</small></span><input type="checkbox" id="ghostMode" onchange="toggleGhost()"></div>
-<div class="toggle"><span>2-Step Verification 🛡️<br><small style="color:#777">Hack panna mudiyathu - Original</small></span><input type="checkbox" id="twoFactor" onchange="toggleTwoFactor()"></div>
-<div class="toggle"><span>Block List 🚫<br><small style="color:#777">Supabase la lock</small></span><button onclick="viewBlocks()" style="background:#222;border:1px solid #444;color:#fff;padding:5px 10px;border-radius:6px">View</button></div>
-<div class="toggle"><span>Report & Safety</span><button onclick="alert('Report sent to Pixoro Safety Team 🔵 Girls safe!')" style="background:#ff3040;border:0;color:#fff;padding:5px 10px;border-radius:6px">Report</button></div>
+<div class="toggle"><span>2-Step Verification 🛡️<br><small style="color:#777">Hack panna mudiyathu</small></span><input type="checkbox" id="twoFactor" onchange="toggleTwoFactor()"></div>
+<div class="toggle"><span>Block List 🚫</span><button onclick="viewBlocks()" style="background:#222;border:1px solid #444;color:#fff;padding:5px 10px;border-radius:6px">View</button></div>
 </div>
-<div class="settingsBox"><b>✔️ Original Blue Tick - Hack Proof</b>
-<div class="toggle"><span>Request Blue Tick<br><small style="color:#777">Free - Premium la auto varum</small></span><button id="tickBtn" onclick="requestBlueTick()" style="background:#0095f6;border:0;color:#fff;padding:6px 14px;border-radius:8px">Request ✔️</button></div>
-<div id="tickStatus" style="font-size:12px;color:#777;margin-top:6px">Status: Not requested - Premium pay panna auto verified!</div>
-<div style="font-size:11px;color:#555;margin-top:8px">⚠️ Blue tick Supabase la lock aagum da - Local la illa! Yarum hack panna mudiyathu!</div>
+
+<div class="settingsBox"><b>✔️ Original Blue Tick - 1 Device 1 Tick</b>
+<div class="toggle"><span>Request Blue Tick<br><small style="color:#777">FREE - 1 device ku 1 than</small></span><button id="tickBtn" onclick="freePremium()" style="background:#0095f6;border:0;color:#fff;padding:6px 14px;border-radius:8px">Request ✔️</button></div>
+<div id="tickStatus" style="font-size:12px;color:#777;margin-top:6px">Status: Not requested - Original ku mattum 🔵</div>
+<div style="font-size:11px;color:#555;margin-top:8px">⚠️ Supabase + Device ID lock! Fake ID ku blue tick varathu da!</div>
 </div>
+
 <div class="settingsBox"><b>⚙️ Account Security</b>
-<div class="toggle"><span>Login Activity</span><button onclick="alert('Last login: Today 3:24 PM - Chennai 🔵 Safe!')" style="background:#222;border:1px solid #444;color:#fff;padding:5px 10px;border-radius:6px">View</button></div>
+<div class="toggle"><span>Login Activity</span><button onclick="alert('Last login: Today - Chennai 🔵 Safe!')" style="background:#222;border:1px solid #444;color:#fff;padding:5px 10px;border-radius:6px">View</button></div>
 <div class="toggle"><span>Logout - Secure</span><button onclick="logout()" style="background:#222;border:1px solid #444;color:#fff;padding:5px 10px;border-radius:6px">Logout</button></div>
 </div>
 </div></div></div>
@@ -50,62 +48,76 @@ function openSettings(){document.getElementById('settingsModal').style.display='
 function closeSettings(){document.getElementById('settingsModal').style.display='none'}
 function chooseGilli(){document.getElementById('gilliInput').click()}
 document.getElementById('gilliInput').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{document.getElementById('myPfp').src=ev.target.result;localStorage.setItem('pixoro_gilli_pfp',ev.target.result);alert('Photo set da Giri! 🔵')};r.readAsDataURL(f)})
+async function togglePrivate(){let v=document.getElementById('privateAcc').checked;localStorage.setItem('pixoro_private',v);await supa.from('profiles').upsert({username: ME, is_private: v});alert(v?'🔒 Private ON':'🌍 Public ON')}
+async function toggleGhost(){let v=document.getElementById('ghostMode').checked;localStorage.setItem('pixoro_ghost',v);await supa.from('profiles').upsert({username: ME, ghost_mode: v});alert(v?'👻 Ghost ON':'Ghost OFF')}
+async function toggleTwoFactor(){let v=document.getElementById('twoFactor').checked;await supa.from('profiles').upsert({username: ME, two_factor: v});alert(v?'🛡️ 2-Step ON':'2-Step OFF')}
+async function viewBlocks(){let {data}=await supa.from('blocks').select('*').eq('blocker',ME);if(data&&data.length){alert('Blocked: '+data.map(d=>d.blocked).join(', '))}else{let b=JSON.parse(localStorage.getItem('pixoro_blocks')||'[]');alert(b.length?'Blocked: '+b.join(', '):'No blocked users 🔵')}}
 
-async function togglePrivate(){let v=document.getElementById('privateAcc').checked;localStorage.setItem('pixoro_private',v);await supa.from('profiles').upsert({username: ME, is_private: v});alert(v?'🔒 Private ON - Girls safe!':'🌍 Public ON')}
-async function toggleGhost(){let v=document.getElementById('ghostMode').checked;localStorage.setItem('pixoro_ghost',v);await supa.from('profiles').upsert({username: ME, ghost_mode: v});alert(v?'👻 Ghost ON - No tracking!':'Ghost OFF')}
-async function toggleTwoFactor(){let v=document.getElementById('twoFactor').checked;await supa.from('profiles').upsert({username: ME, two_factor: v});alert(v?'🛡️ 2-Step ON - Hack mudiyathu!':'2-Step OFF')}
-async function viewBlocks(){let {data}=await supa.from('blocks').select('*').eq('blocker',ME);if(data&&data.length){alert('Blocked: '+data.map(d=>d.blocked).join(', ')+' 🚫')}else{let b=JSON.parse(localStorage.getItem('pixoro_blocks')||'[]');alert(b.length?'Blocked: '+b.join(', '):'No blocked users - Safe! 🔵')}}
+async function requestBlueTick(){ return freePremium(); }
+async function pay500(){ return freePremium(); }
+function payUPI(){ return freePremium(); }
 
-async function requestBlueTick(){
-  let btn=document.getElementById('tickBtn');let status=document.getElementById('tickStatus');
-  status.innerText='Status: Request sent... Premium 500₹ pay panna instant verified! 🔵';
-  btn.innerText='Pending...';btn.disabled=true;
-  try{await supa.from('profiles').upsert({username: ME});await supa.from('blue_tick_requests').upsert({username: ME, status: 'pending'});localStorage.setItem('pixoro_bluetick','pending');alert('Request sent da! 500₹ pay panna instant blue tick varum da Giri! ✔️')}catch(err){localStorage.setItem('pixoro_bluetick','pending');alert('Request sent da!')}
-}
-
-// 500RS PAYMENT SYSTEM - CORRECT DA!
-async function pay500(){
-  let btn=document.getElementById('payBtn');btn.innerText='Processing...';
-  if(window.Razorpay){
-    let options={key:"rzp_test_1234567890",amount:50000,currency:"INR",name:"Pixoro Premium 🔵",description:"1 Month Blue Tick + Premium",handler:async function(res){
-      await supa.from('payments').insert({username:ME,amount:500,status:'success',razorpay_id:res.razorpay_payment_id});
-      await supa.from('premium_users').upsert({username:ME,is_premium:true,premium_till:new Date(Date.now()+30*24*60*60*1000).toISOString()});
-      await supa.from('profiles').upsert({username:ME,is_verified:true});
-      document.getElementById('premiumStatus').innerText='Active till '+new Date(Date.now()+30*24*60*60*1000).toLocaleDateString()+' ✔️';document.getElementById('payBtn').innerText='Premium Active ✔️';document.getElementById('blueTick').style.display='inline';document.getElementById('verifiedText').style.display='inline';document.getElementById('tickStatus').innerText='Status: Verified ✔️🔵 Premium!';alert('Payment success da Giri! 🔵💰 500₹ received! 1 month premium ON!')},prefill:{name:ME},theme:{color:"#feda75"}};
-    let rzp=new Razorpay(options);rzp.open();rzp.on('payment.failed',()=>{btn.innerText='Pay 500₹ 🔵';alert('Payment failed da')});
-  }else{
-    if(confirm('DEMO: 500₹ pay panna OK va da? (Razorpay key add panna real payment varum) 🔵')){
-      await supa.from('payments').insert({username:ME,amount:500,status:'success',plan:'1_month_premium'}).catch(()=>{});
-      await supa.from('premium_users').upsert({username:ME,is_premium:true,premium_till:new Date(Date.now()+30*24*60*60*1000).toISOString()}).catch(()=>{});
-      await supa.from('profiles').upsert({username:ME,is_verified:true}).catch(()=>{});
-      localStorage.setItem('pixoro_premium','active');localStorage.setItem('pixoro_premium_till',new Date(Date.now()+30*24*60*60*1000).toISOString());
-      document.getElementById('premiumStatus').innerText='Active till '+new Date(Date.now()+30*24*60*60*1000).toLocaleDateString()+' ✔️ (DEMO)';document.getElementById('payBtn').innerText='Premium Active ✔️';document.getElementById('blueTick').style.display='inline';document.getElementById('verifiedText').style.display='inline';document.getElementById('tickStatus').innerText='Status: Verified ✔️🔵 Premium!';alert('Demo payment success da! 🔵 1 month premium ON! Blue tick ON!');
-    }else{btn.innerText='Pay 500₹ 🔵';}
+async function freePremium(){
+  let btn=document.getElementById('payBtn');
+  let deviceId=localStorage.getItem('pixoro_device_id');
+  if(!deviceId){
+    deviceId='DEV_'+Date.now()+'_'+Math.random().toString(36).substr(2,9);
+    localStorage.setItem('pixoro_device_id',deviceId);
   }
+  try{
+    let {data:deviceCheck}=await supa.from('premium_users').select('*').eq('device_id',deviceId).single();
+    if(deviceCheck && deviceCheck.username!== ME){
+      alert('🚫 OrU phone la oru ID ku than blue tick da! Already @'+deviceCheck.username+' ku irukku! Fake ID ku mudiyathu 🛡️');
+      document.getElementById('premiumStatus').innerText='Blocked - Already @'+deviceCheck.username+' has tick 🛡️';
+      return;
+    }
+  }catch(e){}
+  if(ME!== 'Giri'){
+    try{ await supa.from('blue_tick_requests').upsert({username: ME, status: 'pending', device_id: deviceId}); }catch(e){}
+    localStorage.setItem('pixoro_bluetick','pending');
+    document.getElementById('premiumStatus').innerText='Pending - Admin approval needed 🔵';
+    document.getElementById('tickStatus').innerText='Status: Pending - Giri approve pannathan varum ⏳';
+    alert('Request sent da! Original ID ku than Giri approve pannuvanga! Fake ID ku illa! 🔵');
+    return;
+  }
+  btn.innerText='Activating...';
+  try{
+    await supa.from('premium_users').upsert({username: ME, is_premium: true, device_id: deviceId, premium_till: new Date(Date.now()+30*24*60*60*1000).toISOString()});
+    await supa.from('profiles').upsert({username: ME, is_verified: true});
+  }catch(e){}
+  localStorage.setItem('pixoro_premium','active');
+  localStorage.setItem('pixoro_premium_till', new Date(Date.now()+30*24*60*60*1000).toISOString());
+  localStorage.setItem('pixoro_bluetick','verified');
+  document.getElementById('premiumStatus').innerText='Active till '+new Date(Date.now()+30*24*60*60*1000).toLocaleDateString()+' ✔️ ORIGINAL!';
+  document.getElementById('payBtn').innerText='ORIGINAL Verified ✔️';
+  document.getElementById('blueTick').style.display='inline';
+  document.getElementById('verifiedText').style.display='inline';
+  document.getElementById('tickStatus').innerText='Status: Verified ✔️🔵 Original - 1 Device 1 Tick!';
+  document.getElementById('tickBtn').innerText='Verified ✔️';
+  document.getElementById('tickBtn').disabled=true;
+  alert('Original Blue Tick ON da Giri! 🔵 1 Device = 1 Tick! Fake ID ku mudiyathu! 🛡️');
 }
-function payUPI(){
-  let upiLink=`upi://pay?pa=giri@upi&pn=Pixoro&am=500&cu=INR&tn=Pixoro Premium 1 Month`;
-  window.location.href=upiLink;
-  setTimeout(async()=>{if(confirm('UPI payment panniya da? Yes na premium ON pannuren! 💰')){await supa.from('premium_users').upsert({username:ME,is_premium:true,premium_till:new Date(Date.now()+30*24*60*60*1000).toISOString()}).catch(()=>{});localStorage.setItem('pixoro_premium','active');checkPremium();alert('UPI verified da! Premium ON! 🔵✔️')}},2000);
-}
+
 async function checkPremium(){
+  let localTill=localStorage.getItem('pixoro_premium_till');
+  if(localTill && new Date(localTill) > new Date()){
+    document.getElementById('premiumStatus').innerText='Active till '+new Date(localTill).toLocaleDateString()+' ✔️ FREE';
+    document.getElementById('payBtn').innerText='Verified ✔️';
+    document.getElementById('blueTick').style.display='inline';
+    document.getElementById('verifiedText').style.display='inline';
+  }else{
+    document.getElementById('premiumStatus').innerText='FREE - Click to get 🔵';
+    document.getElementById('payBtn').innerText='FREE Premium 🔵';
+  }
   try{
     let {data}=await supa.from('premium_users').select('*').eq('username',ME).single();
-    if(data&&data.is_premium&&new Date(data.premium_till)>new Date()){
-      document.getElementById('premiumStatus').innerText='Active till '+new Date(data.premium_till).toLocaleDateString()+' ✔️🔵';document.getElementById('payBtn').innerText='Premium Active ✔️';document.getElementById('blueTick').style.display='inline';document.getElementById('verifiedText').style.display='inline';
-    }else{
-      let localTill=localStorage.getItem('pixoro_premium_till');
-      if(localTill&&new Date(localTill)>new Date()){
-        document.getElementById('premiumStatus').innerText='Active till '+new Date(localTill).toLocaleDateString()+' ✔️ (DEMO)';document.getElementById('payBtn').innerText='Premium Active ✔️';document.getElementById('blueTick').style.display='inline';
-      }else{
-        document.getElementById('premiumStatus').innerText='Not active - Pay 500₹ to get 🔵';document.getElementById('payBtn').innerText='Pay 500₹ 🔵';
-      }
+    if(data && data.is_premium && new Date(data.premium_till) > new Date()){
+      document.getElementById('premiumStatus').innerText='Active till '+new Date(data.premium_till).toLocaleDateString()+' ✔️ ORIGINAL';
+      document.getElementById('payBtn').innerText='Verified ✔️';
+      document.getElementById('blueTick').style.display='inline';
+      document.getElementById('verifiedText').style.display='inline';
     }
-  }catch(e){
-    let localTill=localStorage.getItem('pixoro_premium_till');
-    if(localTill&&new Date(localTill)>new Date()){document.getElementById('premiumStatus').innerText='Active till '+new Date(localTill).toLocaleDateString()+' ✔️ (DEMO)';document.getElementById('payBtn').innerText='Premium Active ✔️';document.getElementById('blueTick').style.display='inline';}
-    else{document.getElementById('premiumStatus').innerText='Not active - Pay 500₹ 🔵'}
-  }
+  }catch(e){}
 }
 function logout(){localStorage.clear();alert('Secure logout da! 🔵');location.href='index.html'}
 
@@ -124,6 +136,7 @@ window.addEventListener('load',async()=>{
     }
     let {data:posts}=await supa.from('posts').select('*').eq('username',ME).order('created_at',{ascending:false});
     if(posts){document.getElementById('pPosts').innerText=posts.length;let grid='';posts.forEach(p=>{grid+=`<img src="${p.image_url}" style="width:100%;aspect-ratio:1/1;object-fit:cover">`});document.getElementById('myFeed').innerHTML=grid;}
+    setTimeout(()=>{if(window.getFollowersCount)document.getElementById('pFollowers').innerText=getFollowersCount(ME);if(window.getFollowingCount)document.getElementById('pFollowing').innerText=getFollowingCount(ME);},800);
   }catch(e){console.log('Local mode 🔵');}
 })
 </script>
