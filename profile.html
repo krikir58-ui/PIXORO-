@@ -1,145 +1,69 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Profile - Pixoro 🔵</title>
-<link rel="stylesheet" href="css/follow.css">
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Profile - Pixoro 🔵</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}.top{padding:12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:50}.pfpRing{width:88px;height:88px;border-radius:50%;background:conic-gradient(#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);padding:3px}.pfpInner{width:100%;height:100%;background:#000;border-radius:50%;padding:3px}.pfpInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}.settingsBox{background:#121212;border-radius:16px;margin:10px;padding:14px}.toggle{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #222}.nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100;max-width:450px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%}.nav a{color:#777;text-decoration:none;font-size:24px}.nav a.active{color:#fff}</style></head><body>
-<div class="top"><b id="profileName">@Giri <span id="blueTick" style="display:none;color:#0095f6">✔️</span></b><span style="font-size:22px;cursor:pointer" onclick="openSettings()">⚙️</span></div>
-<div style="padding:16px;display:flex;gap:20px;align-items:center">
-<div class="pfpRing"><div class="pfpInner"><img id="myPfp" src="https://i.pravatar.cc/200?u=Giri"></div></div>
-<div><div style="display:flex;gap:18px"><span><b id="pPosts">0</b> posts</span><span><b id="pFollowers">0</b> followers</span><span><b id="pFollowing">0</b> following</span></div><div style="margin-top:8px">Pixoro Founder 🔵 <span id="verifiedText" style="display:none;color:#0095f6;font-size:12px">Original Verified</span></div><button style="margin-top:8px;background:#222;border:1px solid #444;color:#fff;padding:6px 14px;border-radius:8px" onclick="chooseGilli()">Edit Photo</button></div>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}
+.top{padding:12px 15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:50}
+.pfpBig{width:90px;height:90px;border-radius:50%;background:conic-gradient(from 0deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5,#feda75);padding:3px}
+.pfpBigInner{width:100%;height:100%;border-radius:50%;background:#000;padding:3px}
+.pfpBigInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.stats{display:flex;gap:20px;text-align:center}
+.stats b{display:block;font-size:18px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:10px}
+.grid img{width:100%;aspect-ratio:1/1;object-fit:cover}
+.verifiedBadge{width:16px;height:16px;background:#0095F6;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}
+.btn{border:1px solid #333;background:#222;color:#fff;padding:7px 0;border-radius:8px;width:100%;font-weight:600;cursor:pointer}
+.btnPrimary{background:#fff;color:#000}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100;max-width:450px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%}
+</style></head><body>
+<div class="top"><b style="font-size:20px;font-family:cursive">Pixoro 🔵</b><span onclick="location.href='index.html'" style="font-size:20px">✕</span></div>
+
+<div style="padding:15px">
+  <div style="display:flex;gap:20px;align-items:center">
+    <div class="pfpBig"><div class="pfpBigInner"><img id="pfpImg" src="https://i.pravatar.cc/150?u=Giri"></div></div>
+    <div class="stats">
+      <div><b id="postCount">0</b><span style="color:#777;font-size:13px">Posts</span></div>
+      <div><b id="followerCount">0</b><span style="color:#777;font-size:13px">Followers</span></div>
+      <div><b id="followingCount">0</b><span style="color:#777;font-size:13px">Following</span></div>
+    </div>
+  </div>
+  
+  <div style="margin-top:12px">
+    <div style="display:flex;align-items:center"><b>Giri</b><span class="verifiedBadge"><svg viewBox="0 0 24 24" width="10" height="10" fill="none"><path d="M17 8.5L10.5 15L7 11.5" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+    <div style="color:#777;font-size:14px;margin-top:2px">Tiruchengode to World! 🔥 Pixoro Founder</div>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-top:15px">
+    <button class="btn btnPrimary" onclick="alert('Edit Profile soon da Giri!')">Edit Profile</button>
+    <button class="btn" onclick="alert('Share Profile: ikir58-ui.github.io')">Share Profile</button>
+  </div>
+
+  <div style="display:flex;justify-content:space-around;border-top:1px solid #222;margin-top:15px;padding-top:10px;color:#777">
+    <span style="color:#fff;border-bottom:1px solid #fff;padding-bottom:5px">⊞ Posts</span><span>🎬 Reels</span><span>🔖 Saved</span>
+  </div>
+
+  <div id="myGrid" class="grid"></div>
 </div>
-<input type="file" id="gilliInput" hidden accept="image/*">
-<div id="myFeed" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px"></div>
+
 <div style="height:70px"></div>
-<div class="nav"><a href="index.html">🏠</a><a href="search.html">🔎</a><a href="reels.html">🎬</a><a class="active" href="profile.html">👤</a></div>
-
-<div id="settingsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;overflow-y:auto"><div style="padding:16px;text-align:center;border-bottom:1px solid #222"><b>Settings & Safety 🔵🛡️</b><span onclick="closeSettings()" style="float:right;font-size:20px;cursor:pointer">✕</span></div>
-<div style="padding:14px">
-
-<div class="settingsBox" style="border:2px solid #00ff88;background:linear-gradient(180deg,#001a0f,#121212)"><b>🔵 Pixoro Original - FREE 1 Device 1 Tick</b>
-<div style="font-size:13px;color:#aaa;margin:6px 0">✔️ Original Blue Tick ✔️ 1 Phone 1 ID ✔️ Fake ID Block 🛡️</div>
-<div class="toggle"><span>Premium Status<br><small id="premiumStatus" style="color:#00ff88">FREE - Click to get 🔵</small></span><button id="payBtn" onclick="freePremium()" style="background:linear-gradient(45deg,#00ff88,#00cc6a);border:0;color:#000;padding:8px 18px;border-radius:8px;font-weight:bold">FREE Premium 🔵</button></div>
-<div style="display:flex;gap:8px;margin-top:10px"><button onclick="freePremium()" style="flex:1;background:#fff;color:#000;border:0;padding:10px;border-radius:8px;font-weight:bold">✔️ Get Blue Tick FREE</button><button onclick="checkPremium()" style="flex:1;background:#222;border:1px solid #444;color:#fff;padding:10px;border-radius:8px">Check Status</button></div>
-<div style="font-size:11px;color:#555;margin-top:8px">🛡️ 1 device = 1 blue tick only • Fake ID auto block • Supabase lock!</div>
-</div>
-
-<div class="settingsBox"><b>🛡️ Girls Safety - No Hack Protection</b>
-<div class="toggle"><span>Private Account 🔒<br><small style="color:#777">Only followers can see</small></span><input type="checkbox" id="privateAcc" onchange="togglePrivate()"></div>
-<div class="toggle"><span>Ghost Mode 👻<br><small style="color:#777">Hide active & story views</small></span><input type="checkbox" id="ghostMode" onchange="toggleGhost()"></div>
-<div class="toggle"><span>2-Step Verification 🛡️<br><small style="color:#777">Hack panna mudiyathu</small></span><input type="checkbox" id="twoFactor" onchange="toggleTwoFactor()"></div>
-<div class="toggle"><span>Block List 🚫</span><button onclick="viewBlocks()" style="background:#222;border:1px solid #444;color:#fff;padding:5px 10px;border-radius:6px">View</button></div>
-</div>
-
-<div class="settingsBox"><b>✔️ Original Blue Tick - 1 Device 1 Tick</b>
-<div class="toggle"><span>Request Blue Tick<br><small style="color:#777">FREE - 1 device ku 1 than</small></span><button id="tickBtn" onclick="freePremium()" style="background:#0095f6;border:0;color:#fff;padding:6px 14px;border-radius:8px">Request ✔️</button></div>
-<div id="tickStatus" style="font-size:12px;color:#777;margin-top:6px">Status: Not requested - Original ku mattum 🔵</div>
-<div style="font-size:11px;color:#555;margin-top:8px">⚠️ Supabase + Device ID lock! Fake ID ku blue tick varathu da!</div>
-</div>
-
-<div class="settingsBox"><b>⚙️ Account Security</b>
-<div class="toggle"><span>Login Activity</span><button onclick="alert('Last login: Today - Chennai 🔵 Safe!')" style="background:#222;border:1px solid #444;color:#fff;padding:5px 10px;border-radius:6px">View</button></div>
-<div class="toggle"><span>Logout - Secure</span><button onclick="logout()" style="background:#222;border:1px solid #444;color:#fff;padding:5px 10px;border-radius:6px">Logout</button></div>
-</div>
-</div></div></div>
+<div class="nav"><a href="index.html" style="text-decoration:none;font-size:22px">🏠</a><a href="search.html" style="text-decoration:none;font-size:22px">🔎</a><a href="reels.html" style="text-decoration:none;font-size:22px">🎬</a><a href="profile.html" style="text-decoration:none;font-size:22px;color:#fff">👤</a></div>
 
 <script>
-const supa=supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME='Giri'
-function openSettings(){document.getElementById('settingsModal').style.display='flex'}
-function closeSettings(){document.getElementById('settingsModal').style.display='none'}
-function chooseGilli(){document.getElementById('gilliInput').click()}
-document.getElementById('gilliInput').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{document.getElementById('myPfp').src=ev.target.result;localStorage.setItem('pixoro_gilli_pfp',ev.target.result);alert('Photo set da Giri! 🔵')};r.readAsDataURL(f)})
-async function togglePrivate(){let v=document.getElementById('privateAcc').checked;localStorage.setItem('pixoro_private',v);await supa.from('profiles').upsert({username: ME, is_private: v});alert(v?'🔒 Private ON':'🌍 Public ON')}
-async function toggleGhost(){let v=document.getElementById('ghostMode').checked;localStorage.setItem('pixoro_ghost',v);await supa.from('profiles').upsert({username: ME, ghost_mode: v});alert(v?'👻 Ghost ON':'Ghost OFF')}
-async function toggleTwoFactor(){let v=document.getElementById('twoFactor').checked;await supa.from('profiles').upsert({username: ME, two_factor: v});alert(v?'🛡️ 2-Step ON':'2-Step OFF')}
-async function viewBlocks(){let {data}=await supa.from('blocks').select('*').eq('blocker',ME);if(data&&data.length){alert('Blocked: '+data.map(d=>d.blocked).join(', '))}else{let b=JSON.parse(localStorage.getItem('pixoro_blocks')||'[]');alert(b.length?'Blocked: '+b.join(', '):'No blocked users 🔵')}}
-
-async function requestBlueTick(){ return freePremium(); }
-async function pay500(){ return freePremium(); }
-function payUPI(){ return freePremium(); }
-
-async function freePremium(){
-  let btn=document.getElementById('payBtn');
-  let deviceId=localStorage.getItem('pixoro_device_id');
-  if(!deviceId){
-    deviceId='DEV_'+Date.now()+'_'+Math.random().toString(36).substr(2,9);
-    localStorage.setItem('pixoro_device_id',deviceId);
-  }
-  try{
-    let {data:deviceCheck}=await supa.from('premium_users').select('*').eq('device_id',deviceId).single();
-    if(deviceCheck && deviceCheck.username!== ME){
-      alert('🚫 OrU phone la oru ID ku than blue tick da! Already @'+deviceCheck.username+' ku irukku! Fake ID ku mudiyathu 🛡️');
-      document.getElementById('premiumStatus').innerText='Blocked - Already @'+deviceCheck.username+' has tick 🛡️';
-      return;
-    }
-  }catch(e){}
-  if(ME!== 'Giri'){
-    try{ await supa.from('blue_tick_requests').upsert({username: ME, status: 'pending', device_id: deviceId}); }catch(e){}
-    localStorage.setItem('pixoro_bluetick','pending');
-    document.getElementById('premiumStatus').innerText='Pending - Admin approval needed 🔵';
-    document.getElementById('tickStatus').innerText='Status: Pending - Giri approve pannathan varum ⏳';
-    alert('Request sent da! Original ID ku than Giri approve pannuvanga! Fake ID ku illa! 🔵');
-    return;
-  }
-  btn.innerText='Activating...';
-  try{
-    await supa.from('premium_users').upsert({username: ME, is_premium: true, device_id: deviceId, premium_till: new Date(Date.now()+30*24*60*60*1000).toISOString()});
-    await supa.from('profiles').upsert({username: ME, is_verified: true});
-  }catch(e){}
-  localStorage.setItem('pixoro_premium','active');
-  localStorage.setItem('pixoro_premium_till', new Date(Date.now()+30*24*60*60*1000).toISOString());
-  localStorage.setItem('pixoro_bluetick','verified');
-  document.getElementById('premiumStatus').innerText='Active till '+new Date(Date.now()+30*24*60*60*1000).toLocaleDateString()+' ✔️ ORIGINAL!';
-  document.getElementById('payBtn').innerText='ORIGINAL Verified ✔️';
-  document.getElementById('blueTick').style.display='inline';
-  document.getElementById('verifiedText').style.display='inline';
-  document.getElementById('tickStatus').innerText='Status: Verified ✔️🔵 Original - 1 Device 1 Tick!';
-  document.getElementById('tickBtn').innerText='Verified ✔️';
-  document.getElementById('tickBtn').disabled=true;
-  alert('Original Blue Tick ON da Giri! 🔵 1 Device = 1 Tick! Fake ID ku mudiyathu! 🛡️');
+async function loadProfile(){
+  let {data:posts}=await supa.from('posts').select('*').eq('username',ME).order('created_at',{ascending:false})
+  let {data:follows}=await supa.from('follows').select('*')
+  let followers = follows.filter(f=>f.following==ME).length
+  let following = follows.filter(f=>f.follower==ME).length
+  
+  document.getElementById('postCount').textContent=posts?posts.length:0
+  document.getElementById('followerCount').textContent=followers
+  document.getElementById('followingCount').textContent=following
+  
+  let grid=document.getElementById('myGrid')
+  grid.innerHTML=(posts||[]).map(p=>`<img src="${p.image_url}" onclick="location.href='index.html'">`).join('') || '<p style="grid-column:1/4;text-align:center;padding:40px;color:#555">No posts yet da!</p>'
 }
-
-async function checkPremium(){
-  let localTill=localStorage.getItem('pixoro_premium_till');
-  if(localTill && new Date(localTill) > new Date()){
-    document.getElementById('premiumStatus').innerText='Active till '+new Date(localTill).toLocaleDateString()+' ✔️ FREE';
-    document.getElementById('payBtn').innerText='Verified ✔️';
-    document.getElementById('blueTick').style.display='inline';
-    document.getElementById('verifiedText').style.display='inline';
-  }else{
-    document.getElementById('premiumStatus').innerText='FREE - Click to get 🔵';
-    document.getElementById('payBtn').innerText='FREE Premium 🔵';
-  }
-  try{
-    let {data}=await supa.from('premium_users').select('*').eq('username',ME).single();
-    if(data && data.is_premium && new Date(data.premium_till) > new Date()){
-      document.getElementById('premiumStatus').innerText='Active till '+new Date(data.premium_till).toLocaleDateString()+' ✔️ ORIGINAL';
-      document.getElementById('payBtn').innerText='Verified ✔️';
-      document.getElementById('blueTick').style.display='inline';
-      document.getElementById('verifiedText').style.display='inline';
-    }
-  }catch(e){}
-}
-function logout(){localStorage.clear();alert('Secure logout da! 🔵');location.href='index.html'}
-
-window.addEventListener('load',async()=>{
-  let s=localStorage.getItem('pixoro_gilli_pfp');if(s)document.getElementById('myPfp').src=s;
-  if(localStorage.getItem('pixoro_private')=='true')document.getElementById('privateAcc').checked=true;
-  if(localStorage.getItem('pixoro_ghost')=='true')document.getElementById('ghostMode').checked=true;
-  checkPremium();
-  try{
-    let {data}=await supa.from('profiles').select('*').eq('username',ME).single();
-    if(data){
-      if(data.is_private)document.getElementById('privateAcc').checked=true;
-      if(data.ghost_mode)document.getElementById('ghostMode').checked=true;
-      if(data.two_factor)document.getElementById('twoFactor').checked=true;
-      if(data.is_verified){document.getElementById('blueTick').style.display='inline';document.getElementById('verifiedText').style.display='inline';document.getElementById('tickStatus').innerText='Status: Verified ✔️🔵 Original!';document.getElementById('tickBtn').innerText='Verified ✔️';document.getElementById('tickBtn').disabled=true;}
-    }
-    let {data:posts}=await supa.from('posts').select('*').eq('username',ME).order('created_at',{ascending:false});
-    if(posts){document.getElementById('pPosts').innerText=posts.length;let grid='';posts.forEach(p=>{grid+=`<img src="${p.image_url}" style="width:100%;aspect-ratio:1/1;object-fit:cover">`});document.getElementById('myFeed').innerHTML=grid;}
-    setTimeout(()=>{if(window.getFollowersCount)document.getElementById('pFollowers').innerText=getFollowersCount(ME);if(window.getFollowingCount)document.getElementById('pFollowing').innerText=getFollowingCount(ME);},800);
-  }catch(e){console.log('Local mode 🔵');}
-})
+loadProfile()
 </script>
-<script src="js/follow.js"></script>
-<script src="js/supabase.js"></script>
 </body></html>
