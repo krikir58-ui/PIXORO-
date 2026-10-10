@@ -1,25 +1,129 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Story - Pixoro</title>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Story - Pixoro 🔵</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>body{background:#000;color:#fff;font-family:sans-serif;max-width:400px;margin:auto;padding:20px}input,textarea{width:100%;background:#111;border:1px solid #333;padding:12px;border-radius:10px;color:#fff;margin:10px 0;box-sizing:border-box}button{background:#ff0040;border:0;color:#fff;padding:12px;width:100%;border-radius:10px;font-weight:bold}</style>
+<style>body{background:#000;color:#fff;font-family:sans-serif;max-width:400px;margin:auto;padding:20px}input,textarea{width:100%;background:#111;border:1px solid #333;padding:12px;border-radius:10px;color:#fff;margin:10px 0;box-sizing:border-box}button{background:#0095F6;border:0;color:#fff;padding:12px;width:100%;border-radius:10px;font-weight:bold;cursor:pointer}.filterBar{display:flex;gap:8px;overflow-x:auto;padding:10px 0}.fbtn{padding:6px 12px;background:#222;border:1px solid #333;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer}.fbtn.active{border-color:#0095F6;background:#001a26;color:#0095F6} #preview{width:100%;height:400px;background:#111;border-radius:15px;object-fit:cover;display:none;margin:10px 0}</style>
 </head>
 <body>
-<h2>📕 Add Story</h2>
-<input type="file" id="file" accept="image/*,video/*">
-<button onclick="up()">Share Story</button>
-<p id="st" style="text-align:center;color:#aaa"></p>
+<h2>📕 Add Story - Pixoro 🔵</h2>
+<input type="file" id="file" accept="image/*,video/*" onchange="preview(this)">
+<img id="preview" />
+<video id="previewVideo" style="width:100%;height:400px;background:#111;border-radius:15px;display:none;margin:10px 0" autoplay muted loop></video>
+
+<div class="filterBar">
+  <div class="fbtn active" onclick="setF('none',this)">Normal</div>
+  <div class="fbtn" onclick="setF('grayscale(1)',this)">B&W</div>
+  <div class="fbtn" onclick="setF('sepia(1)',this)">Sepia</div>
+  <div class="fbtn" onclick="setF('contrast(1.5) saturate(1.5)',this)">Vivid</div>
+  <div class="fbtn" onclick="setF('blur(0.5px) brightness(1.2)',this)">Soft</div>
+</div>
+
+<textarea id="caption" placeholder="Caption + Font + @Mention + Poll... type pannu da! Ex: Enna da poll? 😍"></textarea>
+
+<div style="display:flex;gap:8px;margin:10px 0">
+  <button onclick="addPoll()" style="background:#222;flex:1">📊 Poll</button>
+  <button onclick="aiGen()" style="background:linear-gradient(to right,#00BFFF,#9c27b0);flex:1">🤖 AI Image</button>
+</div>
+
+<button onclick="up()">Share to Your Story ⭐</button>
+<button onclick="upClose()" style="background:#002a14;border:1px solid #00ff66;color:#00ff66;margin-top:8px">Share to Close Friends 💚</button>
+<p id="st" style="text-align:center;color:#aaa;margin-top:10px"></p>
 <button onclick="location.href='index.html'" style="background:#222;margin-top:10px">Back</button>
+
 <script>
 const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-async function up(){
-let f=document.getElementById('file').files[0]; if(!f){alert('File select pannu!');return;}
-document.getElementById('st').innerText='Uploading... ⏳'; let name=Date.now()+'_'+f.name;
-let {error}=await supa.storage.from('stories').upload(name,f);
-if(error){document.getElementById('st').innerText=error.message;return;}
-let {data}=supa.storage.from('stories').getPublicUrl(name);
-await supa.from('stories').insert({image_url:data.publicUrl,username:'Giri'});
-document.getElementById('st').innerText='Story Added ✅';setTimeout(()=>location.href='index.html',1000);
+let ME = localStorage.getItem('pixoro_current_user') || 'Giri'
+let curFilter='none', mediaType='image', fileData=''
+
+function preview(input){
+  if(input.files && input.files[0]){
+    let f=input.files[0]
+    mediaType = f.type.startsWith('video')?'video':'image'
+    let url=URL.createObjectURL(f)
+    fileData=f
+    if(mediaType==='video'){
+      document.getElementById('previewVideo').src=url
+      document.getElementById('previewVideo').style.display='block'
+      document.getElementById('preview').style.display='none'
+    }else{
+      document.getElementById('preview').src=url
+      document.getElementById('preview').style.display='block'
+      document.getElementById('previewVideo').style.display='none'
+    }
+  }
+}
+function setF(f, el){
+  curFilter=f
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'))
+  el.classList.add('active')
+  document.getElementById('preview').style.filter=f
+  document.getElementById('previewVideo').style.filter=f
+}
+function addPoll(){
+  let q=prompt('Poll Question:')
+  if(q){ document.getElementById('caption').value += `\n📊 POLL: ${q} (Yes/No)` }
+}
+function aiGen(){
+  let p=prompt('AI Image prompt:')
+  if(p){
+    let aiUrl=`https://picsum.photos/seed/${encodeURIComponent(p)}/400/700`
+    document.getElementById('preview').src=aiUrl
+    document.getElementById('preview').style.display='block'
+    document.getElementById('previewVideo').style.display='none'
+    fileData=null
+    // AI image URL direct save pannuvom
+    window.aiImageUrl=aiUrl
+  }
+}
+
+async function uploadFile(){
+  // AI image-na direct URL thaan
+  if(window.aiImageUrl) return window.aiImageUrl
+
+  let f=fileData
+  if(!f) return null
+  let name=Date.now()+'_'+f.name
+  // Bucket illana error varum, athukku public URL method
+  let {data:upData, error} = await supa.storage.from('stories').upload(name, f, {upsert:true})
+  if(error){
+    // Bucket illa-na base64 la save panniduvom (temporary hack)
+    console.log('Storage error, using base64', error.message)
+    return new Promise(res=>{
+      let r=new FileReader()
+      r.onload=e=>res(e.target.result.substring(0,200000))
+      r.readAsDataURL(f)
+    })
+  }
+  let {data}=supa.storage.from('stories').getPublicUrl(name)
+  return data.publicUrl
+}
+
+async function up(){ share('public') }
+async function upClose(){ share('close_friends') }
+
+async function share(audience){
+  let fileInput=document.getElementById('file')
+  if(!fileInput.files[0] &&!window.aiImageUrl){alert('File select pannu da Giri!');return;}
+  document.getElementById('st').innerText='Uploading... ⏳'
+
+  let mediaUrl = await uploadFile()
+  if(!mediaUrl){ document.getElementById('st').innerText='Upload failed!'; return }
+
+  // ITHU THAAN FIX: image_url illa, media_url!
+  let {error}=await supa.from('stories').insert({
+    username: ME,
+    media_url: mediaUrl,
+    media_type: mediaType,
+    caption: document.getElementById('caption').value,
+    filter: curFilter,
+    audience: audience,
+    stickers: [],
+    expires_at: new Date(Date.now()+24*60*60*1000).toISOString()
+  })
+
+  if(error){document.getElementById('st').innerText='DB Error: '+error.message; return;}
+  document.getElementById('st').innerText = audience==='close_friends'?'💚 Close Friends ku poyiduchu!':'✅ Your Story Added da Giri! 🔵'
+  setTimeout(()=>location.href='index.html',1200)
 }
 </script>
 </body>
