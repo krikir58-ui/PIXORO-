@@ -2,15 +2,13 @@
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Profile - Pixoro 🔵 MASS</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;transition:0.3s}
 .top{padding:12px 15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:50}
-/* MASS RING ANIMATION */
 .pfpBig{width:92px;height:92px;border-radius:50%;background:conic-gradient(from 0deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5,#feda75);padding:3px;cursor:pointer;animation:rotateRing 3s linear infinite}
 @keyframes rotateRing{to{transform:rotate(360deg)}}
 .pfpBigInner{width:100%;height:100%;border-radius:50%;background:#000;padding:3px;animation:rotateRing 3s linear infinite reverse}
 .pfpBigInner img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
 .stats{display:flex;gap:25px;text-align:center}.stats b{display:block;font-size:18px}
-.stats b{animation:countUp 0.8s ease-out}
 .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:2px}
 .grid img{width:100%;aspect-ratio:1/1;object-fit:cover;cursor:pointer;transition:0.2s}
 .grid img:hover{filter:brightness(0.7)}
@@ -24,13 +22,13 @@
 #editSheet{background:#111;border-top:1px solid #333;border-radius:20px 20px 0 0;width:100%;max-width:450px;padding:20px;animation:slideUp 0.3s}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .inputBox{width:100%;background:#000;border:1px solid #333;color:#fff;padding:12px;border-radius:10px;margin:8px 0}
-/* MASS HIGHLIGHTS */
 .highlights{display:flex;gap:15px;margin:18px 0;overflow-x:auto;padding-bottom:5px}
 .highlights::-webkit-scrollbar{display:none}
 .h-item{text-align:center;min-width:65px;cursor:pointer}
 .h-circle{width:64px;height:64px;border-radius:50%;border:2px solid #222;display:flex;align-items:center;justify-content:center;font-size:26px;background:#111;transition:0.2s}
-.h-item:hover.h-circle{border-color:#00BFFF;transform:scale(1.05)}
 .h-text{font-size:11px;margin-top:5px;color:#aaa}
+/* GHOST MODE MASS STYLE */
+.ghostOn{border:1px solid #00BFFF!important; box-shadow:0 0 20px rgba(0,191,255,0.4)!important; background:linear-gradient(to right,#001a26,#00334d)!important; color:#00BFFF!important}
 .profDash{background:#111;border:1px solid #222;border-radius:12px;padding:12px;margin:15px 0}
 </style></head><body>
 
@@ -48,17 +46,12 @@
   </div>
 
   <div style="margin-top:14px">
-    <div style="display:flex;align-items:center"><b style="font-size:16px">Giri</b><span class="verifiedBadge"><svg viewBox="0 0 24 24" width="11" height="11" fill="none"><path d="M17 8.5L10.5 15L7 11.5" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+    <div style="display:flex;align-items:center"><b style="font-size:16px">Giri</b><span class="verifiedBadge"><svg viewBox="0 0 24 24" width="11" height="11" fill="none"><path d="M17 8.5L10.5 15L7 11.5" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span id="ghostBadge" style="display:none;background:#00BFFF;color:#000;font-size:10px;padding:2px 8px;border-radius:20px;margin-left:8px;font-weight:900">👻 GHOST</span></div>
     <div id="bioText" style="color:#fff;font-size:14px;margin-top:6px;line-height:19px">
-      🔥 Tiruchengode ➡️ World<br>
-      👨‍💻 Pixoro Founder | Coder<br>
-      💧 Water Can Team Respect Series 🙏<br>
-      📍 Palladam, Tiruppur<br>
-      <span style="color:#00BFFF">🔗 pixoro.com</span>
+      🔥 Tiruchengode ➡️ World<br>👨‍💻 Pixoro Founder | Coder<br>💧 Water Can Team Respect Series 🙏<br>📍 Palladam, Tiruppur<br><span style="color:#00BFFF">🔗 pixoro.com</span>
     </div>
   </div>
 
-  <!-- PROFESSIONAL DASHBOARD MASS -->
   <div class="profDash">
     <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:13px">Professional dashboard</b><span style="font-size:11px;color:#aaa">7 views in last 30 days</span></div>
     <div style="font-size:12px;color:#aaa;margin-top:4px">Creator | 1.2K accounts reached</div>
@@ -69,7 +62,12 @@
     <button class="btn" onclick="shareProfile()">Share Profile</button>
   </div>
 
-  <!-- HIGHLIGHTS - MASS FEATURE -->
+  <!-- GHOST BUTTON - MASS -->
+  <button id="ghostToggleBtn" class="btn" onclick="toggleGhost()" style="margin-top:10px;padding:12px;font-size:14px">
+    👁️ Ghost Mode OFF
+  </button>
+  <p id="ghostHint" style="font-size:10px;color:#666;text-align:center;margin-top:6px">ON pannuna story paatha yaarukkum theriyathu da Giri! 👻</p>
+
   <div class="highlights">
     <div class="h-item"><div class="h-circle">🔥</div><div class="h-text">My Work</div></div>
     <div class="h-item"><div class="h-circle">💧</div><div class="h-text">Water Can</div></div>
@@ -123,8 +121,9 @@ async function loadProfile(){
   document.getElementById('myGrid').innerHTML=myPosts.map(p=>`<img src="${p.image_url}">`).join('') || '<p style="grid-column:1/4;text-align:center;padding:50px;color:#555">No posts da Giri! 😭 Post pannu da!</p>'
   if(mySaves.length>0){
     let html = mySaves.map(s=>{let post=myPosts.find(p=>p.id==s.post_id)||myPosts[0];return post?`<img src="${post.image_url}">`:''}).join('')
-    document.getElementById('savedGrid').innerHTML=html || '<p style="grid-column:1/4;text-align:center;padding:50px;color:#555">No saved posts</p>'
+    document.getElementById('savedGrid').innerHTML=html || ''
   }
+  checkGhost()
 }
 function openEdit(){document.getElementById('editModal').style.display='flex';document.getElementById('editBio').value=localStorage.getItem('pixoro_bio')||document.getElementById('bioText').innerText}
 function closeEdit(){document.getElementById('editModal').style.display='none'}
@@ -155,6 +154,38 @@ function switchTab(t){
   else{document.getElementById('myGrid').style.display='grid';document.getElementById('savedGrid').style.display='none'}
 }
 function shareProfile(){if(navigator.share){navigator.share({title:'Pixoro - Giri',url:location.href})}else{prompt('Copy link da Giri:',location.href)}}
+
+// GHOST LOGIC - MASS
+function toggleGhost(){
+  let isGhost = localStorage.getItem('ghostMode') === 'true';
+  if(isGhost){
+    localStorage.removeItem('ghostMode'); localStorage.removeItem('pixoro_ghost');
+    alert('👁️ Ghost OFF da Giri! Ippo normal!');
+  } else {
+    localStorage.setItem('ghostMode','true'); localStorage.setItem('pixoro_ghost','true');
+    alert('👻 Ghost ON da Giri!\nStory paatha yaarukkum theriyathu! Invisible da!');
+  }
+  checkGhost();
+}
+function checkGhost(){
+  let isGhost = localStorage.getItem('ghostMode') === 'true';
+  let btn = document.getElementById('ghostToggleBtn');
+  let badge = document.getElementById('ghostBadge');
+  let hint = document.getElementById('ghostHint');
+  if(isGhost){
+    btn.innerText = '👻 Ghost Mode ON - Invisible Da!';
+    btn.classList.add('ghostOn');
+    badge.style.display = 'inline-block';
+    hint.innerText = 'Nee ippo invisible da Giri! 👻 Story paatha theriyathu!';
+    hint.style.color = '#00BFFF';
+  } else {
+    btn.innerText = '👁️ Ghost Mode OFF';
+    btn.classList.remove('ghostOn');
+    badge.style.display = 'none';
+    hint.innerText = 'ON pannuna story paatha yaarukkum theriyathu da Giri! 👻';
+    hint.style.color = '#666';
+  }
+}
 loadProfile()
 </script>
 </body></html>
