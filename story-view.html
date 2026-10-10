@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Story - Pixoro 🔵</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;overflow:hidden;font-family:sans-serif}
+.progress{position:absolute;top:5px;left:5px;right:5px;display:flex;gap:4px;z-index:10}
+.bar{flex:1;height:3px;background:#ffffff44;border-radius:10px;overflow:hidden}
+.barFill{height:100%;background:#fff;width:0%;transition:width 0.1s linear}
+.top{position:absolute;top:15px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;z-index:10}
+.storyMedia{width:100%;height:100vh;object-fit:cover}
+.caption{position:absolute;bottom:80px;left:15px;right:15px;text-align:center;font-size:18px;font-weight:700;text-shadow:2px 2px 6px #000;z-index:10}
+.close{position:absolute;top:50px;right:15px;font-size:28px;z-index:20;cursor:pointer}
+</style></head><body>
+<div class="progress" id="progress"></div>
+<div class="top">
+  <div style="display:flex;align-items:center;gap:10px"><img id="uPic" src="" style="width:36px;height:36px;border-radius:50%"><b id="uName"></b><span style="font-size:11px;color:#ccc" id="time"></span></div>
+  <span onclick="location.href='index.html'" style="font-size:24px;cursor:pointer">✕</span>
+</div>
+<img id="mediaImg" class="storyMedia" style="display:none">
+<video id="mediaVideo" class="storyMedia" style="display:none" autoplay muted playsinline></video>
+<div class="caption" id="caption"></div>
+
+<script>
+const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+let params=new URLSearchParams(location.search)
+let USER=params.get('user')||'Giri'
+let stories=[], cur=0, timer=null, prog=0
+
+async function load(){
+  let {data}=await supa.from('stories').select('*').eq('username',USER).gt('expires_at',new Date().toISOString()).order('created_at',{ascending:true})
+  stories=data||[]
+  if(stories.length===0){ alert('No stories da!'); location.href='index.html'; return }
+  document.getElementById('uName').innerText=USER
+  document.getElementById('uPic').src=`https://i.pravatar.cc/100?u=${USER}`
+  // progress bars
+  document.getElementById('progress').innerHTML=stories.map((s,i)=>`<div class="bar"><div class="barFill" id="bar${i}"></div></div>`).join('')
+  show(0)
+}
+function show(i){
+  cur=i; prog=0
+  let s=stories[i]
+  document.getElementById('caption').innerText=s.caption||''
+  document.getElementById('time').innerText= new Date(s.created_at).toLocaleTimeString()
+  let img=document.getElementById('mediaImg'), vid=document.getElementById('mediaVideo')
+  if(s.media_type==='video' || s.media_url.includes('.mp4') || s.media_url.includes('video')){
+    img.style.display='none'; vid.style.display='block'; vid.src=s.media_url; vid.style.filter=s.filter||'none'
+  }else{
+    vid.style.display='none'; img.style.display='block'; img.src=s.media_url; img.style.filter=s.filter||'none'
+  }
+  // Ghost view - yaar paathanga-nu save pannama kooda vidalam (Ghost mode secret!)
+  // supa.from('story_views').insert({story_id:s.id, viewer:localStorage.getItem('pixoro_current_user')||'Giri'})
+  startProgress()
+}
+function startProgress(){
+  clearInterval(timer)
+  timer=setInterval(()=>{
+    prog+=0.5
+    document.getElementById(`bar${cur}`).style.width=prog+'%'
+    if(prog>=100){
+      clearInterval(timer)
+      if(cur < stories.length-1) show(cur+1)
+      else location.href='index.html'
+    }
+  }, 30) // 5 sec per story (0.5 * 30ms * 200 = 5000)
+}
+// tap to next/prev
+document.body.addEventListener('click', (e)=>{
+  if(e.target.closest('.top')) return
+  let x=e.clientX
+  if(x < window.innerWidth/2){ if(cur>0) show(cur-1) }
+  else{ if(cur < stories.length-1) show(cur+1); else location.href='index.html' }
+})
+load()
+</script>
+</body></html>
