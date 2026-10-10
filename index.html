@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro 🔵</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro </title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}
@@ -16,9 +16,28 @@
 .verifiedBadge{width:16px;height:16px;background:#0095F6;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}
 .followBtn{border:1.5px solid #fff;border-radius:20px;background:#000;color:#fff;padding:5px 18px;font-size:13px;font-weight:600}
 .followBtn.following{background:#fff;color:#000}
+/* STORY BAR - NEW DA GIRI! */
+.storyBar{display:flex;gap:12px;padding:12px 10px;overflow-x:auto;border-bottom:1px solid #222;background:#000}
+.storyBar::-webkit-scrollbar{display:none}
+.sItem{text-align:center;min-width:65px;cursor:pointer}
+.sRing{width:62px;height:62px;border-radius:50%;padding:2.5px;background:linear-gradient(45deg,#feda75,#d62976,#4f5bd5)}
+.sRing.seen{background:#222}
+.sRing img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2.5px solid #000;display:block}
+.sAdd{width:62px;height:62px;border-radius:50%;background:#111;border:2px dashed #333;display:flex;align-items:center;justify-content:center;font-size:28px;position:relative}
+.sAdd::after{content:'+';position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;background:#0095F6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid #000}
+.sName{font-size:11px;margin-top:4px;max-width:65px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style></head><body>
 
-<div class="top"><b style="font-size:22px;font-family:cursive">Pixoro 🔵</b><span onclick="location.href='notifications.html'" style="cursor:pointer;font-size:22px">🔔</span></div>
+<div class="top"><b style="font-size:22px;font-family:cursive">Pixoro </b><span onclick="location.href='notifications.html'" style="cursor:pointer;font-size:22px">🔔</span></div>
+
+<!-- STORY BAR - ITHU PUTHUSU DA! -->
+<div class="storyBar" id="storyBar">
+  <div class="sItem" onclick="location.href='story-add.html'">
+    <div class="sAdd">👤</div>
+    <div class="sName">Your Story</div>
+  </div>
+  <div style="color:#444;display:flex;align-items:center;font-size:12px">Loading stories...</div>
+</div>
 
 <div id="feed"><p style="text-align:center;padding:60px;color:#666">Loading Pixoro... 🔵</p></div>
 <div style="height:70px"></div>
@@ -26,8 +45,8 @@
 
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-const ME='Giri'
-let allPosts=[], allLikes=[], allComments=[], allFollows=[], allSaves=[]
+const ME=localStorage.getItem('pixoro_current_user') || 'Giri'
+let allPosts=[], allLikes=[], allComments=[], allFollows=[], allSaves=[], allStories=[]
 
 function blueTick(){return `<span class="verifiedBadge"><svg viewBox="0 0 24 24" width="10" height="10" fill="none"><path d="M17 8.5L10.5 15L7 11.5" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`}
 function pfpHtml(u){return `<div class="pfpRing"><div class="pfpInner"><img src="https://i.pravatar.cc/100?u=${u}"></div></div>`}
@@ -38,9 +57,25 @@ async function loadAll(){
   let {data:comments}=await supa.from('comments').select('*')
   let {data:follows}=await supa.from('follows').select('*')
   let {data:saves}=await supa.from('saves').select('*').eq('username',ME)
-  allPosts=posts||[]; allLikes=likes||[]; allComments=comments||[]; allFollows=follows||[]; allSaves=saves||[]
+  let {data:stories}=await supa.from('stories').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false})
+  allPosts=posts||[]; allLikes=likes||[]; allComments=comments||[]; allFollows=follows||[]; allSaves=saves||[]; allStories=stories||[]
+  renderStories()
   renderFeed()
 }
+
+function renderStories(){
+  let bar=document.getElementById('storyBar')
+  let users=[...new Set(allStories.map(s=>s.username))]
+  let html=`<div class="sItem" onclick="location.href='story-add.html'"><div class="sAdd">👤</div><div class="sName">Your Story</div></div>`
+  html+=users.map(u=>{
+    let s=allStories.find(x=>x.username===u)
+    let isClose = s.audience==='close_friends'
+    return `<div class="sItem" onclick="viewStory('${u}')"><div class="sRing" style="${isClose?'background:#00ff66':''}"><img src="${s.media_url}" style="filter:${s.filter||'none'}"></div><div class="sName">${u}${isClose?' 💚':''}</div></div>`
+  }).join('')
+  if(users.length===0) html+=`<div style="color:#555;display:flex;align-items:center;font-size:12px;padding-left:10px">No stories - Add pannu da! 👻</div>`
+  bar.innerHTML=html
+}
+function viewStory(u){ location.href=`story-view.html?user=${encodeURIComponent(u)}` }
 
 function renderFeed(){
   let html=''
@@ -50,54 +85,19 @@ function renderFeed(){
     let isSaved=allSaves.some(s=>s.post_id==p.id)
     let isMe=p.username===ME
     let followBtn = isMe ? `<span style="font-size:11px;color:#555">YOU</span>` : `<button class="followBtn ${allFollows.some(f=>f.follower==ME && f.following==p.username)?'following':''}" onclick="toggleFollow('${p.username}')">${allFollows.some(f=>f.follower==ME && f.following==p.username)?'Following':'Follow'}</button>`
-    
     html+=`<div class="post">
       <div class="postTop"><div style="display:flex;align-items:center;gap:10px">${pfpHtml(p.username)}<div><b style="display:flex;align-items:center">@${p.username}${isMe?blueTick():''}</b><div style="font-size:11px;color:#777">${allFollows.filter(f=>f.following==p.username).length} followers</div></div></div>${followBtn}</div>
       <img class="main" src="${p.image_url}" ondblclick="likePost(${p.id})">
-      
-      <!-- LIKE COMMENT SHARE SAVE - UN IMAGE MAARI OUTLINE STYLE DA -->
-      <div class="actions">
-        <div class="left">
-          <button onclick="likePost(${p.id})">
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="${isLiked?'#ff3040':'none'}" stroke="${isLiked?'#ff3040':'#fff'}" stroke-width="${isLiked?'2':'1.8'}" stroke-linejoin="round"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg>
-          </button>
-          <button onclick="alert('Comment soon da!')">
-            <svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-          </button>
-          <button onclick="sharePost()">
-            <svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          </button>
-        </div>
-        <button onclick="savePost(${p.id})">
-          <svg viewBox="0 0 24 24" width="27" height="27" fill="${isSaved?'#fff':'none'}" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21L12 16L5 21V5C5 3.89543 5.89543 3 7 3H17C18.1046 3 19 3.89543 19 5V21Z"/></svg>
-        </button>
-      </div>
-      
+      <div class="actions"><div class="left"><button onclick="likePost(${p.id})"><svg viewBox="0 0 24 24" width="28" height="28" fill="${isLiked?'#ff3040':'none'}" stroke="${isLiked?'#ff3040':'#fff'}" stroke-width="${isLiked?'2':'1.8'}" stroke-linejoin="round"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg></button><button onclick="alert('Comment soon da!')"><svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button><button onclick="sharePost()"><svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div><button onclick="savePost(${p.id})"><svg viewBox="0 0 24 24" width="27" height="27" fill="${isSaved?'#fff':'none'}" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21L12 16L5 21V5C5 3.89543 5.89543 3 7 3H17C18.1046 3 19 3.89543 19 5V21Z"/></svg></button></div>
       <div style="padding:0 12px"><b>${lCount} likes</b><br><b>@${p.username} ${isMe?blueTick():''}</b> ${p.caption||''}</div>
     </div>`
   }
   document.getElementById('feed').innerHTML=html||'<p style="text-align:center;padding:60px">No posts da!</p>'
 }
-
-async function likePost(id){
-  let liked=allLikes.some(l=>l.post_id==id && l.username==ME)
-  if(liked){ await supa.from('likes').delete().eq('post_id',id).eq('username',ME) }
-  else{ await supa.from('likes').insert({post_id:id,username:ME}) }
-  let {data}=await supa.from('likes').select('*'); allLikes=data||[]; renderFeed()
-}
-async function savePost(id){
-  let saved=allSaves.some(s=>s.post_id==id)
-  if(saved){ await supa.from('saves').delete().eq('post_id',id).eq('username',ME) }
-  else{ await supa.from('saves').insert({post_id:id,username:ME}) }
-  let {data}=await supa.from('saves').select('*').eq('username',ME); allSaves=data||[]; renderFeed()
-}
+async function likePost(id){ let liked=allLikes.some(l=>l.post_id==id && l.username==ME); if(liked){ await supa.from('likes').delete().eq('post_id',id).eq('username',ME) } else{ await supa.from('likes').insert({post_id:id,username:ME}) } let {data}=await supa.from('likes').select('*'); allLikes=data||[]; renderFeed() }
+async function savePost(id){ let saved=allSaves.some(s=>s.post_id==id); if(saved){ await supa.from('saves').delete().eq('post_id',id).eq('username',ME) } else{ await supa.from('saves').insert({post_id:id,username:ME}) } let {data}=await supa.from('saves').select('*').eq('username',ME); allSaves=data||[]; renderFeed() }
 function sharePost(){ if(navigator.share){navigator.share({url:location.href})}else{prompt('Copy:',location.href)} }
-async function toggleFollow(u){ 
-  let already=allFollows.some(f=>f.follower==ME && f.following==u)
-  if(already){ await supa.from('follows').delete().eq('follower',ME).eq('following',u) }
-  else{ await supa.from('follows').insert({follower:ME,following:u}) }
-  let {data}=await supa.from('follows').select('*'); allFollows=data||[]; renderFeed()
-}
+async function toggleFollow(u){ let already=allFollows.some(f=>f.follower==ME && f.following==u); if(already){ await supa.from('follows').delete().eq('follower',ME).eq('following',u) } else{ await supa.from('follows').insert({follower:ME,following:u}) } let {data}=await supa.from('follows').select('*'); allFollows=data||[]; renderFeed() }
 loadAll()
 </script>
 </body></html>
