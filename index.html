@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro 🔵</title>
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="css/comments.css">
-<link rel="stylesheet" href="css/follow.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}
@@ -11,82 +9,60 @@
 .post img.main{width:100%!important;aspect-ratio:1/1!important;object-fit:cover!important;display:block!important}
 .actions{padding:10px 12px;display:flex;gap:18px;align-items:center}
 .nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100;max-width:450px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%}.nav a{color:#777;text-decoration:none;font-size:24px}.nav a.active{color:#fff}
-.heart-btn,.cmt-btn,.share-btn{background:none;border:0;cursor:pointer}
-.heart-btn.liked svg{fill:#ff3040!important;stroke:#ff3040!important;animation:likePop 0.3s ease}
-@keyframes likePop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
-@keyframes heartBlast{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(1.3);opacity:1}100%{transform:translate(-50%,-50%) scale(1.5);opacity:0}}
 .pfpRing{width:38px;height:38px;border-radius:50%;background:conic-gradient(from 0deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5,#feda75);padding:2px;cursor:pointer;flex-shrink:0}
 .pfpInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2px}
 .pfpInner img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
-/* INSTAGRAM BLUE TICK - CIRCLE KULLA TICK DA GIRI 🔵✔️ */
-.verifiedBadge{width:16px;height:16px;background:#0095F6;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;vertical-align:middle;flex-shrink:0}
-.verifiedBadge svg{width:10px;height:10px}
+/* BLUE TICK + FOLLOW BUTTON STYLE */
+.verifiedBadge{width:16px;height:16px;background:#0095F6;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}
+.followBtn{border:1.5px solid #fff;border-radius:20px;background:#000;color:#fff;padding:5px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.followBtn.following{background:#fff;color:#000}
+@keyframes heartBlast{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(1.3);opacity:1}100%{transform:translate(-50%,-50%) scale(1.5);opacity:0}}
 </style></head><body>
-<div class="top"><b style="font-size:22px;font-family:cursive">Pixoro 🔵</b><div style="display:flex;gap:16px;font-size:20px"><span onclick="location.href='search.html'" style="cursor:pointer">🔎</span><span onclick="location.href='notifications.html'" style="cursor:pointer">🔔</span><span onclick="location.href='profile.html'" style="cursor:pointer">⚙️</span></div></div>
-<div id="feed"></div><div style="height:70px"></div>
+
+<!-- TOP - SEARCH + SETTINGS REMOVE PANNITEN DA - BELL MATTUM -->
+<div class="top"><b style="font-size:22px;font-family:cursive">Pixoro 🔵</b><span onclick="location.href='notifications.html'" style="cursor:pointer;font-size:22px">🔔</span></div>
+
+<div id="feed"><p style="text-align:center;padding:60px;color:#666">Loading Pixoro... 🔵</p></div>
+<div style="height:70px"></div>
 <div class="nav"><a class="active" href="index.html">🏠</a><a href="search.html">🔎</a><a href="reels.html">🎬</a><a href="profile.html">👤</a></div>
-<div id="commentModal" onclick="if(event.target==this)closeComments()"><div id="commentSheet"><div class="cmtHeader">Comments <span onclick="closeComments()" style="position:absolute;right:15px;top:12px;font-size:20px;cursor:pointer">✕</span></div><div id="cmtList" class="cmtList"></div><div id="replyTag" class="replyTag" style="display:none"><span id="replyTxt"></span><span onclick="cancelReply()" style="cursor:pointer">✕</span></div><div class="emojiBar"><span onclick="addEmoji('❤️')">❤️</span><span onclick="addEmoji('🔥')">🔥</span><span onclick="addEmoji('😍')">😍</span><span onclick="addEmoji('😂')">😂</span></div><div class="cmtInputArea"><div class="cmtBox"><div style="width:32px;height:32px;border-radius:50%;background:#444;display:flex;align-items:center;justify-content:center">G</div><input id="cmtInput" placeholder="What do you think?" onkeydown="if(event.key==='Enter')postComment()"><button class="sendBtn" onclick="postComment()">↑</button></div></div></div></div>
-<div id="cmtOptionModal" onclick="if(event.target==this)closeCmtOptions()"><div id="cmtOptBox"><div style="width:40px;height:4px;background:#555;border-radius:10px;margin:8px auto"></div><div id="cmtOptContent"></div></div></div>
-<div id="followModal" onclick="if(event.target==this)closeFollowModal()"><div id="followSheet"><div style="padding:14px;text-align:center;border-bottom:1px solid #222;position:relative"><b id="followTitle">Followers</b><span onclick="closeFollowModal()" style="position:absolute;right:15px;top:12px;font-size:20px;cursor:pointer">✕</span><div class="followHeader"><span id="tabFollowers" onclick="switchFollowTab('followers')">Followers</span><span id="tabFollowing" onclick="switchFollowTab('following')">Following</span><span id="tabRequests" onclick="switchFollowTab('requests')">Requests</span></div></div><div id="followList" class="followList"></div></div></div>
+
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME='Giri'
-let allPosts=[], allLikes=[], allComments=[], allFollows=[], blockedUsers=[], verifiedUsers=['Giri']
+let allPosts=[], allLikes=[], allComments=[], allFollows=[]
 
-function blueTickSvg(){return `<span class="verifiedBadge"><svg viewBox="0 0 24 24" fill="none"><path d="M17 8.5L10.5 15L7 11.5" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`}
-
-function isVerified(username){
-  if(verifiedUsers.includes(username)) return true
-  if(username===ME) return true
-  return false
-}
-
-function blastHeart(){let h=document.createElement('div');h.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;z-index:9999;animation:heartBlast 1s ease-out;pointer-events:none';h.innerHTML='❤️🔵';document.body.appendChild(h);setTimeout(()=>h.remove(),1000);if(navigator.vibrate)navigator.vibrate(100)}
-function pfpHtml(username){let saved=localStorage.getItem('pixoro_gilli_pfp');let pic=(username===ME&&saved)?saved:`https://i.pravatar.cc/100?u=${username}`;return `<div class="pfpRing" onclick="openFollowModal('${username}','followers')"><div class="pfpInner"><img src="${pic}"></div></div>`;}
+function blueTick(){return `<span class="verifiedBadge"><svg viewBox="0 0 24 24" width="10" height="10" fill="none"><path d="M17 8.5L10.5 15L7 11.5" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`}
+function isFollowing(u){return allFollows.some(f=>f.follower==ME && f.following==u)}
+function pfpHtml(u){return `<div class="pfpRing"><div class="pfpInner"><img src="https://i.pravatar.cc/100?u=${u}"></div></div>`}
 
 async function loadAll(){
-  let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false});
-  let {data:likes}=await supa.from('likes').select('*');
-  let {data:comments}=await supa.from('comments').select('*').order('created_at',{ascending:true});
-  let {data:profiles}=await supa.from('profiles').select('username,is_verified').eq('is_verified',true);
-  allPosts=posts||[];allLikes=likes||[];allComments=comments||[];
-  if(profiles){verifiedUsers = profiles.map(p=>p.username); if(!verifiedUsers.includes('Giri')) verifiedUsers.push('Giri')}
-  await loadFollows();
-  renderFeed();
+  let {data:posts} = await supa.from('posts').select('*').order('created_at',{ascending:false})
+  let {data:likes} = await supa.from('likes').select('*')
+  let {data:comments} = await supa.from('comments').select('*')
+  let {data:follows} = await supa.from('follows').select('*')
+  allPosts=posts||[]; allLikes=likes||[]; allComments=comments||[]; allFollows=follows||[]
+  renderFeed()
 }
 
 function renderFeed(){
-  let html='';
+  let html=''
   for(let p of allPosts){
-    if(blockedUsers.includes(p.username))continue;
-    let lCount=allLikes.filter(l=>l.post_id==p.id).length;
-    let cCount=allComments.filter(c=>c.post_id==p.id).length;
-    let isLiked=allLikes.some(l=>l.post_id==p.id&&l.username==ME);
-    let vTick = isVerified(p.username) ? blueTickSvg() : ''
-    html+=`<div class="post"><div class="postTop"><div style="display:flex;align-items:center;gap:10px">${pfpHtml(p.username)}<div><b onclick="openFollowModal('${p.username}','followers')" style="cursor:pointer;display:flex;align-items:center">@${p.username}${vTick}</b><div style="font-size:11px;color:#777">${getFollowersCount?getFollowersCount(p.username):'0'} followers</div></div></div>${typeof followBtnHtml!=='undefined'?followBtnHtml(p.username):''}</div><img class="main" src="${p.image_url}" ondblclick="likePost(${p.id});blastHeart()"><div class="actions"><button onclick="likePost(${p.id})" class="heart-btn ${isLiked?'liked':''}"><svg viewBox="0 0 24 24" width="26" height="26" fill="${isLiked?'#ff3040':'none'}" stroke="${isLiked?'#ff3040':'#fff'}" stroke-width="2"><path d="M12 21s-6.5-4.35-9-8.5S3 4 8.5 4 12 7.5 12 7.5 15 4 20.5 4 21 8.5 18 12.5 12 21 12 21z"/></svg></button><button onclick="openComments(${p.id})" class="cmt-btn"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button><button onclick="sharePost()" class="share-btn"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div><div style="padding:0 12px"><b>${lCount} likes</b> • <b onclick="openComments(${p.id})" style="color:#aaa;cursor:pointer">${cCount>0?`View ${cCount} comments`:'Add comment'}</b><br><b style="display:inline-flex;align-items:center">@${p.username}${vTick}</b> ${p.caption||''}</div></div>`
+    let lCount=allLikes.filter(l=>l.post_id==p.id).length
+    let cCount=allComments.filter(c=>c.post_id==p.id).length
+    let isMe = p.username===ME
+    let followBtn = isMe ? `<span style="font-size:11px;color:#555">YOU</span>` : `<button class="followBtn ${isFollowing(p.username)?'following':''}" onclick="toggleFollow('${p.username}',this)">${isFollowing(p.username)?'Following':'Follow'}</button>`
+    
+    html+=`<div class="post"><div class="postTop"><div style="display:flex;align-items:center;gap:10px">${pfpHtml(p.username)}<div><b style="display:flex;align-items:center">@${p.username}${isMe?blueTick():''}</b><div style="font-size:11px;color:#777">${allFollows.filter(f=>f.following==p.username).length} followers</div></div></div>${followBtn}</div><img class="main" src="${p.image_url}"><div style="padding:10px 12px"><b>${lCount} likes</b> • <b style="color:#aaa">${cCount} comments</b><br><b>@${p.username} ${isMe?blueTick():''}</b> ${p.caption||''}</div></div>`
   }
-  document.getElementById('feed').innerHTML=html
+  document.getElementById('feed').innerHTML = html || '<p style="text-align:center;padding:60px;color:#777">No posts da Giri! Upload pannu! 🔵</p>'
 }
 
-async function likePost(id){let liked=allLikes.some(l=>l.post_id==id&&l.username==ME);if(liked){await supa.from('likes').delete().eq('post_id',id).eq('username',ME)}else{await supa.from('likes').insert({post_id:id,username:ME});blastHeart()}let {data}=await supa.from('likes').select('*');allLikes=data||[];renderFeed()}
-function sharePost(){if(navigator.share){navigator.share({title:'Pixoro',url:location.href})}else{prompt('Copy link:',location.href)}}
+async function toggleFollow(u,btn){
+  let already=isFollowing(u)
+  if(already){ await supa.from('follows').delete().eq('follower',ME).eq('following',u) }
+  else{ await supa.from('follows').insert({follower:ME,following:u}) }
+  let {data} = await supa.from('follows').select('*'); allFollows=data||[]; renderFeed()
+}
 loadAll()
 </script>
-<script src="js/supabase.js"></script>
-<script src="js/db.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/feed.js"></script>
-<script src="js/likes.js"></script>
-<script src="js/comments.js"></script>
-<script src="js/follow.js"></script>
-<script src="js/stories.js"></script>
-<script src="js/reels.js"></script>
-<script src="js/search.js"></script>
-<script src="js/profile.js"></script>
-<script src="js/safety.js"></script>
-<script src="js/ghost.js"></script>
-<script src="js/upload.js"></script>
-<script src="js/realtime.js"></script>
-<script src="js/app.js"></script>
-<script>setTimeout(()=>{if(window.enableRealtime)enableRealtime(); console.log('Pixoro 🔵 Instagram Blue Tick ON!');},1500)</script>
 </body></html>
