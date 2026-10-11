@@ -15,7 +15,8 @@
 .btnPrimary{background:#0095F6;color:#fff;border:0}
 .tab{padding:12px 0;flex:1;text-align:center;font-size:14px;cursor:pointer;color:#777;border-bottom:1px solid transparent}
 .tab.active{color:#fff;border-bottom:1px solid #fff}
-.nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100;max-width:450px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;padding:12px 0;z-index:100;max-width:450px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%}.nav a{color:#777;text-decoration:none;font-size:22px}.nav a.active{color:#fff}
+.navPlus{width:36px;height:36px;background:#fff;color:#000;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;cursor:pointer}
 #editModal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;display:none;align-items:flex-end;justify-content:center}
 #editSheet{background:#111;border-top:1px solid #333;border-radius:20px 20px 0 0;width:100%;max-width:450px;padding:20px}
 @keyframes slideLeft{from{transform:translateX(100%)}to{transform:translateX(0)}}
@@ -66,20 +67,15 @@
 <div id="cfList" style="margin-top:14px;font-size:13px;color:#888"></div>
 </div></div>
 
-<div style="height:70px"></div><div class="nav"><a href="index.html" style="text-decoration:none;font-size:22px">🏠</a><a href="search.html" style="text-decoration:none;font-size:22px">🔎</a><a href="reels.html" style="text-decoration:none;font-size:22px">🎬</a><a href="profile.html" style="text-decoration:none;font-size:22px">👤</a></div>
+<div style="height:70px"></div>
+<div class="nav"><a href="index.html">🏠</a><a href="search.html">🔎</a><div class="navPlus" onclick="location.href='upload.html'">+</div><a href="reels.html">🎬</a><a href="profile.html" class="active">👤</a></div>
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 let ME = localStorage.getItem('pixoro_current_user') || 'Giri'
 let myPosts=[], mySaves=[], allFollows=[]
-
-function toggleSOS(){
-  let on=document.getElementById('sosToggle').checked;
-  localStorage.setItem('pixoro_sos_on', on);
-  alert(on?'✅ Girls Safety SOS ON da! Home la red button varum!':'❌ SOS OFF!');
-}
+function toggleSOS(){let on=document.getElementById('sosToggle').checked;localStorage.setItem('pixoro_sos_on', on);alert(on?'✅ Girls Safety SOS ON da! Home la red button varum!':'❌ SOS OFF!');}
 function manageTrusted(){ document.getElementById('cfModal').style.display='block'; loadCF(); }
 function closeCF(){ document.getElementById('cfModal').style.display='none'; loadCFMini(); }
-
 async function addCF(){
   let name=document.getElementById('cfName').value.trim();
   let phone=document.getElementById('cfPhone').value.trim().replace(/[^0-9]/g,'');
@@ -88,7 +84,7 @@ async function addCF(){
   if(phone.length==10) phone='91'+phone;
   if(phone.length==11 && phone.startsWith('0')) phone='91'+phone.slice(1);
   let {error}=await supa.from('close_friends').insert({owner:ME,friend:name,phone:phone});
-  if(error){ alert('Error da: '+error.message+'\nSupabase la phone column add panniya?'); return; }
+  if(error){ alert('Error da: '+error.message); return; }
   document.getElementById('cfName').value=''; document.getElementById('cfPhone').value='';
   alert('✅ Saved da! '+name+' - '+phone);
   loadCF(); loadCFMini();
@@ -108,7 +104,6 @@ async function loadCFMini(){
   else el.innerHTML=data.map(c=>`💚 ${c.friend} - ${c.phone}`).join('<br>');
 }
 async function removeCF(id){ if(!confirm('Delete panava?')) return; await supa.from('close_friends').delete().eq('id',id); loadCF(); loadCFMini(); }
-
 async function loadProfile(){
   document.getElementById('displayName').textContent = ME
   try{
