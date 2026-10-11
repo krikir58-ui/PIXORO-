@@ -11,13 +11,8 @@
 .layer{position:absolute;z-index:20;cursor:move;user-select:none;touch-action:none;font-weight:700;text-shadow:0 1px 3px #000}
 .toolRight{position:absolute;right:10px;top:70px;z-index:50;display:flex;flex-direction:column;gap:18px;background:rgba(0,0,0,.4);padding:12px 8px;border-radius:25px;backdrop-filter:blur(10px)}
 .toolRight i{font-size:20px;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%}
-.toolRight i:hover{background:rgba(255,255,255,.2)}
 .bottomBar{position:absolute;bottom:0;left:0;right:0;z-index:50;background:linear-gradient(to top,rgba(0,0,0,.9),transparent);padding:12px}
-.templates{display:flex;gap:10px;margin-bottom:10px;overflow-x:auto}
-.templates::-webkit-scrollbar{display:none}
-.tpl{min-width:90px;height:60px;background:#222;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-direction:column;gap:4px;border:1px solid #333}
-.musicBar{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);padding:6px 10px;border-radius:20px;margin-bottom:12px;overflow:hidden}
-.musicBar marquee{font-size:12px}
+.musicBar{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);padding:6px 10px;border-radius:20px;margin-bottom:12px}
 .actionRow{display:flex;align-items:center;gap:10px}
 .actionRow input{flex:1;background:rgba(255,255,255,.15);border:0;padding:12px 14px;border-radius:25px;color:#fff;outline:none}
 .pill{padding:8px 14px;border-radius:20px;background:#222;font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer}
@@ -29,124 +24,110 @@
 .textModal textarea{width:100%;height:120px;background:transparent;border:0;color:#fff;font-size:32px;font-weight:700;text-align:center;outline:none;margin-top:30%;resize:none}
 </style></head><body>
 
-<div class="top"><i class="fa fa-times" onclick="location.href='./index.html'" style="font-size:22px;cursor:pointer"></i><b>Add to story</b><i class="fa fa-cog" style="font-size:18px"></i></div>
+<div class="top"><i class="fa fa-times" onclick="location.href='./index.html'" style="font-size:22px;cursor:pointer"></i><b>Add to story</b></div>
 
 <div class="canvasArea" id="canvasArea">
 <img id="bgImg" class="bg" style="display:none">
 <canvas id="drawCanvas"></canvas>
 <div id="layers"></div>
-
 <div class="toolRight">
-<i class="fa fa-font" onclick="openText()" title="Text Aa"></i>
-<i class="fa fa-face-smile" onclick="openStickers()" title="Stickers"></i>
-<i class="fa fa-music" onclick="openMusic()" title="Music"></i>
-<i class="fa fa-wand-magic-sparkles" onclick="restyle()" title="Restyle"></i>
-<i class="fa fa-at" onclick="openMention()" title="Mention"></i>
-<i class="fa fa-pen" id="drawBtn" onclick="toggleDraw()" title="Draw"></i>
-<i class="fa fa-download" onclick="saveDraft()" title="Save"></i>
+<i class="fa fa-font" onclick="openText()"></i>
+<i class="fa fa-face-smile" onclick="openStickers()"></i>
+<i class="fa fa-music" onclick="openMusic()"></i>
+<i class="fa fa-wand-magic-sparkles" onclick="restyle()"></i>
+<i class="fa fa-at" onclick="openMention()"></i>
+<i class="fa fa-pen" id="drawBtn" onclick="toggleDraw()"></i>
 </div>
 </div>
 
 <div class="bottomBar">
-<div id="musicSuggest" class="musicBar" style="display:none"><i class="fa fa-music"></i><marquee id="musicName">Appa Kooda • Love Today - Suggested audio</marquee><i class="fa fa-times" onclick="this.parentElement.style.display='none'"></i></div>
+<div id="musicSuggest" class="musicBar" style="display:none"><i class="fa fa-music"></i><marquee id="musicName">Appa Kooda • Love Today</marquee><i class="fa fa-times" onclick="this.parentElement.style.display='none'"></i></div>
 <div class="actionRow">
 <input id="captionInput" placeholder="Add a caption...">
-<div class="pill" id="pYour" onclick="setAud('public',this)"><img src="https://i.pravatar.cc/20" style="width:18px;height:18px;border-radius:50%"> Your story</div>
+<div class="pill active" onclick="setAud('public',this)">🌍 Public</div>
 <div class="pill" onclick="setAud('close_friends',this)" style="background:#00ff66;color:#000">💚 Close</div>
 <div class="send" onclick="upload()"><i class="fa fa-paper-plane"></i></div>
 </div>
+<p id="status" style="font-size:11px;color:#888;text-align:center;margin-top:8px"></p>
 </div>
 
-<!-- Text Modal -->
-<div class="modal" id="textModal"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('textModal')"></i><b onclick="addText()" style="color:#0095f6;cursor:pointer">Done</b></div><textarea id="textArea" placeholder="Type something..."></textarea>
-<div style="display:flex;gap:8px;justify-content:center;margin-top:20px"><button onclick="setTStyle('white')" style="width:30px;height:30px;border-radius:50%;background:white"></button><button onclick="setTStyle('#ff3040')" style="width:30px;height:30px;border-radius:50%;background:#ff3040"></button><button onclick="setTStyle('#00ff66')" style="width:30px;height:30px;border-radius:50%;background:#00ff66"></button><button onclick="setTStyle('#feda75')" style="width:30px;height:30px;border-radius:50%;background:#feda75"></button></div>
-</div>
-
-<!-- Stickers -->
+<div class="modal" id="textModal"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('textModal')"></i><b onclick="addText()" style="color:#0095f6;cursor:pointer">Done</b></div><textarea id="textArea" placeholder="Type something..."></textarea></div>
 <div class="modal" id="stickerModal"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('stickerModal')"></i><b>Stickers</b><span></span></div><div class="stickerGrid">
 <span onclick="addSticker('❤️')">❤️</span><span onclick="addSticker('🔥')">🔥</span><span onclick="addSticker('😂')">😂</span><span onclick="addSticker('👻')">👻</span><span onclick="addSticker('💚')">💚</span><span onclick="addSticker('✨')">✨</span><span onclick="addSticker('🥺')">🥺</span><span onclick="addSticker('💯')">💯</span><span onclick="addSticker('📍 Tiruchuli')">📍</span><span onclick="addSticker('⏰ NOW')">⏰</span><span onclick="addSticker('@Giri')">@</span><span onclick="addSticker('🔵 PIXORO')">🔵</span>
 </div></div>
-
-<!-- Music -->
 <div class="modal" id="musicModal"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('musicModal')"></i><b>Music</b><span></span></div>
 <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px">
 <div onclick="pickMusic('Appa Kooda - Love Today')" style="padding:12px;background:#111;border-radius:10px">🎵 Appa Kooda - Love Today</div>
-<div onclick="pickMusic('Sai Abhyankkar - Katchi Sera')" style="padding:12px;background:#111;border-radius:10px">🎵 Katchi Sera - Sai</div>
-<div onclick="pickMusic('Anirudh - Hukum')" style="padding:12px;background:#111;border-radius:10px">🎵 Hukum - Jailer</div>
-<div onclick="pickMusic('No Music')" style="padding:12px;background:#222;border-radius:10px">🔇 No music</div>
+<div onclick="pickMusic('Katchi Sera - Sai')" style="padding:12px;background:#111;border-radius:10px">🎵 Katchi Sera - Sai</div>
+<div onclick="pickMusic('Hukum - Jailer')" style="padding:12px;background:#111;border-radius:10px">🎵 Hukum - Jailer</div>
 </div></div>
 
-<input type="file" id="file" accept="image/*,video/*" style="display:none">
+<input type="file" id="file" accept="image/*" style="display:none">
 
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME = localStorage.getItem('pixoro_current_user') || 'Giri'
-let filter='none', audience='public', music='', tColor='white', drawing=false
+let filter='none', audience='public', music='', tColor='white', drawing=false, finalBase64=''
 let canvas=document.getElementById('drawCanvas'), ctx=canvas.getContext('2d')
-
 function resize(){ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight }
 window.addEventListener('resize',resize); resize()
-
-// Auto open gallery first time - like Insta
-setTimeout(()=> document.getElementById('file').click(), 600)
+setTimeout(()=> document.getElementById('file').click(), 500)
 
 document.getElementById('file').addEventListener('change', e=>{
  let f=e.target.files[0]; if(!f) return
- let url=URL.createObjectURL(f)
- let bg=document.getElementById('bgImg'); bg.src=url; bg.style.display='block'
+ let reader=new FileReader()
+ reader.onload= ev=>{
+   finalBase64=ev.target.result
+   let bg=document.getElementById('bgImg'); bg.src=finalBase64; bg.style.display='block'
+ }
+ reader.readAsDataURL(f)
 })
 
-function openText(){ document.getElementById('textModal').style.display='flex'; document.getElementById('textArea').focus() }
+function openText(){ document.getElementById('textModal').style.display='flex' }
 function closeM(id){ document.getElementById(id).style.display='none' }
-function setTStyle(c){ tColor=c; document.getElementById('textArea').style.color=c }
 function addText(){
  let t=document.getElementById('textArea').value; if(!t) return closeM('textModal')
- let d=document.createElement('div'); d.className='layer'; d.style.color=tColor; d.style.left='50%'; d.style.top='50%'; d.style.transform='translate(-50%,-50%)'; d.style.fontSize='28px'; d.innerText=t
+ let d=document.createElement('div'); d.className='layer'; d.style.color='white'; d.style.left='50%'; d.style.top='50%'; d.style.transform='translate(-50%,-50%)'; d.style.fontSize='28px'; d.innerText=t
  makeDraggable(d); document.getElementById('layers').appendChild(d); closeM('textModal'); document.getElementById('textArea').value=''
 }
 function openStickers(){ document.getElementById('stickerModal').style.display='flex' }
 function addSticker(s){ let d=document.createElement('div'); d.className='layer'; d.style.left='50%'; d.style.top='40%'; d.style.fontSize='30px'; d.innerText=s; makeDraggable(d); document.getElementById('layers').appendChild(d); closeM('stickerModal') }
 function openMusic(){ document.getElementById('musicModal').style.display='flex' }
-function pickMusic(m){ music=m; document.getElementById('musicName').innerText=m; document.getElementById('musicSuggest').style.display=m==='No Music'?'none':'flex'; closeM('musicModal') }
-function openMention(){ let u=prompt('Mention whom? @username'); if(u) addSticker('@'+u) }
+function pickMusic(m){ music=m; document.getElementById('musicName').innerText=m; document.getElementById('musicSuggest').style.display='flex'; closeM('musicModal') }
+function openMention(){ let u=prompt('Mention whom?'); if(u) addSticker('@'+u) }
 function restyle(){
- let filters=['none','grayscale(100%)','sepia(100%)','contrast(150%) brightness(110%)','hue-rotate(90deg)','blur(1px) brightness(120%)']
+ let filters=['none','grayscale(100%)','sepia(100%)','contrast(150%) brightness(110%)','hue-rotate(90deg)']
  let idx=filters.indexOf(filter); filter=filters[(idx+1)%filters.length]
  document.getElementById('bgImg').style.filter=filter
 }
-function toggleDraw(){
- drawing=!drawing; document.getElementById('drawBtn').style.background=drawing?'#fff':''; document.getElementById('drawBtn').style.color=drawing?'#000':'#fff'
- canvas.style.pointerEvents=drawing?'auto':'none'
-}
+function toggleDraw(){ drawing=!drawing; document.getElementById('drawBtn').style.background=drawing?'#fff':''; canvas.style.pointerEvents=drawing?'auto':'none' }
 let isDraw=false, last={x:0,y:0}
 canvas.addEventListener('pointerdown', e=>{ if(!drawing) return; isDraw=true; let r=canvas.getBoundingClientRect(); last={x:e.clientX-r.left, y:e.clientY-r.top} })
 canvas.addEventListener('pointermove', e=>{ if(!isDraw||!drawing) return; let r=canvas.getBoundingClientRect(); let x=e.clientX-r.left, y=e.clientY-r.top; ctx.strokeStyle='#fff'; ctx.lineWidth=4; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(x,y); ctx.stroke(); last={x,y} })
 canvas.addEventListener('pointerup', ()=> isDraw=false)
-function makeDraggable(el){
- let sx=0,sy=0
- el.addEventListener('pointerdown', e=>{ sx=e.clientX; sy=e.clientY; el.setPointerCapture(e.pointerId) })
- el.addEventListener('pointermove', e=>{ if(e.buttons!==1) return; let dx=e.clientX-sx, dy=e.clientY-sy; let l=el.offsetLeft+dx, t=el.offsetTop+dy; el.style.left=l+'px'; el.style.top=t+'px'; sx=e.clientX; sy=e.clientY })
-}
+function makeDraggable(el){ let sx=0,sy=0; el.addEventListener('pointerdown', e=>{ sx=e.clientX; sy=e.clientY; el.setPointerCapture(e.pointerId) }); el.addEventListener('pointermove', e=>{ if(e.buttons!==1) return; let dx=e.clientX-sx, dy=e.clientY-sy; el.style.left=(el.offsetLeft+dx)+'px'; el.style.top=(el.offsetTop+dy)+'px'; sx=e.clientX; sy=e.clientY }) }
 function setAud(a,el){ audience=a; document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active')); el.classList.add('active') }
-function saveDraft(){ alert('Draft saved da! - Local la irukku') }
 
 async function upload(){
+ if(!finalBase64){ alert('Image select pannu da!'); return }
  let btn=document.querySelector('.send'); btn.innerHTML='⏳'
- // Take screenshot of composite? For now use bg image + layers data
- let bg=document.getElementById('bgImg').src
- if(!bg){ alert('Image select pannu da!'); btn.innerHTML='<i class="fa fa-paper-plane"></i>'; return }
- // For demo, upload bg image url, filter, music, caption as data
- let caption=document.getElementById('captionInput').value
+ document.getElementById('status').innerText='Uploading... Please wait da'
  let expires=new Date(Date.now()+24*60*60*1000).toISOString()
  try{
+   // ONLY image_url and expires_at - no media_url column needed!
    let {error}=await supa.from('stories').insert({
-     username: ME, image_url: bg, media_url: bg, media_type:'image',
-     filter: filter, audience: audience, caption: caption, music: music,
+     username: ME,
+     image_url: finalBase64,
      expires_at: expires
    })
    if(error) throw error
-   alert('Story posted da! 🔵'); location.href='./index.html'
- }catch(e){ alert('Error: '+e.message); btn.innerHTML='<i class="fa fa-paper-plane"></i>' }
+   document.getElementById('status').innerText='Posted! 🔵'
+   setTimeout(()=> location.href='./index.html', 800)
+ }catch(e){
+   document.getElementById('status').innerText='Error: '+e.message
+   alert('Error: '+e.message);
+   btn.innerHTML='<i class="fa fa-paper-plane"></i>'
+ }
 }
 </script>
 </body></html>
