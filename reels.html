@@ -1,71 +1,64 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pixoro Reels 🎬</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Reels - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-body{background:#000;color:#fff;overflow:hidden}
-.reels{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch}
-.reel{height:100vh;position:relative;scroll-snap-align:start;background:#000;display:flex;align-items:center;justify-content:center}
-.reel video{width:100%;height:100%;object-fit:cover}
-.top{position:fixed;top:0;left:0;right:0;padding:15px 15px;display:flex;justify-content:space-between;z-index:100;background:linear-gradient(rgba(0,0,0,0.8), transparent);font-weight:bold}
-.overlay{position:absolute;bottom:0;left:0;right:60px;padding:0 15px 100px;z-index:10}
-.actions{position:absolute;right:12px;bottom:110px;display:flex;flex-direction:column;gap:28px;text-align:center;z-index:10}
-.act{font-size:30px;cursor:pointer;line-height:1}
-.act span{display:block;font-size:12px;margin-top:4px;font-weight:bold}
-.nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100}
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;overflow:hidden}
+.top{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;padding:14px;display:flex;justify-content:space-between;z-index:50;background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent)}
+.reelWrap{width:100%;height:100vh;position:relative;overflow-y:scroll;scroll-snap-type:y mandatory}
+.reelWrap::-webkit-scrollbar{display:none}
+.reel{width:100%;height:100vh;position:relative;scroll-snap-align:start;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.reel video,.reel img{width:100%;height:100%;object-fit:cover}
+.vBar{position:absolute;right:10px;bottom:120px;display:flex;flex-direction:column;gap:22px;align-items:center;z-index:10}
+.vBtn{text-align:center;cursor:pointer;filter:drop-shadow(0 2px 6px rgba(0,0,0,.9))}
+.vBtn small{display:block;font-size:13px;font-weight:700;margin-top:4px}
+.info{position:absolute;bottom:90px;left:12px;right:70px;z-index:10}
+.info b{font-size:15px;text-shadow:0 1px 4px #000}
+.info p{font-size:13px;color:#ddd;margin-top:4px;text-shadow:0 1px 3px #000}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100}
 .nav a{color:#777;text-decoration:none;font-size:24px}.nav a.active{color:#fff}
-</style>
-</head>
-<body>
+</style></head><body>
 
-<div class="top">
-  <a href="index.html" style="color:#fff;text-decoration:none">← Pixoro</a>
-  <span>Reels 🎬</span>
-  <span>📷</span>
-</div>
+<div class="top"><b>Reels</b><b style="font-family:cursive">Pixoro 🔵</b><span style="width:40px"></span></div>
 
-<div id="reels" class="reels">Loading... ⏳</div>
+<div class="reelWrap" id="reelWrap"><p style="text-align:center;padding-top:50vh">Loading Reels... 🔵</p></div>
 
-<div class="nav">
-  <a href="index.html">🏠</a>
-  <a href="reels.html" class="active">🎬</a>
-  <a href="#">➕</a>
-  <a href="#">❤️</a>
-  <a href="#">👤</a>
-</div>
+<div class="nav"><a href="index.html">🏠</a><a href="search.html">🔎</a><a class="active" href="reels.html">🎬</a><a href="profile.html">👤</a></div>
 
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-async function load(){
-  const {data} = await supa.from('reels').select('*').order('created_at',{ascending:false})
-  if(!data || data.length==0){ document.getElementById('reels').innerHTML='<p style="padding:80px;text-align:center;color:#888">No reels da - Add video!</p>'; return}
-  document.getElementById('reels').innerHTML = data.map(r=>`
-    <div class="reel">
-      <video src="${r.video_url}" loop autoplay muted playsinline onclick="this.paused?this.play():this.pause()"></video>
-      <div class="actions">
-        <div class="act" onclick="like(${r.id},${r.likes||0})">❤️<span id="l-${r.id}">${r.likes||0}</span></div>
-        <div class="act">💬<span>12</span></div>
-        <div class="act">✈️<span>Share</span></div>
-        <div class="act">⋯</div>
-        <div class="act" style="border:2px solid #fff;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;margin:0 auto">🎵</div>
+const ME = localStorage.getItem('pixoro_current_user') || 'Giri'
+let allLikes=[], allSaves=[]
+
+async function loadReels(){
+  let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false})
+  let {data:likes}=await supa.from('likes').select('*')
+  let {data:saves}=await supa.from('saves').select('*').eq('username',ME)
+  allLikes=likes||[]; allSaves=saves||[]
+  
+  let wrap=document.getElementById('reelWrap')
+  wrap.innerHTML=(posts||[]).map(p=>{
+    let lCount=allLikes.filter(l=>l.post_id==p.id).length
+    let isLiked=allLikes.some(l=>l.post_id==p.id && l.username==ME)
+    let isSaved=allSaves.some(s=>s.post_id==p.id)
+    let isVideo = p.image_url && (p.image_url.includes('.mp4') || p.media_type==='video')
+    return `<div class="reel">
+      ${isVideo?`<video src="${p.image_url}" autoplay loop muted playsinline></video>`:`<img src="${p.image_url}">`}
+      <div class="vBar">
+        <div class="vBtn" onclick="likeReel(${p.id})">
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="${isLiked?'#ff3040':'none'}" stroke="${isLiked?'#ff3040':'white'}" stroke-width="2"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg>
+          <small>${lCount||'Likes'}</small>
+        </div>
+        <div class="vBtn"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="white" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><small>4</small></div>
+        <div class="vBtn" onclick="shareReel()"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="white" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><small>Share</small></div>
+        <div class="vBtn" onclick="saveReel(${p.id})"><svg viewBox="0 0 24 24" width="30" height="30" fill="${isSaved?'white':'none'}" stroke="white" stroke-width="2"><path d="M19 21L12 16L5 21V5C5 3.89543 5.89543 3 7 3H17C18.1046 3 19 3.89543 19 5V21Z"/></svg><small>${isSaved?'Saved':'Save'}</small></div>
       </div>
-      <div class="overlay">
-        <b>@${r.username} ${r.username.toLowerCase()=='giri'?'🔵':''}</b>
-        <div style="margin-top:6px;font-size:14px;line-height:1.3">${r.caption||''}</div>
-        <div style="margin-top:10px;font-size:13px">🎵 Original audio - Tiruchuli • ${r.username}</div>
-      </div>
-    </div>
-  `).join('')
+      <div class="info"><b>@${p.username} 🔵</b><p>${p.caption||'Real time Instagram clone! #pixoro'}</p></div>
+    </div>`
+  }).join('')
 }
-async function like(id,cur){
-  await supa.from('reels').update({likes:cur+1}).eq('id',id)
-  document.getElementById('l-'+id).innerText=cur+1
-}
-load()
+async function likeReel(id){ let liked=allLikes.some(l=>l.post_id==id && l.username==ME); if(liked) await supa.from('likes').delete().eq('post_id',id).eq('username',ME); else await supa.from('likes').insert({post_id:id,username:ME}); loadReels() }
+async function saveReel(id){ let saved=allSaves.some(s=>s.post_id==id); if(saved) await supa.from('saves').delete().eq('post_id',id).eq('username',ME); else await supa.from('saves').insert({post_id:id,username:ME}); loadReels() }
+function shareReel(){ if(navigator.share) navigator.share({url:location.href}); else alert('Link copied da!') }
+loadReels()
 </script>
-</body>
-</html>
+</body></html>
