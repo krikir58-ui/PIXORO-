@@ -11,23 +11,56 @@
 .actions .left{display:flex;gap:18px;align-items:center}
 .actions button{background:none;border:0;cursor:pointer;display:flex;transition:.15s}
 .actions button:active{transform:scale(.85)}
-.nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100;max-width:450px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%}.nav a{color:#777;text-decoration:none;font-size:24px}.nav a.active{color:#fff}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;padding:12px 0;z-index:100;max-width:450px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%}.nav a{color:#777;text-decoration:none;font-size:24px}.nav a.active{color:#fff}
+.navPlus{width:36px;height:36px;background:#fff;color:#000;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;cursor:pointer}
 .pfpRing{width:38px;height:38px;border-radius:50%;background:conic-gradient(from 0deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5,#feda75);padding:2px}.pfpInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2px}.pfpInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .verifiedBadge{width:16px;height:16px;background:#0095F6;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}
 .followBtn{border:1.5px solid #fff;border-radius:20px;background:#000;color:#fff;padding:5px 18px;font-size:13px;font-weight:600}.followBtn.following{background:#fff;color:#000}
 .storyBar{display:flex;gap:12px;padding:12px 10px;overflow-x:auto;border-bottom:1px solid #222;background:#000}.storyBar::-webkit-scrollbar{display:none}
 .sItem{text-align:center;min-width:68px;cursor:pointer;position:relative}.sRing{width:64px;height:64px;border-radius:50%;padding:3px;display:flex;align-items:center;justify-content:center}.sRing.public{background:conic-gradient(from 45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5,#feda75)}.sRing.close{background:conic-gradient(from 45deg,#00ff66,#00cc44,#00ff66)}.sRing.seen{background:#333}.sRingInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2.5px}.sRingInner img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}.sAdd{width:64px;height:64px;border-radius:50%;background:#111;border:2px dashed #333;display:flex;align-items:center;justify-content:center;font-size:28px;position:relative}.sAdd::after{content:'+';position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;background:#0095F6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid #000;color:#fff}.sName{font-size:11px;margin-top:4px;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.closeBadge{position:absolute;top:0;right:4px;background:#00ff66;color:#000;font-size:8px;font-weight:800;padding:2px 4px;border-radius:10px}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 </style></head><body>
 <div class="top"><b style="font-size:22px;font-family:cursive">Pixoro 🔵</b><div style="display:flex;gap:15px"><span onclick="openCloseFriend()" style="cursor:pointer">💚</span><span onclick="location.href='notifications.html'" style="cursor:pointer;font-size:22px">🔔</span></div></div>
 <div class="storyBar" id="storyBar"><div class="sItem" onclick="location.href='./story-add.html'"><div class="sAdd">👤</div><div class="sName">Your Story</div></div><div style="color:#444;display:flex;align-items:center;font-size:12px">Loading...</div></div>
 <div id="feed"><p style="text-align:center;padding:60px;color:#666">Loading Pixoro... 🔵</p></div>
-<div style="height:70px"></div>
-<div class="nav"><a class="active" href="index.html">🏠</a><a href="search.html">🔎</a><a href="reels.html">🎬</a><a href="profile.html">👤</a></div>
+<div style="height:80px"></div>
+
+<!-- BOTTOM NAV WITH + SECRET -->
+<div class="nav">
+  <a class="active" href="index.html">🏠</a>
+  <a href="search.html">🔎</a>
+  <div class="navPlus" onclick="openCreate()">+</div>
+  <a href="reels.html">🎬</a>
+  <a href="profile.html">👤</a>
+</div>
+
+<!-- CREATE SHEET -->
+<div id="createSheet" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:flex-end;justify-content:center">
+<div style="background:#161616;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:18px 18px 28px;animation:slideUp .25s">
+  <div style="width:40px;height:4px;background:#333;border-radius:10px;margin:0 auto 18px"></div>
+  <b style="display:block;text-align:center;margin-bottom:16px;font-size:16px">Create New</b>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div onclick="goCreate('post')" style="background:#1e1e1e;border-radius:16px;padding:18px;text-align:center;cursor:pointer;border:1px solid #2a2a2a">
+      <div style="font-size:32px">📸</div><div style="margin-top:6px;font-weight:700">Post</div><div style="font-size:11px;color:#777">Feed photo</div>
+    </div>
+    <div onclick="goCreate('reel')" style="background:#1e1e1e;border-radius:16px;padding:18px;text-align:center;cursor:pointer;border:1px solid #2a2a2a">
+      <div style="font-size:32px">🎞️</div><div style="margin-top:6px;font-weight:700">Reels</div><div style="font-size:11px;color:#777">Short video</div>
+    </div>
+    <div onclick="goCreate('story')" style="background:#1e1e1e;border-radius:16px;padding:18px;text-align:center;cursor:pointer;border:1px solid #2a2a2a">
+      <div style="font-size:32px">⭕</div><div style="margin-top:6px;font-weight:700">Story</div><div style="font-size:11px;color:#777">24h story</div>
+    </div>
+    <div onclick="goCreate('live')" style="background:#1e1e1e;border-radius:16px;padding:18px;text-align:center;cursor:pointer;border:1px solid #2a2a2a">
+      <div style="font-size:32px">🔴</div><div style="margin-top:6px;font-weight:700">Live</div><div style="font-size:11px;color:#777">Go live</div>
+    </div>
+  </div>
+  <div onclick="closeCreate()" style="margin-top:16px;text-align:center;background:#222;padding:12px;border-radius:12px;color:#aaa;cursor:pointer">Cancel</div>
+</div>
+</div>
 
 <!-- CLOSE FRIEND MODAL -->
 <div id="cfModal" style="position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;display:none;padding:20px"><div style="background:#111;border-radius:15px;padding:15px;max-width:400px;margin:20% auto"><div style="display:flex;justify-content:space-between"><b>💚 Close Friends</b><span onclick="closeCF()" style="cursor:pointer">✕</span></div><input id="cfInput" placeholder="Username..." style="width:100%;margin-top:12px;padding:10px;border-radius:10px;border:0;background:#222;color:#fff"><button onclick="addCF()" style="width:100%;margin-top:10px;padding:10px;background:#00ff66;border:0;border-radius:10px;font-weight:700">Add</button><div id="cfList" style="margin-top:12px;font-size:13px;color:#888"></div></div></div>
 
-<!-- COMMENT MODAL - INSTA SECRET -->
+<!-- COMMENT MODAL -->
 <div id="commentModal" style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:flex-end;justify-content:center">
 <div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;display:flex;flex-direction:column">
 <div style="padding:14px;display:flex;justify-content:center;border-bottom:1px solid #222;position:relative"><div style="width:40px;height:4px;background:#333;border-radius:10px"></div><b style="position:absolute;left:50%;transform:translateX(-50%);top:14px;font-size:14px">Comments</b><span onclick="closeComment()" style="position:absolute;right:15px;top:10px;font-size:22px;cursor:pointer">✕</span></div>
@@ -78,7 +111,18 @@ async function savePost(id){ let saved=allSaves.some(s=>s.post_id==id); if(saved
 function sharePost(){ if(navigator.share) navigator.share({url:location.href}); else prompt('Copy:',location.href) }
 async function toggleFollow(u){ let a=allFollows.some(f=>f.follower==ME&&f.following==u); if(a) await supa.from('follows').delete().eq('follower',ME).eq('following',u); else await supa.from('follows').insert({follower:ME,following:u}); let {data}=await supa.from('follows').select('*'); allFollows=data||[]; renderFeed() }
 
-// COMMENT SYSTEM - INSTA SECRET
+// SECRET + BUTTON
+function openCreate(){ document.getElementById('createSheet').style.display='flex' }
+function closeCreate(){ document.getElementById('createSheet').style.display='none' }
+function goCreate(t){
+  closeCreate()
+  if(t==='post') location.href='upload.html'
+  if(t==='reel') location.href='reels-upload.html'
+  if(t==='story') location.href='story-add.html'
+  if(t==='live') { alert('🔴 Live coming soon da Giri! Camera + Supabase Realtime la pannalam!'); location.href='live.html' }
+}
+
+// COMMENT SYSTEM
 async function openComment(postId){
  currentPostId=postId
  document.getElementById('commentModal').style.display='flex'
@@ -86,7 +130,6 @@ async function openComment(postId){
  await loadComments()
 }
 function closeComment(){ document.getElementById('commentModal').style.display='none'; currentPostId=null }
-
 async function loadComments(){
  let {data:comments}=await supa.from('comments').select('*').eq('post_id',currentPostId).order('created_at',{ascending:true})
  let {data:clikes}=await supa.from('comment_likes').select('*')
@@ -128,7 +171,6 @@ async function deleteComment(cId){
  await supa.from('comments').delete().eq('id',cId)
  await loadComments()
 }
-
 function openCloseFriend(){ document.getElementById('cfModal').style.display='block'; loadCF() }
 function closeCF(){ document.getElementById('cfModal').style.display='none' }
 async function addCF(){ let f=document.getElementById('cfInput').value.trim(); if(!f) return; await supa.from('close_friends').insert({owner:ME,friend:f}); document.getElementById('cfInput').value=''; loadCF() }
