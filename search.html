@@ -1,7 +1,45 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Search - Pixoro</title><style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}.top{padding:12px;display:flex;gap:10px;border-bottom:1px solid #222;position:sticky;top:0;background:#000}input{flex:1;background:#222;border:0;padding:10px 14px;border-radius:10px;color:#fff}.userRow{display:flex;align-items:center;justify-content:space-between;padding:12px;border-bottom:1px solid #1a1a1a}</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script></head><body>
-<div class="top"><input id="searchInput" placeholder="Search users..." oninput="doSearch()"><span onclick="location.href='index.html'" style="cursor:pointer">✕</span></div>
-<div id="results"></div>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Search - Pixoro</title><style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}.top{padding:12px;display:flex;gap:10px;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:10}input{flex:1;background:#222;border:0;padding:12px 14px;border-radius:12px;color:#fff;outline:none}.userRow{display:flex;align-items:center;justify-content:space-between;padding:14px 12px;border-bottom:1px solid #1a1a1a;transition:.2s}.userRow:hover{background:#0a0a0a}.msgBtn{background:linear-gradient(135deg,#00ff66,#00ccff);border:0;color:#000;padding:7px 16px;border-radius:20px;font-weight:700;font-size:13px;cursor:pointer}.viewBtn{background:#222;border:1px solid #333;color:#fff;padding:7px 14px;border-radius:20px;font-size:13px;cursor:pointer;margin-right:6px}</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script></head><body>
+<div class="top"><input id="searchInput" placeholder="Search real people... @name" oninput="doSearch()" autofocus><span onclick="location.href='index.html'" style="cursor:pointer;font-size:20px">✕</span></div>
+<div id="results" style="padding-top:10px"></div>
+<div id="hint" style="text-align:center;padding:60px 20px;color:#555"><div style="font-size:40px;margin-bottom:10px">🔒</div><b style="color:#fff">Private Search</b><p style="font-size:12px;margin-top:8px">Type pannu - yaarukku venalum msg pannalam<br>DM la avanga mattum varuvanga - 100% private</p></div>
 <script>
 const supa=supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-async function doSearch(){let q=document.getElementById('searchInput').value;if(!q){document.getElementById('results').innerHTML='';return}let {data}=await supa.from('posts').select('username').ilike('username','%'+q+'%');let uniq=[...new Set((data||[]).map(d=>d.username))];let html='';for(let u of uniq){html+=`<div class="userRow"><div style="display:flex;align-items:center;gap:10px"><img src="https://i.pravatar.cc/40?u=${u}" style="width:36px;height:36px;border-radius:50%"><b>@${u}</b></div><button onclick="location.href='profile.html?u=${u}'" style="background:#0095f6;border:0;color:#fff;padding:6px 14px;border-radius:8px">View</button></div>`}document.getElementById('results').innerHTML=html||'<p style="padding:20px;color:#777">No users found</p>'}
+const ME=localStorage.getItem('pixoro_current_user')||'Giri'
+async function doSearch(){
+ let q=document.getElementById('searchInput').value.trim()
+ let hint=document.getElementById('hint')
+ if(!q){document.getElementById('results').innerHTML='';hint.style.display='block';return}
+ hint.style.display='none'
+ // search from posts + stories + messages - real users
+ let {data:p1}=await supa.from('posts').select('username').ilike('username','%'+q+'%')
+ let {data:p2}=await supa.from('stories').select('username').ilike('username','%'+q+'%').gt('expires_at',new Date().toISOString())
+ let all=[...(p1||[]).map(d=>d.username),...(p2||[]).map(d=>d.username)]
+ let uniq=[...new Set(all)].filter(u=>u.toLowerCase().includes(q.toLowerCase()))
+ // If no results, allow direct username (real chat)
+ if(uniq.length==0 && q.length>=2) uniq=[q]
+
+ let html=''
+ for(let u of uniq.slice(0,20)){
+   if(u===ME) continue
+   html+=`<div class="userRow"><div style="display:flex;align-items:center;gap:10px"><img src="https://i.pravatar.cc/100?u=${u}" style="width:44px;height:44px;border-radius:50%;border:2px solid #111"><div><b>@${u}</b><div style="font-size:11px;color:#00ff66">🔒 Real private • Tap message</div></div></div><div style="display:flex;gap:6px"><button class="viewBtn" onclick="location.href='profile.html?u=${u}'">View</button><button class="msgBtn" onclick="goMsg('${u}')">Message</button></div></div>`
+ }
+ document.getElementById('results').innerHTML=html||`<p style="padding:20px;color:#777">No users - <span style="color:#00ff66;cursor:pointer" onclick="goMsg('${q}')">@${q} ku direct msg pannu?</span></p>`
+}
+function goMsg(u){
+ // Go to DM - this will create real private chat
+ location.href='dm.html?user='+encodeURIComponent(u)
+}
+// Load all users initially
+async function loadAllReal(){
+ let {data}=await supa.from('posts').select('username').limit(100)
+ let uniq=[...new Set((data||[]).map(d=>d.username))].filter(u=>u!==ME).slice(0,15)
+ if(!uniq.length) return
+ document.getElementById('hint').style.display='none'
+ let html='<div style="padding:10px 12px;font-size:12px;color:#666;font-weight:700">SUGGESTED - REAL PEOPLE</div>'
+ for(let u of uniq){
+   html+=`<div class="userRow"><div style="display:flex;align-items:center;gap:10px"><img src="https://i.pravatar.cc/100?u=${u}" style="width:44px;height:44px;border-radius:50%"><div><b>@${u}</b><div style="font-size:11px;color:#888">Tap message to start private chat</div></div></div><div style="display:flex;gap:6px"><button class="viewBtn" onclick="location.href='profile.html?u=${u}'">View</button><button class="msgBtn" onclick="goMsg('${u}')">Message</button></div></div>`
+ }
+ document.getElementById('results').innerHTML=html
+}
+loadAllReal()
 </script></body></html>
