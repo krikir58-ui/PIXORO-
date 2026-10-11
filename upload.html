@@ -9,45 +9,68 @@ body{background:#000;color:#fff;font-family:sans-serif;max-width:400px;margin:au
 input,textarea,button{width:100%;background:#111;border:1px solid #333;padding:12px;border-radius:10px;color:#fff;margin:10px 0;box-sizing:border-box}
 button{background:#0095f6;border:0;font-weight:bold;font-size:16px}
 #log{background:#111;padding:10px;border-radius:10px;font-size:12px;white-space:pre-wrap;color:#0f0;margin-top:10px}
+.vibeBtn{width:auto;padding:8px 14px;border-radius:20px;font-size:14px;cursor:pointer}
+.vibeBtn.sel{transform:scale(1.1);font-weight:700;box-shadow:0 0 10px currentColor}
 </style>
 </head>
 <body>
-<h2>📸 Pixoro Upload - DEBUG MODE</h2>
+<h2>📸 Pixoro Upload - VIBE MODE 😍</h2>
 <input type="file" id="file" accept="image/*">
+
+<!-- PIXORO VIBE SELECTOR -->
+<label style="font-size:13px;color:#888">Select Vibe:</label>
+<div style="display:flex;gap:8px;padding:10px 0;overflow-x:auto">
+  <button type="button" class="vibeBtn" data-vibe="LOVE" style="border:2px solid #ff3040;background:#fff1f2;color:#ff3040">😍 Love</button>
+  <button type="button" class="vibeBtn sel" data-vibe="CHILL" style="border:2px solid #0095f6;background:#e0f2ff;color:#0095f6">😎 Chill</button>
+  <button type="button" class="vibeBtn" data-vibe="FIRE" style="border:2px solid #ff7a00;background:#fff0e0;color:#ff7a00">🔥 Fire</button>
+  <button type="button" class="vibeBtn" data-vibe="HAPPY" style="border:2px solid #00c950;background:#e6ffec;color:#00c950">💚 Happy</button>
+</div>
+<input type="hidden" id="vibeVal" value="CHILL">
+
 <textarea id="cap" placeholder="Caption..."></textarea>
 <button onclick="up()">Share Post</button>
 <button onclick="location.href='index.html'" style="background:#222">Back to Home</button>
-<div id="log">Ready da Giri... file select pannu 🔵</div>
+<div id="log">Ready da Giri... vibe select pannu 🔵</div>
 <script>
 const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+
+// VIBE SELECT LOGIC
+let vBtns=document.querySelectorAll('.vibeBtn');
+vBtns.forEach(b=>b.onclick=()=>{
+  vBtns.forEach(x=>x.classList.remove('sel'));
+  b.classList.add('sel');
+  document.getElementById('vibeVal').value=b.dataset.vibe;
+  document.getElementById('log').innerText='Vibe: '+b.dataset.vibe+' '+b.innerText;
+});
+
 async function up(){
  let f=document.getElementById('file').files[0];
  if(!f){alert('Photo select pannu da!');return;}
  let log=document.getElementById('log');
- log.innerText='Uploading... '+f.name+'\nSize:'+f.size;
+ let selectedVibe = document.getElementById('vibeVal').value;
+ log.innerText='Uploading... '+f.name+' | Vibe:'+selectedVibe;
  try{
   let name=Date.now()+'_'+f.name.replace(/[^a-z0-9.]/gi,'_');
-  log.innerText+='\n\n1. Bucket check pannuren...';
-  let {data:bList} = await supa.storage.listBuckets();
-  log.innerText+='\nBuckets: '+(bList?bList.map(b=>b.name).join(', '):'none');
-
-  log.innerText+='\n\n2. File upload pannuren posts bucket ku...';
   let {data:upData, error:upErr} = await supa.storage.from('posts').upload(name,f,{cacheControl:'3600',upsert:true});
-  if(upErr){log.innerText+='\n❌ UPLOAD ERROR:\n'+JSON.stringify(upErr,null,2); alert('Upload Error: '+upErr.message); return;}
-  log.innerText+='\n✅ Upload OK: '+upData.path;
+  if(upErr){log.innerText+='\n❌ UPLOAD ERROR:\n'+JSON.stringify(upErr,null,2); return;}
 
   let {data:urlData}=supa.storage.from('posts').getPublicUrl(name);
   let publicUrl=urlData.publicUrl;
-  log.innerText+='\n\n3. URL: '+publicUrl;
 
-  log.innerText+='\n\n4. Table la insert pannuren...';
-  let {data:insData, error:insErr}=await supa.from('posts').insert({image_url:publicUrl,caption:document.getElementById('cap').value,username:'Giri'}).select();
-  if(insErr){log.innerText+='\n❌ TABLE INSERT ERROR:\n'+JSON.stringify(insErr,null,2)+'\n\nHint: Table column name image_url thaana nu check pannu!'; alert('DB Error: '+insErr.message); return;}
+  // VIBE ADDED HERE DA!
+  let {data:insData, error:insErr}=await supa.from('posts').insert({
+    image_url:publicUrl,
+    caption:document.getElementById('cap').value,
+    username:'Giri',
+    vibe: selectedVibe
+  }).select();
 
-  log.innerText+='\n✅ SUCCESS DA GIRI! Post saved!\n'+JSON.stringify(insData,null,2);
+  if(insErr){log.innerText+='\n❌ INSERT ERROR:\n'+JSON.stringify(insErr,null,2)+'\n\nSupabase la posts table la vibe column add panniya nu paaru!'; return;}
+
+  log.innerText='\n✅ SUCCESS DA GIRI! '+selectedVibe+' vibe saved!';
   setTimeout(()=>location.href='index.html',1500);
  }catch(e){
-  log.innerText+='\n❌ CATCH ERROR: '+e.message+'\n'+e.stack;
+  log.innerText+='\n❌ ERROR: '+e.message;
  }
 }
 </script>
