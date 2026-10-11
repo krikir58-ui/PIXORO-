@@ -28,6 +28,7 @@
 .ghostOn{border:1px solid #00BFFF!important;background:#001a26!important;color:#00BFFF!important}
 .profDash{background:#111;border:1px solid #222;border-radius:12px;padding:12px;margin:15px 0}
 .setItem{padding:14px;background:#1a1a1a;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer}
+.toggle{position:relative;display:inline-block;width:50px;height:26px}.toggle input{opacity:0;width:0;height:0}.slider{position:absolute;cursor:pointer;inset:0;background:#333;border-radius:20px;transition:.3s}.slider:before{content:'';position:absolute;width:18px;height:18px;left:4px;bottom:4px;background:#fff;border-radius:50%;transition:.3s}.toggle input:checked +.slider{background:#ff3040}.toggle input:checked +.slider:before{transform:translateX(22px)}
 </style></head><body>
 <div class="top"><b style="font-size:22px;font-family:cursive">Pixoro 🔵</b><div style="display:flex;gap:18px;align-items:center"><span style="font-size:22px;cursor:pointer" onclick="openSettings()">☰</span><span style="font-size:22px;cursor:pointer" onclick="location.href='index.html'">✕</span></div></div>
 <div style="padding:15px">
@@ -45,12 +46,40 @@
   <div id="myGrid" class="grid"></div><div id="savedGrid" class="grid" style="display:none"></div>
 </div>
 <div id="editModal" onclick="if(event.target==this)closeEdit()"><div id="editSheet"><div style="width:40px;height:4px;background:#555;border-radius:10px;margin:0 auto 15px"></div><h3 style="text-align:center;margin-bottom:15px">Edit Profile 🔵</h3><div style="text-align:center"><div class="pfpBig" style="margin:0 auto"><div class="pfpBigInner"><img id="editPfpPreview" src="https://i.pravatar.cc/150?u=Giri"></div></div><p style="color:#0095F6;margin-top:8px;font-size:14px;cursor:pointer" onclick="document.getElementById('pfpFile').click()">Edit picture</p></div><label style="font-size:12px;color:#777;margin-top:15px;display:block">Bio</label><textarea id="editBio" class="inputBox" rows="4"></textarea><label style="font-size:12px;color:#777;display:block">Link</label><input id="editLink" class="inputBox" placeholder="pixoro.com"><button onclick="saveProfile()" style="width:100%;background:#0095F6;color:#fff;padding:12px;border:0;border-radius:10px;font-weight:700;margin-top:15px">Done ✔️</button></div></div>
-<div id="settingsModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:999;display:none;justify-content:flex-end"><div style="background:#0f0f0f;width:100%;max-width:450px;height:100%;overflow-y:auto;animation:slideLeft 0.3s"><div style="padding:15px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#0f0f0f"><b>Settings and activity</b><span onclick="closeSettings()" style="font-size:22px;cursor:pointer">✕</span></div><div style="padding:15px"><p style="font-size:11px;color:#777;margin-bottom:10px;font-weight:700;letter-spacing:1px">LOGIN</p><div id="accountList"></div><div class="setItem" onclick="addAccount()"><span>➕ Add account</span></div><div class="setItem" onclick="createAccount()"><span style="color:#0095F6;font-weight:700">Create new account</span></div><p style="font-size:11px;color:#777;margin:20px 0 10px;font-weight:700">SECURITY</p><div class="setItem" onclick="changePassword()"><span>🔒 Change Password</span><span>›</span></div><div class="setItem" onclick="toggleGhost()"><span>👻 Ghost Mode</span><span id="ghostStatus">OFF ›</span></div><p style="font-size:11px;color:#777;margin:20px 0 10px;font-weight:700">VERIFICATION</p><div style="padding:14px;background:#001a26;border:1px solid #00BFFF33;border-radius:12px"><b style="color:#00BFFF;font-size:13px">🔵 Blue Tick - Locked</b><br><span style="font-size:11px;color:#aaa">Server locked - Hack proof</span><div style="margin-top:8px;font-size:10px;color:#00BFFF" id="verifyStatus">Checking...</div></div><p style="font-size:11px;color:#777;margin:20px 0 10px;font-weight:700">ACCOUNT</p><div class="setItem" onclick="logout()"><span style="color:#ff4444">Log out</span></div><div class="setItem" onclick="logoutAll()"><span style="color:#ff4444">Log out of all accounts</span></div><p style="text-align:center;color:#444;font-size:11px;margin-top:40px">Pixoro 🔵 v2.1 • Normal Mode • Battery Save</p><div style="height:80px"></div></div></div></div>
+
+<!-- SETTINGS WITH SAFETY -->
+<div id="settingsModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999;display:none;justify-content:flex-end"><div style="background:#0f0f0f;width:100%;max-width:450px;height:100%;overflow-y:auto;animation:slideLeft 0.3s"><div style="padding:15px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#0f0f0f"><b>Settings and activity</b><span onclick="closeSettings()" style="font-size:22px;cursor:pointer">✕</span></div><div style="padding:15px">
+
+<p style="font-size:11px;color:#ff3040;margin-bottom:10px;font-weight:700;letter-spacing:1px">🆘 SAFETY - GIRLS SAFETY</p>
+<div style="padding:14px;background:#1a0a0a;border:1px solid #ff304033;border-radius:12px;margin-bottom:15px">
+<div style="display:flex;justify-content:space-between;align-items:center"><div><b style="color:#ff3040">🆘 Girls Safety SOS</b><br><small style="color:#888">ON pannina home la red button varum. OFF la iruntha theriyathu. Thevai padravanga mattum ON pannikalam.</small></div><label class="toggle"><input type="checkbox" id="sosToggle" onchange="toggleSOS()"><span class="slider"></span></label></div>
+<div id="cfListMini" style="margin-top:12px;font-size:12px;color:#888;background:#000;padding:10px;border-radius:8px"></div>
+<button onclick="manageTrusted()" style="margin-top:10px;width:100%;padding:10px;background:#00ff66;border:0;border-radius:8px;font-weight:700">💚 Manage Trusted Contacts</button>
+</div>
+
+<p style="font-size:11px;color:#777;margin-bottom:10px;font-weight:700;letter-spacing:1px">LOGIN</p><div id="accountList"></div><div class="setItem" onclick="addAccount()"><span>➕ Add account</span></div><div class="setItem" onclick="createAccount()"><span style="color:#0095F6;font-weight:700">Create new account</span></div><p style="font-size:11px;color:#777;margin:20px 0 10px;font-weight:700">SECURITY</p><div class="setItem" onclick="changePassword()"><span>🔒 Change Password</span><span>›</span></div><div class="setItem" onclick="toggleGhost()"><span>👻 Ghost Mode</span><span id="ghostStatus">OFF ›</span></div><p style="font-size:11px;color:#777;margin:20px 0 10px;font-weight:700">VERIFICATION</p><div style="padding:14px;background:#001a26;border:1px solid #00BFFF33;border-radius:12px"><b style="color:#00BFFF;font-size:13px">🔵 Blue Tick - Locked</b><br><span style="font-size:11px;color:#aaa">Server locked - Hack proof</span><div style="margin-top:8px;font-size:10px;color:#00BFFF" id="verifyStatus">Checking...</div></div><p style="font-size:11px;color:#777;margin:20px 0 10px;font-weight:700">ACCOUNT</p><div class="setItem" onclick="logout()"><span style="color:#ff4444">Log out</span></div><div class="setItem" onclick="logoutAll()"><span style="color:#ff4444">Log out of all accounts</span></div><p style="text-align:center;color:#444;font-size:11px;margin-top:40px">Pixoro 🔵 v2.1 • Safety ON • Girls Safety Feature 💙</p><div style="height:80px"></div></div></div></div>
+
+<div id="cfModal" style="position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1000;display:none;padding:20px"><div style="background:#111;border-radius:15px;padding:15px;max-width:400px;margin:20% auto"><div style="display:flex;justify-content:space-between"><b>💚 Trusted Contacts - SOS pogum</b><span onclick="closeCF()">✕</span></div><input id="cfInput" placeholder="Username add pannu..." style="width:100%;margin-top:12px;padding:10px;border-radius:10px;border:0;background:#222;color:#fff"><button onclick="addCF()" style="width:100%;margin-top:10px;padding:10px;background:#00ff66;border:0;border-radius:10px;font-weight:700">Add</button><div id="cfList" style="margin-top:12px;font-size:13px;color:#888"></div></div></div>
+
 <div style="height:70px"></div><div class="nav"><a href="index.html" style="text-decoration:none;font-size:22px">🏠</a><a href="search.html" style="text-decoration:none;font-size:22px">🔎</a><a href="reels.html" style="text-decoration:none;font-size:22px">🎬</a><a href="profile.html" style="text-decoration:none;font-size:22px">👤</a></div>
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 let ME = localStorage.getItem('pixoro_current_user') || 'Giri'
 let myPosts=[], mySaves=[], allFollows=[]
+
+function toggleSOS(){
+  let on=document.getElementById('sosToggle').checked;
+  localStorage.setItem('pixoro_sos_on', on);
+  alert(on?'✅ Girls Safety SOS ON da! Home page la red button varum!':'❌ SOS OFF pannita!');
+}
+function manageTrusted(){ document.getElementById('cfModal').style.display='block'; loadCF(); }
+function openCF(){ document.getElementById('cfModal').style.display='block'; loadCF(); }
+function closeCF(){ document.getElementById('cfModal').style.display='none'; loadCFMini(); }
+async function addCF(){ let f=document.getElementById('cfInput').value.trim(); if(!f) return; await supa.from('close_friends').insert({owner:ME,friend:f}); document.getElementById('cfInput').value=''; loadCF(); loadCFMini(); }
+async function loadCF(){ let {data}=await supa.from('close_friends').select('*').eq('owner',ME); let list=document.getElementById('cfList'); if(!list) return; list.innerHTML=(data||[]).map(c=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222"><span>💚 ${c.friend}</span><span onclick="removeCF('${c.id}')" style="color:#f44;cursor:pointer">remove</span></div>`).join('')||'No trusted' }
+async function loadCFMini(){ let {data}=await supa.from('close_friends').select('*').eq('owner',ME); let el=document.getElementById('cfListMini'); if(!el) return; el.innerHTML=(data||[]).map(c=>`💚 ${c.friend}`).join('<br>')||'Trusted yaarum illa - add pannu da!'; }
+async function removeCF(id){ await supa.from('close_friends').delete().eq('id',id); loadCF(); loadCFMini(); }
+
 async function loadProfile(){
   document.getElementById('displayName').textContent = ME
   try{
@@ -73,6 +102,7 @@ async function loadProfile(){
   document.getElementById('myGrid').innerHTML=myPosts.map(p=>`<img src="${p.image_url}">`).join('') || '<p style="grid-column:1/4;text-align:center;padding:50px;color:#555">No posts da!</p>'
   if(mySaves.length>0){ let html = mySaves.map(s=>{let post=myPosts.find(p=>p.id==s.post_id);return post?`<img src="${post.image_url}">`:''}).join(''); document.getElementById('savedGrid').innerHTML=html }
   checkGhost()
+  loadCFMini()
 }
 function openEdit(){document.getElementById('editModal').style.display='flex';document.getElementById('editBio').value=localStorage.getItem('pixoro_bio_'+ME)||''}
 function closeEdit(){document.getElementById('editModal').style.display='none'}
@@ -80,7 +110,7 @@ async function saveProfile(){ let bio=document.getElementById('editBio').value; 
 function uploadPfp(input){ if(input.files && input.files[0]){ let reader=new FileReader(); reader.onload=function(e){ let url=e.target.result; localStorage.setItem('pixoro_gilli_pfp_'+ME,url); document.getElementById('pfpImg').src=url; document.getElementById('editPfpPreview').src=url }; reader.readAsDataURL(input.files[0]) } }
 function switchTab(t){ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active'); if(t==='saved'){document.getElementById('myGrid').style.display='none';document.getElementById('savedGrid').style.display='grid'} else{document.getElementById('myGrid').style.display='grid';document.getElementById('savedGrid').style.display='none'} }
 function shareProfile(){if(navigator.share){navigator.share({title:'Pixoro - '+ME,url:location.href})}else{prompt('Copy link:',location.href)}}
-function openSettings(){document.getElementById('settingsModal').style.display='flex';renderAccounts()}
+function openSettings(){document.getElementById('settingsModal').style.display='flex';renderAccounts();document.getElementById('sosToggle').checked = localStorage.getItem('pixoro_sos_on')==='true';loadCFMini();}
 function closeSettings(){document.getElementById('settingsModal').style.display='none'}
 function getAccounts(){return JSON.parse(localStorage.getItem('pixoro_accounts') || JSON.stringify([ME]))}
 function renderAccounts(){ let accounts = getAccounts(); let list = document.getElementById('accountList'); list.innerHTML = accounts.map(acc=>`<div onclick="switchAccount('${acc}')" style="padding:12px;background:${acc===ME?'#222':'#1a1a1a'};border:1px solid ${acc===ME?'#00BFFF':'#333'};border-radius:12px;display:flex;justify-content:space-between;margin-bottom:6px;cursor:pointer"><span>👤 ${acc} ${acc===ME?'• Active':''}</span><span style="color:#00BFFF">${acc===ME?'✔️':''}</span></div>`).join('') }
