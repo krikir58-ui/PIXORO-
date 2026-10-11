@@ -18,16 +18,20 @@
 .followBtn.following{background:#fff;color:#000}
 .storyBar{display:flex;gap:12px;padding:12px 10px;overflow-x:auto;border-bottom:1px solid #222;background:#000}
 .storyBar::-webkit-scrollbar{display:none}
-.sItem{text-align:center;min-width:65px;cursor:pointer}
-.sRing{width:62px;height:62px;border-radius:50%;padding:2.5px;background:linear-gradient(45deg,#feda75,#d62976,#4f5bd5)}
-.sRing.seen{background:#222}
-.sRing img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2.5px solid #000;display:block}
-.sAdd{width:62px;height:62px;border-radius:50%;background:#111;border:2px dashed #333;display:flex;align-items:center;justify-content:center;font-size:28px;position:relative}
-.sAdd::after{content:'+';position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;background:#0095F6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid #000}
-.sName{font-size:11px;margin-top:4px;max-width:65px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sItem{text-align:center;min-width:68px;cursor:pointer;position:relative}
+.sRing{width:64px;height:64px;border-radius:50%;padding:3px;display:flex;align-items:center;justify-content:center}
+.sRing.public{background:conic-gradient(from 45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5,#feda75)}
+.sRing.close{background:conic-gradient(from 45deg,#00ff66,#00cc44,#00ff66)}
+.sRing.seen{background:#333}
+.sRingInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2.5px}
+.sRingInner img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.sAdd{width:64px;height:64px;border-radius:50%;background:#111;border:2px dashed #333;display:flex;align-items:center;justify-content:center;font-size:28px;position:relative}
+.sAdd::after{content:'+';position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;background:#0095F6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid #000;color:#fff}
+.sName{font-size:11px;margin-top:4px;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.closeBadge{position:absolute;top:0;right:4px;background:#00ff66;color:#000;font-size:8px;font-weight:800;padding:2px 4px;border-radius:10px}
 </style></head><body>
 
-<div class="top"><b style="font-size:22px;font-family:cursive">Pixoro 🔵</b><span onclick="location.href='notifications.html'" style="cursor:pointer;font-size:22px">🔔</span></div>
+<div class="top"><b style="font-size:22px;font-family:cursive">Pixoro 🔵</b><div style="display:flex;gap:15px"><span onclick="openCloseFriend()" style="cursor:pointer">💚</span><span onclick="location.href='notifications.html'" style="cursor:pointer;font-size:22px">🔔</span></div></div>
 
 <div class="storyBar" id="storyBar">
   <div class="sItem" onclick="location.href='./story-add.html'">
@@ -40,6 +44,16 @@
 <div id="feed"><p style="text-align:center;padding:60px;color:#666">Loading Pixoro... 🔵</p></div>
 <div style="height:70px"></div>
 <div class="nav"><a class="active" href="index.html">🏠</a><a href="search.html">🔎</a><a href="reels.html">🎬</a><a href="profile.html">👤</a></div>
+
+<!-- Close Friend Modal -->
+<div id="cfModal" style="position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;display:none;padding:20px">
+<div style="background:#111;border-radius:15px;padding:15px;max-width:400px;margin:20% auto">
+<div style="display:flex;justify-content:space-between"><b>💚 Close Friends</b><span onclick="closeCF()" style="cursor:pointer">✕</span></div>
+<input id="cfInput" placeholder="Username add pannu..." style="width:100%;margin-top:12px;padding:10px;border-radius:10px;border:0;background:#222;color:#fff">
+<button onclick="addCF()" style="width:100%;margin-top:10px;padding:10px;background:#00ff66;border:0;border-radius:10px;font-weight:700">Add Close Friend</button>
+<div id="cfList" style="margin-top:12px;font-size:13px;color:#888"></div>
+</div>
+</div>
 
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
@@ -59,6 +73,7 @@ async function loadAll(){
   allPosts=posts||[]; allLikes=likes||[]; allComments=comments||[]; allFollows=follows||[]; allSaves=saves||[]; allStories=stories||[]
   renderStories()
   renderFeed()
+  loadCF()
 }
 
 function renderStories(){
@@ -69,13 +84,26 @@ function renderStories(){
     let s=allStories.find(x=>x.username===u)
     let isClose = s.audience==='close_friends'
     let imgUrl = s.image_url || s.media_url || `https://i.pravatar.cc/100?u=${u}`
-    return `<div class="sItem" onclick="viewStory('${u}')"><div class="sRing" style="${isClose?'background:#00ff66':''}"><img src="${imgUrl}" style="filter:${s.filter||'none'}"></div><div class="sName">${u}${isClose?' 💚':''}</div></div>`
+    return `<div class="sItem" onclick="viewStory('${u}')" oncontextmenu="deleteAsk('${u}');return false" ontouchstart="pressTimer('${u}')" ontouchend="clearPress()">
+      <div class="sRing ${isClose?'close':'public'}"><div class="sRingInner"><img src="${imgUrl}"></div></div>
+      <div class="sName">${u}</div>
+      ${isClose?'<div class="closeBadge">💚</div>':''}
+    </div>`
   }).join('')
   if(users.length===0) html+=`<div style="color:#555;display:flex;align-items:center;font-size:12px;padding-left:10px">No stories - Add pannu da! 👻</div>`
   bar.innerHTML=html
 }
-function viewStory(u){
-  location.href=`./story-view.html?user=${encodeURIComponent(u)}`
+let pressT
+function pressTimer(u){ pressT=setTimeout(()=>deleteAsk(u),700) }
+function clearPress(){ clearTimeout(pressT) }
+function viewStory(u){ location.href=`./story-view.html?user=${encodeURIComponent(u)}` }
+
+async function deleteAsk(u){
+  if(u!==ME) return
+  if(!confirm('Un story-a delete panava da Giri? 🗑️')) return
+  await supa.from('stories').delete().eq('username',ME)
+  alert('Deleted da!')
+  loadAll()
 }
 
 function renderFeed(){
@@ -99,6 +127,23 @@ async function likePost(id){ let liked=allLikes.some(l=>l.post_id==id && l.usern
 async function savePost(id){ let saved=allSaves.some(s=>s.post_id==id); if(saved){ await supa.from('saves').delete().eq('post_id',id).eq('username',ME) } else{ await supa.from('saves').insert({post_id:id,username:ME}) } let {data}=await supa.from('saves').select('*').eq('username',ME); allSaves=data||[]; renderFeed() }
 function sharePost(){ if(navigator.share){navigator.share({url:location.href})}else{prompt('Copy:',location.href)} }
 async function toggleFollow(u){ let already=allFollows.some(f=>f.follower==ME && f.following==u); if(already){ await supa.from('follows').delete().eq('follower',ME).eq('following',u) } else{ await supa.from('follows').insert({follower:ME,following:u}) } let {data}=await supa.from('follows').select('*'); allFollows=data||[]; renderFeed() }
+
+// CLOSE FRIEND
+function openCloseFriend(){ document.getElementById('cfModal').style.display='block'; loadCF() }
+function closeCF(){ document.getElementById('cfModal').style.display='none' }
+async function addCF(){
+  let f=document.getElementById('cfInput').value.trim(); if(!f) return
+  await supa.from('close_friends').insert({owner:ME,friend:f})
+  document.getElementById('cfInput').value=''; loadCF(); alert(f+' added da! 💚')
+}
+async function loadCF(){
+  let {data}=await supa.from('close_friends').select('*').eq('owner',ME)
+  let list=document.getElementById('cfList')
+  if(!list) return
+  list.innerHTML=(data||[]).map(c=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222"><span>💚 ${c.friend}</span><span onclick="removeCF('${c.id}')" style="color:#f44;cursor:pointer">remove</span></div>`).join('') || 'No close friends yet da'
+}
+async function removeCF(id){ await supa.from('close_friends').delete().eq('id',id); loadCF() }
+
 loadAll()
 </script>
 </body></html>
