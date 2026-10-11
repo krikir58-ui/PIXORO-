@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro </title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro 🔵</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}
@@ -16,7 +16,6 @@
 .verifiedBadge{width:16px;height:16px;background:#0095F6;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}
 .followBtn{border:1.5px solid #fff;border-radius:20px;background:#000;color:#fff;padding:5px 18px;font-size:13px;font-weight:600}
 .followBtn.following{background:#fff;color:#000}
-/* STORY BAR - NEW DA GIRI! */
 .storyBar{display:flex;gap:12px;padding:12px 10px;overflow-x:auto;border-bottom:1px solid #222;background:#000}
 .storyBar::-webkit-scrollbar{display:none}
 .sItem{text-align:center;min-width:65px;cursor:pointer}
@@ -28,11 +27,10 @@
 .sName{font-size:11px;margin-top:4px;max-width:65px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style></head><body>
 
-<div class="top"><b style="font-size:22px;font-family:cursive">Pixoro </b><span onclick="location.href='notifications.html'" style="cursor:pointer;font-size:22px">🔔</span></div>
+<div class="top"><b style="font-size:22px;font-family:cursive">Pixoro 🔵</b><span onclick="location.href='notifications.html'" style="cursor:pointer;font-size:22px">🔔</span></div>
 
-<!-- STORY BAR - ITHU PUTHUSU DA! -->
 <div class="storyBar" id="storyBar">
-  <div class="sItem" onclick="location.href='story-add.html'">
+  <div class="sItem" onclick="location.href='./story-add.html'">
     <div class="sAdd">👤</div>
     <div class="sName">Your Story</div>
   </div>
@@ -66,7 +64,7 @@ async function loadAll(){
 function renderStories(){
   let bar=document.getElementById('storyBar')
   let users=[...new Set(allStories.map(s=>s.username))]
-  let html=`<div class="sItem" onclick="location.href='story-add.html'"><div class="sAdd">👤</div><div class="sName">Your Story</div></div>`
+  let html=`<div class="sItem" onclick="location.href='./story-add.html'"><div class="sAdd">👤</div><div class="sName">Your Story</div></div>`
   html+=users.map(u=>{
     let s=allStories.find(x=>x.username===u)
     let isClose = s.audience==='close_friends'
@@ -75,7 +73,10 @@ function renderStories(){
   if(users.length===0) html+=`<div style="color:#555;display:flex;align-items:center;font-size:12px;padding-left:10px">No stories - Add pannu da! 👻</div>`
   bar.innerHTML=html
 }
-function viewStory(u){ location.href=`story-view.html?user=${encodeURIComponent(u)}` }
+// *** CONNECTED - THANI FILE ***
+function viewStory(u){ 
+  location.href=`./story-view.html?user=${encodeURIComponent(u)}` 
+}
 
 function renderFeed(){
   let html=''
