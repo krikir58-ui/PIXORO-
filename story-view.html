@@ -1,30 +1,58 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Story - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#fff;height:100vh;overflow:hidden;font-family:sans-serif}
 .bar{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:4px;z-index:10}
 .b{height:3px;background:rgba(255,255,255,.3);flex:1;border-radius:2px;overflow:hidden}
 .b div{height:100%;background:#fff;width:0%;transition:width.1s}
 .top{position:absolute;top:20px;left:10px;right:10px;display:flex;align-items:center;justify-content:space-between;z-index:10}
 .user{display:flex;align-items:center;gap:8px}
-.user img{width:32px;height:32px;border-radius:50%}
+.user img{width:32px;height:32px;border-radius:50%;object-fit:cover}
+.user b{font-size:14px}
 .close{font-size:22px;cursor:pointer;padding:8px}
 .view{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;background:#000}
-.view img,.view video{max-width:100%;max-height:100vh;object-fit:contain}
-.tap{position:absolute;top:0;bottom:0;width:50%;z-index:5}
+.view img,.view video{width:100%;height:100%;object-fit:contain;background:#000}
+.tap{position:absolute;top:60px;bottom:80px;width:50%;z-index:5}
 .left{left:0}.right{right:0}
+.bottomBar{position:absolute;bottom:15px;left:10px;right:10px;z-index:10;display:flex;justify-content:space-between;align-items:center}
+.deleteBtn{background:rgba(255,0,0,.85);padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;display:none}
+.audBadge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.audBadge.close{background:#00ff66;color:#000}
+.audBadge.public{background:rgba(255,255,255,.2);color:#fff}
+.menu{position:absolute;top:60px;right:10px;background:#111;border-radius:12px;padding:8px;z-index:20;display:none;min-width:160px}
+.menu div{padding:10px 12px;font-size:14px;cursor:pointer;border-radius:8px}
+.menu div:hover{background:#222}
 </style></head><body>
 <div class="bar" id="pBar"></div>
-<div class="top"><div class="user"><img id="uPic" src=""><b id="uName"></b><span id="time"></span></div><span class="close" onclick="location.href='./index.html'">✕</span></div>
+<div class="top">
+<div class="user"><img id="uPic" src=""><b id="uName"></b><span id="time" style="font-size:12px;color:#aaa"></span><span id="audLabel"></span></div>
+<div style="display:flex;gap:10px;align-items:center">
+<i class="fa fa-ellipsis-h" id="moreBtn" onclick="toggleMenu()" style="display:none;cursor:pointer"></i>
+<span class="close" onclick="location.href='./index.html'">✕</span>
+</div>
+</div>
+<div class="menu" id="menu">
+<div onclick="deleteCurrent()"><i class="fa fa-trash" style="color:#f44"></i> Delete Story</div>
+<div onclick="saveStory()"><i class="fa fa-download"></i> Save to Gallery</div>
+<div onclick="toggleMenu()"><i class="fa fa-times"></i> Cancel</div>
+</div>
 <div class="view" id="view"></div>
 <div class="tap left" onclick="prev()"></div>
 <div class="tap right" onclick="next()"></div>
+<div class="bottomBar">
+<span id="delBottom" class="deleteBtn" onclick="deleteCurrent()">🗑️ Delete</span>
+<span id="replyHint" style="font-size:12px;color:#888">Tap left/right to navigate • Own story? Delete pannalam 💚</span>
+</div>
+
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+const ME = localStorage.getItem('pixoro_current_user') || 'Giri'
 const user = new URLSearchParams(location.search).get('user')
 document.getElementById('uName').innerText=user
 document.getElementById('uPic').src=`https://i.pravatar.cc/100?u=${user}`
 let stories=[], cur=0, timer=null, prog=0
+
 async function load(){
  if(!user){ document.getElementById('view').innerHTML='<p>No user</p>'; return }
  let {data, error}=await supa.from('stories').select('*').eq('username',user).gt('expires_at', new Date().toISOString()).order('created_at',{ascending:true})
@@ -33,6 +61,12 @@ async function load(){
  if(stories.length==0){ document.getElementById('view').innerHTML=`<div style="text-align:center"><p>No active story for @${user}</p><br><a href="./index.html" style="color:#0095f6">Go Home</a></div>`; return }
  let bar=document.getElementById('pBar'); bar.innerHTML=stories.map((_,i)=>`<div class="b"><div id="b${i}"></div></div>`).join('')
  show(0)
+ // OWN STORY NA DELETE BUTTON KAAMIKKANUM - INSTAGRAM SECRET
+ if(user===ME){
+   document.getElementById('delBottom').style.display='block'
+   document.getElementById('moreBtn').style.display='block'
+   document.getElementById('replyHint').innerText='Your story • Hold to delete 🗑️'
+ }
 }
 function show(i){
  cur=i; if(cur<0) cur=0; if(cur>=stories.length){ location.href='./index.html'; return }
@@ -40,11 +74,14 @@ function show(i){
  let imgUrl = s.image_url || s.media_url
  let view=document.getElementById('view')
  if((s.media_type||'image')==='video'){
-   view.innerHTML=`<video src="${imgUrl}" autoplay playsinline></video>`
+   view.innerHTML=`<video src="${imgUrl}" autoplay playsinline style="width:100%;height:100%;object-fit:contain"></video>`
  } else {
-   view.innerHTML=`<img src="${imgUrl}" style="filter:${s.filter||'none'}">`
+   // HD QUALITY - filter illa, clear-a kaamikkum
+   view.innerHTML=`<img src="${imgUrl}" style="width:100%;height:100%;object-fit:contain;background:#000">`
  }
- document.getElementById('time').innerText=' • '+new Date(s.created_at).toLocaleTimeString()
+ document.getElementById('time').innerText=' • '+new Date(s.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})
+ let aud = s.audience||'public'
+ document.getElementById('audLabel').innerHTML = aud==='close_friends'? '<span class="audBadge close">💚 Close</span>' : '<span class="audBadge public">🌍</span>'
  prog=0; clearInterval(timer)
  timer=setInterval(()=>{
    prog+=1
@@ -59,6 +96,30 @@ function show(i){
 }
 function next(){ if(cur < stories.length-1) show(cur+1); else location.href='./index.html' }
 function prev(){ if(cur>0) show(cur-1); else show(0) }
+
+function toggleMenu(){
+ let m=document.getElementById('menu')
+ m.style.display = m.style.display==='block'?'none':'block'
+}
+async function deleteCurrent(){
+ if(!confirm('Delete panava da Giri? 🗑️')) return
+ let s=stories[cur]
+ if(s.username!==ME){ alert('Un story mattum delete pannalam da!'); return }
+ clearInterval(timer)
+ let {error} = await supa.from('stories').delete().eq('id', s.id)
+ if(error){ alert('Error: '+error.message); return }
+ stories.splice(cur,1)
+ if(stories.length===0){ alert('Deleted! ✅'); location.href='./index.html'; return }
+ if(cur>=stories.length) cur=stories.length-1
+ // Rebuild bars
+ let bar=document.getElementById('pBar'); bar.innerHTML=stories.map((_,i)=>`<div class="b"><div id="b${i}"></div></div>`).join('')
+ show(cur)
+ document.getElementById('menu').style.display='none'
+}
+function saveStory(){
+ let s=stories[cur]
+ let a=document.createElement('a'); a.href=s.image_url||s.media_url; a.download=`pixoro-story-${Date.now()}.jpg`; a.click()
+}
 load()
 </script>
 </body></html>
