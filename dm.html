@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro Secret DM</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.top{padding:12px 15px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #1a1a1a;background:#000;position:sticky;top:0;z-index:10}
+.top img{width:36px;height:36px;border-radius:50%;border:2px solid #00ff66}
+.list{flex:1;overflow-y:auto}.chat{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:10px;background:#000}
+.msg{max-width:72%;padding:12px 16px;border-radius:20px;font-size:14px;word-break:break-word;position:relative;transition:.2s}
+.me{align-self:flex-end;background:linear-gradient(135deg,#00ff66,#00ccff);color:#000;font-weight:600;border-bottom-right-radius:6px;cursor:pointer}
+.other{align-self:flex-start;background:#1e1e1e;color:#fff;border:1px solid #2a2a2a;border-bottom-left-radius:6px;cursor:pointer}
+.me::after{content:'You can delete';font-size:8px;position:absolute;bottom:-12px;right:4px;color:#00ff66;opacity:.6}
+.other::after{content:'🔒 Can\'t delete others msg';font-size:8px;position:absolute;bottom:-12px;left:4px;color:#666;opacity:.6}
+.bottom{padding:10px;display:flex;gap:8px;border-top:1px solid #1a1a1a;background:#000}
+.bottom input{flex:1;background:#111;border:1px solid #222;padding:13px 18px;border-radius:25px;color:#fff;outline:none}
+.bottom button{width:44px;height:44px;border-radius:50%;border:none;color:#fff;font-size:18px;cursor:pointer}
+.sendBtn{background:linear-gradient(135deg,#00ff66,#00ccff)}.iconBtn{background:#1a1a1a}
+.userRow{display:flex;align-items:center;gap:12px;padding:14px 15px;border-bottom:1px solid #0f0f0f;cursor:pointer}
+.callBox{position:fixed;inset:0;background:#000;z-index:100;display:none;flex-direction:column}
+.callBox.active{display:flex}
+.vid{width:100%;height:50%;background:#0a0a0a;object-fit:cover}
+.confirmBox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.confirmBox.active{display:flex}.box{background:#111;border:1px solid #222;border-radius:20px;padding:20px;width:100%;max-width:320px;text-align:center}
+</style></head><body>
+<div class="top">
+<i class="fa fa-arrow-left" onclick="goBack()" style="cursor:pointer"></i>
+<img id="topPic" src=""><div style="flex:1"><b id="topName">Pixoro Chats</b><div style="font-size:10px;color:#00ff66"><i class="fa fa-lock"></i> Full Permission Safe</div></div>
+<div style="display:flex;gap:8px" id="chatActions">
+<i class="fa fa-phone" onclick="startCall(false)" style="background:#1a1a1a;padding:10px;border-radius:50%;cursor:pointer;color:#00ff66"></i>
+<i class="fa fa-video" onclick="startCall(true)" style="background:linear-gradient(135deg,#00ff66,#00ccff);padding:10px;border-radius:50%;cursor:pointer;color:#000"></i>
+</div>
+</div>
+<div class="list" id="userList"></div>
+<div class="chat" id="chatBox" style="display:none"></div>
+<div class="bottom" id="sendBar" style="display:none">
+<input id="msgInput" placeholder="Message to anyone, anytime... 🔒" onkeypress="if(event.key==='Enter')send()">
+<button class="sendBtn" onclick="send()"><i class="fa fa-paper-plane"></i></button>
+</div>
+
+<!-- DELETE CONFIRM - PIXORO STYLE -->
+<div class="confirmBox" id="delBox">
+<div class="box">
+<i class="fa fa-trash" style="font-size:40px;color:#ff3b30;margin-bottom:12px"></i>
+<h3>Delete for Everyone?</h3>
+<p style="font-size:12px;color:#888;margin:10px 0">Un message mattum than delete pannalam da!<br>Avangalkum delete aayidum - rendu perukkum poayidum!</p>
+<div style="display:flex;gap:10px;margin-top:16px">
+<button onclick="closeDel()" style="flex:1;padding:12px;background:#222;border:none;border-radius:12px;color:#fff">Cancel</button>
+<button onclick="confirmDel()" style="flex:1;padding:12px;background:#ff3b30;border:none;border-radius:12px;color:#fff;font-weight:700">Delete for All</button>
+</div>
+</div>
+</div>
+
+<!-- CALL -->
+<div class="callBox" id="callBox">
+<video id="remoteVid" class="vid" autoplay playsinline></video>
+<video id="localVid" class="vid" autoplay muted playsinline style="height:28%;width:36%;position:absolute;top:18px;right:18px;border-radius:18px;border:2px solid #00ff66;z-index:5"></video>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px">
+<h2 id="callName">@User</h2><p id="callStatus" style="color:#00ff66;margin-top:6px">Pixoro Secure Call - Encrypted 🔒</p>
+<div style="margin-top:8px;background:#111;padding:6px 12px;border-radius:20px;font-size:11px;color:#888"><i class="fa fa-lock"></i> End-to-end safe • No one can intercept</div>
+</div>
+<div style="display:flex;gap:20px;justify-content:center;padding:30px">
+<button onclick="endCall()" style="background:#ff3b30;width:64px;height:64px;border-radius:50%;border:none;color:#fff;font-size:24px"><i class="fa fa-phone" style="transform:rotate(135deg)"></i></button>
+<button onclick="toggleMute()" id="muteBtn" style="background:#222;width:56px;height:56px;border-radius:50%;border:none;color:#fff"><i class="fa fa-microphone"></i></button>
+<button onclick="toggleCam()" id="camBtn" style="background:#222;width:56px;height:56px;border-radius:50%;border:none;color:#fff"><i class="fa fa-video"></i></button>
+</div>
+</div>
+
+<script>
+const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+const ME=localStorage.getItem('pixoro_current_user')||'Giri'
+let CHAT_USER=new URLSearchParams(location.search).get('user')
+let pendingDelId=null, localStream=null, isMute=false, isCamOff=false
+
+async function loadUsers(){
+ let {data}=await supa.from('stories').select('username')
+ let uniq=[...new Set((data||[]).map(d=>d.username))]
+ uniq=[...new Set([...uniq,'Giri','Arun','Priya','Kavi','Anu','Surya','Bala'])]
+ let filtered=uniq.filter(u=>u!==ME)
+ document.getElementById('userList').innerHTML=filtered.map(u=>`<div class="userRow" onclick="openChat('${u}')"><img src="https://i.pravatar.cc/100?u=${u}" style="width:48px;height:48px;border-radius:50%"><div style="flex:1"><b>@${u}</b><div style="font-size:11px;color:#888">Tap - chat anytime 🔓</div></div><div style="width:10px;height:10px;background:#00ff66;border-radius:50%"></div></div>`).join('')
+ if(CHAT_USER) openChat(CHAT_USER)
+}
+function openChat(u){CHAT_USER=u;document.getElementById('topName').innerText='@'+u;document.getElementById('topPic').src=`https://i.pravatar.cc/100?u=${u}`;document.getElementById('userList').style.display='none';document.getElementById('chatBox').style.display='flex';document.getElementById('sendBar').style.display='flex';loadMsgs();setInterval(loadMsgs,2000)}
+function goBack(){if(document.getElementById('chatBox').style.display!=='none'){document.getElementById('userList').style.display='block';document.getElementById('chatBox').style.display='none';document.getElementById('sendBar').style.display='none';CHAT_USER=null;document.getElementById('topName').innerText='Pixoro Chats'}else location.href='./index.html'}
+async function loadMsgs(){
+ if(!CHAT_USER) return
+ let {data}=await supa.from('messages').select('*').or(`and(sender.eq.${ME},receiver.eq.${CHAT_USER}),and(sender.eq.${CHAT_USER},receiver.eq.${ME})`).eq('is_deleted',false).order('created_at',{ascending:true})
+ let box=document.getElementById('chatBox')
+ if(!data||!data.length){box.innerHTML=`<div style="text-align:center;padding:50px 20px;color:#555"><i class="fa fa-lock" style="font-size:44px;color:#00ff66"></i><p style="margin-top:12px;font-weight:700;color:#fff">Secret Chat with @${CHAT_USER}</p><p style="font-size:11px;margin-top:8px;line-height:1.5">🔒 Full Permission Control<br>• Yaar msg ah yaarum delete panna mudiyathu<br>• Un msg ah mattum nee delete pannalam<br>• Delete panna rendu perukkum poayidum<br>• Chat anytime - yarukkum pannalam</p></div>`;return}
+ box.innerHTML=data.map(m=>`<div class="msg ${m.sender===ME?'me':'other'}" onclick="tryDelete(${m.id},'${m.sender}')"><div>${m.message}</div><div style="font-size:8px;opacity:.6;margin-top:4px">${new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} ${m.sender===ME?'✓✓':''}</div></div>`).join('')
+ box.scrollTop=box.scrollHeight
+}
+async function send(){let t=document.getElementById('msgInput').value.trim();if(!t||!CHAT_USER) return;document.getElementById('msgInput').value='';await supa.from('messages').insert({sender:ME,receiver:CHAT_USER,message:t});loadMsgs()}
+function tryDelete(id,sender){
+ if(sender!==ME){
+   alert('🚫 Dei ithu un message illa da!\n\nPixoro Secret Rule:\n• Avanga message ah avanga mattum delete pannalam\n• Nee un message ah mattum delete pannalam\n\nPermission illa da! 🔒')
+   return
+ }
+ pendingDelId=id
+ document.getElementById('delBox').classList.add('active')
+}
+function closeDel(){document.getElementById('delBox').classList.remove('active');pendingDelId=null}
+async function confirmDel(){
+ if(!pendingDelId) return
+ await supa.from('messages').update({is_deleted:true}).eq('id',pendingDelId)
+ closeDel()
+ loadMsgs()
+}
+async function startCall(video){
+ document.getElementById('callBox').classList.add('active')
+ document.getElementById('callName').innerText='@'+CHAT_USER
+ try{
+   localStream=await navigator.mediaDevices.getUserMedia({video:video,audio:true})
+   document.getElementById('localVid').srcObject=localStream
+   document.getElementById('remoteVid').srcObject=localStream
+   document.getElementById('callStatus').innerText=video?'📹 Pixoro Video - Secure':'📞 Pixoro Voice - Secure'
+ }catch(e){document.getElementById('callStatus').innerText='Camera Mic permission kudu da: '+e.message}
+}
+function endCall(){document.getElementById('callBox').classList.remove('active');if(localStream) localStream.getTracks().forEach(t=>t.stop())}
+function toggleMute(){isMute=!isMute;if(localStream) localStream.getAudioTracks().forEach(t=>t.enabled=!isMute);document.getElementById('muteBtn').innerHTML=isMute?'<i class="fa fa-microphone-slash"></i>':'<i class="fa fa-microphone"></i>'}
+function toggleCam(){isCamOff=!isCamOff;if(localStream) localStream.getVideoTracks().forEach(t=>t.enabled=!isCamOff);document.getElementById('camBtn').style.background=isCamOff?'#ff3b30':'#222'}
+loadUsers()
+</script></body></html>
