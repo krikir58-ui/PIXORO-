@@ -1,27 +1,13 @@
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Story - Pixoro 🔵</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>body{margin:0;background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;height:100vh;overflow:hidden} .progress{position:absolute;top:5px;left:5px;right:5px;display:flex;gap:4px;z-index:20} .bar{flex:1;height:3px;background:#ffffff44;border-radius:10px;overflow:hidden} .barFill{height:100%;background:#fff;width:0%} .top{position:absolute;top:15px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;z-index:20} .media{width:100%;height:100vh;object-fit:cover} .caption{position:absolute;bottom:90px;left:15px;right:15px;text-align:center;font-weight:700;text-shadow:2px 2px 6px #000;font-size:18px}</style></head><body>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Story</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>body{margin:0;background:#000;color:#fff;max-width:450px;margin:auto;height:100vh;overflow:hidden;font-family:sans-serif}.progress{position:absolute;top:5px;left:5px;right:5px;display:flex;gap:4px;z-index:20}.bar{flex:1;height:3px;background:#ffffff44;border-radius:10px;overflow:hidden}.barFill{height:100%;background:#fff;width:0%}.top{position:absolute;top:15px;left:10px;right:10px;display:flex;justify-content:space-between;z-index:20}.media{width:100%;height:100vh;object-fit:cover}</style></head><body>
 <div class="progress" id="progress"></div>
-<div class="top"><div style="display:flex;align-items:center;gap:10px"><img id="uPic" style="width:36px;height:36px;border-radius:50%"><b id="uName"></b><span id="time" style="font-size:11px;color:#ccc"></span></div><span onclick="location.href='./index.html'" style="font-size:28px;cursor:pointer">✕</span></div>
-<img id="img" class="media" style="display:none"><video id="vid" class="media" style="display:none" autoplay muted loop playsinline></video>
-<div class="caption" id="cap"></div>
+<div class="top"><div style="display:flex;gap:10px;align-items:center"><img id="uPic" style="width:36px;height:36px;border-radius:50%"><b id="uName"></b></div><span onclick="location.href='index.html'" style="font-size:28px">✕</span></div>
+<img id="img" class="media" style="display:none"><video id="vid" class="media" style="display:none" autoplay muted loop playsinline></video><div id="cap" style="position:absolute;bottom:90px;left:15px;right:15px;text-align:center;font-weight:700;text-shadow:2px 2px 6px #000"></div>
 <div style="position:absolute;inset:0;display:flex;z-index:10"><div style="flex:1" onclick="prev()"></div><div style="flex:1" onclick="next()"></div></div>
 <script>
-const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-let user = new URLSearchParams(location.search).get('user') || 'Giri'
-let stories=[], cur=0, timer, prog=0
-async function load(){
-  let {data} = await supa.from('stories').select('*').eq('username', user).gt('expires_at', new Date().toISOString()).order('created_at',{ascending:true})
-  stories=data||[]; if(!stories.length){ alert('No story da!'); location.href='./index.html'; return }
-  document.getElementById('uName').innerText=user
-  document.getElementById('uPic').src=`https://i.pravatar.cc/100?u=${user}`
-  document.getElementById('progress').innerHTML=stories.map((_,i)=>`<div class="bar"><div class="barFill" id="bar${i}"></div></div>`).join('')
-  show(0)
-}
-function show(i){ cur=i; prog=0; let s=stories[i]; document.getElementById('cap').innerText=s.caption||''; document.getElementById('time').innerText=new Date(s.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); let img=document.getElementById('img'), vid=document.getElementById('vid'); if(s.media_type==='video'){ img.style.display='none'; vid.style.display='block'; vid.src=s.media_url } else { vid.style.display='none'; img.style.display='block'; img.src=s.media_url } if(s.filter){ img.style.filter=s.filter; vid.style.filter=s.filter } start() }
-function start(){ clearInterval(timer); timer=setInterval(()=>{ prog+=1; document.getElementById(`bar${cur}`).style.width=prog+'%'; if(prog>=100){ clearInterval(timer); next() } }, 50) }
-function next(){ if(cur < stories.length-1) show(cur+1); else location.href='./index.html' }
-function prev(){ if(cur>0) show(cur-1) }
-load()
+const supa=supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+let user=new URLSearchParams(location.search).get('user')||'Giri',stories=[],cur=0,timer,prog=0
+async function load(){let {data}=await supa.from('stories').select('*').eq('username',user).gt('expires_at',new Date().toISOString()).order('created_at',{ascending:true});stories=data||[];if(!stories.length){alert('No story');location.href='index.html';return}document.getElementById('uName').innerText=user;document.getElementById('uPic').src=`https://i.pravatar.cc/100?u=${user}`;document.getElementById('progress').innerHTML=stories.map((_,i)=>`<div class="bar"><div class="barFill" id="bar${i}"></div></div>`).join('');show(0)}
+function show(i){cur=i;prog=0;let s=stories[i];document.getElementById('cap').innerText=s.caption||'';let img=document.getElementById('img'),vid=document.getElementById('vid');if(s.media_type==='video'){img.style.display='none';vid.style.display='block';vid.src=s.media_url}else{vid.style.display='none';img.style.display='block';img.src=s.media_url}if(s.filter){img.style.filter=s.filter;vid.style.filter=s.filter}start()}
+function start(){clearInterval(timer);timer=setInterval(()=>{prog+=1;document.getElementById(`bar${cur}`).style.width=prog+'%';if(prog>=100){clearInterval(timer);next()}},50)}
+function next(){if(cur<stories.length-1)show(cur+1);else location.href='index.html'}function prev(){if(cur>0)show(cur-1)}load()
 </script></body></html>
