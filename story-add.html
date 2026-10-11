@@ -4,81 +4,83 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;overflow:hidden;position:relative}
-.top{position:absolute;top:0;left:0;right:0;padding:12px;display:flex;justify-content:space-between;align-items:center;z-index:100;background:linear-gradient(to bottom,rgba(0,0,0,.8),transparent)}
-.canvasArea{width:100%;height:100vh;background:#111;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.canvasArea img.bg{width:100%;height:100%;object-fit:cover}
-#drawCanvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;touch-action:none}
-.layer{position:absolute;z-index:20;cursor:move;user-select:none;touch-action:none;font-weight:700;text-shadow:0 1px 3px #000}
-.toolRight{position:absolute;right:10px;top:70px;z-index:50;display:flex;flex-direction:column;gap:18px;background:rgba(0,0,0,.4);padding:12px 8px;border-radius:25px;backdrop-filter:blur(10px)}
-.toolRight i{font-size:20px;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%}
-.bottomBar{position:absolute;bottom:0;left:0;right:0;z-index:50;background:linear-gradient(to top,rgba(0,0,0,.9),transparent);padding:12px}
-.musicBar{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);padding:6px 10px;border-radius:20px;margin-bottom:12px}
-.actionRow{display:flex;align-items:center;gap:10px}
-.actionRow input{flex:1;background:rgba(255,255,255,.15);border:0;padding:12px 14px;border-radius:25px;color:#fff;outline:none}
-.pill{padding:8px 14px;border-radius:20px;background:#222;font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer}
-.pill.active{background:#fff;color:#000}
-.send{width:44px;height:44px;background:#0095f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
+.top{position:absolute;top:0;left:0;right:0;padding:14px;display:flex;justify-content:space-between;align-items:center;z-index:100;background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent)}
+.center{width:100%;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;padding:20px}
+.pickBtn{width:90%;padding:18px;background:#222;border:2px dashed #555;border-radius:15px;text-align:center;cursor:pointer}
+.pickBtn i{font-size:50px;display:block;margin-bottom:12px}
+.canvasArea{width:100%;height:100vh;background:#111;position:relative;overflow:hidden;display:none;align-items:center;justify-content:center}
+.canvasArea img.bg{width:100%;height:100%;object-fit:contain}
+#drawCanvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10}
+.layer{position:absolute;z-index:20;cursor:move;font-weight:700;text-shadow:0 1px 4px #000}
+.toolRight{position:absolute;right:10px;top:70px;z-index:50;display:flex;flex-direction:column;gap:16px;background:rgba(0,0,0,.5);padding:12px 8px;border-radius:25px;backdrop-filter:blur(8px)}
+.toolRight i{font-size:20px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;background:rgba(255,255,255,.1)}
+.bottomBar{position:absolute;bottom:0;left:0;right:0;z-index:50;background:linear-gradient(to top,rgba(0,0,0,.95),transparent);padding:14px}
+.actionRow{display:flex;gap:10px;align-items:center}
+.actionRow input{flex:1;background:rgba(255,255,255,.15);border:0;padding:13px;border-radius:25px;color:#fff;outline:none}
+.send{width:48px;height:48px;background:#0095f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
 .modal{position:absolute;top:0;left:0;right:0;bottom:0;background:#000;z-index:200;padding:15px;display:none;flex-direction:column}
-.stickerGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:15px}
-.stickerGrid span{font-size:32px;background:#111;padding:15px;border-radius:12px;text-align:center;cursor:pointer}
-.textModal textarea{width:100%;height:120px;background:transparent;border:0;color:#fff;font-size:32px;font-weight:700;text-align:center;outline:none;margin-top:30%;resize:none}
+.stickerGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px}
+.stickerGrid span{font-size:30px;background:#111;padding:14px;border-radius:12px;text-align:center;cursor:pointer}
 </style></head><body>
 
-<div class="top"><i class="fa fa-times" onclick="location.href='./index.html'" style="font-size:22px;cursor:pointer"></i><b>Add to story</b></div>
+<div class="top"><i class="fa fa-times" onclick="location.href='./index.html'" style="font-size:22px"></i><b>Add to Story</b><span></span></div>
+
+<div class="center" id="emptyState">
+<div class="pickBtn" onclick="document.getElementById('file').click()">
+<i class="fa fa-images"></i>
+<b style="font-size:18px">Photo Add pannu da!</b>
+<p style="font-size:13px;color:#888;margin-top:8px">Tap pannu - Gallery open aagum</p>
+<p style="font-size:12px;color:#555;margin-top:12px">📸 Gallery / Camera la irunthu edukkalam</p>
+</div>
+<button onclick="document.getElementById('file').click()" style="margin-top:20px;padding:14px 30px;background:#0095f6;border:0;border-radius:25px;color:#fff;font-weight:700;font-size:16px">Select Photo 📁</button>
+<p id="debug" style="margin-top:15px;font-size:11px;color:#444"></p>
+</div>
 
 <div class="canvasArea" id="canvasArea">
-<img id="bgImg" class="bg" style="display:none">
+<img id="bgImg" class="bg">
 <canvas id="drawCanvas"></canvas>
 <div id="layers"></div>
 <div class="toolRight">
 <i class="fa fa-font" onclick="openText()"></i>
 <i class="fa fa-face-smile" onclick="openStickers()"></i>
-<i class="fa fa-music" onclick="openMusic()"></i>
-<i class="fa fa-wand-magic-sparkles" onclick="restyle()"></i>
-<i class="fa fa-at" onclick="openMention()"></i>
 <i class="fa fa-pen" id="drawBtn" onclick="toggleDraw()"></i>
+<i class="fa fa-rotate" onclick="changePhoto()"></i>
 </div>
 </div>
 
-<div class="bottomBar">
-<div id="musicSuggest" class="musicBar" style="display:none"><i class="fa fa-music"></i><marquee id="musicName">Appa Kooda • Love Today</marquee><i class="fa fa-times" onclick="this.parentElement.style.display='none'"></i></div>
+<div class="bottomBar" id="bottomBar" style="display:none">
 <div class="actionRow">
-<input id="captionInput" placeholder="Add a caption...">
-<div class="pill active" onclick="setAud('public',this)">🌍 Public</div>
-<div class="pill" onclick="setAud('close_friends',this)" style="background:#00ff66;color:#000">💚 Close</div>
-<div class="send" onclick="upload()"><i class="fa fa-paper-plane"></i></div>
+<input id="captionInput" placeholder="Add caption...">
+<div class="send" id="sendBtn" onclick="upload()"><i class="fa fa-paper-plane"></i></div>
 </div>
 <p id="status" style="font-size:11px;color:#888;text-align:center;margin-top:8px"></p>
 </div>
 
-<div class="modal" id="textModal"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('textModal')"></i><b onclick="addText()" style="color:#0095f6;cursor:pointer">Done</b></div><textarea id="textArea" placeholder="Type something..."></textarea></div>
-<div class="modal" id="stickerModal"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('stickerModal')"></i><b>Stickers</b><span></span></div><div class="stickerGrid">
-<span onclick="addSticker('❤️')">❤️</span><span onclick="addSticker('🔥')">🔥</span><span onclick="addSticker('😂')">😂</span><span onclick="addSticker('👻')">👻</span><span onclick="addSticker('💚')">💚</span><span onclick="addSticker('✨')">✨</span><span onclick="addSticker('🥺')">🥺</span><span onclick="addSticker('💯')">💯</span><span onclick="addSticker('📍 Tiruchuli')">📍</span><span onclick="addSticker('⏰ NOW')">⏰</span><span onclick="addSticker('@Giri')">@</span><span onclick="addSticker('🔵 PIXORO')">🔵</span>
-</div></div>
-<div class="modal" id="musicModal"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('musicModal')"></i><b>Music</b><span></span></div>
-<div style="margin-top:20px;display:flex;flex-direction:column;gap:10px">
-<div onclick="pickMusic('Appa Kooda - Love Today')" style="padding:12px;background:#111;border-radius:10px">🎵 Appa Kooda - Love Today</div>
-<div onclick="pickMusic('Katchi Sera - Sai')" style="padding:12px;background:#111;border-radius:10px">🎵 Katchi Sera - Sai</div>
-<div onclick="pickMusic('Hukum - Jailer')" style="padding:12px;background:#111;border-radius:10px">🎵 Hukum - Jailer</div>
-</div></div>
+<div class="modal" id="textModal"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('textModal')"></i><b onclick="addText()" style="color:#0095f6">Done</b></div><textarea id="textArea" placeholder="Type..." style="width:100%;height:120px;background:transparent;border:0;color:#fff;font-size:30px;font-weight:700;text-align:center;outline:none;margin-top:30%"></textarea></div>
+<div class="modal" id="stickerModal"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('stickerModal')"></i><b>Stickers</b><span></span></div><div class="stickerGrid"><span onclick="addSticker('❤️')">❤️</span><span onclick="addSticker('🔥')">🔥</span><span onclick="addSticker('😂')">😂</span><span onclick="addSticker('👻')">👻</span><span onclick="addSticker('💚')">💚</span><span onclick="addSticker('✨')">✨</span><span onclick="addSticker('📍 Tiruchuli')">📍</span><span onclick="addSticker('🔵 PIXORO')">🔵</span></div></div>
 
 <input type="file" id="file" accept="image/*" style="display:none">
 
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME = localStorage.getItem('pixoro_current_user') || 'Giri'
-let filter='none', audience='public', music='', tColor='white', drawing=false, finalBase64=''
+let finalBase64='', drawing=false
 let canvas=document.getElementById('drawCanvas'), ctx=canvas.getContext('2d')
-function resize(){ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight }
-window.addEventListener('resize',resize); resize()
-setTimeout(()=> document.getElementById('file').click(), 500)
+function resize(){ if(canvas.offsetWidth>0){ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight } }
+window.addEventListener('resize',resize)
 
 document.getElementById('file').addEventListener('change', e=>{
- let f=e.target.files[0]; if(!f) return
+ let f=e.target.files[0];
+ document.getElementById('debug').innerText='File: '+(f?f.name:'no file')
+ if(!f) return
  let reader=new FileReader()
  reader.onload= ev=>{
    finalBase64=ev.target.result
-   let bg=document.getElementById('bgImg'); bg.src=finalBase64; bg.style.display='block'
+   document.getElementById('emptyState').style.display='none'
+   document.getElementById('canvasArea').style.display='flex'
+   document.getElementById('bottomBar').style.display='block'
+   let bg=document.getElementById('bgImg'); bg.src=finalBase64
+   setTimeout(resize,100)
  }
  reader.readAsDataURL(f)
 })
@@ -87,46 +89,32 @@ function openText(){ document.getElementById('textModal').style.display='flex' }
 function closeM(id){ document.getElementById(id).style.display='none' }
 function addText(){
  let t=document.getElementById('textArea').value; if(!t) return closeM('textModal')
- let d=document.createElement('div'); d.className='layer'; d.style.color='white'; d.style.left='50%'; d.style.top='50%'; d.style.transform='translate(-50%,-50%)'; d.style.fontSize='28px'; d.innerText=t
+ let d=document.createElement('div'); d.className='layer'; d.style.left='50%'; d.style.top='50%'; d.style.transform='translate(-50%,-50%)'; d.style.fontSize='28px'; d.style.color='#fff'; d.innerText=t
  makeDraggable(d); document.getElementById('layers').appendChild(d); closeM('textModal'); document.getElementById('textArea').value=''
 }
 function openStickers(){ document.getElementById('stickerModal').style.display='flex' }
 function addSticker(s){ let d=document.createElement('div'); d.className='layer'; d.style.left='50%'; d.style.top='40%'; d.style.fontSize='30px'; d.innerText=s; makeDraggable(d); document.getElementById('layers').appendChild(d); closeM('stickerModal') }
-function openMusic(){ document.getElementById('musicModal').style.display='flex' }
-function pickMusic(m){ music=m; document.getElementById('musicName').innerText=m; document.getElementById('musicSuggest').style.display='flex'; closeM('musicModal') }
-function openMention(){ let u=prompt('Mention whom?'); if(u) addSticker('@'+u) }
-function restyle(){
- let filters=['none','grayscale(100%)','sepia(100%)','contrast(150%) brightness(110%)','hue-rotate(90deg)']
- let idx=filters.indexOf(filter); filter=filters[(idx+1)%filters.length]
- document.getElementById('bgImg').style.filter=filter
-}
-function toggleDraw(){ drawing=!drawing; document.getElementById('drawBtn').style.background=drawing?'#fff':''; canvas.style.pointerEvents=drawing?'auto':'none' }
+function changePhoto(){ document.getElementById('file').click() }
+function toggleDraw(){ drawing=!drawing; document.getElementById('drawBtn').style.background=drawing?'#fff':''; document.getElementById('drawBtn').style.color=drawing?'#000':'#fff'; canvas.style.pointerEvents=drawing?'auto':'none' }
 let isDraw=false, last={x:0,y:0}
 canvas.addEventListener('pointerdown', e=>{ if(!drawing) return; isDraw=true; let r=canvas.getBoundingClientRect(); last={x:e.clientX-r.left, y:e.clientY-r.top} })
 canvas.addEventListener('pointermove', e=>{ if(!isDraw||!drawing) return; let r=canvas.getBoundingClientRect(); let x=e.clientX-r.left, y=e.clientY-r.top; ctx.strokeStyle='#fff'; ctx.lineWidth=4; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(x,y); ctx.stroke(); last={x,y} })
 canvas.addEventListener('pointerup', ()=> isDraw=false)
-function makeDraggable(el){ let sx=0,sy=0; el.addEventListener('pointerdown', e=>{ sx=e.clientX; sy=e.clientY; el.setPointerCapture(e.pointerId) }); el.addEventListener('pointermove', e=>{ if(e.buttons!==1) return; let dx=e.clientX-sx, dy=e.clientY-sy; el.style.left=(el.offsetLeft+dx)+'px'; el.style.top=(el.offsetTop+dy)+'px'; sx=e.clientX; sy=e.clientY }) }
-function setAud(a,el){ audience=a; document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active')); el.classList.add('active') }
+function makeDraggable(el){ let sx=0,sy=0; el.addEventListener('pointerdown', e=>{ sx=e.clientX; sy=e.clientY; el.setPointerCapture(e.pointerId) }); el.addEventListener('pointermove', e=>{ if(e.buttons!==1) return; el.style.left=(el.offsetLeft+(e.clientX-sx))+'px'; el.style.top=(el.offsetTop+(e.clientY-sy))+'px'; sx=e.clientX; sy=e.clientY }) }
 
 async function upload(){
- if(!finalBase64){ alert('Image select pannu da!'); return }
- let btn=document.querySelector('.send'); btn.innerHTML='⏳'
- document.getElementById('status').innerText='Uploading... Please wait da'
+ if(!finalBase64){ alert('Photo select pannu da Giri!'); return }
+ let btn=document.getElementById('sendBtn'); btn.innerHTML='⏳'
+ document.getElementById('status').innerText='Uploading... konjam wait pannu da'
  let expires=new Date(Date.now()+24*60*60*1000).toISOString()
  try{
-   // ONLY image_url and expires_at - no media_url column needed!
-   let {error}=await supa.from('stories').insert({
-     username: ME,
-     image_url: finalBase64,
-     expires_at: expires
-   })
+   let {error}=await supa.from('stories').insert({ username: ME, image_url: finalBase64, expires_at: expires })
    if(error) throw error
-   document.getElementById('status').innerText='Posted! 🔵'
+   document.getElementById('status').innerText='Success! 🔵'
    setTimeout(()=> location.href='./index.html', 800)
  }catch(e){
    document.getElementById('status').innerText='Error: '+e.message
-   alert('Error: '+e.message);
-   btn.innerHTML='<i class="fa fa-paper-plane"></i>'
+   alert(e.message); btn.innerHTML='<i class="fa fa-paper-plane"></i>'
  }
 }
 </script>
