@@ -1,121 +1,159 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Add Story - Pixoro</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Add Story</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;overflow:hidden;position:relative}
-.top{position:absolute;top:0;left:0;right:0;padding:14px;display:flex;justify-content:space-between;align-items:center;z-index:100;background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent)}
-.center{width:100%;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;padding:20px}
-.pickBtn{width:90%;padding:18px;background:#222;border:2px dashed #555;border-radius:15px;text-align:center;cursor:pointer}
-.pickBtn i{font-size:50px;display:block;margin-bottom:12px}
-.canvasArea{width:100%;height:100vh;background:#111;position:relative;overflow:hidden;display:none;align-items:center;justify-content:center}
-.canvasArea img.bg{width:100%;height:100%;object-fit:contain}
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;overflow:hidden}
+.top{position:absolute;top:0;left:0;right:0;padding:14px;display:flex;justify-content:space-between;z-index:100;background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent)}
+.center{width:100%;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.pick{width:92%;padding:22px;background:#111;border:2px dashed #444;border-radius:18px;text-align:center;cursor:pointer}
+.stage{width:100%;height:100vh;position:relative;overflow:hidden;background:#000;display:none;touch-action:none}
+.stage.imgWrap{position:absolute;top:0;left:0;width:100%;height:100%;will-change:transform;touch-action:none}
+.stage img{width:100%;height:100%;object-fit:cover;pointer-events:none}
 #drawCanvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10}
-.layer{position:absolute;z-index:20;cursor:move;font-weight:700;text-shadow:0 1px 4px #000}
-.toolRight{position:absolute;right:10px;top:70px;z-index:50;display:flex;flex-direction:column;gap:16px;background:rgba(0,0,0,.5);padding:12px 8px;border-radius:25px;backdrop-filter:blur(8px)}
-.toolRight i{font-size:20px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;background:rgba(255,255,255,.1)}
-.bottomBar{position:absolute;bottom:0;left:0;right:0;z-index:50;background:linear-gradient(to top,rgba(0,0,0,.95),transparent);padding:14px}
-.actionRow{display:flex;gap:10px;align-items:center}
-.actionRow input{flex:1;background:rgba(255,255,255,.15);border:0;padding:13px;border-radius:25px;color:#fff;outline:none}
-.send{width:48px;height:48px;background:#0095f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
-.modal{position:absolute;top:0;left:0;right:0;bottom:0;background:#000;z-index:200;padding:15px;display:none;flex-direction:column}
-.stickerGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px}
-.stickerGrid span{font-size:30px;background:#111;padding:14px;border-radius:12px;text-align:center;cursor:pointer}
+.layer{position:absolute;z-index:20;font-weight:700;text-shadow:0 1px 5px #000;touch-action:none}
+.tools{position:absolute;right:10px;top:75px;z-index:50;display:flex;flex-direction:column;gap:14px;background:rgba(0,0,0,.55);padding:10px 7px;border-radius:24px;backdrop-filter:blur(10px)}
+.tools i{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,.12);cursor:pointer;font-size:18px}
+.bottom{position:absolute;bottom:0;left:0;right:0;z-index:50;padding:14px;background:linear-gradient(to top,rgba(0,0,0,.95),transparent)}
+.row{display:flex;gap:10px;align-items:center}
+.row input{flex:1;background:rgba(255,255,255,.15);border:0;padding:13px 15px;border-radius:25px;color:#fff;outline:none}
+.send{width:50px;height:50px;background:#0095f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
+.hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.6);padding:8px 14px;border-radius:20px;font-size:12px;z-index:40;pointer-events:none;animation:fade 3s forwards}
+@keyframes fade{0%{opacity:1}70%{opacity:1}100%{opacity:0}}
+.zoomBar{position:absolute;bottom:80px;left:15px;right:15px;z-index:50;display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.5);padding:8px 12px;border-radius:20px}
+.zoomBar input{flex:1;accent-color:#0095f6}
+.modal{position:absolute;inset:0;background:#000;z-index:200;padding:15px;display:none;flex-direction:column}
 </style></head><body>
 
-<div class="top"><i class="fa fa-times" onclick="location.href='./index.html'" style="font-size:22px"></i><b>Add to Story</b><span></span></div>
+<div class="top"><i class="fa fa-times" onclick="location.href='./index.html'" style="font-size:22px;cursor:pointer"></i><b>Add to Story</b><span style="width:22px"></span></div>
 
-<div class="center" id="emptyState">
-<div class="pickBtn" onclick="document.getElementById('file').click()">
-<i class="fa fa-images"></i>
-<b style="font-size:18px">Photo Add pannu da!</b>
-<p style="font-size:13px;color:#888;margin-top:8px">Tap pannu - Gallery open aagum</p>
-<p style="font-size:12px;color:#555;margin-top:12px">📸 Gallery / Camera la irunthu edukkalam</p>
+<div class="center" id="empty">
+<div class="pick" onclick="document.getElementById('file').click()">
+<i class="fa fa-photo-film" style="font-size:48px;display:block;margin-bottom:12px;color:#0095f6"></i>
+<b>Photo Select pannu da Giri!</b>
+<p style="font-size:12px;color:#777;margin-top:8px">Tap panna Gallery open aagum</p>
+<p style="font-size:11px;color:#555;margin-top:10px">👆 Drag • 🤏 Pinch Zoom • Slow-a adjust pannalam</p>
 </div>
-<button onclick="document.getElementById('file').click()" style="margin-top:20px;padding:14px 30px;background:#0095f6;border:0;border-radius:25px;color:#fff;font-weight:700;font-size:16px">Select Photo 📁</button>
-<p id="debug" style="margin-top:15px;font-size:11px;color:#444"></p>
+<button onclick="document.getElementById('file').click()" style="margin-top:20px;padding:14px 36px;background:#0095f6;border:0;border-radius:25px;color:#fff;font-weight:700;font-size:16px">📁 Gallery Open</button>
 </div>
 
-<div class="canvasArea" id="canvasArea">
-<img id="bgImg" class="bg">
+<div class="stage" id="stage">
+<div class="imgWrap" id="imgWrap"><img id="bgImg"></div>
 <canvas id="drawCanvas"></canvas>
 <div id="layers"></div>
-<div class="toolRight">
+<div class="hint" id="hint">👆 Drag to move • 🤏 Pinch to zoom</div>
+<div class="tools">
 <i class="fa fa-font" onclick="openText()"></i>
-<i class="fa fa-face-smile" onclick="openStickers()"></i>
-<i class="fa fa-pen" id="drawBtn" onclick="toggleDraw()"></i>
-<i class="fa fa-rotate" onclick="changePhoto()"></i>
+<i class="fa fa-face-smile" onclick="openSticker()"></i>
+<i class="fa fa-pen" id="penBtn" onclick="toggleDraw()"></i>
+<i class="fa fa-image" onclick="document.getElementById('file').click()"></i>
+</div>
+<div class="zoomBar"><i class="fa fa-search-minus"></i><input type="range" id="zoomSlider" min="1" max="3" step="0.05" value="1"><i class="fa fa-search-plus"></i></div>
+<div class="bottom">
+<div class="row"><input id="cap" placeholder="Add caption..."><div class="send" id="send" onclick="upload()"><i class="fa fa-paper-plane"></i></div></div>
+<p id="status" style="font-size:11px;color:#888;text-align:center;margin-top:6px"></p>
 </div>
 </div>
 
-<div class="bottomBar" id="bottomBar" style="display:none">
-<div class="actionRow">
-<input id="captionInput" placeholder="Add caption...">
-<div class="send" id="sendBtn" onclick="upload()"><i class="fa fa-paper-plane"></i></div>
-</div>
-<p id="status" style="font-size:11px;color:#888;text-align:center;margin-top:8px"></p>
-</div>
-
-<div class="modal" id="textModal"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('textModal')"></i><b onclick="addText()" style="color:#0095f6">Done</b></div><textarea id="textArea" placeholder="Type..." style="width:100%;height:120px;background:transparent;border:0;color:#fff;font-size:30px;font-weight:700;text-align:center;outline:none;margin-top:30%"></textarea></div>
-<div class="modal" id="stickerModal"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('stickerModal')"></i><b>Stickers</b><span></span></div><div class="stickerGrid"><span onclick="addSticker('❤️')">❤️</span><span onclick="addSticker('🔥')">🔥</span><span onclick="addSticker('😂')">😂</span><span onclick="addSticker('👻')">👻</span><span onclick="addSticker('💚')">💚</span><span onclick="addSticker('✨')">✨</span><span onclick="addSticker('📍 Tiruchuli')">📍</span><span onclick="addSticker('🔵 PIXORO')">🔵</span></div></div>
+<div class="modal" id="textM"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('textM')"></i><b onclick="addText()" style="color:#0095f6">Done</b></div><textarea id="textA" placeholder="Type something..." style="width:100%;height:120px;background:transparent;border:0;color:#fff;font-size:32px;font-weight:700;text-align:center;outline:none;margin-top:28%"></textarea></div>
+<div class="modal" id="stickM"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('stickM')"></i><b>Stickers</b><span></span></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px"><span onclick="addStick('❤️')" style="font-size:32px;background:#111;padding:14px;border-radius:12px;text-align:center">❤️</span><span onclick="addStick('🔥')" style="font-size:32px;background:#111;padding:14px;border-radius:12px;text-align:center">🔥</span><span onclick="addStick('😍')" style="font-size:32px;background:#111;padding:14px;border-radius:12px;text-align:center">😍</span><span onclick="addStick('💚')" style="font-size:32px;background:#111;padding:14px;border-radius:12px;text-align:center">💚</span><span onclick="addStick('📍 Tiruchuli')" style="font-size:14px;background:#111;padding:14px;border-radius:12px;text-align:center">📍 Tiruchuli</span><span onclick="addStick('✨ Pixoro ✨')" style="font-size:14px;background:#111;padding:14px;border-radius:12px;text-align:center">✨ Pixoro</span><span onclick="addStick('@Giri')" style="font-size:18px;background:#111;padding:14px;border-radius:12px;text-align:center">@Giri</span><span onclick="addStick('🔵')" style="font-size:32px;background:#111;padding:14px;border-radius:12px;text-align:center">🔵</span></div></div>
 
 <input type="file" id="file" accept="image/*" style="display:none">
+<canvas id="exportCanvas" width="1080" height="1920" style="display:none"></canvas>
 
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME = localStorage.getItem('pixoro_current_user') || 'Giri'
-let finalBase64='', drawing=false
-let canvas=document.getElementById('drawCanvas'), ctx=canvas.getContext('2d')
-function resize(){ if(canvas.offsetWidth>0){ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight } }
+let finalBase64='', drawing=false, scale=1, posX=0, posY=0, startX=0, startY=0, lastDist=0
+let canvas=document.getElementById('drawCanvas'), ctx=canvas.getContext('2d'), imgWrap=document.getElementById('imgWrap')
+function resize(){ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight }
 window.addEventListener('resize',resize)
 
 document.getElementById('file').addEventListener('change', e=>{
- let f=e.target.files[0];
- document.getElementById('debug').innerText='File: '+(f?f.name:'no file')
- if(!f) return
- let reader=new FileReader()
- reader.onload= ev=>{
+ let f=e.target.files[0]; if(!f) return
+ let r=new FileReader()
+ r.onload=ev=>{
    finalBase64=ev.target.result
-   document.getElementById('emptyState').style.display='none'
-   document.getElementById('canvasArea').style.display='flex'
-   document.getElementById('bottomBar').style.display='block'
-   let bg=document.getElementById('bgImg'); bg.src=finalBase64
-   setTimeout(resize,100)
+   document.getElementById('bgImg').src=finalBase64
+   document.getElementById('empty').style.display='none'
+   document.getElementById('stage').style.display='block'
+   scale=1; posX=0; posY=0; updateTransform()
+   setTimeout(()=>{resize(); document.getElementById('hint').style.display='block'},100)
  }
- reader.readAsDataURL(f)
+ r.readAsDataURL(f)
 })
 
-function openText(){ document.getElementById('textModal').style.display='flex' }
+function updateTransform(){ imgWrap.style.transform=`translate(${posX}px, ${posY}px) scale(${scale})` }
+document.getElementById('zoomSlider').addEventListener('input', e=>{ scale=parseFloat(e.target.value); updateTransform() })
+
+// DRAG + PINCH
+let stage=document.getElementById('stage')
+stage.addEventListener('touchstart', e=>{
+ if(e.touches.length===1){ startX=e.touches[0].clientX-posX; startY=e.touches[0].clientY-posY }
+ if(e.touches.length===2){ let dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY; lastDist=Math.hypot(dx,dy) }
+},{passive:false})
+stage.addEventListener('touchmove', e=>{
+ e.preventDefault()
+ if(drawing) return
+ if(e.touches.length===1){ posX=e.touches[0].clientX-startX; posY=e.touches[0].clientY-startY; updateTransform() }
+ if(e.touches.length===2){
+   let dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY
+   let dist=Math.hypot(dx,dy)
+   if(lastDist>0){ scale*=dist/lastDist; scale=Math.min(Math.max(scale,1),3); document.getElementById('zoomSlider').value=scale; updateTransform() }
+   lastDist=dist
+ }
+},{passive:false})
+stage.addEventListener('touchend', ()=>{ lastDist=0 })
+
+// Mouse drag for PC test
+let isMouseDown=false
+imgWrap.addEventListener('mousedown', e=>{ isMouseDown=true; startX=e.clientX-posX; startY=e.clientY-posY })
+window.addEventListener('mousemove', e=>{ if(!isMouseDown||drawing) return; posX=e.clientX-startX; posY=e.clientY-startY; updateTransform() })
+window.addEventListener('mouseup', ()=> isMouseDown=false)
+imgWrap.addEventListener('wheel', e=>{ e.preventDefault(); scale+=e.deltaY*-0.001; scale=Math.min(Math.max(scale,1),3); document.getElementById('zoomSlider').value=scale; updateTransform() },{passive:false})
+
+function openText(){ document.getElementById('textM').style.display='flex' }
 function closeM(id){ document.getElementById(id).style.display='none' }
 function addText(){
- let t=document.getElementById('textArea').value; if(!t) return closeM('textModal')
+ let t=document.getElementById('textA').value; if(!t) return closeM('textM')
  let d=document.createElement('div'); d.className='layer'; d.style.left='50%'; d.style.top='50%'; d.style.transform='translate(-50%,-50%)'; d.style.fontSize='28px'; d.style.color='#fff'; d.innerText=t
- makeDraggable(d); document.getElementById('layers').appendChild(d); closeM('textModal'); document.getElementById('textArea').value=''
+ makeDrag(d); document.getElementById('layers').appendChild(d); closeM('textM'); document.getElementById('textA').value=''
 }
-function openStickers(){ document.getElementById('stickerModal').style.display='flex' }
-function addSticker(s){ let d=document.createElement('div'); d.className='layer'; d.style.left='50%'; d.style.top='40%'; d.style.fontSize='30px'; d.innerText=s; makeDraggable(d); document.getElementById('layers').appendChild(d); closeM('stickerModal') }
-function changePhoto(){ document.getElementById('file').click() }
-function toggleDraw(){ drawing=!drawing; document.getElementById('drawBtn').style.background=drawing?'#fff':''; document.getElementById('drawBtn').style.color=drawing?'#000':'#fff'; canvas.style.pointerEvents=drawing?'auto':'none' }
+function openSticker(){ document.getElementById('stickM').style.display='flex' }
+function addStick(s){ let d=document.createElement('div'); d.className='layer'; d.style.left='50%'; d.style.top='40%'; d.style.fontSize=s.length>4?'18px':'32px'; d.innerText=s; makeDrag(d); document.getElementById('layers').appendChild(d); closeM('stickM') }
+function toggleDraw(){ drawing=!drawing; document.getElementById('penBtn').style.background=drawing?'#fff':''; document.getElementById('penBtn').style.color=drawing?'#000':'#fff'; canvas.style.pointerEvents=drawing?'auto':'none'; stage.style.touchAction=drawing?'none':'none' }
 let isDraw=false, last={x:0,y:0}
 canvas.addEventListener('pointerdown', e=>{ if(!drawing) return; isDraw=true; let r=canvas.getBoundingClientRect(); last={x:e.clientX-r.left, y:e.clientY-r.top} })
 canvas.addEventListener('pointermove', e=>{ if(!isDraw||!drawing) return; let r=canvas.getBoundingClientRect(); let x=e.clientX-r.left, y=e.clientY-r.top; ctx.strokeStyle='#fff'; ctx.lineWidth=4; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(x,y); ctx.stroke(); last={x,y} })
 canvas.addEventListener('pointerup', ()=> isDraw=false)
-function makeDraggable(el){ let sx=0,sy=0; el.addEventListener('pointerdown', e=>{ sx=e.clientX; sy=e.clientY; el.setPointerCapture(e.pointerId) }); el.addEventListener('pointermove', e=>{ if(e.buttons!==1) return; el.style.left=(el.offsetLeft+(e.clientX-sx))+'px'; el.style.top=(el.offsetTop+(e.clientY-sy))+'px'; sx=e.clientX; sy=e.clientY }) }
+function makeDrag(el){ let sx=0,sy=0; el.addEventListener('pointerdown', e=>{ sx=e.clientX; sy=e.clientY; el.setPointerCapture(e.pointerId) }); el.addEventListener('pointermove', e=>{ if(e.buttons!==1) return; el.style.left=(el.offsetLeft+(e.clientX-sx))+'px'; el.style.top=(el.offsetTop+(e.clientY-sy))+'px'; sx=e.clientX; sy=e.clientY }) }
 
 async function upload(){
- if(!finalBase64){ alert('Photo select pannu da Giri!'); return }
- let btn=document.getElementById('sendBtn'); btn.innerHTML='⏳'
- document.getElementById('status').innerText='Uploading... konjam wait pannu da'
- let expires=new Date(Date.now()+24*60*60*1000).toISOString()
+ if(!finalBase64){ alert('Photo select pannu da!'); return }
+ let btn=document.getElementById('send'); btn.innerHTML='⏳'
+ document.getElementById('status').innerText='Adjust panna photo-va ready panren...'
  try{
-   let {error}=await supa.from('stories').insert({ username: ME, image_url: finalBase64, expires_at: expires })
+   // Composite final image with zoom/pan
+   let exportCanvas=document.getElementById('exportCanvas')
+   let exCtx=exportCanvas.getContext('2d')
+   let img=new Image(); img.src=finalBase64
+   await new Promise(r=> img.onload=r)
+   exCtx.fillStyle='#000'; exCtx.fillRect(0,0,1080,1920)
+   // Calculate cover + transform
+   let cw=1080, ch=1920, iw=img.width, ih=img.height
+   let coverScale=Math.max(cw/iw, ch/ih) * scale
+   let baseX=(cw-iw*coverScale)/2 + posX*(cw/450), baseY=(ch-ih*coverScale)/2 + posY*(ch/800)
+   exCtx.drawImage(img, baseX, baseY, iw*coverScale, ih*coverScale)
+   // Draw paint canvas
+   exCtx.drawImage(canvas, 0,0, cw, ch)
+   let outBase64=exportCanvas.toDataURL('image/jpeg',0.85)
+
+   let expires=new Date(Date.now()+24*60*60*1000).toISOString()
+   let {error}=await supa.from('stories').insert({ username: ME, image_url: outBase64, expires_at: expires })
    if(error) throw error
-   document.getElementById('status').innerText='Success! 🔵'
-   setTimeout(()=> location.href='./index.html', 800)
- }catch(e){
-   document.getElementById('status').innerText='Error: '+e.message
-   alert(e.message); btn.innerHTML='<i class="fa fa-paper-plane"></i>'
- }
+   document.getElementById('status').innerText='Posted! 🔵'
+   setTimeout(()=> location.href='./index.html', 600)
+ }catch(e){ document.getElementById('status').innerText='Error: '+e.message; alert(e.message); btn.innerHTML='<i class="fa fa-paper-plane"></i>' }
 }
 </script>
 </body></html>
