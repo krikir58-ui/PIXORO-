@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro 🔵</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}
 .top{padding:12px 15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:50}
-.post{border-bottom:1px solid #222;padding-bottom:12px}.postTop{padding:10px 12px;display:flex;align-items:center;justify-content:space-between}
-.post img.main{width:100%!important;aspect-ratio:1/1!important;object-fit:cover!important;display:block!important}
-.actions{padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
-.actions.left{display:flex;gap:18px;align-items:center}
-.actions button{background:none;border:0;cursor:pointer;display:flex}
+.post{border-bottom:1px solid #111;position:relative;background:#000;padding-bottom:10px}
+.postTop{padding:10px 12px;display:flex;align-items:center;justify-content:space-between}
+.postWrap{position:relative;width:100%;aspect-ratio:1/1;background:#111;overflow:hidden}
+.postWrap img.main{width:100%;height:100%;object-fit:cover;display:block}
+.verticalBar{position:absolute;right:10px;bottom:15px;display:flex;flex-direction:column;gap:20px;align-items:center;z-index:5}
+.vBtn{text-align:center;cursor:pointer;filter:drop-shadow(0 2px 4px rgba(0,0,0,.9));transition:.15s}
+.vBtn:active{transform:scale(.85)}
+.vBtn small{display:block;font-size:12px;font-weight:700;margin-top:3px;text-shadow:0 1px 3px #000}
+.heartPop{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:90px;opacity:0;transition:all .35s cubic-bezier(.17,.89,.32,1.49);pointer-events:none;z-index:10}
 .nav{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100;max-width:450px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%}.nav a{color:#777;text-decoration:none;font-size:24px}.nav a.active{color:#fff}
 .pfpRing{width:38px;height:38px;border-radius:50%;background:conic-gradient(from 0deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5,#feda75);padding:2px}
 .pfpInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2px}
@@ -33,36 +38,20 @@
 
 <div class="top"><b style="font-size:22px;font-family:cursive">Pixoro 🔵</b><div style="display:flex;gap:15px"><span onclick="openCloseFriend()" style="cursor:pointer">💚</span><span onclick="location.href='notifications.html'" style="cursor:pointer;font-size:22px">🔔</span></div></div>
 
-<div class="storyBar" id="storyBar">
-  <div class="sItem" onclick="location.href='./story-add.html'">
-    <div class="sAdd">👤</div>
-    <div class="sName">Your Story</div>
-  </div>
-  <div style="color:#444;display:flex;align-items:center;font-size:12px">Loading stories...</div>
-</div>
+<div class="storyBar" id="storyBar"><div class="sItem" onclick="location.href='./story-add.html'"><div class="sAdd">👤</div><div class="sName">Your Story</div></div><div style="color:#444;display:flex;align-items:center;font-size:12px">Loading stories...</div></div>
 
 <div id="feed"><p style="text-align:center;padding:60px;color:#666">Loading Pixoro... 🔵</p></div>
 <div style="height:70px"></div>
 <div class="nav"><a class="active" href="index.html">🏠</a><a href="search.html">🔎</a><a href="reels.html">🎬</a><a href="profile.html">👤</a></div>
 
-<!-- Close Friend Modal -->
-<div id="cfModal" style="position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;display:none;padding:20px">
-<div style="background:#111;border-radius:15px;padding:15px;max-width:400px;margin:20% auto">
-<div style="display:flex;justify-content:space-between"><b>💚 Close Friends</b><span onclick="closeCF()" style="cursor:pointer">✕</span></div>
-<input id="cfInput" placeholder="Username add pannu..." style="width:100%;margin-top:12px;padding:10px;border-radius:10px;border:0;background:#222;color:#fff">
-<button onclick="addCF()" style="width:100%;margin-top:10px;padding:10px;background:#00ff66;border:0;border-radius:10px;font-weight:700">Add Close Friend</button>
-<div id="cfList" style="margin-top:12px;font-size:13px;color:#888"></div>
-</div>
-</div>
+<div id="cfModal" style="position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;display:none;padding:20px"><div style="background:#111;border-radius:15px;padding:15px;max-width:400px;margin:20% auto"><div style="display:flex;justify-content:space-between"><b>💚 Close Friends</b><span onclick="closeCF()" style="cursor:pointer">✕</span></div><input id="cfInput" placeholder="Username add pannu..." style="width:100%;margin-top:12px;padding:10px;border-radius:10px;border:0;background:#222;color:#fff"><button onclick="addCF()" style="width:100%;margin-top:10px;padding:10px;background:#00ff66;border:0;border-radius:10px;font-weight:700">Add Close Friend</button><div id="cfList" style="margin-top:12px;font-size:13px;color:#888"></div></div></div>
 
 <script>
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME=localStorage.getItem('pixoro_current_user') || 'Giri'
 let allPosts=[], allLikes=[], allComments=[], allFollows=[], allSaves=[], allStories=[]
-
 function blueTick(){return `<span class="verifiedBadge"><svg viewBox="0 0 24 24" width="10" height="10" fill="none"><path d="M17 8.5L10.5 15L7 11.5" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`}
 function pfpHtml(u){return `<div class="pfpRing"><div class="pfpInner"><img src="https://i.pravatar.cc/100?u=${u}"></div></div>`}
-
 async function loadAll(){
   let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false})
   let {data:likes}=await supa.from('likes').select('*')
@@ -71,11 +60,8 @@ async function loadAll(){
   let {data:saves}=await supa.from('saves').select('*').eq('username',ME)
   let {data:stories}=await supa.from('stories').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false})
   allPosts=posts||[]; allLikes=likes||[]; allComments=comments||[]; allFollows=follows||[]; allSaves=saves||[]; allStories=stories||[]
-  renderStories()
-  renderFeed()
-  loadCF()
+  renderStories(); renderFeed(); loadCF()
 }
-
 function renderStories(){
   let bar=document.getElementById('storyBar')
   let users=[...new Set(allStories.map(s=>s.username))]
@@ -84,27 +70,16 @@ function renderStories(){
     let s=allStories.find(x=>x.username===u)
     let isClose = s.audience==='close_friends'
     let imgUrl = s.image_url || s.media_url || `https://i.pravatar.cc/100?u=${u}`
-    return `<div class="sItem" onclick="viewStory('${u}')" oncontextmenu="deleteAsk('${u}');return false" ontouchstart="pressTimer('${u}')" ontouchend="clearPress()">
-      <div class="sRing ${isClose?'close':'public'}"><div class="sRingInner"><img src="${imgUrl}"></div></div>
-      <div class="sName">${u}</div>
-      ${isClose?'<div class="closeBadge">💚</div>':''}
-    </div>`
+    return `<div class="sItem" onclick="viewStory('${u}')" oncontextmenu="deleteAsk('${u}');return false" ontouchstart="pressTimer('${u}')" ontouchend="clearPress()"><div class="sRing ${isClose?'close':'public'}"><div class="sRingInner"><img src="${imgUrl}"></div></div><div class="sName">${u}</div>${isClose?'<div class="closeBadge">💚</div>':''}</div>`
   }).join('')
-  if(users.length===0) html+=`<div style="color:#555;display:flex;align-items:center;font-size:12px;padding-left:10px">No stories - Add pannu da! 👻</div>`
+  if(users.length===0) html+=`<div style="color:#555;display:flex;align-items:center;font-size:12px;padding-left:10px">No stories 👻</div>`
   bar.innerHTML=html
 }
 let pressT
 function pressTimer(u){ pressT=setTimeout(()=>deleteAsk(u),700) }
 function clearPress(){ clearTimeout(pressT) }
 function viewStory(u){ location.href=`./story-view.html?user=${encodeURIComponent(u)}` }
-
-async function deleteAsk(u){
-  if(u!==ME) return
-  if(!confirm('Un story-a delete panava da Giri? 🗑️')) return
-  await supa.from('stories').delete().eq('username',ME)
-  alert('Deleted da!')
-  loadAll()
-}
+async function deleteAsk(u){ if(u!==ME) return; if(!confirm('Delete panava da? 🗑️')) return; await supa.from('stories').delete().eq('username',ME); alert('Deleted da!'); loadAll() }
 
 function renderFeed(){
   let html=''
@@ -116,34 +91,36 @@ function renderFeed(){
     let followBtn = isMe? `<span style="font-size:11px;color:#555">YOU</span>` : `<button class="followBtn ${allFollows.some(f=>f.follower==ME && f.following==p.username)?'following':''}" onclick="toggleFollow('${p.username}')">${allFollows.some(f=>f.follower==ME && f.following==p.username)?'Following':'Follow'}</button>`
     html+=`<div class="post">
       <div class="postTop"><div style="display:flex;align-items:center;gap:10px">${pfpHtml(p.username)}<div><b style="display:flex;align-items:center">@${p.username}${isMe?blueTick():''}</b><div style="font-size:11px;color:#777">${allFollows.filter(f=>f.following==p.username).length} followers</div></div></div>${followBtn}</div>
-      <img class="main" src="${p.image_url}" ondblclick="likePost(${p.id})">
-      <div class="actions"><div class="left"><button onclick="likePost(${p.id})"><svg viewBox="0 0 24 24" width="28" height="28" fill="${isLiked?'#ff3040':'none'}" stroke="${isLiked?'#ff3040':'#fff'}" stroke-width="${isLiked?'2':'1.8'}" stroke-linejoin="round"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg></button><button onclick="alert('Comment soon da!')"><svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button><button onclick="sharePost()"><svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div><button onclick="savePost(${p.id})"><svg viewBox="0 0 24 24" width="27" height="27" fill="${isSaved?'#fff':'none'}" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21L12 16L5 21V5C5 3.89543 5.89543 3 7 3H17C18.1046 3 19 3.89543 19 5V21Z"/></svg></button></div>
-      <div style="padding:0 12px"><b>${lCount} likes</b><br><b>@${p.username} ${isMe?blueTick():''}</b> ${p.caption||''}</div>
+      <div class="postWrap">
+        <img class="main" src="${p.image_url}" ondblclick="likePost(${p.id});burst(${p.id})" onclick="burst(${p.id})">
+        <div id="pop-${p.id}" class="heartPop">❤️</div>
+        <div class="verticalBar">
+          <div class="vBtn" onclick="likePost(${p.id});burst(${p.id})">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="${isLiked?'#ff3040':'none'}" stroke="${isLiked?'#ff3040':'white'}" stroke-width="2" stroke-linejoin="round"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg>
+            <small>${lCount>0?lCount:''}</small>
+          </div>
+          <div class="vBtn" onclick="alert('Comments soon! 💬')"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="white" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+          <div class="vBtn" onclick="sharePost()"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="white" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+          <div class="vBtn" onclick="savePost(${p.id})">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="${isSaved?'white':'none'}" stroke="white" stroke-width="2"><path d="M19 21L12 16L5 21V5C5 3.89543 5.89543 3 7 3H17C18.1046 3 19 3.89543 19 5V21Z"/></svg>
+          </div>
+        </div>
+      </div>
+      <div style="padding:10px 12px"><b>${lCount} likes</b><br><b>@${p.username} ${isMe?blueTick():''}</b> ${p.caption||''}<br><span style="color:#777;font-size:12px">Save thotta fill aagum da! Bookmark maari 🔖</span></div>
     </div>`
   }
   document.getElementById('feed').innerHTML=html||'<p style="text-align:center;padding:60px">No posts da!</p>'
 }
-async function likePost(id){ let liked=allLikes.some(l=>l.post_id==id && l.username==ME); if(liked){ await supa.from('likes').delete().eq('post_id',id).eq('username',ME) } else{ await supa.from('likes').insert({post_id:id,username:ME}) } let {data}=await supa.from('likes').select('*'); allLikes=data||[]; renderFeed() }
+function burst(id){ let el=document.getElementById('pop-'+id); if(!el) return; el.style.transform='translate(-50%,-50%) scale(1)'; el.style.opacity='1'; setTimeout(()=>{ el.style.transform='translate(-50%,-50%) scale(0)'; el.style.opacity='0'},700) }
+async function likePost(id){ let liked=allLikes.some(l=>l.post_id==id && l.username==ME); if(liked){ await supa.from('likes').delete().eq('post_id',id).eq('username',ME) } else{ await supa.from('likes').insert({post_id:id,username:ME}); burst(id) } let {data}=await supa.from('likes').select('*'); allLikes=data||[]; renderFeed() }
 async function savePost(id){ let saved=allSaves.some(s=>s.post_id==id); if(saved){ await supa.from('saves').delete().eq('post_id',id).eq('username',ME) } else{ await supa.from('saves').insert({post_id:id,username:ME}) } let {data}=await supa.from('saves').select('*').eq('username',ME); allSaves=data||[]; renderFeed() }
 function sharePost(){ if(navigator.share){navigator.share({url:location.href})}else{prompt('Copy:',location.href)} }
 async function toggleFollow(u){ let already=allFollows.some(f=>f.follower==ME && f.following==u); if(already){ await supa.from('follows').delete().eq('follower',ME).eq('following',u) } else{ await supa.from('follows').insert({follower:ME,following:u}) } let {data}=await supa.from('follows').select('*'); allFollows=data||[]; renderFeed() }
-
-// CLOSE FRIEND
 function openCloseFriend(){ document.getElementById('cfModal').style.display='block'; loadCF() }
 function closeCF(){ document.getElementById('cfModal').style.display='none' }
-async function addCF(){
-  let f=document.getElementById('cfInput').value.trim(); if(!f) return
-  await supa.from('close_friends').insert({owner:ME,friend:f})
-  document.getElementById('cfInput').value=''; loadCF(); alert(f+' added da! 💚')
-}
-async function loadCF(){
-  let {data}=await supa.from('close_friends').select('*').eq('owner',ME)
-  let list=document.getElementById('cfList')
-  if(!list) return
-  list.innerHTML=(data||[]).map(c=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222"><span>💚 ${c.friend}</span><span onclick="removeCF('${c.id}')" style="color:#f44;cursor:pointer">remove</span></div>`).join('') || 'No close friends yet da'
-}
+async function addCF(){ let f=document.getElementById('cfInput').value.trim(); if(!f) return; await supa.from('close_friends').insert({owner:ME,friend:f}); document.getElementById('cfInput').value=''; loadCF(); alert(f+' added da! 💚') }
+async function loadCF(){ let {data}=await supa.from('close_friends').select('*').eq('owner',ME); let list=document.getElementById('cfList'); if(!list) return; list.innerHTML=(data||[]).map(c=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222"><span>💚 ${c.friend}</span><span onclick="removeCF('${c.id}')" style="color:#f44;cursor:pointer">remove</span></div>`).join('') || 'No close friends yet da' }
 async function removeCF(id){ await supa.from('close_friends').delete().eq('id',id); loadCF() }
-
 loadAll()
 </script>
 </body></html>
