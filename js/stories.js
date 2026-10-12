@@ -9,9 +9,11 @@ export async function loadStories(){
   let valid = (data||[]).filter(s => (now - new Date(s.created_at).getTime()) < 24*60*60*1000);
 
   let box = document.getElementById('storyBox');
+  if(!box) box = document.getElementById('storyBar'); // rendu id support da
   if(!box) return;
 
   let u = getUser();
+  let currentUser = u?.username || localStorage.getItem('pixoro_current_user') || 'Giri';
   let seenStories = JSON.parse(localStorage.getItem('pixoro_seen') || '[]');
 
   // Group by username - oru aalukku pala story irukkalam
@@ -21,20 +23,44 @@ export async function loadStories(){
     grouped[s.username].push(s);
   });
 
-  let addBtn = `
-  <div class="s" onclick="document.getElementById('fileInput').click()" style="cursor:pointer">
-    <div class="r" style="background: #111; border:2px dashed #333; display:flex;align-items:center;justify-content:center;">
-      <div style="font-size:22px">+</div>
-    </div>
-    <small>Your Story</small>
-  </div>`;
+  // 🔵 YOUR STORY - UN PHOTO RING LA VARANUM DA!
+  let myStories = grouped[currentUser] || [];
+  let myHasStory = myStories.length > 0;
 
-  let list = Object.keys(grouped).map(username => {
+  let addBtn = '';
+  if(myHasStory){
+    let isMySeen = seenStories.includes(currentUser);
+    let ringStyle = isMySeen
+    ? `background: #333;`
+      : `background: conic-gradient(from 0deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5,#feda75);`;
+
+    addBtn = `
+    <div class="s" onclick="window.viewStoryGroup('${currentUser}')" style="cursor:pointer; position:relative">
+      <div class="r" style="${ringStyle} padding:2.5px;">
+        <div style="background:#000; padding:2px; border-radius:50%;">
+          <img src="${myStories[0].img}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;display:block;">
+        </div>
+      </div>
+      <div style="position:absolute; bottom:14px; right:2px; background:#0095f6; color:#fff; border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center; font-size:12px; border:2px solid #000">+</div>
+      <small>Your Story</small>
+    </div>`;
+  } else {
+    addBtn = `
+    <div class="s" onclick="document.getElementById('fileInput')? document.getElementById('fileInput').click() : location.href='story-add.html'" style="cursor:pointer">
+      <div class="r" style="background: #111; border:2px dashed #333; display:flex;align-items:center;justify-content:center;">
+        <div style="font-size:22px">+</div>
+      </div>
+      <small>Your Story</small>
+    </div>`;
+  }
+
+  // Follow panravanga - unna thavira side la varuvanga da!
+  let list = Object.keys(grouped).filter(username => username!== currentUser).map(username => {
     let stories = grouped[username];
     let isSeen = seenStories.includes(username);
     // Seen na grey border, Unseen na rainbow
     let ringStyle = isSeen
-     ? `background: #333;`
+    ? `background: #333;`
       : `background: conic-gradient(from 0deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5,#feda75);`;
 
     return `
@@ -48,7 +74,7 @@ export async function loadStories(){
     </div>`;
   }).join('');
 
-  box.innerHTML = addBtn + list + `<div class="s"><div class="r"><div style="font-size:20px">🌍</div></div><small>@pixoro</small></div>`;
+  box.innerHTML = addBtn + list;
 
   // Store for viewer
   window._pixoroGroupedStories = grouped;
@@ -92,7 +118,8 @@ window.viewStoryGroup = (username) => {
         <span style="font-size:22px">❤️</span><span style="font-size:22px">📤</span>
       </div>
     `;
-    document.body.appendChild(d);
+    if(!document.getElementById('pixoroStoryViewer')) document.body.appendChild(d);
+    else document.getElementById('pixoroStoryViewer').innerHTML = d.innerHTML;
 
     // Progress Animation
     setTimeout(() => {
@@ -117,17 +144,16 @@ window.viewStoryGroup = (username) => {
     clearTimeout(window._storyTimer);
     currentIndex++;
     if(currentIndex >= stories.length){
-      d.remove();
+      let viewer = document.getElementById('pixoroStoryViewer');
+      if(viewer) viewer.remove();
       loadStories(); // Refresh ring to grey
     } else {
-      d.innerHTML = '';
       renderStory();
     }
   }
   window.prevStory = () => {
     clearTimeout(window._storyTimer);
     currentIndex = Math.max(0, currentIndex-1);
-    d.innerHTML = '';
     renderStory();
   }
 
@@ -136,15 +162,12 @@ window.viewStoryGroup = (username) => {
 
 // Simple view for single image (old function backup)
 window.viewStory = (img) => {
-  window.viewStoryGroup = window.viewStoryGroup || (()=>{});
-  // Find user for this img
   let grouped = window._pixoroGroupedStories || {};
   for(let u in grouped){
     if(grouped[u].some(s => s.img === img)){
       return window.viewStoryGroup(u);
     }
   }
-  // Fallback old style
   let d = document.createElement('div');
   d.style.cssText='position:fixed; inset:0; background:#000; z-index:9999; display:flex; align-items:center; justify-content:center';
   d.innerHTML=`<img src="${img}" style="width:100%; max-width:500px; height:100%; object-fit:contain"><div style="position:absolute; top:20px; right:20px; color:#fff; font-size:24px">✕</div>`;
