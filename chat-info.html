@@ -1,0 +1,34 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro Info</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}
+.top{padding:12px;display:flex;gap:12px;align-items:center;border-bottom:1px solid #111;position:sticky;top:0;background:#000}
+.row{display:flex;justify-content:space-between;align-items:center;padding:16px 14px;border-bottom:1px solid #111;cursor:pointer}.row:active{background:#111}
+.toggle{width:44px;height:26px;background:#333;border-radius:20px;position:relative;transition:.3s}.toggle.on{background:#fff}.toggle::after{content:'';position:absolute;top:2px;left:2px;width:22px;height:22px;background:#000;border-radius:50%;transition:.3s}.toggle.on::after{left:20px}
+</style></head><body>
+<div class="top"><span onclick="history.back()" style="font-size:22px;cursor:pointer">←</span><b>Chat Info</b></div>
+
+<div style="text-align:center;padding:20px"><img id="pfp" style="width:90px;height:90px;border-radius:50%"><div id="name" style="margin-top:10px;font-size:18px;font-weight:700"></div><div style="display:flex;justify-content:center;gap:24px;margin-top:16px;font-size:12px;color:#aaa"><div>👤<br>Profile</div><div>🔍<br>Search</div><div>🔕<br>Mute</div><div onclick="document.getElementById('privacy').style.display='block'">⋯<br>Options</div></div></div>
+
+<div class="row"><div>🎨 Theme<br><small style="color:#888">Default</small></div><div style="width:20px;height:20px;background:linear-gradient(135deg,#7F00FF,#E100FF);border-radius:50%"></div></div>
+<div class="row" onclick="toggleDis()"><div>🌙 Disappearing messages<br><small style="color:#888" id="disText">Off</small></div><div class="toggle" id="disToggle"></div></div>
+<div class="row"><div>💬 Chat controls</div>›</div>
+
+<div id="privacy" style="border-top:8px solid #111">
+<div style="padding:14px;color:#888;font-size:12px;font-weight:700">Privacy & safety</div>
+<div class="row"><div>Read receipts<br><small style="color:#666">Others can see when you read</small></div><div class="toggle on" id="readT" onclick="this.classList.toggle('on')"></div></div>
+<div class="row"><div>Typing indicator<br><small style="color:#666">Others can see when you type</small></div><div class="toggle on" id="typeT" onclick="this.classList.toggle('on')"></div></div>
+<div style="padding:14px;color:#888;font-size:12px;font-weight:700">Who can reach you</div>
+<div class="row" onclick="alert('Restricted da!')">🚫 Restrict</div>
+<div class="row" onclick="if(confirm('Block panava?')){alert('Blocked da');history.back()}">⭕ Block</div>
+<div class="row" style="color:#FF0A33" onclick="alert('Reported da!')">🚩 Report</div>
+</div>
+
+<div style="padding:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px" id="media"></div>
+
+<script>
+let other=new URLSearchParams(location.search).get('user')||'Siva'
+document.getElementById('name').innerText=other
+document.getElementById('pfp').src=`https://i.pravatar.cc/200?u=${other}`
+function toggleDis(){let t=document.getElementById('disToggle');t.classList.toggle('on');let on=t.classList.contains('on');document.getElementById('disText').innerText=on?'On':'Off';localStorage.setItem('pixoro_disappear_'+other,on)}
+if(localStorage.getItem('pixoro_disappear_'+other)==='true'){document.getElementById('disToggle').classList.add('on');document.getElementById('disText').innerText='On'}
+let m=document.getElementById('media');for(let i=0;i<6;i++){m.innerHTML+=`<div style="aspect-ratio:1/1;background:#111;border-radius:8px;overflow:hidden"><img src="https://picsum.photos/200?random=${i}" style="width:100%;height:100%;object-fit:cover"></div>`}
+</script></body></html>
