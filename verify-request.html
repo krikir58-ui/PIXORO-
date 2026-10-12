@@ -22,39 +22,22 @@ h2{margin-top:0}
   <p id="status"></p>
   <a href="index.html">Back to Pixoro</a>
 </div>
-
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
-const supa = createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_ANON_KEY')
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPA_URL = 'https://yecpltndhlzfjpjlzchcpm.supabase.co';
+const SUPA_KEY = 'sb_publishable_byUfZPczrxfKYKTMuNco5w_oqabYQJ_';
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 document.getElementById('submitVerify').onclick = async () => {
   const { data: { user } } = await supa.auth.getUser();
   if(!user){ alert('Login pannu da!'); return; }
-
   const fullName = document.getElementById('fullName').value;
   const reason = document.getElementById('reason').value;
   const proof = document.getElementById('instaLink').value;
-
-  if(!fullName || !reason || !proof){
-    alert('Ellam fill pannu da! ID Proof must!');
-    return;
-  }
-
+  if(!fullName || !reason || !proof){ alert('Ellam fill pannu da! ID Proof must!'); return; }
   const { data: existing } = await supa.from('verification_requests').select('*').eq('user_id', user.id).maybeSingle();
-  if(existing){
-    document.getElementById('status').innerText = 'Nee already request pannita da! Status: '+existing.status+' | One ID ku one tick mattum!';
-    return;
-  }
-
-  const { error } = await supa.from('verification_requests').insert({
-    user_id: user.id,
-    username: user.email,
-    full_name: fullName,
-    reason: reason,
-    id_proof_url: proof,
-    status: 'pending'
-  });
-
+  if(existing){ document.getElementById('status').innerText = 'Nee already request pannita da! Status: '+existing.status; return; }
+  const { error } = await supa.from('verification_requests').insert({ user_id: user.id, username: user.email, full_name: fullName, reason: reason, id_proof_url: proof, status: 'pending' });
   if(error) document.getElementById('status').innerText = 'Error: '+error.message;
   else document.getElementById('status').innerText = '✅ Request sent da! Admin confirm panni FREE blue tick tharuvom!';
 };
