@@ -91,21 +91,30 @@ function checkSOS(){
 }
 async function triggerSOS(){
   if(!confirm('🆘 SOS Anupava? Trusted contacts ku location pogum!')) return;
-  let msg=`🚨 SOS! ${ME} needs help! Location: https://maps.google.com/?q=${localStorage.getItem('last_lat')||'11.2,77.8'}`;
-  try{
-    let {data}=await supa.from('close_friends').select('*').eq('owner',ME);
-    if(!data||!data.length) alert('Trusted contacts illa da! Profile > Settings > Manage Trusted la add pannu!');
-    else{
-      for(let c of data){
-        window.open(`https://wa.me/${c.phone}?text=${encodeURIComponent(msg)}`,'_blank');
+  
+  // Location edukkurom da
+  navigator.geolocation.getCurrentPosition(async (pos)=>{
+    let lat = pos.coords.latitude;
+    let lng = pos.coords.longitude;
+    let msg=`🚨 SOS! ${localStorage.getItem('pixoro_user') || 'Friend'} needs help! Location: https://maps.google.com/?q=${lat},${lng}`;
+    
+    try{
+      let {data}=await supa.from('close_friends').select('*').eq('owner_id', (await supa.auth.getUser()).data.user.id);
+      if(!data||!data.length) alert('Trusted contacts illa da! Profile la add pannu!');
+      else{
+        for(let c of data){
+          window.open(`https://wa.me/${c.phone}?text=${encodeURIComponent(msg)}`);
+        }
+        alert('✅ SOS sent to '+data.length+' persons da!');
       }
-      alert('✅ SOS sent to '+data.length+' persons da!');
-    }
-  }catch(e){ alert('Error: '+e.message); }
+    }catch(e){ alert('Error: '+e.message); }
+  }, ()=>{ alert('Location on pannu da!'); });
 }
 // Get location
 if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(p=>{ localStorage.setItem('last_lat',p.coords.latitude+','+p.coords.longitude); }); }
 
 loadAll()
 setInterval(checkSOS,2000);
-</script></body></html>
+</script>
+<script src="js/chat-settings.js"></script>
+</body></html>
