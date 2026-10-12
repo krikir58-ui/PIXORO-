@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin - Pixoro Verify</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>body{font-family:Arial;padding:20px} .card{border:1px solid #ccc;padding:15px;margin:10px 0;border-radius:12px}</style>
+</head>
+<body>
+<h2>💙 Admin Panel - Blue Tick Requests</h2>
+<div id="list">Loading...</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+const supa = createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_ANON_KEY')
+
+async function loadRequests(){
+  const { data } = await supa.from('verification_requests').select('*').eq('status','pending').order('created_at',{ascending:false});
+  let html='';
+  if(!data || data.length==0){ document.getElementById('list').innerHTML='No pending requests da!'; return; }
+  data.forEach(r=>{
+    html+=`<div class="card">
+      <b>${r.full_name}</b> - ${r.username}<br>
+      Reason: ${r.reason}<br>
+      Proof: <a href="${r.id_proof_url}" target="_blank">${r.id_proof_url}</a><br>
+      Date: ${new Date(r.created_at).toLocaleString()}<br><br>
+      <button onclick="approve('${r.user_id}','${r.id}')" style="background:green;color:white;padding:8px 15px;border:none;border-radius:8px;margin-right:10px;">✅ Approve - Free Tick Kudu</button>
+      <button onclick="reject('${r.id}')" style="background:red;color:white;padding:8px 15px;border:none;border-radius:8px;">❌ Reject</button>
+    </div>`;
+  });
+  document.getElementById('list').innerHTML=html;
+}
+window.approve = async (userId, reqId)=>{
+  await supa.from('profiles').update({is_verified:true}).eq('id',userId);
+  await supa.from('verification_requests').update({status:'approved'}).eq('id',reqId);
+  alert('💙 Blue tick kuduthachu da!'); loadRequests();
+}
+window.reject = async (reqId)=>{
+  await supa.from('verification_requests').update({status:'rejected'}).eq('id',reqId);
+  loadRequests();
+}
+loadRequests();
+</script>
+</body>
+</html>
