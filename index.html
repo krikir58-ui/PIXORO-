@@ -10,12 +10,13 @@
 .actions{padding:12px 14px;display:flex;justify-content:space-between;align-items:center}.actions .left{display:flex;gap:22px;align-items:center}
 .act{width:30px;height:30px;cursor:pointer;background:none;border:0;display:flex;align-items:center;justify-content:center}.act svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:2.2}
 .act.liked svg{fill:#FF0A33;stroke:#FF0A33}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:62px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;z-index:100;padding:0 10px;padding-bottom:env(safe-area-inset-bottom);transform:translateZ(0)}
-.bottom-nav a{width:40px;height:40px;display:flex;align-items:center;justify-content:center;text-decoration:none}
-.bottom-nav a svg{width:26px;height:26px;fill:none;stroke:#777;stroke-width:1.8}
-.bottom-nav a.active svg{fill:#fff;stroke:#fff}
-.bottom-nav .profile-ring{width:30px;height:30px;border-radius:50%;border:2px solid #fff;overflow:hidden}
-.bottom-nav .profile-ring img{width:100%;height:100%;object-fit:cover}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:70px;background:#000;border-top:1px solid #1e1e1e;display:flex;justify-content:space-around;align-items:center;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:#777}
+.bottom-nav a svg{width:28px;height:28px;fill:none;stroke:#777;stroke-width:1.6}
+.bottom-nav a.active{color:#fff}
+.bottom-nav a.active svg{stroke:#fff}
+.bottom-nav a.active span{color:#fff;font-weight:700}
+.bottom-nav span{font-size:11px;color:#777}
 .pfpRing{width:38px;height:38px;border-radius:50%;background:#fff;padding:2px}.pfpInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2px}.pfpInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .storyBar{display:flex;gap:16px;padding:14px 12px;overflow-x:auto;background:#000;border-bottom:1px solid #1a1a1a}.storyBar::-webkit-scrollbar{display:none}
 .sItem{text-align:center;min-width:72px;cursor:pointer}
@@ -27,16 +28,12 @@
 #feed{padding-bottom:20px}
 </style></head><body>
 
-<!-- TOP - + & BELL BLACK WHITE - EMOJI ILLA DA -->
 <div class="top">
   <b style="font-size:26px;font-weight:900">Pixoro</b>
   <div style="display:flex;gap:14px;align-items:center">
     <div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div>
     <a href="notifications.html" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center">
-      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 8a6 6 0 0 1 12 0c0 7 6 9 6 9H0s6-2 6-9"></path>
-        <path d="M10 21a2 2 0 0 0 4 0"></path>
-      </svg>
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 7 6 9 6 9H0s6-2 6-9"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg>
     </a>
   </div>
 </div>
@@ -44,13 +41,28 @@
 <div class="storyBar" id="storyBar"></div>
 <div id="feed"><p style="text-align:center;padding:60px;color:#666">Loading...</p></div>
 
-<!-- BOTTOM - DM KILLA - MSG STYLE PREMIUM - + ILLA DA -->
+<!-- BOTTOM NAV - UN SCREENSHOT MARIYE OUTLINE ICONS DA -->
 <div class="bottom-nav">
-  <a class="active" href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z" fill="#fff" stroke="#fff"/></svg></a>
-  <a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></a>
-  <a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="#fff"/></svg></a>
-  <a href="dm.html"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></a>
-  <a href="profile.html"><div class="profile-ring"><img src="https://i.pravatar.cc/100?u=Giri" id="navPfp"></div></a>
+  <a class="active" href="index.html">
+    <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg>
+    <span>Home</span>
+  </a>
+  <a href="search.html">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <span>Search</span>
+  </a>
+  <a href="reels.html">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg>
+    <span>Reels</span>
+  </a>
+  <a href="dm.html">
+    <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    <span>DM</span>
+  </a>
+  <a href="profile.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+    <span>Profile</span>
+  </a>
 </div>
 
 <div id="createSheet" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:flex-end;justify-content:center"><div style="background:#1a1a1a;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:18px 18px 28px;border:1px solid #333"><div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 18px"></div><b style="display:block;text-align:center;margin-bottom:16px">Create New</b><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -75,7 +87,6 @@ async function loadAll(){
     let {data:stories}=await supa.from('stories').select('*').gt('expires_at',new Date().toISOString());
     allPosts=posts||[];allLikes=likes||[];allSaves=saves||[];allStories=stories||[];
   }catch(e){ allPosts=[] }
-  let pfp=localStorage.getItem('pixoro_gilli_pfp_'+ME)||`https://i.pravatar.cc/150?u=${ME}`; let nav=document.getElementById('navPfp'); if(nav) nav.src=pfp
   renderStories();renderFeed();
 }
 function renderStories(){
