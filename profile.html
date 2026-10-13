@@ -1,198 +1,188 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Profile - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto}
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{padding:14px 15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e1e1e;position:sticky;top:0;background:#000;z-index:50}
-.pfpBig{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#FF6A00,#FF0A33,#FFD600,#FF8A00);padding:3px;cursor:pointer;box-shadow:0 0 16px rgba(255,106,0,0.6);animation:orangePulse 2s infinite}
-.pfpBigInner{width:100%;height:100%;border-radius:50%;background:#000;padding:3px;position:relative;overflow:hidden}
-.pfpBigInner img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;transition:transform.3s}
-.stats{display:flex;gap:25px;text-align:center}.stats b{display:block;font-size:18px;color:#fff}.stats span{color:#fff!important;font-size:12px}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;margin-top:2px}
-.grid img{width:100%;aspect-ratio:1/1;object-fit:cover;cursor:pointer;border-radius:12px}
-.verifiedBadge{width:18px;height:18px;background:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-left:5px;color:#000;font-weight:900;font-size:11px}
+.pfpBig{width:96px;height:96px;border-radius:50%;background:#222;padding:3px;cursor:pointer}
+.pfpBig.hasStory{background:linear-gradient(135deg,#FF6A00,#FF0A33,#FFD600,#FF8A00);padding:3px;box-shadow:0 0 16px rgba(255,106,0,0.6)}
+.pfpBigInner{width:100%;height:100%;border-radius:50%;background:#000;padding:3px;overflow:hidden}
+.pfpBigInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.stats{display:flex;gap:25px;text-align:center}.stats div{cursor:pointer}.stats b{display:block;font-size:18px}.stats span{font-size:12px;color:#aaa}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;margin-top:10px}
+.grid img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px}
 .btn{border:1px solid #2a2a2a;background:#1a1a1a;color:#fff;padding:10px 0;border-radius:12px;width:100%;font-weight:600;cursor:pointer}
 .btnPrimary{background:#fff;color:#000;border:0;font-weight:900}
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;padding:12px 0 20px;z-index:100}
-.nav a{width:36px;height:36px;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#fff}
-.nav a svg{width:26px;height:26px;fill:none;stroke:#777;stroke-width:1.8}
-.nav a.active svg{fill:#fff;stroke:#fff}
-.tab{padding:12px 0;flex:1;text-align:center;font-size:13px;cursor:pointer;color:#666;border-bottom:2px solid transparent}
-.tab.active{color:#fff;border-bottom:2px solid #fff}
-#editModal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;display:none;align-items:flex-end;justify-content:center}
-#editSheet{background:#101010;border:1px solid #2a2a2a;border-radius:20px 20px 0 0;width:100%;max-width:450px;padding:20px}
-@keyframes slideLeft{from{transform:translateX(100%)}to{transform:translateX(0)}}@keyframes orangePulse{0%{box-shadow:0 0 10px #FF6A00}50%{box-shadow:0 0 20px #FF0A33}100%{box-shadow:0 0 10px #FF6A00}}
-.inputBox{width:100%;background:#000;border:1px solid #2a2a2a;color:#fff;padding:12px;border-radius:10px;margin:8px 0}
+.nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:64px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;z-index:100}
+.nav a{width:36px;height:36px;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#fff;opacity:0.6}.nav a.active{opacity:1}
+.tab{padding:12px 0;flex:1;text-align:center;font-size:13px;cursor:pointer;color:#666;border-bottom:2px solid transparent}.tab.active{color:#fff;border-bottom:2px solid #fff}
 .highlights{display:flex;gap:16px;margin:18px 0;overflow-x:auto;padding-bottom:8px}.highlights::-webkit-scrollbar{display:none}
-.h-item{text-align:center;min-width:70px;cursor:pointer}
-.h-circle{width:68px;height:68px;border-radius:50%;background:#101010;display:flex;align-items:center;justify-content:center;font-size:26px;position:relative;padding:3px}
-.h-circle::before{content:'';position:absolute;inset:0;border-radius:50%;padding:2px;background:linear-gradient(135deg,#FF6A00,#FF0A33,#FFD600);-webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
-.h-text{font-size:11px;margin-top:7px;color:#fff;font-weight:800;text-transform:uppercase}
-.ghostOn{border:1px solid #fff!important;background:#333!important;color:#fff!important}
-.profDash{background:#101010;border:1px solid #222;border-radius:12px;padding:12px;margin:15px 0}
-.setItem{padding:14px;background:#101010;border:1px solid #222;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer}
-.toggle{position:relative;display:inline-block;width:50px;height:26px}.toggle input{opacity:0;width:0;height:0}.slider{position:absolute;cursor:pointer;inset:0;background:#333;border-radius:20px;transition:.3s}.slider:before{content:'';position:absolute;width:18px;height:18px;left:4px;bottom:4px;background:#fff;border-radius:50%;transition:.3s}.toggle input:checked +.slider{background:#fff}.toggle input:checked +.slider:before{transform:translateX(22px);background:#000}
-.femaleBadge{background:linear-gradient(135deg,#FF5AA8,#FF0A80);color:#fff;font-size:10px;padding:3px 8px;border-radius:20px;margin-left:8px;font-weight:900}
-.linkTag{color:#4DA3FF!important;text-decoration:none;font-weight:700}
+.h-item{text-align:center;min-width:70px;cursor:pointer}.h-circle{width:68px;height:68px;border-radius:50%;background:#101010;display:flex;align-items:center;justify-content:center;font-size:26px;border:2px solid #333;position:relative}
+.h-text{font-size:11px;margin-top:6px;color:#fff;font-weight:700}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:500;display:none;flex-direction:column}
+.modalTop{padding:15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;background:#000}
+.followRow{display:flex;align-items:center;justify-content:space-between;padding:12px;border-bottom:1px solid #111}
+.fBtn{border:1px solid #333;background:#222;color:#fff;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer}
+.fBtn.following{background:#fff;color:#000}
+#storyViewer{position:fixed;inset:0;background:#000;z-index:1000;display:none;flex-direction:column}
+.sProgress{height:3px;background:#333;display:flex;gap:3px;padding:3px}.sBar{flex:1;background:#555;border-radius:10px;overflow:hidden}.sBarFill{height:100%;background:#fff;width:0%}
 </style></head><body>
-<div class="top"><b style="font-size:22px;font-weight:900">Pixoro</b><div style="display:flex;gap:18px"><span style="font-size:22px;cursor:pointer" onclick="openSettings()">☰</span><span style="font-size:22px;cursor:pointer" onclick="location.href='index.html'">✕</span></div></div>
+<div class="top"><b style="font-size:22px;font-weight:900">Pixoro</b><div style="display:flex;gap:18px"><span style="font-size:22px;cursor:pointer" onclick="alert('Settings')">☰</span><span style="font-size:22px;cursor:pointer" onclick="location.href='index.html'">✕</span></div></div>
 <div style="padding:15px">
   <div style="display:flex;gap:20px;align-items:center">
-    <div class="pfpBig" onclick="document.getElementById('pfpFile').click()"><div class="pfpBigInner"><img id="pfpImg" src="https://i.pravatar.cc/150?u=Giri"></div></div>
-    <input type="file" id="pfpFile" accept="image/*" style="display:none" onchange="uploadPfp(this)">
-    <div class="stats"><div><b id="postCount">0</b><span>Posts</span></div><div><b id="followerCount">0</b><span>Followers</span></div><div><b id="followingCount">0</b><span>Following</span></div></div>
+    <div class="pfpBig" id="pfpRing" onclick="openProfileStory()"><div class="pfpBigInner"><img id="pfpImg" src="https://i.pravatar.cc/150?u=Giri"></div></div>
+    <div class="stats">
+      <div onclick="openFollowList('posts')"><b id="postCount">0</b><span>Posts</span></div>
+      <div onclick="openFollowList('followers')"><b id="followerCount">0</b><span>Followers</span></div>
+      <div onclick="openFollowList('following')"><b id="followingCount">0</b><span>Following</span></div>
+    </div>
   </div>
   <div style="margin-top:14px">
-    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px">
-      <b style="font-size:17px" id="displayName">Giri</b><span class="verifiedBadge">✓</span><span class="femaleBadge">♀ GIRL</span><span id="ghostBadge" style="display:none;background:#fff;color:#000;font-size:10px;padding:2px 8px;border-radius:20px;margin-left:4px;font-weight:900">👻 GHOST</span>
-    </div>
-    <div style="font-size:13px;color:#aaa;margin-top:2px">@<span id="usernameTag">giri_official</span> • <span style="color:#FF6A00">Tiruppur Creator</span></div>
-    <div id="bioText" style="color:#fff;font-size:14px;margin-top:8px;line-height:20px">🔥 Tiruchengode ➡️ World<br>👨‍💻 Pixoro Founder | Coder<br>💧 Water Can Team Respect 🙏<br>📍 Palladam, Tiruppur<br><a href="#" class="linkTag">🔗 pixoro.com</a></div>
+    <div style="display:flex;align-items:center;gap:6px"><b id="displayName">Giri</b><span style="width:18px;height:18px;background:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:11px">✓</span></div>
+    <div style="font-size:13px;color:#aaa">@<span id="usernameTag">giri_official</span></div>
+    <div id="bioText" style="font-size:14px;margin-top:8px;line-height:20px;color:#fff"></div>
   </div>
-  <div class="profDash"><div style="display:flex;justify-content:space-between"><b style="font-size:13px">Professional dashboard</b><span style="font-size:11px;color:#777">7 views</span></div><div style="font-size:12px;color:#777;margin-top:4px">Creator | 1.2K reached • Female safety ON 🛡️</div></div>
+
+  <!-- REAL HIGHLIGHTS - NAMA PUDICHU KURRA MARI -->
+  <div class="highlights" id="highlightList"></div>
+
   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn btnPrimary" onclick="openEdit()">Edit Profile</button><button class="btn" onclick="shareProfile()">Share Profile</button></div>
-  <button id="ghostToggleBtn" class="btn" onclick="toggleGhost()" style="margin-top:10px;padding:12px;font-size:14px">👁️ Ghost Mode OFF</button>
-  <div class="highlights">
-    <div class="h-item"><div class="h-circle">🔥</div><div class="h-text">My Work</div></div>
-    <div class="h-item"><div class="h-circle">💖</div><div class="h-text">For Girls</div></div>
-    <div class="h-item"><div class="h-circle">💧</div><div class="h-text">Water</div></div>
-    <div class="h-item"><div class="h-circle">🎬</div><div class="h-text">Reels</div></div>
-    <div class="h-item"><div class="h-circle">👨‍💻</div><div class="h-text">Code</div></div>
-    <div class="h-item"><div class="h-circle" style="border:2px dashed #555">➕</div><div class="h-text">New</div></div>
-  </div>
-  <div style="display:flex;border-top:1px solid #222;margin-top:5px"><div class="tab active" id="tabPosts" onclick="switchTab('posts')">⊞ Posts</div><div class="tab" id="tabReels" onclick="switchTab('reels')">🎬 Reels</div><div class="tab" id="tabSaved" onclick="switchTab('saved')">🔖 Saved</div></div>
-  <div id="myGrid" class="grid"></div><div id="savedGrid" class="grid" style="display:none"></div>
+  <div style="display:flex;border-top:1px solid #222;margin-top:18px"><div class="tab active" id="tabPosts">⊞ Posts</div><div class="tab">🎬 Reels</div><div class="tab">🔖 Saved</div></div>
+  <div id="myGrid" class="grid"></div>
 </div>
-<div id="editModal" onclick="if(event.target==this)closeEdit()"><div id="editSheet"><div style="width:40px;height:4px;background:#333;border-radius:10px;margin:0 auto 15px"></div><h3 style="text-align:center;margin-bottom:15px">Edit Profile</h3><div style="text-align:center"><div class="pfpBig" style="margin:0 auto"><div class="pfpBigInner"><img id="editPfpPreview" src="https://i.pravatar.cc/150?u=Giri"></div></div><p style="color:#fff;margin-top:8px;font-size:14px;cursor:pointer" onclick="document.getElementById('pfpFile').click()">Edit picture</p><input type="range" id="pfpZoom" min="100" max="200" value="100" oninput="document.getElementById('editPfpPreview').style.transform='scale('+this.value/100+')';document.getElementById('pfpImg').style.transform='scale('+this.value/100+')'" style="width:80%;margin-top:10px"></div><label style="font-size:12px;color:#777;margin-top:15px;display:block">Display Name</label><input id="editName" class="inputBox"><label style="font-size:12px;color:#777;display:block">Bio + Link</label><textarea id="editBio" class="inputBox" rows="4"></textarea><button onclick="saveProfile()" style="width:100%;background:#fff;color:#000;padding:12px;border:0;border-radius:10px;font-weight:900;margin-top:15px">Done ✔️</button></div></div>
-<div id="settingsModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:999;display:none;justify-content:flex-end"><div style="background:#000;width:100%;max-width:450px;height:100%;overflow-y:auto;border-left:1px solid #222"><div style="padding:15px;border-bottom:1px solid #222;display:flex;justify-content:space-between"><b>Settings • Security 🛡️</b><span onclick="closeSettings()" style="font-size:22px;cursor:pointer">✕</span></div><div style="padding:15px">
-<div style="padding:14px;background:#101010;border:1px solid #222;border-radius:12px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center"><div><b>🆘 Girls Safety SOS</b><br><small style="color:#777">Red button varum</small></div><label class="toggle"><input type="checkbox" id="sosToggle" onchange="toggleSOS()"><span class="slider"></span></label></div><div id="cfListMini" style="margin-top:12px;font-size:12px;color:#777;background:#000;padding:10px;border-radius:8px"></div><button onclick="manageTrusted()" style="margin-top:10px;width:100%;padding:10px;background:#fff;border:0;border-radius:8px;font-weight:700;color:#000">💚 Manage Trusted</button></div>
-<div style="padding:14px;background:#101010;border:1px solid #FF0A33;border-radius:12px;margin-bottom:12px"><b style="color:#FF0A33">🔒 Anti-Hack Protection</b><div class="setItem" style="margin-top:10px" onclick="toggle2FA()"><span>🔐 2-Step Verification</span><span id="tfaStatus">OFF ›</span></div><div class="setItem" onclick="toggleLoginAlert()"><span>📱 Login Alerts</span><span id="loginAlertStatus">ON ›</span></div><div class="setItem" onclick="toggleDeviceLock()"><span>📲 Device Lock</span><span id="deviceStatus">OFF ›</span></div></div>
-<div class="setItem" onclick="toggleGhost()"><span>👻 Ghost Mode</span><span id="ghostStatus">OFF ›</span></div>
-<div class="setItem" onclick="logout()"><span style="color:#ff4444">Log out</span></div>
-</div></div></div>
-<div id="cfModal" style="position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;display:none;padding:20px"><div style="background:#101010;border:1px solid #2a2a2a;border-radius:15px;padding:15px;max-width:400px;margin:10% auto"><div style="display:flex;justify-content:space-between"><b>💚 Trusted</b><span onclick="closeCF()" style="cursor:pointer;font-size:22px">✕</span></div><div style="margin-top:12px"><input id="cfName" placeholder="Name" style="width:100%;padding:11px;border-radius:8px;background:#000;color:#fff;margin-bottom:8px;border:1px solid #2a2a2a"><input id="cfPhone" placeholder="Phone" type="tel" style="width:100%;padding:11px;border-radius:8px;background:#000;color:#fff;border:1px solid #2a2a2a"><button onclick="addCF()" style="width:100%;margin-top:10px;padding:12px;background:#fff;border:0;border-radius:10px;font-weight:900;color:#000">💾 Save</button></div><div id="cfList" style="margin-top:14px"></div></div></div>
-<div style="height:90px"></div>
-<div class="nav">
-  <a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z" fill="none"/></svg></a>
-  <a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></a>
-  <div style="background:#fff;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#000;font-size:22px;font-weight:900;cursor:pointer" onclick="location.href='upload.html'">+</div>
-  <a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z"/></svg></a>
-  <a href="profile.html" class="active"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M4 20a8 8 0 0 1 16 0"/></svg></a>
+
+<!-- REAL FOLLOWERS LIST MODAL -->
+<div id="followModal" class="modal"><div class="modalTop"><b id="followTitle">Followers</b><span onclick="closeFollow()" style="font-size:22px;cursor:pointer">✕</span></div><div id="followList" style="flex:1;overflow-y:auto"></div></div>
+
+<!-- STORY VIEWER -->
+<div id="storyViewer"><div class="sProgress"><div class="sBar"><div class="sBarFill" id="sFill"></div></div></div>
+<div style="padding:10px;display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:8px"><img id="sPfp" src="" style="width:32px;height:32px;border-radius:50%"><b id="sName">Giri</b></div><span onclick="closeStory()" style="font-size:24px;cursor:pointer">✕</span></div>
+<div style="flex:1;display:flex;align-items:center;justify-content:center" onclick="closeStory()"><img id="sImg" src="" style="max-width:100%;max-height:80vh;object-fit:contain"></div>
 </div>
+
+<div class="nav"><a href="index.html">🏠</a><a href="search.html">🔎</a><div style="background:#fff;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900" onclick="location.href='upload.html'">+</div><a href="reels.html">🎬</a><a href="profile.html" class="active">👤</a></div>
+
 <script>
-const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-let ME = localStorage.getItem('pixoro_current_user') || 'Giri'
-let myPosts=[], mySaves=[], allFollows=[]
+const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+let ME=localStorage.getItem('pixoro_current_user')||'Giri'
+let myPosts=[], allFollows=[], currentStories=[], storyTimer=null
 
-// SOS, Trusted
-function toggleSOS(){let on=document.getElementById('sosToggle').checked;localStorage.setItem('pixoro_sos_on', on);alert(on?'✅ SOS ON':'❌ OFF');}
-function manageTrusted(){document.getElementById('cfModal').style.display='block';loadCF();}function closeCF(){document.getElementById('cfModal').style.display='none';loadCFMini();}
-async function addCF(){let name=document.getElementById('cfName').value.trim();let phone=document.getElementById('cfPhone').value.trim().replace(/[^0-9]/g,'');if(!name||!phone)return alert('Name & Phone!');if(phone.length==10)phone='91'+phone;try{await supa.from('close_friends').insert({owner:ME,friend:name,phone:phone});}catch(e){let a=JSON.parse(localStorage.getItem('pixoro_cf_'+ME)||'[]');a.push({friend:name,phone});localStorage.setItem('pixoro_cf_'+ME,JSON.stringify(a));}document.getElementById('cfName').value='';document.getElementById('cfPhone').value='';alert('✅ Saved!');loadCF();loadCFMini();}
-async function loadCF(){let listEl=document.getElementById('cfList');try{let {data}=await supa.from('close_friends').select('*').eq('owner',ME);if(data&&data.length){listEl.innerHTML=data.map(c=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #333"><div>💚 ${c.friend}<br><small>${c.phone}</small></div><span onclick="removeCF('${c.id}')" style="color:#ff4444;cursor:pointer">Del</span></div>`).join('');return;}}catch(e){}let local=JSON.parse(localStorage.getItem('pixoro_cf_'+ME)||'[]');listEl.innerHTML=local.length?local.map((c,i)=>`<div style="padding:10px 0;border-bottom:1px solid #333">💚 ${c.friend} - ${c.phone} <span onclick="let a=JSON.parse(localStorage.getItem('pixoro_cf_${ME}')||'[]');a.splice(${i},1);localStorage.setItem('pixoro_cf_${ME}',JSON.stringify(a));loadCF()" style="color:#f44;float:right;cursor:pointer">Del</span></div>`).join(''):'<p style="text-align:center;padding:20px;color:#777">No trusted!</p>';}
-async function loadCFMini(){let el=document.getElementById('cfListMini');try{let {data}=await supa.from('close_friends').select('*').eq('owner',ME);if(data&&data.length){el.innerHTML=data.map(c=>`💚 ${c.friend} - ${c.phone}`).join('<br>');return;}}catch(e){}let local=JSON.parse(localStorage.getItem('pixoro_cf_'+ME)||'[]');el.innerHTML=local.length?local.map(c=>`💚 ${c.friend} - ${c.phone}`).join('<br>'):'No trusted! Add pannu da!';}
-async function removeCF(id){if(!confirm('Delete?'))return;try{await supa.from('close_friends').delete().eq('id',id);}catch(e){}loadCF();loadCFMini();}
-
-// FIXED LOAD PROFILE - LIST WORK AAGUM DA!
 async function loadProfile(){
-  let urlParam=new URLSearchParams(location.search).get('u');
-  let target = urlParam || ME;
-  document.getElementById('displayName').textContent=target;
-  document.getElementById('usernameTag').textContent=target.toLowerCase()+'_official';
-  document.getElementById('editName').value=localStorage.getItem('pixoro_name_'+ME)||ME;
-  document.getElementById('pfpImg').src=localStorage.getItem('pixoro_gilli_pfp_'+ME)||`https://i.pravatar.cc/150?u=${target}`;
-  document.getElementById('editPfpPreview').src=document.getElementById('pfpImg').src;
-  let savedBio=localStorage.getItem('pixoro_bio_'+ME);
-  if(savedBio) document.getElementById('bioText').innerHTML=savedBio.replace(/\n/g,'<br>');
+  let target=new URLSearchParams(location.search).get('u')||ME
+  document.getElementById('displayName').textContent=target
+  document.getElementById('usernameTag').textContent=target.toLowerCase()+'_official'
+  document.getElementById('pfpImg').src=localStorage.getItem('pixoro_gilli_pfp_'+target)||`https://i.pravatar.cc/150?u=${target}`
+  document.getElementById('sPfp').src=document.getElementById('pfpImg').src
+  document.getElementById('sName').textContent=target
+  document.getElementById('bioText').innerText=localStorage.getItem('pixoro_bio_'+ME)||'🔥 Tiruchengode ➡️ World\n👨‍💻 Pixoro Founder'
 
-  // POSTS - 100% WORK
+  // REAL POSTS ONLY - NO FAKE
   try{
-    let {data:posts, error}=await supa.from('posts').select('*').eq('username',target).order('created_at',{ascending:false});
-    if(error) throw error;
-    myPosts=posts||[];
-  }catch(e){
-    console.log('Supa fail:',e.message);
-    myPosts=JSON.parse(localStorage.getItem('pixoro_local_posts_'+target)||'[]');
-    if(!myPosts.length && target===ME){
-      myPosts=[
-        {image_url:'https://picsum.photos/400/400?random=1'},
-        {image_url:'https://picsum.photos/400/400?random=2'},
-        {image_url:'https://picsum.photos/400/400?random=3'},
-        {image_url:'https://picsum.photos/400/400?random=4'},
-        {image_url:'https://picsum.photos/400/400?random=5'},
-        {image_url:'https://picsum.photos/400/400?random=6'}
-      ];
-    }
-  }
+    let {data, error}=await supa.from('posts').select('*').eq('username',target).order('created_at',{ascending:false})
+    if(error) throw error
+    myPosts=data||[]
+  }catch(e){ myPosts=[] }
+  document.getElementById('postCount').textContent=myPosts.length
+  document.getElementById('myGrid').innerHTML=myPosts.length?myPosts.map(p=>`<img src="${p.image_url}" onclick="location.href='index.html'">`).join(''):`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet<br><span style="font-size:12px">Upload panna thaan varum da</span></div>`
 
-  // FOLLOWS
+  // REAL FOLLOWS ONLY - NO FAKE
   try{
-    let {data:follows}=await supa.from('follows').select('*');
-    allFollows=follows||[];
-    document.getElementById('followerCount').textContent=allFollows.filter(f=>f.following==target).length || Math.floor(Math.random()*500+100);
-    document.getElementById('followingCount').textContent=allFollows.filter(f=>f.follower==target).length || Math.floor(Math.random()*100+50);
-  }catch(e){
-    document.getElementById('followerCount').textContent='1.2K';
-    document.getElementById('followingCount').textContent='91';
-  }
+    let {data}=await supa.from('follows').select('*')
+    allFollows=data||[]
+  }catch(e){ allFollows=[] }
+  let followers=allFollows.filter(f=>f.following==target)
+  let following=allFollows.filter(f=>f.follower==target)
+  document.getElementById('followerCount').textContent=followers.length
+  document.getElementById('followingCount').textContent=following.length
 
-  document.getElementById('postCount').textContent=myPosts.length;
-  let grid=document.getElementById('myGrid');
-  if(myPosts.length){
-    grid.innerHTML=myPosts.map(p=>`<img src="${p.image_url}" onclick="location.href='index.html'">`).join('');
-  } else {
-    grid.innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#777">No posts da!<br><br><button onclick="location.href='upload.html'" style="background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ Create Post</button></div>`;
-  }
-
-  // SAVED
-  try{
-    let {data:saves}=await supa.from('saves').select('*').eq('username',ME);
-    if(saves&&saves.length){
-      let {data:allP}=await supa.from('posts').select('*');
-      let map={}; (allP||[]).forEach(p=>map[p.id]=p);
-      document.getElementById('savedGrid').innerHTML=saves.map(s=>`<img src="${map[s.post_id]?.image_url||'https://picsum.photos/200?random='+s.post_id}">`).join('')||'<div style="grid-column:1/4;text-align:center;padding:30px;color:#777">No saved 🔖</div>';
-    } else {
-      document.getElementById('savedGrid').innerHTML='<div style="grid-column:1/4;text-align:center;padding:30px;color:#777">No saved da 🔖</div>';
-    }
-  }catch(e){
-    document.getElementById('savedGrid').innerHTML='<div style="grid-column:1/4;text-align:center;padding:30px;color:#777">No saved da 🔖</div>';
-  }
-
-  checkGhost();loadCFMini();checkSecurity();
+  // REAL STORY RING ONLY
+  checkStoryRing(target)
+  loadRealHighlights()
 }
 
-function openEdit(){document.getElementById('editModal').style.display='flex';document.getElementById('editBio').value=localStorage.getItem('pixoro_bio_'+ME)||''}
-function closeEdit(){document.getElementById('editModal').style.display='none'}
-async function saveProfile(){let bio=document.getElementById('editBio').value;let name=document.getElementById('editName').value;localStorage.setItem('pixoro_bio_'+ME,bio);localStorage.setItem('pixoro_name_'+ME,name);document.getElementById('bioText').innerHTML=bio.replace(/\n/g,'<br>')||'Bio empty';document.getElementById('displayName').textContent=name||ME;try{await supa.from('profiles').upsert({username:ME,bio:bio,display_name:name});}catch(e){}closeEdit();alert('✅ Updated!');}
-function uploadPfp(input){if(input.files&&input.files[0]){let r=new FileReader();r.onload=e=>{let url=e.target.result;localStorage.setItem('pixoro_gilli_pfp_'+ME,url);document.getElementById('pfpImg').src=url;document.getElementById('editPfpPreview').src=url};r.readAsDataURL(input.files[0])}}
-function switchTab(t){
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-  document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');
-  if(t==='saved'){
-    document.getElementById('myGrid').style.display='none';document.getElementById('savedGrid').style.display='grid';
-  } else if(t==='reels'){
-    document.getElementById('myGrid').style.display='grid';document.getElementById('savedGrid').style.display='none';
-    let reels=myPosts.filter(p=>p.image_url && (p.image_url.includes('.mp4')||p.image_url.includes('video')));
-    if(reels.length) document.getElementById('myGrid').innerHTML=reels.map(p=>`<video src="${p.image_url}" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px" muted loop></video>`).join('');
-    else {
-      let reelFallback=myPosts.slice(0,3);
-      document.getElementById('myGrid').innerHTML=reelFallback.length?reelFallback.map(p=>`<img src="${p.image_url}" style="filter:brightness(0.8)"><div style="position:relative;top:-30px;left:10px;color:#fff;font-size:12px">🎬 Reel</div>`).join(''):'<div style="grid-column:1/4;text-align:center;padding:40px;color:#777">No reels da 🎬</div>';
-    }
-  } else {
-    document.getElementById('myGrid').style.display='grid';document.getElementById('savedGrid').style.display='none';
-    document.getElementById('myGrid').innerHTML=myPosts.map(p=>`<img src="${p.image_url}">`).join('')||'<div style="grid-column:1/4;text-align:center;padding:40px;color:#777">No posts</div>';
+async function checkStoryRing(target){
+  let ring=document.getElementById('pfpRing')
+  try{
+    let {data}=await supa.from('stories').select('*').eq('username',target).gt('expires_at',new Date().toISOString())
+    currentStories=data||[]
+    if(currentStories.length>0) ring.classList.add('hasStory')
+    else ring.classList.remove('hasStory')
+  }catch(e){ ring.classList.remove('hasStory') }
+}
+
+function openProfileStory(){
+  if(!currentStories.length){ if(ME==new URLSearchParams(location.search).get('u')||!new URLSearchParams(location.search).get('u')){ if(confirm('Story illa da! Add pannava?')) location.href='upload.html' } return }
+  document.getElementById('sImg').src=currentStories[0].image_url||currentStories[0].image
+  document.getElementById('storyViewer').style.display='flex'
+  let fill=document.getElementById('sFill'); fill.style.width='0%'; let w=0
+  clearInterval(storyTimer)
+  storyTimer=setInterval(()=>{ w+=1; fill.style.width=w+'%'; if(w>=100) closeStory() },40)
+}
+function closeStory(){ document.getElementById('storyViewer').style.display='none'; clearInterval(storyTimer) }
+
+// REAL FOLLOW LIST - FAKE ILLA DA
+function openFollowList(type){
+  let target=new URLSearchParams(location.search).get('u')||ME
+  let modal=document.getElementById('followModal')
+  let title=document.getElementById('followTitle')
+  let list=document.getElementById('followList')
+  modal.style.display='flex'
+
+  if(type==='posts'){ title.textContent='Posts'; list.innerHTML=`<div style="padding:20px;text-align:center;color:#777">${myPosts.length} posts<br><span style="font-size:11px">Real posts mattum</span></div>`; return }
+
+  let users= type==='followers'? allFollows.filter(f=>f.following==target).map(f=>f.follower) : allFollows.filter(f=>f.follower==target).map(f=>f.following)
+  title.textContent= type==='followers'? 'Followers' : 'Following'
+
+  if(!users.length){
+    list.innerHTML=`<div style="text-align:center;padding:60px 20px;color:#666"><div style="font-size:40px">👤</div><b style="color:#fff">No ${type} yet</b><p style="font-size:12px;margin-top:8px">Yaarum ${type==='followers'?'follow pannala':'follow pannala'} da<br>Real follow panna thaan varum da</p></div>`
+    return
+  }
+
+  list.innerHTML=users.map(u=>{
+    let isFollow=allFollows.some(f=>f.follower==ME&&f.following==u)
+    return `<div class="followRow"><div style="display:flex;align-items:center;gap:10px"><img src="https://i.pravatar.cc/100?u=${u}" style="width:44px;height:44px;border-radius:50%"><div><b>@${u}</b><div style="font-size:11px;color:#666">Real user • Tiruppur</div></div></div><button class="fBtn ${isFollow?'following':''}" onclick="toggleFollow('${u}',this)">${isFollow?'Following':'Follow'}</button></div>`
+  }).join('')
+}
+function closeFollow(){ document.getElementById('followModal').style.display='none' }
+async function toggleFollow(u,btn){
+  let isFollow=allFollows.some(f=>f.follower==ME&&f.following==u)
+  try{
+    if(isFollow){ await supa.from('follows').delete().eq('follower',ME).eq('following',u); allFollows=allFollows.filter(f=>!(f.follower==ME&&f.following==u)); btn.textContent='Follow'; btn.classList.remove('following') }
+    else { await supa.from('follows').insert({follower:ME,following:u}); allFollows.push({follower:ME,following:u}); btn.textContent='Following'; btn.classList.add('following') }
+  }catch(e){ alert('Supabase follows table check pannu da!') }
+  loadProfile()
+}
+
+// REAL HIGHLIGHTS - NAMA PUDICHU KURRA MARI
+function loadRealHighlights(){
+  let container=document.getElementById('highlightList')
+  let saved=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]')
+  // Default empty - real mattum, fake illa
+  let html=saved.map((h,i)=>`<div class="h-item" onclick="openHighlight(${i})"><div class="h-circle">${h.emoji}</div><div class="h-text">${h.title}</div></div>`).join('')
+  // + button - nama pudichu add pannalam
+  html+=`<div class="h-item" onclick="addHighlight()"><div class="h-circle" style="border:2px dashed #555">➕</div><div class="h-text">New</div></div>`
+  container.innerHTML=html
+}
+function addHighlight(){
+  let emoji=prompt('Emoji podu da (ex: 🔥):')
+  if(!emoji) return
+  let title=prompt('Title podu da (ex: My Work):')
+  if(!title) return
+  let saved=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]')
+  saved.push({emoji,title,images:[]})
+  localStorage.setItem('pixoro_highlights_'+ME,JSON.stringify(saved))
+  loadRealHighlights()
+}
+function openHighlight(i){
+  let saved=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]')
+  let h=saved[i]
+  if(!h) return
+  if(confirm(`Delete "${h.title}" highlight?`)){
+    if(confirm('Nijama delete pannava?')){ saved.splice(i,1); localStorage.setItem('pixoro_highlights_'+ME,JSON.stringify(saved)); loadRealHighlights() }
   }
 }
-function shareProfile(){if(navigator.share)navigator.share({title:'Pixoro - '+ME,url:location.href});else prompt('Copy:',location.href)}
-function openSettings(){document.getElementById('settingsModal').style.display='flex';document.getElementById('sosToggle').checked=localStorage.getItem('pixoro_sos_on')==='true';loadCFMini();checkSecurity();}
-function closeSettings(){document.getElementById('settingsModal').style.display='none'}
-function logout(){if(confirm('Logout?')){localStorage.clear();location.href='index.html'}}
-function toggleGhost(){let g=localStorage.getItem('ghostMode')==='true';if(g)localStorage.removeItem('ghostMode');else localStorage.setItem('ghostMode','true');checkGhost()}
-function checkGhost(){let g=localStorage.getItem('ghostMode')==='true';let btn=document.getElementById('ghostToggleBtn');let badge=document.getElementById('ghostBadge');let status=document.getElementById('ghostStatus');if(g){btn.innerText='👻 Ghost ON';btn.classList.add('ghostOn');badge.style.display='inline-block';if(status)status.innerText='ON 👻';}else{btn.innerText='👁️ Ghost OFF';btn.classList.remove('ghostOn');badge.style.display='none';if(status)status.innerText='OFF';}}
-function checkSecurity(){let tfa=document.getElementById('tfaStatus');if(tfa)tfa.innerText=localStorage.getItem('2fa_on')==='true'?'ON ✅':'OFF ›';let la=document.getElementById('loginAlertStatus');if(la)la.innerText=localStorage.getItem('login_alert')!=='false'?'ON ✅':'OFF ›';let ds=document.getElementById('deviceStatus');if(ds)ds.innerText=localStorage.getItem('device_lock')==='true'?'ON ✅':'OFF ›';}
-function toggle2FA(){let on=localStorage.getItem('2fa_on')==='true';localStorage.setItem('2fa_on',!on);alert(!on?'✅ 2FA ON':'❌ OFF');checkSecurity();}
-function toggleLoginAlert(){let on=localStorage.getItem('login_alert')!=='false';localStorage.setItem('login_alert',!on);alert(!on?'✅ ON':'❌ OFF');checkSecurity();}
-function toggleDeviceLock(){let on=localStorage.getItem('device_lock')==='true';localStorage.setItem('device_lock',!on);alert(!on?'✅ Device lock ON':'❌ OFF');checkSecurity();}
+function openEdit(){ let b=prompt('Bio podu da:'); if(b){ localStorage.setItem('pixoro_bio_'+ME,b); document.getElementById('bioText').innerText=b } }
+function shareProfile(){ navigator.clipboard.writeText(location.href); alert('Link copied da!') }
 
 loadProfile()
 </script></body></html>
