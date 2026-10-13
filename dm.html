@@ -1,127 +1,44 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro DM</title>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>DM</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-body{background:#000;color:#fff;max-width:450px;margin:0 auto;min-height:100vh}
-.top{display:flex;justify-content:space-between;align-items:center;padding:14px}
-.tabs{display:flex;gap:8px;padding:8px 14px}
-.tab{padding:6px 14px;border-radius:18px;background:#222;color:#999;font-size:13px;cursor:pointer}
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:80px}
+.top{padding:14px 15px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#000;z-index:50;border-bottom:1px solid #1e1e1e}
+.search{margin:10px 12px;background:#1a1a1a;border-radius:12px;padding:10px 14px;color:#888;display:flex;gap:8px}
+.notes{display:flex;gap:14px;overflow-x:auto;padding:10px 12px;scrollbar-width:none;border-bottom:1px solid #111}
+.notes::-webkit-scrollbar{display:none}
+.nItem{flex:0 0 72px;text-align:center}
+.nRing{width:68px;height:68px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#FF6A00,#FF0A33,#FFD600);position:relative}
+.nRingInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2.5px}.nRingInner img{width:100%;height:100%;border-radius:50%}
+.noteBubble{position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:#2a2a2a;color:#fff;font-size:10px;padding:4px 8px;border-radius:12px;white-space:nowrap;border:1px solid #333}
+.tabs{display:flex;gap:8px;padding:10px 12px}
+.tab{padding:6px 14px;border-radius:18px;background:#222;color:#999;font-size:13px}
 .tab.active{background:#fff;color:#000;font-weight:700}
-.noteRow{display:flex;gap:12px;overflow-x:auto;padding:10px 14px;scrollbar-width:none}
-.note{flex:0 0 auto;text-align:center;width:62px}
-.note img{width:62px;height:62px;border-radius:50%;border:2px solid #333;object-fit:cover}
-.note b{font-size:11px;display:block;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chatRow{display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer}
-.chatRow:active{background:#111}
-.chatRow img{width:52px;height:52px;border-radius:50%;object-fit:cover}
-.last{color:#999;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
-.dot{width:8px;height:8px;background:#0095f6;border-radius:50%;margin-left:auto}
+.chatRow{display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid #111;cursor:pointer}
+.chatRow img{width:52px;height:52px;border-radius:50%}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:12px 0 20px;z-index:100}
 </style>
 </head><body>
-<div class="top"><b style="font-size:20px">Pixoro</b><div style="display:flex;gap:16px;font-size:20px">✏️</div></div>
-
-<div class="noteRow" id="notes">
-  <div class="note"><img src="https://i.pravatar.cc/100?u=you"><b>Your note</b></div>
+<div class="top"><b style="font-size:20px">comedy_gi... ▾</b><div style="display:flex;gap:16px;font-size:20px"><span>☰</span><span onclick="newChat()">✏️</span></div></div>
+<div class="search">🔍 Search or ask Meta AI</div>
+<div class="notes" id="notes"></div>
+<div class="tabs"><div class="tab active">All 3</div><div class="tab">Primary 3</div><div class="tab">General</div><div class="tab">Requests</div></div>
+<div id="list" style="text-align:center;color:#555;padding:30px">Loading real chats da...</div>
+<div class="bottom">
+  <span onclick="location.href='index.html'">🏠</span><span onclick="location.href='search.html'">🔍</span><span onclick="location.href='index.html'">➕</span><span onclick="location.href='reels.html'">🎬</span><span>👤</span>
 </div>
-
-<div class="tabs">
-  <div class="tab active" id="t-all" onclick="filterTab('all')">All</div>
-  <div class="tab" id="t-primary" onclick="filterTab('primary')">Primary</div>
-  <div class="tab" id="t-general" onclick="filterTab('general')">General</div>
-  <div class="tab" id="t-req" onclick="filterTab('requests')">Requests</div>
-</div>
-
-<div id="chatList"><div style="text-align:center;color:#555;padding:40px 20px">Loading real chats da...<br><small>Yaaru message pannalo anga varum da!</small></div></div>
-
 <script>
-const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-let ME = localStorage.getItem('pixoro_current_user')
-if(!ME){
-  ME = prompt('Un Pixoro name enna da? (ex: Giri)') || 'Giri'
-  localStorage.setItem('pixoro_current_user', ME)
+const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+let ME=localStorage.getItem('pixoro_current_user')||'Giri'
+function newChat(){let u=prompt('Yaaruku msg da?'); if(u) location.href=`chat.html?user=${u}`}
+async function load(){
+  let {data} = await supa.from('messages').select('*').or(`sender.eq.${ME},receiver.eq.${ME}`).order('created_at',{ascending:false}).limit(100)
+  let notesUsers = data? [...new Set(data.map(m=>m.sender===ME?m.receiver:m.sender))].slice(0,6) : []
+  document.getElementById('notes').innerHTML = `<div class="nItem"><div class="nRing" style="background:#222"><div class="nRingInner"><img src="https://i.pravatar.cc/100?u=${ME}"></div><div class="noteBubble">Your note<br><small style="color:#888">Location off</small></div></div></div>` + notesUsers.map(u=>`<div class="nItem" onclick="location.href='chat.html?user=${u}'"><div class="nRing"><div class="nRingInner"><img src="https://i.pravatar.cc/100?u=${u}"></div><div class="noteBubble">Hi da ${u} ❤️</div></div></div>`).join('') || '<div class="nItem"><div class="nRing"><div class="nRingInner"><img src="https://i.pravatar.cc/100?u=test"></div></div><div style="font-size:11px;margin-top:4px">No notes</div></div>'
+  if(!data||!data.length){document.getElementById('list').innerHTML=`<div style="padding:40px;color:#666">No chats da!<br><button onclick="newChat()" style="margin-top:12px;background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`;return}
+  let map={}; data.forEach(m=>{let o=m.sender===ME?m.receiver:m.sender; if(!map[o]||new Date(m.created_at)>new Date(map[o].created_at)) map[o]=m})
+  let chats=Object.values(map)
+  document.getElementById('list').innerHTML = chats.map(c=>{let o=c.sender===ME?c.receiver:c.sender; return `<div class="chatRow" onclick="location.href='chat.html?user=${o}'"><img src="https://i.pravatar.cc/100?u=${o}"><div style="flex:1;text-align:left"><b style="font-size:14px">${o} 🎀</b><div style="font-size:12px;color:#999">${c.sender===ME?'Sent':'4+ new messages'} • ${new Date(c.created_at).toLocaleTimeString()}</div></div><div style="font-size:18px">📷</div></div>`}).join('')
 }
-let allChats = []
-let currentTab = 'all'
-
-function getAvatar(name){ return `https://i.pravatar.cc/100?u=${name}` }
-
-async function loadRealChats(){
-  // Real chats - last message per chat_id where ME involved
-  let {data, error} = await supa.from('messages').select('*').or(`sender.eq.${ME},receiver.eq.${ME}`).order('created_at',{ascending:false}).limit(100)
-  if(error){document.getElementById('chatList').innerHTML = 'Error: '+error.message; return}
-  if(!data ||!data.length){
-    document.getElementById('chatList').innerHTML = `<div style="text-align:center;color:#666;padding:50px 20px">Innum yaarum message pannala da!<br><small style="color:#444">Friend kitta sollu da:<br><b style="color:#fff">pixoro.vercel.app/chat.html?user=${ME}</b><br>nu link anuppa<br>Avanga message panna inga varum da!</small><br><br><button onclick="copyLink()" style="background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">Copy My Link</button></div>`
-    return
-  }
-  // Group by other user
-  let map = {}
-  data.forEach(m=>{
-    let other = m.sender===ME? m.receiver : m.sender
-    if(!map[other] || new Date(m.created_at) > new Date(map[other].created_at)){
-      map[other] = m
-    }
-  })
-  allChats = Object.values(map).map(m=>{
-    let other = m.sender===ME? m.receiver : m.sender
-    return {...m, other, unread: data.filter(x=>x.receiver===ME && x.sender===other &&!x.seen).length}
-  }).sort((a,b)=> new Date(b.created_at)-new Date(a.created_at))
-
-  renderChats()
-  renderNotes()
-}
-
-function renderNotes(){
-  let users = [...new Set(allChats.map(c=>c.other))].slice(0,8)
-  let html = `<div class="note"><img src="${getAvatar(ME)}"><b>Your note</b></div>`
-  users.forEach(u=>{
-    html += `<div class="note" onclick="openChat('${u}')"><img src="${getAvatar(u)}"><b>${u}</b></div>`
-  })
-  document.getElementById('notes').innerHTML = html
-}
-
-function renderChats(){
-  let list = allChats
-  if(currentTab==='primary') list = allChats.filter((_,i)=>i%2===0)
-  if(currentTab==='general') list = allChats.filter((_,i)=>i%2!==0)
-  if(currentTab==='requests') list = []
-
-  if(!list.length){
-    document.getElementById('chatList').innerHTML = `<div style="text-align:center;color:#666;padding:30px">No chats in ${currentTab} da</div>`
-    return
-  }
-  document.getElementById('chatList').innerHTML = list.map(c=>{
-    let time = new Date(c.created_at)
-    let diff = Math.floor((Date.now()-time)/3600000)
-    let timeText = diff<1? 'now' : diff<24? diff+'h' : diff/24+'d'
-    let preview = c.sender===ME? `You: ${c.text}` : c.text
-    return `<div class="chatRow" onclick="openChat('${c.other}')">
-      <img src="${getAvatar(c.other)}">
-      <div style="flex:1"><div style="font-weight:500;font-size:14.5px">${c.other} ${c.unread? '🔥':''}</div><div class="last">${preview} · ${timeText}</div></div>
-      ${c.unread? `<div style="background:#0095f6;color:#fff;font-size:11px;padding:2px 6px;border-radius:10px">${c.unread}</div>` : `<div class="dot" style="background:${Math.random()>0.5?'#00ff00':'transparent'}"></div>`}
-    </div>`
-  }).join('')
-}
-
-function filterTab(t){
-  currentTab=t
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'))
-  document.getElementById('t-'+t).classList.add('active')
-  renderChats()
-}
-
-function openChat(user){
-  location.href = `chat.html?user=${encodeURIComponent(user)}`
-}
-function copyLink(){
-  let link = `${location.origin}/chat.html?user=${ME}`
-  navigator.clipboard.writeText(link)
-  alert('Link copied da! Friend ku anuppu da: '+link)
-}
-
-// REALTIME - Puthu message vantha udane list update aayidum da!
-supa.channel('dm-'+ME).on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:`receiver=eq.${ME}`},()=>loadRealChats()).subscribe()
-supa.channel('dm2-'+ME).on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:`sender=eq.${ME}`},()=>loadRealChats()).subscribe()
-
-loadRealChats()
+load()
 </script>
 </body></html>
