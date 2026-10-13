@@ -1,14 +1,11 @@
-import { supabase } from './supabase.js'
+-- profiles table la add pannu da
+ALTER TABLE profiles ADD COLUMN is_private_account BOOLEAN DEFAULT false;
 
-export async function getFeed(){
-  const { data, error } = await supabase.from('posts').select('*').order('created_at', {ascending:false})
-  if(error) console.log(error)
-  return data || []
-}
-
-export async function createPost(username, img, cap){
-  const isGiri = username.toLowerCase() === 'giri' || username.toLowerCase() === 'pixoro'
-  const { data, error } = await supabase.from('posts').insert({ username, img, cap, verified: isGiri }).select()
-  if(error) alert(error.message)
-  return data
-}
+-- follow_requests table
+CREATE TABLE follow_requests (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  from_id UUID REFERENCES profiles(id),
+  to_id UUID REFERENCES profiles(id),
+  status TEXT DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT NOW()
+);
