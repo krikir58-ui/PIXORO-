@@ -1,25 +1,26 @@
-import { getUser } from './auth.js';
+// reels.js - Reels visibility
+export async function uploadReel(userId, videoUrl, isPrivateShare, sharedWithIds) {
+  await supabase.from('reels').insert({
+    user_id: userId,
+    video_url: videoUrl,
+    visibility: isPrivateShare ? 'private_share' : 'public', // Instagram maari public da
+    shared_with: isPrivateShare ? sharedWithIds : null
+  })
+}
 
-export function loadReels(){
-  // 3 sec ku mela paatha than view count erum
-  let observer=new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        let img=entry.target;
-        let key=img.src;
-        setTimeout(()=>{
-          let views=JSON.parse(localStorage.getItem('pixoro_view_'+key)||'[]');
-          let u=getUser();
-          let last=views.find(v=>v.user===u);
-          if(last && (Date.now()-last.time < 3600000)) return;
-          views.push({user:u, time:Date.now()});
-          localStorage.setItem('pixoro_view_'+key, JSON.stringify(views));
-        }, 3000);
-      }
-    });
-  }, {threshold:0.7});
-  
-  setTimeout(()=>{
-    document.querySelectorAll('.post-img').forEach(img=>observer.observe(img));
-  }, 1000);
+// feed.js - Feed la enna kaamikkanum
+export async function getFeed(currentUserId) {
+  // Public IDs oda reels + Naan follow panra Private IDs oda reels mattum da
+  const { data: following } = await supabase
+    .from('follows').select('following_id').eq('follower_id', currentUserId)
+
+  const followingIds = following.map(f => f.following_id)
+
+  const { data: reels } = await supabase
+    .from('reels')
+    .select('*, profiles!inner(is_private_account)')
+    .or(`profiles.is_private_account.eq.false,user_id.in.(${followingIds})`)
+    .eq('visibility', 'public') // Private Share reels feed la varathu da - DM la mattum
+
+  return reels
 }
