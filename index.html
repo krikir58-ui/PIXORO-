@@ -4,44 +4,52 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:80px}
 .top{padding:14px 15px;display:flex;justify-content:space-between;align-items:center;background:#000;position:sticky;top:0;z-index:50;border-bottom:1px solid #1e1e1e}
+.topPlus{width:34px;height:34px;background:#fff;color:#000;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;cursor:pointer}
 .post{background:#101010;border:1px solid #222;border-radius:20px;margin:12px 10px 18px;overflow:hidden;padding-bottom:12px}.postTop{padding:12px;display:flex;align-items:center;justify-content:space-between}
 .post img.main{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
 .actions{padding:12px 14px;display:flex;justify-content:space-between;align-items:center}.actions .left{display:flex;gap:22px;align-items:center}
-.act{width:30px;height:30px;cursor:pointer;background:none;border:0;display:flex;align-items:center;justify-content:center}.act svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:2.2;transition:.2s}
+.act{width:30px;height:30px;cursor:pointer;background:none;border:0;display:flex;align-items:center;justify-content:center}.act svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:2.2}
 .act.liked svg{fill:#FF0A33;stroke:#FF0A33}
-.act.saved svg{fill:#fff;stroke:#fff}
-/* 1ST PHOTO MARI NAV - MARAVE MARATHU DA */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:62px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;z-index:100;padding:0 10px;padding-bottom:env(safe-area-inset-bottom);transform:translateZ(0)}
 .bottom-nav a{width:40px;height:40px;display:flex;align-items:center;justify-content:center;text-decoration:none}
 .bottom-nav a svg{width:26px;height:26px;fill:none;stroke:#777;stroke-width:1.8}
 .bottom-nav a.active svg{fill:#fff;stroke:#fff}
-.bottom-nav .plus-btn{background:#fff;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#000;font-size:26px;font-weight:900;cursor:pointer}
 .bottom-nav .profile-ring{width:30px;height:30px;border-radius:50%;border:2px solid #fff;overflow:hidden}
 .bottom-nav .profile-ring img{width:100%;height:100%;object-fit:cover}
 .pfpRing{width:38px;height:38px;border-radius:50%;background:#fff;padding:2px}.pfpInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2px}.pfpInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .storyBar{display:flex;gap:16px;padding:14px 12px;overflow-x:auto;background:#000;border-bottom:1px solid #1a1a1a}.storyBar::-webkit-scrollbar{display:none}
 .sItem{text-align:center;min-width:72px;cursor:pointer}
-.sRing{width:68px;height:68px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#FF6A00,#FF0A33,#FFD600,#FF8A00);box-shadow:0 0 14px rgba(255,106,0,0.7)}
-.sRing.seen{background:#333!important;box-shadow:none}
+.sRing{width:68px;height:68px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#FF6A00,#FF0A33,#FFD600,#FF8A00)}
+.sRing.seen{background:#333!important}
 .sRingInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2.5px}.sRingInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .sAdd{width:68px;height:68px;border-radius:50%;background:#101010;border:2px dashed #fff;display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff}
 .sName{font-size:13px;margin-top:6px;color:#fff;font-weight:700}
-@keyframes heartPop{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(1.3);opacity:1}100%{transform:translate(-50%,-50%) scale(0);opacity:0}}
 #feed{padding-bottom:20px}
-#sosFloat{position:fixed;bottom:80px;right:16px;width:62px;height:62px;background:#FF0A33;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:28px;z-index:999;cursor:pointer;border:3px solid #fff}
-#sosFloat.show{display:flex}
 </style></head><body>
-<div class="top"><b style="font-size:26px;font-weight:900">Pixoro</b><div style="display:flex;gap:18px;font-size:22px"><span onclick="location.href='dm.html'" style="cursor:pointer">✈️</span><span onclick="location.href='notifications.html'" style="cursor:pointer">🔔</span></div></div>
+
+<!-- TOP - + & BELL BLACK WHITE - EMOJI ILLA DA -->
+<div class="top">
+  <b style="font-size:26px;font-weight:900">Pixoro</b>
+  <div style="display:flex;gap:14px;align-items:center">
+    <div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div>
+    <a href="notifications.html" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 8a6 6 0 0 1 12 0c0 7 6 9 6 9H0s6-2 6-9"></path>
+        <path d="M10 21a2 2 0 0 0 4 0"></path>
+      </svg>
+    </a>
+  </div>
+</div>
+
 <div class="storyBar" id="storyBar"></div>
 <div id="feed"><p style="text-align:center;padding:60px;color:#666">Loading...</p></div>
-<div id="sosFloat" onclick="triggerSOS()">🆘</div>
 
-<!-- 1ST PHOTO MARI BOTTOM NAV - MARATHU DA -->
+<!-- BOTTOM - DM KILLA - MSG STYLE PREMIUM - + ILLA DA -->
 <div class="bottom-nav">
   <a class="active" href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z" fill="#fff" stroke="#fff"/></svg></a>
   <a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></a>
-  <a href="upload.html"><div class="plus-btn">+</div></a>
   <a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="#fff"/></svg></a>
+  <a href="dm.html"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></a>
   <a href="profile.html"><div class="profile-ring"><img src="https://i.pravatar.cc/100?u=Giri" id="navPfp"></div></a>
 </div>
 
@@ -51,7 +59,9 @@
 <div onclick="location.href='story-add.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:32px">⭕</div><div style="margin-top:6px;font-weight:700">Story</div></div>
 <div onclick="location.href='live.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:32px">🔴</div><div style="margin-top:6px;font-weight:700">Live</div></div>
 </div><div onclick="document.getElementById('createSheet').style.display='none'" style="margin-top:16px;text-align:center;background:#000;padding:12px;border-radius:12px;color:#888;border:1px solid #333">Cancel</div></div></div>
-<div id="commentModal" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #333"><b>Comments</b><span onclick="closeComment()" style="cursor:pointer;font-size:22px">✕</span></div><div id="commentList" style="flex:1;overflow-y:auto;padding:12px;min-height:200px"></div><div style="padding:10px;border-top:1px solid #333;display:flex;gap:10px"><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#000;border:1px solid #333;padding:12px 14px;border-radius:20px;color:#fff" onkeydown="if(event.key==='Enter')addComment()"><button onclick="addComment()" style="background:#fff;border:0;color:#000;font-weight:900;padding:10px 16px;border-radius:20px">Post</button></div></div></div>
+
+<div id="commentModal" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #333"><b>Comments</b><span onclick="closeComment()" style="font-size:22px">✕</span></div><div id="commentList" style="flex:1;overflow-y:auto;padding:12px"></div><div style="padding:10px;border-top:1px solid #333;display:flex;gap:10px"><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#000;border:1px solid #333;padding:12px 14px;border-radius:20px;color:#fff"><button onclick="addComment()" style="background:#fff;border:0;color:#000;font-weight:900;padding:10px 16px;border-radius:20px">Post</button></div></div></div>
+
 <script>
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME=localStorage.getItem('pixoro_current_user')||'Giri'
@@ -66,7 +76,7 @@ async function loadAll(){
     allPosts=posts||[];allLikes=likes||[];allSaves=saves||[];allStories=stories||[];
   }catch(e){ allPosts=[] }
   let pfp=localStorage.getItem('pixoro_gilli_pfp_'+ME)||`https://i.pravatar.cc/150?u=${ME}`; let nav=document.getElementById('navPfp'); if(nav) nav.src=pfp
-  renderStories();renderFeed();checkSOS();
+  renderStories();renderFeed();
 }
 function renderStories(){
   let bar=document.getElementById('storyBar');
@@ -75,19 +85,16 @@ function renderStories(){
   let html='';
   if(myStory){ html+=`<div class="sItem" onclick="location.href='story-view.html?user=${ME}'"><div class="sRing"><div class="sRingInner"><img src="${myStory.image_url}"></div></div><div class="sName">Your Story</div></div>`; }
   else { html+=`<div class="sItem" onclick="location.href='story-add.html'"><div class="sAdd">+</div><div class="sName">Your Story</div></div>`; }
-  html+=otherUsers.map(u=>{let s=allStories.find(x=>x.username===u);let viewed=localStorage.getItem('pixoro_viewed_'+u)==='true';return `<div class="sItem" onclick="localStorage.setItem('pixoro_viewed_${u}','true');location.href='story-view.html?user=${u}'"><div class="sRing ${viewed?'seen':''}"><div class="sRingInner"><img src="${s.image_url||'https://i.pravatar.cc/100?u='+u}"></div></div><div class="sName">${u}</div></div>`}).join('');
-  bar.innerHTML=html||`<div class="sItem" onclick="location.href='story-add.html'"><div class="sAdd">+</div><div class="sName">Your Story</div></div>`;
+  html+=otherUsers.map(u=>{let s=allStories.find(x=>x.username===u);return `<div class="sItem" onclick="location.href='story-view.html?user=${u}'"><div class="sRing"><div class="sRingInner"><img src="${s.image_url||'https://i.pravatar.cc/100?u='+u}"></div></div><div class="sName">${u}</div></div>`}).join('');
+  bar.innerHTML=html;
 }
-function heartAnim(id){let h=document.getElementById('heart-'+id);if(!h)return;h.style.animation='none';h.offsetHeight;h.style.animation='heartPop .9s forwards'}
-function renderFeed(){let html='';for(let p of allPosts){let lCount=allLikes.filter(l=>l.post_id==p.id).length;let isLiked=allLikes.some(l=>l.post_id==p.id&&l.username==ME);let isSaved=allSaves.some(s=>s.post_id==p.id);html+=`<div class="post"><div class="postTop"><div style="display:flex;align-items:center;gap:10px">${pfpHtml(p.username)}<b>@${p.username}</b></div><span>⋮</span></div><div style="position:relative" ondblclick="heartAnim(${p.id});likePost(${p.id})"><img class="main" src="${p.image_url}"><div id="heart-${p.id}" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:90px;opacity:0;pointer-events:none">❤️</div></div><div class="actions"><div class="left"><button class="act ${isLiked?'liked':''}" onclick="likePost(${p.id})"><svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg></button><button class="act" onclick="openComment(${p.id})"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button><button class="act" onclick="sharePost(${p.id})"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div><button class="act ${isSaved?'saved':''}" onclick="savePost(${p.id})"><svg viewBox="0 0 24 24"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></button></div><div style="padding:0 14px"><b>${lCount} likes</b><br><b>@${p.username}</b> ${p.caption||''}</div></div>`}document.getElementById('feed').innerHTML=html||'<p style="text-align:center;padding:60px;color:#666">No posts</p>'}
-async function likePost(id){let liked=allLikes.some(l=>l.post_id==id&&l.username==ME);if(liked)await supa.from('likes').delete().eq('post_id',id).eq('username',ME);else{await supa.from('likes').insert({post_id:id,username:ME});heartAnim(id);}let {data}=await supa.from('likes').select('*');allLikes=data||[];renderFeed()}
+function renderFeed(){let html='';for(let p of allPosts){let lCount=allLikes.filter(l=>l.post_id==p.id).length;let isLiked=allLikes.some(l=>l.post_id==p.id&&l.username==ME);let isSaved=allSaves.some(s=>s.post_id==p.id);html+=`<div class="post"><div class="postTop"><div style="display:flex;align-items:center;gap:10px">${pfpHtml(p.username)}<b>@${p.username}</b></div><span>⋮</span></div><img class="main" src="${p.image_url}"><div class="actions"><div class="left"><button class="act ${isLiked?'liked':''}" onclick="likePost(${p.id})"><svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg></button><button class="act" onclick="openComment(${p.id})"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button><button class="act" onclick="sharePost(${p.id})"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div><button class="act ${isSaved?'saved':''}" onclick="savePost(${p.id})"><svg viewBox="0 0 24 24"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></button></div><div style="padding:0 14px"><b>${lCount} likes</b><br><b>@${p.username}</b> ${p.caption||''}</div></div>`}document.getElementById('feed').innerHTML=html||'<p style="text-align:center;padding:60px;color:#666">No posts</p>'}
+async function likePost(id){let liked=allLikes.some(l=>l.post_id==id&&l.username==ME);if(liked)await supa.from('likes').delete().eq('post_id',id).eq('username',ME);else await supa.from('likes').insert({post_id:id,username:ME});let {data}=await supa.from('likes').select('*');allLikes=data||[];renderFeed()}
 async function savePost(id){let saved=allSaves.some(s=>s.post_id==id);if(saved)await supa.from('saves').delete().eq('post_id',id).eq('username',ME);else await supa.from('saves').insert({post_id:id,username:ME});let {data}=await supa.from('saves').select('*').eq('username',ME);allSaves=data||[];renderFeed()}
-function sharePost(id){let p=allPosts.find(x=>x.id==id);if(navigator.share){navigator.share({title:'Pixoro @'+p.username,text:p.caption||'',url:location.href});}else{prompt('Copy link:',location.origin+'/post.html?id='+id);}}
-async function openComment(id){currentPostId=id;document.getElementById('commentModal').style.display='flex';let list=document.getElementById('commentList');list.innerHTML='<p style="text-align:center;padding:20px;color:#777">Loading...</p>';let local=JSON.parse(localStorage.getItem('pixoro_comments_'+id)||'[]');let supaC=[];try{let {data}=await supa.from('comments').select('*').eq('post_id',id).order('created_at',{ascending:true});supaC=data||[];}catch(e){}let all=[...supaC,...local];list.innerHTML=all.length?all.map(c=>`<div style="padding:10px 0;border-bottom:1px solid #1e1e1e;display:flex;gap:8px"><img src="https://i.pravatar.cc/40?u=${c.username}" style="width:28px;height:28px;border-radius:50%"><div><b>@${c.username}</b> ${c.text}</div></div>`).join(''):'<p style="text-align:center;padding:30px;color:#666">No comments yet</p>';}
-function closeComment(){document.getElementById('commentModal').style.display='none';}
-async function addComment(){let t=document.getElementById('commentInput').value.trim();if(!t||!currentPostId)return;let k='pixoro_comments_'+currentPostId;let a=JSON.parse(localStorage.getItem(k)||'[]');a.push({post_id:currentPostId,username:ME,text:t,created_at:new Date().toISOString()});localStorage.setItem(k,JSON.stringify(a));try{await supa.from('comments').insert({post_id:currentPostId,username:ME,text:t});}catch(e){}document.getElementById('commentInput').value='';openComment(currentPostId);}
-function checkSOS(){let on=localStorage.getItem('pixoro_sos_on')==='true';let btn=document.getElementById('sosFloat');if(on) btn.classList.add('show'); else btn.classList.remove('show');}
-async function triggerSOS(){if(!confirm('🆘 SOS Anupava?')) return;navigator.geolocation.getCurrentPosition(async (pos)=>{let lat=pos.coords.latitude;let lng=pos.coords.longitude;let msg=`🚨 SOS! Location: https://maps.google.com/?q=${lat},${lng}`;window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);}, ()=>{ alert('Location on pannu da!'); });}
+function sharePost(id){prompt('Copy:',location.origin+'/post.html?id='+id)}
+async function openComment(id){currentPostId=id;document.getElementById('commentModal').style.display='flex';let list=document.getElementById('commentList');let {data}=await supa.from('comments').select('*').eq('post_id',id);list.innerHTML=(data||[]).map(c=>`<div style="padding:8px 0"><b>@${c.username}</b> ${c.text}</div>`).join('')||'No comments'}
+function closeComment(){document.getElementById('commentModal').style.display='none'}
+async function addComment(){let t=document.getElementById('commentInput').value.trim();if(!t||!currentPostId)return;await supa.from('comments').insert({post_id:currentPostId,username:ME,text:t});document.getElementById('commentInput').value='';openComment(currentPostId)}
 loadAll()
 </script>
 </body></html>
