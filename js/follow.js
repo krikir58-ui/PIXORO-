@@ -1,51 +1,43 @@
-// PIXORO FOLLOW SYSTEM - Instagram Style 🔵
-let allFollows = []
-let blockedUsers = []
+// follow.js - Public ID vs Private ID
+import { supabase } from './supabase.js'
 
-async function loadFollows(){
-  let {data} = await supa.from('follows').select('*')
-  allFollows = data || []
-  let {data:blocks} = await supa.from('blocks').select('*').eq('blocker', ME)
-  blockedUsers = (blocks||[]).map(b=>b.blocked)
-}
+// Follow pannumbothu check pannum
+export async function followUser(currentUserId, targetUserId) {
+  const { data: target } = await supabase
+    .from('profiles')
+    .select('is_private_account')
+    .eq('id', targetUserId).single()
 
-function getFollowersCount(username){
-  return allFollows.filter(f=>f.following==username && f.status!=='pending').length
-}
-
-function isFollowing(username){
-  return allFollows.some(f=>f.follower==ME && f.following==username)
-}
-
-function followBtnHtml(username){
-  if(username===ME) return `<span style="font-size:11px;color:#777;font-weight:600">YOU ✓</span>`
-  
-  // INTHA STYLE THAN NEENGA KETTA IMAGE MAARI DA - White Border!
-  let following = isFollowing(username)
-  if(following){
-    return `<button onclick="toggleFollow('${username}',this)" style="border:1.5px solid #fff;border-radius:20px;background:#fff;color:#000;padding:5px 16px;font-size:13px;font-weight:600;cursor:pointer">Following</button>`
+  if (target.is_private_account) {
+    // PRIVATE ID - Request anuppanum da
+    await supabase.from('follow_requests').insert({
+      from_id: currentUserId,
+      to_id: targetUserId,
+      status: 'pending'
+    })
+    return { status: 'requested' } // "Requested" button varum
   } else {
-    return `<button onclick="toggleFollow('${username}',this)" style="border:1.5px solid #fff;border-radius:20px;background:#000;color:#fff;padding:5px 18px;font-size:13px;font-weight:600;cursor:pointer">Follow</button>`
+    // PUBLIC ID - Direct follow da
+    await supabase.from('follows').insert({
+      follower_id: currentUserId,
+      following_id: targetUserId
+    })
+    return { status: 'following' }
   }
 }
 
-async function toggleFollow(username, btn){
-  if(btn) {
-    btn.textContent = '...'
-    btn.disabled = true
-  }
-  
-  let already = isFollowing(username)
-  if(already){
-    await supa.from('follows').delete().eq('follower',ME).eq('following',username)
+// Private ID request Accept/Decline da
+export async function handleFollowRequest(requestId, action) {
+  if (action === 'accept') {
+    const { data: req } = await supabase
+      .from('follow_requests').select('*').eq('id', requestId).single()
+    
+    await supabase.from('follows').insert({
+      follower_id: req.from_id,
+      following_id: req.to_id
+    })
+    await supabase.from('follow_requests').delete().eq('id', requestId)
   } else {
-    await supa.from('follows').insert({follower:ME, following:username, status:'accepted'})
+    await supabase.from('follow_requests').delete().eq('id', requestId)
   }
-  
-  await loadFollows()
-  if(window.renderFeed) renderFeed()
 }
-
-function openFollowModal(username, tab){ /* your existing modal code */ }
-function closeFollowModal(){ document.getElementById('followModal').style.display='none' }
-function switchFollowTab(t){ }
