@@ -1,37 +1,28 @@
-// Profile Photo + Real Blue Tick - Secure da!
-function chooseGilli(){ document.getElementById('gilliInput')?.click(); }
-
-async function requestBlueTick(){
-  let btn = document.getElementById('tickBtn');
-  let status = document.getElementById('tickStatus');
-  if(btn) btn.innerText = 'Checking...';
-  
-  const { data: { user } } = await supa.auth.getUser();
-  if(!user){ alert('Login pannu da!'); return; }
-
-  // Supabase la real ah verified ah nu check pannu da!
-  const { data: profile } = await supa.from('profiles').select('is_verified').eq('id', user.id).single();
-  
-  if(profile && profile.is_verified){
-    if(status) status.innerText = 'Verified ✔️💙';
-    if(document.getElementById('blueTick')) document.getElementById('blueTick').style.display = 'inline';
-    localStorage.setItem('pixoro_bluetick','verified');
-    alert('Blue Tick Already Verified da Giri! ✔️💙');
-  } else {
-    // Verified illa na - request page ku anuppu da
-    window.location.href = 'verify-request.html';
-  }
+// profile.js - Public/Private Account toggle
+export async function togglePrivateAccount(userId, isPrivate) {
+  await supabase.from('profiles').update({
+    is_private_account: isPrivate // true = Private ID, false = Public ID
+  }).eq('id', userId)
 }
 
-// Page load aagumbothu blue tick check pannu
-async function checkBlueTickOnLoad(){
-  const { data: { user } } = await supa.auth.getUser();
-  if(!user) return;
-  const { data: profile } = await supa.from('profiles').select('is_verified').eq('id', user.id).single();
-  if(profile && profile.is_verified){
-    let status = document.getElementById('tickStatus');
-    if(status) status.innerText = 'Verified ✔️💙';
-    if(document.getElementById('blueTick')) document.getElementById('blueTick').style.display = 'inline';
+export async function getProfile(viewerId, profileId) {
+  const { data: profile } = await supabase
+    .from('profiles').select('*').eq('id', profileId).single()
+
+  if (profile.is_private_account) {
+    // Private ID na - Follower ah nu check pannu da
+    const { data: isFollowing } = await supabase
+      .from('follows')
+      .select('*')
+      .eq('follower_id', viewerId)
+      .eq('following_id', profileId).single()
+
+    if (!isFollowing && viewerId !== profileId) {
+      return { ...profile, isLocked: true, reels: [] } // Lock screen kaatu da
+    }
   }
+  // Public ID or Follower na full data kaatu da
+  const { data: reels } = await supabase
+    .from('reels').select('*').eq('user_id', profileId)
+  return { ...profile, isLocked: false, reels }
 }
-checkBlueTickOnLoad();
