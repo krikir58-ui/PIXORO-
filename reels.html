@@ -24,7 +24,7 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;overf
 .adBadge{position:absolute;top:50px;left:12px;background:#ffcc00;color:#000;font-size:10px;font-weight:800;padding:3px 8px;border-radius:4px;z-index:15}
 </style></head><body>
 <div class="reelWrap" id="reelWrap"><p style="text-align:center;padding-top:50vh;color:#666">Loading Reels... 🎬</p></div>
-<div class="nav"><a href="index.html">🏠</a><a href="search.html">🔎</a><a class="active" href="reels.html">🎬</a><a href="profile.html">👤</a></div>
+<div class="nav"><a href="index.html">🏠</a><a href="search.html">🔎</a><a class="active" href="reels.html">🎬</a><a href="dm.html">💬</a><a href="profile.html">👤</a></div>
 
 <div id="cModal" style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:flex-end;justify-content:center">
 <div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:80vh;display:flex;flex-direction:column">
@@ -82,8 +82,7 @@ function render(){
     let liked=allLikes.some(l=>l.post_id==p.id&&l.username==ME)
     let saved=allSaves.some(s=>s.post_id==p.id)
     let isFollow=allFollows.some(f=>f.follower==ME&&f.following==p.username)
-    // QUALITY SAVE: preload metadata only, 720p playback
-    let media=p.image_url.includes('.mp4')?`<video src="${p.image_url}" preload="metadata" loop muted playsinline poster="${p.image_url}#t=0.1"></video>`:`<img src="${p.image_url}" loading="lazy">`
+    let media=p.image_url.includes('.mp4')?`<video src="${p.image_url}" preload="metadata" loop muted playsinline></video>`:`<img src="${p.image_url}" loading="lazy">`
     return `<div class="reel" data-id="${p.id}" ondblclick="like(${p.id},true)" onclick="togglePlay(this)">
       <div class="progress"></div>${media}<div class="heartBurst">❤️</div>
       <div class="topBar"><b>Reels</b><div class="muteBtn" onclick="event.stopPropagation();toggleMute(this)">🔇</div></div>
@@ -145,23 +144,6 @@ async function loadC(){
 async function addC(){ let t=document.getElementById('cInput').value.trim(); if(!t||!curPost) return; await supa.from('comments').insert({post_id:curPost,username:ME,text:t}); document.getElementById('cInput').value=''; await loadC() }
 async function likeC(cid){ let liked=allCLikes.some(l=>l.comment_id==cid&&l.username==ME); if(liked) await supa.from('comment_likes').delete().eq('comment_id',cid).eq('username',ME); else await supa.from('comment_likes').insert({comment_id:cid,username:ME}); await loadC() }
 async function delC(cid){ if(!confirm('Delete?')) return; let c=allComments.find(x=>x.id==cid); if(c.username!==ME) return alert('Your comment only!'); await supa.from('comments').delete().eq('id',cid); await loadC() }
-
-// === QUALITY KORAIYAMA STORAGE SAVE - UPLOAD CHECK ===
-async function validateReel(file){
-  if(file.size > 15*1024*1024){
-    alert('⚠️ 15MB ku mela vendaam da! WhatsApp la anupuna auto 2MB aayidum - quality same!');
-    return false;
-  }
-  return new Promise(res=>{
-    let v=document.createElement('video');
-    v.src=URL.createObjectURL(file);
-    v.onloadedmetadata=()=>{
-      if(v.duration>45){ alert('⏱️ 45 sec ku mela vendaam da! Storage save!'); res(false); }
-      else res(true);
-    }
-  });
-}
-
 load()
 </script>
 </body></html>
