@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Notifications - Pixoro</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:80px}
+.top{padding:14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:10}
+.notItem{display:flex;gap:12px;padding:14px;border-bottom:1px solid #111;align-items:center}
+.notItem img{width:44px;height:44px;border-radius:50%;object-fit:cover}
+.notText{flex:1;font-size:14px;line-height:1.4}
+.notText b{font-weight:800}
+.notTime{font-size:11px;color:#666;margin-top:2px}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;height:70px;background:#000;border-top:1px solid #1e1e1e;display:flex;justify-content:space-around;align-items:center;z-index:100}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:#777}
+.bottom-nav a svg{width:28px;height:28px;fill:none;stroke:#777;stroke-width:1.6}
+.bottom-nav a.active{color:#fff}.bottom-nav a.active svg{stroke:#fff}
+.bottom-nav span{font-size:11px}
+.tabBar{display:flex;gap:0;border-bottom:1px solid #222}
+.tabBar div{flex:1;text-align:center;padding:12px;font-size:13px;font-weight:700;color:#666;border-bottom:2px solid transparent;cursor:pointer}
+.tabBar div.active{color:#fff;border-bottom:2px solid #fff}
+</style></head><body>
+
+<div class="top">
+  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">←</span>
+  <b style="font-size:18px">Notifications</b>
+</div>
+
+<div class="tabBar">
+  <div class="active" onclick="filterNot('all',this)">All</div>
+  <div onclick="filterNot('likes',this)">Likes</div>
+  <div onclick="filterNot('follows',this)">Follows</div>
+  <div onclick="filterNot('comments',this)">Comments</div>
+</div>
+
+<div id="notList"><p style="text-align:center;padding:60px;color:#666">Loading...</p></div>
+
+<div class="bottom-nav">
+  <a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
+  <a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span>Search</span></a>
+  <a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a>
+  <a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
+  <a href="profile.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg><span>Profile</span></a>
+</div>
+
+<script>
+const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+const ME=(localStorage.getItem('pixoro_current_user')||'Giri').trim()
+let allNots=[]
+
+async function loadNots(){
+  try{
+    let {data:likes}=await supa.from('likes').select('*').order('created_at',{ascending:false}).limit(50)
+    let {data:comments}=await supa.from('comments').select('*').order('created_at',{ascending:false}).limit(50)
+    let {data:follows}=await supa.from('follows').select('*').order('created_at',{ascending:false}).limit(50)
+    let {data:posts}=await supa.from('posts').select('*')
+
+    let nots=[]
+
+    // Likes notification da - Un post ah yaar like pannanga da
+    let myPostIds=(posts||[]).filter(p=> (p.username||'').toLowerCase()===ME.toLowerCase()).map(p=>p.id)
+    ;(likes||[]).forEach(l=>{
+      if(myPostIds.includes(l.post_id) && (l.username||'').toLowerCase()!==ME.toLowerCase()){
+        nots.push({type:'likes', username:l.username, text:`liked your post ❤️`, time:l.created_at, post_id:l.post_id})
+      }
+    })
+
+    // Comments notification da
+    ;(comments||[]).forEach(c=>{
+      if(myPostIds.includes(c.post_id) && (c.username||'').toLowerCase()!==ME.toLowerCase()){
+        nots.push({type:'comments', username:c.username, text:`commented: "${c.text}" 💬`, time:c.created_at, post_id:c.post_id})
+      }
+    })
+
+    // Follows notification da
+    ;(follows||[]).forEach(f=>{
+      if((f.following||'').toLowerCase()===ME.toLowerCase()){
+        nots.push({type:'follows', username:f.follower, text:`started following you 👤`, time:f.created_at})
+      }
+    })
+
+    // Sort by time da - Latest first da
+    nots.sort((a,b)=> new Date(b.time) - new Date(a.time))
+    allNots=nots
+
+    renderNots('all')
+
+    if(nots.length===0){
+      document.getElementById('notList').innerHTML=`<div style="text-align:center;padding:60px"><div style="font-size:50px">🔔</div><p style="color:#666;margin-top:10px">No notifications yet da<br><span style="font-size:12px">Like, comment, follow panna inga varum da!</span></p></div>`
+    }
+
+  }catch(e){
+    document.getElementById('notList').innerHTML=`<p style="text-align:center;padding:40px;color:#666">Error: ${e.message}<br><br>Supabase la tables check pannu da GIRI!</p>`
+  }
+}
+
+function renderNots(filter){
+  let list=document.getElementById('notList')
+  let filtered = filter==='all' ? allNots : allNots.filter(n=> n.type===filter)
+
+  if(filtered.length===0){
+    list.innerHTML=`<p style="text-align:center;padding:40px;color:#666">No ${filter} notifications da</p>`
+    return
+  }
+
+  list.innerHTML=filtered.map(n=>`
+    <div class="notItem" onclick="location.href='${n.post_id?'index.html':`profile.html?user=${n.username}`} '">
+      <img src="https://i.pravatar.cc/100?u=${n.username}">
+      <div class="notText">
+        <b>@${n.username}</b> ${n.text}
+        <div class="notTime">${timeAgo(n.time)}</div>
+      </div>
+      <div style="font-size:20px">${n.type==='likes'?'❤️':n.type==='follows'?'👤':'💬'}</div>
+    </div>
+  `).join('')
+}
+
+function filterNot(type, el){
+  document.querySelectorAll('.tabBar div').forEach(d=> d.classList.remove('active'))
+  el.classList.add('active')
+  renderNots(type)
+}
+
+function timeAgo(t){
+  if(!t) return 'now'
+  let diff=Math.floor((new Date() - new Date(t))/1000)
+  if(diff<60) return `${diff}s ago`
+  if(diff<3600) return `${Math.floor(diff/60)}m ago`
+  if(diff<86400) return `${Math.floor(diff/3600)}h ago`
+  return `${Math.floor(diff/86400)}d ago`
+}
+
+loadNots()
+</script>
+</body></html>
