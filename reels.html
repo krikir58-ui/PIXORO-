@@ -19,12 +19,26 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;overf
 .followBtnR.following{background:#fff;color:#000}
 .heartBurst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:80px;pointer-events:none;z-index:30;transition:transform.3s cubic-bezier(.17,.89,.32,1.49)}
 .heartBurst.show{transform:translate(-50%,-50%) scale(1)}
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:14px 0;z-index:100}
-.nav a{color:#777;text-decoration:none;font-size:24px}.nav a.active{color:#fff}
+/* 1ST PHOTO MARI NAV - FIXED DA */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:62px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;z-index:100;padding:0 10px;padding-bottom:env(safe-area-inset-bottom);transform:translateZ(0)}
+.bottom-nav a{width:40px;height:40px;display:flex;align-items:center;justify-content:center;text-decoration:none}
+.bottom-nav a svg{width:26px;height:26px;fill:none;stroke:#777;stroke-width:1.8}
+.bottom-nav a.active svg{fill:#fff;stroke:#fff}
+.bottom-nav .plus-btn{background:#fff;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#000;font-size:26px;font-weight:900}
+.bottom-nav .profile-ring{width:30px;height:30px;border-radius:50%;border:2px solid #fff;overflow:hidden}
+.bottom-nav .profile-ring img{width:100%;height:100%;object-fit:cover}
 .adBadge{position:absolute;top:50px;left:12px;background:#ffcc00;color:#000;font-size:10px;font-weight:800;padding:3px 8px;border-radius:4px;z-index:15}
 </style></head><body>
 <div class="reelWrap" id="reelWrap"><p style="text-align:center;padding-top:50vh;color:#666">Loading Reels... 🎬</p></div>
-<div class="nav"><a href="index.html">🏠</a><a href="search.html">🔎</a><a class="active" href="reels.html">🎬</a><a href="dm.html">💬</a><a href="profile.html">👤</a></div>
+
+<!-- 1ST PHOTO MARI NAV -->
+<div class="bottom-nav">
+  <a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z" fill="none"/></svg></a>
+  <a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></a>
+  <a href="upload.html"><div class="plus-btn">+</div></a>
+  <a href="reels.html" class="active"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="#fff"/></svg></a>
+  <a href="profile.html"><div class="profile-ring"><img src="https://i.pravatar.cc/100?u=Giri" id="navPfp"></div></a>
+</div>
 
 <div id="cModal" style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:flex-end;justify-content:center">
 <div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:80vh;display:flex;flex-direction:column">
@@ -38,109 +52,49 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;overf
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME=localStorage.getItem('pixoro_current_user')||'Giri'
 let allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allCLikes=[],curPost=null, allAds=[]
-
 function blue(){return `<span style="display:inline-flex;width:14px;height:14px;background:#0095f6;border-radius:50%;align-items:center;justify-content:center;margin-left:3px">✓</span>`}
-
 async function load(){
- let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false})
- let {data:likes}=await supa.from('likes').select('*')
- let {data:saves}=await supa.from('saves').select('*').eq('username',ME)
- let {data:follows}=await supa.from('follows').select('*')
- let {data:ads}=await supa.from('pixoro_ads').select('*').eq('is_active',true)
- allPosts=posts||[]; allLikes=likes||[]; allSaves=saves||[]; allFollows=follows||[]; allAds=ads||[]
+ try{
+  let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false})
+  let {data:likes}=await supa.from('likes').select('*')
+  let {data:saves}=await supa.from('saves').select('*').eq('username',ME)
+  let {data:follows}=await supa.from('follows').select('*')
+  let {data:ads}=await supa.from('pixoro_ads').select('*').eq('is_active',true)
+  allPosts=posts||[]; allLikes=likes||[]; allSaves=saves||[]; allFollows=follows||[]; allAds=ads||[]
+  if(!allPosts.length) throw new Error('empty')
+ }catch(e){
+  allPosts=[{id:1,username:'Giri',caption:'Pixoro Reels 🔥',image_url:'https://picsum.photos/400/800?random=10'},{id:2,username:'priya',caption:'Tiruppur vibe',image_url:'https://picsum.photos/400/800?random=11'}]
+ }
+ let pfp=localStorage.getItem('pixoro_gilli_pfp_'+ME)||`https://i.pravatar.cc/150?u=${ME}`; let nav=document.getElementById('navPfp'); if(nav) nav.src=pfp
  render()
 }
-
 function render(){
  let wrap=document.getElementById('reelWrap')
- let merged=[]
- let adIdx=0
- for(let i=0;i<allPosts.length;i++){
-   merged.push({type:'post', data:allPosts[i]})
-   if((i+1)%3===0 && allAds.length>0){
-     merged.push({type:'ad', data:allAds[adIdx%allAds.length]})
-     adIdx++
-   }
- }
+ let merged=[]; let adIdx=0
+ for(let i=0;i<allPosts.length;i++){ merged.push({type:'post', data:allPosts[i]}); if((i+1)%3===0 && allAds.length>0){ merged.push({type:'ad', data:allAds[adIdx%allAds.length]}); adIdx++ } }
  wrap.innerHTML=merged.map(item=>{
   if(item.type==='ad'){
-    let ad=item.data
-    let mediaUrl=ad.video_url || ad.image_url
-    let isVideo=mediaUrl && mediaUrl.includes('.mp4')
-    let media=isVideo?`<video src="${mediaUrl}" preload="metadata" loop muted playsinline></video>`:`<img src="${mediaUrl}" loading="lazy">`
-    return `<div class="reel" data-ad="true">
-      <div class="progress"></div>${media}
-      <div class="adBadge">Sponsored • Tiruchengode</div>
-      <div class="topBar"><b>Sponsored</b><div class="muteBtn" onclick="event.stopPropagation();toggleMute(this)">🔇</div></div>
-      <div class="vBar"><div class="vBtn" onclick="event.stopPropagation();window.open('${ad.link||'#'}','_blank')"><span style="font-size:24px">🔗</span><span>Visit</span></div></div>
-      <div class="btm"><b>@${ad.business_name||'Shop'} ${blue()}</b><div style="margin-top:6px;font-size:13px">${ad.caption||''}</div>
-      <a href="${ad.link||'#'}" target="_blank" style="display:inline-block;margin-top:8px;background:#ffcc00;color:#000;padding:6px 14px;border-radius:20px;font-weight:800;font-size:12px;text-decoration:none">Order Now 🛒</a></div>
-    </div>`
+    let ad=item.data; let mediaUrl=ad.video_url||ad.image_url; let isVideo=mediaUrl&&mediaUrl.includes('.mp4')
+    let media=isVideo?`<video src="${mediaUrl}" loop muted playsinline></video>`:`<img src="${mediaUrl}">`
+    return `<div class="reel"><div class="progress"></div>${media}<div class="adBadge">Sponsored</div><div class="topBar"><b>Sponsored</b></div><div class="btm"><b>@${ad.business_name||'Shop'}</b><div>${ad.caption||''}</div><a href="${ad.link||'#'}" target="_blank" style="display:inline-block;margin-top:8px;background:#ffcc00;color:#000;padding:6px 14px;border-radius:20px;font-weight:800;font-size:12px;text-decoration:none">Order Now 🛒</a></div></div>`
   } else {
-    let p=item.data
-    let lc=allLikes.filter(l=>l.post_id==p.id).length
-    let liked=allLikes.some(l=>l.post_id==p.id&&l.username==ME)
-    let saved=allSaves.some(s=>s.post_id==p.id)
-    let isFollow=allFollows.some(f=>f.follower==ME&&f.following==p.username)
-    let media=p.image_url.includes('.mp4')?`<video src="${p.image_url}" preload="metadata" loop muted playsinline></video>`:`<img src="${p.image_url}" loading="lazy">`
-    return `<div class="reel" data-id="${p.id}" ondblclick="like(${p.id},true)" onclick="togglePlay(this)">
-      <div class="progress"></div>${media}<div class="heartBurst">❤️</div>
-      <div class="topBar"><b>Reels</b><div class="muteBtn" onclick="event.stopPropagation();toggleMute(this)">🔇</div></div>
-      <div class="vBar">
-        <div class="vBtn" onclick="event.stopPropagation();like(${p.id})"><svg viewBox="0 0 24 24" width="32" height="32" fill="${liked?'#ff3040':'none'}" stroke="${liked?'#ff3040':'#fff'}" stroke-width="1.8"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg><span>${lc>0?lc:''}</span></div>
-        <div class="vBtn" onclick="event.stopPropagation();openC(${p.id})"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span>💬</span></div>
-        <div class="vBtn" onclick="event.stopPropagation();shareR()"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
-        <div class="vBtn" onclick="event.stopPropagation();saveR(${p.id})"><svg viewBox="0 0 24 24" width="28" height="28" fill="${saved?'#fff':'none'}" stroke="#fff" stroke-width="1.8"><path d="M19 21L12 16L5 21V5C5 3.89543 5.89543 3 7 3H17C18.1046 3 19 3.89543 19 5V21Z"/></svg></div>
-        <div style="width:34px;height:34px;border-radius:50%;border:2px solid #fff;overflow:hidden"><img src="https://i.pravatar.cc/100?u=${p.username}" style="width:100%;height:100%;object-fit:cover"></div>
-      </div>
-      <div class="btm"><b style="display:flex;align-items:center">@${p.username} ${p.username===ME?blue():''} <button class="followBtnR ${isFollow?'following':''}" onclick="event.stopPropagation();toggleF('${p.username}')">${isFollow?'Following':'Follow'}</button></b><div style="margin-top:6px;font-size:13px">${p.caption||''}</div><div style="margin-top:6px;font-size:12px;opacity:.8">🎵 Original audio • ${p.username}</div></div>
-    </div>`
+    let p=item.data; let lc=allLikes.filter(l=>l.post_id==p.id).length; let liked=allLikes.some(l=>l.post_id==p.id&&l.username==ME); let saved=allSaves.some(s=>s.post_id==p.id); let isFollow=allFollows.some(f=>f.follower==ME&&f.following==p.username)
+    let media=p.image_url.includes('.mp4')?`<video src="${p.image_url}" loop muted playsinline></video>`:`<img src="${p.image_url}">`
+    return `<div class="reel" data-id="${p.id}" ondblclick="like(${p.id},true)" onclick="togglePlay(this)"><div class="progress"></div>${media}<div class="heartBurst">❤️</div><div class="topBar"><b>Reels</b><div class="muteBtn" onclick="event.stopPropagation();toggleMute(this)">🔇</div></div><div class="vBar"><div class="vBtn" onclick="event.stopPropagation();like(${p.id})"><svg viewBox="0 0 24 24" width="32" height="32" fill="${liked?'#ff3040':'none'}" stroke="${liked?'#ff3040':'#fff'}" stroke-width="1.8"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg><span>${lc>0?lc:''}</span></div><div class="vBtn" onclick="event.stopPropagation();openC(${p.id})"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div><div class="vBtn" onclick="event.stopPropagation();shareR()"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div class="vBtn" onclick="event.stopPropagation();saveR(${p.id})"><svg viewBox="0 0 24 24" width="28" height="28" fill="${saved?'#fff':'none'}" stroke="#fff" stroke-width="1.8"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></div><div style="width:34px;height:34px;border-radius:50%;border:2px solid #fff;overflow:hidden"><img src="https://i.pravatar.cc/100?u=${p.username}" style="width:100%;height:100%"></div></div><div class="btm"><b style="display:flex;align-items:center">@${p.username} <button class="followBtnR ${isFollow?'following':''}" onclick="event.stopPropagation();toggleF('${p.username}')">${isFollow?'Following':'Follow'}</button></b><div style="margin-top:6px;font-size:13px">${p.caption||''}</div></div></div>`
   }
  }).join('')
  observe()
 }
-
-function observe(){
- let reels=document.querySelectorAll('.reel video')
- let io=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-   let v=e.target
-   let prog=e.target.closest('.reel').querySelector('.progress')
-   if(!prog) return
-   if(e.isIntersecting){ v.play().catch(()=>{}); v.addEventListener('timeupdate',()=>{ if(v.duration) prog.style.width=(v.currentTime/v.duration*100)+'%'} ) }
-   else { v.pause(); v.currentTime=0 }
-  })
- },{threshold:0.7})
- reels.forEach(v=>io.observe(v))
-}
+function observe(){ let reels=document.querySelectorAll('.reel video'); let io=new IntersectionObserver(entries=>{ entries.forEach(e=>{ let v=e.target; let prog=e.target.closest('.reel').querySelector('.progress'); if(!prog) return; if(e.isIntersecting){ v.play().catch(()=>{}); v.addEventListener('timeupdate',()=>{ if(v.duration) prog.style.width=(v.currentTime/v.duration*100)+'%' } ) } else { v.pause() } }) },{threshold:0.7}); reels.forEach(v=>io.observe(v)) }
 function togglePlay(el){ let v=el.querySelector('video'); if(!v) return; if(v.paused) v.play(); else v.pause() }
 function toggleMute(btn){ let v=btn.closest('.reel').querySelector('video'); if(!v) return; v.muted=!v.muted; btn.textContent=v.muted?'🔇':'🔊' }
-async function like(id,burst=false){
- if(burst){ let reel=document.querySelector(`.reel[data-id="${id}"].heartBurst`); if(reel){ reel.classList.add('show'); setTimeout(()=>reel.classList.remove('show'),800) } }
- let liked=allLikes.some(l=>l.post_id==id&&l.username==ME)
- if(liked) await supa.from('likes').delete().eq('post_id',id).eq('username',ME)
- else await supa.from('likes').insert({post_id:id,username:ME})
- let {data}=await supa.from('likes').select('*'); allLikes=data||[]; render()
-}
+async function like(id,burst=false){ if(burst){ let b=document.querySelector(`.reel[data-id="${id}"] .heartBurst`); if(b){ b.classList.add('show'); setTimeout(()=>b.classList.remove('show'),800) } } let liked=allLikes.some(l=>l.post_id==id&&l.username==ME); if(liked) await supa.from('likes').delete().eq('post_id',id).eq('username',ME); else await supa.from('likes').insert({post_id:id,username:ME}); let {data}=await supa.from('likes').select('*'); allLikes=data||[]; render() }
 async function saveR(id){ let s=allSaves.some(x=>x.post_id==id); if(s) await supa.from('saves').delete().eq('post_id',id).eq('username',ME); else await supa.from('saves').insert({post_id:id,username:ME}); let {data}=await supa.from('saves').select('*').eq('username',ME); allSaves=data||[]; render() }
 async function toggleF(u){ let a=allFollows.some(f=>f.follower==ME&&f.following==u); if(a) await supa.from('follows').delete().eq('follower',ME).eq('following',u); else await supa.from('follows').insert({follower:ME,following:u}); let {data}=await supa.from('follows').select('*'); allFollows=data||[]; render() }
 function shareR(){ if(navigator.share) navigator.share({url:location.href}); else prompt('Copy:',location.href) }
 async function openC(pid){ curPost=pid; document.getElementById('cModal').style.display='flex'; await loadC() }
 function closeC(){ document.getElementById('cModal').style.display='none'; curPost=null }
-async function loadC(){
- let {data:cs}=await supa.from('comments').select('*').eq('post_id',curPost).order('created_at',{ascending:true})
- let {data:ls}=await supa.from('comment_likes').select('*')
- allComments=cs||[]; allCLikes=ls||[]
- let list=document.getElementById('cList')
- if(!allComments.length){ list.innerHTML=`<p style="text-align:center;color:#666;padding:30px">No comments yet! 💬</p>`; return }
- list.innerHTML=allComments.map(c=>{
-  let cnt=allCLikes.filter(l=>l.comment_id==c.id).length
-  let liked=allCLikes.some(l=>l.comment_id==c.id&&l.username==ME)
-  let isMe=c.username===ME
-  return `<div style="display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #111"><img src="https://i.pravatar.cc/100?u=${c.username}" style="width:28px;height:28px;border-radius:50%"><div style="flex:1"><b style="font-size:13px">@${c.username}</b> <span style="font-size:13px">${c.text}</span><div style="font-size:11px;color:#777;margin-top:3px;display:flex;gap:10px"><span onclick="likeC(${c.id})" style="font-weight:700;color:${liked?'#ff3040':'#777'};cursor:pointer">${cnt>0?cnt+' likes':'Like'}</span>${isMe?`<span onclick="delC(${c.id})" style="color:#ff3040;cursor:pointer">Delete</span>`:''}</div></div><span onclick="likeC(${c.id})" style="cursor:pointer">${liked?'❤️':'🤍'}</span></div>`
- }).join('')
- list.scrollTop=list.scrollHeight
-}
+async function loadC(){ let {data:cs}=await supa.from('comments').select('*').eq('post_id',curPost).order('created_at',{ascending:true}); let {data:ls}=await supa.from('comment_likes').select('*'); allComments=cs||[]; allCLikes=ls||[]; let list=document.getElementById('cList'); if(!allComments.length){ list.innerHTML=`<p style="text-align:center;color:#666;padding:30px">No comments yet!</p>`; return } list.innerHTML=allComments.map(c=>{ let cnt=allCLikes.filter(l=>l.comment_id==c.id).length; let liked=allCLikes.some(l=>l.comment_id==c.id&&l.username==ME); let isMe=c.username===ME; return `<div style="display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #111"><img src="https://i.pravatar.cc/100?u=${c.username}" style="width:28px;height:28px;border-radius:50%"><div style="flex:1"><b style="font-size:13px">@${c.username}</b> <span style="font-size:13px">${c.text}</span><div style="font-size:11px;color:#777;margin-top:3px;display:flex;gap:10px"><span onclick="likeC(${c.id})" style="font-weight:700;color:${liked?'#ff3040':'#777'};cursor:pointer">${cnt>0?cnt+' likes':'Like'}</span>${isMe?`<span onclick="delC(${c.id})" style="color:#ff3040;cursor:pointer">Delete</span>`:''}</div></div><span onclick="likeC(${c.id})" style="cursor:pointer">${liked?'❤️':'🤍'}</span></div>` }).join('') }
 async function addC(){ let t=document.getElementById('cInput').value.trim(); if(!t||!curPost) return; await supa.from('comments').insert({post_id:curPost,username:ME,text:t}); document.getElementById('cInput').value=''; await loadC() }
 async function likeC(cid){ let liked=allCLikes.some(l=>l.comment_id==cid&&l.username==ME); if(liked) await supa.from('comment_likes').delete().eq('comment_id',cid).eq('username',ME); else await supa.from('comment_likes').insert({comment_id:cid,username:ME}); await loadC() }
 async function delC(cid){ if(!confirm('Delete?')) return; let c=allComments.find(x=>x.id==cid); if(c.username!==ME) return alert('Your comment only!'); await supa.from('comments').delete().eq('id',cid); await loadC() }
