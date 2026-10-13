@@ -15,7 +15,13 @@
 .tab.active{background:#fff;color:#000;font-weight:700}
 .chatRow{display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid #111;cursor:pointer}
 .chatRow img{width:52px;height:52px;border-radius:50%}
-.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:12px 0 20px;z-index:100}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#000;border-top:1px solid #1e1e1e;display:flex;justify-content:space-around;align-items:center;height:70px;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:#777}
+.bottom-nav a svg{width:28px;height:28px;fill:none;stroke:#777;stroke-width:1.6}
+.bottom-nav a.active{color:#fff}
+.bottom-nav a.active svg{stroke:#fff}
+.bottom-nav a.active span{color:#fff;font-weight:700}
+.bottom-nav span{font-size:11px;color:#777}
 </style>
 </head><body>
 <div class="top"><b style="font-size:20px">comedy_gi... ▾</b><div style="display:flex;gap:16px;font-size:20px"><span>☰</span><span onclick="newChat()">✏️</span></div></div>
@@ -23,9 +29,16 @@
 <div class="notes" id="notes"></div>
 <div class="tabs"><div class="tab active">All 3</div><div class="tab">Primary 3</div><div class="tab">General</div><div class="tab">Requests</div></div>
 <div id="list" style="text-align:center;color:#555;padding:30px">Loading real chats da...</div>
-<div class="bottom">
-  <span onclick="location.href='index.html'">🏠</span><span onclick="location.href='search.html'">🔍</span><span onclick="location.href='index.html'">➕</span><span onclick="location.href='reels.html'">🎬</span><span>👤</span>
+
+<!-- BOTTOM NAV - OUTLINE ICONS + LABEL DA - DM ACTIVE DA -->
+<div class="bottom-nav">
+  <a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
+  <a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span>Search</span></a>
+  <a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a>
+  <a href="dm.html" class="active"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
+  <a href="profile.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg><span>Profile</span></a>
 </div>
+
 <script>
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 let ME=localStorage.getItem('pixoro_current_user')||'Giri'
