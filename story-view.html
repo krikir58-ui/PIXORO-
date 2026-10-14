@@ -2,7 +2,8 @@
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Story - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#fff;height:100vh;overflow:hidden;font-family:sans-serif}
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#fff;height:100vh;overflow:hidden;font-family:sans-serif}
 .bar{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:4px;z-index:10}
 .b{height:3px;background:rgba(255,255,255,.3);flex:1;border-radius:2px;overflow:hidden}
 .b div{height:100%;background:#fff;width:0%;transition:width.1s}
@@ -13,7 +14,7 @@
 .close{font-size:22px;cursor:pointer;padding:8px}
 .view{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;background:#000}
 .view img,.view video{width:100%;height:100%;object-fit:contain;background:#000}
-.tap{position:absolute;top:60px;bottom:120px;width:50%;z-index:5}
+.tap{position:absolute;top:60px;bottom:130px;width:50%;z-index:5}
 .left{left:0}.right{right:0}
 .bottomBar{position:absolute;bottom:15px;left:10px;right:10px;z-index:10;display:flex;flex-direction:column;gap:8px}
 .deleteBtn{background:rgba(255,0,0,.85);padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;display:none}
@@ -25,6 +26,9 @@
 .menu div:hover{background:#222}
 .viewerBar{position:absolute;bottom:0;left:0;right:0;background:#111;border-radius:20px 20px 0 0;max-height:45vh;z-index:15;transform:translateY(100%);transition:.3s;overflow:hidden;display:flex;flex-direction:column}
 .viewerBar.open{transform:translateY(0)}
+.replyArea{display:flex;gap:8px;align-items:center;margin-top:2px}
+.replyArea input{flex:1;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);padding:12px 16px;border-radius:25px;color:#fff;outline:none}
+.emojiRow{display:flex;gap:12px;overflow-x:auto;padding:4px 0}.emojiRow span{font-size:24px;cursor:pointer}.emojiRow::-webkit-scrollbar{display:none}
 </style></head><body>
 <div class="bar" id="pBar"></div>
 <div class="top">
@@ -48,6 +52,12 @@
 <span id="delBottom" class="deleteBtn" onclick="deleteCurrent()">🗑️ Delete</span>
 <span id="viewEye" onclick="openViewers()" style="background:rgba(255,255,255,.15);padding:8px 14px;border-radius:20px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px"><i class="fa fa-eye"></i> <span id="viewCount">0</span> Views</span>
 </div>
+
+<div id="replySection" style="display:none">
+<div class="emojiRow"><span onclick="react('❤️')">❤️</span><span onclick="react('🔥')">🔥</span><span onclick="react('😂')">😂</span><span onclick="react('😍')">😍</span><span onclick="react('👏')">👏</span><span onclick="react('💚')">💚</span><span onclick="react('💯')">💯</span></div>
+<div class="replyArea"><input id="replyInput" placeholder="Reply to story..."><span onclick="sendReply()" style="background:#fff;color:#000;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><i class="fa fa-paper-plane"></i></span></div>
+</div>
+
 <span id="replyHint" style="font-size:12px;color:#888">Tap left/right to navigate</span>
 </div>
 
@@ -81,6 +91,13 @@ async function load(){
    document.getElementById('delBottom').style.display='block'
    document.getElementById('moreBtn').style.display='block'
    document.getElementById('replyHint').innerText='Your story • Eye click panni viewers paaru 👁️'
+   document.getElementById('replySection').style.display='none'
+ } else {
+   document.getElementById('replySection').style.display='block'
+   document.getElementById('viewEye').style.display='none'
+   document.getElementById('delBottom').style.display='none'
+   document.getElementById('moreBtn').style.display='none'
+   document.getElementById('replyHint').style.display='none'
  }
  addViewer()
  loadViewers()
@@ -93,9 +110,7 @@ function markAsViewed(id){
     localStorage.setItem('pixoro_viewed_stories',JSON.stringify(viewedStories))
   }
 }
-
 function goHome(){ location.href='./index.html' }
-
 function show(i){
  cur=i; if(cur<0) cur=0; if(cur>=stories.length){ goHome(); return }
  let s=stories[cur]
@@ -171,12 +186,26 @@ async function loadViewers(){
      list.innerHTML=data.map(v=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1a1a1a"><div style="display:flex;align-items:center;gap:10px"><img src="https://i.pravatar.cc/100?u=${v.viewer}" style="width:36px;height:36px;border-radius:50%"><div><b style="font-size:13px">@${v.viewer}</b><div style="font-size:11px;color:#777">${new Date(v.created_at).toLocaleTimeString()}</div></div></div><span style="color:#00ff66;font-size:12px">👁️</span></div>`).join('')
    }
  }catch(e){
-   document.getElementById('viewerList').innerHTML='<p style="color:#666;text-align:center">No table - Supabase la story_views create pannu da!</p>'
+   document.getElementById('viewerList').innerHTML='<p style="color:#666;text-align:center">Supabase la story_views table create pannu da!</p>'
  }
 }
 function openViewers(){ document.getElementById('viewerBar').classList.add('open'); clearInterval(timer) }
 function closeViewers(){ document.getElementById('viewerBar').classList.remove('open'); prog=0; timer=setInterval(()=>{ prog+=1; let bEl=document.getElementById(`b${cur}`); if(bEl) bEl.style.width=prog+'%'; if(prog>=100){ clearInterval(timer); next() } },50) }
-
+// PATHU REPLY SYSTEM DA
+async function react(emoji){
+ try{ await supa.from('dms').insert({sender:ME,receiver:user,text:`Reacted ${emoji} to your story 🔥`,type:'story_react'}) }catch(e){}
+ if(navigator.vibrate) navigator.vibrate(40)
+ let el=document.createElement('div'); el.innerText=emoji; el.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:80px;z-index:100;pointer-events:none;animation:pop.8s forwards'; document.body.appendChild(el)
+ let s=document.createElement('style'); s.innerHTML='@keyframes pop{0%{transform:translate(-50%,-50%) scale(0)}50%{transform:translate(-50%,-50%) scale(1.4)}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}'; document.head.appendChild(s)
+ setTimeout(()=>el.remove(),800)
+}
+async function sendReply(){
+ let t=document.getElementById('replyInput').value.trim()
+ if(!t) return
+ try{ await supa.from('dms').insert({sender:ME,receiver:user,text:`Story Reply: ${t}`,type:'story_reply'}) }catch(e){}
+ document.getElementById('replyInput').value=''
+ alert(`DM sent da! "${t}" → @${user}`)
+}
 load()
 </script>
 </body></html>
