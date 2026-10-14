@@ -3,29 +3,20 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
-
-/* TOP - CORRECT SIZE 56px - chinna vum illa perusa vum illa */
 .top{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;background:#000;position:sticky;top:0;z-index:50;border-bottom:1px solid #1e1e1e;height:56px}
 .topPlus{width:32px;height:32px;background:#fff;color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;cursor:pointer}
 .bellWhite{width:32px;height:32px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .bellWhite svg{width:18px;height:18px}
-
 .post{background:#0e0e0e;border:1px solid #1e1e1e;border-radius:20px;margin:10px 8px 14px;overflow:hidden;padding-bottom:10px}
 .postTop{padding:10px 12px;display:flex;align-items:center;justify-content:space-between}
 .post img.main{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
 .actions{padding:10px 12px;display:flex;justify-content:space-between;align-items:center}.actions .left{display:flex;gap:18px;align-items:center}
 .act{width:26px;height:26px;cursor:pointer;background:none;border:0;display:flex;align-items:center;justify-content:center}.act svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:1.8}
 .act.liked svg{fill:#FF0A33;stroke:#FF0A33}
-
-/* BOTTOM - CORRECT SIZE 60px - perfect medium */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:60px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100;padding-bottom:4px;padding-top:4px}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}
 .bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}
-.bottom-nav a.active{color:#fff}
-.bottom-nav a.active svg{stroke:#fff}
-.bottom-nav span{font-size:10px;font-weight:400;color:#8e8e8e}
-.bottom-nav a.active span{color:#fff;font-weight:700}
-
+.bottom-nav a.active{color:#fff}.bottom-nav a.active svg{stroke:#fff}.bottom-nav span{font-size:10px;font-weight:400;color:#8e8e8e}.bottom-nav a.active span{color:#fff;font-weight:700}
 .pfpRing{width:34px;height:34px;border-radius:50%;background:#fff;padding:1.5px}.pfpInner{width:100%;height:100%;border-radius:50%;background:#000;padding:1.5px}.pfpInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .storyBar{display:flex;gap:14px;padding:10px 10px;overflow-x:auto;background:#000;border-bottom:1px solid #151515}.storyBar::-webkit-scrollbar{display:none}
 .sItem{text-align:center;min-width:64px;cursor:pointer}
@@ -35,6 +26,9 @@
 .sAdd{width:60px;height:60px;border-radius:50%;background:#101010;border:1.5px dashed #666;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff}
 .sName{font-size:10px;margin-top:5px;color:#fff;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #feed{padding-bottom:10px}
+/* STORY SEARCH - CHINNA BOX */
+.storySearchWrap{padding:6px 10px;background:#000;border-bottom:1px solid #151515;display:flex;gap:8px;align-items:center}
+.storySearchWrap input{flex:1;background:#111;border:1px solid #222;padding:8px 12px;border-radius:20px;color:#fff;outline:none;font-size:12px}
 </style></head><body>
 
 <div class="top">
@@ -45,6 +39,12 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M6 8a6 6 0 0 1 12 0c0 7 6 9 6 9H0s6-2 6-9"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg>
     </div>
   </div>
+</div>
+
+<!-- STORY SEARCH - IDHU THAN PUTHUSA ADD PANNATHU DA -->
+<div class="storySearchWrap">
+  <input id="storySearch" placeholder="🔍 Search Story - ID, @name type pannu..." oninput="renderStories()">
+  <span onclick="document.getElementById('storySearch').value='';renderStories()" style="font-size:14px;color:#666;cursor:pointer">✕</span>
 </div>
 
 <div class="storyBar" id="storyBar"></div>
@@ -88,24 +88,33 @@ async function loadAll(){
 }
 function renderStories(){
   let bar=document.getElementById('storyBar');
+  let searchQ=(document.getElementById('storySearch')?.value||'').toLowerCase().trim()
   let meLow=ME.toLowerCase()
   let myStories = allStories.filter(s=> (s.username||'').toLowerCase().trim() === meLow);
   let otherStories = allStories.filter(s=> (s.username||'').toLowerCase().trim() !== meLow);
   let followingUsers = allFollows.filter(f=> (f.follower||'').toLowerCase()===meLow).map(f=> (f.following||'').toLowerCase())
   if(followingUsers.length>0){ otherStories = otherStories.filter(s=> followingUsers.includes((s.username||'').toLowerCase())) }
+  // SEARCH FILTER
+  if(searchQ){
+    otherStories = otherStories.filter(s=> (s.username||'').toLowerCase().includes(searchQ) || (s.id+'').includes(searchQ))
+    myStories = myStories.filter(s=> (s.username||'').toLowerCase().includes(searchQ))
+  }
   let grouped={}
   otherStories.forEach(s=>{ let key=(s.username||'').toLowerCase(); if(!grouped[key]) grouped[key]=s })
   let html='';
-  if(myStories.length>0){
-    let s=myStories[0]; let seen = viewedStories.includes(s.id)
-    html+=`<div class="sItem" onclick="openMyStory()"><div class="sRing ${seen?'seen':''}"><div class="sRingInner"><img src="${s.image_url||s.image}"></div></div><div class="sName">Your Story</div></div>`;
-  } else {
-    html+=`<div class="sItem" onclick="location.href='story-add.html'"><div class="sAdd">+</div><div class="sName">Your Story</div></div>`;
+  if(!searchQ){
+    if(myStories.length>0){
+      let s=myStories[0]; let seen = viewedStories.includes(s.id)
+      html+=`<div class="sItem" onclick="openMyStory()"><div class="sRing ${seen?'seen':''}"><div class="sRingInner"><img src="${s.image_url||s.image}"></div></div><div class="sName">Your Story</div></div>`;
+    } else {
+      html+=`<div class="sItem" onclick="location.href='story-add.html'"><div class="sAdd">+</div><div class="sName">Your Story</div></div>`;
+    }
   }
   Object.values(grouped).forEach(s=>{
     let seen = viewedStories.includes(s.id)
     html+=`<div class="sItem" onclick="openOtherStory('${s.username}')"><div class="sRing ${seen?'seen':''}"><div class="sRingInner"><img src="${s.image_url||s.image||'https://i.pravatar.cc/150?u='+s.username}"></div></div><div class="sName">${s.username}</div></div>`
   })
+  if(!html) html=`<div style="padding:12px;color:#666;font-size:12px">No story for "${searchQ}" da</div>`
   bar.innerHTML=html;
 }
 function openMyStory(){
