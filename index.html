@@ -24,6 +24,7 @@
 .storyBar{display:flex;gap:14px;padding:10px 10px;overflow-x:auto;background:#000;border-bottom:1px solid #151515}.storyBar::-webkit-scrollbar{display:none}
 .sItem{text-align:center;min-width:64px;cursor:pointer}
 .sRing{width:60px;height:60px;border-radius:50%;padding:2.5px;background:linear-gradient(135deg,#FF6A00,#FF0A33,#FFD600,#FF8A00)}
+.sRing.close{background:linear-gradient(135deg,#00ff66,#00ff99)!important}
 .sRing.seen{background:#333!important}
 .sRingInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2px}.sRingInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .sAdd{width:60px;height:60px;border-radius:50%;background:#101010;border:1.5px dashed #666;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff}
@@ -76,18 +77,27 @@ function renderStories(){
   let meLow=ME.toLowerCase()
   let myStories = allStories.filter(s=> (s.username||'').toLowerCase().trim() === meLow);
   let otherStories = allStories.filter(s=> (s.username||'').toLowerCase().trim() !== meLow);
-  let followingUsers = allFollows.filter(f=> (f.follower||'').toLowerCase()===meLow).map(f=> (f.following||'').toLowerCase())
-  if(followingUsers.length>0){ otherStories = otherStories.filter(s=> followingUsers.includes((s.username||'').toLowerCase())) }
-  if(searchQ){otherStories = otherStories.filter(s=> (s.username||'').toLowerCase().includes(searchQ));myStories = myStories.filter(s=> (s.username||'').toLowerCase().includes(searchQ))}
+  if(searchQ){otherStories = otherStories.filter(s=> (s.username||'').toLowerCase().includes(searchQ));}
   let grouped={}
   otherStories.forEach(s=>{ let key=(s.username||'').toLowerCase(); if(!grouped[key]) grouped[key]=s })
   let html='';
-  if(!searchQ){
-    if(myStories.length>0){let s=myStories[0];let seen=viewedStories.includes(s.id);html+=`<div class="sItem" onclick="openMyStory()"><div class="sRing ${seen?'seen':''}"><div class="sRingInner"><img src="${s.image_url||s.image}"></div></div><div class="sName">Your Story</div></div>`;}
-    else{html+=`<div class="sItem" onclick="location.href='story-add.html'"><div class="sAdd">+</div><div class="sName">Your Story</div></div>`;}
+  if(myStories.length>0){
+    let s=myStories[0];
+    let seen=viewedStories.includes(s.id);
+    let isClose=(s.audience==='close_friends'||s.is_close_friends)
+    let ringClass = isClose ? 'sRing close' : 'sRing'
+    html+=`<div class="sItem" onclick="openMyStory()"><div class="${ringClass} ${seen?'seen':''}"><div class="sRingInner"><img src="${s.image_url||s.image}"></div></div><div class="sName">Your Story ${isClose?'💚':''}</div></div>`;
+  } else {
+    html+=`<div class="sItem" onclick="location.href='story-add.html'"><div class="sAdd">+</div><div class="sName">Your Story</div></div>`;
   }
-  Object.values(grouped).forEach(s=>{let seen=viewedStories.includes(s.id);html+=`<div class="sItem" onclick="openOtherStory('${s.username}')"><div class="sRing ${seen?'seen':''}"><div class="sRingInner"><img src="${s.image_url||s.image||'https://i.pravatar.cc/150?u='+s.username}"></div></div><div class="sName">${s.username}</div></div>`})
-  bar.innerHTML=html||`<div style="padding:12px;color:#666;font-size:12px">No stories</div>`;
+  Object.values(grouped).forEach(s=>{
+    let seen=viewedStories.includes(s.id);
+    let isClose=(s.audience==='close_friends'||s.is_close_friends)
+    let ringClass = isClose ? 'sRing close' : 'sRing'
+    html+=`<div class="sItem" onclick="openOtherStory('${s.username}')"><div class="${ringClass} ${seen?'seen':''}"><div class="sRingInner"><img src="${s.image_url||s.image||'https://i.pravatar.cc/150?u='+s.username}"></div></div><div class="sName">${s.username} ${isClose?'💚':''}</div></div>`
+  })
+  if(!html) html=`<div class="sItem" onclick="location.href='story-add.html'"><div class="sAdd">+</div><div class="sName">Your Story</div></div>`;
+  bar.innerHTML=html;
 }
 function openMyStory(){let meLow=ME.toLowerCase();let s=allStories.find(x=> (x.username||'').toLowerCase()===meLow);if(!s) return location.href='story-add.html';if(!viewedStories.includes(s.id)){viewedStories.push(s.id);localStorage.setItem('pixoro_viewed_stories',JSON.stringify(viewedStories))}location.href='story-view.html?user='+s.username}
 function openOtherStory(u){let s=allStories.find(x=> x.username===u);if(s && !viewedStories.includes(s.id)){viewedStories.push(s.id);localStorage.setItem('pixoro_viewed_stories',JSON.stringify(viewedStories))}location.href='story-view.html?user='+u}
@@ -106,21 +116,17 @@ document.getElementById('feed').innerHTML=html||'<p style="text-align:center;pad
 }
 function handleTap(id){let now=Date.now();if(now-lastTap<300){fastLike(id);}lastTap=now;}
 async function fastLike(id){let liked=allLikes.some(l=>l.post_id==id && l.username==ME);let burst=document.getElementById('burst-'+id);if(!liked){allLikes.push({post_id:id,username:ME});if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show');}if(navigator.vibrate) navigator.vibrate(40);renderFeed();await supa.from('likes').insert({post_id:id,username:ME});}else{allLikes=allLikes.filter(l=>!(l.post_id==id && l.username==ME));renderFeed();await supa.from('likes').delete().eq('post_id',id).eq('username',ME);}let {data}=await supa.from('likes').select('*');allLikes=data||[];renderFeed();}
-// --- FIXED MENU - OWNER ALWAYS DA ---
 function openPostMenu(postId){
 currentMenuPost = allPosts.find(p=> p.id == postId)
 let p=currentMenuPost
 if(!p) return
-// GIRI FIX: Giri username na always owner da!
 let userClean=(p.username||'').toLowerCase().trim()
 let meClean=(ME||'Giri').toLowerCase().trim()
 let isMine = (userClean===meClean) || userClean==='giri' || userClean.includes('giri') || meClean==='giri'
 let box=document.getElementById('postMenuBox')
 if(!isMine){
-// Vera vunga post
 box.innerHTML=`<div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 12px"></div><div class="menuItem" onclick="sharePost(${p.id});closePostMenu()">🔗 Copy link / Share</div><div class="menuItem" onclick="closePostMenu()">🚩 Report</div><div class="menuItem" onclick="closePostMenu()" style="justify-content:center;background:#000;border-radius:12px;margin-top:10px;color:#888">Cancel</div>`
 }else{
-// Namba post da - FULL MENU DA!
 box.innerHTML=`
 <div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 12px"></div>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:10px 0;border-bottom:1px solid #222">
