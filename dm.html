@@ -1,43 +1,64 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>DM</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:80px}
-.top{padding:14px 15px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#000;z-index:50;border-bottom:1px solid #1e1e1e}
-.search{margin:10px 12px;background:#1a1a1a;border-radius:12px;padding:10px 14px;color:#888;display:flex;gap:8px}
-.notes{display:flex;gap:14px;overflow-x:auto;padding:10px 12px;scrollbar-width:none;border-bottom:1px solid #111}
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:65px}
+
+/* TOP MELLA DA - 52px */
+.top{padding:8px 10px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#000;z-index:50;border-bottom:1px solid #151515;height:52px}
+.topPlus{width:32px;height:32px;background:#fff;color:#000;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;cursor:pointer}
+.bellWhite{width:32px;height:32px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+
+.search{margin:8px 10px;background:#161616;border-radius:10px;padding:9px 12px;color:#888;display:flex;gap:8px;font-size:13px;border:1px solid #222}
+.notes{display:flex;gap:12px;overflow-x:auto;padding:8px 10px;scrollbar-width:none;border-bottom:1px solid #151515}
 .notes::-webkit-scrollbar{display:none}
-.nItem{flex:0 0 72px;text-align:center}
-.nRing{width:68px;height:68px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#FF6A00,#FF0A33,#FFD600);position:relative}
-.nRingInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2.5px}.nRingInner img{width:100%;height:100%;border-radius:50%}
-.noteBubble{position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:#2a2a2a;color:#fff;font-size:10px;padding:4px 8px;border-radius:12px;white-space:nowrap;border:1px solid #333}
-.tabs{display:flex;gap:8px;padding:10px 12px}
-.tab{padding:6px 14px;border-radius:18px;background:#222;color:#999;font-size:13px}
+.nItem{flex:0 0 66px;text-align:center}
+.nRing{width:60px;height:60px;border-radius:50%;padding:2.5px;background:linear-gradient(135deg,#FF6A00,#FF0A33,#FFD600);position:relative}
+.nRingInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2px}.nRingInner img{width:100%;height:100%;border-radius:50%}
+.noteBubble{position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:#222;color:#fff;font-size:9px;padding:3px 6px;border-radius:10px;white-space:nowrap;border:1px solid #333}
+.tabs{display:flex;gap:6px;padding:8px 10px}
+.tab{padding:5px 12px;border-radius:16px;background:#1a1a1a;color:#999;font-size:12px}
 .tab.active{background:#fff;color:#000;font-weight:700}
-.chatRow{display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid #111;cursor:pointer}
-.chatRow img{width:52px;height:52px;border-radius:50%}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#000;border-top:1px solid #1e1e1e;display:flex;justify-content:space-around;align-items:center;height:70px;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
-.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:#777}
-.bottom-nav a svg{width:28px;height:28px;fill:none;stroke:#777;stroke-width:1.6}
+.chatRow{display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid #111;cursor:pointer}
+.chatRow img{width:46px;height:46px;border-radius:50%}
+
+/* BOTTOM CHINNA DA - 58px */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#000;border-top:1px solid #1a1a1a;display:flex;justify-content:space-around;align-items:center;height:58px;z-index:100}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:#666}
+.bottom-nav a svg{width:20px;height:20px;fill:none;stroke:#666;stroke-width:1.5}
 .bottom-nav a.active{color:#fff}
 .bottom-nav a.active svg{stroke:#fff}
+.bottom-nav span{font-size:9px;color:#666}
 .bottom-nav a.active span{color:#fff;font-weight:700}
-.bottom-nav span{font-size:11px;color:#777}
 </style>
 </head><body>
-<div class="top"><b style="font-size:20px">comedy_gi... ▾</b><div style="display:flex;gap:16px;font-size:20px"><span>☰</span><span onclick="newChat()">✏️</span></div></div>
+<div class="top">
+<b style="font-size:18px">comedy_gi... ▾</b>
+<div style="display:flex;gap:8px;align-items:center">
+<div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div>
+<div class="bellWhite" onclick="location.href='notifications.html'"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#000" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 6 9 6 9H0s6-2 6-9"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg></div>
+<span onclick="newChat()" style="font-size:18px;cursor:pointer">✏️</span>
+</div>
+</div>
+
 <div class="search">🔍 Search or ask Meta AI</div>
 <div class="notes" id="notes"></div>
 <div class="tabs"><div class="tab active">All 3</div><div class="tab">Primary 3</div><div class="tab">General</div><div class="tab">Requests</div></div>
 <div id="list" style="text-align:center;color:#555;padding:30px">Loading real chats da...</div>
 
-<!-- BOTTOM NAV - OUTLINE ICONS + LABEL DA - DM ACTIVE DA -->
 <div class="bottom-nav">
   <a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
-  <a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span>Search</span></a>
+  <a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
   <a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a>
   <a href="dm.html" class="active"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
-  <a href="profile.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg><span>Profile</span></a>
+  <a href="profile.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg><span>Profile</span></a>
 </div>
+
+<div id="createSheet" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:flex-end;justify-content:center"><div style="background:#1a1a1a;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:18px 18px 28px;border:1px solid #333"><div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 18px"></div><b style="display:block;text-align:center;margin-bottom:16px">Create New</b><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div onclick="location.href='upload.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">📸</div><div style="margin-top:6px;font-weight:700">Post</div></div>
+<div onclick="location.href='reels-upload.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">🎞️</div><div style="margin-top:6px;font-weight:700">Reels</div></div>
+<div onclick="location.href='story-add.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">⭕</div><div style="margin-top:6px;font-weight:700">Story</div></div>
+<div onclick="location.href='live.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">🔴</div><div style="margin-top:6px;font-weight:700">Live</div></div>
+</div><div onclick="document.getElementById('createSheet').style.display='none'" style="margin-top:16px;text-align:center;background:#000;padding:12px;border-radius:12px;color:#888;border:1px solid #333">Cancel</div></div></div>
 
 <script>
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
@@ -46,11 +67,11 @@ function newChat(){let u=prompt('Yaaruku msg da?'); if(u) location.href=`chat.ht
 async function load(){
   let {data} = await supa.from('messages').select('*').or(`sender.eq.${ME},receiver.eq.${ME}`).order('created_at',{ascending:false}).limit(100)
   let notesUsers = data? [...new Set(data.map(m=>m.sender===ME?m.receiver:m.sender))].slice(0,6) : []
-  document.getElementById('notes').innerHTML = `<div class="nItem"><div class="nRing" style="background:#222"><div class="nRingInner"><img src="https://i.pravatar.cc/100?u=${ME}"></div><div class="noteBubble">Your note<br><small style="color:#888">Location off</small></div></div></div>` + notesUsers.map(u=>`<div class="nItem" onclick="location.href='chat.html?user=${u}'"><div class="nRing"><div class="nRingInner"><img src="https://i.pravatar.cc/100?u=${u}"></div><div class="noteBubble">Hi da ${u} ❤️</div></div></div>`).join('') || '<div class="nItem"><div class="nRing"><div class="nRingInner"><img src="https://i.pravatar.cc/100?u=test"></div></div><div style="font-size:11px;margin-top:4px">No notes</div></div>'
+  document.getElementById('notes').innerHTML = `<div class="nItem"><div class="nRing" style="background:#222"><div class="nRingInner"><img src="https://i.pravatar.cc/100?u=${ME}"></div><div class="noteBubble">Your note</div></div></div>` + notesUsers.map(u=>`<div class="nItem" onclick="location.href='chat.html?user=${u}'"><div class="nRing"><div class="nRingInner"><img src="https://i.pravatar.cc/100?u=${u}"></div><div class="noteBubble">Hi da ❤️</div></div></div>`).join('') || ''
   if(!data||!data.length){document.getElementById('list').innerHTML=`<div style="padding:40px;color:#666">No chats da!<br><button onclick="newChat()" style="margin-top:12px;background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`;return}
   let map={}; data.forEach(m=>{let o=m.sender===ME?m.receiver:m.sender; if(!map[o]||new Date(m.created_at)>new Date(map[o].created_at)) map[o]=m})
   let chats=Object.values(map)
-  document.getElementById('list').innerHTML = chats.map(c=>{let o=c.sender===ME?c.receiver:c.sender; return `<div class="chatRow" onclick="location.href='chat.html?user=${o}'"><img src="https://i.pravatar.cc/100?u=${o}"><div style="flex:1;text-align:left"><b style="font-size:14px">${o} 🎀</b><div style="font-size:12px;color:#999">${c.sender===ME?'Sent':'4+ new messages'} • ${new Date(c.created_at).toLocaleTimeString()}</div></div><div style="font-size:18px">📷</div></div>`}).join('')
+  document.getElementById('list').innerHTML = chats.map(c=>{let o=c.sender===ME?c.receiver:c.sender; return `<div class="chatRow" onclick="location.href='chat.html?user=${o}'"><img src="https://i.pravatar.cc/100?u=${o}"><div style="flex:1;text-align:left"><b style="font-size:13px">${o} 🎀</b><div style="font-size:11px;color:#999">${c.sender===ME?'Sent':'4+ new messages'} • ${new Date(c.created_at).toLocaleTimeString()}</div></div><div style="font-size:16px">📷</div></div>`}).join('')
 }
 load()
 </script>
