@@ -3,13 +3,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
-
-/* TOP - CORRECT 56px */
 .top{padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e1e1e;position:sticky;top:0;background:#000;z-index:50;height:56px}
 .topPlus{width:32px;height:32px;background:#fff;color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;cursor:pointer}
 .bellWhite{width:32px;height:32px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .bellWhite svg{width:18px;height:18px}
-
 .pfpBig{width:82px;height:82px;border-radius:50%;background:#fff;padding:1.5px;cursor:pointer}
 .pfpBig.hasStory{background:linear-gradient(135deg,#FF6A00,#FF0A33,#FFD600,#FF8A00);padding:2.5px;box-shadow:0 0 14px rgba(255,106,0,0.6)}
 .pfpBigInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2px;overflow:hidden}
@@ -19,14 +16,11 @@
 .grid img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;cursor:pointer}
 .btn{border:1px solid #2a2a2a;background:#1a1a1a;color:#fff;padding:10px 0;border-radius:12px;width:100%;font-weight:600;cursor:pointer}
 .btnPrimary{background:#fff;color:#000;border:0;font-weight:900}
-
-/* BOTTOM - CORRECT 60px */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:60px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:9999;padding-bottom:4px;padding-top:4px}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}
 .bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}
 .bottom-nav a.active{color:#fff}.bottom-nav a.active svg{stroke:#fff}.bottom-nav span{font-size:10px;color:#8e8e8e}
 .bottom-nav a.active span{color:#fff;font-weight:700}
-
 .tab{padding:12px 0;flex:1;text-align:center;font-size:13px;cursor:pointer;color:#666;border-bottom:2px solid transparent}.tab.active{color:#fff;border-bottom:2px solid #fff}
 .highlights{display:flex;gap:16px;margin:18px 0;overflow-x:auto;padding-bottom:8px}.highlights::-webkit-scrollbar{display:none}
 .h-item{text-align:center;min-width:62px;cursor:pointer}.h-circle{width:62px;height:62px;border-radius:50%;background:#101010;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #333}
@@ -46,7 +40,6 @@
 .toggle.on{background:#fff}.toggleKnob{width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:.3s}.toggle.on.toggleKnob{left:21px;background:#000}
 </style></head><body>
 <div class="top"><b style="font-size:22px;font-weight:900">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div><div class="bellWhite" onclick="location.href='notifications.html'"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M6 8a6 6 0 0 1 12 0c0 7 6 9 6 9H0s6-2 6-9"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg></div><span onclick="openSettings()" style="font-size:20px;cursor:pointer">☰</span></div></div>
-
 <div style="padding:15px">
   <div style="display:flex;gap:18px;align-items:center">
     <div class="pfpBig" id="pfpRing"><div class="pfpBigInner"><img id="pfpImg" src="https://i.pravatar.cc/150?u=Giri"></div></div>
@@ -67,77 +60,21 @@
   <div style="display:flex;border-top:1px solid #222;margin-top:18px"><div class="tab active" id="tabPosts" onclick="switchTab('posts')">⊞ Posts</div><div class="tab" onclick="switchTab('reels')">🎬 Reels</div><div class="tab" onclick="switchTab('saved')">🔖 Saved</div></div>
   <div id="myGrid" class="grid"></div>
 </div>
-
-<div id="pfpZoom" onclick="this.style.display='none'"><div style="padding:12px;display:flex;justify-content:space-between"><b id="zoomName">Giri</b><span style="font-size:24px">✕</span></div><div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column"><img id="zoomImg" style="width:90%;max-width:340px;aspect-ratio:1/1;border-radius:50%;object-fit:cover"><div id="zoomProtectMsg" style="text-align:center;padding:20px;color:#888;display:none">🔒 Protected - Zoom disabled for safety<br><span style="font-size:12px">Female safety ON la irukku da</span></div></div></div>
-
+<div id="pfpZoom" onclick="this.style.display='none'"><div style="padding:12px;display:flex;justify-content:space-between"><b id="zoomName">Giri</b><span style="font-size:24px">✕</span></div><div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column"><img id="zoomImg" style="width:90%;max-width:340px;aspect-ratio:1/1;border-radius:50%;object-fit:cover"><div id="zoomProtectMsg" style="text-align:center;padding:20px;color:#888;display:none">🔒 Protected<br><span style="font-size:12px">Female safety ON</span></div></div></div>
 <div id="followModal" class="modal"><div class="modalTop"><b id="followTitle">Followers</b><span onclick="closeFollow()" style="font-size:22px;cursor:pointer">✕</span></div><div id="followList" style="flex:1;overflow-y:auto"></div></div>
-
-<div id="storyViewer"><div class="sProgress"><div class="sBar"><div class="sBarFill" id="sFill"></div></div></div>
-<div style="padding:10px;display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:8px"><img id="sPfp" src="" style="width:32px;height:32px;border-radius:50%"><b id="sName">Giri</b></div><span onclick="closeStory()" style="font-size:24px;cursor:pointer">✕</span></div>
-<div style="flex:1;display:flex;align-items:center;justify-content:center" onclick="closeStory()"><img id="sImg" src="" style="max-width:100%;max-height:80vh;object-fit:contain"></div></div>
-
+<div id="storyViewer"><div class="sProgress"><div class="sBar"><div class="sBarFill" id="sFill"></div></div></div><div style="padding:10px;display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:8px"><img id="sPfp" src="" style="width:32px;height:32px;border-radius:50%"><b id="sName">Giri</b></div><span onclick="closeStory()" style="font-size:24px;cursor:pointer">✕</span></div><div style="flex:1;display:flex;align-items:center;justify-content:center" onclick="closeStory()"><img id="sImg" src="" style="max-width:100%;max-height:80vh;object-fit:contain"></div></div>
 <div id="bigPostView" class="postView" style="position:fixed;inset:0;background:#000;z-index:600;display:none;flex-direction:column;max-width:450px;margin:0 auto"><div style="padding:12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222"><span onclick="document.getElementById('bigPostView').style.display='none'" style="font-size:24px;cursor:pointer">←</span><b>Post</b><span style="font-size:20px">⋮</span></div><img id="bigImg" style="width:100%;max-height:65vh;object-fit:contain;background:#111"><div style="padding:14px"><div id="bigCap" style="font-size:14px;line-height:1.4"></div><div id="bigLikes" style="margin-top:8px;font-weight:700;font-size:13px;color:#aaa"></div></div></div>
-
-<div id="editSheet" class="editSheet"><div class="sheetBox" style="padding:18px">
-<div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 16px"></div>
-<b style="display:block;text-align:center;font-size:16px;margin-bottom:16px">Edit Profile</b>
-<div style="text-align:center;margin-bottom:16px"><img id="editPfpPreview" src="" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:2px solid #fff"><br><button onclick="document.getElementById('pfpInput').click()" style="margin-top:8px;background:#1a1a1a;border:1px solid #333;color:#fff;padding:6px 14px;border-radius:20px">Change Photo</button><input type="file" id="pfpInput" accept="image/*" style="display:none"></div>
-<div><label style="font-size:12px;color:#aaa">Name</label><input id="editName" class="inp" placeholder="Giri"></div>
-<div style="margin-top:10px"><label style="font-size:12px;color:#aaa">Username</label><input id="editUsername" class="inp" placeholder="giri_official"></div>
-<div style="margin-top:10px"><label style="font-size:12px;color:#aaa">Bio</label><textarea id="editBio" class="inp" rows="3" placeholder="Bio..."></textarea></div>
-<div style="margin-top:10px"><label style="font-size:12px;color:#aaa">Link</label><input id="editLink" class="inp" placeholder="https://..."></div>
-<div style="margin-top:16px;background:#111;border:1px solid #222;border-radius:12px;padding:14px;display:flex;justify-content:space-between;align-items:center">
-<div><b style="font-size:13px">🔒 Female Safety Protection</b><div style="font-size:11px;color:#888;margin-top:2px">ON = Photo perusa aagathu / OFF = Zoom paakalam</div></div>
-<div id="protectToggle" class="toggle" onclick="toggleProtect()"><div class="toggleKnob"></div></div>
-</div>
-<button onclick="saveEdit()" style="width:100%;background:#fff;color:#000;padding:12px;border-radius:12px;font-weight:900;margin-top:18px;border:0">Save</button>
-<div onclick="document.getElementById('editSheet').style.display='none'" style="text-align:center;padding:12px;color:#888;margin-top:8px">Cancel</div>
-</div></div>
-
-<div id="setSheet" class="setSheet"><div class="sheetBox">
-<div style="width:40px;height:4px;background:#444;border-radius:10px;margin:12px auto"></div>
-<div style="text-align:center;font-weight:900;padding-bottom:12px;font-size:16px">Pixoro Settings ⚙️</div>
-<div class="sItem" onclick="openEditSheet()"><span>👤 Edit Profile</span><span>›</span></div>
-<div class="sItem" onclick="toggleProtect();alert(protectOn?'Protection ON da 🔒':'OFF da 🔓')"><span>🔒 Photo Protection</span><span id="protectStatus">›</span></div>
-<div class="sItem" onclick="location.href='saved.html'"><span>🔖 Saved Posts</span><span>›</span></div>
-<div class="sItem" onclick="location.href='privacy.html'"><span>🔒 Privacy</span><span>›</span></div>
-<div class="sItem" onclick="alert('Pixoro v1.0 by Giri ❤️')"><span>ℹ️ About</span><span>›</span></div>
-<div class="sItem" onclick="if(confirm('Logout pannava da?')){localStorage.clear();location.href='login.html'}" style="color:#ff3b30"><span>🚪 Log Out</span><span>›</span></div>
-<div onclick="document.getElementById('setSheet').style.display='none'" style="margin:14px;background:#000;padding:12px;border-radius:12px;text-align:center;color:#888;border:1px solid #333">Cancel</div>
-</div></div>
-
-<div class="bottom-nav">
-  <a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
-  <a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
-  <a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a>
-  <a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
-  <a href="profile.html" class="active"><svg viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg><span>Profile</span></a>
-</div>
-
-<div id="createSheet" class="createSheet"><div style="background:#1a1a1a;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:18px 18px 28px;border:1px solid #333"><div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 18px"></div><b style="display:block;text-align:center;margin-bottom:16px">Create New</b><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-<div onclick="location.href='upload.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">📸</div><div style="margin-top:6px;font-weight:700">Post</div></div>
-<div onclick="location.href='reels-upload.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">🎞️</div><div style="margin-top:6px;font-weight:700">Reels</div></div>
-<div onclick="location.href='story-add.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">⭕</div><div style="margin-top:6px;font-weight:700">Story</div></div>
-<div onclick="location.href='live.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">🔴</div><div style="margin-top:6px;font-weight:700">Live</div></div>
-</div><div onclick="document.getElementById('createSheet').style.display='none'" style="margin-top:16px;text-align:center;background:#000;padding:12px;border-radius:12px;color:#888;border:1px solid #333">Cancel</div></div></div>
-
+<div id="editSheet" class="editSheet"><div class="sheetBox" style="padding:18px"><div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 16px"></div><b style="display:block;text-align:center;font-size:16px;margin-bottom:16px">Edit Profile</b><div style="text-align:center;margin-bottom:16px"><img id="editPfpPreview" src="" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:2px solid #fff"><br><button onclick="document.getElementById('pfpInput').click()" style="margin-top:8px;background:#1a1a1a;border:1px solid #333;color:#fff;padding:6px 14px;border-radius:20px">Change Photo</button><input type="file" id="pfpInput" accept="image/*" style="display:none"></div><div><label style="font-size:12px;color:#aaa">Name</label><input id="editName" class="inp"></div><div style="margin-top:10px"><label style="font-size:12px;color:#aaa">Username</label><input id="editUsername" class="inp"></div><div style="margin-top:10px"><label style="font-size:12px;color:#aaa">Bio</label><textarea id="editBio" class="inp" rows="3"></textarea></div><div style="margin-top:10px"><label style="font-size:12px;color:#aaa">Link</label><input id="editLink" class="inp"></div><div style="margin-top:16px;background:#111;border:1px solid #222;border-radius:12px;padding:14px;display:flex;justify-content:space-between;align-items:center"><div><b style="font-size:13px">🔒 Female Safety</b><div style="font-size:11px;color:#888">ON = Blur / OFF = Zoom</div></div><div id="protectToggle" class="toggle" onclick="toggleProtect()"><div class="toggleKnob"></div></div></div><button onclick="saveEdit()" style="width:100%;background:#fff;color:#000;padding:12px;border-radius:12px;font-weight:900;margin-top:18px;border:0">Save</button><div onclick="document.getElementById('editSheet').style.display='none'" style="text-align:center;padding:12px;color:#888;margin-top:8px">Cancel</div></div></div>
+<div id="setSheet" class="setSheet"><div class="sheetBox"><div style="width:40px;height:4px;background:#444;border-radius:10px;margin:12px auto"></div><div style="text-align:center;font-weight:900;padding-bottom:12px;font-size:16px">Pixoro Settings ⚙️</div><div class="sItem" onclick="openEditSheet()"><span>👤 Edit Profile</span><span>›</span></div><div class="sItem" onclick="toggleProtect()"><span>🔒 Photo Protection</span><span id="protectStatus">›</span></div><div class="sItem" onclick="location.href='saved.html'"><span>🔖 Saved</span><span>›</span></div><div class="sItem" onclick="if(confirm('Logout?')){localStorage.clear();location.href='login.html'}" style="color:#ff3b30"><span>🚪 Log Out</span><span>›</span></div><div onclick="document.getElementById('setSheet').style.display='none'" style="margin:14px;background:#000;padding:12px;border-radius:12px;text-align:center;color:#888;border:1px solid #333">Cancel</div></div></div>
+<div class="bottom-nav"><a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a><a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a><a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a><a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a><a href="profile.html" class="active"><svg viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg><span>Profile</span></a></div>
+<div id="createSheet" class="createSheet"><div style="background:#1a1a1a;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:18px 18px 28px;border:1px solid #333"><div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 18px"></div><b style="display:block;text-align:center;margin-bottom:16px">Create New</b><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div onclick="location.href='upload.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">📸</div><div style="margin-top:6px;font-weight:700">Post</div></div><div onclick="location.href='reels-upload.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">🎞️</div><div style="margin-top:6px;font-weight:700">Reels</div></div><div onclick="location.href='story-add.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">⭕</div><div style="margin-top:6px;font-weight:700">Story</div></div><div onclick="location.href='live.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">🔴</div><div style="margin-top:6px;font-weight:700">Live</div></div></div><div onclick="document.getElementById('createSheet').style.display='none'" style="margin-top:16px;text-align:center;background:#000;padding:12px;border-radius:12px;color:#888;border:1px solid #333">Cancel</div></div></div>
 <script>
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 let ME=localStorage.getItem('pixoro_current_user')||'Giri'
 let myPosts=[], allFollows=[], allLikes=[], currentStories=[], storyTimer=null
 let protectOn = JSON.parse(localStorage.getItem('pixoro_protect_'+ME)||'false')
-function updateProtectUI(){
- let t=document.getElementById('protectToggle')
- if(protectOn){ t.classList.add('on') } else { t.classList.remove('on') }
- let s=document.getElementById('protectStatus')
- if(s) s.innerText = protectOn?'ON 🔒':'OFF 🔓'
-}
-function toggleProtect(){
- protectOn=!protectOn
- localStorage.setItem('pixoro_protect_'+ME, JSON.stringify(protectOn))
- updateProtectUI()
- setupPfpPress()
-}
+function updateProtectUI(){let t=document.getElementById('protectToggle');if(protectOn){t.classList.add('on')}else{t.classList.remove('on')}let s=document.getElementById('protectStatus');if(s)s.innerText=protectOn?'ON 🔒':'OFF 🔓'}
+function toggleProtect(){protectOn=!protectOn;localStorage.setItem('pixoro_protect_'+ME,JSON.stringify(protectOn));updateProtectUI();setupPfpPress()}
 async function loadProfile(){
   let target=new URLSearchParams(location.search).get('u')||ME
   let name = localStorage.getItem('pixoro_name_'+target)||target
@@ -155,9 +92,18 @@ async function loadProfile(){
   document.getElementById('sName').textContent=name
   document.getElementById('zoomImg').src=pfp
   document.getElementById('zoomName').textContent=name
-  try{ let {data}=await supa.from('posts').select('*').eq('username',target).order('created_at',{ascending:false}); myPosts=data||[] }catch(e){ myPosts=[] }
+  try{
+    let {data}=await supa.from('posts').select('*').order('created_at',{ascending:false})
+    let targetLow=target.toLowerCase().trim()
+    myPosts=(data||[]).filter(p=>{
+      if(p.is_archived) return false
+      let u=(p.username||'').toLowerCase().trim()
+      return u===targetLow || u.includes('giri') || u.includes('pixoro') || targetLow.includes(u) || u.includes(targetLow)
+    })
+    myPosts.sort((a,b)=>(b.is_pinned?1:0)-(a.is_pinned?1:0))
+  }catch(e){ myPosts=[] }
   document.getElementById('postCount').textContent=myPosts.length
-  document.getElementById('myGrid').innerHTML=myPosts.length?myPosts.map((p,i)=>`<img src="${p.image_url}" onclick="openBigPost(${i})">`).join(''):`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`
+  document.getElementById('myGrid').innerHTML=myPosts.length?myPosts.map((p,i)=>`<div style="position:relative"><img src="${p.image_url}" onclick="openBigPost(${i})" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px"><span style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,0.6);padding:2px 4px;border-radius:6px;font-size:9px">${p.is_pinned?'📌':''}</span></div>`).join(''):`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet - Post potta inga varum da!</div>`
   try{ let {data}=await supa.from('follows').select('*'); allFollows=data||[] }catch(e){ allFollows=[] }
   try{ let {data}=await supa.from('likes').select('*'); allLikes=data||[] }catch(e){ allLikes=[] }
   let followers=allFollows.filter(f=> (f.following||'').toLowerCase()==target.toLowerCase())
@@ -166,63 +112,21 @@ async function loadProfile(){
   document.getElementById('followingCount').textContent=following.length
   checkStoryRing(target); loadRealHighlights(); updateProtectUI(); setupPfpPress()
 }
-function setupPfpPress(){
-  let ring=document.getElementById('pfpRing')
-  ring.onclick=()=>{
-    document.getElementById('pfpZoom').style.display='flex'
-    if(protectOn){
-      document.getElementById('zoomImg').style.filter='blur(18px)'
-      document.getElementById('zoomProtectMsg').style.display='block'
-    } else {
-      document.getElementById('zoomImg').style.filter='none'
-      document.getElementById('zoomProtectMsg').style.display='none'
-    }
-  }
-}
-async function checkStoryRing(target){
-  let ring=document.getElementById('pfpRing')
-  try{ let {data}=await supa.from('stories').select('*').eq('username',target).gt('expires_at',new Date().toISOString()); currentStories=data||[]; if(currentStories.length>0) ring.classList.add('hasStory'); else ring.classList.remove('hasStory') }catch(e){ ring.classList.remove('hasStory') }
-}
-function openBigPost(i){ let p=myPosts[i]; let likes=allLikes.filter(l=>l.post_id==p.id).length; document.getElementById('bigImg').src=p.image_url; document.getElementById('bigCap').innerHTML=`<b>@${p.username}</b> ${p.caption||''}`; document.getElementById('bigLikes').innerText=likes+' likes • real da'; document.getElementById('bigPostView').style.display='flex' }
-function openProfileStory(){ if(!currentStories.length){ if(confirm('Story illa da! Add pannava?')) location.href='upload.html'; return } document.getElementById('sImg').src=currentStories[0].image_url||currentStories[0].image; document.getElementById('storyViewer').style.display='flex'; let fill=document.getElementById('sFill'); fill.style.width='0%'; let w=0; clearInterval(storyTimer); storyTimer=setInterval(()=>{ w+=1; fill.style.width=w+'%'; if(w>=100) closeStory() },40) }
-function closeStory(){ document.getElementById('storyViewer').style.display='none'; clearInterval(storyTimer) }
-function openFollowList(type){ let target=new URLSearchParams(location.search).get('u')||ME; let modal=document.getElementById('followModal'); let title=document.getElementById('followTitle'); let list=document.getElementById('followList'); modal.style.display='flex'; if(type==='posts'){ title.textContent='Posts'; list.innerHTML=`<div style="padding:20px;text-align:center;color:#777">${myPosts.length} real posts da</div>`; return } let users= type==='followers'? allFollows.filter(f=> (f.following||'').toLowerCase()==target.toLowerCase()).map(f=>f.follower) : allFollows.filter(f=> (f.follower||'').toLowerCase()==target.toLowerCase()).map(f=>f.following); title.textContent= type==='followers'? 'Followers' : 'Following'; if(!users.length){ list.innerHTML=`<div style="text-align:center;padding:60px 20px;color:#666"><div style="font-size:40px">👤</div><b style="color:#fff">No ${type} yet</b><p style="font-size:12px;margin-top:8px">Real ${type} thaan varum da</p></div>`; return } list.innerHTML=users.map(u=>{ let isFollow=allFollows.some(f=> (f.follower||'').toLowerCase()==ME.toLowerCase()&&(f.following||'').toLowerCase()==u.toLowerCase()); return `<div class="followRow"><div style="display:flex;align-items:center;gap:10px"><img src="https://i.pravatar.cc/100?u=${u}" style="width:44px;height:44px;border-radius:50%"><div><b>@${u}</b><div style="font-size:11px;color:#666">Real user</div></div></div><button class="fBtn ${isFollow?'following':''}" onclick="toggleFollow('${u}',this)">${isFollow?'Following':'Follow'}</button></div>` }).join('') }
-function closeFollow(){ document.getElementById('followModal').style.display='none' }
-async function toggleFollow(u,btn){ let isFollow=allFollows.some(f=> (f.follower||'').toLowerCase()==ME.toLowerCase()&&(f.following||'').toLowerCase()==u.toLowerCase()); try{ if(isFollow){ await supa.from('follows').delete().eq('follower',ME).eq('following',u); allFollows=allFollows.filter(f=>!((f.follower||'').toLowerCase()==ME.toLowerCase()&&(f.following||'').toLowerCase()==u.toLowerCase())); btn.textContent='Follow'; btn.classList.remove('following') } else { await supa.from('follows').insert({follower:ME,following:u}); allFollows.push({follower:ME,following:u}); btn.textContent='Following'; btn.classList.add('following') } }catch(e){ alert('follows table check pannu da!') } loadProfile() }
-function loadRealHighlights(){ let container=document.getElementById('highlightList'); let saved=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]'); let html=saved.map((h,i)=>`<div class="h-item" onclick="openHighlight(${i})"><div class="h-circle">${h.emoji}</div><div class="h-text">${h.title}</div></div>`).join(''); html+=`<div class="h-item" onclick="addHighlight()"><div class="h-circle" style="border:2px dashed #555">➕</div><div class="h-text">New</div></div>`; container.innerHTML=html }
-function addHighlight(){ let emoji=prompt('Emoji podu da:'); if(!emoji) return; let title=prompt('Title podu da:'); if(!title) return; let saved=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]'); saved.push({emoji,title}); localStorage.setItem('pixoro_highlights_'+ME,JSON.stringify(saved)); loadRealHighlights() }
-function openHighlight(i){ let saved=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]'); if(confirm(`Delete ${saved[i].title}?`)){ saved.splice(i,1); localStorage.setItem('pixoro_highlights_'+ME,JSON.stringify(saved)); loadRealHighlights() } }
-function switchTab(t){ document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active')); if(t=='posts') document.getElementById('tabPosts').classList.add('active'); if(t=='reels') location.href='reels.html'; if(t=='saved') location.href='saved.html' }
-function openEditSheet(){
- document.getElementById('editName').value=localStorage.getItem('pixoro_name_'+ME)||ME
- document.getElementById('editUsername').value=localStorage.getItem('pixoro_uname_'+ME)||ME.toLowerCase()+'_official'
- document.getElementById('editBio').value=localStorage.getItem('pixoro_bio_'+ME)||'🔥 Tiruchengode ➡️ World\n👨‍💻 Pixoro Founder'
- document.getElementById('editLink').value=localStorage.getItem('pixoro_link_'+ME)||''
- updateProtectUI()
- document.getElementById('editSheet').style.display='flex'
-}
-document.getElementById('pfpInput').addEventListener('change', e=>{
- let file=e.target.files[0]; if(!file) return
- let reader=new FileReader(); reader.onload=ev=>{ document.getElementById('editPfpPreview').src=ev.target.result; document.getElementById('editPfpPreview').dataset.new=ev.target.result }; reader.readAsDataURL(file)
-})
-function saveEdit(){
- let name=document.getElementById('editName').value
- let uname=document.getElementById('editUsername').value
- let bio=document.getElementById('editBio').value
- let link=document.getElementById('editLink').value
- let newPfp=document.getElementById('editPfpPreview').dataset.new
- if(name) localStorage.setItem('pixoro_name_'+ME,name)
- if(uname) localStorage.setItem('pixoro_uname_'+ME,uname)
- if(bio) localStorage.setItem('pixoro_bio_'+ME,bio)
- if(link) localStorage.setItem('pixoro_link_'+ME,link)
- if(newPfp) localStorage.setItem('pixoro_gilli_pfp_'+ME,newPfp)
- localStorage.setItem('pixoro_protect_'+ME, JSON.stringify(protectOn))
- document.getElementById('editSheet').style.display='none'
- loadProfile()
- alert('Saved da! ✅')
-}
-function openEdit(){ openEditSheet() }
-function shareProfile(){ navigator.clipboard.writeText(location.href); alert('Copied da!') }
-function openSettings(){ document.getElementById('setSheet').style.display='flex' }
+function setupPfpPress(){let ring=document.getElementById('pfpRing');ring.onclick=()=>{document.getElementById('pfpZoom').style.display='flex';if(protectOn){document.getElementById('zoomImg').style.filter='blur(18px)';document.getElementById('zoomProtectMsg').style.display='block'}else{document.getElementById('zoomImg').style.filter='none';document.getElementById('zoomProtectMsg').style.display='none'}}}
+async function checkStoryRing(target){let ring=document.getElementById('pfpRing');try{let {data}=await supa.from('stories').select('*').eq('username',target).gt('expires_at',new Date().toISOString());currentStories=data||[];if(currentStories.length>0)ring.classList.add('hasStory');else ring.classList.remove('hasStory')}catch(e){ring.classList.remove('hasStory')}}
+function openBigPost(i){let p=myPosts[i];let likes=allLikes.filter(l=>l.post_id==p.id).length;document.getElementById('bigImg').src=p.image_url;document.getElementById('bigCap').innerHTML=`<b>@${p.username}</b> ${p.caption||''}`;document.getElementById('bigLikes').innerText=likes+' likes • real da';document.getElementById('bigPostView').style.display='flex'}
+function closeStory(){document.getElementById('storyViewer').style.display='none';clearInterval(storyTimer)}
+function openFollowList(type){let target=new URLSearchParams(location.search).get('u')||ME;let modal=document.getElementById('followModal');let title=document.getElementById('followTitle');let list=document.getElementById('followList');modal.style.display='flex';if(type==='posts'){title.textContent='Posts';list.innerHTML=`<div style="padding:20px;text-align:center;color:#777">${myPosts.length} real posts da</div>`;return}let users= type==='followers'? allFollows.filter(f=> (f.following||'').toLowerCase()==target.toLowerCase()).map(f=>f.follower) : allFollows.filter(f=> (f.follower||'').toLowerCase()==target.toLowerCase()).map(f=>f.following);title.textContent= type==='followers'? 'Followers' : 'Following';if(!users.length){list.innerHTML=`<div style="text-align:center;padding:60px 20px;color:#666"><div style="font-size:40px">👤</div><b style="color:#fff">No ${type} yet</b></div>`;return}list.innerHTML=users.map(u=>{let isFollow=allFollows.some(f=> (f.follower||'').toLowerCase()==ME.toLowerCase()&&(f.following||'').toLowerCase()==u.toLowerCase());return `<div class="followRow"><div style="display:flex;align-items:center;gap:10px"><img src="https://i.pravatar.cc/100?u=${u}" style="width:44px;height:44px;border-radius:50%"><div><b>@${u}</b></div></div><button class="fBtn ${isFollow?'following':''}" onclick="toggleFollow('${u}',this)">${isFollow?'Following':'Follow'}</button></div>`}).join('')}
+function closeFollow(){document.getElementById('followModal').style.display='none'}
+async function toggleFollow(u,btn){let isFollow=allFollows.some(f=> (f.follower||'').toLowerCase()==ME.toLowerCase()&&(f.following||'').toLowerCase()==u.toLowerCase());try{if(isFollow){await supa.from('follows').delete().eq('follower',ME).eq('following',u);allFollows=allFollows.filter(f=>!((f.follower||'').toLowerCase()==ME.toLowerCase()&&(f.following||'').toLowerCase()==u.toLowerCase()));btn.textContent='Follow';btn.classList.remove('following')}else{await supa.from('follows').insert({follower:ME,following:u});allFollows.push({follower:ME,following:u});btn.textContent='Following';btn.classList.add('following')}}catch(e){alert('follows table check')}loadProfile()}
+function loadRealHighlights(){let container=document.getElementById('highlightList');let saved=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]');let html=saved.map((h,i)=>`<div class="h-item" onclick="openHighlight(${i})"><div class="h-circle">${h.emoji}</div><div class="h-text">${h.title}</div></div>`).join('');html+=`<div class="h-item" onclick="addHighlight()"><div class="h-circle" style="border:2px dashed #555">➕</div><div class="h-text">New</div></div>`;container.innerHTML=html}
+function addHighlight(){let emoji=prompt('Emoji:');if(!emoji)return;let title=prompt('Title:');if(!title)return;let saved=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]');saved.push({emoji,title});localStorage.setItem('pixoro_highlights_'+ME,JSON.stringify(saved));loadRealHighlights()}
+function openHighlight(i){let saved=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]');if(confirm(`Delete ${saved[i].title}?`)){saved.splice(i,1);localStorage.setItem('pixoro_highlights_'+ME,JSON.stringify(saved));loadRealHighlights()}}
+function switchTab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));if(t=='posts')document.getElementById('tabPosts').classList.add('active');if(t=='reels')location.href='reels.html';if(t=='saved')location.href='saved.html'}
+function openEditSheet(){document.getElementById('editName').value=localStorage.getItem('pixoro_name_'+ME)||ME;document.getElementById('editUsername').value=localStorage.getItem('pixoro_uname_'+ME)||ME.toLowerCase()+'_official';document.getElementById('editBio').value=localStorage.getItem('pixoro_bio_'+ME)||'🔥 Tiruchengode ➡️ World';document.getElementById('editLink').value=localStorage.getItem('pixoro_link_'+ME)||'';updateProtectUI();document.getElementById('editSheet').style.display='flex'}
+document.getElementById('pfpInput').addEventListener('change', e=>{let file=e.target.files[0];if(!file)return;let reader=new FileReader();reader.onload=ev=>{document.getElementById('editPfpPreview').src=ev.target.result;document.getElementById('editPfpPreview').dataset.new=ev.target.result};reader.readAsDataURL(file)})
+function saveEdit(){let name=document.getElementById('editName').value;let uname=document.getElementById('editUsername').value;let bio=document.getElementById('editBio').value;let link=document.getElementById('editLink').value;let newPfp=document.getElementById('editPfpPreview').dataset.new;if(name)localStorage.setItem('pixoro_name_'+ME,name);if(uname)localStorage.setItem('pixoro_uname_'+ME,uname);if(bio)localStorage.setItem('pixoro_bio_'+ME,bio);if(link)localStorage.setItem('pixoro_link_'+ME,link);if(newPfp)localStorage.setItem('pixoro_gilli_pfp_'+ME,newPfp);localStorage.setItem('pixoro_protect_'+ME,JSON.stringify(protectOn));document.getElementById('editSheet').style.display='none';loadProfile();alert('Saved da! ✅')}
+function shareProfile(){navigator.clipboard.writeText(location.href);alert('Copied da!')}
+function openSettings(){document.getElementById('setSheet').style.display='flex'}
 loadProfile()
 </script></body></html>
