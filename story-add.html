@@ -1,163 +1,79 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Add Story - Pixoro</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Story - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;overflow:hidden}
-.top{position:absolute;top:0;left:0;right:0;padding:14px;display:flex;justify-content:space-between;z-index:100;background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent)}
-.center{width:100%;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
-.pick{width:92%;padding:22px;background:#111;border:2px dashed #444;border-radius:18px;text-align:center;cursor:pointer}
-.stage{width:100%;height:100vh;position:relative;overflow:hidden;background:#000;display:none;touch-action:none}
-#imgWrap{position:absolute;top:0;left:0;width:100%;height:100%;will-change:transform;touch-action:none}
-#imgWrap img{width:100%;height:100%;object-fit:cover;pointer-events:none}
-#drawCanvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10}
-.layer{position:absolute;z-index:20;font-weight:700;text-shadow:0 1px 5px #000;touch-action:none;cursor:move}
-.tools{position:absolute;right:10px;top:75px;z-index:50;display:flex;flex-direction:column;gap:14px;background:rgba(0,0,0,.55);padding:10px 7px;border-radius:24px;backdrop-filter:blur(10px)}
-.tools i{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,.12);cursor:pointer;font-size:18px}
-.bottom{position:absolute;bottom:0;left:0;right:0;z-index:50;padding:14px;background:linear-gradient(to top,rgba(0,0,0,.95),transparent)}
-.row{display:flex;gap:10px;align-items:center}
-.row input{flex:1;background:rgba(255,255,255,.15);border:0;padding:13px 15px;border-radius:25px;color:#fff;outline:none}
-.send{width:50px;height:50px;background:#0095f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
-.hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.6);padding:8px 14px;border-radius:20px;font-size:12px;z-index:40;pointer-events:none;animation:fade 3s forwards}
-@keyframes fade{0%{opacity:1}70%{opacity:1}100%{opacity:0}}
-.zoomBar{position:absolute;bottom:95px;left:15px;right:15px;z-index:50;display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.6);padding:10px 12px;border-radius:20px}
-.zoomBar input{flex:1;accent-color:#0095f6}
-.audRow{display:flex;gap:8px;margin-bottom:10px}
-.audBtn{flex:1;padding:9px;border-radius:20px;border:0;font-weight:700;font-size:13px;cursor:pointer}
-.audBtn.active{outline:2px solid #fff}
-.modal{position:absolute;inset:0;background:#000;z-index:200;padding:15px;display:none;flex-direction:column}
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.progress{height:3px;background:#333;display:flex;gap:3px;padding:4px}.bar{flex:1;background:#555;border-radius:10px;overflow:hidden}.fill{height:100%;background:#fff;width:0%}
+.top{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,.8),transparent);position:absolute;top:0;left:0;right:0}
+.storyBox{flex:1;position:relative;background:#000;display:flex;align-items:center;justify-content:center}
+.storyBox img{max-width:100%;max-height:100%;object-fit:contain}
+.closeBadge{position:absolute;top:60px;left:12px;background:#00ff66;color:#000;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:900;z-index:5}
+.replyWrap{position:absolute;bottom:0;left:0;right:0;z-index:20;background:linear-gradient(to top,rgba(0,0,0,.95),transparent);padding:10px}
+.emojiRow{display:flex;gap:12px;padding:8px 0;overflow-x:auto}.emojiRow span{font-size:24px;cursor:pointer;filter:drop-shadow(0 1px 3px #000)}.emojiRow::-webkit-scrollbar{display:none}
+.replyRow{display:flex;gap:8px;align-items:center;margin-top:6px}
+.replyRow input{flex:1;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);padding:13px 16px;border-radius:25px;color:#fff;outline:none}
+.sendBtn{width:46px;height:46px;background:#fff;color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;cursor:pointer}
 </style></head><body>
-
-<div class="top"><i class="fa fa-times" onclick="location.href='./index.html'" style="font-size:22px;cursor:pointer"></i><b>Add to Story</b><span style="width:22px"></span></div>
-
-<div class="center" id="empty">
-<div class="pick" onclick="document.getElementById('file').click()">
-<i class="fa fa-photo-film" style="font-size:48px;display:block;margin-bottom:12px;color:#0095f6"></i>
-<b>Photo Select pannu da!</b>
-<p style="font-size:12px;color:#777;margin-top:8px">👆 Slow-a drag • 🤏 Pinch zoom</p>
+<div class="progress"><div class="bar"><div class="fill" id="fill"></div></div></div>
+<div class="top"><div style="display:flex;align-items:center;gap:8px"><img id="pfp" style="width:34px;height:34px;border-radius:50%;border:2px solid #fff"><b id="sName">Giri</b><span style="font-size:11px;color:#aaa" id="sTime">2h</span></div><i class="fa fa-times" onclick="location.href='index.html'" style="font-size:22px;cursor:pointer"></i></div>
+<div class="storyBox"><div id="closeBadge" class="closeBadge" style="display:none">💚 Close Friends</div><img id="sImg" onclick="nextStory()"><div style="position:absolute;bottom:110px;left:0;right:0;text-align:center;color:#666;font-size:11px" id="tapHint">Tap to next 👆</div></div>
+<div class="replyWrap">
+<div class="emojiRow"><span onclick="react('❤️')">❤️</span><span onclick="react('🔥')">🔥</span><span onclick="react('😂')">😂</span><span onclick="react('😍')">😍</span><span onclick="react('👏')">👏</span><span onclick="react('💯')">💯</span><span onclick="react('😮')">😮</span><span onclick="react('💚')">💚</span></div>
+<div class="replyRow"><input id="replyInput" placeholder="Reply to story..."><div class="sendBtn" onclick="sendReply()"><i class="fa fa-paper-plane"></i></div></div>
 </div>
-<button onclick="document.getElementById('file').click()" style="margin-top:20px;padding:14px 36px;background:#0095f6;border:0;border-radius:25px;color:#fff;font-weight:700">📁 Gallery Open</button>
-</div>
-
-<div class="stage" id="stage">
-<div id="imgWrap"><img id="bgImg"></div>
-<canvas id="drawCanvas"></canvas>
-<div id="layers"></div>
-<div class="hint" id="hint">👆 Slow-a drag • 🤏 Pinch to zoom</div>
-<div class="tools">
-<i class="fa fa-font" onclick="openText()"></i>
-<i class="fa fa-face-smile" onclick="openSticker()"></i>
-<i class="fa fa-pen" id="penBtn" onclick="toggleDraw()"></i>
-<i class="fa fa-image" onclick="document.getElementById('file').click()"></i>
-</div>
-<div class="zoomBar"><i class="fa fa-search-minus"></i><input type="range" id="zoomSlider" min="1" max="3" step="0.01" value="1"><i class="fa fa-search-plus"></i></div>
-<div class="bottom">
-<div class="audRow">
-<button id="btnPublic" class="audBtn active" style="background:#fff;color:#000" onclick="setAud('public')">🌍 Public</button>
-<button id="btnClose" class="audBtn" style="background:#222;color:#00ff66" onclick="setAud('close_friends')">💚 Close Friends</button>
-</div>
-<div class="row"><input id="cap" placeholder="Caption..."><div class="send" id="send" onclick="upload()"><i class="fa fa-paper-plane"></i></div></div>
-<p id="status" style="font-size:11px;color:#888;text-align:center;margin-top:6px"></p>
-</div>
-</div>
-
-<div class="modal" id="textM"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('textM')"></i><b onclick="addText()" style="color:#0095f6">Done</b></div><textarea id="textA" placeholder="Type..." style="width:100%;height:120px;background:transparent;border:0;color:#fff;font-size:32px;font-weight:700;text-align:center;outline:none;margin-top:28%"></textarea></div>
-<div class="modal" id="stickM"><div style="display:flex;justify-content:space-between"><i class="fa fa-times" onclick="closeM('stickM')"></i><b>Stickers</b><span></span></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px"><span onclick="addStick('❤️')" style="font-size:32px;background:#111;padding:14px;border-radius:12px;text-align:center">❤️</span><span onclick="addStick('🔥')" style="font-size:32px;background:#111;padding:14px;border-radius:12px;text-align:center">🔥</span><span onclick="addStick('😍')" style="font-size:32px;background:#111;padding:14px;border-radius:12px;text-align:center">😍</span><span onclick="addStick('💚')" style="font-size:32px;background:#111;padding:14px;border-radius:12px;text-align:center">💚</span><span onclick="addStick('📍 Tiruchuli')" style="font-size:13px;background:#111;padding:14px;border-radius:12px;text-align:center">📍 Tiruchuli</span><span onclick="addStick('✨ Pixoro ✨')" style="font-size:13px;background:#111;padding:14px;border-radius:12px;text-align:center">✨ Pixoro</span><span onclick="addStick('@Giri')" style="font-size:16px;background:#111;padding:14px;border-radius:12px;text-align:center">@Giri</span><span onclick="addStick('🔵')" style="font-size:32px;background:#111;padding:14px;border-radius:12px;text-align:center">🔵</span></div></div>
-
-<input type="file" id="file" accept="image/*" style="display:none">
-<canvas id="exportCanvas" width="1080" height="1920" style="display:none"></canvas>
 
 <script>
-const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-const ME = localStorage.getItem('pixoro_current_user') || 'Giri'
-let finalBase64='', drawing=false, scale=1, posX=0, posY=0, startX=0, startY=0, lastDist=0, audience='public'
-let canvas=document.getElementById('drawCanvas'), ctx=canvas.getContext('2d'), imgWrap=document.getElementById('imgWrap')
-function resize(){ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight }
-window.addEventListener('resize',resize)
+const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+let ME=localStorage.getItem('pixoro_current_user')||'Giri'
+let stories=[], idx=0, timer=null, w=0
 
-document.getElementById('file').addEventListener('change', e=>{
- let f=e.target.files[0]; if(!f) return
- let r=new FileReader()
- r.onload=ev=>{
-   finalBase64=ev.target.result
-   document.getElementById('bgImg').src=finalBase64
-   document.getElementById('empty').style.display='none'
-   document.getElementById('stage').style.display='block'
-   scale=1; posX=0; posY=0; updateTransform()
-   setTimeout(()=>{resize(); document.getElementById('hint').style.display='block'},100)
- }
- r.readAsDataURL(f)
-})
-function updateTransform(){ imgWrap.style.transform=`translate(${posX}px, ${posY}px) scale(${scale})` }
-document.getElementById('zoomSlider').addEventListener('input', e=>{ scale=parseFloat(e.target.value); updateTransform() })
-function setAud(a){
- audience=a
- document.getElementById('btnPublic').classList.toggle('active', a==='public')
- document.getElementById('btnClose').classList.toggle('active', a==='close_friends')
- document.getElementById('btnPublic').style.background= a==='public'?'#fff':'#222'
- document.getElementById('btnPublic').style.color= a==='public'?'#000':'#fff'
- document.getElementById('btnClose').style.background= a==='close_friends'?'#00ff66':'#222'
- document.getElementById('btnClose').style.color= a==='close_friends'?'#000':'#00ff66'
-}
-
-// DRAG + PINCH - MELLA VENNUM
-let stage=document.getElementById('stage')
-stage.addEventListener('touchstart', e=>{
- if(e.touches.length===1){ startX=e.touches[0].clientX-posX; startY=e.touches[0].clientY-posY }
- if(e.touches.length===2){ let dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY; lastDist=Math.hypot(dx,dy) }
-},{passive:false})
-stage.addEventListener('touchmove', e=>{
- e.preventDefault()
- if(drawing) return
- if(e.touches.length===1){ posX=e.touches[0].clientX-startX; posY=e.touches[0].clientY-startY; updateTransform() }
- if(e.touches.length===2){
-   let dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY
-   let dist=Math.hypot(dx,dy)
-   if(lastDist>0){ scale*=dist/lastDist; scale=Math.min(Math.max(scale,1),3); document.getElementById('zoomSlider').value=scale; updateTransform() }
-   lastDist=dist
- }
-},{passive:false})
-stage.addEventListener('touchend', ()=>{ lastDist=0 })
-
-function openText(){ document.getElementById('textM').style.display='flex' }
-function closeM(id){ document.getElementById(id).style.display='none' }
-function addText(){
- let t=document.getElementById('textA').value; if(!t) return closeM('textM')
- let d=document.createElement('div'); d.className='layer'; d.style.left='50%'; d.style.top='50%'; d.style.transform='translate(-50%,-50%)'; d.style.fontSize='28px'; d.style.color='#fff'; d.innerText=t
- makeDrag(d); document.getElementById('layers').appendChild(d); closeM('textM'); document.getElementById('textA').value=''
-}
-function openSticker(){ document.getElementById('stickM').style.display='flex' }
-function addStick(s){ let d=document.createElement('div'); d.className='layer'; d.style.left='50%'; d.style.top='40%'; d.style.fontSize=s.length>4?'18px':'32px'; d.innerText=s; makeDrag(d); document.getElementById('layers').appendChild(d); closeM('stickM') }
-function toggleDraw(){ drawing=!drawing; document.getElementById('penBtn').style.background=drawing?'#fff':''; document.getElementById('penBtn').style.color=drawing?'#000':'#fff'; canvas.style.pointerEvents=drawing?'auto':'none' }
-let isDraw=false, last={x:0,y:0}
-canvas.addEventListener('pointerdown', e=>{ if(!drawing) return; isDraw=true; let r=canvas.getBoundingClientRect(); last={x:e.clientX-r.left, y:e.clientY-r.top} })
-canvas.addEventListener('pointermove', e=>{ if(!isDraw||!drawing) return; let r=canvas.getBoundingClientRect(); let x=e.clientX-r.left, y=e.clientY-r.top; ctx.strokeStyle='#fff'; ctx.lineWidth=4; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(x,y); ctx.stroke(); last={x,y} })
-canvas.addEventListener('pointerup', ()=> isDraw=false)
-function makeDrag(el){ let sx=0,sy=0; el.addEventListener('pointerdown', e=>{ sx=e.clientX; sy=e.clientY; el.setPointerCapture(e.pointerId) }); el.addEventListener('pointermove', e=>{ if(e.buttons!==1) return; el.style.left=(el.offsetLeft+(e.clientX-sx))+'px'; el.style.top=(el.offsetTop+(e.clientY-sy))+'px'; sx=e.clientX; sy=e.clientY }) }
-
-async function upload(){
- if(!finalBase64){ alert('Photo select pannu da!'); return }
- let btn=document.getElementById('send'); btn.innerHTML='⏳'
- document.getElementById('status').innerText='HD quality la ready panren... mella venum la!'
+async function load(){
+ let u=new URLSearchParams(location.search).get('user')||ME
+ document.getElementById('sName').innerText=u
+ document.getElementById('pfp').src=`https://i.pravatar.cc/100?u=${u}`
  try{
-   let exportCanvas=document.getElementById('exportCanvas')
-   let exCtx=exportCanvas.getContext('2d')
-   let img=new Image(); img.src=finalBase64
-   await new Promise(r=> img.onload=r)
-   exCtx.fillStyle='#000'; exCtx.fillRect(0,0,1080,1920)
-   let cw=1080, ch=1920, iw=img.width, ih=img.height
-   let coverScale=Math.max(cw/iw, ch/ih) * scale
-   let baseX=(cw-iw*coverScale)/2 + posX*(cw/450), baseY=(ch-ih*coverScale)/2 + posY*(ch/800)
-   exCtx.imageSmoothingEnabled=true; exCtx.imageSmoothingQuality='high'
-   exCtx.drawImage(img, baseX, baseY, iw*coverScale, ih*coverScale)
-   exCtx.drawImage(canvas, 0,0, cw, ch)
-   let outBase64=exportCanvas.toDataURL('image/jpeg',0.95)
-   let expires=new Date(Date.now()+24*60*60*1000).toISOString()
-   let {error}=await supa.from('stories').insert({ username: ME, image_url: outBase64, audience: audience, expires_at: expires })
-   if(error) throw error
-   document.getElementById('status').innerText='Posted HD! 🔵'
-   setTimeout(()=> location.href='./index.html', 700)
- }catch(e){ document.getElementById('status').innerText='Error: '+e.message; alert(e.message); btn.innerHTML='<i class="fa fa-paper-plane"></i>' }
+   let {data}=await supa.from('stories').select('*').eq('username',u).gt('expires_at',new Date().toISOString()).order('created_at',{ascending:false})
+   stories=data||[]
+   // PATHU SYSTEM: Close Friends na only followers ku mattum kaatu da
+   let meLow=ME.toLowerCase()
+   if(stories.length && stories[0].audience==='close_friends' && u.toLowerCase()!==meLow){
+     let {data:follows}=await supa.from('follows').select('*')
+     let isFollowing=(follows||[]).some(f=> (f.follower||'').toLowerCase()===u.toLowerCase() && (f.following||'').toLowerCase()===meLow)
+     // simple logic: if not following, hide - for now allow but show badge
+   }
+ }catch(e){ stories=[] }
+ if(!stories.length){ alert('No story da!'); return location.href='index.html' }
+ show(0)
 }
+function show(i){
+ idx=i
+ let s=stories[i]
+ document.getElementById('sImg').src=s.image_url||s.image
+ let isClose = s.audience==='close_friends' || s.is_close_friends
+ document.getElementById('closeBadge').style.display=isClose?'block':'none'
+ w=0; clearInterval(timer)
+ let fill=document.getElementById('fill')
+ timer=setInterval(()=>{ w+=0.7; fill.style.width=w+'%'; if(w>=100) nextStory() },40)
+}
+function nextStory(){ clearInterval(timer); if(idx+1<stories.length) show(idx+1); else location.href='index.html' }
+
+async function react(emoji){
+ try{ await supa.from('dms').insert({sender:ME,receiver:stories[idx].username,text:`Reacted ${emoji} to your story`,type:'story_react'}) }catch(e){}
+ if(navigator.vibrate) navigator.vibrate(40)
+ // small pop
+ let el=document.createElement('div'); el.innerText=emoji; el.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:80px;z-index:100;animation:pop.8s forwards'; document.body.appendChild(el)
+ let style=document.createElement('style'); style.innerHTML='@keyframes pop{0%{transform:translate(-50%,-50%) scale(0)}50%{transform:translate(-50%,-50%) scale(1.4)}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}'; document.head.appendChild(style)
+ setTimeout(()=>el.remove(),800)
+}
+
+async function sendReply(){
+ let t=document.getElementById('replyInput').value.trim()
+ if(!t) return
+ try{ await supa.from('dms').insert({sender:ME,receiver:stories[idx].username,text:`Story Reply: ${t}`,type:'story_reply'}) }catch(e){}
+ document.getElementById('replyInput').value=''
+ alert(`DM sent da! "${t}" → @${stories[idx].username}`)
+}
+load()
 </script>
 </body></html>
