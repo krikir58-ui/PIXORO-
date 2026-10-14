@@ -1,79 +1,77 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Story - Pixoro</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Add Story - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.progress{height:3px;background:#333;display:flex;gap:3px;padding:4px}.bar{flex:1;background:#555;border-radius:10px;overflow:hidden}.fill{height:100%;background:#fff;width:0%}
-.top{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,.8),transparent);position:absolute;top:0;left:0;right:0}
-.storyBox{flex:1;position:relative;background:#000;display:flex;align-items:center;justify-content:center}
-.storyBox img{max-width:100%;max-height:100%;object-fit:contain}
-.closeBadge{position:absolute;top:60px;left:12px;background:#00ff66;color:#000;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:900;z-index:5}
-.replyWrap{position:absolute;bottom:0;left:0;right:0;z-index:20;background:linear-gradient(to top,rgba(0,0,0,.95),transparent);padding:10px}
-.emojiRow{display:flex;gap:12px;padding:8px 0;overflow-x:auto}.emojiRow span{font-size:24px;cursor:pointer;filter:drop-shadow(0 1px 3px #000)}.emojiRow::-webkit-scrollbar{display:none}
-.replyRow{display:flex;gap:8px;align-items:center;margin-top:6px}
-.replyRow input{flex:1;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);padding:13px 16px;border-radius:25px;color:#fff;outline:none}
-.sendBtn{width:46px;height:46px;background:#fff;color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;cursor:pointer}
+<style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding:16px;min-height:100vh}
+.top{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #222}
+.btn{width:100%;background:#fff;color:#000;padding:14px;border-radius:12px;font-weight:900;border:0;margin-top:12px;cursor:pointer}
+.btn2{width:100%;background:#222;color:#fff;padding:12px;border-radius:12px;border:1px solid #333;margin-top:8px;cursor:pointer}
+img#preview{width:100%;max-height:60vh;object-fit:contain;background:#111;border-radius:16px;margin-top:12px;display:none}
+.aud{display:flex;gap:8px;margin-top:12px}
+.aud button{flex:1;padding:10px;border-radius:20px;border:0;font-weight:700}
+.aud button.active{outline:2px solid #fff}
 </style></head><body>
-<div class="progress"><div class="bar"><div class="fill" id="fill"></div></div></div>
-<div class="top"><div style="display:flex;align-items:center;gap:8px"><img id="pfp" style="width:34px;height:34px;border-radius:50%;border:2px solid #fff"><b id="sName">Giri</b><span style="font-size:11px;color:#aaa" id="sTime">2h</span></div><i class="fa fa-times" onclick="location.href='index.html'" style="font-size:22px;cursor:pointer"></i></div>
-<div class="storyBox"><div id="closeBadge" class="closeBadge" style="display:none">💚 Close Friends</div><img id="sImg" onclick="nextStory()"><div style="position:absolute;bottom:110px;left:0;right:0;text-align:center;color:#666;font-size:11px" id="tapHint">Tap to next 👆</div></div>
-<div class="replyWrap">
-<div class="emojiRow"><span onclick="react('❤️')">❤️</span><span onclick="react('🔥')">🔥</span><span onclick="react('😂')">😂</span><span onclick="react('😍')">😍</span><span onclick="react('👏')">👏</span><span onclick="react('💯')">💯</span><span onclick="react('😮')">😮</span><span onclick="react('💚')">💚</span></div>
-<div class="replyRow"><input id="replyInput" placeholder="Reply to story..."><div class="sendBtn" onclick="sendReply()"><i class="fa fa-paper-plane"></i></div></div>
+<div class="top"><span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">←</span><b>Add to Story 🔥</b><span style="width:22px"></span></div>
+
+<div style="margin-top:20px;text-align:center">
+<div onclick="document.getElementById('file').click()" style="border:2px dashed #444;border-radius:20px;padding:30px;background:#111;cursor:pointer">
+<div style="font-size:48px">📸</div><b>Photo Select Pannu Da!</b><p style="font-size:12px;color:#777;margin-top:6px">Gallery la irunthu eduthuko da</p>
+</div>
+<button onclick="document.getElementById('file').click()" style="margin-top:14px;padding:12px 24px;background:#0095f6;border:0;border-radius:20px;color:#fff;font-weight:700">Gallery Open</button>
 </div>
 
+<img id="preview">
+<input type="file" id="file" accept="image/*" style="display:none">
+
+<div class="aud">
+<button id="bPublic" class="active" style="background:#fff;color:#000" onclick="setAud('public')">🌍 Public</button>
+<button id="bClose" style="background:#222;color:#00ff66" onclick="setAud('close_friends')">💚 Close Friends</button>
+</div>
+
+<input id="cap" placeholder="Caption (optional)..." style="width:100%;background:#111;border:1px solid #333;padding:12px;border-radius:12px;color:#fff;margin-top:12px">
+
+<button class="btn" id="postBtn" onclick="upload()">Post Story 🚀</button>
+<button class="btn2" onclick="location.href='index.html'">Cancel</button>
+<p id="status" style="text-align:center;font-size:12px;color:#888;margin-top:10px"></p>
+
 <script>
-const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-let ME=localStorage.getItem('pixoro_current_user')||'Giri'
-let stories=[], idx=0, timer=null, w=0
-
-async function load(){
- let u=new URLSearchParams(location.search).get('user')||ME
- document.getElementById('sName').innerText=u
- document.getElementById('pfp').src=`https://i.pravatar.cc/100?u=${u}`
+const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+let ME = localStorage.getItem('pixoro_current_user')||'Giri'
+let finalBase64='', audience='public'
+function setAud(a){ audience=a; document.getElementById('bPublic').classList.toggle('active',a==='public'); document.getElementById('bClose').classList.toggle('active',a==='close_friends'); document.getElementById('bPublic').style.background=a==='public'?'#fff':'#222'; document.getElementById('bPublic').style.color=a==='public'?'#000':'#fff'; document.getElementById('bClose').style.background=a==='close_friends'?'#00ff66':'#222'; document.getElementById('bClose').style.color=a==='close_friends'?'#000':'#00ff66'; }
+document.getElementById('file').addEventListener('change', e=>{
+ let f=e.target.files[0]; if(!f) return
+ if(f.size>5*1024*1024){ alert('Photo perusa irukku da! 5MB kulla eduthuko da!'); return }
+ let r=new FileReader()
+ r.onload=ev=>{
+   finalBase64=ev.target.result
+   let im=document.getElementById('preview')
+   im.src=finalBase64; im.style.display='block'
+   document.getElementById('status').innerText='Photo ready da! ✅'
+ }
+ r.readAsDataURL(f)
+})
+async function upload(){
+ if(!finalBase64){ alert('Photo select pannu da Giri! 📸'); return }
+ let btn=document.getElementById('postBtn')
+ btn.innerText='Posting... ⏳'; btn.disabled=true
+ document.getElementById('status').innerText='Uploading... mella venum da!'
  try{
-   let {data}=await supa.from('stories').select('*').eq('username',u).gt('expires_at',new Date().toISOString()).order('created_at',{ascending:false})
-   stories=data||[]
-   // PATHU SYSTEM: Close Friends na only followers ku mattum kaatu da
-   let meLow=ME.toLowerCase()
-   if(stories.length && stories[0].audience==='close_friends' && u.toLowerCase()!==meLow){
-     let {data:follows}=await supa.from('follows').select('*')
-     let isFollowing=(follows||[]).some(f=> (f.follower||'').toLowerCase()===u.toLowerCase() && (f.following||'').toLowerCase()===meLow)
-     // simple logic: if not following, hide - for now allow but show badge
+   let expires=new Date(Date.now()+24*60*60*1000).toISOString()
+   // Try with audience column
+   let {error} = await supa.from('stories').insert({ username: ME, image_url: finalBase64, audience: audience, expires_at: expires })
+   if(error){
+     console.log('retry without audience', error.message)
+     let {error:err2} = await supa.from('stories').insert({ username: ME, image_url: finalBase64, image: finalBase64, expires_at: expires })
+     if(err2) throw err2
    }
- }catch(e){ stories=[] }
- if(!stories.length){ alert('No story da!'); return location.href='index.html' }
- show(0)
+   document.getElementById('status').innerText='Posted HD! 🔥'
+   alert('Story Posted da Giri! ✅')
+   location.href='index.html'
+ }catch(e){
+   document.getElementById('status').innerText='Error: '+e.message
+   alert('Error da: '+e.message+' - Supabase stories table check pannu da!')
+   btn.innerText='Post Story 🚀'; btn.disabled=false
+ }
 }
-function show(i){
- idx=i
- let s=stories[i]
- document.getElementById('sImg').src=s.image_url||s.image
- let isClose = s.audience==='close_friends' || s.is_close_friends
- document.getElementById('closeBadge').style.display=isClose?'block':'none'
- w=0; clearInterval(timer)
- let fill=document.getElementById('fill')
- timer=setInterval(()=>{ w+=0.7; fill.style.width=w+'%'; if(w>=100) nextStory() },40)
-}
-function nextStory(){ clearInterval(timer); if(idx+1<stories.length) show(idx+1); else location.href='index.html' }
-
-async function react(emoji){
- try{ await supa.from('dms').insert({sender:ME,receiver:stories[idx].username,text:`Reacted ${emoji} to your story`,type:'story_react'}) }catch(e){}
- if(navigator.vibrate) navigator.vibrate(40)
- // small pop
- let el=document.createElement('div'); el.innerText=emoji; el.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:80px;z-index:100;animation:pop.8s forwards'; document.body.appendChild(el)
- let style=document.createElement('style'); style.innerHTML='@keyframes pop{0%{transform:translate(-50%,-50%) scale(0)}50%{transform:translate(-50%,-50%) scale(1.4)}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}'; document.head.appendChild(style)
- setTimeout(()=>el.remove(),800)
-}
-
-async function sendReply(){
- let t=document.getElementById('replyInput').value.trim()
- if(!t) return
- try{ await supa.from('dms').insert({sender:ME,receiver:stories[idx].username,text:`Story Reply: ${t}`,type:'story_reply'}) }catch(e){}
- document.getElementById('replyInput').value=''
- alert(`DM sent da! "${t}" → @${stories[idx].username}`)
-}
-load()
 </script>
 </body></html>
