@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Story Editor</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
 html,body{width:100%;height:100%;background:#000;overflow:hidden}
@@ -8,12 +9,10 @@ body{max-width:100% !important;margin:0}
 .photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .top{position:absolute;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:16px 14px;background:linear-gradient(to bottom,rgba(0,0,0,.65),transparent)}
 .top span{font-size:24px;cursor:pointer}.top b{font-size:17px}
-/* SIDE BLOCK FIX DA - CUT AAGAATHU */
 .side{position:absolute;right:10px;top:75px;bottom:130px;width:60px;z-index:20;background:rgba(20,20,20,.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.3);border-radius:30px;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:14px;overflow-y:auto;scrollbar-width:none}
 .side::-webkit-scrollbar{display:none}
 .side div{font-size:21px;cursor:pointer;text-align:center;line-height:1}
 .side span{font-size:9px;display:block;color:#eee;margin-top:3px}
-/* BOTTOM FIX DA */
 .bottom{position:absolute;bottom:0;left:0;right:0;z-index:20;padding:12px 14px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,rgba(0,0,0,.75),transparent)}
 .cap{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.35);border-radius:12px;color:#fff;padding:11px;margin-bottom:10px;outline:none}
 .actions{display:flex;gap:8px}
@@ -37,12 +36,27 @@ body{max-width:100% !important;margin:0}
 <div>⚙️<span>Quality</span></div>
 </div>
 <div class="bottom">
-<input class="cap" placeholder="Add a caption...">
-<div class="actions"><button class="pill" onclick="postStory()">⊕ Your story</button><button class="pill green" onclick="postStory()">★ Close Friends</button></div>
+<input class="cap" id="cap" placeholder="Add a caption...">
+<div class="actions"><button class="pill" onclick="postStory('everyone')">⊕ Your story</button><button class="pill green" onclick="postStory('close_friends')">★ Close Friends</button></div>
 </div>
 </div>
 <script>
+const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+const ME=localStorage.getItem('pixoro_current_user')||'Giri'
 let m=sessionStorage.getItem('pixoro_pending_media'); if(m) document.getElementById('eImg').src=m;
+let type=sessionStorage.getItem('pixoro_pending_type')||'image'
 function addText(){ let t=prompt('Text enna da?'); if(t) alert(t+' added da!') }
-function postStory(){ sessionStorage.removeItem('pixoro_pending_media'); alert('Story posted da Giri!'); location.href='index.html'; }
+async function postStory(aud){
+  let media = sessionStorage.getItem('pixoro_pending_media') || document.getElementById('eImg').src
+  if(!media){ alert('Photo illa da!'); return }
+  let exp=new Date(); exp.setHours(exp.getHours()+24);
+  let story={ id:'local_'+Date.now(), username:ME, image_url:media, media_url:media, image:media, media_type:type, caption:document.getElementById('cap').value, audience:aud, created_at:new Date().toISOString(), expires_at:exp.toISOString() }
+  // Local save - 100% work aagum
+  let arr=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]'); arr.push(story); localStorage.setItem('pixoro_local_stories',JSON.stringify(arr));
+  // Supabase try
+  try{ await supa.from('stories').insert({username:ME,image_url:media,media_type:type,caption:story.caption,audience:aud,expires_at:exp.toISOString()}) }catch(e){ console.log('supa skip',e) }
+  sessionStorage.removeItem('pixoro_pending_media');
+  alert('Story posted da Giri! 🔥');
+  location.href='index.html';
+}
 </script></body></html>
