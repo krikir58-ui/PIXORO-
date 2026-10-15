@@ -66,9 +66,16 @@ async function loadAll(){
     let {data:stories}=await supa.from('stories').select('*').order('created_at',{ascending:false});
     let {data:follows}=await supa.from('follows').select('*');
     let now=new Date()
-    allStories=(stories||[]).filter(s=>{ if(!s.expires_at) return true; return new Date(s.expires_at) > now })
+    let supaStories=(stories||[]).filter(s=>{ if(!s.expires_at) return true; return new Date(s.expires_at) > now })
+    let localStories=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]').filter(s=>{ if(!s.expires_at) return true; return new Date(s.expires_at) > now })
+    allStories=[...localStories, ...supaStories]
     allPosts=(posts||[]).filter(p=>!p.is_archived);allLikes=likes||[];allSaves=saves||[];allFollows=follows||[];
-  }catch(e){ allPosts=[] }
+  }catch(e){
+    let now=new Date()
+    let localStories=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]').filter(s=> new Date(s.expires_at) > now)
+    allStories=localStories
+    allPosts=[]
+  }
   renderStories();renderFeed();
 }
 function renderStories(){
