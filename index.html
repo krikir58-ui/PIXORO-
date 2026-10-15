@@ -32,12 +32,14 @@
 .grid.cam{background:#111;aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:12px;color:#888;cursor:pointer}
 .tabs{display:flex;justify-content:center;gap:28px;padding:14px;background:#111;margin:12px;border-radius:20px}.tabs span{color:#888;font-weight:700;font-size:13px;letter-spacing:1px;cursor:pointer}.tabs span.act{color:#fff}
 .createBtn{margin:12px;width:calc(100% - 24px);background:#fff;color:#000;border:0;padding:14px;border-radius:22px;font-weight:800;font-size:15px;cursor:pointer}
+.closeBtn{margin:0 12px 12px;width:calc(100% - 24px);background:#002a14!important;border:1px solid #00ff66!important;color:#00ff66!important;padding:14px;border-radius:22px;font-weight:800;font-size:15px;cursor:pointer}
 .heart-burst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:90px;color:#FF0A33;pointer-events:none;opacity:0}.heart-burst.show{animation:burst.9s forwards}@keyframes burst{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
 .postMenuSheet{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:600;display:none;align-items:flex-end;justify-content:center}.postMenuSheet.show{display:flex}
 .postMenuBox{background:#1a1a1a;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:12px 14px 30px;border:1px solid #333;max-height:85vh;overflow-y:auto}
 .menuItem{padding:14px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #222;cursor:pointer;font-size:14px}.menuItem.delete{color:#ff3040}
 .tgl{position:relative;width:46px;height:26px;background:#333;border-radius:20px;cursor:pointer;flex-shrink:0;transition:.2s}.tgl.on{background:#00c853}.tgl span{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s}.tgl.on span{left:23px}
 .setRow{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #222}
+textarea{width:calc(100% - 24px);margin:0 12px;background:#111;border:1px solid #222;padding:12px;border-radius:12px;color:#fff;outline:none;min-height:60px}
 </style></head><body>
 <div class="top"><b style="font-size:24px;font-weight:900">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="openCreateUnified('STORY')">+</div><div class="bellWhite" onclick="location.href='notifications.html'"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M6 8a6 6 0 0 1 12 0c0 7 6 9 6 9H0s6-2 6-9"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg></div></div></div>
 <div class="storySearchWrap"><input id="storySearch" placeholder="🔍 Search Story..." oninput="renderStories()"><span onclick="document.getElementById('storySearch').value='';renderStories()" style="color:#666;cursor:pointer">✕</span></div>
@@ -45,15 +47,16 @@
 <div id="feed"><p style="text-align:center;padding:60px;color:#666">Loading...</p></div>
 <div class="bottom-nav"><a class="active" href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a><a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a><a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a><a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a><a href="profile.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg><span>Profile</span></a></div>
 
-<!-- UNIFIED CREATE - POST STORY REEL LIVE ELLAM OREY SHEET LA -->
 <div id="storySheet">
   <div class="sSheetHead"><span onclick="closeStorySheet()" style="font-size:26px;cursor:pointer">✕</span><b id="sheetTitle">Add to story</b><span onclick="openStorySettings()" style="cursor:pointer;font-size:18px">⚙️</span></div>
   <div class="chips"><div class="chip">✨ Templates</div><div class="chip">🎵 Music</div><div class="chip">🖼️ Collage</div></div>
   <div class="bigPrev" id="bigPrev"><img id="bigImg"></div>
+  <textarea id="caption" placeholder="Caption + Poll + @Mention..."></textarea>
   <div class="recHead"><b>Recents ∨</b><span onclick="document.getElementById('fileInput').click()" style="color:#888;font-size:13px">Select</span></div>
   <div class="grid" id="storyGrid"><div class="cam" onclick="document.getElementById('fileInput').click()">📷<span>Camera</span></div><div class="cam" onclick="document.getElementById('fileInput').click()">🖼️<span>Gallery</span></div></div>
   <div class="tabs"><span id="tabPOST" onclick="switchTab('POST')">POST</span><span id="tabSTORY" class="act" onclick="switchTab('STORY')">STORY</span><span id="tabREEL" onclick="switchTab('REEL')">REEL</span><span id="tabLIVE" onclick="switchTab('LIVE')">LIVE</span></div>
   <button class="createBtn" id="createBtn" onclick="uploadUnified()">+ Create Story - Add to Story</button>
+  <button class="closeBtn" id="closeBtn" onclick="uploadUnifiedClose()">💚 Share to Close Friends</button>
   <div style="text-align:center;color:#666;font-size:12px;padding:8px">Today • Pixoro Black • Battery Saver</div>
 </div>
 
@@ -63,7 +66,7 @@
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b>⚙️ Story Settings</b><span onclick="document.getElementById('storySettings').style.display='none'" style="font-size:22px;cursor:pointer">✕</span></div>
     <div style="color:#888;font-size:11px;margin-bottom:14px">✨ Pixoro Plus - FREE</div>
     <div style="background:#000;border-radius:16px;padding:4px 14px">
-      <div class="setRow"><span style="font-size:14px">👻 Ghost Mode<br><small style="color:#888">Seen varathu</small></span><div class="tgl" id="tglGhost" onclick="toggleSwitch('ghost')"><span></span></div></div>
+      <div class="setRow"><span style="font-size:14px">👻 Ghost Mode</span><div class="tgl" id="tglGhost" onclick="toggleSwitch('ghost')"><span></span></div></div>
       <div class="setRow"><span style="font-size:14px">⏰ 48 Hours Story</span><div class="tgl on" id="tgl48" onclick="toggleSwitch('48h')"><span></span></div></div>
       <div class="setRow"><span style="font-size:14px">👁️ Rewatch Count</span><div class="tgl on" id="tglRewatch" onclick="toggleSwitch('rewatch')"><span></span></div></div>
       <div class="setRow" style="border-bottom:0"><span style="font-size:14px">🔍 Search Viewers</span><div class="tgl on" id="tglSearch" onclick="toggleSwitch('search')"><span></span></div></div>
@@ -75,13 +78,6 @@
       <span onclick="setAudience('vip')" style="background:#111;border:1px solid #333;padding:7px 11px;border-radius:12px;font-size:12px;cursor:pointer">⭐ VIP</span>
       <span onclick="setAudience('school')" style="background:#111;border:1px solid #333;padding:7px 11px;border-radius:12px;font-size:12px;cursor:pointer">🎓 School</span>
       <span onclick="createList()" style="background:#fff;color:#000;padding:7px 11px;border-radius:12px;font-size:12px;cursor:pointer">+ New List</span>
-    </div>
-    <b style="display:block;margin:16px 0 8px;font-size:13px">Story Controls:</b>
-    <div style="background:#000;border-radius:16px;padding:4px 14px">
-      <div class="setRow"><span style="font-size:14px">❤️ Like Allow</span><div class="tgl on" onclick="this.classList.toggle('on')"><span></span></div></div>
-      <div class="setRow"><span style="font-size:14px">💬 Comment Allow</span><div class="tgl on" onclick="this.classList.toggle('on')"><span></span></div></div>
-      <div class="setRow"><span style="font-size:14px">🔗 Share Allow</span><div class="tgl on" onclick="this.classList.toggle('on')"><span></span></div></div>
-      <div class="setRow" style="border-bottom:0"><span style="font-size:14px">🔖 Save Allow</span><div class="tgl on" onclick="this.classList.toggle('on')"><span></span></div></div>
     </div>
     <div onclick="document.getElementById('storySettings').style.display='none'" style="margin-top:16px;text-align:center;background:#fff;color:#000;padding:12px;border-radius:12px;font-weight:800">Done</div>
   </div>
@@ -117,7 +113,7 @@ async function loadAll(){
 function syncToggles(){ if(document.getElementById('tglGhost')){ document.getElementById('tglGhost').className='tgl'+(PLUS.ghost?' on':''); document.getElementById('tgl48').className='tgl'+(PLUS['48h']?' on':''); document.getElementById('tglRewatch').className='tgl'+(PLUS.rewatch?' on':''); document.getElementById('tglSearch').className='tgl'+(PLUS.search?' on':'') } }
 function toggleSwitch(k){ if(k=='ghost')PLUS.ghost=!PLUS.ghost; if(k=='48h')PLUS['48h']=!PLUS['48h']; if(k=='rewatch')PLUS.rewatch=!PLUS.rewatch; if(k=='search')PLUS.search=!PLUS.search; localStorage.setItem('pixoro_plus',JSON.stringify(PLUS)); syncToggles() }
 function openStorySettings(){ document.getElementById('storySettings').style.display='flex'; syncToggles() }
-function switchTab(t){ CUR_TAB=t; document.querySelectorAll('.tabs span').forEach(s=>s.classList.remove('act')); document.getElementById('tab'+t).classList.add('act'); document.getElementById('sheetTitle').innerText = t=='POST'?'New Post': t=='STORY'?'Add to story': t=='REEL'?'New Reel':'Go Live'; document.getElementById('createBtn').innerText = t=='POST'?'+ Create Post': t=='STORY'?'+ Create Story - Add to Story': t=='REEL'?'+ Create Reel':'🔴 Go Live'; let bp=document.getElementById('bigPrev'); if(t=='POST') bp.style.aspectRatio='1/1'; if(t=='STORY') bp.style.aspectRatio='9/13'; if(t=='REEL') bp.style.aspectRatio='9/16'; if(t=='LIVE') bp.style.aspectRatio='9/16'; }
+function switchTab(t){ CUR_TAB=t; document.querySelectorAll('.tabs span').forEach(s=>s.classList.remove('act')); document.getElementById('tab'+t).classList.add('act'); document.getElementById('sheetTitle').innerText = t=='POST'?'New Post': t=='STORY'?'Add to story': t=='REEL'?'New Reel':'Go Live'; document.getElementById('createBtn').innerText = t=='POST'?'+ Create Post': t=='STORY'?'+ Create Story - Add to Story': t=='REEL'?'+ Create Reel':'🔴 Go Live'; document.getElementById('closeBtn').style.display = t=='LIVE'?'none':'block'; let bp=document.getElementById('bigPrev'); if(t=='POST') bp.style.aspectRatio='1/1'; if(t=='STORY') bp.style.aspectRatio='9/13'; if(t=='REEL') bp.style.aspectRatio='9/16'; if(t=='LIVE') bp.style.aspectRatio='9/16'; }
 function openCreateUnified(tab){ document.getElementById('storySheet').classList.add('show'); switchTab(tab||'STORY'); renderStoryGrid() }
 function openStorySheet(){ openCreateUnified('STORY') }
 function renderStories(){
@@ -160,19 +156,20 @@ function renderStoryGrid(){
 }
 function pickStory(i){let f=i.files[0];if(!f) return;let r=new FileReader();r.onload=e=>{SEL_IMG=e.target.result;showBig(SEL_IMG);let myPhotos=JSON.parse(localStorage.getItem('pixoro_my_gallery')||'[]');myPhotos.unshift(e.target.result);myPhotos=myPhotos.slice(0,20);localStorage.setItem('pixoro_my_gallery',JSON.stringify(myPhotos));renderStoryGrid()};r.readAsDataURL(f)}
 function showBig(s){document.getElementById('bigPrev').style.display='block';document.getElementById('bigImg').src=s}
-async function uploadUnified(){
+async function uploadUnified(aud){
   if(!SEL_IMG){alert('Photo select pannu da Giri!');return}
-  if(CUR_TAB=='POST'){ let {error}=await supa.from('posts').insert({username:ME,image_url:SEL_IMG,caption:''}); if(error) alert('Post Added Local da!'); else alert('Post Added da!'); closeStorySheet(); loadAll(); return }
-  if(CUR_TAB=='REEL'){ let {error}=await supa.from('reels').insert({username:ME,video_url:SEL_IMG}); alert('Reel Added da! 🔥'); closeStorySheet(); loadAll(); return }
-  if(CUR_TAB=='LIVE'){ alert('Live starting da Giri! 🔴 - live.html ku poguthu'); location.href='live.html'; return }
-  // STORY
+  let cap=document.getElementById('caption')?.value||''
+  if(CUR_TAB=='POST'){ let {error}=await supa.from('posts').insert({username:ME,image_url:SEL_IMG,caption:cap}); alert('Post Added da! 🔥'); closeStorySheet(); loadAll(); return }
+  if(CUR_TAB=='REEL'){ let {error}=await supa.from('reels').insert({username:ME,video_url:SEL_IMG,caption:cap}); alert('Reel Added da! 🔥'); closeStorySheet(); loadAll(); return }
+  if(CUR_TAB=='LIVE'){ location.href='live.html'; return }
   let hours=PLUS['48h']?48:24
   let exp=new Date(Date.now()+hours*3600*1000).toISOString()
-  let {error}=await supa.from('stories').insert({username:ME,image_url:SEL_IMG,audience:PLUS.audience||'everyone',expires_at:exp})
-  if(error){let ls=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]');ls.unshift({id:Date.now(),username:ME,image_url:SEL_IMG,audience:PLUS.audience,expires_at:exp});localStorage.setItem('pixoro_local_stories',JSON.stringify(ls))}
+  let audience=aud||PLUS.audience||'everyone'
+  let {error}=await supa.from('stories').insert({username:ME,image_url:SEL_IMG,caption:cap,audience:audience,is_close_friends:audience=='close_friends',expires_at:exp})
+  if(error){let ls=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]');ls.unshift({id:Date.now(),username:ME,image_url:SEL_IMG,caption:cap,audience:audience,is_close_friends:audience=='close_friends',expires_at:exp});localStorage.setItem('pixoro_local_stories',JSON.stringify(ls))}
   alert(hours+' Hours Story Added da! 🔥');closeStorySheet();loadAll()
 }
-async function uploadStoryNow(){ uploadUnified() }
+async function uploadUnifiedClose(){ uploadUnified('close_friends') }
 function openPostMenu(postId){
 currentMenuPost = allPosts.find(p=> p.id == postId); let p=currentMenuPost; if(!p) return
 let userClean=(p.username||'').toLowerCase().trim(); let meClean=(ME||'Giri').toLowerCase().trim(); let isMine = (userClean===meClean) || userClean.includes('giri')
