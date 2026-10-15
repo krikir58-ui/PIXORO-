@@ -37,7 +37,7 @@ textarea{min-height:60px;resize:none}
 </style>
 </head>
 <body>
-<div class="top"><span onclick="location.href='index.html'">✕</span><b>Add to story</b><span onclick="openStorySettings()">⚙️</span></div>
+<div class="top"><span onclick="location.href='index.html'">✕</span><b id="sheetTitle">Add to story</b><span onclick="openStorySettings()">⚙️</span></div>
 <div class="chips"><div class="chip">✨ Templates</div><div class="chip">🎵 Music</div><div class="chip">🖼️ Collage</div></div>
 
 <div class="bigPrev" id="bigPrev">
@@ -60,25 +60,25 @@ textarea{min-height:60px;resize:none}
   <button onclick="document.getElementById('file').click()">📁 Gallery</button>
 </div>
 
-<button class="shareBtn" onclick="up()">+ Share to Your Story ⭐</button>
-<button class="closeBtn" onclick="upClose()">💚 Share to Close Friends</button>
+<button class="shareBtn" id="shareBtn" onclick="up()">+ Share to Your Story ⭐</button>
+<button class="closeBtn" id="closeBtn" onclick="upClose()">💚 Share to Close Friends</button>
 <p id="st" style="text-align:center;color:#aaa;margin-top:10px"></p>
 
 <div class="recHead"><b>Recents ∨</b><span onclick="document.getElementById('file').click()">Select</span></div>
 <div class="grid" id="grid"><div class="cam" onclick="document.getElementById('file').click()">📷<span>Camera</span></div><div class="cam" onclick="document.getElementById('file').click()">🖼️<span>Gallery</span></div></div>
 
-<div class="tabs"><span onclick="location.href='upload.html'">POST</span><span class="act">STORY</span><span onclick="location.href='reels-upload.html'">REEL</span><span>LIVE</span></div>
+<!-- UNIFIED TABS - Vera page ku pogaathu da, orey page la ye mathum -->
+<div class="tabs"><span id="tabPOST" onclick="switchTab('POST')">POST</span><span id="tabSTORY" class="act" onclick="switchTab('STORY')">STORY</span><span id="tabREEL" onclick="switchTab('REEL')">REEL</span><span id="tabLIVE" onclick="switchTab('LIVE')">LIVE</span></div>
 <button class="backBtn" onclick="location.href='index.html'">← Back to Home</button>
 
-<!-- STORY SETTINGS - ⚙️ KULLA DA -->
 <div id="storySettings" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:700;align-items:flex-end;justify-content:center" onclick="if(event.target==this)this.style.display='none'">
   <div style="background:#1a1a1a;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:16px 16px 30px;border:1px solid #333;max-height:85vh;overflow-y:auto">
     <div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 16px"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b>⚙️ Story Settings</b><span onclick="document.getElementById('storySettings').style.display='none'" style="font-size:22px;cursor:pointer">✕</span></div>
-    <div style="color:#888;font-size:11px;margin-bottom:14px">✨ Pixoro Plus - FREE • Instagram Plus $3.99 la irukkura feature</div>
+    <div style="color:#888;font-size:11px;margin-bottom:14px">✨ Pixoro Plus - FREE</div>
     <div style="background:#000;border-radius:16px;padding:4px 14px">
       <div class="setRow"><span style="font-size:14px">👻 Ghost Mode<br><small style="color:#888">Seen varathu</small></span><div class="tgl" id="tglGhost" onclick="toggleSwitch('ghost')"><span></span></div></div>
-      <div class="setRow"><span style="font-size:14px">⏰ 48 Hours Story<br><small style="color:#888">24h ku badila 48h</small></span><div class="tgl on" id="tgl48" onclick="toggleSwitch('48h')"><span></span></div></div>
+      <div class="setRow"><span style="font-size:14px">⏰ 48 Hours Story</span><div class="tgl on" id="tgl48" onclick="toggleSwitch('48h')"><span></span></div></div>
       <div class="setRow"><span style="font-size:14px">👁️ Rewatch Count</span><div class="tgl on" id="tglRewatch" onclick="toggleSwitch('rewatch')"><span></span></div></div>
       <div class="setRow" style="border-bottom:0"><span style="font-size:14px">🔍 Search Viewers</span><div class="tgl on" id="tglSearch" onclick="toggleSwitch('search')"><span></span></div></div>
     </div>
@@ -105,13 +105,27 @@ textarea{min-height:60px;resize:none}
 <script>
 const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 let ME = localStorage.getItem('pixoro_current_user') || 'Giri'
-let curFilter='none', mediaType='image', fileData='', base64Cache=''
+let curFilter='none', mediaType='image', fileData='', base64Cache='', CUR_TAB='STORY'
 let PLUS=JSON.parse(localStorage.getItem('pixoro_plus')||'{"ghost":false,"48h":true,"rewatch":true,"search":true,"audience":"everyone"}')
 function syncToggles(){ document.getElementById('tglGhost').className='tgl'+(PLUS.ghost?' on':''); document.getElementById('tgl48').className='tgl'+(PLUS['48h']?' on':''); document.getElementById('tglRewatch').className='tgl'+(PLUS.rewatch?' on':''); document.getElementById('tglSearch').className='tgl'+(PLUS.search?' on':'') }
 function toggleSwitch(k){ if(k=='ghost')PLUS.ghost=!PLUS.ghost; if(k=='48h')PLUS['48h']=!PLUS['48h']; if(k=='rewatch')PLUS.rewatch=!PLUS.rewatch; if(k=='search')PLUS.search=!PLUS.search; localStorage.setItem('pixoro_plus',JSON.stringify(PLUS)); syncToggles() }
 function openStorySettings(){ document.getElementById('storySettings').style.display='flex'; syncToggles() }
 function setAudience(a){ PLUS.audience=a; localStorage.setItem('pixoro_plus',JSON.stringify(PLUS)); alert('Audience: '+a+' da!') }
 function createList(){ let n=prompt('New List peru enna da Giri?'); if(n) alert('List created: '+n+' ✅') }
+function switchTab(t){
+  CUR_TAB=t
+  document.querySelectorAll('.tabs span').forEach(s=>s.classList.remove('act'))
+  document.getElementById('tab'+t).classList.add('act')
+  document.getElementById('sheetTitle').innerText = t=='POST'?'New Post': t=='STORY'?'Add to story': t=='REEL'?'New Reel':'Go Live'
+  document.getElementById('shareBtn').innerText = t=='POST'?'+ Share Post': t=='STORY'?'+ Share to Your Story ⭐': t=='REEL'?'+ Share Reel 🔥':'🔴 Go Live'
+  document.getElementById('closeBtn').style.display = t=='LIVE'?'none':'block'
+  document.getElementById('closeBtn').innerText = t=='POST'?'📦 Share to Close Friends': t=='REEL'?'💚 Share Reel to Close Friends':'💚 Share to Close Friends'
+  let bp=document.getElementById('bigPrev')
+  if(t=='POST') bp.style.aspectRatio='1/1'
+  if(t=='STORY') bp.style.aspectRatio='9/13'
+  if(t=='REEL') bp.style.aspectRatio='9/16'
+  if(t=='LIVE') bp.style.aspectRatio='9/16'
+}
 function preview(input){
   if(input.files && input.files[0]){
     let f=input.files[0]
@@ -154,8 +168,31 @@ async function uploadFile(){
     return data.publicUrl
   }catch(e){ return base64Cache }
 }
-async function up(){ share(PLUS.audience||'public') }
-async function upClose(){ share('close_friends') }
+async function up(){
+  if(CUR_TAB=='POST'){ await sharePost(); return }
+  if(CUR_TAB=='REEL'){ await shareReel(); return }
+  if(CUR_TAB=='LIVE'){ location.href='live.html'; return }
+  share(PLUS.audience||'public')
+}
+async function upClose(){
+  if(CUR_TAB=='POST'){ await sharePost(true); return }
+  if(CUR_TAB=='REEL'){ await shareReel(true); return }
+  share('close_friends')
+}
+async function sharePost(isClose){
+  let mediaUrl = await uploadFile()
+  if(!mediaUrl){ alert('File select pannu da Giri!'); return }
+  let {error}=await supa.from('posts').insert({username:ME,image_url:mediaUrl,caption:document.getElementById('caption').value})
+  document.getElementById('st').innerText='✅ Post Added da Giri! 🔥'
+  setTimeout(()=>location.href='index.html',1000)
+}
+async function shareReel(isClose){
+  let mediaUrl = await uploadFile()
+  if(!mediaUrl){ alert('File select pannu da Giri!'); return }
+  let {error}=await supa.from('reels').insert({username:ME,video_url:mediaUrl,thumbnail_url:mediaUrl})
+  document.getElementById('st').innerText='✅ Reel Added da Giri! 🔥'
+  setTimeout(()=>location.href='reels.html',1000)
+}
 async function share(audience){
   let fileInput=document.getElementById('file')
   if(!fileInput.files[0] &&!base64Cache){alert('File select pannu da Giri!');return;}
