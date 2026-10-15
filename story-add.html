@@ -1,29 +1,111 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Add Story</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Add Story - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<style>body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding:16px;font-family:sans-serif}.btn{width:100%;background:#fff;color:#000;padding:14px;border-radius:12px;font-weight:900;border:0;margin-top:12px}</style></head><body>
-<div style="display:flex;justify-content:space-between"><span onclick="location.href='index.html'">← Back</span><b>Add Story 🔥</b><span></span></div>
-<div style="margin-top:20px;border:2px dashed #444;border-radius:20px;padding:30px;text-align:center;background:#111" onclick="document.getElementById('file').click()"><div style="font-size:40px">📸</div><b>Tap to Select Photo</b></div>
-<img id="preview" style="width:100%;max-height:60vh;object-fit:contain;background:#111;border-radius:16px;margin-top:12px;display:none">
-<input type="file" id="file" accept="image/*" style="display:none">
-<div style="display:flex;gap:8px;margin-top:12px"><button id="bPub" onclick="setAud('public')" style="flex:1;padding:10px;border-radius:20px;border:0;background:#fff;color:#000;font-weight:700">🌍 Public</button><button id="bClose" onclick="setAud('close_friends')" style="flex:1;padding:10px;border-radius:20px;border:0;background:#222;color:#00ff66">💚 Close</button></div>
+<style>
+body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding:16px;font-family:sans-serif}
+.btn{width:100%;background:linear-gradient(135deg,#FF6A00,#FF0A33);color:#fff;padding:14px;border-radius:12px;font-weight:900;border:0;margin-top:12px;cursor:pointer}
+.topBar{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid #222}
+.previewBox{margin-top:20px;border:2px dashed #444;border-radius:20px;padding:30px;text-align:center;background:#111;cursor:pointer}
+#preview{width:100%;max-height:60vh;object-fit:contain;background:#111;border-radius:16px;margin-top:12px;display:none}
+.audBtn{flex:1;padding:12px;border-radius:20px;border:1px solid #333;font-weight:700;cursor:pointer;transition:.2s}
+</style></head><body>
+<div class="topBar"><span onclick="location.href='index.html'" style="cursor:pointer">← Back</span><b>🛡️ PIXORO Add Story</b><span></span></div>
+
+<div class="previewBox" onclick="document.getElementById('file').click()">
+<div style="font-size:40px">📸</div><b>Tap to Select Photo</b><p style="font-size:11px;color:#666;margin-top:6px">JPG / PNG - PIXORO SAFE</p>
+</div>
+<img id="preview" src="">
+<input type="file" id="file" accept="image/*,video/*" style="display:none">
+
+<div style="display:flex;gap:8px;margin-top:16px">
+<button id="bPub" class="audBtn" onclick="setAud('public')" style="background:#fff;color:#000">🌍 Everyone</button>
+<button id="bClose" class="audBtn" onclick="setAud('close_friends')" style="background:#111;color:#00ff66">💚 Close Friends</button>
+</div>
+<p style="font-size:11px;color:#666;margin-top:8px;text-align:center" id="audHint">Everyone = Orange Ring | Close = Green Ring 💚</p>
+
 <button class="btn" id="postBtn" onclick="upload()">Post Story 🚀</button>
-<p id="status" style="text-align:center;color:#888;margin-top:10px;font-size:12px"></p>
+<p id="status" style="text-align:center;color:#888;margin-top:12px;font-size:12px"></p>
+
 <script>
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-let ME=localStorage.getItem('pixoro_current_user')||'Giri', img='', aud='public'
-function setAud(a){aud=a; document.getElementById('bPub').style.background=a==='public'?'#fff':'#222'; document.getElementById('bPub').style.color=a==='public'?'#000':'#fff'; document.getElementById('bClose').style.background=a==='close_friends'?'#00ff66':'#222'; document.getElementById('bClose').style.color=a==='close_friends'?'#000':'#00ff66'}
-document.getElementById('file').addEventListener('change',e=>{let f=e.target.files[0]; if(!f)return; let r=new FileReader(); r.onload=ev=>{img=ev.target.result; let p=document.getElementById('preview'); p.src=img; p.style.display='block'; document.getElementById('status').innerText='Ready ✅'}; r.readAsDataURL(f)})
-async function upload(){
- if(!img){alert('Photo select pannu da!'); return}
- let btn=document.getElementById('postBtn'); btn.innerText='Posting...'; btn.disabled=true
- let expires=new Date(Date.now()+24*60*60*1000).toISOString()
- let localStories=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]')
- localStories.unshift({id:Date.now(), username:ME, image_url:img, image:img, audience:aud, expires_at:expires, created_at:new Date().toISOString()})
- localStorage.setItem('pixoro_local_stories',JSON.stringify(localStories))
- document.getElementById('status').innerText='Local saved! Trying Supabase...'
- try{ await supa.from('stories').insert({username:ME, image_url:img, image:img, media_url:img, audience:aud, expires_at:expires}) }catch(e){ console.log(e) }
- alert('Story Posted da! ✅ - Home ku poren da!'); location.href='index.html'
+let ME=localStorage.getItem('pixoro_current_user')||'Giri', img='', aud='public', fileType='image'
+
+function setAud(a){
+  aud=a;
+  let pub=document.getElementById('bPub')
+  let close=document.getElementById('bClose')
+  if(a==='public'){
+    pub.style.background='#fff'; pub.style.color='#000'; pub.style.borderColor='#fff'
+    close.style.background='#111'; close.style.color='#00ff66'
+    document.getElementById('audHint').innerText='🌍 Everyone can see - Orange Gradient Ring'
+  } else {
+    close.style.background='#00ff66'; close.style.color='#000'; close.style.borderColor='#00ff66'
+    pub.style.background='#111'; pub.style.color='#fff'
+    document.getElementById('audHint').innerText='💚 Close Friends only - Green Ring (SAFE)'
+  }
 }
+
+document.getElementById('file').addEventListener('change',e=>{
+  let f=e.target.files[0]; if(!f) return;
+  fileType = f.type.startsWith('video')? 'video' : 'image'
+  let r=new FileReader();
+  r.onload=ev=>{
+    img=ev.target.result;
+    let p=document.getElementById('preview');
+    p.src=img; p.style.display='block';
+    document.getElementById('status').innerText='Ready ✅ - '+ (fileType==='video'?'Video':'Photo') +' selected'
+    document.querySelector('.previewBox').style.display='none'
+  };
+  r.readAsDataURL(f)
+})
+
+async function upload(){
+ if(!img){alert('Photo select pannu da Giri! 📸'); return}
+ let btn=document.getElementById('postBtn');
+ btn.innerText='Posting to PIXORO... 🛡️'; btn.disabled=true
+ let expires=new Date(Date.now()+24*60*60*1000).toISOString()
+
+ // ADD PANNEN DA - LOCAL ID FIX
+ let newId = 'local_'+Date.now()
+ let localStories=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]')
+ localStories.unshift({
+   id:newId,
+   username:ME,
+   image_url:img,
+   image:img,
+   media_url:img,
+   media_type:fileType,
+   audience:aud,
+   is_close_friends: aud==='close_friends',
+   expires_at:expires,
+   created_at:new Date().toISOString()
+ })
+ localStorage.setItem('pixoro_local_stories',JSON.stringify(localStories))
+ document.getElementById('status').innerText='✅ Local saved! Uploading to cloud...'
+
+ // Supabase try - base64 perusa iruntha fail aagum, athaan try-catch da
+ try{
+   await supa.from('stories').insert({
+     username:ME,
+     image_url:img,
+     image:img,
+     media_url:img,
+     media_type:fileType,
+     audience:aud,
+     is_close_friends: aud==='close_friends',
+     expires_at:expires
+   })
+   document.getElementById('status').innerText='✅ Cloud saved too!'
+ }catch(e){
+   console.log('Supa fail but local ok:',e)
+   document.getElementById('status').innerText='⚠️ Cloud fail but local OK - Home la varum da!'
+ }
+
+ setTimeout(()=>{
+   alert('PIXORO Story Posted da Giri! 🛡️💚 Home la ring varum da!');
+   location.href='index.html'
+ },800)
+}
+setAud('public')
 </script>
 </body></html>
