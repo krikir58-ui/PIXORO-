@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Story Editor - Pixoro</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;display:flex;flex-direction:column}
+.top{padding:14px;display:flex;justify-content:space-between;align-items:center}.top span{font-size:22px;cursor:pointer}
+.edit{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#111}
+.edit img,.edit video{max-width:100%;max-height:100%;object-fit:contain}
+.tools{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:14px;text-align:right;font-size:12px}
+.tools div{background:rgba(0,0,0,.6);padding:8px 10px;border-radius:20px;cursor:pointer}
+.fontBar{display:flex;gap:8px;overflow-x:auto;padding:10px}.fontBar::-webkit-scrollbar{display:none}
+.fontBar div{padding:8px 14px;background:#1a1a1a;border-radius:20px;white-space:nowrap;font-size:12px;cursor:pointer}.fontBar div.act{background:#fff;color:#000;font-weight:700}
+.drawLayer{position:absolute;inset:0}
+</style></head><body>
+<div class="top"><span onclick="location.href='story-add.html'">←</span><b>Story Editor</b><span>⚙️</span></div>
+<div class="edit" id="editBox"><img id="eImg"><video id="eVid" autoplay muted loop playsinline style="display:none"></video>
+<canvas id="drawCanvas" style="position:absolute;inset:0;pointer-events:none"></canvas>
+<div id="textOverlay" style="position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:800;text-shadow:0 2px 8px #000;text-align:center;pointer-events:none"></div>
+<div class="tools"><div onclick="addText()">Text <b>Aa</b></div><div onclick="addSticker()">Stickers 😊</div><div onclick="alert('Music soon da!')">Music 🎵</div><div onclick="addEffect()">Effects ✨</div><div onclick="mention()">Mention @</div><div onclick="toggleDraw()">Draw ✏️</div></div></div>
+<div class="fontBar"><div class="act" onclick="setFont('sans-serif',this)">Normal</div><div onclick="setFont('serif',this)">Serif</div><div onclick="setFont('cursive',this)">Handwriting</div><div onclick="setFont('monospace',this)">Mono</div><div onclick="setFont('fantasy',this)">Bold</div></div>
+<div style="padding:0 12px 8px"><input id="caption" placeholder="Add a caption..." style="width:100%;background:transparent;border:0;border-bottom:1px solid #333;color:#fff;outline:none;padding:10px 0"></div>
+<div style="padding:12px;display:flex;gap:8px"><button onclick="share('public')" style="flex:1;background:#fff;color:#000;padding:14px;border-radius:22px;font-weight:800;border:0">Your story</button><button onclick="share('close_friends')" style="flex:1;background:#002a14;border:1px solid #00ff66;color:#00ff66;padding:14px;border-radius:22px;font-weight:800">💚 Close Friends</button><button onclick="share('public')" style="background:#0095f6;color:#fff;padding:14px 18px;border-radius:22px;border:0;font-weight:800">→</button></div>
+<script>
+const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+let ME = localStorage.getItem('pixoro_current_user') || 'Giri'
+let CUR = localStorage.getItem('pixoro_cur_tab') || 'STORY'
+let media = sessionStorage.getItem('pixoro_pending_media')
+let type = sessionStorage.getItem('pixoro_pending_type') || 'image'
+let curFont='sans-serif', drawing=false, ctx=null
+if(!media){ location.href='story-add.html' }
+if(type=='video'){ let v=document.getElementById('eVid'); v.src=media; v.style.display='block'; document.getElementById('eImg').style.display='none' } else { document.getElementById('eImg').src=media }
+function addText(){ let t=prompt('Text enna da?'); if(t){ let o=document.getElementById('textOverlay'); o.innerText=t; o.style.fontFamily=curFont } }
+function addSticker(){ let s=prompt('Sticker emoji podu da 😍🔥'); if(s) document.getElementById('textOverlay').innerText += ' '+s }
+function addEffect(){ let f=prompt('Filter: Normal / B&W / Sepia / Vivid'); let el=document.getElementById('eImg'); if(f=='B&W') el.style.filter='grayscale(1)'; if(f=='Sepia') el.style.filter='sepia(1)'; if(f=='Vivid') el.style.filter='contrast(1.5) saturate(1.5)'; if(f=='Normal') el.style.filter='none' }
+function mention(){ let m=prompt('@Mention yaaru?'); if(m) document.getElementById('caption').value += ' @'+m }
+function setFont(f,el){ curFont=f; document.querySelectorAll('.fontBar div').forEach(d=>d.classList.remove('act')); el.classList.add('act'); document.getElementById('textOverlay').style.fontFamily=f; document.getElementById('caption').style.fontFamily=f }
+function toggleDraw(){ let c=document.getElementById('drawCanvas'); c.width=document.getElementById('editBox').offsetWidth; c.height=document.getElementById('editBox').offsetHeight; ctx=c.getContext('2d'); ctx.strokeStyle='#ff0'; ctx.lineWidth=4; c.style.pointerEvents='auto'; c.onpointerdown=e=>{drawing=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY)}; c.onpointermove=e=>{if(drawing){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke()}}; c.onpointerup=()=>drawing=false; alert('Draw pannu da - Finger la draw pannu!') }
+async function share(aud){
+  let blob = await (await fetch(media)).blob()
+  let file = new File([blob], 'story.jpg', {type: blob.type})
+  let name=Date.now()+'_story.jpg'; let url=media
+  try{ let {error}=await supa.storage.from('stories').upload(name,file,{upsert:true}); let {data}=supa.storage.from('stories').getPublicUrl(name); url=data.publicUrl }catch(e){}
+  let cap=document.getElementById('caption').value + ' ' + document.getElementById('textOverlay').innerText
+  if(CUR=='POST'){ await supa.from('posts').insert({username:ME,image_url:url,caption:cap}); alert('Post Added da! 🔥'); location.href='index.html'; return }
+  if(CUR=='REEL'){ await supa.from('reels').insert({username:ME,video_url:url,thumbnail_url:url}); alert('Reel Added da! 🔥'); location.href='reels.html'; return }
+  let exp=new Date(Date.now()+48*3600*1000).toISOString()
+  let ls=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]'); ls.unshift({id:'local_'+Date.now(),username:ME,image_url:url,media_type:type,caption:cap,audience:aud,is_close_friends:aud=='close_friends',expires_at:exp,created_at:new Date().toISOString()}); localStorage.setItem('pixoro_local_stories',JSON.stringify(ls))
+  await supa.from('stories').insert({username:ME,image_url:url,media_type:type,caption:cap,audience:aud,is_close_friends:aud=='close_friends',expires_at:exp})
+  alert(aud=='close_friends'?'💚 Close Friends ku poyiduchu!':'✅ Story Added da! 🔥'); location.href='index.html'
+}
+</script></body></html>
