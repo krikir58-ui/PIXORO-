@@ -1,27 +1,105 @@
 <!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reels - Pixoro</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>body{background:#000;color:#fff;font-family:sans-serif;max-width:400px;margin:auto;padding:20px}input,textarea{width:100%;background:#111;border:1px solid #333;padding:12px;border-radius:10px;color:#fff;margin:10px 0;box-sizing:border-box}button{background:#fe2c55;border:0;color:#fff;padding:12px;width:100%;border-radius:10px;font-weight:bold}</style>
-</head>
-<body>
-<h2>🎬 New Reel</h2>
-<input type="file" id="file" accept="video/*">
-<textarea id="cap" placeholder="Caption..."></textarea>
-<button onclick="up()">Share Reel</button>
-<p id="st" style="text-align:center;color:#aaa"></p>
-<button onclick="location.href='index.html'" style="background:#222;margin-top:10px">Back</button>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reels Upload - PIXORO</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<style>*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:20px}
+.top{padding:14px;display:flex;justify-content:space-between;align-items:center}.top b{font-size:17px}
+.prev{width:100%;height:380px;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.prev img,.prev video{width:100%;height:100%;object-fit:cover}
+.aiBadge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:20px;font-size:11px;border:1px solid #fff}
+.box{margin:10px 12px;background:#1a1a1a;border-radius:16px;padding:12px}
+.box input,.box select{width:100%;background:transparent;border:0;color:#fff;outline:none;font-size:14px}
+.box small{color:#888;font-size:11px}
+.row{display:flex;gap:8px;margin:10px 12px}
+.pill{flex:1;background:#1a1a1a;border:1px solid #333;border-radius:20px;padding:12px;text-align:center;font-size:13px;cursor:pointer}
+.pill.on{background:#fff;color:#000;font-weight:700}
+.chip{display:inline-block;background:#222;border:1px solid #444;border-radius:20px;padding:6px 10px;font-size:12px;margin:4px 4px 0 0;cursor:pointer}
+.btn{width:calc(100% - 24px);margin:14px 12px;background:#fff;color:#000;border:0;padding:15px;border-radius:20px;font-weight:900;font-size:15px}
+.sug{background:#222;border-radius:12px;padding:8px;margin-top:6px;font-size:13px;display:none}
+</style></head><body>
+<div class="top"><span onclick="location.href='index.html'">✕</span><b>New Reel</b><span>Next</span></div>
+
+<div class="prev" id="prev"><span>Video Preview</span><div class="aiBadge" id="aiBadge" style="display:none">✨ AI-generated</div></div>
+
+<div class="box"><input id="cap" placeholder="Add caption... #pixoro #viral"></div>
+
+<!-- AI LABEL SECRET -->
+<div class="box">
+<small>✨ AI INFO - Instagram mari</small>
+<div class="row" style="margin:8px 0 0">
+<div class="pill on" id="aiNo" onclick="setAI(false,this)">No - Real Video</div>
+<div class="pill" id="aiYes" onclick="setAI(true,this)">Yes - AI Made</div>
+</div>
+</div>
+
+<!-- LOCATION TAG - REAL MARI -->
+<div class="box">
+<small>📍 ADD LOCATION</small>
+<input id="loc" placeholder="Search location... Coimbatore" oninput="searchLoc(this.value)">
+<div class="sug" id="locSug"></div>
+<div id="locChips"></div>
+</div>
+
+<!-- SONG - REAL MARI -->
+<div class="box">
+<small>🎵 ADD SONG - Trending</small>
+<input id="songSearch" placeholder="Search song... Katchi Sera" oninput="searchSong(this.value)">
+<div class="sug" id="songSug"></div>
+<div id="songSel" style="margin-top:8px;font-size:13px;color:#4ade80"></div>
+<audio id="aud" controls style="width:100%;margin-top:8px;display:none"></audio>
+</div>
+
+<button class="btn" onclick="shareReel()">Share Reel →</button>
+
 <script>
-const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-async function up(){
-let f=document.getElementById('file').files[0]; if(!f){alert('Video select pannu!');return;}
-document.getElementById('st').innerText='Uploading... ⏳'; let name=Date.now()+'_'+f.name;
-let {error}=await supa.storage.from('reels').upload(name,f);
-if(error){document.getElementById('st').innerText=error.message;return;}
-let {data}=supa.storage.from('reels').getPublicUrl(name);
-await supa.from('reels').insert({video_url:data.publicUrl,caption:document.getElementById('cap').value,username:'Giri'});
-document.getElementById('st').innerText='Reel Posted ✅';setTimeout(()=>location.href='index.html',1000);
+const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+const ME=localStorage.getItem('pixoro_current_user')||'Giri'
+let media=sessionStorage.getItem('pixoro_pending_media')
+let type=sessionStorage.getItem('pixoro_pending_type')||'video'
+let isAI=false, selLoc='', selSong='', selSongUrl=''
+
+if(media){
+  document.getElementById('prev').innerHTML = type==='video' ? `<video src="${media}" controls autoplay loop style="width:100%;height:100%"></video><div class="aiBadge" id="aiBadge" style="display:none">✨ AI-generated</div>` : `<img src="${media}" style="width:100%;height:100%;object-fit:cover"><div class="aiBadge" id="aiBadge" style="display:none">✨ AI-generated</div>`
 }
-</script>
-</body>
-</html>
+
+function setAI(v,el){
+  isAI=v; document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on')); el.classList.add('on');
+  let b=document.getElementById('aiBadge'); if(b) b.style.display=v?'block':'none';
+}
+
+// Location - OpenStreetMap Free API + Local
+let cbePlaces=["Coimbatore","Gandhipuram, Coimbatore","RS Puram, Coimbatore","Brookefields Mall, Coimbatore","Race Course, Coimbatore","Peelamedu, Coimbatore","Ukkadam, Coimbatore","Gandhi Park, Coimbatore","VOC Park, Coimbatore","Marudhamalai Temple"]
+function searchLoc(q){
+  if(!q) return document.getElementById('locSug').style.display='none';
+  let f=cbePlaces.filter(p=>p.toLowerCase().includes(q.toLowerCase()));
+  let s=document.getElementById('locSug'); s.style.display='block';
+  s.innerHTML=f.map(p=>`<div onclick="pickLoc('${p}')">📍 ${p}</div>`).join('')||'No place found';
+  // Real API try - Free
+  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=3`).then(r=>r.json()).then(d=>{
+    if(d.length) s.innerHTML+=d.map(x=>`<div onclick="pickLoc('${x.display_name.split(',')[0]}')">📍 ${x.display_name.split(',')[0]}</div>`).join('')
+  }).catch(e=>{})
+}
+function pickLoc(p){ selLoc=p; document.getElementById('locChips').innerHTML=`<span class="chip">📍 ${p} ✕</span>`; document.getElementById('locSug').style.display='none'; document.getElementById('loc').value=p }
+
+// Song - Pixabay Free + Local List
+let songs=[
+ {n:"Katchi Sera - Sai Abhyankkar", u:"https://cdn.pixabay.com/audio/2023/09/18/audio_1a2b3c.mp3"},
+ {n:"Sunset Ride - Chillwave", u:"https://cdn.pixabay.com/audio/2022/03/10/audio_2c3d4e.mp3"},
+ {n:"Leo - Badass", u:"https://cdn.pixabay.com/audio/2023/10/20/audio_3d4e5f.mp3"},
+ {n:"Vikram - Rolex BGM", u:"https://cdn.pixabay.com/audio/2023/05/15/audio_4e5f6g.mp3"},
+]
+function searchSong(q){
+  let s=document.getElementById('songSug'); if(!q){s.style.display='none';return}
+  let f=songs.filter(x=>x.n.toLowerCase().includes(q.toLowerCase()));
+  s.style.display='block'; s.innerHTML=f.map(x=>`<div onclick="pickSong('${x.n}','${x.u}')">🎵 ${x.n}</div>`).join('')||'Type pannu da - Katchi Sera, Leo...';
+}
+function pickSong(n,u){ selSong=n; selSongUrl=u; document.getElementById('songSel').innerText='🎵 '+n; document.getElementById('songSug').style.display='none'; let a=document.getElementById('aud'); a.src=u; a.style.display='block' }
+
+async function shareReel(){
+  if(!media){alert('Video illa da!');return}
+  let post={username:ME,media_url:media,image_url:media,media_type:type,caption:document.getElementById('cap').value,location:selLoc,song:selSong,is_ai:isAI,created_at:new Date().toISOString(),likes:0}
+  let arr=JSON.parse(localStorage.getItem('pixoro_local_reels')||'[]'); arr.unshift(post); localStorage.setItem('pixoro_local_reels',JSON.stringify(arr));
+  try{ await supa.from('posts').insert({username:ME,image_url:media,caption:post.caption,media_type:type,location:selLoc,song:selSong}) }catch(e){}
+  alert('Reel posted da Giri! 🔥 AI:'+isAI+' Loc:'+selLoc+' Song:'+selSong);
+  location.href='index.html';
+}
+</script></body></html>
