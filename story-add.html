@@ -1,31 +1,48 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Add to story - Pixoro</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Add to story</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
 body{background:#000;color:#fff;max-width:450px;margin:0 auto}
-.top{padding:14px;display:flex;justify-content:space-between;align-items:center}.top b{font-size:16px}.top span{font-size:22px;cursor:pointer}
-.chips{display:flex;gap:8px;padding:0 12px 12px}.chip{flex:1;background:#1a1a1a;border-radius:12px;padding:12px;text-align:center;font-size:13px}
-.recHead{display:flex;justify-content:space-between;padding:12px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}.cam{background:#1a1a1a;aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#888;cursor:pointer}
-.tabs{display:flex;justify-content:center;gap:28px;padding:14px;background:#111;margin:12px;border-radius:20px}.tabs span{color:#888;font-weight:700;font-size:13px;cursor:pointer}.tabs span.act{color:#fff}
+.top{padding:14px;display:flex;justify-content:space-between;align-items:center}
+.top b{font-size:17px}.top span{font-size:22px}
+.chips{display:flex;gap:8px;padding:0 12px 12px}
+.chip{flex:1;background:#1a1a1a;border-radius:20px;padding:11px;text-align:center;font-size:13px;font-weight:600}
+.recHead{display:flex;justify-content:space-between;padding:14px 12px;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px}
+.cell{aspect-ratio:1/1.4;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:#888;font-size:12px;cursor:pointer;position:relative;overflow:hidden}
+.cell img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.tabs{display:flex;justify-content:center;gap:30px;padding:14px;background:#1a1a1a;margin:12px;border-radius:24px}
+.tabs span{color:#888;font-weight:700;font-size:13px;letter-spacing:.5px}.tabs span.act{color:#fff}
 </style></head><body>
-<div class="top"><span onclick="location.href='index.html'">✕</span><b id="sheetTitle">Add to story</b><span>⚙️</span></div>
+<div class="top"><span onclick="location.href='index.html'">✕</span><b>Add to story</b><span>⚙️</span></div>
 <div class="chips"><div class="chip">✨ Templates</div><div class="chip">🎵 Music</div><div class="chip">🖼️ Collage</div></div>
-<div class="recHead"><b>Recents ∨</b><span onclick="document.getElementById('file').click()">☐ Select</span></div>
-<div class="grid"><div class="cam" onclick="document.getElementById('file').click()">📷<span>Camera</span></div><div class="cam" onclick="document.getElementById('file').click()" style="grid-column:span 2;min-height:110px"><span style="color:#fff;font-size:14px">📁 Tap to open REAL Gallery</span><span style="font-size:12px">Un phone photos thaan - Fake illa</span></div></div>
-<p style="text-align:center;color:#666;font-size:12px;padding:20px">Photo select pannu da<br>Next page la Editor varum da</p>
-<div class="tabs"><span id="tabPOST" onclick="switchTab('POST')">POST</span><span id="tabSTORY" class="act" onclick="switchTab('STORY')">STORY</span><span id="tabREEL" onclick="switchTab('REEL')">REEL</span><span id="tabLIVE" onclick="switchTab('LIVE')">LIVE</span></div>
+
+<div class="recHead"><b>Recents ∨</b><span>☐ Select</span></div>
+
+<!-- INSTAGRAM MARI GRID DA - TEXT ILLA DA -->
+<div class="grid" id="grid">
+  <div class="cell" onclick="openPicker()">📷<span>Camera</span></div>
+  <div class="cell" onclick="openPicker()"><span style="font-size:22px">🖼️</span></div>
+  <div class="cell" onclick="openPicker()"></div>
+  <div class="cell" onclick="openPicker()"></div>
+  <div class="cell" onclick="openPicker()"></div>
+  <div class="cell" onclick="openPicker()"></div>
+  <div class="cell" onclick="openPicker()"></div>
+  <div class="cell" onclick="openPicker()"></div>
+  <div class="cell" onclick="openPicker()"></div>
+</div>
+
+<div class="tabs"><span id="tPOST" onclick="sw('POST',this)">POST</span><span id="tSTORY" class="act" onclick="sw('STORY',this)">STORY</span><span onclick="sw('REEL',this)">REEL</span><span onclick="sw('LIVE',this)">LIVE</span></div>
+
 <input type="file" id="file" accept="image/*,video/*" hidden onchange="goNext(this)">
 <script>
-let CUR='STORY'
-function switchTab(t){ CUR=t; document.querySelectorAll('.tabs span').forEach(s=>s.classList.remove('act')); document.getElementById('tab'+t).classList.add('act'); document.getElementById('sheetTitle').innerText=t=='POST'?'New post':t=='STORY'?'Add to story':t=='REEL'?'New reel':'Go Live'; if(t=='LIVE') location.href='live.html'; localStorage.setItem('pixoro_cur_tab',CUR) }
+function openPicker(){ document.getElementById('file').click() }
+function sw(t,el){ document.querySelectorAll('.tabs span').forEach(s=>s.classList.remove('act')); el.classList.add('act'); localStorage.setItem('pixoro_cur_tab',t); if(t=='LIVE') location.href='live.html' }
 function goNext(inp){
   if(!inp.files[0]) return
   let f=inp.files[0]
-  // NEXT PAGE KU PHOTO AH PASS PANNA DA - Base64 la save pannu da
   let r=new FileReader()
-  r.onload=e=>{ sessionStorage.setItem('pixoro_pending_media', e.target.result); sessionStorage.setItem('pixoro_pending_type', f.type.startsWith('video')?'video':'image'); location.href='story-editor.html' }
+  r.onload=e=>{ sessionStorage.setItem('pixoro_pending_media',e.target.result); sessionStorage.setItem('pixoro_pending_type',f.type.startsWith('video')?'video':'image'); location.href='story-editor.html' }
   r.readAsDataURL(f)
 }
 </script></body></html>
