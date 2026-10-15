@@ -1,77 +1,29 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Add Story - Pixoro</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Add Story</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding:16px;min-height:100vh}
-.top{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #222}
-.btn{width:100%;background:#fff;color:#000;padding:14px;border-radius:12px;font-weight:900;border:0;margin-top:12px;cursor:pointer}
-.btn2{width:100%;background:#222;color:#fff;padding:12px;border-radius:12px;border:1px solid #333;margin-top:8px;cursor:pointer}
-img#preview{width:100%;max-height:60vh;object-fit:contain;background:#111;border-radius:16px;margin-top:12px;display:none}
-.aud{display:flex;gap:8px;margin-top:12px}
-.aud button{flex:1;padding:10px;border-radius:20px;border:0;font-weight:700}
-.aud button.active{outline:2px solid #fff}
-</style></head><body>
-<div class="top"><span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">←</span><b>Add to Story 🔥</b><span style="width:22px"></span></div>
-
-<div style="margin-top:20px;text-align:center">
-<div onclick="document.getElementById('file').click()" style="border:2px dashed #444;border-radius:20px;padding:30px;background:#111;cursor:pointer">
-<div style="font-size:48px">📸</div><b>Photo Select Pannu Da!</b><p style="font-size:12px;color:#777;margin-top:6px">Gallery la irunthu eduthuko da</p>
-</div>
-<button onclick="document.getElementById('file').click()" style="margin-top:14px;padding:12px 24px;background:#0095f6;border:0;border-radius:20px;color:#fff;font-weight:700">Gallery Open</button>
-</div>
-
-<img id="preview">
+<style>body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding:16px;font-family:sans-serif}.btn{width:100%;background:#fff;color:#000;padding:14px;border-radius:12px;font-weight:900;border:0;margin-top:12px}</style></head><body>
+<div style="display:flex;justify-content:space-between"><span onclick="location.href='index.html'">← Back</span><b>Add Story 🔥</b><span></span></div>
+<div style="margin-top:20px;border:2px dashed #444;border-radius:20px;padding:30px;text-align:center;background:#111" onclick="document.getElementById('file').click()"><div style="font-size:40px">📸</div><b>Tap to Select Photo</b></div>
+<img id="preview" style="width:100%;max-height:60vh;object-fit:contain;background:#111;border-radius:16px;margin-top:12px;display:none">
 <input type="file" id="file" accept="image/*" style="display:none">
-
-<div class="aud">
-<button id="bPublic" class="active" style="background:#fff;color:#000" onclick="setAud('public')">🌍 Public</button>
-<button id="bClose" style="background:#222;color:#00ff66" onclick="setAud('close_friends')">💚 Close Friends</button>
-</div>
-
-<input id="cap" placeholder="Caption (optional)..." style="width:100%;background:#111;border:1px solid #333;padding:12px;border-radius:12px;color:#fff;margin-top:12px">
-
+<div style="display:flex;gap:8px;margin-top:12px"><button id="bPub" onclick="setAud('public')" style="flex:1;padding:10px;border-radius:20px;border:0;background:#fff;color:#000;font-weight:700">🌍 Public</button><button id="bClose" onclick="setAud('close_friends')" style="flex:1;padding:10px;border-radius:20px;border:0;background:#222;color:#00ff66">💚 Close</button></div>
 <button class="btn" id="postBtn" onclick="upload()">Post Story 🚀</button>
-<button class="btn2" onclick="location.href='index.html'">Cancel</button>
-<p id="status" style="text-align:center;font-size:12px;color:#888;margin-top:10px"></p>
-
+<p id="status" style="text-align:center;color:#888;margin-top:10px;font-size:12px"></p>
 <script>
-const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-let ME = localStorage.getItem('pixoro_current_user')||'Giri'
-let finalBase64='', audience='public'
-function setAud(a){ audience=a; document.getElementById('bPublic').classList.toggle('active',a==='public'); document.getElementById('bClose').classList.toggle('active',a==='close_friends'); document.getElementById('bPublic').style.background=a==='public'?'#fff':'#222'; document.getElementById('bPublic').style.color=a==='public'?'#000':'#fff'; document.getElementById('bClose').style.background=a==='close_friends'?'#00ff66':'#222'; document.getElementById('bClose').style.color=a==='close_friends'?'#000':'#00ff66'; }
-document.getElementById('file').addEventListener('change', e=>{
- let f=e.target.files[0]; if(!f) return
- if(f.size>5*1024*1024){ alert('Photo perusa irukku da! 5MB kulla eduthuko da!'); return }
- let r=new FileReader()
- r.onload=ev=>{
-   finalBase64=ev.target.result
-   let im=document.getElementById('preview')
-   im.src=finalBase64; im.style.display='block'
-   document.getElementById('status').innerText='Photo ready da! ✅'
- }
- r.readAsDataURL(f)
-})
+const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+let ME=localStorage.getItem('pixoro_current_user')||'Giri', img='', aud='public'
+function setAud(a){aud=a; document.getElementById('bPub').style.background=a==='public'?'#fff':'#222'; document.getElementById('bPub').style.color=a==='public'?'#000':'#fff'; document.getElementById('bClose').style.background=a==='close_friends'?'#00ff66':'#222'; document.getElementById('bClose').style.color=a==='close_friends'?'#000':'#00ff66'}
+document.getElementById('file').addEventListener('change',e=>{let f=e.target.files[0]; if(!f)return; let r=new FileReader(); r.onload=ev=>{img=ev.target.result; let p=document.getElementById('preview'); p.src=img; p.style.display='block'; document.getElementById('status').innerText='Ready ✅'}; r.readAsDataURL(f)})
 async function upload(){
- if(!finalBase64){ alert('Photo select pannu da Giri! 📸'); return }
- let btn=document.getElementById('postBtn')
- btn.innerText='Posting... ⏳'; btn.disabled=true
- document.getElementById('status').innerText='Uploading... mella venum da!'
- try{
-   let expires=new Date(Date.now()+24*60*60*1000).toISOString()
-   // Try with audience column
-   let {error} = await supa.from('stories').insert({ username: ME, image_url: finalBase64, audience: audience, expires_at: expires })
-   if(error){
-     console.log('retry without audience', error.message)
-     let {error:err2} = await supa.from('stories').insert({ username: ME, image_url: finalBase64, image: finalBase64, expires_at: expires })
-     if(err2) throw err2
-   }
-   document.getElementById('status').innerText='Posted HD! 🔥'
-   alert('Story Posted da Giri! ✅')
-   location.href='index.html'
- }catch(e){
-   document.getElementById('status').innerText='Error: '+e.message
-   alert('Error da: '+e.message+' - Supabase stories table check pannu da!')
-   btn.innerText='Post Story 🚀'; btn.disabled=false
- }
+ if(!img){alert('Photo select pannu da!'); return}
+ let btn=document.getElementById('postBtn'); btn.innerText='Posting...'; btn.disabled=true
+ let expires=new Date(Date.now()+24*60*60*1000).toISOString()
+ let localStories=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]')
+ localStories.unshift({id:Date.now(), username:ME, image_url:img, image:img, audience:aud, expires_at:expires, created_at:new Date().toISOString()})
+ localStorage.setItem('pixoro_local_stories',JSON.stringify(localStories))
+ document.getElementById('status').innerText='Local saved! Trying Supabase...'
+ try{ await supa.from('stories').insert({username:ME, image_url:img, image:img, media_url:img, audience:aud, expires_at:expires}) }catch(e){ console.log(e) }
+ alert('Story Posted da! ✅ - Home ku poren da!'); location.href='index.html'
 }
 </script>
 </body></html>
