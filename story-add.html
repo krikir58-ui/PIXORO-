@@ -3,65 +3,29 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:80px}
-.top{padding:14px;display:flex;align-items:center;justify-content:space-between;background:#000;border-bottom:1px solid #111}
-.top b{font-size:18px}.top span{font-size:22px;cursor:pointer}
-.chips{display:flex;gap:8px;padding:12px}.chip{flex:1;background:#111;border:1px solid #222;border-radius:12px;padding:12px;text-align:center;font-size:13px;font-weight:600}
-.bigPrev{margin:0 12px;border-radius:16px;overflow:hidden;aspect-ratio:9/13;background:#111;position:relative;cursor:pointer}
-.bigPrev img,.bigPrev video{width:100%;height:100%;object-fit:cover;display:none}
-.bigPrev.empty{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#666;text-align:center;padding:20px}
-.filterBar{display:flex;gap:8px;overflow-x:auto;padding:12px}.filterBar::-webkit-scrollbar{display:none}
-.fbtn{padding:8px 14px;background:#111;border:1px solid #222;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer}.fbtn.active{border-color:#fff;background:#fff;color:#000;font-weight:700}
-textarea{width:calc(100% - 24px);margin:0 12px;background:#111;border:1px solid #222;padding:12px;border-radius:12px;color:#fff;outline:none;min-height:60px}
-.btnRow{display:flex;gap:8px;margin:12px}.btnRow button{flex:1;background:#111;border:1px solid #222;color:#fff;padding:12px;border-radius:12px;font-weight:700}
-.shareBtn{margin:0 12px;width:calc(100% - 24px);background:#fff;color:#000;border:0;padding:14px;border-radius:22px;font-weight:800;font-size:15px}
-.closeBtn{margin:8px 12px;width:calc(100% - 24px);background:#002a14;border:1px solid #00ff66;color:#00ff66;padding:14px;border-radius:22px;font-weight:800;font-size:15px}
-.recHead{display:flex;justify-content:space-between;padding:14px 12px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin:0 2px}.grid img{width:100%;aspect-ratio:3/4;object-fit:cover}.cam{background:#111;aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:12px;color:#888;cursor:pointer}
+body{background:#000;color:#fff;max-width:450px;margin:0 auto}
+.top{padding:14px;display:flex;justify-content:space-between;align-items:center}.top b{font-size:16px}.top span{font-size:22px;cursor:pointer}
+.chips{display:flex;gap:8px;padding:0 12px 12px}.chip{flex:1;background:#1a1a1a;border-radius:12px;padding:12px;text-align:center;font-size:13px}
+.recHead{display:flex;justify-content:space-between;padding:12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}.cam{background:#1a1a1a;aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#888;cursor:pointer}
 .tabs{display:flex;justify-content:center;gap:28px;padding:14px;background:#111;margin:12px;border-radius:20px}.tabs span{color:#888;font-weight:700;font-size:13px;cursor:pointer}.tabs span.act{color:#fff}
-.tgl{position:relative;width:46px;height:26px;background:#333;border-radius:20px;cursor:pointer}.tgl.on{background:#00c853}.tgl span{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%}.tgl.on span{left:23px}
-.setRow{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #222}
 </style></head><body>
-<div class="top"><span onclick="location.href='index.html'">✕</span><b id="sheetTitle">Add to story</b><span onclick="openStorySettings()">⚙️</span></div>
+<div class="top"><span onclick="location.href='index.html'">✕</span><b id="sheetTitle">Add to story</b><span>⚙️</span></div>
 <div class="chips"><div class="chip">✨ Templates</div><div class="chip">🎵 Music</div><div class="chip">🖼️ Collage</div></div>
-<div class="bigPrev empty" id="bigPrev" onclick="document.getElementById('file').click()"><img id="preview"><video id="previewVideo" autoplay muted loop playsinline></video><div id="emptyMsg" style="text-align:center"><div style="font-size:40px">📷</div><div style="margin-top:10px;color:#fff">+ Add your photo or video</div><div style="font-size:12px;color:#666;margin-top:4px">Tap to import from REAL Gallery</div></div></div>
-<div class="filterBar"><div class="fbtn active" onclick="setF('none',this)">Normal</div><div class="fbtn" onclick="setF('grayscale(1)',this)">B&W</div><div class="fbtn" onclick="setF('sepia(1)',this)">Sepia</div><div class="fbtn" onclick="setF('contrast(1.5) saturate(1.5)',this)">Vivid</div><div class="fbtn" onclick="setF('blur(0.5px) brightness(1.2)',this)">Soft</div></div>
-<textarea id="caption" placeholder="Caption + Poll + @Mention..."></textarea>
-<div class="btnRow"><button onclick="addPoll()">📊 Poll</button><button onclick="document.getElementById('file').click()">📁 Gallery</button></div>
-<button class="shareBtn" id="shareBtn" onclick="up()">+ Share to Your Story ⭐</button>
-<button class="closeBtn" id="closeBtn" onclick="upClose()">💚 Share to Close Friends</button>
-<p id="st" style="text-align:center;color:#aaa;margin-top:10px"></p>
 <div class="recHead"><b>Recents ∨</b><span onclick="document.getElementById('file').click()">☐ Select</span></div>
-<div class="grid" id="grid"><div class="cam" onclick="document.getElementById('file').click()">📷<span>Camera</span></div><div class="cam" onclick="document.getElementById('file').click()" style="grid-column:span 2;aspect-ratio:auto;min-height:110px"><span style="color:#fff;font-size:14px">📁 Tap to open REAL Gallery</span><span>Un phone photos thaan varum - Fake illa</span></div></div>
+<div class="grid"><div class="cam" onclick="document.getElementById('file').click()">📷<span>Camera</span></div><div class="cam" onclick="document.getElementById('file').click()" style="grid-column:span 2;min-height:110px"><span style="color:#fff;font-size:14px">📁 Tap to open REAL Gallery</span><span style="font-size:12px">Un phone photos thaan - Fake illa</span></div></div>
+<p style="text-align:center;color:#666;font-size:12px;padding:20px">Photo select pannu da<br>Next page la Editor varum da</p>
 <div class="tabs"><span id="tabPOST" onclick="switchTab('POST')">POST</span><span id="tabSTORY" class="act" onclick="switchTab('STORY')">STORY</span><span id="tabREEL" onclick="switchTab('REEL')">REEL</span><span id="tabLIVE" onclick="switchTab('LIVE')">LIVE</span></div>
-<button onclick="location.href='index.html'" style="margin:12px;width:calc(100% - 24px);background:#111;border:1px solid #222;color:#888;padding:12px;border-radius:12px">← Back to Home</button>
-
-<!-- INSTAGRAM EDITOR -->
-<div id="editor" style="display:none;position:fixed;inset:0;background:#000;z-index:100;flex-direction:column"><div style="padding:14px;display:flex;justify-content:space-between;align-items:center"><span onclick="closeEditor()" style="font-size:22px">←</span><span>✈️ ⚙️</span></div><div style="flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden"><img id="eImg" style="max-width:100%;max-height:100%;object-fit:contain"><div style="position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:14px;text-align:right;font-size:12px"><div onclick="addText()">Text <b>Aa</b></div><div onclick="alert('Stickers soon da!')">Stickers 😊</div><div onclick="alert('Music soon da!')">Music 🎵</div><div onclick="alert('Effects')">Effects ✨</div><div onclick="mention()">Mention @</div><div onclick="alert('Draw')">Draw ✏️</div></div></div><div style="padding:12px;display:flex;gap:8px"><button onclick="up()" style="flex:1;background:#fff;color:#000;padding:14px;border-radius:22px;font-weight:800;border:0">Your story</button><button onclick="upClose()" style="flex:1;background:#002a14;border:1px solid #00ff66;color:#00ff66;padding:14px;border-radius:22px;font-weight:800">💚 Close Friends</button><button onclick="up()" style="background:#0095f6;color:#fff;padding:14px 18px;border-radius:22px;border:0;font-weight:800">→</button></div></div>
-
-<div id="storySettings" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:700;align-items:flex-end;justify-content:center" onclick="if(event.target==this)this.style.display='none'"><div style="background:#1a1a1a;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:16px 16px 30px;border:1px solid #333;max-height:85vh;overflow-y:auto"><div style="display:flex;justify-content:space-between"><b>⚙️ Story Settings</b><span onclick="document.getElementById('storySettings').style.display='none'" style="font-size:22px">✕</span></div><div style="background:#000;border-radius:16px;padding:4px 14px;margin-top:12px"><div class="setRow"><span>👻 Ghost Mode</span><div class="tgl" id="tglGhost" onclick="toggleSwitch('ghost')"><span></span></div></div><div class="setRow"><span>⏰ 48 Hours Story</span><div class="tgl on" id="tgl48" onclick="toggleSwitch('48h')"><span></span></div></div><div class="setRow" style="border-bottom:0"><span>👁️ Rewatch Count</span><div class="tgl on" id="tglRewatch" onclick="toggleSwitch('rewatch')"><span></span></div></div></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:14px"><span onclick="setAudience('close_friends')" style="background:#002a14;border:1px solid #00ff66;color:#00ff66;padding:7px 11px;border-radius:12px;font-size:12px">💚 Close Friends</span><span onclick="setAudience('family')" style="background:#111;border:1px solid #333;padding:7px 11px;border-radius:12px;font-size:12px">👨‍👩‍👧 Family</span><span onclick="setAudience('vip')" style="background:#111;border:1px solid #333;padding:7px 11px;border-radius:12px;font-size:12px">⭐ VIP</span></div><div onclick="document.getElementById('storySettings').style.display='none'" style="margin-top:16px;text-align:center;background:#fff;color:#000;padding:12px;border-radius:12px;font-weight:800">Done</div></div></div>
-<input type="file" id="file" accept="image/*,video/*" hidden onchange="preview(this)">
+<input type="file" id="file" accept="image/*,video/*" hidden onchange="goNext(this)">
 <script>
-const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-let ME = localStorage.getItem('pixoro_current_user') || 'Giri'
-let curFilter='none', mediaType='image', fileData=null, CUR_TAB='STORY'
-let PLUS=JSON.parse(localStorage.getItem('pixoro_plus')||'{"ghost":false,"48h":true,"rewatch":true,"search":true,"audience":"everyone"}')
-function syncToggles(){ document.getElementById('tglGhost').className='tgl'+(PLUS.ghost?' on':''); document.getElementById('tgl48').className='tgl'+(PLUS['48h']?' on':''); document.getElementById('tglRewatch').className='tgl'+(PLUS.rewatch?' on':'') }
-function toggleSwitch(k){ if(k=='ghost')PLUS.ghost=!PLUS.ghost; if(k=='48h')PLUS['48h']=!PLUS['48h']; if(k=='rewatch')PLUS.rewatch=!PLUS.rewatch; localStorage.setItem('pixoro_plus',JSON.stringify(PLUS)); syncToggles() }
-function openStorySettings(){ document.getElementById('storySettings').style.display='flex'; syncToggles() }
-function setAudience(a){ PLUS.audience=a; localStorage.setItem('pixoro_plus',JSON.stringify(PLUS)); alert('Audience: '+a+' da!') }
-function switchTab(t){ CUR_TAB=t; document.querySelectorAll('.tabs span').forEach(s=>s.classList.remove('act')); document.getElementById('tab'+t).classList.add('act'); document.getElementById('sheetTitle').innerText = t=='POST'?'New Post': t=='STORY'?'Add to story': t=='REEL'?'New Reel':'Go Live'; document.getElementById('shareBtn').innerText = t=='POST'?'+ Share Post': t=='STORY'?'+ Share to Your Story ⭐': t=='REEL'?'+ Share Reel 🔥':'🔴 Go Live'; document.getElementById('closeBtn').style.display = t=='LIVE'?'none':'block'; let bp=document.getElementById('bigPrev'); if(t=='POST') bp.style.aspectRatio='1/1'; if(t=='STORY') bp.style.aspectRatio='9/13'; if(t=='REEL') bp.style.aspectRatio='9/16'; if(t=='LIVE') bp.style.aspectRatio='9/16'; if(t=='LIVE') location.href='live.html' }
-function preview(input){ if(!input.files[0]) return; let f=input.files[0]; mediaType=f.type.startsWith('video')?'video':'image'; fileData=f; let url=URL.createObjectURL(f); document.getElementById('bigPrev').classList.remove('empty'); document.getElementById('emptyMsg').style.display='none'; if(mediaType==='video'){ let v=document.getElementById('previewVideo'); v.src=url; v.style.display='block'; v.style.filter=curFilter; document.getElementById('preview').style.display='none' } else { let im=document.getElementById('preview'); im.src=url; im.style.display='block'; im.style.filter=curFilter; document.getElementById('previewVideo').style.display='none' } document.getElementById('eImg').src=url; document.getElementById('editor').style.display='flex' }
-function closeEditor(){ document.getElementById('editor').style.display='none' }
-function setF(f,el){ curFilter=f; document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); document.getElementById('preview').style.filter=f; document.getElementById('previewVideo').style.filter=f }
-function addPoll(){ let q=prompt('Poll Question enna da Giri?'); if(q) document.getElementById('caption').value += `\n📊 POLL: ${q} (Yes/No)` }
-function addText(){ let t=prompt('Text enna da?'); if(t) document.getElementById('caption').value += ' '+t }
-function mention(){ let m=prompt('@Mention yaaru da?'); if(m) document.getElementById('caption').value += ' @'+m }
-async function uploadFile(){ if(!fileData) return null; let name=Date.now()+'_'+fileData.name.replace(/\s/g,'_'); try{ let {error}=await supa.storage.from('stories').upload(name,fileData,{upsert:true}); if(error) throw error; let {data}=supa.storage.from('stories').getPublicUrl(name); return data.publicUrl }catch(e){ return URL.createObjectURL(fileData) } }
-async function up(){ if(CUR_TAB=='POST'){await sharePost();return} if(CUR_TAB=='REEL'){await shareReel();return} if(CUR_TAB=='LIVE'){location.href='live.html';return} share(PLUS.audience||'public') }
-async function upClose(){ if(CUR_TAB=='POST'){await sharePost(true);return} if(CUR_TAB=='REEL'){await shareReel(true);return} share('close_friends') }
-async function sharePost(){ let u=await uploadFile(); if(!u){alert('Gallery la photo select pannu da Giri!');return} await supa.from('posts').insert({username:ME,image_url:u,caption:document.getElementById('caption').value}); document.getElementById('st').innerText='✅ Post Added da Giri! 🔥'; setTimeout(()=>location.href='index.html',1000) }
-async function shareReel(){ let u=await uploadFile(); if(!u){alert('Gallery la photo select pannu da Giri!');return} await supa.from('reels').insert({username:ME,video_url:u,thumbnail_url:u}); document.getElementById('st').innerText='✅ Reel Added da Giri! 🔥'; setTimeout(()=>location.href='reels.html',1000) }
-async function share(audience){ if(!fileData){alert('Gallery la photo select pannu da Giri!');return} document.getElementById('st').innerText='Uploading... ⏳'; let mediaUrl=await uploadFile(); let hours=PLUS['48h']?48:24; let exp=new Date(Date.now()+hours*60*60*1000).toISOString(); let ls=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]'); ls.unshift({id:'local_'+Date.now(),username:ME,image_url:mediaUrl,image:mediaUrl,media_url:mediaUrl,media_type:mediaType,caption:document.getElementById('caption').value,filter:curFilter,audience:audience,is_close_friends:audience==='close_friends',expires_at:exp,created_at:new Date().toISOString()}); localStorage.setItem('pixoro_local_stories',JSON.stringify(ls)); await supa.from('stories').insert({username:ME,image_url:mediaUrl,image:mediaUrl,media_url:mediaUrl,media_type:mediaType,caption:document.getElementById('caption').value,filter:curFilter,audience:audience,is_close_friends:audience==='close_friends',expires_at:exp}); document.getElementById('st').innerText='✅ Story Added da Giri! '+hours+'H 🔥'; setTimeout(()=>location.href='index.html',1200) }
-syncToggles()
-</script>
-</body></html>
+let CUR='STORY'
+function switchTab(t){ CUR=t; document.querySelectorAll('.tabs span').forEach(s=>s.classList.remove('act')); document.getElementById('tab'+t).classList.add('act'); document.getElementById('sheetTitle').innerText=t=='POST'?'New post':t=='STORY'?'Add to story':t=='REEL'?'New reel':'Go Live'; if(t=='LIVE') location.href='live.html'; localStorage.setItem('pixoro_cur_tab',CUR) }
+function goNext(inp){
+  if(!inp.files[0]) return
+  let f=inp.files[0]
+  // NEXT PAGE KU PHOTO AH PASS PANNA DA - Base64 la save pannu da
+  let r=new FileReader()
+  r.onload=e=>{ sessionStorage.setItem('pixoro_pending_media', e.target.result); sessionStorage.setItem('pixoro_pending_type', f.type.startsWith('video')?'video':'image'); location.href='story-editor.html' }
+  r.readAsDataURL(f)
+}
+</script></body></html>
