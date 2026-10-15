@@ -1,27 +1,28 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Story Editor</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Story Editor</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100dvh;overflow:hidden}
-.page{position:relative;width:100%;height:100dvh}
+html,body{width:100%;height:100%;background:#000;overflow:hidden}
+body{max-width:100% !important;margin:0}
+.page{position:fixed;inset:0;width:100%;height:100dvh;background:#000;z-index:9999;isolation:isolate}
 .photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.top{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,.6),transparent)}
-.top span{font-size:22px;cursor:pointer}.top b{font-size:17px}
-/* RIGHT SIDE BLOCK - INTHA IMAGE LA IRUKKA MARI DA */
-.side{position:absolute;right:10px;top:70px;bottom:110px;width:58px;z-index:10;background:rgba(0,0,0,.45);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.25);border-radius:28px;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:16px;overflow-y:auto}
-.side div{font-size:20px;cursor:pointer;text-align:center}
-.side span{font-size:9px;display:block;color:#ddd;margin-top:2px}
-/* BOTTOM */
-.bottom{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:14px;background:linear-gradient(to top,rgba(0,0,0,.7),transparent)}
-.cap{width:100%;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.3);border-radius:12px;color:#fff;padding:10px;margin-bottom:10px;outline:none}
+.top{position:absolute;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:16px 14px;background:linear-gradient(to bottom,rgba(0,0,0,.65),transparent)}
+.top span{font-size:24px;cursor:pointer}.top b{font-size:17px}
+/* SIDE BLOCK FIX DA - CUT AAGAATHU */
+.side{position:absolute;right:10px;top:75px;bottom:130px;width:60px;z-index:20;background:rgba(20,20,20,.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.3);border-radius:30px;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:14px;overflow-y:auto;scrollbar-width:none}
+.side::-webkit-scrollbar{display:none}
+.side div{font-size:21px;cursor:pointer;text-align:center;line-height:1}
+.side span{font-size:9px;display:block;color:#eee;margin-top:3px}
+/* BOTTOM FIX DA */
+.bottom{position:absolute;bottom:0;left:0;right:0;z-index:20;padding:12px 14px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,rgba(0,0,0,.75),transparent)}
+.cap{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.35);border-radius:12px;color:#fff;padding:11px;margin-bottom:10px;outline:none}
 .actions{display:flex;gap:8px}
-.pill{flex:1;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.4);color:#fff;padding:12px;border-radius:999px;font-weight:700;font-size:13px}
+.pill{flex:1;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.45);color:#fff;padding:13px;border-radius:999px;font-weight:700;font-size:13px}
 .pill.green{color:#4ade80}
 </style></head><body>
 <div class="page">
 <img class="photo" id="eImg" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1080">
-<div class="top"><span onclick="history.back()">✕</span><b>Story</b><span onclick="alert('Settings')">⋯</span></div>
-<!-- SIDE BLOCK DA -->
+<div class="top"><span onclick="location.href='index.html'">✕</span><b>Story</b><span>⋯</span></div>
 <div class="side">
 <div onclick="addText()">Aa<span>Text</span></div>
 <div>😊<span>Sticker</span></div>
@@ -37,10 +38,11 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100dvh;over
 </div>
 <div class="bottom">
 <input class="cap" placeholder="Add a caption...">
-<div class="actions"><button class="pill">⊕ Your story</button><button class="pill green">★ Close Friends</button></div>
+<div class="actions"><button class="pill" onclick="postStory()">⊕ Your story</button><button class="pill green" onclick="postStory()">★ Close Friends</button></div>
 </div>
 </div>
 <script>
 let m=sessionStorage.getItem('pixoro_pending_media'); if(m) document.getElementById('eImg').src=m;
 function addText(){ let t=prompt('Text enna da?'); if(t) alert(t+' added da!') }
+function postStory(){ sessionStorage.removeItem('pixoro_pending_media'); alert('Story posted da Giri!'); location.href='index.html'; }
 </script></body></html>
