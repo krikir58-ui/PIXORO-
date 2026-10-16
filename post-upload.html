@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reels Upload - PIXORO World</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Post Upload - PIXORO World</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:20px}
 .top{padding:14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #111}.top b{font-size:17px}
@@ -7,7 +7,7 @@
 .prev img,.prev video{width:100%;height:100%;object-fit:cover}
 .aiBadge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:20px;font-size:11px;border:1px solid #FFD700;color:#FFD700}
 .box{margin:10px 12px;background:#111;border:1px solid #222;border-radius:16px;padding:12px}
-.box input{width:100%;background:transparent;border:0;color:#fff;outline:none;font-size:14px}
+.box input,.box textarea{width:100%;background:transparent;border:0;color:#fff;outline:none;font-size:14px;resize:none}
 .box small{color:#FFD700;font-size:11px;font-weight:700}
 .row{display:flex;gap:8px;margin:10px 12px}
 .pill{flex:1;background:#111;border:1px solid #333;border-radius:20px;padding:12px;text-align:center;font-size:13px;cursor:pointer}
@@ -17,12 +17,16 @@
 .sug{background:#222;border-radius:12px;padding:8px;margin-top:6px;font-size:13px;display:none;max-height:200px;overflow:auto}
 .sug div{padding:8px;border-bottom:1px solid #333;cursor:pointer}
 .sug div:hover{background:#333}
+.toggle{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #222;font-size:14px}
+.toggle:last-child{border:0}
+.switch{width:44px;height:24px;background:#333;border-radius:20px;position:relative;cursor:pointer}
+.switch.on{background:#FFD700}.switch.on:after{left:22px}.switch:after{content:'';width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px}
 </style></head><body>
-<div class="top"><span onclick="location.href='index.html'">✕</span><b>New Reel 🎬</b><span style="color:#FFD700">Next</span></div>
-<div class="prev" id="prev"><span>Video Preview</span><div class="aiBadge" id="aiBadge" style="display:none">✨ AI-generated</div></div>
-<div class="box"><input id="cap" placeholder="Add caption... #pixoro #viral"></div>
+<div class="top"><span onclick="location.href='index.html'">✕</span><b>New Post 📸</b><span style="color:#FFD700">Share</span></div>
+<div class="prev" id="prev"><span>Photo Preview</span><div class="aiBadge" id="aiBadge" style="display:none">✨ AI-generated</div></div>
+<div class="box"><textarea id="cap" rows="2" placeholder="Write caption... #pixoro #viral 🔥"></textarea></div>
 
-<div class="box"><small>✨ AI INFO</small><div class="row" style="margin:8px 0 0"><div class="pill on" onclick="setAI(false,this)">No - Real Video</div><div class="pill" onclick="setAI(true,this)">Yes - AI Made</div></div></div>
+<div class="box"><small>✨ AI INFO</small><div class="row" style="margin:8px 0 0"><div class="pill on" onclick="setAI(false,this)">No - Real Photo</div><div class="pill" onclick="setAI(true,this)">Yes - AI Made</div></div></div>
 
 <div class="box"><small>📍 ADD LOCATION - ALL WORLD 🌍</small>
 <input id="loc" placeholder="Search anywhere... Paris, Dubai, Tokyo, NYC" oninput="searchWorld(this.value)">
@@ -37,13 +41,20 @@
 <audio id="aud" controls style="width:100%;margin-top:8px;display:none"></audio>
 </div>
 
-<button class="btn" onclick="shareReel()">Share Reel →</button>
+<div class="box"><small>⚙️ POST SETTINGS</small>
+<div class="toggle"><span>👥 Audience</span><select id="audSel" style="background:#222;color:#fff;border:1px solid #333;padding:6px 10px;border-radius:10px"><option value="everyone">🌍 Everyone</option><option value="close_friends">💚 Close Friends</option></select></div>
+<div class="toggle"><span>❤️ Hide Like Count</span><div class="switch" id="swLike" onclick="this.classList.toggle('on')"></div></div>
+<div class="toggle"><span>💬 Turn Off Commenting</span><div class="switch" id="swComment" onclick="this.classList.toggle('on')"></div></div>
+<div class="toggle"><span>🔗 Hide Share</span><div class="switch" id="swShare" onclick="this.classList.toggle('on')"></div></div>
+</div>
+
+<button class="btn" onclick="sharePost()">Share Post →</button>
 
 <script>
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME=localStorage.getItem('pixoro_current_user')||'Giri'
 let media=sessionStorage.getItem('pixoro_pending_media') || localStorage.getItem('pix_media')
-let type=sessionStorage.getItem('pixoro_pending_type') || localStorage.getItem('pix_media_type') || 'video'
+let type=sessionStorage.getItem('pixoro_pending_type') || localStorage.getItem('pix_media_type') || 'image'
 let isAI=false, selLoc='', selSong='', selSongUrl=''
 if(media){ document.getElementById('prev').innerHTML = type==='video' ? `<video src="${media}" controls autoplay loop style="width:100%;height:100%"></video><div class="aiBadge" id="aiBadge" style="display:none">✨ AI-generated</div>` : `<img src="${media}" style="width:100%;height:100%;object-fit:cover"><div class="aiBadge" id="aiBadge" style="display:none">✨ AI-generated</div>` }
 function setAI(v,el){ isAI=v; document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on')); el.classList.add('on'); let b=document.getElementById('aiBadge'); if(b) b.style.display=v?'block':'none' }
@@ -67,12 +78,17 @@ function pickLoc(p){ selLoc=p; document.getElementById('locChips').innerHTML=`<s
 let songs=[{n:"Katchi Sera - Sai Abhyankkar",u:"https://cdn.pixabay.com/audio/2023/09/18/audio_1a2b3c.mp3"},{n:"Sunset Ride - Chillwave",u:"https://cdn.pixabay.com/audio/2022/03/10/audio_2c3d4e.mp3"},{n:"Leo - Badass",u:"https://cdn.pixabay.com/audio/2023/10/20/audio_3d4e5f.mp3"}]
 function searchSong(q){ let s=document.getElementById('songSug'); if(!q){s.style.display='none';return} let f=songs.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())); s.style.display='block'; s.innerHTML=f.map(x=>`<div onclick="pickSong('${x.n}','${x.u}')">🎵 ${x.n}</div>`).join('')||'No song' }
 function pickSong(n,u){ selSong=n; selSongUrl=u; document.getElementById('songSel').innerText='🎵 '+n; document.getElementById('songSug').style.display='none'; let a=document.getElementById('aud'); a.src=u; a.style.display='block' }
-async function shareReel(){
-  if(!media){alert('Video illa da! upload.html la select pannu da!'); location.href='upload.html'; return}
-  let post={username:ME,media_url:media,image_url:media,video_url:media,media_type:type,caption:document.getElementById('cap').value,location:selLoc,song:selSong,is_ai:isAI,created_at:new Date().toISOString(),likes:0}
-  let arr=JSON.parse(localStorage.getItem('pixoro_local_reels')||'[]'); arr.unshift(post); localStorage.setItem('pixoro_local_reels',JSON.stringify(arr));
-  try{ await supa.from('posts').insert({username:ME,image_url:media,caption:post.caption,media_type:type,location:selLoc,song:selSong}) }catch(e){}
-  alert('Reel posted da Giri! 🔥 Loc:'+selLoc);
-  location.href='reels.html';
+
+async function sharePost(){
+  if(!media){alert('Photo illa da! upload.html la select pannu da!'); location.href='upload.html'; return}
+  let hideL=document.getElementById('swLike').classList.contains('on')
+  let hideC=document.getElementById('swComment').classList.contains('on')
+  let hideS=document.getElementById('swShare').classList.contains('on')
+  let aud=document.getElementById('audSel').value
+  let post={username:ME,image_url:media,media_url:media,media_type:type,caption:document.getElementById('cap').value,location:selLoc,song:selSong,is_ai:isAI,audience:aud,hide_likes:hideL,hide_comments:hideC,hide_share:hideS,created_at:new Date().toISOString(),likes:0}
+  let arr=JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]'); arr.unshift(post); localStorage.setItem('pixoro_local_posts',JSON.stringify(arr));
+  try{ await supa.from('posts').insert({username:ME,image_url:media,caption:post.caption,media_type:type,location:selLoc,song:selSong,hide_likes:hideL,hide_comments:hideC,hide_share:hideS,audience:aud}) }catch(e){}
+  alert('Post posted da Giri! 🔥 Loc:'+selLoc);
+  location.href='index.html';
 }
 </script></body></html>
