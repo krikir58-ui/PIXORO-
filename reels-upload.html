@@ -21,24 +21,19 @@
 <div class="top"><span onclick="location.href='index.html'">✕</span><b>New Reel 🎬</b><span style="color:#fff">Next</span></div>
 <div class="prev" id="prev"><span>Video Preview</span><div class="aiBadge" id="aiBadge" style="display:none">✨ AI-generated</div></div>
 <div class="box"><input id="cap" placeholder="Add caption... #pixoro #viral"></div>
-
 <div class="box"><small>✨ AI INFO</small><div class="row" style="margin:8px 0 0"><div class="pill on" onclick="setAI(false,this)">No - Real Video</div><div class="pill" onclick="setAI(true,this)">Yes - AI Made</div></div></div>
-
 <div class="box"><small>📍 ADD LOCATION - ALL WORLD 🌍</small>
 <input id="loc" placeholder="Search anywhere... Paris, Dubai, Tokyo, NYC" oninput="searchWorld(this.value)">
 <div class="sug" id="locSug"></div>
 <div id="locChips"></div>
 </div>
-
 <div class="box"><small>🎵 ADD SONG</small>
 <input id="songSearch" placeholder="Search song... Katchi Sera" oninput="searchSong(this.value)">
 <div class="sug" id="songSug"></div>
 <div id="songSel" style="margin-top:8px;font-size:13px;color:#4ade80"></div>
 <audio id="aud" controls style="width:100%;margin-top:8px;display:none"></audio>
 </div>
-
 <button class="btn" onclick="shareReel()">Share Reel →</button>
-
 <script>
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME=localStorage.getItem('pixoro_current_user')||'Giri'
@@ -68,11 +63,10 @@ let songs=[{n:"Katchi Sera - Sai Abhyankkar",u:"https://cdn.pixabay.com/audio/20
 function searchSong(q){ let s=document.getElementById('songSug'); if(!q){s.style.display='none';return} let f=songs.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())); s.style.display='block'; s.innerHTML=f.map(x=>`<div onclick="pickSong('${x.n}','${x.u}')">🎵 ${x.n}</div>`).join('')||'No song' }
 function pickSong(n,u){ selSong=n; selSongUrl=u; document.getElementById('songSel').innerText='🎵 '+n; document.getElementById('songSug').style.display='none'; let a=document.getElementById('aud'); a.src=u; a.style.display='block' }
 async function shareReel(){
-  if(!media){alert('Video illa da! upload.html la select pannu da!'); location.href='upload.html'; return}
+  if(!media){ location.href='upload.html'; return }
   let post={id:Date.now(),username:ME,media_url:media,image_url:media,video_url:media,media_type:type,caption:document.getElementById('cap').value,location:selLoc,song:selSong,is_ai:isAI,created_at:new Date().toISOString(),likes:0}
   let arr=JSON.parse(localStorage.getItem('pixoro_local_reels')||'[]'); arr.unshift(post); localStorage.setItem('pixoro_local_reels',JSON.stringify(arr));
   try{ await supa.from('posts').insert({username:ME,image_url:media,caption:post.caption,media_type:type,location:selLoc,song:selSong}) }catch(e){}
-  alert('Reel posted da Giri! 🔥 Loc:'+selLoc);
   location.href='reels.html';
 }
 </script></body></html>
