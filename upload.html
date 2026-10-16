@@ -6,20 +6,19 @@
 .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:2px}
 .cell{aspect-ratio:1;background:#111;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;border:1px solid #222;font-size:13px;color:#888}
 .cell img,.cell video{width:100%;height:100%;object-fit:cover}
-.cell.sel{border:2px solid #FFD700;box-shadow:0 0 0 2px #C0C0C0}
+.cell.sel{border:2px solid #fff;box-shadow:0 0 0 2px #666}
 .tabs{margin:12px;background:#111;border:1px solid #222;border-radius:30px;display:flex;padding:4px}
 .tabs button{flex:1;border:0;background:transparent;color:#888;padding:10px;border-radius:20px;font-weight:700;cursor:pointer}
-.tabs button.on{background:#FFD700;color:#000}
-.next{margin:0 12px;background:#FFD700;border:0;width:calc(100% - 24px);padding:13px;border-radius:20px;font-weight:900;color:#000;font-size:15px;cursor:pointer}
-.preview{margin:12px;height:280px;background:#111;border:2px dashed #FFD700;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tabs button.on{background:#fff;color:#000}
+.next{margin:0 12px;background:#fff;border:0;width:calc(100% - 24px);padding:13px;border-radius:20px;font-weight:900;color:#000;font-size:15px;cursor:pointer}
+.preview{margin:12px;height:280px;background:#111;border:2px dashed #fff;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .preview img,.preview video{width:100%;height:100%;object-fit:cover}
 </style></head><body>
 <div class="top"><b>Pixoro</b><span onclick="location.href='index.html'" style="cursor:pointer">✕</span></div>
 
-<!-- PREVIEW - SELECT PANNA THERIYUM DA -->
 <div class="preview" id="preview"><span style="font-size:40px">📸</span></div>
 
-<div class="top"><span>Recents ▼</span><span onclick="document.getElementById('f').click()" style="color:#FFD700;cursor:pointer">Select</span></div>
+<div class="top"><span>Recents ▼</span><span onclick="document.getElementById('f').click()" style="color:#fff;cursor:pointer">Select</span></div>
 <div class="grid">
   <div class="cell" onclick="document.getElementById('f').click()">📷 Camera</div>
   <div class="cell" onclick="selectDemo(this,'https://picsum.photos/300?1')">Photo 1</div>
@@ -46,6 +45,8 @@ function selectDemo(el,url){
   selectedMedia=url;
   document.getElementById('preview').innerHTML=`<img src="${url}">`;
   localStorage.setItem('pix_media',url);
+  localStorage.setItem('pix_media_type','image');
+  sessionStorage.setItem('pixoro_pending_media',url);
 }
 function handleFile(e){
   let f=e.target.files[0]; if(!f) return;
@@ -55,11 +56,13 @@ function handleFile(e){
   document.getElementById('preview').innerHTML = isVideo ? `<video src="${url}" controls autoplay></video>` : `<img src="${url}">`;
   localStorage.setItem('pix_media',url);
   localStorage.setItem('pix_media_type', isVideo?'video':'image');
+  sessionStorage.setItem('pixoro_pending_media',url);
+  sessionStorage.setItem('pixoro_pending_type', isVideo?'video':'image');
 }
 function go(){
  if(!selectedMedia && !localStorage.getItem('pix_media')){ alert('Photo / Video select pannu da Giri!'); return; }
  if(mode==='post') location.href='post-upload.html';
- else if(mode==='story') location.href='story-upload.html';
+ else if(mode==='story') location.href='story-add.html';
  else if(mode==='reel') location.href='reels-upload.html';
  else alert('LIVE soon da Giri! 🔴');
 }
