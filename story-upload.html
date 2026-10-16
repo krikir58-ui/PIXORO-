@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Story - Pixoro 🔵</title>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Story - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>body{background:#000;color:#fff;font-family:sans-serif;max-width:400px;margin:auto;padding:20px}input,textarea{width:100%;background:#111;border:1px solid #333;padding:12px;border-radius:10px;color:#fff;margin:10px 0;box-sizing:border-box}button{background:#0095F6;border:0;color:#fff;padding:12px;width:100%;border-radius:10px;font-weight:bold;cursor:pointer}.filterBar{display:flex;gap:8px;overflow-x:auto;padding:10px 0}.fbtn{padding:6px 12px;background:#222;border:1px solid #333;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer}.fbtn.active{border-color:#0095F6;background:#001a26;color:#0095F6} #preview{width:100%;height:400px;background:#111;border-radius:15px;object-fit:cover;display:none;margin:10px 0}</style>
+<style>body{background:#000;color:#fff;font-family:sans-serif;max-width:400px;margin:auto;padding:20px}input,textarea{width:100%;background:#111;border:1px solid #333;padding:12px;border-radius:10px;color:#fff;margin:10px 0;box-sizing:border-box}button{background:#fff;border:0;color:#000;padding:12px;width:100%;border-radius:10px;font-weight:bold;cursor:pointer}.filterBar{display:flex;gap:8px;overflow-x:auto;padding:10px 0}.fbtn{padding:6px 12px;background:#222;border:1px solid #333;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer}.fbtn.active{border-color:#fff;background:#fff;color:#000;font-weight:700} #preview{width:100%;height:400px;background:#111;border-radius:15px;object-fit:cover;display:none;margin:10px 0}</style>
 </head>
 <body>
-<h2>📕 Add Story - Pixoro 🔵</h2>
+<h2>📕 Add Story - Pixoro</h2>
 <input type="file" id="file" accept="image/*,video/*" onchange="preview(this)">
 <img id="preview" />
 <video id="previewVideo" style="width:100%;height:400px;background:#111;border-radius:15px;display:none;margin:10px 0" autoplay muted loop></video>
@@ -21,14 +21,14 @@
 <textarea id="caption" placeholder="Caption + Font + @Mention + Poll... type pannu da! Ex: Enna da poll? 😍"></textarea>
 
 <div style="display:flex;gap:8px;margin:10px 0">
-  <button onclick="addPoll()" style="background:#222;flex:1">📊 Poll</button>
-  <button onclick="aiGen()" style="background:linear-gradient(to right,#00BFFF,#9c27b0);flex:1">🤖 AI Image</button>
+  <button onclick="addPoll()" style="background:#222;color:#fff;flex:1">📊 Poll</button>
+  <button onclick="aiGen()" style="background:#fff;color:#000;flex:1">🤖 AI Image</button>
 </div>
 
 <button onclick="up()">Share to Your Story ⭐</button>
 <button onclick="upClose()" style="background:#002a14;border:1px solid #00ff66;color:#00ff66;margin-top:8px">Share to Close Friends 💚</button>
 <p id="st" style="text-align:center;color:#aaa;margin-top:10px"></p>
-<button onclick="location.href='index.html'" style="background:#222;margin-top:10px">Back</button>
+<button onclick="location.href='index.html'" style="background:#222;color:#fff;margin-top:10px">Back</button>
 
 <script>
 const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
@@ -71,22 +71,16 @@ function aiGen(){
     document.getElementById('preview').style.display='block'
     document.getElementById('previewVideo').style.display='none'
     fileData=null
-    // AI image URL direct save pannuvom
     window.aiImageUrl=aiUrl
   }
 }
-
 async function uploadFile(){
-  // AI image-na direct URL thaan
   if(window.aiImageUrl) return window.aiImageUrl
-
   let f=fileData
   if(!f) return null
   let name=Date.now()+'_'+f.name
-  // Bucket illana error varum, athukku public URL method
   let {data:upData, error} = await supa.storage.from('stories').upload(name, f, {upsert:true})
   if(error){
-    // Bucket illa-na base64 la save panniduvom (temporary hack)
     console.log('Storage error, using base64', error.message)
     return new Promise(res=>{
       let r=new FileReader()
@@ -97,19 +91,14 @@ async function uploadFile(){
   let {data}=supa.storage.from('stories').getPublicUrl(name)
   return data.publicUrl
 }
-
 async function up(){ share('public') }
 async function upClose(){ share('close_friends') }
-
 async function share(audience){
   let fileInput=document.getElementById('file')
-  if(!fileInput.files[0] &&!window.aiImageUrl){alert('File select pannu da Giri!');return;}
+  if(!fileInput.files[0] &&!window.aiImageUrl){ document.getElementById('st').innerText='File select pannu da Giri!'; return; }
   document.getElementById('st').innerText='Uploading... ⏳'
-
   let mediaUrl = await uploadFile()
   if(!mediaUrl){ document.getElementById('st').innerText='Upload failed!'; return }
-
-  // ITHU THAAN FIX: image_url illa, media_url!
   let {error}=await supa.from('stories').insert({
     username: ME,
     media_url: mediaUrl,
@@ -120,9 +109,8 @@ async function share(audience){
     stickers: [],
     expires_at: new Date(Date.now()+24*60*60*1000).toISOString()
   })
-
   if(error){document.getElementById('st').innerText='DB Error: '+error.message; return;}
-  document.getElementById('st').innerText = audience==='close_friends'?'💚 Close Friends ku poyiduchu!':'✅ Your Story Added da Giri! 🔵'
+  document.getElementById('st').innerText = audience==='close_friends'?'💚 Close Friends ku poyiduchu!':'✅ Your Story Added da Giri!'
   setTimeout(()=>location.href='index.html',1200)
 }
 </script>
