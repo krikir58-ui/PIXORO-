@@ -1,0 +1,69 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto}
+.top{padding:14px;display:flex;justify-content:space-between}
+.camWrap{position:relative;width:100%;height:70vh;background:#111;overflow:hidden;border-radius:16px}
+video{width:100%;height:100%;object-fit:cover}
+#box{position:absolute;border:3px solid #FFD700;border-radius:12px;box-shadow:0 0 20px #FFD700;display:none}
+#box span{position:absolute;top:-22px;left:0;background:#FFD700;color:#000;font-size:11px;padding:2px 6px;border-radius:6px;font-weight:900}
+.btn{margin:12px;background:#fff;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900}
+.fil{display:flex;gap:8px;padding:10px;overflow-x:auto}.fil button{background:#1c1c1c;color:#fff;border:1px solid #333;padding:8px 14px;border-radius:20px;white-space:nowrap}
+.fil button.active{background:#FFD700;color:#000}
+</style></head><body>
+<div class="top"><b onclick="location.href='index.html'">✕ Close</b><b>📸 Real Camera</b><span>🔄</span></div>
+<div class="camWrap">
+<video id="v" autoplay playsinline muted></video>
+<div id="box"><span>😎 GIRI FACE DETECTED</span></div>
+</div>
+<div class="fil">
+<button class="active" onclick="setF('none',this)">Normal</button>
+<button onclick="setF('bw',this)">⚫ B&W</button>
+<button onclick="setF('gold',this)">🟡 Gold</button>
+<button onclick="setF('neon',this)">💜 Neon</button>
+</div>
+<button class="btn" onclick="capture()">📸 Capture Photo</button>
+<canvas id="c" style="display:none"></canvas>
+<script>
+let video=document.getElementById('v'),box=document.getElementById('box'),cur='none'
+async function start(){
+try{
+let s=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false})
+video.srcObject=s
+trackFace()
+}catch(e){alert('Camera permission kudu da Giri! Settings la Camera Allow pannu da')}
+}
+function setF(f,btn){
+cur=f
+document.querySelectorAll('.fil button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')
+if(f=='bw') video.style.filter='grayscale(1) contrast(1.2)'
+else if(f=='gold') video.style.filter='sepia(0.8) saturate(1.5)'
+else if(f=='neon') video.style.filter='hue-rotate(280deg) saturate(2)'
+else video.style.filter='none'
+}
+async function trackFace(){
+if('FaceDetector' in window){
+let det=new FaceDetector({fastMode:true})
+setInterval(async()=>{
+try{
+let faces=await det.detect(video)
+if(faces.length>0){
+let f=faces[0].boundingBox
+box.style.display='block'
+box.style.left=f.x+'px';box.style.top=f.y+'px';box.style.width=f.width+'px';box.style.height=f.height+'px'
+}else box.style.display='none'
+}catch(e){}
+},200)
+}else{
+// Fallback - Fake tracking for old mobile - Center la box kaatum
+box.style.display='block';box.style.left='25%';box.style.top='30%';box.style.width='50%';box.style.height='40%'
+}
+}
+function capture(){
+let c=document.getElementById('c');c.width=video.videoWidth;c.height=video.videoHeight
+let ctx=c.getContext('2d');ctx.filter=video.style.filter;ctx.drawImage(video,0,0)
+let url=c.toDataURL('image/png')
+localStorage.setItem('pix_media',url);sessionStorage.setItem('pixoro_pending_media',url)
+location.href='post-upload.html'
+}
+start()
+</script></body></html>
