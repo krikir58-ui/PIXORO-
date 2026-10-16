@@ -67,8 +67,14 @@
 function showChoice(){document.getElementById('choice').classList.add('show')}
 function hideChoice(){document.getElementById('choice').classList.remove('show')}
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-let ME=(localStorage.getItem('pixoro_current_user')||'Giri').trim()
-if(!localStorage.getItem('pixoro_current_user')){localStorage.setItem('pixoro_current_user','Giri')}
+// --- OTP SAFE GUARD - ADD PANNITEN DA ---
+let ME = localStorage.getItem('pixoro_current_user')
+if(!ME || ME.trim()===''){
+  location.href='login.html'
+  throw new Error('Not logged in - OTP venum da')
+}
+ME = ME.trim()
+// --- GUARD MUDINJIDUCHU DA ---
 let allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],currentPostId=null,currentMenuPost=null
 let viewedStories=JSON.parse(localStorage.getItem('pixoro_viewed_stories')||'[]')
 let lastTap=0
@@ -141,7 +147,7 @@ function handleTap(id){let now=Date.now();if(now-lastTap<300){fastLike(id);}last
 async function fastLike(id){let liked=allLikes.some(l=>l.post_id==id && l.username==ME);let burst=document.getElementById('burst-'+id);if(!liked){allLikes.push({post_id:id,username:ME});if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show');}if(navigator.vibrate) navigator.vibrate(40);renderFeed();await supa.from('likes').insert({post_id:id,username:ME});}else{allLikes=allLikes.filter(l=>!(l.post_id==id && l.username==ME));renderFeed();await supa.from('likes').delete().eq('post_id',id).eq('username',ME);}let {data}=await supa.from('likes').select('*');allLikes=data||[];renderFeed();}
 function openPostMenu(postId){
 currentMenuPost = allPosts.find(p=> p.id == postId); let p=currentMenuPost; if(!p) return
-let userClean=(p.username||'').toLowerCase().trim(); let meClean=(ME||'Giri').toLowerCase().trim(); let isMine = (userClean===meClean) || userClean.includes('giri')
+let userClean=(p.username||'').toLowerCase().trim(); let meClean=(ME||'').toLowerCase().trim(); let isMine = (userClean===meClean) || userClean.includes('giri')
 let box=document.getElementById('postMenuBox')
 if(!isMine){box.innerHTML=`<div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 12px"></div><div class="menuItem" onclick="sharePost(${p.id});closePostMenu()">🔗 Share</div><div class="menuItem" onclick="closePostMenu()">🚩 Report</div><div class="menuItem" onclick="closePostMenu()" style="justify-content:center;background:#000;border-radius:12px;margin-top:10px;color:#888">Cancel</div>`}else{box.innerHTML=`<div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 12px"></div><div class="menuItem" onclick="editPost()">✏️ Edit</div><div class="menuItem" onclick="toggleHideLikes()">${p.hide_likes?'👁️ Unhide':'❤️ Hide like count'}</div><div class="menuItem" onclick="toggleHideComments()">${p.hide_comments?'💬 Turn on':'🚫 Turn off commenting'}</div><div class="menuItem" onclick="togglePin()">${p.is_pinned?'📌 Unpin':'📌 Pin'}</div><div class="menuItem" onclick="archivePost()">📦 Archive</div><div class="menuItem delete" onclick="deletePost()">🗑️ Delete</div><div class="menuItem" onclick="closePostMenu()" style="justify-content:center;background:#000;border-radius:12px;margin-top:10px;color:#888">Cancel</div>`}
 document.getElementById('postMenu').classList.add('show')
