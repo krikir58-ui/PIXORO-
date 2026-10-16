@@ -3,26 +3,27 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:20px}
 .top{padding:14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #111}.top b{font-size:17px}
-.prev{width:100%;height:380px;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;border:2px solid #FFD700;box-shadow:0 0 0 2px #C0C0C0}
+.prev{width:100%;height:380px;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;border:2px solid #fff;box-shadow:0 0 0 2px #666}
 .prev img,.prev video{width:100%;height:100%;object-fit:cover}
-.aiBadge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:20px;font-size:11px;border:1px solid #FFD700;color:#FFD700}
+.aiBadge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:20px;font-size:11px;border:1px solid #fff;color:#fff}
 .box{margin:10px 12px;background:#111;border:1px solid #222;border-radius:16px;padding:12px}
 .box input,.box textarea{width:100%;background:transparent;border:0;color:#fff;outline:none;font-size:14px;resize:none}
-.box small{color:#FFD700;font-size:11px;font-weight:700}
+.box small{color:#fff;font-size:11px;font-weight:700}
 .row{display:flex;gap:8px;margin:10px 12px}
 .pill{flex:1;background:#111;border:1px solid #333;border-radius:20px;padding:12px;text-align:center;font-size:13px;cursor:pointer}
-.pill.on{background:#FFD700;color:#000;font-weight:700;border-color:#FFD700}
-.chip{display:inline-block;background:#222;border:1px solid #FFD700;border-radius:20px;padding:6px 10px;font-size:12px;margin:4px 4px 0 0}
-.btn{width:calc(100% - 24px);margin:14px 12px;background:#FFD700;color:#000;border:0;padding:15px;border-radius:20px;font-weight:900;font-size:15px;box-shadow:0 0 15px rgba(255,215,0,0.6)}
+.pill.on{background:#fff;color:#000;font-weight:700;border-color:#fff}
+.chip{display:inline-block;background:#222;border:1px solid #fff;border-radius:20px;padding:6px 10px;font-size:12px;margin:4px 4px 0 0}
+.btn{width:calc(100% - 24px);margin:14px 12px;background:#fff;color:#000;border:0;padding:15px;border-radius:20px;font-weight:900;font-size:15px}
 .sug{background:#222;border-radius:12px;padding:8px;margin-top:6px;font-size:13px;display:none;max-height:200px;overflow:auto}
 .sug div{padding:8px;border-bottom:1px solid #333;cursor:pointer}
 .sug div:hover{background:#333}
 .toggle{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #222;font-size:14px}
 .toggle:last-child{border:0}
 .switch{width:44px;height:24px;background:#333;border-radius:20px;position:relative;cursor:pointer}
-.switch.on{background:#FFD700}.switch.on:after{left:22px}.switch:after{content:'';width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px}
+.switch.on{background:#fff}.switch.on:after{left:22px}.switch:after{content:'';width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px}
+.switch.on:after{background:#000}
 </style></head><body>
-<div class="top"><span onclick="location.href='index.html'">✕</span><b>New Post 📸</b><span style="color:#FFD700">Share</span></div>
+<div class="top"><span onclick="location.href='index.html'">✕</span><b>New Post 📸</b><span style="color:#fff">Share</span></div>
 <div class="prev" id="prev"><span>Photo Preview</span><div class="aiBadge" id="aiBadge" style="display:none">✨ AI-generated</div></div>
 <div class="box"><textarea id="cap" rows="2" placeholder="Write caption... #pixoro #viral 🔥"></textarea></div>
 
@@ -78,14 +79,13 @@ function pickLoc(p){ selLoc=p; document.getElementById('locChips').innerHTML=`<s
 let songs=[{n:"Katchi Sera - Sai Abhyankkar",u:"https://cdn.pixabay.com/audio/2023/09/18/audio_1a2b3c.mp3"},{n:"Sunset Ride - Chillwave",u:"https://cdn.pixabay.com/audio/2022/03/10/audio_2c3d4e.mp3"},{n:"Leo - Badass",u:"https://cdn.pixabay.com/audio/2023/10/20/audio_3d4e5f.mp3"}]
 function searchSong(q){ let s=document.getElementById('songSug'); if(!q){s.style.display='none';return} let f=songs.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())); s.style.display='block'; s.innerHTML=f.map(x=>`<div onclick="pickSong('${x.n}','${x.u}')">🎵 ${x.n}</div>`).join('')||'No song' }
 function pickSong(n,u){ selSong=n; selSongUrl=u; document.getElementById('songSel').innerText='🎵 '+n; document.getElementById('songSug').style.display='none'; let a=document.getElementById('aud'); a.src=u; a.style.display='block' }
-
 async function sharePost(){
   if(!media){alert('Photo illa da! upload.html la select pannu da!'); location.href='upload.html'; return}
   let hideL=document.getElementById('swLike').classList.contains('on')
   let hideC=document.getElementById('swComment').classList.contains('on')
   let hideS=document.getElementById('swShare').classList.contains('on')
   let aud=document.getElementById('audSel').value
-  let post={username:ME,image_url:media,media_url:media,media_type:type,caption:document.getElementById('cap').value,location:selLoc,song:selSong,is_ai:isAI,audience:aud,hide_likes:hideL,hide_comments:hideC,hide_share:hideS,created_at:new Date().toISOString(),likes:0}
+  let post={id:Date.now(),username:ME,image_url:media,media_url:media,media_type:type,caption:document.getElementById('cap').value,location:selLoc,song:selSong,is_ai:isAI,audience:aud,hide_likes:hideL,hide_comments:hideC,hide_share:hideS,created_at:new Date().toISOString(),likes:0}
   let arr=JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]'); arr.unshift(post); localStorage.setItem('pixoro_local_posts',JSON.stringify(arr));
   try{ await supa.from('posts').insert({username:ME,image_url:media,caption:post.caption,media_type:type,location:selLoc,song:selSong,hide_likes:hideL,hide_comments:hideC,hide_share:hideS,audience:aud}) }catch(e){}
   alert('Post posted da Giri! 🔥 Loc:'+selLoc);
