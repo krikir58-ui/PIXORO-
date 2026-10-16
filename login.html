@@ -1,53 +1,62 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro Login</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding:20px}
-.inp{width:100%;background:#111;border:1px solid #FFD700;padding:14px;border-radius:12px;color:#fff;margin-top:10px;outline:none}
-.btn{width:100%;background:#FFD700;color:#000;padding:14px;border:0;border-radius:12px;font-weight:900;margin-top:14px;cursor:pointer}
-.btn2{width:100%;background:#1a1a1a;color:#FFD700;padding:12px;border:1px solid #FFD700;border-radius:12px;margin-top:10px;cursor:pointer}
+<!DOCTYPE html>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{background:#000;color:#fff;font-family:sans-serif;display:flex;justify-content:center;padding-top:50px}
+.box{width:350px;text-align:center}.card{border:1px solid #262626;padding:25px;border-radius:8px;margin-bottom:10px}
+input{width:100%;padding:10px;margin:6px 0;background:#121212;border:1px solid #262626;color:#fff;border-radius:6px}
+button{width:100%;padding:10px;background:#0095F6;color:#fff;border:0;border-radius:8px;font-weight:bold;margin-top:8px;cursor:pointer}
+.acc{display:flex;align-items:center;justify-content:space-between;padding:10px;border:1px solid #262626;border-radius:8px;margin:6px 0;cursor:pointer}
 </style></head><body>
-<div style="text-align:center;margin-top:30px"><b style="font-size:36px;color:#FFD700">PIXORO</b><div style="font-size:12px;color:#888;margin-top:6px">INSTAGRAM STYLE • 100% SAFE</div></div>
-
-<div id="loginBox">
-<input id="email" class="inp" placeholder="Email">
-<input id="pass" type="password" class="inp" placeholder="Password">
-<button class="btn" onclick="doLogin()">Login</button>
-<button class="btn2" onclick="doGoogle()">Continue with Google</button>
-<button class="btn2" onclick="showCreate()">Create New Account</button>
-<p id="msg" style="text-align:center;margin-top:10px;color:#0f0"></p>
+<div class="box">
+  <div id="accList"></div>
+  <div class="card">
+    <h1>Pixoro</h1>
+    <input id="email" placeholder="Email">
+    <input id="pass" type="password" placeholder="Password">
+    <button onclick="doLogin()">Log in</button>
+    <button onclick="doSignup()" style="background:#262626">Create New Account</button>
+    <p id="msg"></p>
+  </div>
+  <div class="card"><button onclick="addAccount()">+ Add Account</button></div>
+  <button onclick="doLogout()" style="background:#ed4956">Log Out</button>
 </div>
-
-<div id="createBox" style="display:none">
-<input id="cUser" class="inp" placeholder="@Username - giri_official">
-<input id="cEmail" class="inp" placeholder="Email">
-<input id="cPass" type="password" class="inp" placeholder="Password - Min 6 Letters">
-<button class="btn" onclick="doSignup()">Sign Up - Free</button>
-<button class="btn2" onclick="showLogin()">Back to Login</button>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+const supa = supabase.createClient("https://kqgmkjvbgblxmmqgldl.supabase.co","sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_")
+
+let saved = JSON.parse(localStorage.getItem('pixoro_accounts')||'[]')
+let list = document.getElementById('accList')
+if(saved.length){
+  saved.forEach(e=>{
+    list.innerHTML += `<div class="acc" onclick="switchAcc('${e}')"><b>${e}</b><span>Log in →</span></div>`
+  })
+}
+function switchAcc(e){ document.getElementById('email').value=e; alert('Password podu da Giri - '+e) }
 
 async function doSignup(){
-  let u=document.getElementById('cUser').value.trim()
-  let e=document.getElementById('cEmail').value.trim()
-  let p=document.getElementById('cPass').value.trim()
-  if(!u || !e.includes('@') || p.length<6) return alert('Username/Email/Password check pannu da - Password 6+ venum da')
-  let {data,error} = await supa.auth.signUp({email:e, password:p, options:{data:{username:u}}})
-  if(error) return alert(error.message)
-  alert('Account Created da! Login pannu da 🔥')
-  showLogin(); document.getElementById('email').value=e
+  let email=document.getElementById('email').value
+  let pass=document.getElementById('pass').value
+  let {data,error}=await supa.auth.signUp({email:email,password:pass})
+  if(error) return document.getElementById('msg').innerText=error.message
+  saveAcc(email); location.href='index.html'
 }
 async function doLogin(){
-  let e=document.getElementById('email').value.trim()
-  let p=document.getElementById('pass').value.trim()
-  let {data,error} = await supa.auth.signInWithPassword({email:e, password:p})
-  if(error) return alert(error.message)
-  localStorage.setItem('pixoro_current_user', data.user.user_metadata.username || e)
-  alert('Login Success da!'); location.href='index.html'
+  let email=document.getElementById('email').value
+  let pass=document.getElementById('pass').value
+  let {data,error}=await supa.auth.signInWithPassword({email:email,password:pass})
+  if(error) return document.getElementById('msg').innerText=error.message
+  saveAcc(email); location.href='index.html'
 }
-async function doGoogle(){
-  await supa.auth.signInWithOAuth({provider:'google', options:{redirectTo:'https://krikir58-ui.github.io/pixoro/index.html'}})
+function saveAcc(email){
+  let a=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]')
+  if(!a.includes(email)) a.push(email)
+  localStorage.setItem('pixoro_accounts',JSON.stringify(a))
+  localStorage.setItem('pixoro_current_user',email)
 }
-function showCreate(){document.getElementById('loginBox').style.display='none';document.getElementById('createBox').style.display='block'}
-function showLogin(){document.getElementById('loginBox').style.display='block';document.getElementById('createBox').style.display='none'}
+function addAccount(){ document.getElementById('email').value=''; document.getElementById('pass').value=''; alert('Pudhu account details podu da') }
+async function doLogout(){
+  await supa.auth.signOut()
+  localStorage.removeItem('pixoro_current_user')
+  alert('Logged out da - Account list irukkum da')
+  location.reload()
+}
 </script></body></html>
