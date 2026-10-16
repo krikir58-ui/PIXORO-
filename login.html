@@ -1,0 +1,56 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro Login</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding:20px}
+.inp{width:100%;background:#111;border:1px solid #FFD700;padding:14px;border-radius:12px;color:#fff;margin-top:10px;outline:none}
+.btn{width:100%;background:#FFD700;color:#000;padding:14px;border:0;border-radius:12px;font-weight:900;margin-top:14px;cursor:pointer}
+.btn2{width:100%;background:#1a1a1a;color:#FFD700;padding:12px;border:1px solid #FFD700;border-radius:12px;margin-top:10px;cursor:pointer}
+.accRow{display:flex;gap:10px;align-items:center;padding:12px;background:#111;border:1px solid #222;border-radius:12px;margin-top:10px}
+</style></head><body>
+<div style="text-align:center;margin-top:30px"><b style="font-size:36px;color:#FFD700">PIXORO</b><div style="font-size:12px;color:#888;margin-top:6px">GOLD • PREMIUM • REAL</div></div>
+<div id="accList"></div>
+<div id="loginBox">
+<input id="user" class="inp" placeholder="@Username">
+<input id="pass" class="inp" type="password" placeholder="Password">
+<button class="btn" onclick="doLogin()">Log In - Gold</button>
+<button class="btn2" onclick="showCreate()">Create New Account</button>
+</div>
+<div id="createBox" style="display:none">
+<input id="cName" class="inp" placeholder="Full Name - Giri">
+<input id="cUser" class="inp" placeholder="@Username - giri_official">
+<input id="cPhone" class="inp" placeholder="Phone - 98765 43210">
+<input id="cPass" class="inp" type="password" placeholder="Password - 6+ chars">
+<button class="btn" onclick="doCreate()">Create Account - Free</button>
+<button class="btn2" onclick="showLogin()">Back to Login</button>
+</div>
+<div style="margin-top:20px;text-align:center;color:#666;font-size:11px">Add Account la 3 account switch pannalam da</div>
+<script>
+const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+let accounts=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]')
+function renderAcc(){
+  let h=accounts.map((a,i)=>`<div class="accRow"><img src="https://i.pravatar.cc/100?u=${a}" style="width:40px;height:40px;border-radius:50%;border:2px solid #FFD700"><b>@${a}</b><button onclick="switchAcc('${a}')" style="margin-left:auto;background:#FFD700;border:0;padding:6px 12px;border-radius:20px;font-weight:800">Login</button><span onclick="removeAcc('${a}')" style="cursor:pointer;color:#888">✕</span></div>`).join('')
+  if(h) h+=`<button class="btn2" onclick="showCreate()">+ Add Another Account</button>`
+  document.getElementById('accList').innerHTML=h
+}
+function switchAcc(u){ localStorage.setItem('pixoro_current_user',u); location.href='index.html' }
+function removeAcc(u){ accounts=accounts.filter(x=>x!==u); localStorage.setItem('pixoro_accounts',JSON.stringify(accounts)); renderAcc() }
+async function doCreate(){
+  let n=document.getElementById('cName').value.trim(), u=document.getElementById('cUser').value.trim(), p=document.getElementById('cPhone').value.trim(), pw=document.getElementById('cPass').value.trim()
+  if(!u||!pw||pw.length<4) return alert('Username / Password check pannu da')
+  let {error}=await supa.from('users').insert({username:u,password:pw,name:n,phone:p})
+  if(error) return alert('Username already irukku da! Vera name try pannu')
+  accounts.push(u); localStorage.setItem('pixoro_accounts',JSON.stringify(accounts)); localStorage.setItem('pixoro_current_user',u)
+  localStorage.setItem('pixoro_name_'+u,n); localStorage.setItem('pixoro_uname_'+u,u)
+  alert('Account Created da Giri! 🔥'); location.href='index.html'
+}
+async function doLogin(){
+  let u=document.getElementById('user').value.trim(), pw=document.getElementById('pass').value.trim()
+  let {data}=await supa.from('users').select('*').eq('username',u).eq('password',pw).single()
+  if(!data) return alert('Wrong Username / Password da')
+  if(!accounts.includes(u)) accounts.push(u)
+  localStorage.setItem('pixoro_accounts',JSON.stringify(accounts)); localStorage.setItem('pixoro_current_user',u)
+  location.href='index.html'
+}
+function showCreate(){ document.getElementById('loginBox').style.display='none'; document.getElementById('createBox').style.display='block' }
+function showLogin(){ document.getElementById('loginBox').style.display='block'; document.getElementById('createBox').style.display='none' }
+renderAcc()
+</script></body></html>
