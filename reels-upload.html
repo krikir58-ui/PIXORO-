@@ -3,22 +3,22 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:20px}
 .top{padding:14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #111}.top b{font-size:17px}
-.prev{width:100%;height:380px;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;border:2px solid #FFD700;box-shadow:0 0 0 2px #C0C0C0}
+.prev{width:100%;height:380px;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;border:2px solid #fff;box-shadow:0 0 0 2px #666}
 .prev img,.prev video{width:100%;height:100%;object-fit:cover}
-.aiBadge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:20px;font-size:11px;border:1px solid #FFD700;color:#FFD700}
+.aiBadge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:20px;font-size:11px;border:1px solid #fff;color:#fff}
 .box{margin:10px 12px;background:#111;border:1px solid #222;border-radius:16px;padding:12px}
 .box input{width:100%;background:transparent;border:0;color:#fff;outline:none;font-size:14px}
-.box small{color:#FFD700;font-size:11px;font-weight:700}
+.box small{color:#fff;font-size:11px;font-weight:700}
 .row{display:flex;gap:8px;margin:10px 12px}
 .pill{flex:1;background:#111;border:1px solid #333;border-radius:20px;padding:12px;text-align:center;font-size:13px;cursor:pointer}
-.pill.on{background:#FFD700;color:#000;font-weight:700;border-color:#FFD700}
-.chip{display:inline-block;background:#222;border:1px solid #FFD700;border-radius:20px;padding:6px 10px;font-size:12px;margin:4px 4px 0 0}
-.btn{width:calc(100% - 24px);margin:14px 12px;background:#FFD700;color:#000;border:0;padding:15px;border-radius:20px;font-weight:900;font-size:15px;box-shadow:0 0 15px rgba(255,215,0,0.6)}
+.pill.on{background:#fff;color:#000;font-weight:700;border-color:#fff}
+.chip{display:inline-block;background:#222;border:1px solid #fff;border-radius:20px;padding:6px 10px;font-size:12px;margin:4px 4px 0 0}
+.btn{width:calc(100% - 24px);margin:14px 12px;background:#fff;color:#000;border:0;padding:15px;border-radius:20px;font-weight:900;font-size:15px}
 .sug{background:#222;border-radius:12px;padding:8px;margin-top:6px;font-size:13px;display:none;max-height:200px;overflow:auto}
 .sug div{padding:8px;border-bottom:1px solid #333;cursor:pointer}
 .sug div:hover{background:#333}
 </style></head><body>
-<div class="top"><span onclick="location.href='index.html'">✕</span><b>New Reel 🎬</b><span style="color:#FFD700">Next</span></div>
+<div class="top"><span onclick="location.href='index.html'">✕</span><b>New Reel 🎬</b><span style="color:#fff">Next</span></div>
 <div class="prev" id="prev"><span>Video Preview</span><div class="aiBadge" id="aiBadge" style="display:none">✨ AI-generated</div></div>
 <div class="box"><input id="cap" placeholder="Add caption... #pixoro #viral"></div>
 
@@ -69,7 +69,7 @@ function searchSong(q){ let s=document.getElementById('songSug'); if(!q){s.style
 function pickSong(n,u){ selSong=n; selSongUrl=u; document.getElementById('songSel').innerText='🎵 '+n; document.getElementById('songSug').style.display='none'; let a=document.getElementById('aud'); a.src=u; a.style.display='block' }
 async function shareReel(){
   if(!media){alert('Video illa da! upload.html la select pannu da!'); location.href='upload.html'; return}
-  let post={username:ME,media_url:media,image_url:media,video_url:media,media_type:type,caption:document.getElementById('cap').value,location:selLoc,song:selSong,is_ai:isAI,created_at:new Date().toISOString(),likes:0}
+  let post={id:Date.now(),username:ME,media_url:media,image_url:media,video_url:media,media_type:type,caption:document.getElementById('cap').value,location:selLoc,song:selSong,is_ai:isAI,created_at:new Date().toISOString(),likes:0}
   let arr=JSON.parse(localStorage.getItem('pixoro_local_reels')||'[]'); arr.unshift(post); localStorage.setItem('pixoro_local_reels',JSON.stringify(arr));
   try{ await supa.from('posts').insert({username:ME,image_url:media,caption:post.caption,media_type:type,location:selLoc,song:selSong}) }catch(e){}
   alert('Reel posted da Giri! 🔥 Loc:'+selLoc);
