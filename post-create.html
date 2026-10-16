@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto}
+.top{padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #111}
+.prev{margin:12px;height:350px;background:#111;border:2px dashed #fff;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.prev img{width:100%;height:100%;object-fit:cover}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}
+.cell{aspect-ratio:1;background:#111;display:flex;align-items:center;justify-content:center;color:#888;cursor:pointer}
+.cell img{width:100%;height:100%;object-fit:cover}
+.btn{margin:12px;background:#fff;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900}
+</style></head><body>
+<div class="top"><b>New Post 📸</b><span onclick="location.href='index.html'">✕</span></div>
+<div class="prev" id="prev">📸</div>
+<div class="grid"><div class="cell" onclick="document.getElementById('f').click()">📷 Camera</div>
+<div class="cell" onclick="sel('https://picsum.photos/400?1')"><img src="https://picsum.photos/400?1"></div>
+<div class="cell" onclick="sel('https://picsum.photos/400?2')"><img src="https://picsum.photos/400?2"></div></div>
+<button class="btn" onclick="go()">Next →</button>
+<input type="file" id="f" hidden accept="image/*" onchange="h(event)">
+<script>let m='';function sel(u){m=u;document.getElementById('prev').innerHTML=`<img src="${u}">`;localStorage.setItem('pix_media',u);sessionStorage.setItem('pixoro_pending_media',u)}
+function h(e){let f=e.target.files[0];let u=URL.createObjectURL(f);m=u;document.getElementById('prev').innerHTML=`<img src="${u}">`;localStorage.setItem('pix_media',u);sessionStorage.setItem('pixoro_pending_media',u)}
+function go(){if(m)location.href='post-upload.html'}</script></body></html>
