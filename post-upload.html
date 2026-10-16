@@ -26,31 +26,25 @@
 <div class="top"><span onclick="location.href='index.html'">✕</span><b>New Post 📸</b><span style="color:#fff">Share</span></div>
 <div class="prev" id="prev"><span>Photo Preview</span><div class="aiBadge" id="aiBadge" style="display:none">✨ AI-generated</div></div>
 <div class="box"><textarea id="cap" rows="2" placeholder="Write caption... #pixoro #viral 🔥"></textarea></div>
-
 <div class="box"><small>✨ AI INFO</small><div class="row" style="margin:8px 0 0"><div class="pill on" onclick="setAI(false,this)">No - Real Photo</div><div class="pill" onclick="setAI(true,this)">Yes - AI Made</div></div></div>
-
 <div class="box"><small>📍 ADD LOCATION - ALL WORLD 🌍</small>
 <input id="loc" placeholder="Search anywhere... Paris, Dubai, Tokyo, NYC" oninput="searchWorld(this.value)">
 <div class="sug" id="locSug"></div>
 <div id="locChips"></div>
 </div>
-
 <div class="box"><small>🎵 ADD SONG</small>
 <input id="songSearch" placeholder="Search song... Katchi Sera" oninput="searchSong(this.value)">
 <div class="sug" id="songSug"></div>
 <div id="songSel" style="margin-top:8px;font-size:13px;color:#4ade80"></div>
 <audio id="aud" controls style="width:100%;margin-top:8px;display:none"></audio>
 </div>
-
 <div class="box"><small>⚙️ POST SETTINGS</small>
 <div class="toggle"><span>👥 Audience</span><select id="audSel" style="background:#222;color:#fff;border:1px solid #333;padding:6px 10px;border-radius:10px"><option value="everyone">🌍 Everyone</option><option value="close_friends">💚 Close Friends</option></select></div>
 <div class="toggle"><span>❤️ Hide Like Count</span><div class="switch" id="swLike" onclick="this.classList.toggle('on')"></div></div>
 <div class="toggle"><span>💬 Turn Off Commenting</span><div class="switch" id="swComment" onclick="this.classList.toggle('on')"></div></div>
 <div class="toggle"><span>🔗 Hide Share</span><div class="switch" id="swShare" onclick="this.classList.toggle('on')"></div></div>
 </div>
-
 <button class="btn" onclick="sharePost()">Share Post →</button>
-
 <script>
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME=localStorage.getItem('pixoro_current_user')||'Giri'
@@ -80,7 +74,7 @@ let songs=[{n:"Katchi Sera - Sai Abhyankkar",u:"https://cdn.pixabay.com/audio/20
 function searchSong(q){ let s=document.getElementById('songSug'); if(!q){s.style.display='none';return} let f=songs.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())); s.style.display='block'; s.innerHTML=f.map(x=>`<div onclick="pickSong('${x.n}','${x.u}')">🎵 ${x.n}</div>`).join('')||'No song' }
 function pickSong(n,u){ selSong=n; selSongUrl=u; document.getElementById('songSel').innerText='🎵 '+n; document.getElementById('songSug').style.display='none'; let a=document.getElementById('aud'); a.src=u; a.style.display='block' }
 async function sharePost(){
-  if(!media){alert('Photo illa da! upload.html la select pannu da!'); location.href='upload.html'; return}
+  if(!media){ location.href='upload.html'; return }
   let hideL=document.getElementById('swLike').classList.contains('on')
   let hideC=document.getElementById('swComment').classList.contains('on')
   let hideS=document.getElementById('swShare').classList.contains('on')
@@ -88,7 +82,6 @@ async function sharePost(){
   let post={id:Date.now(),username:ME,image_url:media,media_url:media,media_type:type,caption:document.getElementById('cap').value,location:selLoc,song:selSong,is_ai:isAI,audience:aud,hide_likes:hideL,hide_comments:hideC,hide_share:hideS,created_at:new Date().toISOString(),likes:0}
   let arr=JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]'); arr.unshift(post); localStorage.setItem('pixoro_local_posts',JSON.stringify(arr));
   try{ await supa.from('posts').insert({username:ME,image_url:media,caption:post.caption,media_type:type,location:selLoc,song:selSong,hide_likes:hideL,hide_comments:hideC,hide_share:hideS,audience:aud}) }catch(e){}
-  alert('Post posted da Giri! 🔥 Loc:'+selLoc);
   location.href='index.html';
 }
 </script></body></html>
