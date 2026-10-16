@@ -3,17 +3,14 @@
 *{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto}
 .top{padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
 .tools{display:flex;gap:8px;padding:8px 12px}.tbtn{background:#1c1c1c;border:1px solid #FF0A33;color:#fff;padding:8px 14px;border-radius:20px}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}.cell{aspect-ratio:1;background:#111;display:flex;align-items:center;justify-content:center;color:#888;cursor:pointer}.cell img{width:100%;height:100%;object-fit:cover}
-.btn{margin:12px;background:linear-gradient(90deg,#FF0A33,#7c3aed);border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900;color:#fff;box-shadow:0 0 20px rgba(255,10,51,.5)}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}.cell{aspect-ratio:1;background:#111;display:flex;align-items:center;justify-content:center;color:#888;cursor:pointer}
+.btn{margin:12px;background:linear-gradient(90deg,#FF0A33,#7c3aed);border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900;color:#fff}
 </style></head><body>
 <div class="top"><span onclick="location.href='index.html'">✕</span><b>Add to story</b><span>⚙️</span></div>
 <div class="tools"><button class="tbtn">✨ Templates</button><button class="tbtn">🎵 Music</button><button class="tbtn">🖼️ Collage</button></div>
-<div class="top"><span>Recents ▼</span><span onclick="document.getElementById('f').click()">☐ Select</span></div>
-<div class="grid"><div class="cell" onclick="document.getElementById('f').click()">📷 Camera</div>
-<div class="cell" onclick="sel('https://picsum.photos/400?3')"><img src="https://picsum.photos/400?3"></div>
-<div class="cell" onclick="sel('https://picsum.photos/400?4')"><img src="https://picsum.photos/400?4"></div></div>
+<div class="top"><span>Your Gallery</span><span onclick="document.getElementById('f').click()">☐ Select</span></div>
+<div class="grid"><div class="cell" onclick="document.getElementById('f').click()">📷 Camera</div><div class="cell" onclick="document.getElementById('f').click()">🖼️ Gallery</div><div class="cell" onclick="document.getElementById('f').click()">➕ Add</div></div>
 <button class="btn" onclick="go()">Share Story →</button>
 <input type="file" id="f" hidden accept="image/*,video/*" onchange="h(event)">
-<script>let m='';function sel(u){m=u;localStorage.setItem('pix_media',u);sessionStorage.setItem('pixoro_pending_media',u);location.href='story-add.html'}
-function h(e){let f=e.target.files[0];let u=URL.createObjectURL(f);localStorage.setItem('pix_media',u);sessionStorage.setItem('pixoro_pending_media',u);location.href='story-add.html'}
-function go(){if(m)location.href='story-add.html'}</script></body></html>
+<script>let m='';function h(e){let f=e.target.files[0];if(!f)return;let u=URL.createObjectURL(f);localStorage.setItem('pix_media',u);sessionStorage.setItem('pixoro_pending_media',u);location.href='story-add.html'}
+function go(){if(!m){alert('Photo select pannu da Giri!');return}location.href='story-add.html'}</script></body></html>
