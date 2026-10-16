@@ -2,18 +2,22 @@
 <style>
 *{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto}
 .top{padding:14px;display:flex;justify-content:space-between}
-.camWrap{position:relative;width:100%;height:70vh;background:#111;overflow:hidden;border-radius:16px}
+.camWrap{position:relative;width:100%;height:68vh;background:#111;overflow:hidden;border-radius:16px}
 video{width:100%;height:100%;object-fit:cover}
-#box{position:absolute;border:3px solid #FFD700;border-radius:12px;box-shadow:0 0 20px #FFD700;display:none}
+#box{position:absolute;border:3px solid #FFD700;border-radius:12px;display:none}
 #box span{position:absolute;top:-22px;left:0;background:#FFD700;color:#000;font-size:11px;padding:2px 6px;border-radius:6px;font-weight:900}
-.btn{margin:12px;background:#fff;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900}
-.fil{display:flex;gap:8px;padding:10px;overflow-x:auto}.fil button{background:#1c1c1c;color:#fff;border:1px solid #333;padding:8px 14px;border-radius:20px;white-space:nowrap}
+.ctl{display:flex;justify-content:center;gap:16px;padding:14px}
+.cbtn{width:60px;height:60px;border-radius:50%;border:3px solid #fff;background:#FF0A33;font-size:24px}
+.cbtn.rec{background:red;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.5}}
+.sbtn{background:#1c1c1c;color:#fff;border:1px solid #333;padding:10px 16px;border-radius:20px}
+.fil{display:flex;gap:8px;padding:8px;overflow-x:auto}.fil button{background:#1c1c1c;color:#fff;border:1px solid #333;padding:8px 14px;border-radius:20px;white-space:nowrap}
 .fil button.active{background:#FFD700;color:#000}
 </style></head><body>
-<div class="top"><b onclick="location.href='index.html'">✕ Close</b><b>📸 Real Camera</b><span>🔄</span></div>
+<div class="top"><b onclick="location.href='index.html'">✕</b><b>📸 PIXORO PRO CAM</b><span>HD</span></div>
 <div class="camWrap">
 <video id="v" autoplay playsinline muted></video>
-<div id="box"><span>😎 GIRI FACE DETECTED</span></div>
+<div id="box"><span>😎 FACE TRACKING</span></div>
 </div>
 <div class="fil">
 <button class="active" onclick="setF('none',this)">Normal</button>
@@ -21,19 +25,24 @@ video{width:100%;height:100%;object-fit:cover}
 <button onclick="setF('gold',this)">🟡 Gold</button>
 <button onclick="setF('neon',this)">💜 Neon</button>
 </div>
-<button class="btn" onclick="capture()">📸 Capture Photo</button>
+<div class="ctl">
+<button class="sbtn" onclick="flip()">🔄 Flip</button>
+<button class="cbtn" id="recBtn" onclick="toggleRec()">●</button>
+<button class="sbtn" onclick="capture()">📸 Photo</button>
+</div>
+<div style="text-align:center;padding:6px;color:#888;font-size:12px">🔄 Front / Back • ● Record • 📸 Photo</div>
 <canvas id="c" style="display:none"></canvas>
 <script>
-let video=document.getElementById('v'),box=document.getElementById('box'),cur='none'
+let video=document.getElementById('v'),box=document.getElementById('box'),stream=null,rec=null,chunks=[],isRec=false,front=true
 async function start(){
+if(stream) stream.getTracks().forEach(t=>t.stop())
 try{
-let s=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false})
-video.srcObject=s
-trackFace()
-}catch(e){alert('Camera permission kudu da Giri! Settings la Camera Allow pannu da')}
+stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:front?'user':'environment',width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30}},audio:true})
+video.srcObject=stream;video.style.transform=front?'scaleX(-1)':'none';trackFace()
+}catch(e){alert('Camera Allow pannu da Giri!')}
 }
+function flip(){front=!front;start()}
 function setF(f,btn){
-cur=f
 document.querySelectorAll('.fil button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')
 if(f=='bw') video.style.filter='grayscale(1) contrast(1.2)'
 else if(f=='gold') video.style.filter='sepia(0.8) saturate(1.5)'
@@ -43,27 +52,22 @@ else video.style.filter='none'
 async function trackFace(){
 if('FaceDetector' in window){
 let det=new FaceDetector({fastMode:true})
-setInterval(async()=>{
-try{
-let faces=await det.detect(video)
-if(faces.length>0){
-let f=faces[0].boundingBox
-box.style.display='block'
-box.style.left=f.x+'px';box.style.top=f.y+'px';box.style.width=f.width+'px';box.style.height=f.height+'px'
-}else box.style.display='none'
-}catch(e){}
-},200)
-}else{
-// Fallback - Fake tracking for old mobile - Center la box kaatum
-box.style.display='block';box.style.left='25%';box.style.top='30%';box.style.width='50%';box.style.height='40%'
-}
+setInterval(async()=>{try{let fs=await det.detect(video);if(fs.length>0){let f=fs[0].boundingBox;box.style.display='block';box.style.left=f.x+'px';box.style.top=f.y+'px';box.style.width=f.width+'px';box.style.height=f.height+'px'}else box.style.display='none'}catch(e){}},200)
+}else{box.style.display='block';box.style.left='25%';box.style.top='30%';box.style.width='50%';box.style.height='40%'}
 }
 function capture(){
-let c=document.getElementById('c');c.width=video.videoWidth;c.height=video.videoHeight
-let ctx=c.getContext('2d');ctx.filter=video.style.filter;ctx.drawImage(video,0,0)
-let url=c.toDataURL('image/png')
+let c=document.getElementById('c');
+// SECRET: Free storage ku 720p + 0.72 quality thaan da
+let MAX=720,w=video.videoWidth,h=video.videoHeight;if(w>MAX){h=h*MAX/w;w=MAX}
+c.width=w;c.height=h;let ctx=c.getContext('2d');ctx.filter=video.style.filter;ctx.drawImage(video,0,0,w,h)
+let url=c.toDataURL('image/jpeg',0.72)
 localStorage.setItem('pix_media',url);sessionStorage.setItem('pixoro_pending_media',url)
-location.href='post-upload.html'
+let t=new URLSearchParams(location.search).get('type');location.href=t=='reel'?'reels-upload.html':t=='story'?'story-add.html':'post-upload.html'
+}
+function toggleRec(){
+if(!isRec){
+chunks=[];rec=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp9',videoBitsPerSecond:1200000,audioBitsPerSecond:64000});rec.ondataavailable=e=>chunks.push(e.data);rec.onstop=()=>{let blob=new Blob(chunks,{type:'video/webm'});let url=URL.createObjectURL(blob);localStorage.setItem('pix_media',url);sessionStorage.setItem('pixoro_pending_media',url);sessionStorage.setItem('pixoro_pending_type','video');let t=new URLSearchParams(location.search).get('type');location.href=t=='reel'?'reels-upload.html':'post-upload.html'};rec.start();isRec=true;document.getElementById('recBtn').classList.add('rec')
+}else{rec.stop();isRec=false;document.getElementById('recBtn').classList.remove('rec')}
 }
 start()
 </script></body></html>
