@@ -1,16 +1,30 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
 *{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto}
-.top{padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
-.tools{display:flex;gap:8px;padding:8px 12px}.tbtn{background:#1c1c1c;border:1px solid #FF0A33;color:#fff;padding:8px 14px;border-radius:20px}
+.top{padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #FFD700}.top b{color:#FFD700}
+.prev{margin:12px;height:400px;background:#111;border:2px dashed #FFD700;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden}.prev img,.prev video{width:100%;height:100%;object-fit:cover}
 .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}.cell{aspect-ratio:1;background:#111;display:flex;align-items:center;justify-content:center;color:#888;cursor:pointer}
-.btn{margin:12px;background:linear-gradient(90deg,#FF0A33,#7c3aed);border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900;color:#fff}
+.btn{margin:12px;background:#FFD700;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900;color:#000}
 </style></head><body>
-<div class="top"><span onclick="location.href='index.html'">✕</span><b>Add to story</b><span>⚙️</span></div>
-<div class="tools"><button class="tbtn">✨ Templates</button><button class="tbtn">🎵 Music</button><button class="tbtn">🖼️ Collage</button></div>
-<div class="top"><span>Your Gallery</span><span onclick="document.getElementById('f').click()">☐ Select</span></div>
-<div class="grid"><div class="cell" onclick="document.getElementById('f').click()">📷 Camera</div><div class="cell" onclick="document.getElementById('f').click()">🖼️ Gallery</div><div class="cell" onclick="document.getElementById('f').click()">➕ Add</div></div>
-<button class="btn" onclick="go()">Share Story →</button>
+<div class="top"><b>New Story ⭐</b><span onclick="location.href='index.html'">✕</span></div>
+<div class="prev" id="prev">⭐ Photo / Video Select Pannu</div>
+<div class="grid"><div class="cell" onclick="location.href='camera.html?type=story'">📷 Camera</div><div class="cell" onclick="document.getElementById('f').click()">🖼️ Gallery</div><div class="cell" onclick="document.getElementById('f').click()">➕ Add</div></div>
+<button class="btn" onclick="go()">Next →</button>
 <input type="file" id="f" hidden accept="image/*,video/*" onchange="h(event)">
-<script>let m='';function h(e){let f=e.target.files[0];if(!f)return;let u=URL.createObjectURL(f);localStorage.setItem('pix_media',u);sessionStorage.setItem('pixoro_pending_media',u);location.href='story-add.html'}
-function go(){if(!m){alert('Photo select pannu da Giri!');return}location.href='story-add.html'}</script></body></html>
+<script>
+let m='';
+function h(e){
+let f=e.target.files[0];if(!f)return;
+if(f.type.startsWith('video/')){
+let u=URL.createObjectURL(f);m=u;document.getElementById('prev').innerHTML=`<video src="${u}" autoplay loop controls></video>`;localStorage.setItem('pix_media',u);sessionStorage.setItem('pixoro_pending_media',u);sessionStorage.setItem('pixoro_pending_type','video');
+}else{
+let img=new Image();img.onload=()=>{
+// SECRET: 720p + 0.72 - Free storage ku da
+let MAX=720,w=img.width,h=img.height;if(w>MAX){h=h*MAX/w;w=MAX}
+let cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
+let url=cv.toDataURL('image/jpeg',0.72);m=url;document.getElementById('prev').innerHTML=`<img src="${url}">`;localStorage.setItem('pix_media',url);sessionStorage.setItem('pixoro_pending_media',url);sessionStorage.setItem('pixoro_pending_type','image');
+};img.src=URL.createObjectURL(f);
+}
+}
+function go(){if(!m){alert('Story select pannu da Giri!');return}location.href='story-add.html'}
+</script></body></html>
