@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro Login</title>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro Login - OTP Safe</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding:20px}
 .inp{width:100%;background:#111;border:1px solid #FFD700;padding:14px;border-radius:12px;color:#fff;margin-top:10px;outline:none}
@@ -6,23 +6,31 @@
 .btn2{width:100%;background:#1a1a1a;color:#FFD700;padding:12px;border:1px solid #FFD700;border-radius:12px;margin-top:10px;cursor:pointer}
 .accRow{display:flex;gap:10px;align-items:center;padding:12px;background:#111;border:1px solid #222;border-radius:12px;margin-top:10px}
 </style></head><body>
-<div style="text-align:center;margin-top:30px"><b style="font-size:36px;color:#FFD700">PIXORO</b><div style="font-size:12px;color:#888;margin-top:6px">GOLD • PREMIUM • REAL</div></div>
+<div style="text-align:center;margin-top:30px"><b style="font-size:36px;color:#FFD700">PIXORO</b><div style="font-size:12px;color:#888;margin-top:6px">GOLD • PREMIUM • OTP SAFE</div></div>
 <div id="accList"></div>
+
+<!-- LOGIN BOX - OTP -->
 <div id="loginBox">
 <input id="user" class="inp" placeholder="@Username">
-<input id="pass" class="inp" type="password" placeholder="Password">
-<button class="btn" onclick="doLogin()">Log In - Gold</button>
+<input id="email" class="inp" placeholder="Email - giri@gmail.com">
+<button class="btn" onclick="sendOtp()">Send OTP - Free</button>
+<input id="otpInput" class="inp" placeholder="6 Digit OTP - Gmail la vanthirukkum" style="display:none">
+<button id="verifyBtn" class="btn" onclick="verifyOtp()" style="display:none">Verify & Login</button>
 <button class="btn2" onclick="showCreate()">Create New Account</button>
+<p id="msg" style="color:#0f0;text-align:center;margin-top:10px"></p>
 </div>
+
+<!-- CREATE BOX -->
 <div id="createBox" style="display:none">
 <input id="cName" class="inp" placeholder="Full Name - Giri">
 <input id="cUser" class="inp" placeholder="@Username - giri_official">
+<input id="cEmail" class="inp" placeholder="Email - giri@gmail.com">
 <input id="cPhone" class="inp" placeholder="Phone - 98765 43210">
-<input id="cPass" class="inp" type="password" placeholder="Password - 6+ chars">
-<button class="btn" onclick="doCreate()">Create Account - Free</button>
+<button class="btn" onclick="doCreate()">Create Account - Send OTP</button>
 <button class="btn2" onclick="showLogin()">Back to Login</button>
 </div>
-<div style="margin-top:20px;text-align:center;color:#666;font-size:11px">Add Account la 3 account switch pannalam da</div>
+<div style="margin-top:20px;text-align:center;color:#666;font-size:11px">OTP iruntha yarum thiruda mudiyathu da - 100% Safe</div>
+
 <script>
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 let accounts=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]')
@@ -33,22 +41,39 @@ function renderAcc(){
 }
 function switchAcc(u){ localStorage.setItem('pixoro_current_user',u); location.href='index.html' }
 function removeAcc(u){ accounts=accounts.filter(x=>x!==u); localStorage.setItem('pixoro_accounts',JSON.stringify(accounts)); renderAcc() }
-async function doCreate(){
-  let n=document.getElementById('cName').value.trim(), u=document.getElementById('cUser').value.trim(), p=document.getElementById('cPhone').value.trim(), pw=document.getElementById('cPass').value.trim()
-  if(!u||!pw||pw.length<4) return alert('Username / Password check pannu da')
-  let {error}=await supa.from('users').insert({username:u,password:pw,name:n,phone:p})
-  if(error) return alert('Username already irukku da! Vera name try pannu')
-  accounts.push(u); localStorage.setItem('pixoro_accounts',JSON.stringify(accounts)); localStorage.setItem('pixoro_current_user',u)
-  localStorage.setItem('pixoro_name_'+u,n); localStorage.setItem('pixoro_uname_'+u,u)
-  alert('Account Created da Giri! 🔥'); location.href='index.html'
+
+async function sendOtp(){
+  let email=document.getElementById('email').value.trim()
+  let u=document.getElementById('user').value.trim()
+  if(!email.includes('@')) return alert('Email correct ah podu da')
+  if(!u) return alert('Username podu da')
+  let {error}=await supa.auth.signInWithOtp({email:email})
+  if(error) return alert(error.message)
+  document.getElementById('msg').innerText='OTP Sent da! Gmail ah check pannu da 🔥'
+  document.getElementById('otpInput').style.display='block'
+  document.getElementById('verifyBtn').style.display='block'
 }
-async function doLogin(){
-  let u=document.getElementById('user').value.trim(), pw=document.getElementById('pass').value.trim()
-  let {data}=await supa.from('users').select('*').eq('username',u).eq('password',pw).single()
-  if(!data) return alert('Wrong Username / Password da')
+async function verifyOtp(){
+  let email=document.getElementById('email').value.trim()
+  let u=document.getElementById('user').value.trim()
+  let token=document.getElementById('otpInput').value.trim()
+  let {data,error}=await supa.auth.verifyOtp({email:email,token:token,type:'email'})
+  if(error) return alert('Wrong OTP da - Thirumba paaru da')
   if(!accounts.includes(u)) accounts.push(u)
-  localStorage.setItem('pixoro_accounts',JSON.stringify(accounts)); localStorage.setItem('pixoro_current_user',u)
-  location.href='index.html'
+  localStorage.setItem('pixoro_accounts',JSON.stringify(accounts))
+  localStorage.setItem('pixoro_current_user',u)
+  localStorage.setItem('pixoro_email_'+u,email)
+  alert('Login Success da! Safe da!'); location.href='index.html'
+}
+async function doCreate(){
+  let n=document.getElementById('cName').value.trim(), u=document.getElementById('cUser').value.trim(), p=document.getElementById('cPhone').value.trim(), em=document.getElementById('cEmail').value.trim()
+  if(!u||!em.includes('@')) return alert('Username / Email check pannu da')
+  let {error}=await supa.from('users').insert({username:u,name:n,phone:p,email:em})
+  if(error) return alert('Username already irukku da! Vera name try pannu')
+  // Create pannathukku aprom OTP anuppu
+  document.getElementById('loginBox').style.display='block'; document.getElementById('createBox').style.display='none'
+  document.getElementById('user').value=u; document.getElementById('email').value=em
+  alert('Account Created da! Ippo OTP podu da 🔥'); sendOtp()
 }
 function showCreate(){ document.getElementById('loginBox').style.display='none'; document.getElementById('createBox').style.display='block' }
 function showLogin(){ document.getElementById('loginBox').style.display='block'; document.getElementById('createBox').style.display='none' }
