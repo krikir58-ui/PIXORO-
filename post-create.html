@@ -17,5 +17,24 @@
 </div>
 <button class="btn" onclick="go()">Next →</button>
 <input type="file" id="f" hidden accept="image/*" onchange="h(event)">
-<script>let m='';function h(e){let f=e.target.files[0];if(!f)return;let u=URL.createObjectURL(f);m=u;document.getElementById('prev').innerHTML=`<img src="${u}">`;localStorage.setItem('pix_media',u);sessionStorage.setItem('pixoro_pending_media',u)}
-function go(){if(!m){alert('Photo select pannu da Giri!');return}location.href='post-upload.html'}</script></body></html>
+<script>
+let m='';
+function h(e){
+let f=e.target.files[0];if(!f)return;
+let img=new Image();
+img.onload=()=>{
+// SECRET: 720p + 0.72 quality - Yarukum theriyathu da
+let MAX=720,w=img.width,h=img.height;
+if(w>MAX){h=h*MAX/w;w=MAX}
+let cv=document.createElement('canvas');cv.width=w;cv.height=h;
+cv.getContext('2d').drawImage(img,0,0,w,h);
+let url=cv.toDataURL('image/jpeg',0.72);
+m=url;
+document.getElementById('prev').innerHTML=`<img src="${url}">`;
+localStorage.setItem('pix_media',url);
+sessionStorage.setItem('pixoro_pending_media',url);
+};
+img.src=URL.createObjectURL(f);
+}
+function go(){if(!m){alert('Photo select pannu da Giri!');return}location.href='post-upload.html'}
+</script></body></html>
