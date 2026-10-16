@@ -3,23 +3,17 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
 body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
-
-/* TOP - CORRECT 56px */
 .top{padding:8px 12px;display:flex;gap:8px;border-bottom:1px solid #1e1e1e;position:sticky;top:0;background:#000;z-index:10;height:56px;align-items:center}
 input{flex:1;background:#181818;border:1px solid #222;padding:10px 12px;border-radius:10px;color:#fff;outline:none;font-size:14px}
-
-.topPlus{width:32px;height:32px;background:#fff;color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;cursor:pointer;flex-shrink:0}
+.topPlus{width:32px;height:32px;background:#FFD700!important;color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;cursor:pointer;flex-shrink:0;box-shadow:0 0 12px rgba(255,215,0,.6)}
 .bellWhite{width:32px;height:32px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
 .bellWhite svg{width:18px;height:18px}
-
 .userRow{display:flex;align-items:center;justify-content:space-between;padding:12px 10px;border-bottom:1px solid #151515}
 .userRow:hover{background:#0a0a0a}
 .msgBtn{background:#fff;border:0;color:#000;padding:6px 14px;border-radius:20px;font-weight:800;font-size:12px;cursor:pointer}
 .viewBtn{background:#1a1a1a;border:1px solid #333;color:#fff;padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;margin-right:6px}
 .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:8px}
 .grid img{width:100%;aspect-ratio:1;object-fit:cover;cursor:pointer}
-
-/* BOTTOM - CORRECT 60px */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:60px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100;padding-bottom:4px;padding-top:4px}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}
 .bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}
@@ -27,8 +21,11 @@ input{flex:1;background:#181818;border:1px solid #222;padding:10px 12px;border-r
 .bottom-nav a.active svg{stroke:#fff}
 .bottom-nav span{font-size:10px;color:#8e8e8e}
 .bottom-nav a.active span{color:#fff;font-weight:700}
+.pixSheet{background:#0a0a0a;border-top:2px solid #FFD700;border-radius:28px 28px 0 0;padding:24px 16px 28px;width:100%;max-width:450px;box-shadow:0 -10px 40px rgba(255,215,0,.25)}
+.goldCard{background:#000;border:2px solid #FFD700;border-radius:20px;padding:22px 10px;text-align:center;box-shadow:0 0 18px rgba(255,215,0,.35);cursor:pointer}
+.goldCard b{font-size:16px;color:#FFD700;display:block;margin-top:6px}
+.goldCard small{font-size:11px;color:#aaa;display:block;margin-top:4px}
 </style></head><body>
-
 <div class="top">
 <input id="searchInput" placeholder="Search real people... @name" oninput="doSearch()" autofocus>
 <div style="display:flex;gap:8px;align-items:center">
@@ -39,11 +36,9 @@ input{flex:1;background:#181818;border:1px solid #222;padding:10px 12px;border-r
 <span onclick="location.href='index.html'" style="cursor:pointer;font-size:18px;margin-left:2px">✕</span>
 </div>
 </div>
-
 <div id="results"></div>
 <div id="hint" style="text-align:center;padding:30px 20px;color:#555"><div style="font-size:36px;margin-bottom:8px">🔒</div><b style="color:#fff">Private Search</b><p style="font-size:11px;margin-top:8px">Type pannu - yaarukku venalum msg pannalam<br>DM la avanga mattum varuvanga - 100% private</p></div>
 <div id="explore" style="margin-top:10px"><div style="padding:8px 12px;font-size:11px;color:#666;font-weight:700">EXPLORE • REELS MAARI</div><div class="grid" id="grid"></div></div>
-
 <div class="bottom-nav">
   <a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
   <a href="search.html" class="active"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
@@ -51,14 +46,19 @@ input{flex:1;background:#181818;border:1px solid #222;padding:10px 12px;border-r
   <a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
   <a href="profile.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg><span>Profile</span></a>
 </div>
-
-<div id="createSheet" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:flex-end;justify-content:center"><div style="background:#1a1a1a;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:18px 18px 28px;border:1px solid #333"><div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 18px"></div><b style="display:block;text-align:center;margin-bottom:16px">Create New</b><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-<div onclick="location.href='upload.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">📸</div><div style="margin-top:6px;font-weight:700">Post</div></div>
-<div onclick="location.href='reels-upload.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">🎞️</div><div style="margin-top:6px;font-weight:700">Reels</div></div>
-<div onclick="location.href='story-add.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">⭕</div><div style="margin-top:6px;font-weight:700">Story</div></div>
-<div onclick="location.href='live.html'" style="background:#000;border:1px solid #333;border-radius:16px;padding:18px;text-align:center"><div style="font-size:28px">🔴</div><div style="margin-top:6px;font-weight:700">Live</div></div>
-</div><div onclick="document.getElementById('createSheet').style.display='none'" style="margin-top:16px;text-align:center;background:#000;padding:12px;border-radius:12px;color:#888;border:1px solid #333">Cancel</div></div></div>
-
+<div id="createSheet" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:flex-end;justify-content:center" onclick="if(event.target.id=='createSheet')this.style.display='none'"><div class="pixSheet">
+<div style="width:50px;height:5px;background:linear-gradient(90deg,#FFD700,#FFF3A3,#FFD700);border-radius:10px;margin:0 auto 16px"></div>
+<div style="text-align:center;font-size:24px;font-weight:900;color:#FFD700">Create New</div>
+<div style="text-align:center;font-size:12px;color:#aaa;margin-top:4px">Start something amazing</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px">
+<div class="goldCard" onclick="location.href='post-create.html'"><div style="font-size:32px;color:#FFD700">✎</div><b>Post</b><small>Share a photo</small></div>
+<div class="goldCard" onclick="location.href='reel-create.html'"><div style="font-size:32px;color:#FFD700">🎬</div><b>Reels</b><small>Short video</small></div>
+<div class="goldCard" onclick="location.href='story-create.html'"><div style="font-size:32px;color:#FFD700">⊕</div><b>Story</b><small>24-hour story</small></div>
+<div class="goldCard" onclick="location.href='live.html'"><div style="font-size:32px;color:#FFD700">◉</div><b>Live</b><small>Go live now</small></div>
+</div>
+<div style="text-align:center;margin-top:20px;font-size:11px;letter-spacing:5px;color:#FFD700">PIXORO • PREMIUM</div>
+<div onclick="document.getElementById('createSheet').style.display='none'" style="margin-top:12px;text-align:center;padding:12px;color:#777">Cancel</div>
+</div></div>
 <script>
 const supa=supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME=localStorage.getItem('pixoro_current_user')||'Giri'
