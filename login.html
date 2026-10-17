@@ -31,7 +31,6 @@ button{width:100%;padding:11px;background:#0095F6;color:#fff;border:0;border-rad
 const supa = supabase.createClient("https://yecpltndhlzfjplzhcpm.supabase.co","sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_")
 function showErr(m){ document.getElementById('msg').innerText=m }
 function clearErr(){ document.getElementById('msg').innerText='' }
-
 async function checkGoogleLogin(){
   let {data} = await supa.auth.getSession()
   if(data.session && data.session.user){
@@ -44,7 +43,7 @@ supa.auth.onAuthStateChange((event, session)=>{
 })
 async function loginWithGoogle(){
   clearErr()
-  let {error} = await supa.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: location.origin + '/index.html' } })
+  let {error} = await supa.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: 'https://krikir58-ui.github.io/PIXORO-/index.html' } })
   if(error) showErr(error.message)
 }
 let saved = JSON.parse(localStorage.getItem('pixoro_accounts')||'[]')
