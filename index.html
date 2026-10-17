@@ -76,15 +76,40 @@ if(!ME || ME.trim()===''){ location.href='login.html'; throw new Error('Not logg
 ME = ME.trim()
 let accounts=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]')
 if(!accounts.includes(ME)){accounts.push(ME);localStorage.setItem('pixoro_accounts',JSON.stringify(accounts))}
+
+// === PIXORO SAFE - ADDED BY GIRI ===
+async function checkSafeSession(){
+  let {data}=await supa.auth.getSession()
+  if(!data.session){
+    // Token illa na - Login ku anuppiduvom da
+    // Friend password maathitta - Token expire aayidum da
+    location.href='login.html'
+  }
+}
+checkSafeSession()
+
 function showAccMenu(){ renderAccList(); document.getElementById('accMenu').classList.add('show') }
 function hideAccMenu(){ document.getElementById('accMenu').classList.remove('show') }
 function renderAccList(){
   let h=accounts.map(a=>`<div class="accRow"><img src="https://i.pravatar.cc/100?u=${a}" style="width:40px;height:40px;border-radius:50%;border:2px solid #FFD700"><b>@${a}</b> ${a===ME?'<span style="font-size:11px;background:#FFD700;color:#000;padding:3px 8px;border-radius:10px">Current</span>':''}<button onclick="switchAcc('${a}')" style="margin-left:auto;background:#FFD700;border:0;padding:6px 12px;border-radius:20px;font-weight:800">Switch</button><span onclick="removeAcc('${a}')" style="cursor:pointer;color:#888">✕</span></div>`).join('')
   document.getElementById('accList').innerHTML=h
 }
-function switchAcc(u){ localStorage.setItem('pixoro_current_user',u); location.reload() }
+// === FIXED SWITCH - PASSWORD KEKUM DA ===
+async function switchAcc(u){
+  if(u===ME){ hideAccMenu(); return }
+  let pass = prompt(u + ' oda password podu da Giri:')
+  if(!pass) return
+  let {error} = await supa.auth.signInWithPassword({email: u, password: pass})
+  if(error){
+    alert('Password thappu da! Friend password ah maathittan pola da - Pudhu password kekkanum da')
+    return
+  }
+  localStorage.setItem('pixoro_current_user',u)
+  location.reload()
+}
 function removeAcc(u){ accounts=accounts.filter(x=>x!==u); localStorage.setItem('pixoro_accounts',JSON.stringify(accounts)); if(u===ME) doLogout(); renderAccList() }
-function doLogout(){ localStorage.removeItem('pixoro_current_user'); location.href='login.html' }
+// === FIXED LOGOUT - TOKEN DELETE ===
+async function doLogout(){ await supa.auth.signOut(); localStorage.removeItem('pixoro_current_user'); location.href='login.html' }
 function addAccount(){ location.href='login.html' }
 function createAccount(){ location.href='login.html#create' }
 let allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],currentPostId=null,currentMenuPost=null
