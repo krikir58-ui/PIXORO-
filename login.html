@@ -59,10 +59,28 @@ async function verifyOtp(){
   saveAcc(email); alert('OTP Correct da!'); location.href='index.html'
 }
 async function forgot(){
-  let email=document.getElementById('email').value
-  if(!email) return alert('Email podu da')
-  await supa.auth.resetPasswordForEmail(email)
-  alert('Gmail la link pooyiruchu da - Pudhu password vei da')
+  let email=document.getElementById('email').value.trim()
+  if(!email) return alert('Email podu da Giri')
+  let {error}=await supa.auth.signInWithOtp({ email, options:{ shouldCreateUser: false } })
+  if(error) return alert(error.message)
+  document.getElementById('otpBox').style.display='block'
+  document.getElementById('otpBox').innerHTML = `
+    <input id="otpCode" placeholder="6 Digit OTP - Gmail la vantha code">
+    <input id="newPass" type="password" placeholder="Pudhu Password - Itha vei da">
+    <button onclick="resetWithOtp()" style="background:#00c853">Verify OTP + New Password Set Pannu</button>`
+  alert('OTP Gmail ku pooyiruchu da! OTP + Pudhu Password podu da!')
+}
+async function resetWithOtp(){
+  let email=document.getElementById('email').value.trim()
+  let token=document.getElementById('otpCode').value.trim()
+  let newPass=document.getElementById('newPass').value.trim()
+  if(!token || !newPass) return alert('OTP + Pudhu Password rendu podu da')
+  let {error}=await supa.auth.verifyOtp({email,token,type:'email'})
+  if(error) return alert(error.message)
+  let {error:upErr}=await supa.auth.updateUser({password:newPass})
+  if(upErr) return alert(upErr.message)
+  alert('Password maathiyachu da Giri! Ippo Login pannu da!')
+  saveAcc(email); location.href='index.html'
 }
 function addAccount(){ document.getElementById('email').value=''; document.getElementById('pass').value=''; alert('Friend ID podu da Giri - Add aayidum da') }
 async function doLogout(){ await supa.auth.signOut(); localStorage.removeItem('pixoro_current_user'); alert('Logged Out da - Account list irukkum da'); location.reload() }
