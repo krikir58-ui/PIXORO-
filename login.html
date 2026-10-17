@@ -46,13 +46,14 @@ async function doSignup(){
   saveAcc(email); alert('Account Created da Giri!'); location.href='index.html'
 }
 async function showOtp(){
-  let email=document.getElementById('email').value
+  let email=document.getElementById('email').value.trim()
   if(!email) return alert('Email podu da Giri')
-  let {error}=await supa.auth.signInWithOtp({email})
-  if(error) alert(error.message); else { document.getElementById('otpBox').style.display='block'; alert('OTP Gmail ku pooyiruchu da!') }
+  let {error}=await supa.auth.signInWithOtp({ email, options:{ shouldCreateUser: true } })
+  if(error) alert(error.message); else { document.getElementById('otpBox').style.display='block'; alert('OTP Gmail ku pooyiruchu da! 6 Number check pannu da!') }
 }
 async function verifyOtp(){
-  let email=document.getElementById('email').value, token=document.getElementById('otpCode').value
+  let email=document.getElementById('email').value.trim(), token=document.getElementById('otpCode').value.trim()
+  if(!token) return alert('OTP Number podu da Giri')
   let {error}=await supa.auth.verifyOtp({email,token,type:'email'})
   if(error) return alert(error.message)
   saveAcc(email); alert('OTP Correct da!'); location.href='index.html'
