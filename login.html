@@ -12,76 +12,101 @@ button{width:100%;padding:11px;background:#0095F6;color:#fff;border:0;border-rad
 <div class="card">
 <input id="email" placeholder="Email - Ex: giri@gmail.com">
 <input id="pass" type="password" placeholder="Password">
-<button onclick="doLogin()">Log In - Pazhaya Password</button>
+<button onclick="doLogin()">Log In</button>
 <button onclick="doSignup()" style="background:#262626">Create New Account</button>
-<button onclick="showOtp()" style="background:#262626">OTP Login - Password Theriyala na</button>
+<button onclick="showOtp()" style="background:#262626">OTP Login</button>
+<button onclick="loginWithGoogle()" style="background:#fff;color:#000;display:flex;align-items:center;justify-content:center;gap:8px"><span style="font-size:18px;font-weight:900">G</span> Continue with Google</button>
 <div id="otpBox" style="display:none;margin-top:10px">
-<input id="otpCode" placeholder="6 Digit OTP - Gmail la vantha code">
+<input id="otpCode" placeholder="6 Digit OTP">
 <button onclick="verifyOtp()" style="background:#00c853">Verify OTP</button>
 </div>
-<button onclick="forgot()" style="background:none;color:#0095F6">Forgot Password? Reset Pannu da</button>
-<p id="msg" style="color:#ff6b6b"></p>
+<button onclick="forgot()" style="background:none;color:#0095F6">Forgot Password?</button>
+<p id="msg" style="color:#ff3040;font-size:13px"></p>
 </div>
-<div class="card"><button onclick="addAccount()" style="background:#262626">+ Add Account - Friend ID</button></div>
+<div class="card"><button onclick="addAccount()" style="background:#262626">+ Add Account</button></div>
 <button onclick="doLogout()" style="background:#ed4956">Log Out</button>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const supa = supabase.createClient("https://yecpltndhlzfjplzhcpm.supabase.co","sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_")
+function showErr(m){ document.getElementById('msg').innerText=m }
+function clearErr(){ document.getElementById('msg').innerText='' }
+
+async function checkGoogleLogin(){
+  let {data} = await supa.auth.getSession()
+  if(data.session && data.session.user){
+    saveAcc(data.session.user.email); location.href='index.html'
+  }
+}
+checkGoogleLogin()
+supa.auth.onAuthStateChange((event, session)=>{
+  if(event==='SIGNED_IN' && session?.user){ saveAcc(session.user.email); location.href='index.html' }
+})
+async function loginWithGoogle(){
+  clearErr()
+  let {error} = await supa.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: location.origin + '/index.html' } })
+  if(error) showErr(error.message)
+}
 let saved = JSON.parse(localStorage.getItem('pixoro_accounts')||'[]')
 let list = document.getElementById('accList')
 saved.forEach(e=>{ list.innerHTML+=`<div class="acc" onclick="switchAcc('${e}')"><b>${e}</b><span>Login →</span></div>` })
-function switchAcc(e){ document.getElementById('email').value=e; alert('Password / OTP podu da - '+e) }
+function switchAcc(e){ document.getElementById('email').value=e; clearErr() }
 function saveAcc(email){ let a=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]'); if(!a.includes(email)) a.push(email); localStorage.setItem('pixoro_accounts',JSON.stringify(a)); localStorage.setItem('pixoro_current_user',email) }
 async function doLogin(){
+  clearErr()
   let email=document.getElementById('email').value, pass=document.getElementById('pass').value
+  if(!email || !pass) return showErr('Email & Password podu da')
   let {error}=await supa.auth.signInWithPassword({email,password:pass})
-  if(error) return document.getElementById('msg').innerText='Password thappu da! Friend password maathittan pola da - Forgot click pannu da'
+  if(error) return showErr('Sorry, your password was incorrect. Please double-check your password.')
   saveAcc(email); location.href='index.html'
 }
 async function doSignup(){
+  clearErr()
   let email=document.getElementById('email').value, pass=document.getElementById('pass').value
+  if(!email || !pass) return showErr('Email & Password podu da')
   let {error}=await supa.auth.signUp({email,password:pass})
-  if(error) return document.getElementById('msg').innerText=error.message
-  saveAcc(email); alert('Account Created da Giri!'); location.href='index.html'
+  if(error) return showErr(error.message)
+  saveAcc(email); location.href='index.html'
 }
 async function showOtp(){
+  clearErr()
   let email=document.getElementById('email').value.trim()
-  if(!email) return alert('Email podu da Giri')
+  if(!email) return showErr('Email podu da')
   let {error}=await supa.auth.signInWithOtp({ email, options:{ shouldCreateUser: true } })
-  if(error) alert(error.message); else { document.getElementById('otpBox').style.display='block'; alert('OTP Gmail ku pooyiruchu da! 6 Number check pannu da!') }
+  if(error) showErr(error.message); else document.getElementById('otpBox').style.display='block'
 }
 async function verifyOtp(){
+  clearErr()
   let email=document.getElementById('email').value.trim(), token=document.getElementById('otpCode').value.trim()
-  if(!token) return alert('OTP Number podu da Giri')
+  if(!token) return showErr('OTP podu da')
   let {error}=await supa.auth.verifyOtp({email,token,type:'email'})
-  if(error) return alert(error.message)
-  saveAcc(email); alert('OTP Correct da!'); location.href='index.html'
+  if(error) return showErr('OTP thappu da - Thirumba check pannu da')
+  saveAcc(email); location.href='index.html'
 }
 async function forgot(){
+  clearErr()
   let email=document.getElementById('email').value.trim()
-  if(!email) return alert('Email podu da Giri')
+  if(!email) return showErr('Email podu da')
   let {error}=await supa.auth.signInWithOtp({ email, options:{ shouldCreateUser: false } })
-  if(error) return alert(error.message)
+  if(error) return showErr(error.message)
   document.getElementById('otpBox').style.display='block'
   document.getElementById('otpBox').innerHTML = `
-    <input id="otpCode" placeholder="6 Digit OTP - Gmail la vantha code">
-    <input id="newPass" type="password" placeholder="Pudhu Password - Itha vei da">
-    <button onclick="resetWithOtp()" style="background:#00c853">Verify OTP + New Password Set Pannu</button>`
-  alert('OTP Gmail ku pooyiruchu da! OTP + Pudhu Password podu da!')
+    <input id="otpCode" placeholder="6 Digit OTP">
+    <input id="newPass" type="password" placeholder="Pudhu Password">
+    <button onclick="resetWithOtp()" style="background:#00c853">Verify + Set New Password</button>`
 }
 async function resetWithOtp(){
+  clearErr()
   let email=document.getElementById('email').value.trim()
   let token=document.getElementById('otpCode').value.trim()
   let newPass=document.getElementById('newPass').value.trim()
-  if(!token || !newPass) return alert('OTP + Pudhu Password rendu podu da')
+  if(!token || !newPass) return showErr('OTP + Password rendu podu da')
   let {error}=await supa.auth.verifyOtp({email,token,type:'email'})
-  if(error) return alert(error.message)
+  if(error) return showErr('OTP thappu da')
   let {error:upErr}=await supa.auth.updateUser({password:newPass})
-  if(upErr) return alert(upErr.message)
-  alert('Password maathiyachu da Giri! Ippo Login pannu da!')
+  if(upErr) return showErr(upErr.message)
   saveAcc(email); location.href='index.html'
 }
-function addAccount(){ document.getElementById('email').value=''; document.getElementById('pass').value=''; alert('Friend ID podu da Giri - Add aayidum da') }
-async function doLogout(){ await supa.auth.signOut(); localStorage.removeItem('pixoro_current_user'); alert('Logged Out da - Account list irukkum da'); location.reload() }
+function addAccount(){ document.getElementById('email').value=''; document.getElementById('pass').value=''; clearErr() }
+async function doLogout(){ await supa.auth.signOut(); localStorage.removeItem('pixoro_current_user'); location.reload() }
 </script></body></html>
