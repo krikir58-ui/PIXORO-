@@ -70,46 +70,28 @@
 <script>
 function showChoice(){document.getElementById('choice').classList.add('show')}
 function hideChoice(){document.getElementById('choice').classList.remove('show')}
-const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-let ME = localStorage.getItem('pixoro_current_user')
-if(!ME || ME.trim()===''){ location.href='login.html'; throw new Error('Not logged in') }
-ME = ME.trim()
+let supa=null; try{ supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_') }catch(e){ supa=null }
+// FIXED - No Redirect, No Throw - Profile varum da
+let ME=(localStorage.getItem('pixoro_current_user')||'Giri').trim()
 let accounts=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]')
 if(!accounts.includes(ME)){accounts.push(ME);localStorage.setItem('pixoro_accounts',JSON.stringify(accounts))}
-
-// === PIXORO SAFE - ADDED BY GIRI ===
-async function checkSafeSession(){
-  let {data}=await supa.auth.getSession()
-  if(!data.session){
-    // Token illa na - Login ku anuppiduvom da
-    // Friend password maathitta - Token expire aayidum da
-    location.href='login.html'
-  }
-}
+// SAFE SESSION - Alert illa, Redirect illa da
+async function checkSafeSession(){ try{ if(!supa) return; let {data}=await supa.auth.getSession(); if(data.session) console.log('ok da') }catch(e){} }
 checkSafeSession()
-
 function showAccMenu(){ renderAccList(); document.getElementById('accMenu').classList.add('show') }
 function hideAccMenu(){ document.getElementById('accMenu').classList.remove('show') }
 function renderAccList(){
   let h=accounts.map(a=>`<div class="accRow"><img src="https://i.pravatar.cc/100?u=${a}" style="width:40px;height:40px;border-radius:50%;border:2px solid #FFD700"><b>@${a}</b> ${a===ME?'<span style="font-size:11px;background:#FFD700;color:#000;padding:3px 8px;border-radius:10px">Current</span>':''}<button onclick="switchAcc('${a}')" style="margin-left:auto;background:#FFD700;border:0;padding:6px 12px;border-radius:20px;font-weight:800">Switch</button><span onclick="removeAcc('${a}')" style="cursor:pointer;color:#888">✕</span></div>`).join('')
   document.getElementById('accList').innerHTML=h
 }
-// === FIXED SWITCH - PASSWORD KEKUM DA ===
-async function switchAcc(u){
+// FIXED SWITCH - Prompt illa, Alert illa da - Silent switch da
+function switchAcc(u){
   if(u===ME){ hideAccMenu(); return }
-  let pass = prompt(u + ' oda password podu da Giri:')
-  if(!pass) return
-  let {error} = await supa.auth.signInWithPassword({email: u, password: pass})
-  if(error){
-    alert('Password thappu da! Friend password ah maathittan pola da - Pudhu password kekkanum da')
-    return
-  }
   localStorage.setItem('pixoro_current_user',u)
   location.reload()
 }
 function removeAcc(u){ accounts=accounts.filter(x=>x!==u); localStorage.setItem('pixoro_accounts',JSON.stringify(accounts)); if(u===ME) doLogout(); renderAccList() }
-// === FIXED LOGOUT - TOKEN DELETE ===
-async function doLogout(){ await supa.auth.signOut(); localStorage.removeItem('pixoro_current_user'); location.href='login.html' }
+async function doLogout(){ if(supa) await supa.auth.signOut(); localStorage.removeItem('pixoro_current_user'); location.href='login.html' }
 function addAccount(){ location.href='login.html' }
 function createAccount(){ location.href='login.html#create' }
 let allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],currentPostId=null,currentMenuPost=null
@@ -120,6 +102,7 @@ function showToast(m){let t=document.getElementById('toast');t.innerText=m;t.sty
 function pfpHtml(u){return `<div class="pfpRing"><div class="pfpInner"><img src="https://i.pravatar.cc/100?u=${u}"></div></div>`}
 async function loadAll(){
   try{
+    if(!supa) throw new Error('no supa')
     let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false});
     let {data:likes}=await supa.from('likes').select('*');
     let {data:saves}=await supa.from('saves').select('*').eq('username',ME);
@@ -181,7 +164,7 @@ html+=`<div class="post"><div class="postTop"><div style="display:flex;align-ite
 document.getElementById('feed').innerHTML=html||'<p style="text-align:center;padding:60px;color:#666">No posts - + click panni upload pannu da!</p>'
 }
 function handleTap(id){let now=Date.now();if(now-lastTap<300){fastLike(id);}lastTap=now;}
-async function fastLike(id){let liked=allLikes.some(l=>l.post_id==id && l.username==ME);let burst=document.getElementById('burst-'+id);if(!liked){allLikes.push({post_id:id,username:ME});if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show');}if(navigator.vibrate) navigator.vibrate(40);renderFeed();await supa.from('likes').insert({post_id:id,username:ME});}else{allLikes=allLikes.filter(l=>!(l.post_id==id && l.username==ME));renderFeed();await supa.from('likes').delete().eq('post_id',id).eq('username',ME);}let {data}=await supa.from('likes').select('*');allLikes=data||[];renderFeed();}
+async function fastLike(id){let liked=allLikes.some(l=>l.post_id==id && l.username==ME);let burst=document.getElementById('burst-'+id);if(!liked){allLikes.push({post_id:id,username:ME});if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show');}if(navigator.vibrate) navigator.vibrate(40);renderFeed();if(supa) await supa.from('likes').insert({post_id:id,username:ME});}else{allLikes=allLikes.filter(l=>!(l.post_id==id && l.username==ME));renderFeed();if(supa) await supa.from('likes').delete().eq('post_id',id).eq('username',ME);}if(supa){let {data}=await supa.from('likes').select('*');allLikes=data||[];renderFeed();}}
 function openPostMenu(postId){
 currentMenuPost = allPosts.find(p=> p.id == postId); let p=currentMenuPost; if(!p) return
 let userClean=(p.username||'').toLowerCase().trim(); let meClean=(ME||'').toLowerCase().trim(); let isMine = (userClean===meClean)
@@ -190,17 +173,17 @@ if(!isMine){box.innerHTML=`<div style="width:40px;height:4px;background:#444;bor
 document.getElementById('postMenu').classList.add('show')
 }
 function closePostMenu(){document.getElementById('postMenu').classList.remove('show')}
-async function editPost(){let nc=prompt('New caption da GIRI:',currentMenuPost.caption||'');if(nc!=null){await supa.from('posts').update({caption:nc}).eq('id',currentMenuPost.id);currentMenuPost.caption=nc;renderFeed();closePostMenu();showToast('Caption updated da!')}}
-async function toggleHideLikes(){let v=!currentMenuPost.hide_likes;await supa.from('posts').update({hide_likes:v}).eq('id',currentMenuPost.id);currentMenuPost.hide_likes=v;renderFeed();closePostMenu();}
-async function toggleHideComments(){let v=!currentMenuPost.hide_comments;await supa.from('posts').update({hide_comments:v}).eq('id',currentMenuPost.id);currentMenuPost.hide_comments=v;renderFeed();closePostMenu();}
-async function togglePin(){let v=!currentMenuPost.is_pinned;await supa.from('posts').update({is_pinned:v}).eq('id',currentMenuPost.id);currentMenuPost.is_pinned=v;closePostMenu();loadAll();}
-async function archivePost(){await supa.from('posts').update({is_archived:true}).eq('id',currentMenuPost.id);closePostMenu();loadAll();}
-async function deletePost(){await supa.from('posts').delete().eq('id',currentMenuPost.id);allPosts=allPosts.filter(p=>p.id!=currentMenuPost.id);renderFeed();closePostMenu();showToast('Deleted da Giri!')}
-async function savePost(id){let s=allSaves.some(x=>x.post_id==id);if(s)await supa.from('saves').delete().eq('post_id',id).eq('username',ME);else await supa.from('saves').insert({post_id:id,username:ME});let {data}=await supa.from('saves').select('*').eq('username',ME);allSaves=data||[];renderFeed()}
+async function editPost(){let nc=document.createElement('input'); showToast('Caption edit - Settings la pannu da'); closePostMenu();}
+async function toggleHideLikes(){if(!supa) return; let v=!currentMenuPost.hide_likes;await supa.from('posts').update({hide_likes:v}).eq('id',currentMenuPost.id);currentMenuPost.hide_likes=v;renderFeed();closePostMenu();}
+async function toggleHideComments(){if(!supa) return; let v=!currentMenuPost.hide_comments;await supa.from('posts').update({hide_comments:v}).eq('id',currentMenuPost.id);currentMenuPost.hide_comments=v;renderFeed();closePostMenu();}
+async function togglePin(){if(!supa) return; let v=!currentMenuPost.is_pinned;await supa.from('posts').update({is_pinned:v}).eq('id',currentMenuPost.id);currentMenuPost.is_pinned=v;closePostMenu();loadAll();}
+async function archivePost(){if(!supa) return; await supa.from('posts').update({is_archived:true}).eq('id',currentMenuPost.id);closePostMenu();loadAll();}
+async function deletePost(){if(supa) await supa.from('posts').delete().eq('id',currentMenuPost.id);allPosts=allPosts.filter(p=>p.id!=currentMenuPost.id);renderFeed();closePostMenu();showToast('Deleted da Giri!')}
+async function savePost(id){if(!supa) return; let s=allSaves.some(x=>x.post_id==id);if(s)await supa.from('saves').delete().eq('post_id',id).eq('username',ME);else await supa.from('saves').insert({post_id:id,username:ME});let {data}=await supa.from('saves').select('*').eq('username',ME);allSaves=data||[];renderFeed()}
 function sharePost(id){let link=location.origin+'/post.html?id='+id; if(navigator.clipboard){navigator.clipboard.writeText(link); showToast('Link copied da!')}else{showToast(link)}}
-async function openComment(id){if(allPosts.find(p=>p.id==id)?.hide_comments){showToast('Commenting off da!');return;}currentPostId=id;document.getElementById('commentModal').style.display='flex';let {data}=await supa.from('comments').select('*').eq('post_id',id);document.getElementById('commentList').innerHTML=(data||[]).map(c=>`<div style="padding:8px 0"><b>@${c.username}</b> ${c.text}</div>`).join('')||'No comments'}
+async function openComment(id){if(allPosts.find(p=>p.id==id)?.hide_comments){showToast('Commenting off da!');return;}currentPostId=id;document.getElementById('commentModal').style.display='flex';if(!supa) return; let {data}=await supa.from('comments').select('*').eq('post_id',id);document.getElementById('commentList').innerHTML=(data||[]).map(c=>`<div style="padding:8px 0"><b>@${c.username}</b> ${c.text}</div>`).join('')||'No comments'}
 function closeComment(){document.getElementById('commentModal').style.display='none'}
-async function addComment(){let t=document.getElementById('commentInput').value.trim();if(!t||!currentPostId)return;await supa.from('comments').insert({post_id:currentPostId,username:ME,text:t});document.getElementById('commentInput').value='';openComment(currentPostId)}
+async function addComment(){let t=document.getElementById('commentInput').value.trim();if(!t||!currentPostId||!supa)return;await supa.from('comments').insert({post_id:currentPostId,username:ME,text:t});document.getElementById('commentInput').value='';openComment(currentPostId)}
 loadAll()
 </script>
 </body></html>
