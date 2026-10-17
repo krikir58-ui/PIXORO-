@@ -1,20 +1,35 @@
 <!DOCTYPE html>
 <html><head><meta name="viewport" content="width=device-width,initial-scale=1">
-<style>body{background:#000;color:#fff;font-family:sans-serif;display:flex;justify-content:center;padding-top:40px}
+<style>body{background:#000;color:#fff;font-family:sans-serif;display:flex;justify-content:center;padding-top:30px}
 .box{width:350px;text-align:center}.card{border:1px solid #262626;padding:25px;border-radius:8px;margin-bottom:10px}
-input{width:100%;padding:10px;margin:6px 0;background:#121212;border:1px solid #262626;color:#fff;border-radius:6px}
-button{width:100%;padding:10px;background:#0095F6;color:#fff;border:0;border-radius:8px;font-weight:bold;margin-top:8px;cursor:pointer}
-.acc{display:flex;align-items:center;justify-content:space-between;padding:10px;border:1px solid #262626;border-radius:8px;margin:6px 0;cursor:pointer}
-a{color:#0095F6;font-size:13px;text-decoration:none}
+input{width:100%;padding:11px;margin:6px 0;background:#121212;border:1px solid #262626;color:#fff;border-radius:6px}
+button{width:100%;padding:11px;background:#0095F6;color:#fff;border:0;border-radius:8px;font-weight:bold;margin-top:8px;cursor:pointer}
+.acc{display:flex;justify-content:space-between;padding:12px;border:1px solid #262626;border-radius:8px;margin:6px 0;cursor:pointer}
+.tab{display:flex;gap:5px;margin-bottom:10px}.tab button{background:#262626}.tab button.active{background:#0095F6}
 </style></head><body>
 <div class="box">
   <div id="accList"></div>
   <div class="card">
     <h1>Pixoro</h1>
-    <input id="email" placeholder="Email / Username">
-    <input id="pass" type="password" placeholder="Password">
-    <button onclick="doLogin()">Log in</button>
-    <p><a href="#" onclick="forgotPass()">Forgot Password? Password theriyalana inga click pannu da</a></p>
+    <div class="tab">
+      <button id="t1" class="active" onclick="showTab('pass')">Password Login</button>
+      <button id="t2" onclick="showTab('otp')">OTP Login</button>
+    </div>
+
+    <div id="passBox">
+      <input id="email" placeholder="Email">
+      <input id="pass" type="password" placeholder="Password">
+      <button onclick="doLogin()">Log in</button>
+      <button onclick="forgotPass()" style="background:none;color:#0095F6">Forgot Password?</button>
+    </div>
+
+    <div id="otpBox" style="display:none">
+      <input id="otpEmail" placeholder="Email - OTP ku">
+      <button onclick="sendOtp()">Send OTP</button>
+      <input id="otpCode" placeholder="6 Digit OTP - Gmail la vantha code">
+      <button onclick="verifyOtp()" style="background:#00c853">Verify OTP & Login</button>
+    </div>
+
     <button onclick="doSignup()" style="background:#262626">Create New Account</button>
     <p id="msg" style="color:#ff6b6b"></p>
   </div>
@@ -25,35 +40,58 @@ a{color:#0095F6;font-size:13px;text-decoration:none}
 <script>
 const supa = supabase.createClient("https://yecpltndhlzfjplzhcpm.supabase.co","sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_")
 
+function showTab(t){
+  document.getElementById('passBox').style.display = t=='pass'?'block':'none'
+  document.getElementById('otpBox').style.display = t=='otp'?'block':'none'
+  document.getElementById('t1').className = t=='pass'?'active':''
+  document.getElementById('t2').className = t=='otp'?'active':''
+}
+
 let saved = JSON.parse(localStorage.getItem('pixoro_accounts')||'[]')
 let list = document.getElementById('accList')
-if(saved.length){
-  saved.forEach(e=>{
-    list.innerHTML += `<div class="acc" onclick="switchAcc('${e}')"><b>${e}</b><span>Log in →</span></div>`
-  })
-}
-function switchAcc(e){ document.getElementById('email').value=e; alert('Password podu da Giri - '+e) }
+saved.forEach(e=>{
+  list.innerHTML += `<div class="acc" onclick="switchAcc('${e}')"><b>${e}</b><span>Log in →</span></div>`
+})
+function switchAcc(e){ document.getElementById('email').value=e; document.getElementById('otpEmail').value=e; alert('OTP / Password podu da - '+e) }
 
+// 1. CREATE ACCOUNT
 async function doSignup(){
   let email=document.getElementById('email').value
   let pass=document.getElementById('pass').value
-  let {data,error}=await supa.auth.signUp({email:email,password:pass})
+  let {error}=await supa.auth.signUp({email,password:pass})
   if(error) return document.getElementById('msg').innerText=error.message
   saveAcc(email); location.href='index.html'
 }
+// 2. PASSWORD LOGIN
 async function doLogin(){
   let email=document.getElementById('email').value
   let pass=document.getElementById('pass').value
-  let {data,error}=await supa.auth.signInWithPassword({email:email,password:pass})
+  let {error}=await supa.auth.signInWithPassword({email,password:pass})
   if(error) return document.getElementById('msg').innerText=error.message
   saveAcc(email); location.href='index.html'
 }
+// 3. OTP LOGIN - REAL INSTAGRAM MARI
+async function sendOtp(){
+  let email=document.getElementById('otpEmail').value
+  if(!email) return alert('Email podu da Giri')
+  let {error}=await supa.auth.signInWithOtp({email})
+  if(error) alert(error.message)
+  else alert('OTP Gmail ku pooyiruchu da Giri! Gmail open pannu da - 6 digit code irukkum da!')
+}
+async function verifyOtp(){
+  let email=document.getElementById('otpEmail').value
+  let token=document.getElementById('otpCode').value
+  let {error}=await supa.auth.verifyOtp({email,token,type:'email'})
+  if(error) return alert(error.message)
+  saveAcc(email); alert('OTP Correct da! Ulla porom da!'); location.href='index.html'
+}
+// 4. FORGOT
 async function forgotPass(){
   let email=document.getElementById('email').value
-  if(!email) return alert('Email podu da Giri - mela email box la podu da')
+  if(!email) return alert('Email podu da')
   let {error}=await supa.auth.resetPasswordForEmail(email)
   if(error) alert(error.message)
-  else alert('Gmail la link pooyiruchu da Giri! Gmail open pannu da - Link ah click pannu da - Pudhu password vei da!')
+  else alert('Gmail la link pooyiruchu da!')
 }
 function saveAcc(email){
   let a=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]')
@@ -61,11 +99,11 @@ function saveAcc(email){
   localStorage.setItem('pixoro_accounts',JSON.stringify(a))
   localStorage.setItem('pixoro_current_user',email)
 }
-function addAccount(){ document.getElementById('email').value=''; document.getElementById('pass').value=''; alert('Pudhu account details podu da') }
+function addAccount(){ document.getElementById('email').value=''; document.getElementById('pass').value=''; alert('Pudhu account details podu da Giri') }
 async function doLogout(){
   await supa.auth.signOut()
   localStorage.removeItem('pixoro_current_user')
-  alert('Logged out da - Account list irukkum da')
+  alert('Logged out da - Account list irukkum da - Thirumba click pannina ulla poogalam da')
   location.reload()
 }
 </script></body></html>
