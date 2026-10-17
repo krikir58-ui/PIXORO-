@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html><head><meta name="viewport" content="width=device-width,initial-scale=1">
-<style>body{background:#000;color:#fff;font-family:sans-serif;display:flex;justify-content:center;padding-top:50px}
+<style>body{background:#000;color:#fff;font-family:sans-serif;display:flex;justify-content:center;padding-top:40px}
 .box{width:350px;text-align:center}.card{border:1px solid #262626;padding:25px;border-radius:8px;margin-bottom:10px}
 input{width:100%;padding:10px;margin:6px 0;background:#121212;border:1px solid #262626;color:#fff;border-radius:6px}
 button{width:100%;padding:10px;background:#0095F6;color:#fff;border:0;border-radius:8px;font-weight:bold;margin-top:8px;cursor:pointer}
 .acc{display:flex;align-items:center;justify-content:space-between;padding:10px;border:1px solid #262626;border-radius:8px;margin:6px 0;cursor:pointer}
+a{color:#0095F6;font-size:13px;text-decoration:none}
 </style></head><body>
 <div class="box">
   <div id="accList"></div>
   <div class="card">
     <h1>Pixoro</h1>
-    <input id="email" placeholder="Email">
+    <input id="email" placeholder="Email / Username">
     <input id="pass" type="password" placeholder="Password">
     <button onclick="doLogin()">Log in</button>
+    <p><a href="#" onclick="forgotPass()">Forgot Password? Password theriyalana inga click pannu da</a></p>
     <button onclick="doSignup()" style="background:#262626">Create New Account</button>
-    <p id="msg"></p>
+    <p id="msg" style="color:#ff6b6b"></p>
   </div>
   <div class="card"><button onclick="addAccount()">+ Add Account</button></div>
   <button onclick="doLogout()" style="background:#ed4956">Log Out</button>
@@ -45,6 +47,13 @@ async function doLogin(){
   let {data,error}=await supa.auth.signInWithPassword({email:email,password:pass})
   if(error) return document.getElementById('msg').innerText=error.message
   saveAcc(email); location.href='index.html'
+}
+async function forgotPass(){
+  let email=document.getElementById('email').value
+  if(!email) return alert('Email podu da Giri - mela email box la podu da')
+  let {error}=await supa.auth.resetPasswordForEmail(email)
+  if(error) alert(error.message)
+  else alert('Gmail la link pooyiruchu da Giri! Gmail open pannu da - Link ah click pannu da - Pudhu password vei da!')
 }
 function saveAcc(email){
   let a=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]')
