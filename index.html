@@ -18,6 +18,8 @@
 .act{width:28px;height:28px;cursor:pointer;background:none;border:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}.act svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:1.8}.act.liked svg{fill:#FF0A33;stroke:#FF0A33}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:60px;background:#000;border-top:1px solid #111;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}.bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}.bottom-nav a.active{color:#fff}.bottom-nav a.active svg{stroke:#fff}.bottom-nav span{font-size:10px;color:#8e8e8e}.bottom-nav a.active span{color:#fff;font-weight:700}
+.bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #555;background:#111}
+.bottom-nav a.active img.navPfp{border-color:#fff}
 .pfpRing{width:34px;height:34px;border-radius:50%;background:#fff;padding:1.5px;box-shadow:0 0 0 1.5px #666}.pfpInner{width:100%;height:100%;border-radius:50%;background:#000;padding:1.5px}.pfpInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .storyBar{display:flex;gap:14px;padding:10px 12px;overflow-x:auto;background:#000;border-bottom:1px solid #111;min-height:92px}.storyBar::-webkit-scrollbar{display:none}
 .sItem{text-align:center;min-width:64px;max-width:64px;cursor:pointer;flex-shrink:0}
@@ -51,7 +53,7 @@
 <div id="highlightRow" class="hlRow" style="display:none"></div>
 <div id="feed"><p style="text-align:center;padding:60px;color:#666">Loading...</p></div>
 <div id="toast" class="toast"></div>
-<div class="bottom-nav"><a class="active" href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a><a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a><a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a><a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a><a href="profile.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg><span>Profile</span></a></div>
+<div class="bottom-nav"><a class="active" href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a><a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a><a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a><a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
 <div id="commentModal" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #333"><b>Comments</b><span onclick="closeComment()" style="font-size:22px">✕</span></div><div id="commentList" style="flex:1;overflow-y:auto;padding:12px"></div><div style="padding:10px;border-top:1px solid #333;display:flex;gap:10px"><img src="" id="myCommentPfp" style="width:34px;height:34px;border-radius:50%;object-fit:cover"><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#000;border:1px solid #333;padding:12px 14px;border-radius:20px;color:#fff"><button onclick="addComment()" style="background:#fff;border:0;color:#000;font-weight:900;padding:10px 16px;border-radius:20px">Post</button></div></div></div>
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
 <div id="choice" class="choiceSheet" onclick="if(event.target==this)hideChoice()"><div class="pixSheet">
@@ -84,6 +86,8 @@ function getPfp(u){
   return `https://i.pravatar.cc/150?u=${u}`;
 }
 function pfpHtml(u){return `<div class="pfpRing"><div class="pfpInner"><img src="${getPfp(u)}"></div></div>`}
+function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME); }
+updateNavPfp(); setInterval(updateNavPfp,1000);
 async function loadAll(){
   try{
     if(!supa) throw new Error('no supa')
@@ -101,7 +105,7 @@ async function loadAll(){
     allPosts=[...localPosts,...allPosts]
     allLikes=likes||[];allSaves=saves||[];allFollows=follows||[];
   }catch(e){ allStories=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]'); allPosts=JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]'); }
-  renderStories();renderHighlights();renderFeed()
+  renderStories();renderHighlights();renderFeed();updateNavPfp();
 }
 function renderHighlights(){
   let row=document.getElementById('highlightRow');
