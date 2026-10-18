@@ -14,6 +14,9 @@
 .preview{margin:12px;height:280px;background:#111;border:2px dashed #fff;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .preview img,.preview video{width:100%;height:100%;object-fit:cover}
 .msg{text-align:center;color:#ff4444;font-size:13px;height:18px;margin-top:6px}
+.cap{margin:12px;background:#111;border:1px solid #333;border-radius:12px;padding:12px;display:none}
+.cap textarea{width:100%;background:transparent;border:0;color:#fff;outline:none;resize:none;font-size:14px}
+.share{margin:0 12px 20px;background:#0095f6;border:0;width:calc(100% - 24px);padding:13px;border-radius:20px;font-weight:900;color:#fff;font-size:15px;cursor:pointer;display:none}
 </style></head><body>
 <div class="top"><b>Pixoro</b><span onclick="location.href='index.html'" style="cursor:pointer">✕</span></div>
 
@@ -36,39 +39,64 @@
 <button onclick="sel('reel',this)">REEL</button>
 <button onclick="sel('live',this)">LIVE</button>
 </div>
-<button class="next" onclick="go()">Next →</button>
+
+<div class="cap" id="capBox"><textarea id="caption" rows="2" placeholder="Write a caption... ✍️"></textarea></div>
+<button class="next" id="nextBtn" onclick="go()">Next →</button>
+<button class="share" id="shareBtn" onclick="shareNow()">Share</button>
+
 <input type="file" id="f" hidden accept="image/*,video/*" onchange="handleFile(event)">
 <script>
 let mode='post';
 let selectedMedia=null;
+let selectedType='image';
 function sel(t,el){mode=t;document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));el.classList.add('on'); document.getElementById('msg').innerText='';}
+function showShare(){
+  document.getElementById('capBox').style.display='block';
+  document.getElementById('shareBtn').style.display='block';
+  document.getElementById('nextBtn').style.display='none';
+}
 function selectDemo(el,url){
   document.querySelectorAll('.cell').forEach(c=>c.classList.remove('sel')); el.classList.add('sel');
-  selectedMedia=url;
+  selectedMedia=url; selectedType='image';
   document.getElementById('preview').innerHTML=`<img src="${url}">`;
   document.getElementById('msg').innerText='';
   localStorage.setItem('pix_media',url);
   localStorage.setItem('pix_media_type','image');
   sessionStorage.setItem('pixoro_pending_media',url);
   sessionStorage.setItem('pixoro_pending_type','image');
+  showShare();
 }
 function handleFile(e){
   let f=e.target.files[0]; if(!f) return;
   let url=URL.createObjectURL(f);
   selectedMedia=url;
   let isVideo=f.type.startsWith('video');
+  selectedType=isVideo?'video':'image';
   document.getElementById('preview').innerHTML = isVideo ? `<video src="${url}" controls autoplay></video>` : `<img src="${url}">`;
   document.getElementById('msg').innerText='';
   localStorage.setItem('pix_media',url);
-  localStorage.setItem('pix_media_type', isVideo?'video':'image');
+  localStorage.setItem('pix_media_type', selectedType);
   sessionStorage.setItem('pixoro_pending_media',url);
-  sessionStorage.setItem('pixoro_pending_type', isVideo?'video':'image');
+  sessionStorage.setItem('pixoro_pending_type',selectedType);
+  showShare();
 }
 function go(){
  if(!selectedMedia && !localStorage.getItem('pix_media')){ document.getElementById('msg').innerText='Photo / Video select pannu da Giri!'; return; }
- if(mode==='post') location.href='post-upload.html';
+ if(mode==='post' || mode==='reel'){ showShare(); return; }
  else if(mode==='story') location.href='story-add.html';
- else if(mode==='reel') location.href='reels-upload.html';
  else document.getElementById('msg').innerText='LIVE soon da Giri! 🔴';
+}
+function shareNow(){
+  let cap=document.getElementById('caption').value || '';
+  let media=selectedMedia || localStorage.getItem('pix_media');
+  let type=selectedType || localStorage.getItem('pix_media_type') || 'image';
+  let posts=JSON.parse(localStorage.getItem('pixoro_posts')||'[]');
+  posts.unshift({media:media, type:type, caption:cap, time:Date.now(), user:'giri'});
+  localStorage.setItem('pixoro_posts', JSON.stringify(posts));
+  sessionStorage.setItem('pixoro_pending_media',media);
+  sessionStorage.setItem('pixoro_pending_type',type);
+  localStorage.setItem('pixoro_last_caption',cap);
+  alert('Shared da Giri! 🔥');
+  location.href='index.html';
 }
 </script></body></html>
