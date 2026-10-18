@@ -5,16 +5,6 @@
 <link rel="stylesheet" href="css/comments.css">
 <link rel="stylesheet" href="css/splash.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script>
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('keydown', e => {
-  if(e.key==='F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) || (e.ctrlKey && e.key==='U')){
-    e.preventDefault(); alert("Pixoro Protected 🔒"); return false;
-  }
-});
-setInterval(()=>{ try{ console.clear(); }catch(e){} }, 800);
-async function hashPin(pin){ let b=new TextEncoder().encode(pin); let h=await crypto.subtle.digest('SHA-256',b); return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join(''); }
-</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;background:#000;position:sticky;top:0;z-index:50;border-bottom:1px solid #111;height:56px}
@@ -24,8 +14,6 @@ async function hashPin(pin){ let b=new TextEncoder().encode(pin); let h=await cr
 .postTop{padding:10px 12px;display:flex;align-items:center;justify-content:space-between}
 .post img.main{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;border-radius:12px}
 .post video.main{width:100%;aspect-ratio:9/16;object-fit:cover;display:block}
-.pix-profile{width:110px;height:110px;border-radius:50%;object-fit:cover}
-.pix-story{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #fff}
 .actions{padding:10px 12px;display:flex;justify-content:space-between;align-items:center}.actions.left{display:flex;gap:18px;align-items:center}
 .act{width:26px;height:26px;cursor:pointer;background:none;border:0;display:flex;align-items:center;justify-content:center}.act svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:1.8}.act.liked svg{fill:#FF0A33;stroke:#FF0A33}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:60px;background:#000;border-top:1px solid #111;display:flex;justify-content:space-around;align-items:center;z-index:100}
@@ -40,7 +28,7 @@ async function hashPin(pin){ let b=new TextEncoder().encode(pin); let h=await cr
 .sAddPlus{position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;background:#fff;border-radius:50%;border:3px solid #000;display:flex;align-items:center;justify-content:center;font-size:12px;color:#000;font-weight:900}
 .sName{font-size:10.5px;margin-top:6px;color:#fff;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .storySearchWrap{padding:6px 10px;background:#000;border-bottom:1px solid #111;display:flex;gap:8px;align-items:center}.storySearchWrap input{flex:1;background:#111;border:1px solid #222;padding:8px 12px;border-radius:20px;color:#fff;outline:none;font-size:12px}
-.heart-burst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:90px;color:#FF0A33;pointer-events:none;opacity:0}.heart-burst.show{animation:burst.9s forwards}@keyframes burst{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
+.heart-burst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:90px;color:#FF0A33;pointer-events:none;opacity:0}.heart-burst.show{animation:burst .9s forwards}@keyframes burst{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
 .postMenuSheet{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:600;display:none;align-items:flex-end;justify-content:center}.postMenuSheet.show{display:flex}
 .postMenuBox{background:#1a1a1a;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:12px 14px 30px;border:1px solid #333;max-height:85vh;overflow-y:auto}
 .menuItem{padding:14px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #222;cursor:pointer;font-size:14px}.menuItem.delete{color:#ff3040}
@@ -51,10 +39,9 @@ async function hashPin(pin){ let b=new TextEncoder().encode(pin); let h=await cr
 .aiBadge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.7);padding:4px 8px;border-radius:10px;font-size:10px;border:1px solid #fff;color:#fff}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
 .choiceSheet{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;display:none;align-items:flex-end;justify-content:center}.choiceSheet.show{display:flex}
-.pixSheet{background:#0a0a0a;border-top:none;border-radius:28px 28px 0 0;padding:24px 16px 28px;width:100%;max-width:450px}
-.goldCard{background:#1a1a1a;border:none;border-radius:20px;padding:26px 10px 20px;text-align:center;cursor:pointer}
-.goldCard:active{transform:scale(.97)}
-.goldCard .ico{font-size:36px;color:#fff;display:block;margin-bottom:10px}
+.pixSheet{background:#0a0a0a;border-radius:28px 28px 0 0;padding:24px 16px 28px;width:100%;max-width:450px}
+.goldCard{background:#1a1a1a;border-radius:20px;padding:26px 10px 20px;text-align:center;cursor:pointer}.goldCard:active{transform:scale(.97)}
+.goldCard .ico{font-size:36px;display:block;margin-bottom:10px}
 .goldCard b{font-size:19px;color:#fff;display:block}
 .goldCard small{font-size:11px;color:#aaa;display:block;margin-top:5px}
 </style></head><body>
@@ -85,15 +72,6 @@ function showChoice(){document.getElementById('choice').classList.add('show')}
 function hideChoice(){document.getElementById('choice').classList.remove('show')}
 let supa=null; try{ supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_') }catch(e){ supa=null }
 let ME=(localStorage.getItem('pixoro_current_user')||'Giri').trim()
-async function doPixoroLogout(remember=false){
-  if(!confirm("Logout pannava da Giri? Phone la ellam delete aagidum da, Account Pixoro la safe ah irukkum da.")) return;
-  if(supa) await supa.auth.signOut();
-  ['pixoro_current_user','pixoro_local_posts','pixoro_local_stories','pixoro_viewed_stories','pixoro_highlights','pixoro_plus'].forEach(k=>localStorage.removeItem(k));
-  sessionStorage.clear();
-  if('caches' in window){ caches.keys().then(k=>k.forEach(n=>caches.delete(n))); }
-  if(!remember) localStorage.removeItem('pixoro_accounts');
-  location.href='login.html';
-}
 let allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],currentPostId=null,currentMenuPost=null
 let viewedStories=JSON.parse(localStorage.getItem('pixoro_viewed_stories')||'[]')
 let lastTap=0
@@ -126,12 +104,7 @@ function renderHighlights(){
   row.style.display='flex';
   row.innerHTML=hls.map((h,i)=>`<div class="hlItem" onclick="openHighlight(${i})"><div style="width:60px;height:60px;border-radius:50%;padding:2.3px;background:#fff;border:2px solid #fff"><div style="width:100%;height:100%;border-radius:50%;background:#000;padding:2px"><img src="${h.items[0].img}" style="width:100%;height:100%;border-radius:50%;object-fit:cover"></div></div><div style="font-size:10.5px;margin-top:6px;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.name} ⭐</div></div>`).join('');
 }
-function openHighlight(i){
-  let hls=JSON.parse(localStorage.getItem('pixoro_highlights')||'[]');
-  let h=hls[i];
-  localStorage.setItem('pixoro_temp_hl',JSON.stringify(h.items));
-  location.href='story-view.html?user='+ME+'&highlight='+i;
-}
+function openHighlight(i){ let hls=JSON.parse(localStorage.getItem('pixoro_highlights')||'[]'); let h=hls[i]; localStorage.setItem('pixoro_temp_hl',JSON.stringify(h.items)); location.href='story-view.html?user='+ME+'&highlight='+i; }
 function renderStories(){
   let bar=document.getElementById('storyBar');
   let searchQ=(document.getElementById('storySearch')?.value||'').toLowerCase().trim()
@@ -149,14 +122,17 @@ function openMyStory(){let meLow=ME.toLowerCase();let s=allStories.find(x=> (x.u
 function openOtherStory(u){let s=allStories.find(x=> x.username===u);if(PLUS.ghost){location.href='story-view.html?user='+u+'&ghost=1';return}if(s &&!viewedStories.includes(s.id)){viewedStories.push(s.id);localStorage.setItem('pixoro_viewed_stories',JSON.stringify(viewedStories))}location.href='story-view.html?user='+u}
 function renderFeed(){
 let html='';
-let feedPosts = allPosts.filter(p=> p.media_type!=='video' && p.media_type!=='reel');
+// ✅ FIXED - Instagram Mari - Photo + Reels Ellam Home la Varum da
+let feedPosts = allPosts;
 for(let p of feedPosts){
 let lCount=allLikes.filter(l=>l.post_id==p.id).length;let isLiked=allLikes.some(l=>l.post_id==p.id&&l.username==ME);let isSaved=allSaves.some(s=>s.post_id==p.id);
 let likeText = p.hide_likes? '❤️ Like count hidden' : `${lCount} likes`
 let commentBtn = p.hide_comments? '' : `<button class="act" onclick="openComment(${p.id})"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button>`
 let shareText = p.hide_share? '' : `<button class="act" onclick="sharePost(${p.id})"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>`
-let imgUrl = p.image_url || p.media_url || ''
-let mediaHtml = `<img class="main" src="${imgUrl}" loading="eager">`
+// ✅ FIXED - Video na Video, Photo na Photo
+let mUrl = p.media_url || p.image_url || ''
+let isVid = p.media_type=='reel' || p.media_type=='video' || mUrl.includes('.mp4') || mUrl.includes('video')
+let mediaHtml = isVid ? `<video class="main" src="${mUrl}" loop muted playsinline autoplay></video>` : `<img class="main" src="${mUrl}" loading="eager">`
 let locHtml = p.location? `<div class="locBadge">📍 ${p.location}</div>` : ''
 let songHtml = p.song? `<div class="songBadge">🎵 ${p.song}</div>` : ''
 let aiHtml = p.is_ai? `<div class="aiBadge">✨ AI-generated</div>` : ''
