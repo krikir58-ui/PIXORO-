@@ -80,34 +80,39 @@ function switchPixoroAcc(email){ if(email===ME) return; let pin=prompt("PIN podu
 async function doPixoroLogout(){ if(!confirm("Logout pannava da Giri?")) return; if(supa) await supa.auth.signOut(); ['pixoro_current_user','pixoro_local_posts','pixoro_local_stories','pixoro_viewed_stories','pixoro_highlights','pixoro_plus','pixoro_gilli_pfp_'+ME].forEach(k=>localStorage.removeItem(k)); sessionStorage.clear(); location.href='login.html'; }
 function updateProtectUI(){ let t=document.getElementById('protectToggle'); t.classList.toggle('on',protectOn); document.getElementById('protectStatus').innerText=protectOn?'ON 🔒':'OFF 🔓' }
 function toggleProtect(){ protectOn=!protectOn; localStorage.setItem('pixoro_protect_'+ME,JSON.stringify(protectOn)); updateProtectUI() }
-// ✅ FIXED - Profile Grid Renderer - Photo + Video Both
+// ✅ FIXED - Profile Grid Renderer - Photo + Video Both + is_reel
 function renderGrid(list){
   if(!list.length){ document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`; return; }
   document.getElementById('myGrid').innerHTML=list.map(p=>{
     let mUrl = p.media_url || p.image_url || '';
-    let isVid = p.media_type=='reel' || p.media_type=='video' || mUrl.includes('.mp4');
-    if(isVid) return `<div style="position:relative"><video src="${mUrl}" style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px;font-size:14px">🎬</span></div>`;
+    let isVid = p.media_type=='reel' || p.media_type=='video' || p.is_reel==true || mUrl.includes('.mp4');
+    if(isVid) return `<div style="position:relative"><video src="${mUrl}" muted playsinline style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px;font-size:14px">🎬</span></div>`;
     return `<img src="${mUrl}">`;
   }).join('')
 }
 function showTab(type){
   document.getElementById('tabPosts').classList.toggle('active', type=='all');
   document.getElementById('tabReels').classList.toggle('active', type=='reels');
-  let list = type=='reels' ? myPosts.filter(p=> p.media_type=='reel' || p.media_type=='video' || (p.media_url||'').includes('.mp4') || (p.image_url||'').includes('.mp4')) : myPosts;
+  let list = type=='reels' ? myPosts.filter(p=> p.media_type=='reel' || p.media_type=='video' || p.is_reel==true || (p.media_url||'').includes('.mp4') || (p.image_url||'').includes('.mp4')) : myPosts;
   renderGrid(list);
 }
+// ✅ FIXED - loadProfile - Local + Supabase Merge da!
 function loadProfile(){
   let target=new URLSearchParams(location.search).get('u')||ME
   document.getElementById('displayName').textContent=localStorage.getItem('pixoro_name_'+target)||target
-  document.getElementById('usernameTag').textContent=localStorage.getItem('pixoro_uname_'+target)||target.toLowerCase()+'_official'
+  document.getElementById('usernameTag').textContent=localStorage.getItem('pixoro_uname_'+target)||target.toLowerCase().split('@')[0]+'_official'
   document.getElementById('bioText').innerText=localStorage.getItem('pixoro_bio_'+target)||'🔥 Tiruchengode ➡️ World\n👨‍💻 Pixoro Founder'
   document.getElementById('linkText').innerText=localStorage.getItem('pixoro_link_'+target)||''
   document.getElementById('pfpImg').src=localStorage.getItem('pixoro_gilli_pfp_'+target)||`https://i.pravatar.cc/150?u=${target}`
   document.getElementById('editPfpPreview').src=document.getElementById('pfpImg').src
-  document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`
   updateProtectUI(); applyLoginSettings(); loadHighlights()
+  let t = target.toLowerCase().trim();
+  let local = JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
+  myPosts = local.filter(p=> (p.username||'').toLowerCase().trim()==t);
+  document.getElementById('postCount').textContent=myPosts.length;
+  renderGrid(myPosts);
   if(!supa) return
-  setTimeout(async()=>{ try{ let {data}=await supa.from('posts').select('*').order('created_at',{ascending:false}); myPosts=(data||[]).filter(p=> (p.username||'').toLowerCase()==target.toLowerCase()); document.getElementById('postCount').textContent=myPosts.length; renderGrid(myPosts); }catch(e){} },200)
+  setTimeout(async()=>{ try{ let {data}=await supa.from('posts').select('*').order('created_at',{ascending:false}); let dbPosts=(data||[]).filter(p=> (p.username||'').toLowerCase().trim()==t); let seen=new Set(myPosts.map(p=>p.media_url||p.image_url)); dbPosts.forEach(p=>{ let u=p.media_url||p.image_url; if(!seen.has(u)){ myPosts.push(p); seen.add(u); } }); document.getElementById('postCount').textContent=myPosts.length; renderGrid(myPosts); }catch(e){} },200)
 }
 function loadHighlights(){ let s=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]'); document.getElementById('highlightList').innerHTML=s.map(h=>`<div class="h-item"><div class="h-circle">${h.emoji}</div><div class="h-text">${h.title}</div></div>`).join('')+`<div class="h-item" onclick="addHighlight()"><div class="h-circle">➕</div><div class="h-text">New</div></div>` }
 function addHighlight(){ let e=prompt('Emoji:'); if(!e)return; let t=prompt('Title:'); if(!t)return; let s=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]'); s.push({emoji:e,title:t}); localStorage.setItem('pixoro_highlights_'+ME,JSON.stringify(s)); loadHighlights() }
