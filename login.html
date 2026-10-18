@@ -1,5 +1,16 @@
 <!DOCTYPE html>
 <html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pixoro Login</title>
+<script>
+// === PIXORO ANTI-HACK SHIELD 🔒 ===
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if(e.key==='F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) || (e.ctrlKey && e.key==='U')){
+    e.preventDefault(); alert("Pixoro Protected 🔒 - Hack panna mudiyathu da!"); return false;
+  }
+});
+setInterval(()=>{ try{ console.clear(); }catch(e){} }, 800);
+async function hashPin(pin){ let b=new TextEncoder().encode(pin); let h=await crypto.subtle.digest('SHA-256',b); return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join(''); }
+</script>
 <style>body{background:#000;color:#fff;font-family:sans-serif;display:flex;justify-content:center;padding:20px}
 .box{width:360px;text-align:center}.card{border:1px solid #262626;padding:20px;border-radius:10px;margin-bottom:10px}
 input{width:100%;padding:11px;margin:6px 0;background:#121212;border:1px solid #333;color:#fff;border-radius:6px;box-sizing:border-box}
@@ -121,12 +132,7 @@ function addAccount(){ document.getElementById('email').value=''; document.getEl
 async function doPixoroLogout(){
   if(!confirm("Logout pannava da Giri? Phone la ellam delete aagidum da, Account Pixoro la safe ah irukkum da.")) return;
   await supa.auth.signOut();
-  localStorage.removeItem('pixoro_current_user');
-  localStorage.removeItem('pixoro_local_posts');
-  localStorage.removeItem('pixoro_local_stories');
-  localStorage.removeItem('pixoro_viewed_stories');
-  localStorage.removeItem('pixoro_highlights');
-  localStorage.removeItem('pixoro_plus');
+  ['pixoro_current_user','pixoro_local_posts','pixoro_local_stories','pixoro_viewed_stories','pixoro_highlights','pixoro_plus'].forEach(k=>localStorage.removeItem(k));
   sessionStorage.clear();
   if('caches' in window){ caches.keys().then(k=>k.forEach(n=>caches.delete(n))); }
   let remember = document.getElementById('rememberMe')?.checked ?? loginSettings.remember;
