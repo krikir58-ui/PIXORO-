@@ -40,17 +40,13 @@
 .goldCard.ico{font-size:36px;color:#FFD700;filter:drop-shadow(0 0 10px #FFD700);display:block;margin-bottom:10px}
 .goldCard b{font-size:19px;color:#FFD700;display:block}
 .goldCard small{font-size:11px;color:#aaa;display:block;margin-top:5px}
-.accSheet{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:700;display:none;align-items:flex-end;justify-content:center}.accSheet.show{display:flex}
-.accBox{background:#111;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:16px;border:1px solid #333}
-.accRow{display:flex;gap:10px;align-items:center;padding:12px;background:#000;border:1px solid #222;border-radius:12px;margin-top:10px}
 </style></head><body>
-<div class="top"><b onclick="showAccMenu()" style="font-size:24px;font-weight:900;cursor:pointer">Pixoro ⌄</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="location.href='notifications.html'"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M6 8a6 6 0 0 1 12 0c0 7 6 9 6 9H0s6-2 6-9"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg></div></div></div>
+<div class="top"><b style="font-size:24px;font-weight:900">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="location.href='notifications.html'"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M6 8a6 6 0 0 1 12 0c0 7 6 9 6 9H0s6-2 6-9"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg></div></div></div>
 <div class="storySearchWrap"><input id="storySearch" placeholder="🔍 Search Story..." oninput="renderStories()"><span onclick="document.getElementById('storySearch').value='';renderStories()" style="color:#666;cursor:pointer">✕</span></div>
 <div class="storyBar" id="storyBar"></div>
 <div id="highlightRow" class="hlRow" style="display:none"></div>
 <div id="feed"><p style="text-align:center;padding:60px;color:#666">Loading...</p></div>
 <div id="toast" class="toast"></div>
-<div id="accMenu" class="accSheet" onclick="if(event.target==this)hideAccMenu()"><div class="accBox"><div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 12px"></div><b style="font-size:18px">Accounts</b><div id="accList"></div><div onclick="addAccount()" style="padding:14px;text-align:center;background:#FFD700;color:#000;border-radius:12px;font-weight:900;margin-top:12px;cursor:pointer">+ Add Account</div><div onclick="createAccount()" style="padding:14px;text-align:center;background:#222;color:#FFD700;border:1px solid #FFD700;border-radius:12px;font-weight:900;margin-top:8px;cursor:pointer">+ Create New Account</div><div onclick="doLogout()" style="padding:14px;text-align:center;background:#ff3040;color:#fff;border-radius:12px;font-weight:900;margin-top:8px;cursor:pointer">Logout - Current Account</div><div onclick="hideAccMenu()" style="text-align:center;padding:12px;color:#888;margin-top:6px">Cancel</div></div></div>
 <div class="bottom-nav"><a class="active" href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a><a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a><a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a><a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a><a href="profile.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg><span>Profile</span></a></div>
 <div id="commentModal" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #333"><b>Comments</b><span onclick="closeComment()" style="font-size:22px">✕</span></div><div id="commentList" style="flex:1;overflow-y:auto;padding:12px"></div><div style="padding:10px;border-top:1px solid #333;display:flex;gap:10px"><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#000;border:1px solid #333;padding:12px 14px;border-radius:20px;color:#fff"><button onclick="addComment()" style="background:#fff;border:0;color:#000;font-weight:900;padding:10px 16px;border-radius:20px">Post</button></div></div></div>
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
@@ -71,29 +67,21 @@
 function showChoice(){document.getElementById('choice').classList.add('show')}
 function hideChoice(){document.getElementById('choice').classList.remove('show')}
 let supa=null; try{ supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_') }catch(e){ supa=null }
-// FIXED - No Redirect, No Throw - Profile varum da
 let ME=(localStorage.getItem('pixoro_current_user')||'Giri').trim()
-let accounts=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]')
-if(!accounts.includes(ME)){accounts.push(ME);localStorage.setItem('pixoro_accounts',JSON.stringify(accounts))}
-// SAFE SESSION - Alert illa, Redirect illa da
-async function checkSafeSession(){ try{ if(!supa) return; let {data}=await supa.auth.getSession(); if(data.session) console.log('ok da') }catch(e){} }
-checkSafeSession()
-function showAccMenu(){ renderAccList(); document.getElementById('accMenu').classList.add('show') }
-function hideAccMenu(){ document.getElementById('accMenu').classList.remove('show') }
-function renderAccList(){
-  let h=accounts.map(a=>`<div class="accRow"><img src="https://i.pravatar.cc/100?u=${a}" style="width:40px;height:40px;border-radius:50%;border:2px solid #FFD700"><b>@${a}</b> ${a===ME?'<span style="font-size:11px;background:#FFD700;color:#000;padding:3px 8px;border-radius:10px">Current</span>':''}<button onclick="switchAcc('${a}')" style="margin-left:auto;background:#FFD700;border:0;padding:6px 12px;border-radius:20px;font-weight:800">Switch</button><span onclick="removeAcc('${a}')" style="cursor:pointer;color:#888">✕</span></div>`).join('')
-  document.getElementById('accList').innerHTML=h
+// PIXORO SECURE LOGOUT - Phone la ellam delete, Supabase la safe
+async function doPixoroLogout(remember=false){
+  if(supa) await supa.auth.signOut();
+  localStorage.removeItem('pixoro_current_user');
+  localStorage.removeItem('pixoro_local_posts');
+  localStorage.removeItem('pixoro_local_stories');
+  localStorage.removeItem('pixoro_viewed_stories');
+  localStorage.removeItem('pixoro_highlights');
+  localStorage.removeItem('pixoro_plus');
+  sessionStorage.clear();
+  if('caches' in window){ caches.keys().then(k=>k.forEach(n=>caches.delete(n))); }
+  if(!remember) localStorage.removeItem('pixoro_accounts');
+  location.href='login.html';
 }
-// FIXED SWITCH - Prompt illa, Alert illa da - Silent switch da
-function switchAcc(u){
-  if(u===ME){ hideAccMenu(); return }
-  localStorage.setItem('pixoro_current_user',u)
-  location.reload()
-}
-function removeAcc(u){ accounts=accounts.filter(x=>x!==u); localStorage.setItem('pixoro_accounts',JSON.stringify(accounts)); if(u===ME) doLogout(); renderAccList() }
-async function doLogout(){ if(supa) await supa.auth.signOut(); localStorage.removeItem('pixoro_current_user'); location.href='login.html' }
-function addAccount(){ location.href='login.html' }
-function createAccount(){ location.href='login.html#create' }
 let allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],currentPostId=null,currentMenuPost=null
 let viewedStories=JSON.parse(localStorage.getItem('pixoro_viewed_stories')||'[]')
 let lastTap=0
