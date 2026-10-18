@@ -1,60 +1,41 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIXORO - Share</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;padding-bottom:20px}
+*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto}
 .top{padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #111}
-.prev{margin:12px;height:380px;background:#111;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.prev{margin:12px;height:350px;background:#111;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .prev img,.prev video{width:100%;height:100%;object-fit:cover}
-.cap{margin:12px;background:#111;border:1px solid #222;color:#fff;padding:14px;border-radius:14px;width:calc(100% - 24px);font-size:14px}
-.btn{margin:12px;background:#fff;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900;cursor:pointer}
-.btn2{margin:0 12px;background:#222;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;color:#fff;font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px}
+.cell{padding:16px;background:#1a1a1a;border-radius:14px;text-align:center;cursor:pointer}
+.btn{margin:12px;background:#fff;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900}
 </style></head><body>
-<div class="top"><b id="shareTitle">PIXORO - Share 🔥</b><span onclick="location.href='index.html'">✕</span></div>
-<div class="prev" id="prev">Loading...</div>
-<input id="cap" class="cap" placeholder="Caption eluthu da Giri...">
-<button class="btn" id="shareBtn" onclick="share()">Share 🚀</button>
-<button class="btn2" onclick="location.href='index.html'">Cancel</button>
+<div class="top"><b>New Post 📸</b><span onclick="location.href='index.html'">✕</span></div>
+<div class="prev" id="prev">📸 Photo / Video Select Pannu</div>
+<div class="grid"><div class="cell" onclick="document.getElementById('f').click()">🖼️ Gallery</div><div class="cell" onclick="document.getElementById('f').click()">➕ Add Photo</div></div>
+<button class="btn" onclick="go()">Next →</button>
+<input type="file" id="f" hidden accept="image/*,video/*" onchange="h(event)">
 <script>
-let supa=null; try{ supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_') }catch(e){}
-let ME=localStorage.getItem('pixoro_current_user')||'Giri';
-let mUrl = localStorage.getItem('pix_media') || sessionStorage.getItem('pixoro_pending_media') || '';
-let mType = localStorage.getItem('pix_media_type') || 'image';
-let isReel = localStorage.getItem('pix_media_is_reel')=='true';
-
-// ✅ FIX - Photo na IMG, Video na VIDEO - Black Block Varaathu da!
-let isVid = isReel || mType=='video' || mType=='reel' || mUrl.startsWith('data:video');
-document.getElementById('shareTitle').innerText = isVid ? 'PIXORO Reels - Share 🔥' : 'PIXORO Post - Share 📸';
-document.getElementById('shareBtn').innerText = isVid ? 'Share Reel 🚀' : 'Share Post 🚀';
-
-if(!mUrl){
-  document.getElementById('prev').innerHTML='No Media Found da';
-} else if(isVid){
-  document.getElementById('prev').innerHTML=`<video src="${mUrl}" autoplay muted loop playsinline></video>`;
-} else {
-  document.getElementById('prev').innerHTML=`<img src="${mUrl}">`;
+const supa=supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_');
+let m=''; let mType='image';
+async function h(e){
+  let f=e.target.files[0]; if(!f) return;
+  let isVideo=f.type.startsWith('video');
+  mType=isVideo?'video':'image';
+  let url=URL.createObjectURL(f);
+  document.getElementById('prev').innerHTML=isVideo?`<video src="${url}" autoplay muted loop></video>`:`<img src="${url}">`;
+  document.getElementById('prev').innerHTML+=`<div style="position:absolute;color:#fff;background:#000a;padding:4px 8px;border-radius:8px;font-size:12px">Uploading... ⏳</div>`;
+  // ✅ REELS MAARI - Storage la Upload da!
+  let bucket=isVideo?'reels':'posts';
+  let fileName=Date.now()+'_'+f.name.replace(/[^a-zA-Z0-9.]/g,'_');
+  let {error}=await supa.storage.from(bucket).upload(fileName,f);
+  if(error){ alert('Upload Fail da: '+error.message); return; }
+  let {data}=supa.storage.from(bucket).getPublicUrl(fileName);
+  m=data.publicUrl;
+  localStorage.setItem('pix_media',m);
+  sessionStorage.setItem('pixoro_pending_media',m);
+  localStorage.setItem('pix_media_type',mType);
+  localStorage.setItem('pix_media_is_reel',isVideo?'true':'false');
+  alert('Upload Done da Giri! 🔥 Next ku po da');
 }
-
-async function share(){
-  let cap=document.getElementById('cap').value||'';
-  let post={
-    username: ME,
-    caption: cap,
-    media_url: mUrl,
-    image_url: mUrl,
-    media_type: isVid ? 'video' : 'image',
-    is_reel: isVid,
-    created_at: new Date().toISOString()
-  };
-  if(supa){
-    let {error}=await supa.from('posts').insert([post]);
-    if(error){ alert('Upload fail da: '+error.message); return; }
-  }
-  // Local backup
-  let all=JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
-  all.unshift(post); localStorage.setItem('pixoro_local_posts',JSON.stringify(all));
-  localStorage.removeItem('pix_media'); sessionStorage.removeItem('pixoro_pending_media');
-  alert(isVid ? 'Reel Upload Aayiduchu da 🔥' : 'Photo Upload Aayiduchu da 📸');
-  location.href='index.html';
-}
+function go(){ if(!m){alert('Photo select pannu da Giri!');return} location.href='post-upload.html' }
 </script></body></html>
