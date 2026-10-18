@@ -1,30 +1,38 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reel Upload - PIXORO</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<style>*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:20px}
-.top{padding:14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #111}.top b{font-size:17px;color:#fff}
-.prev{width:100%;height:420px;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;border:none}
-.prev video,.prev img{width:100%;height:100%;object-fit:cover}
-.box{margin:10px 12px;background:#111;border:none;border-radius:16px;padding:12px}
-.box input,.box textarea{width:100%;background:transparent;border:0;color:#fff;outline:none;font-size:14px}
-.box small{color:#fff;font-size:11px;font-weight:700}
-.btn{width:calc(100% - 24px);margin:14px 12px;background:#fff;color:#000;border:0;padding:15px;border-radius:20px;font-weight:900;font-size:15px}
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;padding:14px}
+input,textarea{width:100%;background:#111;border:1px solid #222;padding:12px;border-radius:12px;color:#fff;margin:8px 0}
+.btn{background:#fff;color:#000;border:0;width:100%;padding:14px;border-radius:20px;font-weight:900;margin-top:10px}
+.prev{height:300px;background:#111;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.prev video{width:100%;height:100%;object-fit:cover}
 </style></head><body>
-<div class="top"><span onclick="location.href='index.html'">✕</span><b>New Reel 🎬</b><span>Share</span></div>
-<div class="prev" id="prev"><span>Reel Preview</span></div>
-<div class="box"><textarea id="cap" rows="2" placeholder="Write caption for Reel... #pixoro #viral 🔥"></textarea></div>
-<div class="box"><small>🎵 ADD SONG</small><input id="song" placeholder="Search song... Katchi Sera"></div>
-<div class="box"><small>📍 ADD LOCATION</small><input id="loc" placeholder="Paris, Dubai, Tokyo..."></div>
-<button class="btn" onclick="shareReel()">Share Reel →</button>
+<b>PIXORO Reels - Share 🔥</b>
+<div class="prev" id="prev">Loading...</div>
+<input id="cap" placeholder="Caption eluthu da Giri...">
+<button class="btn" onclick="share()">Share Reel 🚀</button>
+<button class="btn" style="background:#222;color:#fff" onclick="location.href='index.html'">Cancel</button>
 <script>
-const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-const ME=localStorage.getItem('pixoro_current_user')||'Giri'
-let media=sessionStorage.getItem('pixoro_pending_media')||localStorage.getItem('pix_media')
-if(media){document.getElementById('prev').innerHTML=`<video src="${media}" controls autoplay loop muted></video>`}
-async function shareReel(){
-if(!media){alert('Video illa da!');return}
-let post={id:Date.now(),username:ME,image_url:media,media_url:media,video_url:media,media_type:'video',is_reel:true,caption:document.getElementById('cap').value,location:document.getElementById('loc').value,song:document.getElementById('song').value,created_at:new Date().toISOString()}
-let arr=JSON.parse(localStorage.getItem('pixoro_local_reels')||'[]');arr.unshift(post);localStorage.setItem('pixoro_local_reels',JSON.stringify(arr));
-try{await supa.from('posts').insert({username:ME,image_url:media,caption:post.caption,media_type:'video',location:post.location,song:post.song})}catch(e){}
-alert('Reel Posted da Giri! 🔥');location.href='reels.html';
+const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_');
+let media = sessionStorage.getItem('pixoro_pending_media') || localStorage.getItem('pix_media') || '';
+let ME = (localStorage.getItem('pixoro_current_user')||'Giri').trim();
+let prev = document.getElementById('prev');
+if(media){
+  prev.innerHTML = `<video src="${media}" autoplay loop muted playsinline controls style="width:100%;height:100%;object-fit:cover"></video>`;
+} else {
+  prev.innerHTML = 'Video Illa da Giri - Thumba poi Select pannu da!';
+}
+async function share(){
+  if(!media){ alert('Video illa da!'); return; }
+  let cap = document.getElementById('cap').value || 'PIXORO Reel 🔥';
+  // 1. Local la Save - Odane Theriyum da
+  let local = JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
+  let newPost = {id: Date.now(), username: ME, caption: cap, image_url: media, media_url: media, media_type:'reel', created_at: new Date().toISOString()};
+  local.unshift(newPost);
+  localStorage.setItem('pixoro_local_posts', JSON.stringify(local));
+  // 2. Supabase la Save - Ella Makkalukkum Theriyum da
+  let {error} = await supa.from('posts').insert({username: ME, caption: cap, image_url: media, media_url: media, media_type:'reel'});
+  if(error){ alert('Supabase Fail da: '+error.message+' - Aana Local la Save aagiduchu da!'); }
+  alert('Reel Upload Done da Giri! 🔥 Reels Page la Paaru da!');
+  location.href = 'reels.html';
 }
 </script></body></html>
