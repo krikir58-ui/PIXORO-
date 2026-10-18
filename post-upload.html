@@ -9,7 +9,7 @@ input,textarea{width:100%;background:#111;border:1px solid #222;padding:12px;bor
 <b>PIXORO Reels - Share 🔥</b>
 <div class="prev" id="prev">Loading...</div>
 <input id="cap" placeholder="Caption eluthu da Giri...">
-<button class="btn" onclick="share()">Share Reel 🚀</button>
+<button class="btn" id="shareBtn" onclick="share()">Share Reel 🚀</button>
 <button class="btn" style="background:#222;color:#fff" onclick="location.href='index.html'">Cancel</button>
 <script>
 const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_');
@@ -23,16 +23,33 @@ if(media){
 }
 async function share(){
   if(!media){ alert('Video illa da!'); return; }
+  document.getElementById('shareBtn').innerText='Uploading... ⏳';
   let cap = document.getElementById('cap').value || 'PIXORO Reel 🔥';
-  // 1. Local la Save - Odane Theriyum da
+  let publicUrl = media;
+  // PIXORO REAL SECRET - blob / data URL ah - Supabase Storage ku Upload pannu da!
+  try{
+    if(media.startsWith('blob:') || media.startsWith('data:')){
+      let res = await fetch(media);
+      let blob = await res.blob();
+      let fileName = Date.now() + '.mp4';
+      // Unakku Irukkarathu REELS bucket da!
+      let {error:upErr} = await supa.storage.from('reels').upload(fileName, blob, {contentType:'video/mp4', upsert:true});
+      if(upErr) throw upErr;
+      let {data:urlData} = supa.storage.from('reels').getPublicUrl(fileName);
+      publicUrl = urlData.publicUrl;
+    }
+  }catch(e){ alert('Storage Upload Fail da: '+e.message); document.getElementById('shareBtn').innerText='Share Reel 🚀'; return; }
+
+  // 1. Local la Save
   let local = JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
-  let newPost = {id: Date.now(), username: ME, caption: cap, image_url: media, media_url: media, media_type:'reel', created_at: new Date().toISOString()};
+  let newPost = {id: Date.now(), username: ME, caption: cap, image_url: publicUrl, media_url: publicUrl, media_type:'reel', created_at: new Date().toISOString()};
   local.unshift(newPost);
   localStorage.setItem('pixoro_local_posts', JSON.stringify(local));
-  // 2. Supabase la Save - Ella Makkalukkum Theriyum da
-  let {error} = await supa.from('posts').insert({username: ME, caption: cap, image_url: media, media_url: media, media_type:'reel'});
-  if(error){ alert('Supabase Fail da: '+error.message+' - Aana Local la Save aagiduchu da!'); }
-  alert('Reel Upload Done da Giri! 🔥 Reels Page la Paaru da!');
+
+  // 2. Supabase la Save - Ella Makkalukkum Theriyum da!
+  let {error} = await supa.from('posts').insert({username: ME, caption: cap, image_url: publicUrl, media_url: publicUrl, media_type:'reel'});
+  if(error){ alert('Supabase Fail da: '+error.message); }
+  else { alert('Reel Upload Done da Giri! Makkal Ellam Paappanga da! 🔥'); }
   location.href = 'reels.html';
 }
 </script></body></html>
