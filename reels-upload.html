@@ -3,22 +3,22 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:20px}
 .top{padding:14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #111}.top b{font-size:17px}
-.prev{width:100%;height:380px;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;border:2px solid #fff;box-shadow:0 0 0 2px #666}
+.prev{width:100%;height:380px;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;border:none}
 .prev img,.prev video{width:100%;height:100%;object-fit:cover}
 .aiBadge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:20px;font-size:11px;border:1px solid #fff;color:#fff}
-.box{margin:10px 12px;background:#111;border:1px solid #222;border-radius:16px;padding:12px}
+.box{margin:10px 12px;background:#111;border:none;border-radius:16px;padding:12px}
 .box input{width:100%;background:transparent;border:0;color:#fff;outline:none;font-size:14px}
 .box small{color:#fff;font-size:11px;font-weight:700}
 .row{display:flex;gap:8px;margin:10px 12px}
 .pill{flex:1;background:#111;border:1px solid #333;border-radius:20px;padding:12px;text-align:center;font-size:13px;cursor:pointer}
 .pill.on{background:#fff;color:#000;font-weight:700;border-color:#fff}
-.chip{display:inline-block;background:#222;border:1px solid #fff;border-radius:20px;padding:6px 10px;font-size:12px;margin:4px 4px 0 0}
+.chip{display:inline-block;background:#222;border:1px solid #333;border-radius:20px;padding:6px 10px;font-size:12px;margin:4px 4px 0 0}
 .btn{width:calc(100% - 24px);margin:14px 12px;background:#fff;color:#000;border:0;padding:15px;border-radius:20px;font-weight:900;font-size:15px}
 .sug{background:#222;border-radius:12px;padding:8px;margin-top:6px;font-size:13px;display:none;max-height:200px;overflow:auto}
 .sug div{padding:8px;border-bottom:1px solid #333;cursor:pointer}
 .sug div:hover{background:#333}
 </style></head><body>
-<div class="top"><span onclick="location.href='index.html'">✕</span><b id="title">New Reel 🎬</b><span style="color:#fff">Next</span></div>
+<div class="top"><span onclick="location.href='index.html'">✕</span><b id="title">New Post 📸</b><span style="color:#fff">Next</span></div>
 <div class="prev" id="prev"><span>Preview</span><div class="aiBadge" id="aiBadge" style="display:none">✨ AI-generated</div></div>
 <div class="box"><input id="cap" placeholder="Add caption... #pixoro #viral"></div>
 <div class="box"><small>✨ AI INFO</small><div class="row" style="margin:8px 0 0"><div class="pill on" onclick="setAI(false,this)">No - Real</div><div class="pill" onclick="setAI(true,this)">Yes - AI Made</div></div></div>
@@ -33,15 +33,14 @@
 <div id="songSel" style="margin-top:8px;font-size:13px;color:#4ade80"></div>
 <audio id="aud" controls style="width:100%;margin-top:8px;display:none"></audio>
 </div>
-<button class="btn" id="shareBtn" onclick="shareReel()">Share Reel →</button>
+<button class="btn" id="shareBtn" onclick="shareReel()">Share Post →</button>
 <script>
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME=localStorage.getItem('pixoro_current_user')||'Giri'
 let media=sessionStorage.getItem('pixoro_pending_media') || localStorage.getItem('pix_media')
-let type=sessionStorage.getItem('pixoro_pending_type') || localStorage.getItem('pix_media_type') || 'video'
+let type=sessionStorage.getItem('pixoro_pending_type') || localStorage.getItem('pix_media_type') || 'image'
 let mode=localStorage.getItem('pixoro_share_mode') || (type==='image' ? 'post' : 'reel')
 let isAI=false, selLoc='', selSong='', selSongUrl=''
-// Photo na Post, Video na Reel nu auto maathu da Giri!
 if(mode==='post' || type==='image'){
   document.getElementById('title').innerText='New Post 📸';
   document.getElementById('shareBtn').innerText='Share Post →';
@@ -72,14 +71,18 @@ let songs=[{n:"Katchi Sera - Sai Abhyankkar",u:"https://cdn.pixabay.com/audio/20
 function searchSong(q){ let s=document.getElementById('songSug'); if(!q){s.style.display='none';return} let f=songs.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())); s.style.display='block'; s.innerHTML=f.map(x=>`<div onclick="pickSong('${x.n}','${x.u}')">🎵 ${x.n}</div>`).join('')||'No song' }
 function pickSong(n,u){ selSong=n; selSongUrl=u; document.getElementById('songSel').innerText='🎵 '+n; document.getElementById('songSug').style.display='none'; let a=document.getElementById('aud'); a.src=u; a.style.display='block' }
 async function shareReel(){
-  if(!media){ location.href='upload.html'; return }
-  let post={id:Date.now(),username:ME,media_url:media,image_url:media,video_url:media,media_type:type,caption:document.getElementById('cap').value,location:selLoc,song:selSong,is_ai:isAI,created_at:new Date().toISOString(),likes:0}
-  // Photo & Reel rendu kum save aagum da
-  let arr=JSON.parse(localStorage.getItem('pixoro_local_reels')||'[]'); arr.unshift(post); localStorage.setItem('pixoro_local_reels',JSON.stringify(arr));
-  let posts=JSON.parse(localStorage.getItem('pixoro_posts')||'[]'); posts.unshift(post); localStorage.setItem('pixoro_posts',JSON.stringify(posts));
-  try{ await supa.from('posts').insert({username:ME,image_url:media,caption:post.caption,media_type:type,location:selLoc,song:selSong}) }catch(e){}
-  // Photo na Home ku, Video na Reels ku pogum da
-  if(type==='image' || mode==='post') location.href='index.html';
+  if(!media){ location.href='index.html'; return }
+  let isPost = (type==='image' || mode==='post');
+  let post={id:Date.now(),username:ME,media_url:media,image_url:media,video_url:media,media_type: isPost ? 'image' : 'video',is_reel: !isPost,caption:document.getElementById('cap').value,location:selLoc,song:selSong,is_ai:isAI,created_at:new Date().toISOString(),likes:0}
+  // FIX: Photo na POST la mattum, Video na REELS la mattum da!
+  if(isPost){
+    let posts=JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]'); posts.unshift(post); localStorage.setItem('pixoro_local_posts',JSON.stringify(posts));
+    let posts2=JSON.parse(localStorage.getItem('pixoro_posts')||'[]'); posts2.unshift(post); localStorage.setItem('pixoro_posts',JSON.stringify(posts2));
+  } else {
+    let arr=JSON.parse(localStorage.getItem('pixoro_local_reels')||'[]'); arr.unshift(post); localStorage.setItem('pixoro_local_reels',JSON.stringify(arr));
+  }
+  try{ await supa.from('posts').insert({username:ME,image_url:media,caption:post.caption,media_type:post.media_type,location:selLoc,song:selSong}) }catch(e){}
+  if(isPost) location.href='index.html';
   else location.href='reels.html';
 }
 </script></body></html>
