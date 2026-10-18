@@ -4,16 +4,6 @@
 <link rel="stylesheet" href="css/profile.css">
 <link rel="stylesheet" href="css/follow.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script>
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('keydown', e => {
-  if(e.key==='F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) || (e.ctrlKey && e.key==='U')){
-    e.preventDefault(); alert("Pixoro Protected 🔒 - Hack panna mudiyathu da!"); return false;
-  }
-});
-setInterval(()=>{ try{ console.clear(); }catch(e){} }, 800);
-async function hashPin(pin){ let b=new TextEncoder().encode(pin); let h=await crypto.subtle.digest('SHA-256',b); return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join(''); }
-</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e1e1e;position:sticky;top:0;background:#000;z-index:50;height:56px}
@@ -24,13 +14,13 @@ async function hashPin(pin){ let b=new TextEncoder().encode(pin); let h=await cr
 .pfpBigInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .stats{display:flex;gap:22px;text-align:center}.stats b{display:block;font-size:17px}.stats span{font-size:12px;color:#aaa}
 .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:10px}
-.grid img{width:100%;aspect-ratio:1/1;object-fit:cover}
+.grid img,.grid video{width:100%;aspect-ratio:1/1;object-fit:cover}
 .btn{border:1px solid #333;background:#1a1a1a;color:#fff;padding:10px 0;border-radius:8px;width:100%;font-weight:600}
 .btnPrimary{background:#fff!important;color:#000!important;border:0;font-weight:900}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:60px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:9999}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}
 .bottom-nav a.active{color:#fff}.bottom-nav span{font-size:10px;color:#8e8e8e}.bottom-nav a.active span{color:#fff;font-weight:700}
-.tab{padding:12px 0;flex:1;text-align:center;font-size:13px;color:#666;border-bottom:2px solid transparent}.tab.active{color:#fff;border-bottom:2px solid #fff}
+.tab{padding:12px 0;flex:1;text-align:center;font-size:13px;color:#666;border-bottom:2px solid transparent;cursor:pointer}.tab.active{color:#fff;border-bottom:2px solid #fff}
 .highlights{display:flex;gap:16px;margin:18px 0;overflow-x:auto}.h-item{text-align:center;min-width:62px}.h-circle{width:62px;height:62px;border-radius:50%;background:#101010;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #fff}.h-text{font-size:10px;margin-top:6px}
 .postView,.editSheet,.setSheet,.createSheet,.modal{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:800;display:none;align-items:flex-end;justify-content:center}
 .sheetBox{background:#0a0a0a;width:100%;max-width:450px;border-radius:22px 22px 0 0;border:1px solid #333;max-height:90vh;overflow-y:auto;padding-bottom:20px}
@@ -49,7 +39,7 @@ async function hashPin(pin){ let b=new TextEncoder().encode(pin); let h=await cr
 <div style="margin-top:14px"><div style="display:flex;gap:6px"><b id="displayName">Giri</b><span style="width:16px;height:16px;background:#0095f6;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:10px">✓</span></div><div style="font-size:13px;color:#aaa">@<span id="usernameTag">giri_official</span></div><div id="bioText" style="font-size:14px;margin-top:8px"></div><div id="linkText" style="font-size:13px;color:#0095f6;margin-top:6px"></div></div>
 <div class="highlights" id="highlightList"></div>
 <div style="display:flex;gap:8px;margin-top:12px"><button class="btn btnPrimary" onclick="openEditSheet()">Edit Profile</button><button class="btn" onclick="shareProfile()">Share Profile</button></div>
-<div style="display:flex;border-top:1px solid #222;margin-top:18px"><div class="tab active">⊞ Posts</div><div class="tab" onclick="location.href='reels.html'">🎬 Reels</div><div class="tab" onclick="location.href='saved.html'">🔖 Saved</div></div>
+<div style="display:flex;border-top:1px solid #222;margin-top:18px"><div class="tab active" id="tabPosts" onclick="showTab('all')">⊞ Posts</div><div class="tab" id="tabReels" onclick="showTab('reels')">🎬 Reels</div><div class="tab" onclick="location.href='saved.html'">🔖 Saved</div></div>
 <div id="myGrid" class="grid"></div>
 </div>
 <div id="setSheet" class="setSheet"><div class="sheetBox"><div style="width:40px;height:4px;background:#fff;border-radius:10px;margin:12px auto"></div><div style="text-align:center;font-weight:900;padding-bottom:12px;color:#fff">Pixoro Settings ⚙️ 🔒</div>
@@ -87,17 +77,25 @@ async function showOtp(){ let em=document.getElementById('loginEmail').value.tri
 async function verifyOtp(){ let em=document.getElementById('loginEmail').value.trim(),tk=document.getElementById('otpCode').value.trim(); let {error}=await supa.auth.verifyOtp({email:em,token:tk,type:'email'}); if(error) return loginMsg('OTP thappu da'); saveAcc(em); location.href='index.html' }
 async function forgot(){ let em=document.getElementById('loginEmail').value.trim(); if(!em) return loginMsg('Email podu da'); let {error}=await supa.auth.signInWithOtp({email:em,options:{shouldCreateUser:false}}); if(error) loginMsg(error.message); else document.getElementById('otpArea').style.display='block' }
 function switchPixoroAcc(email){ if(email===ME) return; let pin=prompt("PIN podu da - Switch panna 🔒"); if(pin!==PIXORO_PIN) return alert("Wrong PIN da!"); localStorage.setItem('pixoro_current_user',email); location.reload(); }
-async function doPixoroLogout(){
-  if(!confirm("Logout pannava da Giri? Phone la ellam delete aagidum da, Account Pixoro la safe ah irukkum da.")) return;
-  if(supa) await supa.auth.signOut();
-  ['pixoro_current_user','pixoro_local_posts','pixoro_local_stories','pixoro_viewed_stories','pixoro_highlights','pixoro_plus','pixoro_gilli_pfp_'+ME].forEach(k=>localStorage.removeItem(k));
-  sessionStorage.clear();
-  if('caches' in window){ caches.keys().then(k=>k.forEach(n=>caches.delete(n))); }
-  if(!loginSettings.remember) localStorage.removeItem('pixoro_accounts');
-  location.href='login.html';
-}
+async function doPixoroLogout(){ if(!confirm("Logout pannava da Giri?")) return; if(supa) await supa.auth.signOut(); ['pixoro_current_user','pixoro_local_posts','pixoro_local_stories','pixoro_viewed_stories','pixoro_highlights','pixoro_plus','pixoro_gilli_pfp_'+ME].forEach(k=>localStorage.removeItem(k)); sessionStorage.clear(); location.href='login.html'; }
 function updateProtectUI(){ let t=document.getElementById('protectToggle'); t.classList.toggle('on',protectOn); document.getElementById('protectStatus').innerText=protectOn?'ON 🔒':'OFF 🔓' }
 function toggleProtect(){ protectOn=!protectOn; localStorage.setItem('pixoro_protect_'+ME,JSON.stringify(protectOn)); updateProtectUI() }
+// ✅ FIXED - Profile Grid Renderer - Photo + Video Both
+function renderGrid(list){
+  if(!list.length){ document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`; return; }
+  document.getElementById('myGrid').innerHTML=list.map(p=>{
+    let mUrl = p.media_url || p.image_url || '';
+    let isVid = p.media_type=='reel' || p.media_type=='video' || mUrl.includes('.mp4');
+    if(isVid) return `<div style="position:relative"><video src="${mUrl}" style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px;font-size:14px">🎬</span></div>`;
+    return `<img src="${mUrl}">`;
+  }).join('')
+}
+function showTab(type){
+  document.getElementById('tabPosts').classList.toggle('active', type=='all');
+  document.getElementById('tabReels').classList.toggle('active', type=='reels');
+  let list = type=='reels' ? myPosts.filter(p=> p.media_type=='reel' || p.media_type=='video' || (p.media_url||'').includes('.mp4') || (p.image_url||'').includes('.mp4')) : myPosts;
+  renderGrid(list);
+}
 function loadProfile(){
   let target=new URLSearchParams(location.search).get('u')||ME
   document.getElementById('displayName').textContent=localStorage.getItem('pixoro_name_'+target)||target
@@ -109,7 +107,7 @@ function loadProfile(){
   document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`
   updateProtectUI(); applyLoginSettings(); loadHighlights()
   if(!supa) return
-  setTimeout(async()=>{ try{ let {data}=await supa.from('posts').select('*').order('created_at',{ascending:false}); myPosts=(data||[]).filter(p=> (p.username||'').toLowerCase()==target.toLowerCase()); document.getElementById('postCount').textContent=myPosts.length; if(myPosts.length) document.getElementById('myGrid').innerHTML=myPosts.map(p=>`<img src="${p.image_url}">`).join('') }catch(e){} },200)
+  setTimeout(async()=>{ try{ let {data}=await supa.from('posts').select('*').order('created_at',{ascending:false}); myPosts=(data||[]).filter(p=> (p.username||'').toLowerCase()==target.toLowerCase()); document.getElementById('postCount').textContent=myPosts.length; renderGrid(myPosts); }catch(e){} },200)
 }
 function loadHighlights(){ let s=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]'); document.getElementById('highlightList').innerHTML=s.map(h=>`<div class="h-item"><div class="h-circle">${h.emoji}</div><div class="h-text">${h.title}</div></div>`).join('')+`<div class="h-item" onclick="addHighlight()"><div class="h-circle">➕</div><div class="h-text">New</div></div>` }
 function addHighlight(){ let e=prompt('Emoji:'); if(!e)return; let t=prompt('Title:'); if(!t)return; let s=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]'); s.push({emoji:e,title:t}); localStorage.setItem('pixoro_highlights_'+ME,JSON.stringify(s)); loadHighlights() }
