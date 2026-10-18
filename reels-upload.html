@@ -4,35 +4,44 @@
 input,textarea{width:100%;background:#111;border:1px solid #222;padding:12px;border-radius:12px;color:#fff;margin:8px 0}
 .btn{background:#fff;color:#000;border:0;width:100%;padding:14px;border-radius:20px;font-weight:900;margin-top:10px}
 .prev{height:300px;background:#111;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.prev video{width:100%;height:100%;object-fit:cover}
+.prev video,.prev img{width:100%;height:100%;object-fit:cover}
 </style></head><body>
-<b>PIXORO Reels - Share 🔥</b>
+<b id="title">PIXORO Reels - Share 🔥</b>
 <div class="prev" id="prev">Loading...</div>
 <input id="cap" placeholder="Caption eluthu da Giri...">
-<button class="btn" onclick="share()">Share Reel 🚀</button>
+<button class="btn" id="shareBtn" onclick="share()">Share Reel 🚀</button>
 <button class="btn" style="background:#222;color:#fff" onclick="location.href='index.html'">Cancel</button>
 <script>
 const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_');
 let media = sessionStorage.getItem('pixoro_pending_media') || localStorage.getItem('pix_media') || '';
 let ME = (localStorage.getItem('pixoro_current_user')||'Giri').trim();
 let prev = document.getElementById('prev');
+// ✅ FIX - Photo na Photo, Video na Video - Black Block Poyidum da!
+let isVid = !(media.startsWith('data:image') || media.includes('.jpg') || media.includes('.png') || media.includes('.jpeg') || media.includes('.webp'));
 if(media){
-  prev.innerHTML = `<video src="${media}" autoplay loop muted playsinline controls style="width:100%;height:100%;object-fit:cover"></video>`;
+  if(isVid){
+    document.getElementById('title').innerText='PIXORO Reels - Share 🔥';
+    document.getElementById('shareBtn').innerText='Share Reel 🚀';
+    prev.innerHTML = `<video src="${media}" autoplay loop muted playsinline controls style="width:100%;height:100%;object-fit:cover"></video>`;
+  } else {
+    document.getElementById('title').innerText='PIXORO Post - Share 📸';
+    document.getElementById('shareBtn').innerText='Share Post 🚀';
+    prev.innerHTML = `<img src="${media}" style="width:100%;height:100%;object-fit:cover">`;
+  }
 } else {
-  prev.innerHTML = 'Video Illa da Giri - Thumba poi Select pannu da!';
+  prev.innerHTML = 'Media Illa da Giri - Thumba poi Select pannu da!';
 }
 async function share(){
-  if(!media){ alert('Video illa da!'); return; }
-  let cap = document.getElementById('cap').value || 'PIXORO Reel 🔥';
-  // 1. Local la Save - Odane Theriyum da
+  if(!media){ alert('Media illa da!'); return; }
+  let cap = document.getElementById('cap').value || (isVid ? 'PIXORO Reel 🔥' : 'PIXORO Post 📸');
+  let type = isVid ? 'reel' : 'image';
+  let newPost = {id: Date.now(), username: ME, caption: cap, image_url: media, media_url: media, media_type: type, created_at: new Date().toISOString()};
   let local = JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
-  let newPost = {id: Date.now(), username: ME, caption: cap, image_url: media, media_url: media, media_type:'reel', created_at: new Date().toISOString()};
   local.unshift(newPost);
   localStorage.setItem('pixoro_local_posts', JSON.stringify(local));
-  // 2. Supabase la Save - Ella Makkalukkum Theriyum da
-  let {error} = await supa.from('posts').insert({username: ME, caption: cap, image_url: media, media_url: media, media_type:'reel'});
+  let {error} = await supa.from('posts').insert({username: ME, caption: cap, image_url: media, media_url: media, media_type: type});
   if(error){ alert('Supabase Fail da: '+error.message+' - Aana Local la Save aagiduchu da!'); }
-  alert('Reel Upload Done da Giri! 🔥 Reels Page la Paaru da!');
-  location.href = 'reels.html';
+  alert(isVid ? 'Reel Upload Done da Giri! 🔥' : 'Photo Upload Done da Giri! 📸');
+  location.href = isVid ? 'reels.html' : 'index.html';
 }
 </script></body></html>
