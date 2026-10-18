@@ -14,18 +14,22 @@
 <script>
 let m='';
 function h(e){
-  let f=e.target.files[0];if(!f)return;
-  let u=URL.createObjectURL(f);
-  m=u;
-  document.getElementById('prev').innerHTML=`<video src="${u}" autoplay loop controls muted></video>`;
-  // FIX: Blob URL odaiyaama irukka - Session la save pannu da
-  sessionStorage.setItem('pixoro_pending_media',u);
-  sessionStorage.setItem('pixoro_pending_type','video');
-  localStorage.setItem('pix_media',u);
-  localStorage.setItem('pix_media_type','video');
-  localStorage.setItem('pix_media_is_reel','true');
-  // Video file name ah save pannu - Upload page la use aagum da
-  localStorage.setItem('pix_video_name',f.name);
+  let f=e.target.files[0];
+  if(!f) return;
+  // FIXED DA GIRI - Blob URL illa, Base64 da - Odaiyathu!
+  let reader = new FileReader();
+  reader.onload = function(){
+    let u = reader.result;
+    m = u;
+    document.getElementById('prev').innerHTML = `<video src="${u}" autoplay loop controls muted playsinline></video>`;
+    sessionStorage.setItem('pixoro_pending_media', u);
+    sessionStorage.setItem('pixoro_pending_type','video');
+    localStorage.setItem('pix_media', u);
+    localStorage.setItem('pix_media_type','video');
+    localStorage.setItem('pix_media_is_reel','true');
+    localStorage.setItem('pix_video_name', f.name);
+  };
+  reader.readAsDataURL(f);
 }
 function go(){
   if(!m){alert('Video select pannu da Giri!');return}
