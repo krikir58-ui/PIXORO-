@@ -5,32 +5,36 @@ input,textarea{width:100%;background:#111;border:1px solid #222;padding:12px;bor
 .btn{background:#fff;color:#000;border:0;width:100%;padding:14px;border-radius:20px;font-weight:900;margin-top:10px}
 .prev{height:300px;background:#111;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .prev video,.prev img{width:100%;height:100%;object-fit:cover}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
 </style></head><body>
 <b id="title">PIXORO Post - Share 📸</b>
 <div class="prev" id="prev">Loading...</div>
 <input id="cap" placeholder="Caption eluthu da Giri...">
 <button class="btn" id="shareBtn" onclick="share()">Share Post 🚀</button>
 <button class="btn" style="background:#222;color:#fff" onclick="location.href='index.html'">Cancel</button>
+<div id="toast" class="toast"></div>
 <script>
 const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_');
+// === PIXORO NO FULL ALERT LOCK ===
+function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
+window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
+window.confirm = function(msg){ showToast(msg); return true; };
+window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
 let media = sessionStorage.getItem('pixoro_pending_media') || localStorage.getItem('pix_media') || '';
 let ME = (localStorage.getItem('pixoro_current_user')||'Giri').trim();
 let prev = document.getElementById('prev');
 let isVid = media.startsWith('data:video') || media.includes('.mp4') || localStorage.getItem('pix_media_type')=='video';
-
 if(media){
   if(isVid){ prev.innerHTML = `<video src="${media}" autoplay loop muted playsinline controls style="width:100%;height:100%;object-fit:cover"></video>`; }
   else { prev.innerHTML = `<img src="${media}" style="width:100%;height:100%;object-fit:cover">`; }
 } else {
   prev.innerHTML = 'Media Illa da Giri - Thumba poi Select pannu da!';
 }
-
 async function share(){
-  if(!media){ alert('Media illa da!'); return; }
+  if(!media){ showToast('Media illa da - Select pannu da'); return; }
   document.getElementById('shareBtn').innerText='Uploading... ⏳';
   let cap = document.getElementById('cap').value || 'PIXORO Post 📸';
   let publicUrl = media;
-  // ✅ REELS MAARIYE - Blob/Data ah Storage ku Upload da!
   try{
     if(media.startsWith('blob:') || media.startsWith('data:')){
       let res = await fetch(media);
@@ -43,17 +47,15 @@ async function share(){
       let {data:urlData} = supa.storage.from(bucket).getPublicUrl(fileName);
       publicUrl = urlData.publicUrl;
     }
-  }catch(e){ alert('Storage Upload Fail da: '+e.message); document.getElementById('shareBtn').innerText='Share Post 🚀'; return; }
-
+  }catch(e){ showToast('Adutha side la problem da - Try again'); document.getElementById('shareBtn').innerText='Share Post 🚀'; return; }
   let type = isVid ? 'video' : 'image';
   let local = JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
   let newPost = {id: Date.now(), username: ME, caption: cap, image_url: publicUrl, media_url: publicUrl, media_type: type, created_at: new Date().toISOString()};
   local.unshift(newPost);
   localStorage.setItem('pixoro_local_posts', JSON.stringify(local));
-
   let {error} = await supa.from('posts').insert({username: ME, caption: cap, image_url: publicUrl, media_url: publicUrl, media_type: type});
-  if(error){ alert('Supabase Fail da: '+error.message); }
-  else { alert('Post Upload Done da Giri! Makkal Ellam Paappanga da! 📸'); }
-  location.href = 'index.html';
+  if(error){ showToast('Adutha side la problem da - Local la save aayiduchu'); }
+  else { showToast('Post Done da Giri! 📸 Makkal paappanga'); }
+  setTimeout(()=>{ location.href = 'index.html'; },800);
 }
 </script></body></html>
