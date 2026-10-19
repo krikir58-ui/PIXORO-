@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>
 *{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto}
 .top{padding:14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #111}
 .top b{font-size:20px;font-weight:900}
@@ -17,12 +16,11 @@
 .cap{margin:12px;background:#111;border:1px solid #333;border-radius:12px;padding:12px;display:none}
 .cap textarea{width:100%;background:transparent;border:0;color:#fff;outline:none;resize:none;font-size:14px}
 .share{margin:0 12px 20px;background:#0095f6;border:0;width:calc(100% - 24px);padding:13px;border-radius:20px;font-weight:900;color:#fff;font-size:15px;cursor:pointer;display:none}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
 </style></head><body>
 <div class="top"><b>Pixoro</b><span onclick="location.href='index.html'" style="cursor:pointer">✕</span></div>
-
 <div class="preview" id="preview"><span style="font-size:40px">📸</span></div>
 <div class="msg" id="msg"></div>
-
 <div class="top"><span>Recents ▼</span><span onclick="document.getElementById('f').click()" style="color:#fff;cursor:pointer">Select</span></div>
 <div class="grid">
   <div class="cell" onclick="document.getElementById('f').click()">📷 Camera</div>
@@ -32,20 +30,23 @@
   <div class="cell" onclick="selectDemo(this,'https://picsum.photos/300?4')">Photo 4</div>
   <div class="cell" onclick="selectDemo(this,'https://picsum.photos/300?5')">Photo 5</div>
 </div>
-
 <div class="tabs">
 <button id="bPost" class="on" onclick="sel('post',this)">POST</button>
 <button onclick="sel('story',this)">STORY</button>
 <button onclick="sel('reel',this)">REEL</button>
 <button onclick="sel('live',this)">LIVE</button>
 </div>
-
 <div class="cap" id="capBox"><textarea id="caption" rows="2" placeholder="Write a caption... ✍️"></textarea></div>
 <button class="next" id="nextBtn" onclick="go()">Next →</button>
 <button class="share" id="shareBtn" onclick="shareNow()">Share</button>
-
+<div id="toast" class="toast"></div>
 <input type="file" id="f" hidden accept="image/*,video/*" onchange="handleFile(event)">
 <script>
+// === PIXORO NO FULL ALERT LOCK ===
+function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
+window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
+window.confirm = function(msg){ showToast(msg); return true; };
+window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
 let mode='post';
 let selectedMedia=null;
 let selectedType='image';
@@ -81,10 +82,10 @@ function handleFile(e){
   showShare();
 }
 function go(){
- if(!selectedMedia && !localStorage.getItem('pix_media')){ document.getElementById('msg').innerText='Photo / Video select pannu da Giri!'; return; }
+ if(!selectedMedia && !localStorage.getItem('pix_media')){ showToast('Photo / Video select pannu da Giri!'); document.getElementById('msg').innerText='Photo / Video select pannu da Giri!'; return; }
  if(mode==='post' || mode==='reel'){ showShare(); return; }
  else if(mode==='story') location.href='story-add.html';
- else document.getElementById('msg').innerText='LIVE soon da Giri! 🔴';
+ else { showToast('LIVE soon da Giri! 🔴'); document.getElementById('msg').innerText='LIVE soon da Giri! 🔴'; }
 }
 function shareNow(){
   let cap=document.getElementById('caption').value || '';
@@ -96,7 +97,7 @@ function shareNow(){
   sessionStorage.setItem('pixoro_pending_media',media);
   sessionStorage.setItem('pixoro_pending_type',type);
   localStorage.setItem('pixoro_last_caption',cap);
-  alert('Shared da Giri! 🔥');
-  location.href='index.html';
+  showToast('Shared da Giri! 🔥');
+  setTimeout(()=>{ location.href='index.html'; },800);
 }
 </script></body></html>
