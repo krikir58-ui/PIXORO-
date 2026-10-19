@@ -49,10 +49,10 @@ input[type=range]{width:100%;accent-color:#fff}
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 window.alert=function(msg){showToast(String(msg||'').slice(0,40)||'Adutha side la problem da')}; window.confirm=function(msg){showToast(msg); return true}; window.onerror=function(){showToast('Adutha side la problem da'); return true};
 let supa=null; try{ supa=window.supabase?window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_'):null }catch(e){ supa=null }
-let ME_RAW=localStorage.getItem('pixoro_user_id')||localStorage.getItem('pixoro_current_user')||'Giri'
-let ME=localStorage.getItem('pixoro_display_name')||cleanUser(ME_RAW)
 function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||'giri'; }
-function displayNameFor(u){ if(!u) return ME; let c=cleanUser(u); let oldC=cleanUser(localStorage.getItem('pixoro_old_user')||''); let uid=localStorage.getItem('pixoro_user_id')||ME_RAW; if(c===oldC||c===cleanUser(ME_RAW)) return localStorage.getItem('pixoro_display_name')||cleanUser(uid); return c; }
+let ME_RAW=localStorage.getItem('pixoro_user_id')||localStorage.getItem('pixoro_current_user')||'Giri'
+let ME=cleanUser(localStorage.getItem('pixoro_user_id')||localStorage.getItem('pixoro_current_user')||ME_RAW)
+function displayNameFor(u){ if(!u) return ME; let c=cleanUser(u); let oldC=cleanUser(localStorage.getItem('pixoro_old_user')||''); let uid=localStorage.getItem('pixoro_user_id')||ME_RAW; if(c===oldC||c===cleanUser(ME_RAW)) return cleanUser(uid); return c; }
 function isMyUser(u){ let c=cleanUser(u); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||'')||c===cleanUser(localStorage.getItem('pixoro_user_id')||''); }
 function isMyPostUser(u){ let c=cleanUser(u||''); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||'')||c===cleanUser(localStorage.getItem('pixoro_user_id')||'')||c==='krikir58'||c.includes('kri')||c==='giri'||!c; }
 let myPosts=[]; let protectOn=JSON.parse(localStorage.getItem('pixoro_protect_'+ME_RAW)||'false')
@@ -87,8 +87,8 @@ function showTab(type){ document.getElementById('tabPosts').classList.toggle('ac
 function loadProfile(){
   let target=new URLSearchParams(location.search).get('u')||ME_RAW;
   let isMine=isMyUser(target)||isMyPostUser(target);
-  let display = isMine ? (localStorage.getItem('pixoro_name_'+ME_RAW)||localStorage.getItem('pixoro_display_name')||ME) : (localStorage.getItem('pixoro_name_'+target)||cleanUser(target));
-  let uname = isMine ? (localStorage.getItem('pixoro_user_id')||ME) : cleanUser(target);
+  let uname = isMine ? cleanUser(localStorage.getItem('pixoro_user_id')||ME) : cleanUser(target);
+  let display = isMine ? (localStorage.getItem('pixoro_name_'+uname)||localStorage.getItem('pixoro_name_'+ME_RAW)||uname) : (localStorage.getItem('pixoro_name_'+target)||cleanUser(target));
   document.getElementById('topUsername').textContent=uname;
   document.getElementById('displayName').textContent=display;
   document.getElementById('usernameTag').textContent=uname;
@@ -118,7 +118,7 @@ function loadProfile(){
 function loadHighlights(){ let s=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME_RAW)||'[]'); document.getElementById('highlightList').innerHTML=s.map(h=>`<div class="h-item"><div class="h-circle">${h.emoji}</div><div class="h-text">${h.title}</div></div>`).join('')+`<div class="h-item" onclick="addHighlight()"><div class="h-circle">➕</div><div class="h-text">New</div></div>` }
 function addHighlight(){ let s=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME_RAW)||'[]'); let t='My Highlight '+(s.length+1); s.push({emoji:'⭐',title:t}); localStorage.setItem('pixoro_highlights_'+ME_RAW,JSON.stringify(s)); loadHighlights(); showToast('Highlight Added da ⭐'); }
 function openSettings(){ document.getElementById('setSheet').style.display='flex'; applyLoginSettings() }
-function openEditSheet(){ document.getElementById('editName').value=localStorage.getItem('pixoro_name_'+ME_RAW)||ME; document.getElementById('editUsername').value=localStorage.getItem('pixoro_user_id')||ME; document.getElementById('editBio').value=localStorage.getItem('pixoro_bio_'+ME_RAW)||''; document.getElementById('editLink').value=localStorage.getItem('pixoro_link_'+ME_RAW)||''; document.getElementById('editSheet').style.display='flex' }
+function openEditSheet(){ document.getElementById('editName').value=localStorage.getItem('pixoro_name_'+ME)||localStorage.getItem('pixoro_name_'+ME_RAW)||''; document.getElementById('editUsername').value=localStorage.getItem('pixoro_user_id')||ME; document.getElementById('editBio').value=localStorage.getItem('pixoro_bio_'+ME_RAW)||''; document.getElementById('editLink').value=localStorage.getItem('pixoro_link_'+ME_RAW)||''; document.getElementById('editSheet').style.display='flex' }
 let cropX=0,cropY=0,cropScale=1,cropDragging=false,cropStartX=0,cropStartY=0,cropOrigX=0,cropOrigY=0,cropImgEl=document.getElementById('cropImg');
 function updateCropTransform(){ cropImgEl.style.transform=`translate(-50%,-50%) translate(${cropX}px,${cropY}px) scale(${cropScale})`; }
 function openCrop(src){ cropX=0; cropY=0; cropScale=1; document.getElementById('zoomRange').value=1; cropImgEl.src=src; cropImgEl.onload=()=>{ let w=cropImgEl.naturalWidth, h=cropImgEl.naturalHeight; if(w>h){ cropImgEl.style.width='auto'; cropImgEl.style.height='280px'; } else { cropImgEl.style.width='280px'; cropImgEl.style.height='auto'; } updateCropTransform(); }; document.getElementById('cropOverlay').style.display='flex'; document.getElementById('editSheet').style.display='none'; }
@@ -154,10 +154,11 @@ function saveEdit(){
   localStorage.setItem('pixoro_old_user', oldU);
   localStorage.setItem('pixoro_user_id', newU);
   localStorage.setItem('pixoro_current_user', newU);
-  localStorage.setItem('pixoro_display_name', n||newU);
+  localStorage.setItem('pixoro_display_name', newU);
   localStorage.setItem('pixoro_uname_'+newU, newU);
   localStorage.setItem('pixoro_uname_'+oldU, newU);
   if(n) localStorage.setItem('pixoro_name_'+newU,n);
+  if(n) localStorage.setItem('pixoro_name_'+oldU,n);
   if(b) localStorage.setItem('pixoro_bio_'+newU,b);
   if(l) localStorage.setItem('pixoro_link_'+newU,l);
   ['pixoro_local_posts','pixoro_local_stories','pixoro_local_reels','pixoro_local_saved'].forEach(k=>{
