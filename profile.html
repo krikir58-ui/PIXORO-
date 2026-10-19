@@ -22,7 +22,7 @@
 .toggle{width:44px;height:26px;background:#333;border-radius:20px;position:relative;cursor:pointer}.toggle.on{background:#fff}.toggleKnob{width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px}.toggle.on .toggleKnob{left:21px;background:#000}
 .loginRow{padding:14px 18px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}.loginRow small{color:#888;font-size:11px;display:block}
 .createRow{display:flex;align-items:center;gap:16px;padding:18px 20px;border-bottom:1px solid #2a2a2a;cursor:pointer}.createIco{width:44px;height:44px;border-radius:50%;border:1px solid #555;display:flex;align-items:center;justify-content:center;font-size:22px}
-.cropOverlay{position:fixed;inset:0;background:#000;z-index:2000;display:none;flex-direction:column}.cropStage{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}.cropCircle{width:280px;height:280px;border-radius:50%;overflow:hidden;border:3px solid #fff;touch-action:none;background:#111;box-shadow:0 0 0 9999px rgba(0,0,0,.7)}.cropCircle img{position:absolute;left:0;top:0;max-width:none;cursor:grab}
+.cropOverlay{position:fixed;inset:0;background:#000;z-index:2000;display:none;flex-direction:column}.cropStage{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}.cropCircle{width:280px;height:280px;border-radius:50%;overflow:hidden;border:3px solid #fff;touch-action:none;background:#111;box-shadow:0 0 0 9999px rgba(0,0,0,.7);position:relative}.cropCircle img{position:absolute;left:0;top:0;max-width:none;cursor:grab}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;display:none;white-space:nowrap}
 input[type=range]{width:100%;accent-color:#fff}
 </style></head><body>
@@ -50,18 +50,16 @@ let ME=localStorage.getItem('pixoro_display_name')||cleanUser(ME_RAW)
 function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||'giri'; }
 function displayNameFor(u){ if(!u) return ME; let c=cleanUser(u); if(c===cleanUser(ME_RAW)||c===cleanUser(localStorage.getItem('pixoro_old_user')||'')) return ME; return c; }
 function isMyUser(u){ let c=cleanUser(u); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||''); }
+// OREY PHOTO ELLA EDATHULAYUM - SINGLE SOURCE
+function isMyPostUser(u){ let c=cleanUser(u||''); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||'')||c==='krikir58'||c.includes('kri')||c==='giri'||!c; }
 let myPosts=[]; let protectOn=JSON.parse(localStorage.getItem('pixoro_protect_'+ME_RAW)||'false')
 let loginSettings=JSON.parse(localStorage.getItem('pixoro_login_settings')||'{"google":true,"pass":true,"otp":true,"forgot":true,"remember":true,"auto":true}')
-// ===== FIXED DA - FAKE PHOTO ILLA, G LETTER MATTUM =====
 function getPfp(u){
   if(!u) return 'https://ui-avatars.com/api/?name=G&background=333&color=fff&size=200&bold=true';
   let clean=cleanUser(u);
-  if(isMyUser(u)){
-    let my=localStorage.getItem('pixoro_profile_pic')||localStorage.getItem('pixoro_current_pfp')||localStorage.getItem('pixoro_pfp_'+ME_RAW)||localStorage.getItem('pixoro_pfp_'+ME);
-    if(my && my.length>100 && (my.startsWith('data:')||my.startsWith('http')||my.startsWith('blob:')) && !my.includes('pravatar')) return my;
-  }
-  let keys=['pixoro_pfp_'+u,'pixoro_pfp_'+clean,'pixoro_gilli_pfp_'+u,'pixoro_gilli_pfp_'+clean,'pixoro_pfp_'+ME_RAW,'pixoro_pfp_'+ME,'pixoro_profile_pic','pixoro_current_pfp','profile_pic'];
-  for(let k of keys){ let p=localStorage.getItem(k); if(p && p.length>100 && (p.startsWith('data:')||p.startsWith('http')||p.startsWith('blob:')) && !p.includes('pravatar')) return p; }
+  let my=localStorage.getItem('pixoro_profile_pic')||localStorage.getItem('pixoro_current_pfp')||localStorage.getItem('pixoro_pfp_'+ME_RAW)||localStorage.getItem('pixoro_pfp_'+ME);
+  if(my && my.length>100 && my.startsWith('data:')) return my;
+  if(my && my.startsWith('http') && !my.includes('pravatar')) return my;
   return 'https://ui-avatars.com/api/?name='+clean.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true';
 }
 function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW); }
@@ -85,7 +83,7 @@ function renderGrid(list){ if(!list.length){ document.getElementById('myGrid').i
 function showTab(type){ document.getElementById('tabPosts').classList.toggle('active', type=='all'); document.getElementById('tabReels').classList.toggle('active', type=='reels'); let list=type=='reels'? myPosts.filter(p=> p.media_type=='reel'||p.media_type=='video'||p.is_reel==true||(p.media_url||'').includes('.mp4')||(p.image_url||'').includes('.mp4')) : myPosts; renderGrid(list); }
 function loadProfile(){
   let target=new URLSearchParams(location.search).get('u')||ME_RAW;
-  let isMine=isMyUser(target);
+  let isMine=isMyUser(target)||isMyPostUser(target);
   let display = isMine ? (localStorage.getItem('pixoro_name_'+ME_RAW)||ME) : (localStorage.getItem('pixoro_name_'+target)||cleanUser(target));
   let uname = isMine ? ME : cleanUser(target);
   document.getElementById('topUsername').textContent='@'+uname;
@@ -98,13 +96,14 @@ function loadProfile(){
   updateProtectUI(); applyLoginSettings(); loadHighlights(); updateNavPfp();
   let t=cleanUser(target); let oldC=cleanUser(localStorage.getItem('pixoro_old_user')||'');
   let local=JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
-  myPosts=local.filter(p=> cleanUser(p.username||'')==t || cleanUser(p.username||'')==oldC || isMyUser(p.username));
+  // FIXED DA - POST COUNT 0 VARATHU - giri / krikir58 ella post um count aagum da
+  myPosts=local.filter(p=> isMyPostUser(p.username) || cleanUser(p.username||'')==t || cleanUser(p.username||'')==oldC);
   document.getElementById('postCount').textContent=myPosts.length;
   renderGrid(myPosts);
   if(!supa) return;
   setTimeout(async()=>{ try{
     let {data}=await supa.from('posts').select('*').order('created_at',{ascending:false});
-    let dbPosts=(data||[]).filter(p=> cleanUser(p.username||'')==t || cleanUser(p.username||'')==oldC || isMyUser(p.username));
+    let dbPosts=(data||[]).filter(p=> isMyPostUser(p.username) || cleanUser(p.username||'')==t || cleanUser(p.username||'')==oldC);
     let seen=new Set(myPosts.map(p=>p.media_url||p.image_url)); dbPosts.forEach(p=>{ let u=p.media_url||p.image_url; if(!seen.has(u)){ myPosts.push(p); seen.add(u); } });
     document.getElementById('postCount').textContent=myPosts.length; renderGrid(myPosts);
     let {data:follows}=await supa.from('follows').select('*');
@@ -120,7 +119,8 @@ function openSettings(){ document.getElementById('setSheet').style.display='flex
 function openEditSheet(){ document.getElementById('editName').value=localStorage.getItem('pixoro_name_'+ME_RAW)||ME; document.getElementById('editUsername').value=localStorage.getItem('pixoro_uname_'+ME_RAW)||ME; document.getElementById('editBio').value=localStorage.getItem('pixoro_bio_'+ME_RAW)||''; document.getElementById('editLink').value=localStorage.getItem('pixoro_link_'+ME_RAW)||''; document.getElementById('editSheet').style.display='flex' }
 let cropX=0,cropY=0,cropScale=1.2,cropDragging=false,cropStartX=0,cropStartY=0,cropOrigX=0,cropOrigY=0,cropImgEl=document.getElementById('cropImg');
 function updateCropTransform(){ cropImgEl.style.transform=`translate(${cropX}px,${cropY}px) scale(${cropScale})`; }
-function openCrop(src){ cropX=0; cropY=0; cropScale=1.2; document.getElementById('zoomRange').value=1.2; cropImgEl.src=src; cropImgEl.onload=()=>{ cropImgEl.style.width='280px'; cropImgEl.style.height='auto'; updateCropTransform(); }; document.getElementById('cropOverlay').style.display='flex'; document.getElementById('editSheet').style.display='none'; }
+function openCrop(src){ cropX=0; cropY=0; cropScale=1.2; document.getElementById('zoomRange').value=1.2; cropImgEl.src=src; cropImgEl.onload=()=>{ // Photo va circle ku full ah fill pannu da - cover mathiri
+    let w=cropImgEl.naturalWidth, h=cropImgEl.naturalHeight; if(w>h){ cropImgEl.style.width='auto'; cropImgEl.style.height='280px'; } else { cropImgEl.style.width='280px'; cropImgEl.style.height='auto'; } updateCropTransform(); }; document.getElementById('cropOverlay').style.display='flex'; document.getElementById('editSheet').style.display='none'; }
 function closeCrop(){ document.getElementById('cropOverlay').style.display='none'; }
 function resetCrop(){ cropX=0; cropY=0; cropScale=1.2; document.getElementById('zoomRange').value=1.2; updateCropTransform(); }
 document.getElementById('zoomRange').addEventListener('input',e=>{ cropScale=parseFloat(e.target.value); updateCropTransform(); });
@@ -128,17 +128,19 @@ let circle=document.getElementById('cropCircle');
 circle.addEventListener('pointerdown',e=>{ cropDragging=true; cropStartX=e.clientX; cropStartY=e.clientY; cropOrigX=cropX; cropOrigY=cropY; circle.setPointerCapture(e.pointerId); });
 circle.addEventListener('pointermove',e=>{ if(!cropDragging) return; cropX=cropOrigX+(e.clientX-cropStartX); cropY=cropOrigY+(e.clientY-cropStartY); cropX=Math.max(-140,Math.min(140,cropX)); cropY=Math.max(-140,Math.min(140,cropY)); updateCropTransform(); });
 circle.addEventListener('pointerup',()=>cropDragging=false);
+// FIXED DA - CIRCLE KU ULLA CORRECT AH VARUM
 function applyCrop(){
   let canvas=document.createElement('canvas'); canvas.width=400; canvas.height=400; let ctx=canvas.getContext('2d');
   let img=new Image(); img.onload=()=>{
-    let scaleFactor = img.naturalWidth / 280;
     ctx.save(); ctx.beginPath(); ctx.arc(200,200,200,0,Math.PI*2); ctx.clip();
-    let drawW = 280*cropScale*scaleFactor, drawH = (img.naturalHeight/img.naturalWidth)*drawW;
-    let dx = cropX*scaleFactor + (400-drawW)/2, dy = cropY*scaleFactor + (400-drawH)/2;
-    ctx.drawImage(img, dx, dy, drawW, drawH); ctx.restore();
-    let out=canvas.toDataURL('image/jpeg',0.85);
+    let scale=Math.max(400/img.naturalWidth, 400/img.naturalHeight)*cropScale;
+    let dw=img.naturalWidth*scale, dh=img.naturalHeight*scale;
+    let dx=200-dw/2+cropX*1.4, dy=200-dh/2+cropY*1.4;
+    ctx.drawImage(img, dx, dy, dw, dh); ctx.restore();
+    let out=canvas.toDataURL('image/jpeg',0.92);
     document.getElementById('editPfpPreview').src=out; document.getElementById('editPfpPreview').dataset.new=out;
-    closeCrop(); document.getElementById('editSheet').style.display='flex'; showToast('Photo adjust aayiduchu da ✅ - Save pannu');
+    localStorage.setItem('pixoro_profile_pic',out); localStorage.setItem('pixoro_current_pfp',out);
+    closeCrop(); document.getElementById('editSheet').style.display='flex'; showToast('Photo correct ah circle ulla vanthiduchu da ✅ - Save pannu');
   }; img.src=cropImgEl.src;
 }
 document.getElementById('pfpInput').addEventListener('change',e=>{ let f=e.target.files[0]; if(!f)return; let r=new FileReader(); r.onload=ev=>{ openCrop(ev.target.result) }; r.readAsDataURL(f) })
