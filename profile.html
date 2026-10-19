@@ -52,17 +52,17 @@ function displayNameFor(u){ if(!u) return ME; let c=cleanUser(u); if(c===cleanUs
 function isMyUser(u){ let c=cleanUser(u); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||''); }
 let myPosts=[]; let protectOn=JSON.parse(localStorage.getItem('pixoro_protect_'+ME_RAW)||'false')
 let loginSettings=JSON.parse(localStorage.getItem('pixoro_login_settings')||'{"google":true,"pass":true,"otp":true,"forgot":true,"remember":true,"auto":true}')
-// ===== ADD PANNITEN DA - ITHU THAN FIX =====
+// ===== FIXED DA - FAKE PHOTO ILLA, G LETTER MATTUM =====
 function getPfp(u){
-  if(!u) return 'https://i.pravatar.cc/200?u=giri';
+  if(!u) return 'https://ui-avatars.com/api/?name=G&background=333&color=fff&size=200&bold=true';
   let clean=cleanUser(u);
   if(isMyUser(u)){
     let my=localStorage.getItem('pixoro_profile_pic')||localStorage.getItem('pixoro_current_pfp')||localStorage.getItem('pixoro_pfp_'+ME_RAW)||localStorage.getItem('pixoro_pfp_'+ME);
-    if(my && my.length>100 && (my.startsWith('data:')||my.startsWith('http')||my.startsWith('blob:'))) return my;
+    if(my && my.length>100 && (my.startsWith('data:')||my.startsWith('http')||my.startsWith('blob:')) && !my.includes('pravatar')) return my;
   }
   let keys=['pixoro_pfp_'+u,'pixoro_pfp_'+clean,'pixoro_gilli_pfp_'+u,'pixoro_gilli_pfp_'+clean,'pixoro_pfp_'+ME_RAW,'pixoro_pfp_'+ME,'pixoro_profile_pic','pixoro_current_pfp','profile_pic'];
-  for(let k of keys){ let p=localStorage.getItem(k); if(p && p.length>100 && (p.startsWith('data:')||p.startsWith('http')||p.startsWith('blob:'))) return p; }
-  return 'https://i.pravatar.cc/200?u='+clean;
+  for(let k of keys){ let p=localStorage.getItem(k); if(p && p.length>100 && (p.startsWith('data:')||p.startsWith('http')||p.startsWith('blob:')) && !p.includes('pravatar')) return p; }
+  return 'https://ui-avatars.com/api/?name='+clean.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true';
 }
 function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW); }
 updateNavPfp(); setInterval(updateNavPfp,1000);
