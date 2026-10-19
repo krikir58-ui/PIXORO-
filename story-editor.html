@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Story Editor</title>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Story Editor</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
@@ -18,45 +17,61 @@ body{max-width:100% !important;margin:0}
 .actions{display:flex;gap:8px}
 .pill{flex:1;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.45);color:#fff;padding:13px;border-radius:999px;font-weight:700;font-size:13px}
 .pill.green{color:#4ade80}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:99999;display:none;white-space:nowrap}
+.textOverlay{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);z-index:25;font-size:28px;font-weight:900;text-shadow:2px 2px 0 #000;text-align:center;max-width:90%}
 </style></head><body>
 <div class="page">
 <img class="photo" id="eImg" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1080">
+<div id="textOverlay" class="textOverlay"></div>
 <div class="top"><span onclick="location.href='index.html'">✕</span><b>Story</b><span>⋯</span></div>
 <div class="side">
 <div onclick="addText()">Aa<span>Text</span></div>
-<div>😊<span>Sticker</span></div>
-<div>🎵<span>Music</span></div>
-<div>✨<span>Effect</span></div>
-<div>@<span>Mention</span></div>
-<div>✏️<span>Draw</span></div>
-<div>🎛️<span>Filter</span></div>
-<div>⏱️<span>Timer</span></div>
-<div>👥<span>Close</span></div>
-<div>🔒<span>Privacy</span></div>
-<div>⚙️<span>Quality</span></div>
+<div onclick="showToast('Sticker - Adutha update la da')">😊<span>Sticker</span></div>
+<div onclick="showToast('Music - Adutha update la da')">🎵<span>Music</span></div>
+<div onclick="showToast('Effect - Adutha update la da')">✨<span>Effect</span></div>
+<div onclick="showToast('Mention - Caption la @ podu da')">@<span>Mention</span></div>
+<div onclick="showToast('Draw - Adutha update la da')">✏️<span>Draw</span></div>
+<div onclick="showToast('Filter - Adutha update la da')">🎛️<span>Filter</span></div>
+<div onclick="showToast('Timer - 24h auto da')">⏱️<span>Timer</span></div>
+<div onclick="showToast('Close Friends - Keela button da')">👥<span>Close</span></div>
+<div onclick="showToast('Privacy - Everyone da')">🔒<span>Privacy</span></div>
+<div onclick="showToast('Quality - HD da 🔥')">⚙️<span>Quality</span></div>
 </div>
 <div class="bottom">
 <input class="cap" id="cap" placeholder="Add a caption...">
 <div class="actions"><button class="pill" onclick="postStory('everyone')">⊕ Your story</button><button class="pill green" onclick="postStory('close_friends')">★ Close Friends</button></div>
 </div>
 </div>
+<div id="toast" class="toast"></div>
 <script>
+// === PIXORO NO FULL ALERT LOCK ===
+function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
+window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
+window.confirm = function(msg){ showToast(msg); return true; };
+window.prompt = function(){ showToast('Caption la text eluthu da'); return null; };
+window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME=localStorage.getItem('pixoro_current_user')||'Giri'
 let m=sessionStorage.getItem('pixoro_pending_media'); if(m) document.getElementById('eImg').src=m;
 let type=sessionStorage.getItem('pixoro_pending_type')||'image'
-function addText(){ let t=prompt('Text enna da?'); if(t) alert(t+' added da!') }
+function addText(){
+  let capEl=document.getElementById('cap');
+  capEl.focus();
+  capEl.placeholder='Text inga eluthu da - Photo mela varum...';
+  showToast('Text inga eluthu da - Photo mela varum');
+  capEl.addEventListener('input',()=>{
+    document.getElementById('textOverlay').innerText = capEl.value;
+  },{once:false});
+}
 async function postStory(aud){
   let media = sessionStorage.getItem('pixoro_pending_media') || document.getElementById('eImg').src
-  if(!media){ alert('Photo illa da!'); return }
+  if(!media){ showToast('Photo illa da - Select pannu da'); return }
   let exp=new Date(); exp.setHours(exp.getHours()+24);
   let story={ id:'local_'+Date.now(), username:ME, image_url:media, media_url:media, image:media, media_type:type, caption:document.getElementById('cap').value, audience:aud, created_at:new Date().toISOString(), expires_at:exp.toISOString() }
-  // Local save - 100% work aagum
   let arr=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]'); arr.push(story); localStorage.setItem('pixoro_local_stories',JSON.stringify(arr));
-  // Supabase try
   try{ await supa.from('stories').insert({username:ME,image_url:media,media_type:type,caption:story.caption,audience:aud,expires_at:exp.toISOString()}) }catch(e){ console.log('supa skip',e) }
   sessionStorage.removeItem('pixoro_pending_media');
-  alert('Story posted da Giri! 🔥');
-  location.href='index.html';
+  showToast('Story Posted da Giri! 🔥');
+  setTimeout(()=>{ location.href='index.html'; },800);
 }
 </script></body></html>
