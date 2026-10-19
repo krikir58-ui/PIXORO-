@@ -64,6 +64,12 @@
 <div onclick="hideChoice()" style="text-align:center;padding:14px;color:#777;margin-top:10px">Cancel</div>
 </div></div>
 <script>
+// === PIXORO NO FULL ALERT LOCK ===
+function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
+window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
+window.confirm = function(msg){ showToast(msg); return true; };
+window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
+window.addEventListener('unhandledrejection', ()=>{ showToast('Net slow da - Try again'); });
 function showChoice(){document.getElementById('choice').classList.add('show')}
 function hideChoice(){document.getElementById('choice').classList.remove('show')}
 let supa=null; try{ supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_') }catch(e){ supa=null }
@@ -75,7 +81,6 @@ let allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],currentPostI
 let viewedStories=JSON.parse(localStorage.getItem('pixoro_viewed_stories')||'[]')
 let lastTap=0
 let PLUS=JSON.parse(localStorage.getItem('pixoro_plus')||'{"ghost":false,"48h":true,"rewatch":true,"search":true,"audience":"everyone"}')
-function showToast(m){let t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 function getPfp(u){
   if(!u) return '';
   let clean = cleanUser(u);
