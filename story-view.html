@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Story - Pixoro</title>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Story - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
@@ -33,6 +32,7 @@
 .hlSheet{position:absolute;bottom:0;left:0;right:0;background:#111;border-radius:20px 20px 0 0;padding:16px;z-index:30;display:none}
 .hlSheet button{width:100%;background:#222;color:#fff;border:0;padding:12px;margin-top:8px;border-radius:12px;text-align:left}
 .hlSheet input{width:100%;background:#222;border:1px solid #333;color:#fff;padding:12px;border-radius:12px;outline:none}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
 </style></head><body>
 <div class="bar" id="pBar"></div>
 <div class="top"><div class="user"><img id="uPic" src=""><b id="uName"></b><span id="time" style="font-size:12px;color:#aaa"></span><span id="audLabel"></span></div><div style="display:flex;gap:10px;align-items:center"><i class="fa fa-ellipsis-h" id="moreBtn" onclick="toggleMenu()" style="display:none;cursor:pointer"></i><span class="close" onclick="goHome()">✕</span></div></div>
@@ -42,10 +42,15 @@
 <div class="tap left" onclick="prev()"></div><div class="tap right" onclick="next()"></div>
 <div class="bottomBar"><div style="display:flex;justify-content:space-between;align-items:center"><span id="delBottom" class="deleteBtn" onclick="deleteCurrent()">🗑️ Delete</span><span id="viewEye" onclick="openViewers()" style="background:rgba(255,255,255,.15);padding:8px 14px;border-radius:20px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px"><i class="fa fa-eye"></i> <span id="viewCount">0</span> Views</span></div><div id="replySection" style="display:none"><div class="emojiRow"><span onclick="react('❤️')">❤️</span><span onclick="react('🔥')">🔥</span><span onclick="react('😂')">😂</span><span onclick="react('😍')">😍</span><span onclick="react('👏')">👏</span><span onclick="react('💚')">💚</span><span onclick="react('💯')">💯</span></div><div class="replyArea"><input id="replyInput" placeholder="Reply to story..."><span onclick="sendReply()" style="background:#fff;color:#000;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><i class="fa fa-paper-plane"></i></span></div></div><span id="replyHint" style="font-size:12px;color:#888">Tap left/right to navigate</span></div>
 <div class="viewerBar" id="viewerBar"><div style="width:40px;height:4px;background:#333;border-radius:10px;margin:10px auto"></div><div style="padding:0 15px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222"><b style="font-size:14px">👁️ Viewed by <span id="vCount2">0</span> people</b><span onclick="closeViewers()" style="font-size:20px;cursor:pointer">✕</span></div><div id="viewerList" style="overflow-y:auto;padding:10px 15px;flex:1"></div></div>
-
 <div class="hlSheet" id="hlSheet"><b>⭐ Add to Highlight</b><div id="hlList" style="margin:10px 0"></div><input id="hlName" placeholder="New Highlight name - Ex: Travel, Fav"><button onclick="createHighlight()" style="background:#fff;color:#000;font-weight:800;text-align:center">+ Create Highlight</button><button onclick="closeHighlight()" style="text-align:center">Cancel</button></div>
-
+<div id="toast" class="toast"></div>
 <script>
+// === PIXORO NO FULL ALERT LOCK ===
+function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
+window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
+window.confirm = function(msg){ showToast(msg); return true; };
+window.prompt = function(){ showToast('Caption la type pannu da'); return null; };
+window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME = localStorage.getItem('pixoro_current_user') || 'Giri'
 const user = new URLSearchParams(location.search).get('user')
@@ -87,21 +92,20 @@ function show(i){
 function next(){ if(cur < stories.length-1) show(cur+1); else goHome() }
 function prev(){ if(cur>0) show(cur-1); else show(0) }
 function toggleMenu(){ let m=document.getElementById('menu'); m.style.display = m.style.display==='block'?'none':'block' }
+let delArmed=false;
 async function deleteCurrent(){
- if(!confirm('Delete panava da Giri? 🗑️')) return
  let s=stories[cur]
- if(s.username.toLowerCase()!==ME.toLowerCase()){ alert('Un story mattum delete pannalam da!'); return }
- clearInterval(timer)
- if(s.id.toString().startsWith('local_')){ let allLocal = JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]'); allLocal = allLocal.filter(x=> x.id!== s.id); localStorage.setItem('pixoro_local_stories', JSON.stringify(allLocal)) } else { let {error} = await supa.from('stories').delete().eq('id', s.id); if(error){ alert('Error: '+error.message); return } }
+ if(s.username.toLowerCase()!==ME.toLowerCase()){ showToast('Un story mattum delete pannalam da!'); return }
+ if(!delArmed){ delArmed=true; showToast('Delete panna marubadiyum click pannu da 🗑️'); setTimeout(()=>delArmed=false,2500); document.getElementById('menu').style.display='none'; return; }
+ delArmed=false; clearInterval(timer)
+ if(s.id.toString().startsWith('local_')){ let allLocal = JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]'); allLocal = allLocal.filter(x=> x.id!== s.id); localStorage.setItem('pixoro_local_stories', JSON.stringify(allLocal)) } else { let {error} = await supa.from('stories').delete().eq('id', s.id); if(error){ showToast('Adutha side la problem da'); return } }
  stories.splice(cur,1)
- if(stories.length===0){ alert('Deleted! ✅'); goHome(); return }
+ if(stories.length===0){ showToast('Deleted! ✅'); setTimeout(goHome,600); return }
  if(cur>=stories.length) cur=stories.length-1
  let bar=document.getElementById('pBar'); bar.innerHTML=stories.map((_,i)=>`<div class="b"><div id="b${i}"></div></div>`).join('')
  show(cur); document.getElementById('menu').style.display='none'
 }
 function saveStory(){ let s=stories[cur]; let link=s.image_url||s.media_url||s.image; let a=document.createElement('a'); a.href=link; a.target='_blank'; a.download=`pixoro-story-${Date.now()}.jpg`; fetch(link).then(r=>r.blob()).then(b=>{ let url=URL.createObjectURL(b); a.href=url; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000) }).catch(()=>{ window.open(link,'_blank') }) }
-
-// === HIGHLIGHT FEATURE - NEW ===
 function openHighlight(){
   toggleMenu(); clearInterval(timer);
   let hls = JSON.parse(localStorage.getItem('pixoro_highlights')||'[]');
@@ -113,12 +117,12 @@ function openHighlight(){
 function closeHighlight(){ document.getElementById('hlSheet').style.display='none'; prog=0; timer=setInterval(()=>{ prog+=1; let bEl=document.getElementById(`b${cur}`); if(bEl) bEl.style.width=prog+'%'; if(prog>=100){ clearInterval(timer); next() } },50) }
 function createHighlight(){
   let name = document.getElementById('hlName').value.trim();
-  if(!name){ alert('Name type pannu da!'); return }
+  if(!name){ showToast('Name type pannu da!'); return }
   let s = stories[cur];
   let hls = JSON.parse(localStorage.getItem('pixoro_highlights')||'[]');
   hls.push({name:name, user: ME, items:[{img: s.image_url||s.media_url||s.image, caption: s.caption||'', created_at: s.created_at}]});
   localStorage.setItem('pixoro_highlights', JSON.stringify(hls));
-  alert(name+' Highlight la save aayiduchu da ⭐');
+  showToast(name+' Highlight la save aayiduchu da ⭐');
   document.getElementById('hlName').value='';
   closeHighlight();
 }
@@ -127,16 +131,14 @@ function addToExisting(i){
   let hls = JSON.parse(localStorage.getItem('pixoro_highlights')||'[]');
   hls[i].items.push({img: s.image_url||s.media_url||s.image, caption: s.caption||'', created_at: s.created_at});
   localStorage.setItem('pixoro_highlights', JSON.stringify(hls));
-  alert(hls[i].name+' la add aayiduchu da ⭐');
+  showToast(hls[i].name+' la add aayiduchu da ⭐');
   closeHighlight();
 }
-
 async function addViewer(){ try{ let {data:exist}=await supa.from('story_views').select('*').eq('story_owner',user).eq('viewer',ME).limit(1); if(!exist || exist.length==0){ await supa.from('story_views').insert({story_owner:user, viewer:ME}) } loadViewers() }catch(e){} }
 async function loadViewers(){ try{ let {data}=await supa.from('story_views').select('*').eq('story_owner',user).order('created_at',{ascending:false}); let count=data?data.length:0; document.getElementById('viewCount').innerText=count; document.getElementById('vCount2').innerText=count; let list=document.getElementById('viewerList'); if(!data || data.length==0){ list.innerHTML='<p style="text-align:center;color:#666;padding:20px">No views yet 👀</p>' } else { list.innerHTML=data.map(v=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1a1a1a"><div style="display:flex;align-items:center;gap:10px"><img src="https://i.pravatar.cc/100?u=${v.viewer}" style="width:36px;height:36px;border-radius:50%"><div><b style="font-size:13px">@${v.viewer}</b><div style="font-size:11px;color:#777">${safeTime(v.created_at)}</div></div></div><span style="color:#00ff66;font-size:12px">👁️</span></div>`).join('') } }catch(e){ document.getElementById('viewerList').innerHTML='<p style="color:#666;text-align:center">Supabase la story_views table create pannu da!</p>' } }
 function openViewers(){ document.getElementById('viewerBar').classList.add('open'); clearInterval(timer) }
 function closeViewers(){ document.getElementById('viewerBar').classList.remove('open'); prog=0; timer=setInterval(()=>{ prog+=1; let bEl=document.getElementById(`b${cur}`); if(bEl) bEl.style.width=prog+'%'; if(prog>=100){ clearInterval(timer); next() } },50) }
 async function react(emoji){ try{ await supa.from('dms').insert({sender:ME,receiver:user,text:`Reacted ${emoji} to your story 🔥`,type:'story_react'}) }catch(e){} if(navigator.vibrate) navigator.vibrate(40); let el=document.createElement('div'); el.innerText=emoji; el.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:80px;z-index:100;pointer-events:none;animation:pop.8s forwards'; document.body.appendChild(el); let s=document.createElement('style'); s.innerHTML='@keyframes pop{0%{transform:translate(-50%,-50%) scale(0)}50%{transform:translate(-50%,-50%) scale(1.4)}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}'; document.head.appendChild(s); setTimeout(()=>el.remove(),800) }
-async function sendReply(){ let t=document.getElementById('replyInput').value.trim(); if(!t) return; try{ await supa.from('dms').insert({sender:ME,receiver:user,text:`Story Reply: ${t}`,type:'story_reply'}) }catch(e){} document.getElementById('replyInput').value=''; alert(`DM sent da! "${t}" → @${user}`) }
+async function sendReply(){ let t=document.getElementById('replyInput').value.trim(); if(!t) return; try{ await supa.from('dms').insert({sender:ME,receiver:user,text:`Story Reply: ${t}`,type:'story_reply'}) }catch(e){} document.getElementById('replyInput').value=''; showToast(`DM Sent da! → @${user}`) }
 load()
-</script>
-</body></html>
+</script></body></html>
