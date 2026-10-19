@@ -3,30 +3,36 @@
 <style>
 *{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto}
 .top{padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #111}
-.prev{margin:12px;height:400px;background:#111;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden}.prev video{width:100%;height:100%;object-fit:cover}
+.prev{margin:12px;height:400px;background:#111;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}.prev video{width:100%;height:100%;object-fit:cover}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px}.cell{padding:16px;background:#1a1a1a;border-radius:14px;text-align:center;cursor:pointer}
 .btn{margin:12px;background:#fff;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900;color:#000}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
 </style></head><body>
 <div class="top"><b>New Reel 🎬</b><span onclick="location.href='index.html'">✕</span></div>
 <div class="prev" id="prev">🎬 Video Select Pannu</div>
 <div class="grid"><div class="cell" onclick="document.getElementById('f').click()">🖼️ Gallery</div><div class="cell" onclick="document.getElementById('f').click()">➕ Add Video</div></div>
 <button class="btn" onclick="go()">Next →</button>
+<div id="toast" class="toast"></div>
 <input type="file" id="f" hidden accept="video/*" onchange="h(event)">
 <script>
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+// === PIXORO NO FULL ALERT LOCK ===
+function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
+window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
+window.confirm = function(msg){ showToast(msg); return true; };
+window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
 let m = '';
 async function h(e){
   let f = e.target.files[0];
   if(!f) return;
   let u = URL.createObjectURL(f);
   document.getElementById('prev').innerHTML = `<video src="${u}" autoplay loop muted controls playsinline></video>`;
-  document.getElementById('prev').innerHTML += `<div style="position:absolute;color:#fff;background:#000a;padding:4px 8px;border-radius:8px;font-size:12px">Uploading... ⏳</div>`;
-  // AUTO UPLOAD TO SUPABASE - reels bucket da!
+  showToast('Uploading... ⏳');
   let fileName = Date.now() + '_' + f.name.replace(/[^a-zA-Z0-9.]/g,'_');
   let {data, error} = await supa.storage.from('reels').upload(fileName, f);
-  if(error){ alert('Upload Fail da Giri: '+error.message); return; }
+  if(error){ showToast('Adutha side la problem da - Try again'); return; }
   let {data: urlData} = supa.storage.from('reels').getPublicUrl(fileName);
   m = urlData.publicUrl;
   sessionStorage.setItem('pixoro_pending_media', m);
@@ -35,10 +41,10 @@ async function h(e){
   localStorage.setItem('pix_media_type','video');
   localStorage.setItem('pix_media_is_reel','true');
   localStorage.setItem('pix_video_name', f.name);
-  alert('Auto Upload Done da Giri! 🔥 Next ku po da');
+  showToast('Upload Done da 🔥 Next ku po da');
 }
 function go(){
-  if(!m){ alert('Video select pannu da Giri - Upload aagattum da!'); return; }
+  if(!m){ showToast('Video select pannu da - Upload aagattum'); return; }
   location.href = 'reels-upload.html';
 }
 </script></body></html>
