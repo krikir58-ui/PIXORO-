@@ -20,7 +20,7 @@
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}.bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}.bottom-nav a.active{color:#fff}.bottom-nav a.active svg{stroke:#fff}.bottom-nav span{font-size:10px;color:#8e8e8e}.bottom-nav a.active span{color:#fff;font-weight:700}
 .bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #555;background:#111}
 .bottom-nav a.active img.navPfp{border-color:#fff}
-.pfpRing{width:34px;height:34px;border-radius:50%;background:#fff;padding:1.5px;box-shadow:0 0 0 1.5px #666}.pfpInner{width:100%;height:100%;border-radius:50%;background:#000;padding:1.5px}.pfpInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.pfpRing{width:34px;height:34px;border-radius:50%;background:#fff;padding:1.5px;box-shadow:0 0 0 1.5px #666;cursor:pointer;flex-shrink:0}.pfpInner{width:100%;height:100%;border-radius:50%;background:#000;padding:1.5px}.pfpInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .storyBar{display:flex;gap:14px;padding:10px 12px;overflow-x:auto;background:#000;border-bottom:1px solid #111;min-height:92px}.storyBar::-webkit-scrollbar{display:none}
 .sItem{text-align:center;min-width:64px;max-width:64px;cursor:pointer;flex-shrink:0}
 .sRing{width:60px;height:60px;border-radius:50%;padding:2.3px;background:#fff!important;border:2px solid #fff}
@@ -73,7 +73,10 @@
 function showChoice(){document.getElementById('choice').classList.add('show')}
 function hideChoice(){document.getElementById('choice').classList.remove('show')}
 let supa=null; try{ supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_') }catch(e){ supa=null }
-let ME=(localStorage.getItem('pixoro_current_user')||'Giri').trim()
+let ME_RAW=(localStorage.getItem('pixoro_current_user')||'Giri').trim()
+let ME=localStorage.getItem('pixoro_display_name')||cleanUser(ME_RAW)
+function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||'giri'; }
+function openProfileFast(u){ localStorage.setItem('pixoro_view_user',u); location.href='profile.html?u='+encodeURIComponent(u); }
 let allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],currentPostId=null,currentMenuPost=null
 let viewedStories=JSON.parse(localStorage.getItem('pixoro_viewed_stories')||'[]')
 let lastTap=0
@@ -83,9 +86,9 @@ function getPfp(u){
   if(!u) return 'https://i.pravatar.cc/150?u=Giri';
   let p = localStorage.getItem('pixoro_gilli_pfp_'+u) || localStorage.getItem('pixoro_pfp_'+u) || localStorage.getItem('pixoro_gilli_pfp_'+u.toLowerCase()) || localStorage.getItem('pixoro_pfp_'+u.toLowerCase());
   if(p) return p;
-  return `https://i.pravatar.cc/150?u=${u}`;
+  return `https://i.pravatar.cc/150?u=${encodeURIComponent(cleanUser(u))}`;
 }
-function pfpHtml(u){return `<div class="pfpRing"><div class="pfpInner"><img src="${getPfp(u)}"></div></div>`}
+function pfpHtml(u){return `<div class="pfpRing" onclick="event.stopPropagation();openProfileFast('${u}')"><div class="pfpInner"><img src="${getPfp(u)}"></div></div>`}
 function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME); }
 updateNavPfp(); setInterval(updateNavPfp,1000);
 async function loadAll(){
@@ -93,7 +96,7 @@ async function loadAll(){
     if(!supa) throw new Error('no supa')
     let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false});
     let {data:likes}=await supa.from('likes').select('*');
-    let {data:saves}=await supa.from('saves').select('*').eq('username',ME);
+    let {data:saves}=await supa.from('saves').select('*').eq('username',ME_RAW);
     let {data:stories}=await supa.from('stories').select('*').order('created_at',{ascending:false});
     let {data:follows}=await supa.from('follows').select('*');
     let now=new Date()
@@ -114,27 +117,27 @@ function renderHighlights(){
   row.style.display='flex';
   row.innerHTML=hls.map((h,i)=>`<div class="hlItem" onclick="openHighlight(${i})"><div style="width:60px;height:60px;border-radius:50%;padding:2.3px;background:#fff;border:2px solid #fff"><div style="width:100%;height:100%;border-radius:50%;background:#000;padding:2px"><img src="${h.items[0].img}" style="width:100%;height:100%;border-radius:50%;object-fit:cover"></div></div><div style="font-size:10.5px;margin-top:6px;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.name} ⭐</div></div>`).join('');
 }
-function openHighlight(i){ let hls=JSON.parse(localStorage.getItem('pixoro_highlights')||'[]'); let h=hls[i]; localStorage.setItem('pixoro_temp_hl',JSON.stringify(h.items)); location.href='story-view.html?user='+ME+'&highlight='+i; }
+function openHighlight(i){ let hls=JSON.parse(localStorage.getItem('pixoro_highlights')||'[]'); let h=hls[i]; localStorage.setItem('pixoro_temp_hl',JSON.stringify(h.items)); location.href='story-view.html?user='+ME_RAW+'&highlight='+i; }
 function renderStories(){
   let bar=document.getElementById('storyBar');
   let searchQ=(document.getElementById('storySearch')?.value||'').toLowerCase().trim()
-  let meLow=ME.toLowerCase().trim()
-  let myStories = allStories.filter(s=> (s.username||'').toLowerCase().trim() === meLow);
-  let otherStories = allStories.filter(s=> (s.username||'').toLowerCase().trim()!== meLow);
-  if(searchQ){otherStories = otherStories.filter(s=> (s.username||'').toLowerCase().includes(searchQ));}
-  let grouped={}; otherStories.forEach(s=>{ let key=(s.username||'').toLowerCase(); if(!grouped[key]) grouped[key]=s })
+  let meLow=cleanUser(ME_RAW)
+  let myStories = allStories.filter(s=> cleanUser(s.username||'') === meLow);
+  let otherStories = allStories.filter(s=> cleanUser(s.username||'')!== meLow);
+  if(searchQ){otherStories = otherStories.filter(s=> cleanUser(s.username||'').includes(searchQ));}
+  let grouped={}; otherStories.forEach(s=>{ let key=cleanUser(s.username||''); if(!grouped[key]) grouped[key]=s })
   let html=''; let myPfp = getPfp(ME);
   if(myStories.length>0){ let s=myStories[0]; let seen=viewedStories.includes(s.id); let isClose=(s.audience==='close_friends'||s.is_close_friends); let ringClass = isClose? 'sRing close' : 'sRing'; html+=`<div class="sItem" onclick="openMyStory()"><div class="${ringClass} ${seen?'seen':''}"><div class="sRingInner"><img src="${myPfp}"></div></div><div class="sName">Your Story ${isClose?'💚':''}</div></div>`; } else { html+=`<div class="sItem" onclick="location.href='story-add.html'"><div class="sAddWrap"><img class="sAddImg" src="${myPfp}"><div class="sAddPlus">+</div></div><div class="sName">Your Story</div></div>`; }
-  Object.values(grouped).forEach(s=>{ let seen=viewedStories.includes(s.id); let isClose=(s.audience==='close_friends'||s.is_close_friends); let ringClass = isClose? 'sRing close' : 'sRing'; html+=`<div class="sItem" onclick="openOtherStory('${s.username}')"><div class="${ringClass} ${seen?'seen':''}"><div class="sRingInner"><img src="${getPfp(s.username)}"></div></div><div class="sName">${s.username} ${isClose?'💚':''}</div></div>` })
+  Object.values(grouped).forEach(s=>{ let seen=viewedStories.includes(s.id); let isClose=(s.audience==='close_friends'||s.is_close_friends); let ringClass = isClose? 'sRing close' : 'sRing'; html+=`<div class="sItem" onclick="openOtherStory('${s.username}')"><div class="${ringClass} ${seen?'seen':''}"><div class="sRingInner"><img src="${getPfp(s.username)}"></div></div><div class="sName">${cleanUser(s.username)} ${isClose?'💚':''}</div></div>` })
   bar.innerHTML=html;
 }
-function openMyStory(){let meLow=ME.toLowerCase();let s=allStories.find(x=> (x.username||'').toLowerCase()===meLow);if(!s) return location.href='story-add.html';if(!PLUS.ghost &&!viewedStories.includes(s.id)){viewedStories.push(s.id);localStorage.setItem('pixoro_viewed_stories',JSON.stringify(viewedStories))}location.href='story-view.html?user='+s.username+(PLUS.ghost?'&ghost=1':'')}
+function openMyStory(){let meLow=cleanUser(ME_RAW);let s=allStories.find(x=> cleanUser(x.username||'')===meLow);if(!s) return location.href='story-add.html';if(!PLUS.ghost &&!viewedStories.includes(s.id)){viewedStories.push(s.id);localStorage.setItem('pixoro_viewed_stories',JSON.stringify(viewedStories))}location.href='story-view.html?user='+s.username+(PLUS.ghost?'&ghost=1':'')}
 function openOtherStory(u){let s=allStories.find(x=> x.username===u);if(PLUS.ghost){location.href='story-view.html?user='+u+'&ghost=1';return}if(s &&!viewedStories.includes(s.id)){viewedStories.push(s.id);localStorage.setItem('pixoro_viewed_stories',JSON.stringify(viewedStories))}location.href='story-view.html?user='+u}
 function renderFeed(){
 let html='';
 let feedPosts = allPosts;
 for(let p of feedPosts){
-let lCount=allLikes.filter(l=>l.post_id==p.id).length;let isLiked=allLikes.some(l=>l.post_id==p.id&&l.username==ME);let isSaved=allSaves.some(s=>s.post_id==p.id);
+let lCount=allLikes.filter(l=>l.post_id==p.id).length;let isLiked=allLikes.some(l=>l.post_id==p.id&&l.username==ME_RAW);let isSaved=allSaves.some(s=>s.post_id==p.id);
 let likeText = p.hide_likes? '❤️ Like count hidden' : `<span id="likeCount-${p.id}">${lCount}</span> likes`
 let commentBtn = p.hide_comments? '' : `<button class="act" onclick="event.stopPropagation();openComment(${p.id})"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button>`
 let shareText = p.hide_share? '' : `<button class="act" onclick="event.stopPropagation();sharePost(${p.id})"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>`
@@ -144,42 +147,42 @@ let mediaHtml = isVid ? `<video class="main" src="${mUrl}" loop muted playsinlin
 let locHtml = p.location? `<div class="locBadge">📍 ${p.location}</div>` : ''
 let songHtml = p.song? `<div class="songBadge">🎵 ${p.song}</div>` : ''
 let aiHtml = p.is_ai? `<div class="aiBadge">✨ AI-generated</div>` : ''
-html+=`<div class="post"><div class="postTop"><div style="display:flex;align-items:center;gap:10px">${pfpHtml(p.username)}<b>@${p.username}</b> ${p.is_pinned?'📌':''}</div><span onclick="openPostMenu(${p.id})" style="cursor:pointer;padding:4px 10px;font-size:20px;font-weight:900">⋮</span></div><div style="position:relative;overflow:hidden" ondblclick="doubleLike(${p.id})" onclick="handleTap(${p.id})">${mediaHtml}${aiHtml}<div id="burst-${p.id}" class="heart-burst">❤</div></div>${locHtml}${songHtml}<div class="actions"><div class="left"><button id="likeBtn-${p.id}" class="act ${isLiked?'liked':''}" onclick="event.stopPropagation();fastLike(${p.id})"><svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg></button>${commentBtn}${shareText}</div><button class="act ${isSaved?'saved':''}" onclick="event.stopPropagation();savePost(${p.id})"><svg viewBox="0 0 24 24"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></button></div><div style="padding:0 14px"><b>${likeText}</b><br><b>@${p.username}</b> ${p.caption||''}</div></div>`
+html+=`<div class="post"><div class="postTop"><div style="display:flex;align-items:center;gap:10px">${pfpHtml(p.username)}<b onclick="openProfileFast('${p.username}')" style="cursor:pointer">@${cleanUser(p.username)}</b> ${p.is_pinned?'📌':''}</div><span onclick="openPostMenu(${p.id})" style="cursor:pointer;padding:4px 10px;font-size:20px;font-weight:900">⋮</span></div><div style="position:relative;overflow:hidden" ondblclick="doubleLike(${p.id})" onclick="handleTap(${p.id})">${mediaHtml}${aiHtml}<div id="burst-${p.id}" class="heart-burst">❤</div></div>${locHtml}${songHtml}<div class="actions"><div class="left"><button id="likeBtn-${p.id}" class="act ${isLiked?'liked':''}" onclick="event.stopPropagation();fastLike(${p.id})"><svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg></button>${commentBtn}${shareText}</div><button class="act ${isSaved?'saved':''}" onclick="event.stopPropagation();savePost(${p.id})"><svg viewBox="0 0 24 24"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></button></div><div style="padding:0 14px"><b>${likeText}</b><br><b onclick="openProfileFast('${p.username}')" style="cursor:pointer">@${cleanUser(p.username)}</b> ${p.caption||''}</div></div>`
 }
 document.getElementById('feed').innerHTML=html||'<p style="text-align:center;padding:60px;color:#666">No posts - + click panni upload pannu da!</p>'
 }
 function handleTap(id){let now=Date.now();if(now-lastTap<300){doubleLike(id);}lastTap=now;}
 function doubleLike(id){
-  let liked=allLikes.some(l=>l.post_id==id && l.username==ME);
+  let liked=allLikes.some(l=>l.post_id==id && l.username==ME_RAW);
   let burst=document.getElementById('burst-'+id);
   if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show');}
   if(liked) return;
-  allLikes.push({post_id:id,username:ME});
+  allLikes.push({post_id:id,username:ME_RAW});
   let btn=document.getElementById('likeBtn-'+id); if(btn) btn.classList.add('liked');
   let c=document.getElementById('likeCount-'+id); if(c) c.innerText=parseInt(c.innerText||'0')+1;
-  if(supa) supa.from('likes').insert({post_id:id,username:ME});
+  if(supa) supa.from('likes').insert({post_id:id,username:ME_RAW});
 }
 function fastLike(id){
-  let liked=allLikes.some(l=>l.post_id==id && l.username==ME);
+  let liked=allLikes.some(l=>l.post_id==id && l.username==ME_RAW);
   let btn=document.getElementById('likeBtn-'+id);
   let c=document.getElementById('likeCount-'+id);
   if(!liked){
-    allLikes.push({post_id:id,username:ME});
+    allLikes.push({post_id:id,username:ME_RAW});
     if(btn) btn.classList.add('liked');
     if(c) c.innerText=parseInt(c.innerText||'0')+1;
     let burst=document.getElementById('burst-'+id);
     if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show');}
-    if(supa) supa.from('likes').insert({post_id:id,username:ME});
+    if(supa) supa.from('likes').insert({post_id:id,username:ME_RAW});
   }else{
-    allLikes=allLikes.filter(l=>!(l.post_id==id && l.username==ME));
+    allLikes=allLikes.filter(l=>!(l.post_id==id && l.username==ME_RAW));
     if(btn) btn.classList.remove('liked');
     if(c) c.innerText=Math.max(0,parseInt(c.innerText||'1')-1);
-    if(supa) supa.from('likes').delete().eq('post_id',id).eq('username',ME);
+    if(supa) supa.from('likes').delete().eq('post_id',id).eq('username',ME_RAW);
   }
 }
 function openPostMenu(postId){
 currentMenuPost = allPosts.find(p=> p.id == postId); let p=currentMenuPost; if(!p) return
-let userClean=(p.username||'').toLowerCase().trim(); let meClean=(ME||'').toLowerCase().trim(); let isMine = (userClean===meClean)
+let userClean=cleanUser(p.username||''); let meClean=cleanUser(ME_RAW); let isMine = (userClean===meClean)
 let box=document.getElementById('postMenuBox')
 if(!isMine){box.innerHTML=`<div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 12px"></div><div class="menuItem" onclick="sharePost(${p.id});closePostMenu()">🔗 Share</div><div class="menuItem" onclick="closePostMenu()">🚩 Report</div><div class="menuItem" onclick="closePostMenu()" style="justify-content:center;background:#000;border-radius:12px;margin-top:10px;color:#888">Cancel</div>`}else{box.innerHTML=`<div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 12px"></div><div class="menuItem" onclick="editPost()">✏️ Edit</div><div class="menuItem" onclick="toggleHideLikes()">${p.hide_likes?'👁️ Unhide':'❤️ Hide like count'}</div><div class="menuItem" onclick="toggleHideComments()">${p.hide_comments?'💬 Turn on':'🚫 Turn off commenting'}</div><div class="menuItem" onclick="togglePin()">${p.is_pinned?'📌 Unpin':'📌 Pin'}</div><div class="menuItem" onclick="archivePost()">📦 Archive</div><div class="menuItem delete" onclick="deletePost()">🗑️ Delete</div><div class="menuItem" onclick="closePostMenu()" style="justify-content:center;background:#000;border-radius:12px;margin-top:10px;color:#888">Cancel</div>`}
 document.getElementById('postMenu').classList.add('show')
@@ -191,11 +194,11 @@ async function toggleHideComments(){if(!supa) return; let v=!currentMenuPost.hid
 async function togglePin(){if(!supa) return; let v=!currentMenuPost.is_pinned;await supa.from('posts').update({is_pinned:v}).eq('id',currentMenuPost.id);currentMenuPost.is_pinned=v;closePostMenu();loadAll();}
 async function archivePost(){if(!supa) return; await supa.from('posts').update({is_archived:true}).eq('id',currentMenuPost.id);closePostMenu();loadAll();}
 async function deletePost(){if(supa) await supa.from('posts').delete().eq('id',currentMenuPost.id);allPosts=allPosts.filter(p=>p.id!=currentMenuPost.id);renderFeed();closePostMenu();showToast('Deleted da Giri!')}
-async function savePost(id){let s=allSaves.some(x=>x.post_id==id);if(s){allSaves=allSaves.filter(x=>x.post_id!=id);if(supa) supa.from('saves').delete().eq('post_id',id).eq('username',ME);}else{allSaves.push({post_id:id});if(supa) supa.from('saves').insert({post_id:id,username:ME});}renderFeed();}
+async function savePost(id){let s=allSaves.some(x=>x.post_id==id);if(s){allSaves=allSaves.filter(x=>x.post_id!=id);if(supa) supa.from('saves').delete().eq('post_id',id).eq('username',ME_RAW);}else{allSaves.push({post_id:id});if(supa) supa.from('saves').insert({post_id:id,username:ME_RAW});}renderFeed();}
 function sharePost(id){let link=location.origin+'/post.html?id='+id; if(navigator.clipboard){navigator.clipboard.writeText(link); showToast('Link copied da!')}else{showToast(link)}}
-async function openComment(id){if(allPosts.find(p=>p.id==id)?.hide_comments){showToast('Commenting off da!');return;}currentPostId=id;document.getElementById('commentModal').style.display='flex';document.getElementById('myCommentPfp').src=getPfp(ME);if(!supa) return; let {data}=await supa.from('comments').select('*').eq('post_id',id).order('created_at',{ascending:false});document.getElementById('commentList').innerHTML=(data||[]).map(c=>`<div style="display:flex;gap:10px;padding:10px 0;align-items:flex-start"><img src="${getPfp(c.username)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0"><div style="flex:1"><b style="font-size:13px">@${c.username}</b><div style="font-size:13px;margin-top:2px">${c.text}</div></div><span onclick="this.innerText=this.innerText=='♡'?'❤️':'♡'" style="font-size:18px;cursor:pointer">♡</span></div>`).join('')||'No comments'}
+async function openComment(id){if(allPosts.find(p=>p.id==id)?.hide_comments){showToast('Commenting off da!');return;}currentPostId=id;document.getElementById('commentModal').style.display='flex';document.getElementById('myCommentPfp').src=getPfp(ME);if(!supa) return; let {data}=await supa.from('comments').select('*').eq('post_id',id).order('created_at',{ascending:false});document.getElementById('commentList').innerHTML=(data||[]).map(c=>`<div style="display:flex;gap:10px;padding:10px 0;align-items:flex-start"><img src="${getPfp(c.username)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0"><div style="flex:1"><b style="font-size:13px">@${cleanUser(c.username)}</b><div style="font-size:13px;margin-top:2px">${c.text}</div></div><span onclick="this.innerText=this.innerText=='♡'?'❤️':'♡'" style="font-size:18px;cursor:pointer">♡</span></div>`).join('')||'No comments'}
 function closeComment(){document.getElementById('commentModal').style.display='none'}
-async function addComment(){let t=document.getElementById('commentInput').value.trim();if(!t||!currentPostId||!supa)return;await supa.from('comments').insert({post_id:currentPostId,username:ME,text:t});document.getElementById('commentInput').value='';openComment(currentPostId)}
+async function addComment(){let t=document.getElementById('commentInput').value.trim();if(!t||!currentPostId||!supa)return;await supa.from('comments').insert({post_id:currentPostId,username:ME_RAW,text:t});document.getElementById('commentInput').value='';openComment(currentPostId)}
 loadAll()
 </script>
 </body></html>
