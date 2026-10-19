@@ -43,14 +43,10 @@
 .createRow{display:flex;align-items:center;gap:16px;padding:18px 20px;border-bottom:1px solid #2a2a2a;cursor:pointer}
 .createRow:active{background:#222}
 .createIco{width:44px;height:44px;border-radius:50%;border:1px solid #555;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.storageBar{margin:8px 12px;background:#111;border:1px solid #222;border-radius:12px;padding:10px}
-.storageBarInner{height:6px;background:#333;border-radius:10px;overflow:hidden;margin-top:6px}
-.storageBarFill{height:100%;background:#00C853;width:0%}
 </style></head><body>
 <div class="top"><b style="font-size:24px;font-weight:900">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="location.href='notifications.html'"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M6 8a6 6 0 0 1 12 0c0 7 6 9 6 9H0s6-2 6-9"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg></div></div></div>
 <div class="storySearchWrap"><input id="storySearch" placeholder="🔍 Search Story..." oninput="renderStories()"><span onclick="document.getElementById('storySearch').value='';renderStories()" style="color:#666;cursor:pointer">✕</span></div>
 <div class="storyBar" id="storyBar"></div>
-<div class="storageBar" id="storageBar"><div style="display:flex;justify-content:space-between;font-size:11px;color:#aaa"><span>💾 Storage Saver ON - Auto Compress</span><span id="storageText">0 KB used</span></div><div class="storageBarInner"><div class="storageBarFill" id="storageFill"></div></div></div>
 <div id="highlightRow" class="hlRow" style="display:none"></div>
 <div id="feed"><p style="text-align:center;padding:60px;color:#666">Loading...</p></div>
 <div id="toast" class="toast"></div>
@@ -67,7 +63,6 @@
 <div onclick="hideChoice()" style="text-align:center;padding:14px;color:#777;margin-top:10px">Cancel</div>
 </div></div>
 <script>
-// === PIXORO NO FULL ALERT LOCK ===
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
 window.confirm = function(msg){ showToast(msg); return true; };
@@ -79,7 +74,7 @@ let supa=null; try{ supa=window.supabase.createClient('https://yecpltndhlzfjplzh
 let ME_RAW=(localStorage.getItem('pixoro_current_user')||'Giri').trim()
 let ME=localStorage.getItem('pixoro_display_name')||cleanUser(ME_RAW)
 function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||'giri'; }
-// === STORAGE SAVER LOCK - COMPRESS + AUTO CLEAN ===
+// === SILENT COMPRESS - SCREEN LA ONNUM KAAMIKATHU, ULLUKULLA MATTUM WORK AAGUM ===
 async function compressImage(file,maxW=720,quality=0.72){
   return new Promise(res=>{
     let img=new Image(); let url=URL.createObjectURL(file);
@@ -87,12 +82,9 @@ async function compressImage(file,maxW=720,quality=0.72){
     img.src=url;
   });
 }
-function formatSize(bytes){ if(bytes<1024) return bytes+' B'; if(bytes<1048576) return (bytes/1024).toFixed(0)+' KB'; return (bytes/1048576).toFixed(1)+' MB'; }
 function updateStorageBar(){
   let total=0; for(let k in localStorage){ try{ total+=localStorage.getItem(k).length*2; }catch(e){} }
-  let el=document.getElementById('storageText'); if(el) el.innerText=formatSize(total)+' used (Local)';
-  let fill=document.getElementById('storageFill'); if(fill){ let pct=Math.min(95,(total/5242880)*100); fill.style.width=pct+'%'; fill.style.background=pct>80?'#ff3040':'#00C853'; }
-  if(total>4000000){ showToast('Storage full aaguthu da - Old Stories delete aaguthu'); cleanupExpired(); }
+  if(total>4000000){ cleanupExpired(); }
 }
 function cleanupExpired(){
   let now=Date.now();
