@@ -1,5 +1,5 @@
 const SB_URL = 'https://bpgmbywdfrfzprhmwnhn.supabase.co';
-const SB_KEY = 'PASTE_YOUR_REAL_ANON_KEY_HERE';
+const SB_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 
 async function saveToSupabase(){
   let p = getMyProfile();
