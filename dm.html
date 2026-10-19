@@ -33,6 +33,7 @@
 .createRow{display:flex;align-items:center;gap:16px;padding:18px 20px;border-bottom:1px solid #2a2a2a;cursor:pointer}
 .createRow:active{background:#222}
 .createIco{width:44px;height:44px;border-radius:50%;border:1px solid #555;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
 </style>
 </head><body>
 <div class="top">
@@ -43,10 +44,11 @@
 <span onclick="newChat()" style="font-size:18px;cursor:pointer">✏️</span>
 </div>
 </div>
-<div class="search">🔍 Search on Pixoro</div>
+<div class="search" onclick="location.href='search.html'">🔍 Search on Pixoro</div>
 <div class="notes" id="notes"></div>
 <div class="tabs"><div class="tab active">All</div><div class="tab">Primary</div><div class="tab">General</div><div class="tab">Requests</div></div>
 <div id="list" style="text-align:center;color:#555;padding:30px">Loading real chats da...</div>
+<div id="toast" class="toast"></div>
 <div class="bottom-nav">
   <a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
   <a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
@@ -64,6 +66,13 @@
 <div onclick="document.getElementById('createSheet').style.display='none'" style="margin-top:12px;text-align:center;padding:12px;color:#777">Cancel</div>
 </div></div>
 <script>
+// === PIXORO NO FULL ALERT LOCK ===
+function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
+window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
+window.confirm = function(msg){ showToast(msg); return true; };
+window.prompt = function(){ showToast('Search la name type pannu da'); location.href='search.html'; return null; };
+window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
+window.addEventListener('unhandledrejection', ()=>{ showToast('Net slow da - Try again'); });
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME_RAW=localStorage.getItem('pixoro_current_user')||'Giri'
 const ME=localStorage.getItem('pixoro_display_name')||cleanUser(ME_RAW)
@@ -78,8 +87,9 @@ function getPfp(u){
 }
 function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW); }
 updateNavPfp(); setInterval(updateNavPfp,1000);
-function newChat(){let u=prompt('Yaaruku msg da?'); if(u) location.href=`chat.html?user=${encodeURIComponent(cleanUser(u))}`}
+function newChat(){ showToast('Search la name type pannu da'); setTimeout(()=>location.href='search.html',500); }
 async function load(){
+  try{
   let {data} = await supa.from('messages').select('*').or(`sender.eq.${ME_RAW},receiver.eq.${ME_RAW}`).order('created_at',{ascending:false}).limit(100)
   let notesUsers = data? [...new Set(data.map(m=>m.sender===ME_RAW?m.receiver:m.sender))].slice(0,6) : []
   document.getElementById('notes').innerHTML = `<div class="nItem"><div class="nRing" style="background:#222"><div class="nRingInner"><img src="${getPfp(ME_RAW)}"></div><div class="noteBubble">Your note</div></div><div style="font-size:10px;margin-top:4px">${ME}</div></div>` + notesUsers.map(u=>`<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(u)}'"><div class="nRing"><div class="nRingInner"><img src="${getPfp(u)}"></div><div class="noteBubble">Hi da ❤️</div></div><div style="font-size:10px;margin-top:4px">${cleanUser(u)}</div></div>`).join('') || ''
@@ -87,8 +97,8 @@ async function load(){
   let map={}; data.forEach(m=>{let o=m.sender===ME_RAW?m.receiver:m.sender; if(!map[o]||new Date(m.created_at)>new Date(map[o].created_at)) map[o]=m})
   let chats=Object.values(map)
   document.getElementById('list').innerHTML = chats.map(c=>{let o=c.sender===ME_RAW?c.receiver:c.sender; return `<div class="chatRow" onclick="location.href='chat.html?user=${encodeURIComponent(o)}'"><img src="${getPfp(o)}"><div style="flex:1;text-align:left"><b style="font-size:13px">${cleanUser(o)}</b><div style="font-size:11px;color:#999">${c.sender===ME_RAW?'Sent':'New message'} • ${new Date(c.created_at).toLocaleTimeString()}</div></div><div style="font-size:16px">📷</div></div>`}).join('')
+  }catch(e){ showToast('Adutha side la problem da'); }
   updateNavPfp();
 }
 load()
-</script>
-</body></html>
+</script></body></html>
