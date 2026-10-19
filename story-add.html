@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Add to story</title>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Add to story</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
 body{background:#000;color:#fff;max-width:450px;margin:0 auto}
@@ -13,13 +12,11 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto}
 .cell img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
 .tabs{display:flex;justify-content:center;gap:30px;padding:14px;background:#1a1a1a;margin:12px;border-radius:24px}
 .tabs span{color:#888;font-weight:700;font-size:13px;letter-spacing:.5px}.tabs span.act{color:#fff}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
 </style></head><body>
 <div class="top"><span onclick="location.href='index.html'">✕</span><b>Add to story</b><span>⚙️</span></div>
 <div class="chips"><div class="chip">✨ Templates</div><div class="chip">🎵 Music</div><div class="chip">🖼️ Collage</div></div>
-
 <div class="recHead"><b>Recents ∨</b><span>☐ Select</span></div>
-
-<!-- INSTAGRAM MARI GRID DA - TEXT ILLA DA -->
 <div class="grid" id="grid">
   <div class="cell" onclick="openPicker()">📷<span>Camera</span></div>
   <div class="cell" onclick="openPicker()"><span style="font-size:22px">🖼️</span></div>
@@ -31,13 +28,18 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto}
   <div class="cell" onclick="openPicker()"></div>
   <div class="cell" onclick="openPicker()"></div>
 </div>
-
 <div class="tabs"><span id="tPOST" onclick="sw('POST',this)">POST</span><span id="tSTORY" class="act" onclick="sw('STORY',this)">STORY</span><span onclick="sw('REEL',this)">REEL</span><span onclick="sw('LIVE',this)">LIVE</span></div>
-
+<div id="toast" class="toast"></div>
 <input type="file" id="file" accept="image/*,video/*" hidden onchange="goNext(this)">
 <script>
+// === PIXORO NO FULL ALERT LOCK ===
+function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
+window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
+window.confirm = function(msg){ showToast(msg); return true; };
+window.prompt = function(){ showToast('Search la type pannu da'); return null; };
+window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
 function openPicker(){ document.getElementById('file').click() }
-function sw(t,el){ document.querySelectorAll('.tabs span').forEach(s=>s.classList.remove('act')); el.classList.add('act'); localStorage.setItem('pixoro_cur_tab',t); if(t=='LIVE') location.href='live.html' }
+function sw(t,el){ document.querySelectorAll('.tabs span').forEach(s=>s.classList.remove('act')); el.classList.add('act'); localStorage.setItem('pixoro_cur_tab',t); if(t=='LIVE') location.href='live.html'; if(t=='POST') location.href='post-create.html'; if(t=='REEL') location.href='reel-create.html'; }
 function goNext(inp){
   if(!inp.files[0]) return
   let f=inp.files[0]
