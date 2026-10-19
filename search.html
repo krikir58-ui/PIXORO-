@@ -63,9 +63,11 @@ input{flex:1;background:#181818;border:1px solid #222;padding:10px 12px;border-r
 </div></div>
 <script>
 const supa=supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-const ME=localStorage.getItem('pixoro_current_user')||'Giri'
-function getPfp(u){ if(!u) return 'https://i.pravatar.cc/150?u=Giri'; let p=localStorage.getItem('pixoro_gilli_pfp_'+u)||localStorage.getItem('pixoro_pfp_'+u)||localStorage.getItem('pixoro_gilli_pfp_'+u.toLowerCase())||localStorage.getItem('pixoro_pfp_'+u.toLowerCase()); if(p) return p; return `https://i.pravatar.cc/150?u=${u}`; }
-function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME); }
+const ME_RAW=localStorage.getItem('pixoro_current_user')||'Giri'
+const ME=localStorage.getItem('pixoro_display_name')||cleanUser(ME_RAW)
+function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||'giri'; }
+function getPfp(u){ if(!u) return 'https://i.pravatar.cc/150?u=Giri'; let p=localStorage.getItem('pixoro_gilli_pfp_'+u)||localStorage.getItem('pixoro_pfp_'+u)||localStorage.getItem('pixoro_gilli_pfp_'+u.toLowerCase())||localStorage.getItem('pixoro_pfp_'+u.toLowerCase()); if(p) return p; return `https://i.pravatar.cc/150?u=${encodeURIComponent(cleanUser(u))}`; }
+function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW); }
 updateNavPfp(); setInterval(updateNavPfp,1000);
 async function doSearch(){
  let q=document.getElementById('searchInput').value.trim()
@@ -76,24 +78,24 @@ async function doSearch(){
  let {data:p1}=await supa.from('posts').select('username').ilike('username','%'+q+'%')
  let {data:p2}=await supa.from('stories').select('username').ilike('username','%'+q+'%').gt('expires_at',new Date().toISOString())
  let all=[...(p1||[]).map(d=>d.username),...(p2||[]).map(d=>d.username)]
- let uniq=[...new Set(all)].filter(u=>u.toLowerCase().includes(q.toLowerCase()))
+ let uniq=[...new Set(all)].filter(u=>cleanUser(u).includes(cleanUser(q)))
  if(uniq.length==0 && q.length>=2) uniq=[q]
  let html=''
  for(let u of uniq.slice(0,20)){
-   if(u===ME) continue
-   html+=`<div class="userRow"><div style="display:flex;align-items:center;gap:10px"><img src="${getPfp(u)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover"><div><b>@${u}</b><div style="font-size:10px;color:#00ff66">🔒 Real private</div></div></div><div style="display:flex;gap:6px"><button class="viewBtn" onclick="location.href='profile.html?u=${u}'">View</button><button class="msgBtn" onclick="goMsg('${u}')">Message</button></div></div>`
+   if(cleanUser(u)===cleanUser(ME_RAW)) continue
+   html+=`<div class="userRow"><div style="display:flex;align-items:center;gap:10px" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'"><img src="${getPfp(u)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover"><div><b>@${cleanUser(u)}</b><div style="font-size:10px;color:#00ff66">🔒 Real private</div></div></div><div style="display:flex;gap:6px"><button class="viewBtn" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'">View</button><button class="msgBtn" onclick="goMsg('${u}')">Message</button></div></div>`
  }
- document.getElementById('results').innerHTML=html||`<p style="padding:20px;color:#777">No users - <span style="color:#00ff66;cursor:pointer" onclick="goMsg('${q}')">@${q} ku direct msg pannu?</span></p>`
+ document.getElementById('results').innerHTML=html||`<p style="padding:20px;color:#777">No users - <span style="color:#00ff66;cursor:pointer" onclick="goMsg('${q}')">@${cleanUser(q)} ku direct msg pannu?</span></p>`
 }
 function goMsg(u){ location.href='chat.html?user='+encodeURIComponent(u) }
 async function loadAllReal(){
  let {data}=await supa.from('posts').select('username,image_url').limit(30)
- let uniq=[...new Set((data||[]).map(d=>d.username))].filter(u=>u!==ME).slice(0,15)
+ let uniq=[...new Set((data||[]).map(d=>d.username))].filter(u=>cleanUser(u)!==cleanUser(ME_RAW)).slice(0,15)
  if(uniq.length){
    document.getElementById('hint').style.display='none'
    let html='<div style="padding:8px 12px;font-size:11px;color:#666;font-weight:700">SUGGESTED - REAL PEOPLE</div>'
    for(let u of uniq){
-     html+=`<div class="userRow"><div style="display:flex;align-items:center;gap:10px"><img src="${getPfp(u)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover"><div><b>@${u}</b><div style="font-size:10px;color:#888">Tap message to start</div></div></div><div style="display:flex;gap:6px"><button class="viewBtn" onclick="location.href='profile.html?u=${u}'">View</button><button class="msgBtn" onclick="goMsg('${u}')">Message</button></div></div>`
+     html+=`<div class="userRow"><div style="display:flex;align-items:center;gap:10px" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'"><img src="${getPfp(u)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover"><div><b>@${cleanUser(u)}</b><div style="font-size:10px;color:#888">Tap message to start</div></div></div><div style="display:flex;gap:6px"><button class="viewBtn" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'">View</button><button class="msgBtn" onclick="goMsg('${u}')">Message</button></div></div>`
    }
    document.getElementById('results').innerHTML=html
  }
