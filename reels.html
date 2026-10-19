@@ -59,6 +59,12 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden;margin
 <div id="menuSheet" class="menuSheet" onclick="if(event.target==this)closeMenu()"><div class="menuBox" id="menuBox"></div></div>
 <div id="toast" style="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;display:none"></div>
 <script>
+// === PIXORO NO FULL ALERT LOCK ===
+function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
+window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
+window.confirm = function(msg){ showToast(msg); return true; };
+window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
+window.addEventListener('unhandledrejection', ()=>{ showToast('Net slow da - Try again'); });
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 const ME_RAW=localStorage.getItem('pixoro_current_user')||'Giri'
 const ME=localStorage.getItem('pixoro_display_name')||cleanUser(ME_RAW)
@@ -72,7 +78,6 @@ function getPfp(u){
 }
 function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW); let m=document.getElementById('myCPfp'); if(m) m.src=getPfp(ME_RAW); }
 updateNavPfp(); setInterval(updateNavPfp,1000);
-function showToast(m){let t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 function openProfileFast(u){ localStorage.setItem('pixoro_view_user',u); location.href='profile.html?u='+encodeURIComponent(u); }
 let blocked=JSON.parse(localStorage.getItem('pixoro_blocked')||'[]')
 let allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allCLikes=[],curPost=null, allAds=[]
@@ -142,19 +147,19 @@ function updateLikeUI(id,liked){
 function like(id,burst=false){ if(burst) return dblLike(id); return toggleLike(id); }
 async function saveR(id){ let s=allSaves.some(x=>x.post_id==id); let svg=document.getElementById('saveSvg-'+id); if(s){ allSaves=allSaves.filter(x=>x.post_id!=id); if(svg) svg.setAttribute('fill','none'); if(supa) supa.from('saves').delete().eq('post_id',id).eq('username',ME_RAW); } else { allSaves.push({post_id:id}); if(svg) svg.setAttribute('fill','#FFD700'); if(supa) supa.from('saves').insert({post_id:id,username:ME_RAW}); } }
 async function toggleF(u,pid){ let a=allFollows.some(f=>f.follower==ME_RAW&&f.following==u); let btn=document.getElementById('followBtn-'+pid); if(a){ allFollows=allFollows.filter(f=>!(f.follower==ME_RAW&&f.following==u)); if(btn){btn.classList.remove('following');btn.innerText='Follow'} if(supa) supa.from('follows').delete().eq('follower',ME_RAW).eq('following',u); } else { allFollows.push({follower:ME_RAW,following:u}); if(btn){btn.classList.add('following');btn.innerText='Following'} if(supa) supa.from('follows').insert({follower:ME_RAW,following:u}); } }
-function shareR(){ if(navigator.share) navigator.share({url:location.href}); else prompt('Copy:',location.href) }
+function shareR(){ if(navigator.share) navigator.share({url:location.href}); else { navigator.clipboard.writeText(location.href); showToast('Link copied da!'); } }
 function openPostMenu(u,pid){ let isMine=u===ME_RAW || cleanUser(u)===cleanUser(ME_RAW); let box=document.getElementById('menuBox'); box.innerHTML=`<div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 12px"></div><div style="text-align:center;font-weight:800;padding-bottom:8px">@${cleanUser(u)}</div>${isMine?`<div class="menuItem" onclick="deletePost(${pid})">🗑️ Delete Reel</div>`:''}<div class="menuItem" onclick="blockUser('${u}')">🚫 Block @${cleanUser(u)}</div><div class="menuItem" onclick="reportUser('${u}')">🚩 Report</div><div class="menuItem" onclick="shareR()">🔗 Share</div><div class="menuItem" onclick="closeMenu()" style="justify-content:center;color:#888">Cancel</div>`; document.getElementById('menuSheet').classList.add('show'); }
 function closeMenu(){ document.getElementById('menuSheet').classList.remove('show'); }
-function blockUser(u){ if(!confirm('Block @'+cleanUser(u)+'?')) return; blocked.push(u); localStorage.setItem('pixoro_blocked',JSON.stringify(blocked)); closeMenu(); showToast('Blocked @'+cleanUser(u)); allPosts=allPosts.filter(p=>p.username!==u); render(); }
+function blockUser(u){ blocked.push(u); localStorage.setItem('pixoro_blocked',JSON.stringify(blocked)); closeMenu(); showToast('Blocked @'+cleanUser(u)); allPosts=allPosts.filter(p=>p.username!==u); render(); }
 function reportUser(u){ closeMenu(); showToast('Reported da - Team paakum da'); }
-async function deletePost(pid){ if(!confirm('Delete this reel?')) return; if(supa) await supa.from('posts').delete().eq('id',pid); closeMenu(); allPosts=allPosts.filter(p=>p.id!=pid); render(); }
+async function deletePost(pid){ if(supa) await supa.from('posts').delete().eq('id',pid); closeMenu(); allPosts=allPosts.filter(p=>p.id!=pid); render(); showToast('Deleted da'); }
 async function openC(pid){ curPost=pid; document.getElementById('cModal').style.display='flex'; updateNavPfp(); await loadC() }
 function closeC(){ document.getElementById('cModal').style.display='none'; curPost=null }
 async function loadC(){ let {data:cs}=await supa.from('comments').select('*').eq('post_id',curPost).order('created_at',{ascending:true}); let {data:ls}=await supa.from('comment_likes').select('*'); allComments=cs||[]; allCLikes=ls||[]; let list=document.getElementById('cList'); if(!allComments.length){ list.innerHTML=`<p style="text-align:center;color:#666;padding:30px">No comments yet!</p>`; return } list.innerHTML=allComments.map(c=>{ let cnt=allCLikes.filter(l=>l.comment_id==c.id).length; let liked=allCLikes.some(l=>l.comment_id==c.id&&l.username==ME_RAW); let isMe=c.username===ME_RAW || cleanUser(c.username)===cleanUser(ME_RAW); return `<div style="display:flex;gap:8px;padding:10px 0;border-bottom:1px solid #111"><img src="${getPfp(c.username)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0"><div style="flex:1"><b style="font-size:13px">@${cleanUser(c.username)}</b> <span style="font-size:13px">${c.text}</span><div style="font-size:11px;color:#777;margin-top:3px;display:flex;gap:12px"><span onclick="likeC(${c.id})" style="font-weight:700;color:${liked?'#ff3040':'#777'};cursor:pointer">${cnt>0?cnt+' likes':'Like'}</span><span onclick="likeC(${c.id})" style="cursor:pointer">${liked?'❤️':'🤍'}</span>${isMe?`<span onclick="delC(${c.id})" style="color:#ff3040;cursor:pointer">Delete</span>`:''}<span onclick="openCommentMenu('${c.username}',${c.id})" style="cursor:pointer">⋯</span></div></div></div>` }).join('') }
 function openCommentMenu(u,cid){ let isMe=u===ME_RAW || cleanUser(u)===cleanUser(ME_RAW); let box=document.getElementById('menuBox'); box.innerHTML=`<div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 12px"></div><div style="text-align:center;font-weight:800;padding-bottom:8px">@${cleanUser(u)}</div>${isMe?`<div class="menuItem" onclick="delC(${cid});closeMenu()">🗑️ Delete Comment</div>`:''}<div class="menuItem" onclick="blockUser('${u}')">🚫 Block @${cleanUser(u)}</div><div class="menuItem" onclick="reportUser('${u}')">🚩 Report Comment</div><div class="menuItem" onclick="closeMenu()" style="justify-content:center;color:#888">Cancel</div>`; document.getElementById('menuSheet').classList.add('show'); }
 async function addC(){ let t=document.getElementById('cInput').value.trim(); if(!t||!curPost) return; await supa.from('comments').insert({post_id:curPost,username:ME_RAW,text:t}); document.getElementById('cInput').value=''; await loadC() }
 async function likeC(cid){ let liked=allCLikes.some(l=>l.comment_id==cid&&l.username==ME_RAW); if(liked){ allCLikes=allCLikes.filter(l=>!(l.comment_id==cid&&l.username==ME_RAW)); if(supa) await supa.from('comment_likes').delete().eq('comment_id',cid).eq('username',ME_RAW); } else { allCLikes.push({comment_id:cid,username:ME_RAW}); if(supa) await supa.from('comment_likes').insert({comment_id:cid,username:ME_RAW}); } await loadC() }
-async function delC(cid){ if(!confirm('Delete?')) return; let c=allComments.find(x=>x.id==cid); if(c && c.username!==ME_RAW && cleanUser(c.username)!==cleanUser(ME_RAW)) return alert('Your comment only!'); await supa.from('comments').delete().eq('id',cid); await loadC() }
+async function delC(cid){ let c=allComments.find(x=>x.id==cid); if(c && c.username!==ME_RAW && cleanUser(c.username)!==cleanUser(ME_RAW)){ showToast('Ithu un comment illa da'); return; } await supa.from('comments').delete().eq('id',cid); await loadC(); showToast('Deleted da'); }
 load()
 </script>
 </body></html>
