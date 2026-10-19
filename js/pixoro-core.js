@@ -1,4 +1,4 @@
-const SB_URL = 'https://bpgmbywdfrfzprhmwnhn.supabase.co';
+const SB_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SB_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 
 async function saveToSupabase(){
@@ -10,7 +10,6 @@ async function saveToSupabase(){
   });
 }
 
-// PIXORO CORE - ELLA EDATHULAYUM MAARUM DA
 function getMyProfile(){
   return {
     username: localStorage.getItem('pixoro_user_id') || 'giri_official',
@@ -30,11 +29,9 @@ function saveEdit(){
   let newU = document.getElementById('editUsername').value.trim().toLowerCase().replace('@','');
   let newN = document.getElementById('editName').value.trim();
   let newP = document.getElementById('editPfpPreview')?.dataset?.new;
-
   if(newU) localStorage.setItem('pixoro_user_id', newU);
   if(newN) localStorage.setItem('pixoro_display_name', newN);
   if(newP) localStorage.setItem('pixoro_profile_pic', newP);
-
   saveToSupabase();
   updateAllProfiles();
   setTimeout(()=> location.reload(), 500);
