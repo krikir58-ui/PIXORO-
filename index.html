@@ -82,14 +82,29 @@ let viewedStories=JSON.parse(localStorage.getItem('pixoro_viewed_stories')||'[]'
 let lastTap=0
 let PLUS=JSON.parse(localStorage.getItem('pixoro_plus')||'{"ghost":false,"48h":true,"rewatch":true,"search":true,"audience":"everyone"}')
 function showToast(m){let t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
+
+// === FIXED: Profile photo thaan Story la varum - Fake photo illa ===
 function getPfp(u){
-  if(!u) return 'https://i.pravatar.cc/150?u=Giri';
-  let p = localStorage.getItem('pixoro_gilli_pfp_'+u) || localStorage.getItem('pixoro_pfp_'+u) || localStorage.getItem('pixoro_gilli_pfp_'+u.toLowerCase()) || localStorage.getItem('pixoro_pfp_'+u.toLowerCase());
-  if(p) return p;
-  return `https://i.pravatar.cc/150?u=${encodeURIComponent(cleanUser(u))}`;
+  if(!u) return '';
+  let clean = cleanUser(u);
+  let keys = [
+    'pixoro_pfp_'+u, 'pixoro_pfp_'+clean,
+    'pixoro_gilli_pfp_'+u, 'pixoro_gilli_pfp_'+clean,
+    'pixoro_pfp_'+ME_RAW, 'pixoro_pfp_'+ME,
+    'pixoro_profile_pic','pixoro_current_pfp','profile_pic'
+  ];
+  for(let k of keys){
+    let p = localStorage.getItem(k);
+    if(p && (p.startsWith('data:') || p.startsWith('http') || p.startsWith('blob:'))) return p;
+  }
+  // Local la illana - Profile page la irunthu edukanum
+  let nav = document.getElementById('navPfp');
+  if(nav && nav.src && !nav.src.includes('pravatar') && nav.src.length > 10) return nav.src;
+  // Vera vazhi illa na - Grey circle kaamiku, Fake photo vendaam
+  return 'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><circle cx="75" cy="75" r="75" fill="%23333"/><text x="75" y="90" font-size="60" text-anchor="middle" fill="white">G</text></svg>');
 }
-function pfpHtml(u){return `<div class="pfpRing" onclick="event.stopPropagation();openProfileFast('${u}')"><div class="pfpInner"><img src="${getPfp(u)}"></div></div>`}
-function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME); }
+function pfpHtml(u){return `<div class="pfpRing" onclick="event.stopPropagation();openProfileFast('${u}')"><div class="pfpInner"><img src="${getPfp(u)}" onerror="this.src='${getPfp(ME_RAW)}'"></div></div>`}
+function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el){ let p=getPfp(ME_RAW)||getPfp(ME); if(p) el.src=p; } }
 updateNavPfp(); setInterval(updateNavPfp,1000);
 async function loadAll(){
   try{
@@ -126,7 +141,9 @@ function renderStories(){
   let otherStories = allStories.filter(s=> cleanUser(s.username||'')!== meLow);
   if(searchQ){otherStories = otherStories.filter(s=> cleanUser(s.username||'').includes(searchQ));}
   let grouped={}; otherStories.forEach(s=>{ let key=cleanUser(s.username||''); if(!grouped[key]) grouped[key]=s })
-  let html=''; let myPfp = getPfp(ME);
+  let html=''; 
+  // FIXED: Profile photo ve Story la use pannuren
+  let myPfp = getPfp(ME_RAW) || getPfp(ME);
   if(myStories.length>0){ let s=myStories[0]; let seen=viewedStories.includes(s.id); let isClose=(s.audience==='close_friends'||s.is_close_friends); let ringClass = isClose? 'sRing close' : 'sRing'; html+=`<div class="sItem" onclick="openMyStory()"><div class="${ringClass} ${seen?'seen':''}"><div class="sRingInner"><img src="${myPfp}"></div></div><div class="sName">Your Story ${isClose?'💚':''}</div></div>`; } else { html+=`<div class="sItem" onclick="location.href='story-add.html'"><div class="sAddWrap"><img class="sAddImg" src="${myPfp}"><div class="sAddPlus">+</div></div><div class="sName">Your Story</div></div>`; }
   Object.values(grouped).forEach(s=>{ let seen=viewedStories.includes(s.id); let isClose=(s.audience==='close_friends'||s.is_close_friends); let ringClass = isClose? 'sRing close' : 'sRing'; html+=`<div class="sItem" onclick="openOtherStory('${s.username}')"><div class="${ringClass} ${seen?'seen':''}"><div class="sRingInner"><img src="${getPfp(s.username)}"></div></div><div class="sName">${cleanUser(s.username)} ${isClose?'💚':''}</div></div>` })
   bar.innerHTML=html;
