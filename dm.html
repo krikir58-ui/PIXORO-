@@ -30,10 +30,9 @@
 .bottom-nav a.active span{color:#fff;font-weight:700}
 .bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #555;background:#111}
 .bottom-nav a.active img.navPfp{border-color:#fff}
-.pixSheet{background:#0a0a0a;border-top:2px solid #fff;border-radius:28px 28px 0 0;padding:24px 16px 28px;width:100%;max-width:450px}
-.goldCard{background:#000;border:2px solid #fff;border-radius:20px;padding:22px 10px;text-align:center}
-.goldCard b{font-size:16px;color:#fff;display:block;margin-top:6px}
-.goldCard small{font-size:11px;color:#aaa;display:block;margin-top:4px}
+.createRow{display:flex;align-items:center;gap:16px;padding:18px 20px;border-bottom:1px solid #2a2a2a;cursor:pointer}
+.createRow:active{background:#222}
+.createIco{width:44px;height:44px;border-radius:50%;border:1px solid #555;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
 </style>
 </head><body>
 <div class="top">
@@ -55,17 +54,13 @@
   <a href="dm.html" class="active"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
   <a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a>
 </div>
-<div id="createSheet" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:flex-end;justify-content:center" onclick="if(event.target.id=='createSheet')this.style.display='none'"><div class="pixSheet">
-<div style="width:50px;height:5px;background:#fff;border-radius:10px;margin:0 auto 16px"></div>
-<div style="text-align:center;font-size:24px;font-weight:900;color:#fff">Create New</div>
-<div style="text-align:center;font-size:12px;color:#aaa;margin-top:4px">Start something amazing</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px">
-<div class="goldCard" onclick="location.href='post-create.html'"><div style="font-size:32px;color:#fff">✎</div><b>Post</b><small>Share a photo</small></div>
-<div class="goldCard" onclick="location.href='reel-create.html'"><div style="font-size:32px;color:#fff">🎬</div><b>Reels</b><small>Short video</small></div>
-<div class="goldCard" onclick="location.href='story-create.html'"><div style="font-size:32px;color:#fff">⊕</div><b>Story</b><small>24-hour story</small></div>
-<div class="goldCard" onclick="location.href='live.html'"><div style="font-size:32px;color:#fff">◉</div><b>Live</b><small>Go live now</small></div>
-</div>
-<div style="text-align:center;margin-top:20px;font-size:11px;letter-spacing:5px;color:#fff">PIXORO • PREMIUM</div>
+<div id="createSheet" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:flex-end;justify-content:center" onclick="if(event.target.id=='createSheet')this.style.display='none'"><div style="background:#1a1a1a;border-radius:28px 28px 0 0;padding:20px 0 30px;width:100%;max-width:450px">
+<div style="width:50px;height:5px;background:#333;border-radius:10px;margin:0 auto 16px"></div>
+<div style="text-align:center;font-size:22px;font-weight:900;margin-bottom:10px">Create</div>
+<div class="createRow" onclick="location.href='post-create.html'"><div class="createIco">+</div><div style="flex:1"><b>Post</b><div style="font-size:12px;color:#888">Share a photo or update</div></div><span>›</span></div>
+<div class="createRow" onclick="location.href='reel-create.html'"><div class="createIco">▶</div><div style="flex:1"><b>Reels</b><div style="font-size:12px;color:#888">Create a short reel video</div></div><span>›</span></div>
+<div class="createRow" onclick="location.href='story-create.html'"><div class="createIco" style="border-style:dashed">◯</div><div style="flex:1"><b>Story</b><div style="font-size:12px;color:#888">Share a 24-hour story</div></div><span>›</span></div>
+<div class="createRow" style="border-bottom:none" onclick="location.href='live.html'"><div class="createIco">((•))</div><div style="flex:1"><b>Live</b><div style="font-size:12px;color:#888">Go live now</div></div><span>›</span></div>
 <div onclick="document.getElementById('createSheet').style.display='none'" style="margin-top:12px;text-align:center;padding:12px;color:#777">Cancel</div>
 </div></div>
 <script>
@@ -74,7 +69,13 @@ const ME_RAW=localStorage.getItem('pixoro_current_user')||'Giri'
 const ME=localStorage.getItem('pixoro_display_name')||cleanUser(ME_RAW)
 function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||'giri'; }
 document.getElementById('topName').innerText = ME + ' ▾';
-function getPfp(u){ if(!u) return 'https://i.pravatar.cc/150?u=Giri'; let p=localStorage.getItem('pixoro_gilli_pfp_'+u)||localStorage.getItem('pixoro_pfp_'+u)||localStorage.getItem('pixoro_gilli_pfp_'+u.toLowerCase())||localStorage.getItem('pixoro_pfp_'+u.toLowerCase()); if(p) return p; return `https://i.pravatar.cc/150?u=${encodeURIComponent(cleanUser(u))}`; }
+function getPfp(u){
+  if(!u) return '';
+  let clean = cleanUser(u);
+  let keys = ['pixoro_pfp_'+u,'pixoro_pfp_'+clean,'pixoro_gilli_pfp_'+u,'pixoro_gilli_pfp_'+clean,'pixoro_pfp_'+ME_RAW,'pixoro_pfp_'+ME,'pixoro_profile_pic','pixoro_current_pfp','profile_pic'];
+  for(let k of keys){ let p=localStorage.getItem(k); if(p && (p.startsWith('data:')||p.startsWith('http')||p.startsWith('blob:'))) return p; }
+  return 'data:image/svg+xml;utf8,[STRIPPED]'+clean.charAt(0).toUpperCase()+'</text></svg>';
+}
 function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW); }
 updateNavPfp(); setInterval(updateNavPfp,1000);
 function newChat(){let u=prompt('Yaaruku msg da?'); if(u) location.href=`chat.html?user=${encodeURIComponent(cleanUser(u))}`}
