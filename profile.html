@@ -26,10 +26,10 @@
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;display:none;white-space:nowrap}
 input[type=range]{width:100%;accent-color:#fff}
 </style></head><body>
-<div class="top"><b style="font-size:20px;font-weight:900" id="topUsername">@giri</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div><div class="bellWhite" onclick="location.href='notifications.html'">🔔</div><span onclick="openSettings()" style="font-size:20px;cursor:pointer">☰</span></div></div>
+<div class="top"><b style="font-size:20px;font-weight:900" id="topUsername">giri</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div><div class="bellWhite" onclick="location.href='notifications.html'">🔔</div><span onclick="openSettings()" style="font-size:20px;cursor:pointer">☰</span></div></div>
 <div style="padding:15px">
 <div style="display:flex;gap:18px;align-items:center"><div class="pfpBig" onclick="openEditSheet()"><div class="pfpBigInner"><img id="pfpImg" src=""></div></div><div class="stats"><div><b id="postCount">0</b><span>Posts</span></div><div><b id="followerCount">0</b><span>Followers</span></div><div><b id="followingCount">0</b><span>Following</span></div></div></div>
-<div style="margin-top:14px"><div style="display:flex;gap:6px"><b id="displayName">Giri</b><span style="width:16px;height:16px;background:#0095f6;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:10px">✓</span></div><div style="font-size:13px;color:#aaa">@<span id="usernameTag">giri_official</span></div><div id="bioText" style="font-size:14px;margin-top:8px"></div><div id="linkText" style="font-size:13px;color:#0095f6;margin-top:6px"></div></div>
+<div style="margin-top:14px"><div style="display:flex;gap:6px"><b id="displayName">Giri</b><span style="width:16px;height:16px;background:#0095f6;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:10px">✓</span></div><div style="font-size:13px;color:#aaa"><span id="usernameTag">giri</span></div><div id="bioText" style="font-size:14px;margin-top:8px"></div><div id="linkText" style="font-size:13px;color:#0095f6;margin-top:6px"></div></div>
 <div class="highlights" id="highlightList"></div>
 <div style="display:flex;gap:8px;margin-top:12px"><button class="btn btnPrimary" onclick="openEditSheet()">Edit Profile</button><button class="btn" onclick="shareProfile()">Share Profile</button></div>
 <div style="display:flex;border-top:1px solid #222;margin-top:18px"><div class="tab active" id="tabPosts" onclick="showTab('all')">⊞ Posts</div><div class="tab" id="tabReels" onclick="showTab('reels')">🎬 Reels</div><div class="tab" onclick="location.href='saved.html'">🔖 Saved</div></div>
@@ -45,13 +45,12 @@ input[type=range]{width:100%;accent-color:#fff}
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 window.alert=function(msg){showToast(String(msg||'').slice(0,40)||'Adutha side la problem da')}; window.confirm=function(msg){showToast(msg); return true}; window.onerror=function(){showToast('Adutha side la problem da'); return true};
 let supa=null; try{ supa=window.supabase?window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_'):null }catch(e){ supa=null }
-let ME_RAW=localStorage.getItem('pixoro_current_user')||'Giri'
+let ME_RAW=localStorage.getItem('pixoro_user_id')||localStorage.getItem('pixoro_current_user')||'Giri'
 let ME=localStorage.getItem('pixoro_display_name')||cleanUser(ME_RAW)
 function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||'giri'; }
-function displayNameFor(u){ if(!u) return ME; let c=cleanUser(u); if(c===cleanUser(ME_RAW)||c===cleanUser(localStorage.getItem('pixoro_old_user')||'')) return ME; return c; }
-function isMyUser(u){ let c=cleanUser(u); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||''); }
-// OREY PHOTO ELLA EDATHULAYUM - SINGLE SOURCE
-function isMyPostUser(u){ let c=cleanUser(u||''); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||'')||c==='krikir58'||c.includes('kri')||c==='giri'||!c; }
+function displayNameFor(u){ if(!u) return ME; let c=cleanUser(u); let oldC=cleanUser(localStorage.getItem('pixoro_old_user')||''); let uid=localStorage.getItem('pixoro_user_id')||ME_RAW; if(c===oldC||c===cleanUser(ME_RAW)) return localStorage.getItem('pixoro_display_name')||cleanUser(uid); return c; }
+function isMyUser(u){ let c=cleanUser(u); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||'')||c===cleanUser(localStorage.getItem('pixoro_user_id')||''); }
+function isMyPostUser(u){ let c=cleanUser(u||''); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||'')||c===cleanUser(localStorage.getItem('pixoro_user_id')||'')||c==='krikir58'||c.includes('kri')||c==='giri'||!c; }
 let myPosts=[]; let protectOn=JSON.parse(localStorage.getItem('pixoro_protect_'+ME_RAW)||'false')
 let loginSettings=JSON.parse(localStorage.getItem('pixoro_login_settings')||'{"google":true,"pass":true,"otp":true,"forgot":true,"remember":true,"auto":true}')
 function getPfp(u){
@@ -74,7 +73,7 @@ async function doSignup(){ let em=document.getElementById('loginEmail').value,ps
 async function showOtp(){ let em=document.getElementById('loginEmail').value.trim(); if(!em) return loginMsg('Email podu da'); let {error}=await supa.auth.signInWithOtp({email:em,options:{shouldCreateUser:true}}); if(error) loginMsg(error.message); else document.getElementById('otpArea').style.display='block' }
 async function verifyOtp(){ let em=document.getElementById('loginEmail').value.trim(),tk=document.getElementById('otpCode').value.trim(); let {error}=await supa.auth.verifyOtp({email:em,token:tk,type:'email'}); if(error) return loginMsg('OTP thappu da'); saveAcc(em); location.href='index.html' }
 async function forgot(){ let em=document.getElementById('loginEmail').value.trim(); if(!em) return loginMsg('Email podu da'); let {error}=await supa.auth.signInWithOtp({email:em,options:{shouldCreateUser:false}}); if(error) loginMsg(error.message); else document.getElementById('otpArea').style.display='block' }
-function switchPixoroAcc(email){ if(cleanUser(email)===cleanUser(ME_RAW)) return; localStorage.setItem('pixoro_current_user',email); localStorage.setItem('pixoro_display_name',cleanUser(email)); location.reload(); }
+function switchPixoroAcc(email){ if(cleanUser(email)===cleanUser(ME_RAW)) return; localStorage.setItem('pixoro_current_user',email); localStorage.setItem('pixoro_user_id',cleanUser(email)); localStorage.setItem('pixoro_display_name',cleanUser(email)); location.reload(); }
 let logoutArmed=false;
 async function doPixoroLogout(){ if(!logoutArmed){ logoutArmed=true; showToast('Logout panna marubadiyum click pannu da'); setTimeout(()=>logoutArmed=false,2500); return; } if(supa) await supa.auth.signOut(); ['pixoro_current_user','pixoro_display_name','pixoro_local_posts','pixoro_local_stories','pixoro_viewed_stories','pixoro_highlights','pixoro_plus','pixoro_gilli_pfp_'+ME_RAW].forEach(k=>localStorage.removeItem(k)); sessionStorage.clear(); location.href='login.html'; }
 function updateProtectUI(){ let t=document.getElementById('protectToggle'); if(t) t.classList.toggle('on',protectOn); document.getElementById('protectStatus').innerText=protectOn?'ON 🔒':'OFF 🔓' }
@@ -84,9 +83,9 @@ function showTab(type){ document.getElementById('tabPosts').classList.toggle('ac
 function loadProfile(){
   let target=new URLSearchParams(location.search).get('u')||ME_RAW;
   let isMine=isMyUser(target)||isMyPostUser(target);
-  let display = isMine ? (localStorage.getItem('pixoro_name_'+ME_RAW)||ME) : (localStorage.getItem('pixoro_name_'+target)||cleanUser(target));
-  let uname = isMine ? ME : cleanUser(target);
-  document.getElementById('topUsername').textContent='@'+uname;
+  let display = isMine ? (localStorage.getItem('pixoro_name_'+ME_RAW)||localStorage.getItem('pixoro_display_name')||ME) : (localStorage.getItem('pixoro_name_'+target)||cleanUser(target));
+  let uname = isMine ? (localStorage.getItem('pixoro_user_id')||ME) : cleanUser(target);
+  document.getElementById('topUsername').textContent=uname;
   document.getElementById('displayName').textContent=display;
   document.getElementById('usernameTag').textContent=uname;
   document.getElementById('bioText').innerText=localStorage.getItem('pixoro_bio_'+ME_RAW)||localStorage.getItem('pixoro_bio_'+target)||'🔥 Tiruchengode ➡️ World\n👨‍💻 Pixoro Founder';
@@ -96,7 +95,6 @@ function loadProfile(){
   updateProtectUI(); applyLoginSettings(); loadHighlights(); updateNavPfp();
   let t=cleanUser(target); let oldC=cleanUser(localStorage.getItem('pixoro_old_user')||'');
   let local=JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
-  // FIXED DA - POST COUNT 0 VARATHU - giri / krikir58 ella post um count aagum da
   myPosts=local.filter(p=> isMyPostUser(p.username) || cleanUser(p.username||'')==t || cleanUser(p.username||'')==oldC);
   document.getElementById('postCount').textContent=myPosts.length;
   renderGrid(myPosts);
@@ -116,11 +114,10 @@ function loadProfile(){
 function loadHighlights(){ let s=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME_RAW)||'[]'); document.getElementById('highlightList').innerHTML=s.map(h=>`<div class="h-item"><div class="h-circle">${h.emoji}</div><div class="h-text">${h.title}</div></div>`).join('')+`<div class="h-item" onclick="addHighlight()"><div class="h-circle">➕</div><div class="h-text">New</div></div>` }
 function addHighlight(){ let s=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME_RAW)||'[]'); let t='My Highlight '+(s.length+1); s.push({emoji:'⭐',title:t}); localStorage.setItem('pixoro_highlights_'+ME_RAW,JSON.stringify(s)); loadHighlights(); showToast('Highlight Added da ⭐'); }
 function openSettings(){ document.getElementById('setSheet').style.display='flex'; applyLoginSettings() }
-function openEditSheet(){ document.getElementById('editName').value=localStorage.getItem('pixoro_name_'+ME_RAW)||ME; document.getElementById('editUsername').value=localStorage.getItem('pixoro_uname_'+ME_RAW)||ME; document.getElementById('editBio').value=localStorage.getItem('pixoro_bio_'+ME_RAW)||''; document.getElementById('editLink').value=localStorage.getItem('pixoro_link_'+ME_RAW)||''; document.getElementById('editSheet').style.display='flex' }
+function openEditSheet(){ document.getElementById('editName').value=localStorage.getItem('pixoro_name_'+ME_RAW)||ME; document.getElementById('editUsername').value=localStorage.getItem('pixoro_user_id')||ME; document.getElementById('editBio').value=localStorage.getItem('pixoro_bio_'+ME_RAW)||''; document.getElementById('editLink').value=localStorage.getItem('pixoro_link_'+ME_RAW)||''; document.getElementById('editSheet').style.display='flex' }
 let cropX=0,cropY=0,cropScale=1.2,cropDragging=false,cropStartX=0,cropStartY=0,cropOrigX=0,cropOrigY=0,cropImgEl=document.getElementById('cropImg');
 function updateCropTransform(){ cropImgEl.style.transform=`translate(${cropX}px,${cropY}px) scale(${cropScale})`; }
-function openCrop(src){ cropX=0; cropY=0; cropScale=1.2; document.getElementById('zoomRange').value=1.2; cropImgEl.src=src; cropImgEl.onload=()=>{ // Photo va circle ku full ah fill pannu da - cover mathiri
-    let w=cropImgEl.naturalWidth, h=cropImgEl.naturalHeight; if(w>h){ cropImgEl.style.width='auto'; cropImgEl.style.height='280px'; } else { cropImgEl.style.width='280px'; cropImgEl.style.height='auto'; } updateCropTransform(); }; document.getElementById('cropOverlay').style.display='flex'; document.getElementById('editSheet').style.display='none'; }
+function openCrop(src){ cropX=0; cropY=0; cropScale=1.2; document.getElementById('zoomRange').value=1.2; cropImgEl.src=src; cropImgEl.onload=()=>{ let w=cropImgEl.naturalWidth, h=cropImgEl.naturalHeight; if(w>h){ cropImgEl.style.width='auto'; cropImgEl.style.height='280px'; } else { cropImgEl.style.width='280px'; cropImgEl.style.height='auto'; } updateCropTransform(); }; document.getElementById('cropOverlay').style.display='flex'; document.getElementById('editSheet').style.display='none'; }
 function closeCrop(){ document.getElementById('cropOverlay').style.display='none'; }
 function resetCrop(){ cropX=0; cropY=0; cropScale=1.2; document.getElementById('zoomRange').value=1.2; updateCropTransform(); }
 document.getElementById('zoomRange').addEventListener('input',e=>{ cropScale=parseFloat(e.target.value); updateCropTransform(); });
@@ -128,7 +125,6 @@ let circle=document.getElementById('cropCircle');
 circle.addEventListener('pointerdown',e=>{ cropDragging=true; cropStartX=e.clientX; cropStartY=e.clientY; cropOrigX=cropX; cropOrigY=cropY; circle.setPointerCapture(e.pointerId); });
 circle.addEventListener('pointermove',e=>{ if(!cropDragging) return; cropX=cropOrigX+(e.clientX-cropStartX); cropY=cropOrigY+(e.clientY-cropStartY); cropX=Math.max(-140,Math.min(140,cropX)); cropY=Math.max(-140,Math.min(140,cropY)); updateCropTransform(); });
 circle.addEventListener('pointerup',()=>cropDragging=false);
-// FIXED DA - CIRCLE KU ULLA CORRECT AH VARUM
 function applyCrop(){
   let canvas=document.createElement('canvas'); canvas.width=400; canvas.height=400; let ctx=canvas.getContext('2d');
   let img=new Image(); img.onload=()=>{
@@ -144,23 +140,30 @@ function applyCrop(){
   }; img.src=cropImgEl.src;
 }
 document.getElementById('pfpInput').addEventListener('change',e=>{ let f=e.target.files[0]; if(!f)return; let r=new FileReader(); r.onload=ev=>{ openCrop(ev.target.result) }; r.readAsDataURL(f) })
+// ===== FULL SYNC DA - USERNAME MAATHINA ELLA EDATHULAYUM MAARUM =====
 function saveEdit(){
   let n=document.getElementById('editName').value.trim(),u=document.getElementById('editUsername').value.trim(),b=document.getElementById('editBio').value,l=document.getElementById('editLink').value,np=document.getElementById('editPfpPreview').dataset.new;
-  let newU=u?cleanUser(u):ME;
-  localStorage.setItem('pixoro_old_user', ME_RAW);
-  if(n) localStorage.setItem('pixoro_name_'+ME_RAW,n);
+  let oldU=cleanUser(ME_RAW); let newU=u?cleanUser(u):oldU;
+  localStorage.setItem('pixoro_old_user', oldU);
+  localStorage.setItem('pixoro_user_id', newU);
+  localStorage.setItem('pixoro_current_user', newU);
+  localStorage.setItem('pixoro_display_name', n||newU);
+  localStorage.setItem('pixoro_uname_'+newU, newU);
+  localStorage.setItem('pixoro_uname_'+oldU, newU);
   if(n) localStorage.setItem('pixoro_name_'+newU,n);
-  localStorage.setItem('pixoro_uname_'+ME_RAW,newU);
-  localStorage.setItem('pixoro_uname_'+newU,newU);
-  localStorage.setItem('pixoro_display_name',newU);
-  localStorage.setItem('pixoro_current_user',newU);
-  if(b) localStorage.setItem('pixoro_bio_'+ME_RAW,b);
   if(b) localStorage.setItem('pixoro_bio_'+newU,b);
-  if(l) localStorage.setItem('pixoro_link_'+ME_RAW,l);
   if(l) localStorage.setItem('pixoro_link_'+newU,l);
-  if(np){ localStorage.setItem('pixoro_profile_pic',np); localStorage.setItem('pixoro_current_pfp',np); localStorage.setItem('pixoro_pfp_'+ME_RAW,np); localStorage.setItem('pixoro_pfp_'+newU,np); localStorage.setItem('pixoro_gilli_pfp_'+ME_RAW,np); localStorage.setItem('pixoro_gilli_pfp_'+newU,np); }
+  // POST / REELS / STORY ELLATHULAYUM USERNAME MAATHU DA
+  ['pixoro_local_posts','pixoro_local_stories','pixoro_local_reels','pixoro_local_saved'].forEach(k=>{
+    try{ let arr=JSON.parse(localStorage.getItem(k)||'[]'); arr.forEach(p=>{ if(cleanUser(p.username||'')==oldU||cleanUser(p.username||'')=='krikir58') p.username=newU; }); localStorage.setItem(k,JSON.stringify(arr)); }catch(e){}
+  });
+  // FOLLOW / LIKE LIST LA KUDU
+  ['pixoro_follows','pixoro_likes'].forEach(k=>{ try{ let arr=JSON.parse(localStorage.getItem(k)||'[]'); arr.forEach(p=>{ if(p.username&&cleanUser(p.username)==oldU) p.username=newU; }); localStorage.setItem(k,JSON.stringify(arr)); }catch(e){} });
+  if(np){ localStorage.setItem('pixoro_profile_pic',np); localStorage.setItem('pixoro_current_pfp',np); localStorage.setItem('pixoro_pfp_'+newU,np); }
+  // SUPABASE LA KUDU UPDATE PANNU DA
+  if(supa){ supa.from('posts').update({username:newU}).eq('username',oldU); }
   document.getElementById('editSheet').style.display='none';
-  showToast('Saved da! '+newU+' nu mariduchu ✅');
+  showToast('Username full ah maariduchu da ✅ '+newU);
   loadProfile(); updateNavPfp(); setTimeout(()=>location.reload(),700);
 }
 function shareProfile(){ navigator.clipboard.writeText(location.href).then(()=>showToast('Profile Link Copy aayiduchu da!')).catch(()=>showToast('Profile Link Copy aayiduchu da!')) }
