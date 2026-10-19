@@ -44,10 +44,10 @@
 <div style="display:flex;border-top:1px solid #222;margin-top:18px"><div class="tab active" id="tabPosts" onclick="showTab('all')">⊞ Posts</div><div class="tab" id="tabReels" onclick="showTab('reels')">🎬 Reels</div><div class="tab" onclick="location.href='saved.html'">🔖 Saved</div></div>
 <div id="myGrid" class="grid"></div>
 </div>
-<div id="setSheet" class="setSheet"><div class="sheetBox"><div style="width:40px;height:4px;background:#fff;border-radius:10px;margin:12px auto"></div><div style="text-align:center;font-weight:900;padding-bottom:12px;color:#fff">Pixoro Settings ⚙️ 🔒</div>
+<div id="setSheet" class="setSheet"><div class="sheetBox"><div style="width:40px;height:4px;background:#fff;border-radius:10px;margin:12px auto"></div><div style="text-align:center;font-weight:900;padding-bottom:12px;color:#fff">Pixoro Settings ⚙️</div>
 <div class="sItem" onclick="openEditSheet()"><span>👤 Edit Profile</span><span>›</span></div>
 <div class="sItem" onclick="toggleProtect()"><span>🔒 Photo Protection</span><span id="protectStatus">›</span></div>
-<div style="padding:14px 18px 6px"><b style="color:#fff;font-size:13px">🔐 ACCOUNTS - SECURE</b><div style="font-size:11px;color:#888">PIN lock - Hack panna mudiyathu da</div></div>
+<div style="padding:14px 18px 6px"><b style="color:#fff;font-size:13px">🔐 ACCOUNTS</b><div style="font-size:11px;color:#888">Switch account - No PIN needed</div></div>
 <div id="accList" style="padding:0 18px"></div>
 <div class="loginRow"><div><b style="font-size:13px">Google Login</b><small>Continue with Google</small></div><div class="toggle on" id="sw_google" onclick="toggleLoginSw('google',this)"><div class="toggleKnob"></div></div></div>
 <div class="loginRow"><div><b style="font-size:13px">Password Login</b><small>Email + Password</small></div><div class="toggle on" id="sw_pass" onclick="toggleLoginSw('pass',this)"><div class="toggleKnob"></div></div></div>
@@ -64,27 +64,28 @@
 <div id="createSheet" class="createSheet"><div class="pixSheet"><div style="text-align:center;font-size:24px;font-weight:900;color:#fff">Create New</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px"><div class="goldCard" onclick="location.href='post-create.html'"><b>Post</b><small>Share a photo</small></div><div class="goldCard" onclick="location.href='reel-create.html'"><b>Reels</b><small>Short video</small></div><div class="goldCard" onclick="location.href='story-create.html'"><b>Story</b><small>24-hour story</small></div><div class="goldCard" onclick="location.href='live.html'"><b>Live</b><small>Go live now</small></div></div><div onclick="document.getElementById('createSheet').style.display='none'" style="margin-top:12px;text-align:center;padding:12px;color:#777">Cancel</div></div></div>
 <script>
 let supa=null; try{ supa=window.supabase?window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_'):null }catch(e){ supa=null }
-let ME=localStorage.getItem('pixoro_current_user')||'Giri'
-let PIXORO_PIN = localStorage.getItem('pixoro_pin') || "2026";
-let myPosts=[]; let protectOn=JSON.parse(localStorage.getItem('pixoro_protect_'+ME)||'false')
+let ME_RAW=localStorage.getItem('pixoro_current_user')||'Giri'
+let ME=localStorage.getItem('pixoro_display_name')||cleanUser(ME_RAW)
+function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||'giri'; }
+let myPosts=[]; let protectOn=JSON.parse(localStorage.getItem('pixoro_protect_'+ME_RAW)||'false')
 let loginSettings=JSON.parse(localStorage.getItem('pixoro_login_settings')||'{"google":true,"pass":true,"otp":true,"forgot":true,"remember":true,"auto":true}')
-function getPfp(u){ if(!u) return 'https://i.pravatar.cc/150?u=Giri'; let p=localStorage.getItem('pixoro_gilli_pfp_'+u)||localStorage.getItem('pixoro_pfp_'+u)||localStorage.getItem('pixoro_gilli_pfp_'+u.toLowerCase())||localStorage.getItem('pixoro_pfp_'+u.toLowerCase()); if(p) return p; return `https://i.pravatar.cc/150?u=${u}`; }
-function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME); }
+function getPfp(u){ if(!u) return 'https://i.pravatar.cc/150?u=Giri'; let p=localStorage.getItem('pixoro_gilli_pfp_'+u)||localStorage.getItem('pixoro_pfp_'+u)||localStorage.getItem('pixoro_gilli_pfp_'+u.toLowerCase())||localStorage.getItem('pixoro_pfp_'+u.toLowerCase()); if(p) return p; return `https://i.pravatar.cc/150?u=${encodeURIComponent(cleanUser(u))}`; }
+function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW); }
 updateNavPfp(); setInterval(updateNavPfp,1000);
-function applyLoginSettings(){ for(let k in loginSettings){let el=document.getElementById('sw_'+k); if(el) el.classList.toggle('on',loginSettings[k])} document.getElementById('googleBox').style.display=loginSettings.google?'block':'none'; document.getElementById('passBox').style.display=loginSettings.pass?'block':'none'; document.getElementById('otpBox').style.display=loginSettings.otp?'block':'none'; document.getElementById('forgotBox').style.display=loginSettings.forgot?'block':'none'; let saved=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]'); document.getElementById('accList').innerHTML=saved.map(e=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#111;border:1px solid #222;border-radius:10px;margin:4px 0"><b style="font-size:12px">${e} ${e===ME?'• Current':''}</b><span onclick="switchPixoroAcc('${e}')" style="color:#fff;font-size:12px;font-weight:800;cursor:pointer">Switch →</span></div>`).join('') }
+function applyLoginSettings(){ for(let k in loginSettings){let el=document.getElementById('sw_'+k); if(el) el.classList.toggle('on',loginSettings[k])} document.getElementById('googleBox').style.display=loginSettings.google?'block':'none'; document.getElementById('passBox').style.display=loginSettings.pass?'block':'none'; document.getElementById('otpBox').style.display=loginSettings.otp?'block':'none'; document.getElementById('forgotBox').style.display=loginSettings.forgot?'block':'none'; let saved=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]'); document.getElementById('accList').innerHTML=saved.map(e=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#111;border:1px solid #222;border-radius:10px;margin:4px 0"><b style="font-size:12px">${cleanUser(e)} ${cleanUser(e)===cleanUser(ME_RAW)?'• Current':''}</b><span onclick="switchPixoroAcc('${e}')" style="color:#fff;font-size:12px;font-weight:800;cursor:pointer">Switch →</span></div>`).join('') }
 function toggleLoginSw(k){ loginSettings[k]=!loginSettings[k]; localStorage.setItem('pixoro_login_settings',JSON.stringify(loginSettings)); applyLoginSettings() }
 function loginMsg(m){ document.getElementById('loginMsg').innerText=m }
-function saveAcc(e){ let a=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]'); if(!a.includes(e))a.push(e); localStorage.setItem('pixoro_accounts',JSON.stringify(a)); localStorage.setItem('pixoro_current_user',e) }
+function saveAcc(e){ let a=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]'); if(!a.includes(e))a.push(e); localStorage.setItem('pixoro_accounts',JSON.stringify(a)); localStorage.setItem('pixoro_current_user',e); localStorage.setItem('pixoro_display_name',cleanUser(e)); }
 async function loginWithGoogle(){ if(!supa) return loginMsg('Try again da'); let {error}=await supa.auth.signInWithOAuth({provider:'google'}); if(error) loginMsg(error.message) }
 async function doLogin(){ let em=document.getElementById('loginEmail').value,ps=document.getElementById('loginPass').value; if(!em||!ps) return loginMsg('Email & Password podu da'); if(!supa) return loginMsg('Net check pannu da'); let {error}=await supa.auth.signInWithPassword({email:em,password:ps}); if(error) return loginMsg('Password thappu da'); saveAcc(em); location.href='index.html' }
 async function doSignup(){ let em=document.getElementById('loginEmail').value,ps=document.getElementById('loginPass').value; if(!em||!ps) return loginMsg('Email & Password podu da'); let {error}=await supa.auth.signUp({email:em,password:ps}); if(error) return loginMsg(error.message); saveAcc(em); location.href='index.html' }
 async function showOtp(){ let em=document.getElementById('loginEmail').value.trim(); if(!em) return loginMsg('Email podu da'); let {error}=await supa.auth.signInWithOtp({email:em,options:{shouldCreateUser:true}}); if(error) loginMsg(error.message); else document.getElementById('otpArea').style.display='block' }
 async function verifyOtp(){ let em=document.getElementById('loginEmail').value.trim(),tk=document.getElementById('otpCode').value.trim(); let {error}=await supa.auth.verifyOtp({email:em,token:tk,type:'email'}); if(error) return loginMsg('OTP thappu da'); saveAcc(em); location.href='index.html' }
 async function forgot(){ let em=document.getElementById('loginEmail').value.trim(); if(!em) return loginMsg('Email podu da'); let {error}=await supa.auth.signInWithOtp({email:em,options:{shouldCreateUser:false}}); if(error) loginMsg(error.message); else document.getElementById('otpArea').style.display='block' }
-function switchPixoroAcc(email){ if(email===ME) return; let pin=prompt("PIN podu da - Switch panna 🔒"); if(pin!==PIXORO_PIN) return alert("Wrong PIN da!"); localStorage.setItem('pixoro_current_user',email); location.reload(); }
-async function doPixoroLogout(){ if(!confirm("Logout pannava da Giri?")) return; if(supa) await supa.auth.signOut(); ['pixoro_current_user','pixoro_local_posts','pixoro_local_stories','pixoro_viewed_stories','pixoro_highlights','pixoro_plus','pixoro_gilli_pfp_'+ME].forEach(k=>localStorage.removeItem(k)); sessionStorage.clear(); location.href='login.html'; }
+function switchPixoroAcc(email){ if(cleanUser(email)===cleanUser(ME_RAW)) return; localStorage.setItem('pixoro_current_user',email); localStorage.setItem('pixoro_display_name',cleanUser(email)); location.reload(); }
+async function doPixoroLogout(){ if(!confirm("Logout pannava da Giri?")) return; if(supa) await supa.auth.signOut(); ['pixoro_current_user','pixoro_display_name','pixoro_local_posts','pixoro_local_stories','pixoro_viewed_stories','pixoro_highlights','pixoro_plus','pixoro_gilli_pfp_'+ME_RAW].forEach(k=>localStorage.removeItem(k)); sessionStorage.clear(); location.href='login.html'; }
 function updateProtectUI(){ let t=document.getElementById('protectToggle'); t.classList.toggle('on',protectOn); document.getElementById('protectStatus').innerText=protectOn?'ON 🔒':'OFF 🔓' }
-function toggleProtect(){ protectOn=!protectOn; localStorage.setItem('pixoro_protect_'+ME,JSON.stringify(protectOn)); updateProtectUI() }
+function toggleProtect(){ protectOn=!protectOn; localStorage.setItem('pixoro_protect_'+ME_RAW,JSON.stringify(protectOn)); updateProtectUI() }
 function renderGrid(list){
   if(!list.length){ document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`; return; }
   document.getElementById('myGrid').innerHTML=list.map(p=>{
@@ -101,28 +102,29 @@ function showTab(type){
   renderGrid(list);
 }
 function loadProfile(){
-  let target=new URLSearchParams(location.search).get('u')||ME
-  document.getElementById('displayName').textContent=localStorage.getItem('pixoro_name_'+target)||target
-  document.getElementById('usernameTag').textContent=localStorage.getItem('pixoro_uname_'+target)||target.toLowerCase().split('@')[0]+'_official'
+  let target=new URLSearchParams(location.search).get('u')||ME_RAW
+  let isMine = cleanUser(target)===cleanUser(ME_RAW)
+  document.getElementById('displayName').textContent = isMine ? (localStorage.getItem('pixoro_name_'+ME_RAW)||ME) : (localStorage.getItem('pixoro_name_'+target)||cleanUser(target))
+  document.getElementById('usernameTag').textContent = isMine ? (localStorage.getItem('pixoro_uname_'+ME_RAW)||ME) : (localStorage.getItem('pixoro_uname_'+target)||cleanUser(target))
   document.getElementById('bioText').innerText=localStorage.getItem('pixoro_bio_'+target)||'🔥 Tiruchengode ➡️ World\n👨‍💻 Pixoro Founder'
   document.getElementById('linkText').innerText=localStorage.getItem('pixoro_link_'+target)||''
   document.getElementById('pfpImg').src=getPfp(target)
   document.getElementById('editPfpPreview').src=document.getElementById('pfpImg').src
   updateProtectUI(); applyLoginSettings(); loadHighlights(); updateNavPfp();
-  let t = target.toLowerCase().trim();
+  let t = cleanUser(target);
   let local = JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
-  myPosts = local.filter(p=> (p.username||'').toLowerCase().trim()==t);
+  myPosts = local.filter(p=> cleanUser(p.username||'')==t);
   document.getElementById('postCount').textContent=myPosts.length;
   renderGrid(myPosts);
   if(!supa) return
-  setTimeout(async()=>{ try{ let {data}=await supa.from('posts').select('*').order('created_at',{ascending:false}); let dbPosts=(data||[]).filter(p=> (p.username||'').toLowerCase().trim()==t); let seen=new Set(myPosts.map(p=>p.media_url||p.image_url)); dbPosts.forEach(p=>{ let u=p.media_url||p.image_url; if(!seen.has(u)){ myPosts.push(p); seen.add(u); } }); document.getElementById('postCount').textContent=myPosts.length; renderGrid(myPosts); }catch(e){} },200)
+  setTimeout(async()=>{ try{ let {data}=await supa.from('posts').select('*').order('created_at',{ascending:false}); let dbPosts=(data||[]).filter(p=> cleanUser(p.username||'')==t); let seen=new Set(myPosts.map(p=>p.media_url||p.image_url)); dbPosts.forEach(p=>{ let u=p.media_url||p.image_url; if(!seen.has(u)){ myPosts.push(p); seen.add(u); } }); document.getElementById('postCount').textContent=myPosts.length; renderGrid(myPosts); }catch(e){} },200)
 }
-function loadHighlights(){ let s=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]'); document.getElementById('highlightList').innerHTML=s.map(h=>`<div class="h-item"><div class="h-circle">${h.emoji}</div><div class="h-text">${h.title}</div></div>`).join('')+`<div class="h-item" onclick="addHighlight()"><div class="h-circle">➕</div><div class="h-text">New</div></div>` }
-function addHighlight(){ let e=prompt('Emoji:'); if(!e)return; let t=prompt('Title:'); if(!t)return; let s=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME)||'[]'); s.push({emoji:e,title:t}); localStorage.setItem('pixoro_highlights_'+ME,JSON.stringify(s)); loadHighlights() }
-function openSettings(){ let pin=prompt("PIN podu da Giri 🔒"); if(pin!==PIXORO_PIN){ alert("Wrong PIN da!"); return; } document.getElementById('setSheet').style.display='flex'; applyLoginSettings() }
-function openEditSheet(){ document.getElementById('editName').value=localStorage.getItem('pixoro_name_'+ME)||ME; document.getElementById('editUsername').value=localStorage.getItem('pixoro_uname_'+ME)||''; document.getElementById('editBio').value=localStorage.getItem('pixoro_bio_'+ME)||''; document.getElementById('editLink').value=localStorage.getItem('pixoro_link_'+ME)||''; document.getElementById('editSheet').style.display='flex' }
+function loadHighlights(){ let s=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME_RAW)||'[]'); document.getElementById('highlightList').innerHTML=s.map(h=>`<div class="h-item"><div class="h-circle">${h.emoji}</div><div class="h-text">${h.title}</div></div>`).join('')+`<div class="h-item" onclick="addHighlight()"><div class="h-circle">➕</div><div class="h-text">New</div></div>` }
+function addHighlight(){ let e=prompt('Emoji:'); if(!e)return; let t=prompt('Title:'); if(!t)return; let s=JSON.parse(localStorage.getItem('pixoro_highlights_'+ME_RAW)||'[]'); s.push({emoji:e,title:t}); localStorage.setItem('pixoro_highlights_'+ME_RAW,JSON.stringify(s)); loadHighlights() }
+function openSettings(){ document.getElementById('setSheet').style.display='flex'; applyLoginSettings() }
+function openEditSheet(){ document.getElementById('editName').value=localStorage.getItem('pixoro_name_'+ME_RAW)||ME; document.getElementById('editUsername').value=localStorage.getItem('pixoro_uname_'+ME_RAW)||ME; document.getElementById('editBio').value=localStorage.getItem('pixoro_bio_'+ME_RAW)||''; document.getElementById('editLink').value=localStorage.getItem('pixoro_link_'+ME_RAW)||''; document.getElementById('editSheet').style.display='flex' }
 document.getElementById('pfpInput').addEventListener('change',e=>{ let f=e.target.files[0]; if(!f)return; let r=new FileReader(); r.onload=ev=>{document.getElementById('editPfpPreview').src=ev.target.result; document.getElementById('editPfpPreview').dataset.new=ev.target.result}; r.readAsDataURL(f) })
-function saveEdit(){ let n=document.getElementById('editName').value,u=document.getElementById('editUsername').value,b=document.getElementById('editBio').value,l=document.getElementById('editLink').value,np=document.getElementById('editPfpPreview').dataset.new; if(n)localStorage.setItem('pixoro_name_'+ME,n); if(u)localStorage.setItem('pixoro_uname_'+ME,u); if(b)localStorage.setItem('pixoro_bio_'+ME,b); if(l)localStorage.setItem('pixoro_link_'+ME,l); if(np){ localStorage.setItem('pixoro_gilli_pfp_'+ME,np); localStorage.setItem('pixoro_pfp_'+ME,np); } document.getElementById('editSheet').style.display='none'; loadProfile(); updateNavPfp(); }
+function saveEdit(){ let n=document.getElementById('editName').value.trim(),u=document.getElementById('editUsername').value.trim(),b=document.getElementById('editBio').value,l=document.getElementById('editLink').value,np=document.getElementById('editPfpPreview').dataset.new; let newU = u ? cleanUser(u) : ME; if(n) localStorage.setItem('pixoro_name_'+ME_RAW,n); localStorage.setItem('pixoro_uname_'+ME_RAW,newU); localStorage.setItem('pixoro_display_name',newU); localStorage.setItem('pixoro_current_user',newU); if(b) localStorage.setItem('pixoro_bio_'+ME_RAW,b); if(l) localStorage.setItem('pixoro_link_'+ME_RAW,l); if(np){ localStorage.setItem('pixoro_gilli_pfp_'+ME_RAW,np); localStorage.setItem('pixoro_pfp_'+ME_RAW,np); localStorage.setItem('pixoro_gilli_pfp_'+newU,np); localStorage.setItem('pixoro_pfp_'+newU,np); } document.getElementById('editSheet').style.display='none'; alert('Saved da! Ella edathulayum '+newU+' nu maridum da ✅'); loadProfile(); updateNavPfp(); location.reload(); }
 function shareProfile(){ navigator.clipboard.writeText(location.href) }
 loadProfile()
 </script></body></html>
