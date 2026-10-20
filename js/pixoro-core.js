@@ -20,7 +20,7 @@ function getMyProfile(){
   };
 }
 
-// ===== PIXORO VERIFIED - GOLD TICK - CHINNA SIZE - MATTUM GIRI_OFFICE DA =====
+// ===== PIXORO VERIFIED - GOLD TICK - 12px - MATTUM GIRI_OFFICE DA =====
 function isGoldUser(u){
   if(!u) return false;
   let c=String(u).toLowerCase().split('@')[0].replace(/[^a-z0-9_.]/g,'');
@@ -29,7 +29,7 @@ function isGoldUser(u){
   return false;
 }
 function goldTickHTML(){
-  return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+  return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
 }
 function getTick(u){ return isGoldUser(u) ? goldTickHTML() : ''; }
 window.getTick = getTick;
@@ -39,7 +39,7 @@ window.goldTickHTML = goldTickHTML;
 function addGoldCSS(){
   if(document.getElementById('pixoro-verified-style')) return;
   let s=document.createElement('style'); s.id='pixoro-verified-style';
-  s.innerHTML='.pixoro-verified{width:14px!important;height:14px!important;min-width:14px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;background:linear-gradient(135deg,#FFD700,#FFA500)!important;border:1px solid #FFD700!important;border-radius:50%!important;vertical-align:middle!important;margin-left:4px!important;flex-shrink:0!important;box-shadow:0 0 4px rgba(255,215,0,.5)!important}.pixoro-verified svg{width:9px!important;height:9px!important;display:block!important}.pixoro-verified svg path{stroke:#000!important;fill:none!important;stroke-width:5!important}';
+  s.innerHTML='.pixoro-verified{width:12px!important;height:12px!important;min-width:12px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;background:linear-gradient(135deg,#FFD700,#FFA500)!important;border:1px solid #FFD700!important;border-radius:50%!important;vertical-align:middle!important;margin-left:3px!important;flex-shrink:0!important;box-shadow:0 0 3px rgba(255,215,0,.5)!important}.pixoro-verified svg{width:8px!important;height:8px!important;display:block!important}.pixoro-verified svg path{stroke:#000!important;fill:none!important;stroke-width:5.5!important}';
   document.head.appendChild(s);
 }
 addGoldCSS();
