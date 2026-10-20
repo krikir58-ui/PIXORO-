@@ -1,23 +1,30 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Admin - Pixoro 🔵</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script><style>body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:0 auto;padding:16px}.card{background:#121212;padding:12px;border-radius:12px;margin:10px 0;display:flex;justify-content:space-between;align-items:center}</style></head><body>
-<h2>🔵 Pixoro Admin - Blue Tick Requests</h2><div id="list">Loading...</div>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Admin - Pixoro 👑</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script><style>body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:0 auto;padding:16px}.card{background:#121212;padding:12px;border-radius:12px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;border:1px solid #333}</style></head><body>
+<h2>👑 Pixoro Admin - Gold Tick Requests</h2><div id="list">Loading...</div>
 <script>
 const supa=supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 async function load(){
- let {data}=await supa.from('blue_tick_requests').select('*').order('created_at',{ascending:false});
+ // Profile la irunthu varra verification_requests table da - ID vachu da
+ let {data}=await supa.from('verification_requests').select('*').eq('status','pending').order('created_at',{ascending:false});
  if(!data||!data.length){document.getElementById('list').innerHTML='No requests - All safe! 🛡️';return}
  let h='';data.forEach(r=>{
-  h+=`<div class="card"><div><b>@${r.username}</b><br><small>Device: ${r.device_id||'unknown'} | ${r.status}</small></div><div><button onclick="approve('${r.username}','${r.device_id}')" style="background:#00ff88;border:0;padding:6px 12px;border-radius:6px">Approve ✔️</button> <button onclick="reject('${r.username}')" style="background:#ff3040;border:0;color:#fff;padding:6px 12px;border-radius:6px">Reject</button></div></div>`
+  h+=`<div class="card"><div><b>@${r.username}</b><br><small>ID: <span style="color:#FFD700">${r.username}</span> | Proof: <a href="${r.proof_url}" target="_blank" style="color:#FFD700">View Proof</a></small></div><div><button onclick="approve('${r.username}','${r.id}')" style="background:#FFD700;border:0;padding:6px 12px;border-radius:6px;font-weight:900">Approve 👑</button> <button onclick="reject('${r.id}')" style="background:#ff3040;border:0;color:#fff;padding:6px 12px;border-radius:6px">Reject</button></div></div>`
  });document.getElementById('list').innerHTML=h;
 }
-async function approve(u,d){
- await supa.from('premium_users').upsert({username:u,is_premium:true,device_id:d,premium_till:new Date(Date.now()+30*24*60*60*1000).toISOString()});
- await supa.from('profiles').upsert({username:u,is_verified:true});
- await supa.from('blue_tick_requests').update({status:'approved'}).eq('username',u);
- alert('@'+u+' approved da! 🔵');load();
+async function approve(u,reqId){
+ let clean = u.toLowerCase().trim();
+ // ID vachu Gold Tick kuduthachu da
+ await supa.from('verification_requests').update({status:'approved'}).eq('id',reqId);
+ await supa.from('profiles').upsert({username:clean,is_gold_verified:true,is_verified:true,gold_tick:true});
+ // Profile la kaamikkanum na - GOLD_IDS la add pannu da
+ let ids = JSON.parse(localStorage.getItem('pixoro_gold_ids')||'["giri_office"]');
+ if(!ids.includes(clean)) ids.push(clean);
+ localStorage.setItem('pixoro_gold_ids', JSON.stringify(ids));
+ alert('@'+clean+' approved da! 👑 Gold Tick!');
+ load();
 }
-async function reject(u){
- await supa.from('blue_tick_requests').update({status:'rejected'}).eq('username',u);
- alert('@'+u+' rejected - Fake ID! 🚫');load();
+async function reject(reqId){
+ await supa.from('verification_requests').update({status:'rejected'}).eq('id',reqId);
+ alert('Rejected - Fake ID! 🚫');load();
 }
 load();
 </script></body></html>
