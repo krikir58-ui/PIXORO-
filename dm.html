@@ -66,19 +66,24 @@
 <div class="createRow" style="border-bottom:none" onclick="location.href='live.html'"><div class="createIco">((•))</div><div style="flex:1"><b>Live</b><div style="font-size:12px;color:#888">Go live now</div></div><span>›</span></div>
 <div onclick="document.getElementById('createSheet').style.display='none'" style="margin-top:12px;text-align:center;padding:12px;color:#777">Cancel</div>
 </div></div>
-<script src="pixoro-core.js"></script>
+<script src="js/pixoro-core.js"></script>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
 window.confirm = function(msg){ showToast(msg); return true; };
 window.prompt = function(){ showToast('Search la name type pannu da'); location.href='search.html'; return null; };
 window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
-window.addEventListener('unhandledrejection', ()=>{ showToast('Net slow da - Try again'); });
-const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-const ME_RAW=localStorage.getItem('pixoro_current_user')||'Giri'
-const ME=localStorage.getItem('pixoro_display_name')||cleanUser(ME_RAW)
+if(typeof getTick === 'undefined'){
+  window.getTick = function(u){
+    let c=String(u||'').toLowerCase().split('@')[0].replace(/[^a-z0-9_.]/g,'');
+    if(c==='giri_office') return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+    return '';
+  }
+}
 function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||'giri'; }
-// TICK - CORE LA IRUNTHU VARUM DA - ONE LINK SYSTEM
+const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+const ME_RAW=cleanUser(localStorage.getItem('pixoro_current_user')||localStorage.getItem('pixoro_user_id')||'giri_office')
+const ME=cleanUser(ME_RAW)
 document.getElementById('topName').innerHTML = cleanUser(ME_RAW) + ' ' + getTick(ME_RAW) + ' ▾';
 function getPfp(u){
   if(!u) return '';
