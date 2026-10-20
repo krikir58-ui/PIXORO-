@@ -68,13 +68,20 @@
 <div class="createRow" style="border-bottom:none" onclick="location.href='live.html'"><div class="createIco">((•))</div><div style="flex:1"><b style="font-size:16px">Live</b><div style="font-size:12px;color:#888">Go live now</div></div><span style="color:#666;font-size:20px">›</span></div>
 <div onclick="hideChoice()" style="text-align:center;padding:14px;color:#777;margin-top:10px">Cancel</div>
 </div></div>
-<script src="pixoro-core.js"></script>
+<script src="js/pixoro-core.js"></script>
 <script>
+// FALLBACK - CORE LOAD AGALANA KOODA BLOCK AAGATHU DA
+if(typeof getTick === 'undefined'){
+  window.getTick = function(u){
+    let c=String(u||'').toLowerCase().split('@')[0].replace(/[^a-z0-9_.]/g,'');
+    if(c==='giri_office') return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+    return '';
+  }
+}
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
 window.confirm = function(msg){ showToast(msg); return true; };
 window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
-window.addEventListener('unhandledrejection', ()=>{ showToast('Net slow da - Try again'); });
 function showChoice(){document.getElementById('choice').classList.add('show')}
 function hideChoice(){document.getElementById('choice').classList.remove('show')}
 let supa=null; try{ supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_') }catch(e){ supa=null }
@@ -82,7 +89,6 @@ function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('
 let ME_RAW=cleanUser(localStorage.getItem('pixoro_user_id')||localStorage.getItem('pixoro_current_user')||'giri')
 let ME=ME_RAW
 function displayNameFor(u){ if(!u) return ME; return cleanUser(u); }
-// TICK - CORE LA IRUNTHU VARUM DA - ONE LINK SYSTEM - INGA LOCAL ILLA
 function isMyPost(u){ let c=cleanUser(u); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||'')||c===cleanUser(localStorage.getItem('pixoro_user_id')||''); }
 let feedMode = localStorage.getItem('pixoro_feed_mode')||'foryou'
 function viralScore(p){ let likes=allLikes.filter(l=>l.post_id==p.id).length; let hours=(Date.now()-new Date(p.created_at||Date.now()).getTime())/3600000; return (likes*10)/(hours+2) }
@@ -110,8 +116,13 @@ function pfpHtml(u){return `<div class="pfpRing" onclick="event.stopPropagation(
 function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW)||getPfp(ME); }
 updateNavPfp(); setInterval(updateNavPfp,1000);
 async function loadAll(){
+  // 1. LOCAL AH MUDHALA KAATTU DA - BLOCK POGUM DA
+  allStories=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]');
+  allPosts=JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
+  setFeedMode(feedMode); renderStories();renderHighlights();renderTrending();renderFeed();updateNavPfp();
+  // 2. APROM SUPABASE TRY PANNU DA
   try{
-    if(!supa) throw new Error('no supa')
+    if(!supa) return;
     let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false});
     let {data:likes}=await supa.from('likes').select('*');
     let {data:saves}=await supa.from('saves').select('*').eq('username',ME_RAW);
@@ -121,12 +132,10 @@ async function loadAll(){
     let supaStories=(stories||[]).filter(s=>{ if(!s.expires_at) return true; return new Date(s.expires_at) > now })
     let localStories=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]').filter(s=>{ if(!s.expires_at) return true; return new Date(s.expires_at) > now })
     allStories=[...localStories,...supaStories]
-    allPosts=(posts||[]).filter(p=>!p.is_archived)
-    let localPosts=JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]')
-    allPosts=[...localPosts,...allPosts]
+    allPosts=[...localStories ? [] : [], ...(posts||[]).filter(p=>!p.is_archived), ...JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]')]
     allLikes=likes||[];allSaves=saves||[];allFollows=follows||[];
-  }catch(e){ allStories=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]'); allPosts=JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]'); }
-  setFeedMode(feedMode); renderStories();renderHighlights();renderTrending();renderFeed();updateNavPfp();updateStorageBar();
+    setFeedMode(feedMode); renderStories();renderHighlights();renderTrending();renderFeed();updateNavPfp();updateStorageBar();
+  }catch(e){ console.log('supabase fail - local ok da', e); }
 }
 function renderHighlights(){
   let row=document.getElementById('highlightRow');
