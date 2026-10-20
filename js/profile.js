@@ -25,7 +25,7 @@ export async function getProfile(viewerId, profileId) {
   return { ...profile, isLocked: false, reels }
 }
 
-// ===== PIXORO BLUE TICK - Instagram Style da =====
+// ===== PIXORO BLUE TICK - PIXORO Style da =====
 export async function requestVerification(userId, username) {
   const fullName = prompt("Un Full Name da:")
   const reason = prompt("Yen Unakku Blue Tick Venum da?")
