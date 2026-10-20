@@ -20,39 +20,34 @@ function getMyProfile(){
   };
 }
 
-// ===== PIXORO GOLD TICK - USERNAME MATTUM DA =====
+// ===== PIXORO VERIFIED - GOLD STAR TICK - CORRECTED =====
 function isGoldUser(u){
   if(!u) return false;
   let c=String(u).toLowerCase().split('@')[0].replace(/[^a-z0-9_.]/g,'');
-  if(c==='giri_office'||c==='krikir58') return true;
+  if(c==='giri_office'||c==='giri') return true;
   if(localStorage.getItem('pixoro_gold_'+c)==='yes') return true;
   return false;
 }
 function goldTickHTML(){
-  return '<span class="pixoro-gold-tick"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+  return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
 }
+function getTick(u){ return isGoldUser(u) ? goldTickHTML() : ''; }
 function addGoldCSS(){
-  if(document.getElementById('pixoro-gold-style')) return;
-  let s=document.createElement('style'); s.id='pixoro-gold-style';
-  s.innerHTML='.pixoro-gold-tick{width:16px;height:16px;display:inline-flex;background:radial-gradient(circle at 30% 30%,#FFF6A5,#FFD700 45%,#B8860B);border-radius:50%;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(255,215,0,.8);vertical-align:middle;margin-left:5px;flex-shrink:0}.pixoro-gold-tick svg{width:10px;height:10px}';
+  if(document.getElementById('pixoro-verified-style')) return;
+  let s=document.createElement('style'); s.id='pixoro-verified-style';
+  s.innerHTML='.pixoro-verified{width:16px;height:16px;min-width:16px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#FFE9A8,#FFD700 45%,#C9A227);clip-path:polygon(50% 0%,61% 5%,72% 2%,81% 10%,93% 12%,93% 25%,100% 35%,95% 50%,100% 65%,93% 75%,93% 88%,81% 90%,72% 98%,61% 95%,50% 100%,39% 95%,28% 98%,19% 90%,7% 88%,7% 75%,0% 65%,5% 50%,0% 35%,7% 25%,7% 12%,19% 10%,28% 2%,39% 5%);vertical-align:middle;margin-left:5px;flex-shrink:0}.pixoro-verified svg{width:9px;height:9px}';
   document.head.appendChild(s);
 }
 function applyGoldTicks(){
   addGoldCSS();
   document.querySelectorAll('#topUsername, #usernameTag, .my-username, .username, .user-name, [data-username]').forEach(el=>{
-    if(el.querySelector('.pixoro-gold-tick')) return;
+    if(el.querySelector('.pixoro-verified')) return;
     let txt = el.textContent.trim().replace('@','');
     if(isGoldUser(txt)){
       el.innerHTML = el.textContent.trim() + ' ' + goldTickHTML();
     }
   });
-  document.querySelectorAll('.my-name, #displayName').forEach(el=>{
-    let t = el.querySelector('.pixoro-gold-tick');
-    if(t) t.remove();
-    if(el.textContent.trim().includes('Giri')){
-      el.innerHTML = 'Giri';
-    }
-  });
+  // Giri name ah clear panna venaam - Tick anga venaam
 }
 
 function updateAllProfiles(){
