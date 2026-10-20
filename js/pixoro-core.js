@@ -20,11 +20,11 @@ function getMyProfile(){
   };
 }
 
-// ===== PIXORO GOLD TICK - OPTION 1 - USERNAME MATTUM DA =====
+// ===== PIXORO GOLD TICK - USERNAME MATTUM DA =====
 function isGoldUser(u){
   if(!u) return false;
   let c=String(u).toLowerCase().split('@')[0].replace(/[^a-z0-9_.]/g,'');
-  if(c==='giri'||c==='giri_office'||c==='giri_official'||c==='krikir58'||c.includes('kri')) return true;
+  if(c==='giri_office'||c==='krikir58') return true;
   if(localStorage.getItem('pixoro_gold_'+c)==='yes') return true;
   return false;
 }
@@ -39,7 +39,6 @@ function addGoldCSS(){
 }
 function applyGoldTicks(){
   addGoldCSS();
-  // Username mattum da - Giri ku Tick Venaam da
   document.querySelectorAll('#topUsername, #usernameTag, .my-username, .username, .user-name, [data-username]').forEach(el=>{
     if(el.querySelector('.pixoro-gold-tick')) return;
     let txt = el.textContent.trim().replace('@','');
@@ -47,11 +46,9 @@ function applyGoldTicks(){
       el.innerHTML = el.textContent.trim() + ' ' + goldTickHTML();
     }
   });
-  // Giri Display Name la Tick iruntha Remove pannu da
   document.querySelectorAll('.my-name, #displayName').forEach(el=>{
     let t = el.querySelector('.pixoro-gold-tick');
     if(t) t.remove();
-    // Giri mattum Plain ah irukkanum
     if(el.textContent.trim().includes('Giri')){
       el.innerHTML = 'Giri';
     }
@@ -63,7 +60,6 @@ function updateAllProfiles(){
   document.querySelectorAll('.my-pfp, .profile-pic, .my-avatar').forEach(el => el.src = p.photo);
   document.querySelectorAll('.my-username').forEach(el => el.textContent = '@'+p.username);
   document.querySelectorAll('.my-name').forEach(el => {
-    // Display Name = Giri Plain ah - Tick Illa da
     el.textContent = p.name;
   });
   let top = document.getElementById('topUsername'); if(top) top.textContent = p.username;
