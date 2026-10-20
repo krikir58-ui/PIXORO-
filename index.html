@@ -43,10 +43,15 @@
 .createRow{display:flex;align-items:center;gap:16px;padding:18px 20px;border-bottom:1px solid #2a2a2a;cursor:pointer}
 .createRow:active{background:#222}
 .createIco{width:44px;height:44px;border-radius:50%;border:1px solid #555;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.trendBar{display:flex;gap:8px;padding:10px 12px;overflow-x:auto;border-bottom:1px solid #111}.trendBar::-webkit-scrollbar{display:none}
+.trendChip{background:#111;border:1px solid #333;padding:7px 12px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer}
+.feedTabs{display:flex;border-bottom:1px solid #111}.feedTab{flex:1;text-align:center;padding:12px;font-size:13px;color:#888;cursor:pointer;font-weight:700}.feedTab.active{color:#fff;border-bottom:2px solid #fff}
 </style></head><body>
 <div class="top"><b style="font-size:24px;font-weight:900">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="location.href='notifications.html'"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M6 8a6 6 0 0 1 12 0c0 7 6 9 6 9H0s6-2 6-9"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg></div></div></div>
 <div class="storySearchWrap"><input id="storySearch" placeholder="🔍 Search Story..." oninput="renderStories()"><span onclick="document.getElementById('storySearch').value='';renderStories()" style="color:#666;cursor:pointer">✕</span></div>
 <div class="storyBar" id="storyBar"></div>
+<div class="feedTabs"><div class="feedTab active" id="tabForYou" onclick="setFeedMode('foryou')">✨ For You</div><div class="feedTab" id="tabFollowing" onclick="setFeedMode('following')">👥 Following</div><div class="feedTab" id="tabLatest" onclick="setFeedMode('latest')">🕒 Latest</div></div>
+<div id="trendBar" class="trendBar" style="display:none"></div>
 <div id="highlightRow" class="hlRow" style="display:none"></div>
 <div id="feed"><p style="text-align:center;padding:60px;color:#666">Loading...</p></div>
 <div id="toast" class="toast"></div>
@@ -77,6 +82,10 @@ let ME_RAW=cleanUser(localStorage.getItem('pixoro_user_id')||localStorage.getIte
 let ME=ME_RAW
 function displayNameFor(u){ if(!u) return ME; return cleanUser(u); }
 function isMyPost(u){ let c=cleanUser(u); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||'')||c===cleanUser(localStorage.getItem('pixoro_user_id')||'')||c==='krikir58'||c.includes('kri'); }
+let feedMode = localStorage.getItem('pixoro_feed_mode')||'foryou'
+function viralScore(p){ let likes=allLikes.filter(l=>l.post_id==p.id).length; let hours=(Date.now()-new Date(p.created_at||Date.now()).getTime())/3600000; return (likes*10)/(hours+2) }
+function setFeedMode(m){ feedMode=m; localStorage.setItem('pixoro_feed_mode',m); document.getElementById('tabForYou').classList.toggle('active',m=='foryou'); document.getElementById('tabFollowing').classList.toggle('active',m=='following'); document.getElementById('tabLatest').classList.toggle('active',m=='latest'); renderFeed(); }
+function renderTrending(){ let tags={}; allPosts.forEach(p=>{ (p.caption||'').match(/#\w+/g)?.forEach(t=>{ tags[t.toLowerCase()]=(tags[t.toLowerCase()]||0)+1 }) }); let top=Object.entries(tags).sort((a,b)=>b[1]-a[1]).slice(0,8); let bar=document.getElementById('trendBar'); if(!top.length){ bar.style.display='none'; return; } bar.style.display='flex'; bar.innerHTML=top.map(([t,c])=>`<span class="trendChip" onclick="showToast('${t} • ${c} posts 🔥')">🔥 ${t} • ${c}</span>`).join('') }
 async function compressImage(file,maxW=720,quality=0.72){ return new Promise(res=>{ let img=new Image(); let url=URL.createObjectURL(file); img.onload=()=>{ let w=img.width,h=img.height; if(w>maxW){ h=h*maxW/w; w=maxW; } let c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); c.toBlob(b=>{ res(new File([b],file.name,{type:'image/jpeg'})); },'image/jpeg',quality); URL.revokeObjectURL(url); }; img.src=url; }); }
 function updateStorageBar(){ let total=0; for(let k in localStorage){ try{ total+=localStorage.getItem(k).length*2; }catch(e){} } if(total>4000000){ cleanupExpired(); } }
 function cleanupExpired(){ let now=Date.now(); ['pixoro_local_stories','pixoro_viewed_stories'].forEach(k=>{ let arr=JSON.parse(localStorage.getItem(k)||'[]'); let f=arr.filter(s=> !s.expires_at || new Date(s.expires_at).getTime()>now); if(f.length!==arr.length) localStorage.setItem(k,JSON.stringify(f)); }); updateStorageBar(); }
@@ -115,7 +124,7 @@ async function loadAll(){
     allPosts=[...localPosts,...allPosts]
     allLikes=likes||[];allSaves=saves||[];allFollows=follows||[];
   }catch(e){ allStories=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]'); allPosts=JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]'); }
-  renderStories();renderHighlights();renderFeed();updateNavPfp();updateStorageBar();
+  setFeedMode(feedMode); renderStories();renderHighlights();renderTrending();renderFeed();updateNavPfp();updateStorageBar();
 }
 function renderHighlights(){
   let row=document.getElementById('highlightRow');
@@ -141,7 +150,11 @@ function renderStories(){
 function openMyStory(){let meLow=cleanUser(ME_RAW);let s=allStories.find(x=> isMyPost(x.username));if(!s) return location.href='story-add.html';if(!PLUS.ghost &&!viewedStories.includes(s.id)){viewedStories.push(s.id);localStorage.setItem('pixoro_viewed_stories',JSON.stringify(viewedStories))}location.href='story-view.html?user='+s.username+(PLUS.ghost?'&ghost=1':'')}
 function openOtherStory(u){let s=allStories.find(x=> x.username===u);if(PLUS.ghost){location.href='story-view.html?user='+u+'&ghost=1';return}if(s &&!viewedStories.includes(s.id)){viewedStories.push(s.id);localStorage.setItem('pixoro_viewed_stories',JSON.stringify(viewedStories))}location.href='story-view.html?user='+u}
 function renderFeed(){
-let html=''; let feedPosts = allPosts;
+let feedPosts=[...allPosts];
+if(feedMode=='foryou'){ feedPosts.sort((a,b)=>viralScore(b)-viralScore(a)) }
+else if(feedMode=='latest'){ feedPosts.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)) }
+else if(feedMode=='following'){ let followingSet=new Set(allFollows.filter(f=>cleanUser(f.follower)==ME_RAW).map(f=>cleanUser(f.following))); feedPosts=feedPosts.filter(p=>followingSet.has(cleanUser(p.username))||isMyPost(p.username)) }
+let html='';
 for(let p of feedPosts){
 let lCount=allLikes.filter(l=>l.post_id==p.id).length;let isLiked=allLikes.some(l=>l.post_id==p.id&&l.username==ME_RAW);let isSaved=allSaves.some(s=>s.post_id==p.id);
 let likeText = p.hide_likes? '❤️ Like count hidden' : `<span id="likeCount-${p.id}">${lCount}</span> likes`
@@ -153,7 +166,8 @@ let mediaHtml = isVid ? `<video class="main" src="${mUrl}" loop muted playsinlin
 let locHtml = p.location? `<div class="locBadge">📍 ${p.location}</div>` : ''
 let songHtml = p.song? `<div class="songBadge">🎵 ${p.song}</div>` : ''
 let aiHtml = p.is_ai? `<div class="aiBadge">✨ AI-generated</div>` : ''
-html+=`<div class="post"><div class="postTop"><div style="display:flex;align-items:center;gap:10px">${pfpHtml(p.username)}<b onclick="openProfileFast('${p.username}')" style="cursor:pointer">${displayNameFor(p.username)}</b> ${p.is_pinned?'📌':''}</div><span onclick="openPostMenu(${p.id})" style="cursor:pointer;padding:4px 10px;font-size:20px;font-weight:900">⋮</span></div><div style="position:relative;overflow:hidden" ondblclick="doubleLike(${p.id})" onclick="handleTap(${p.id})">${mediaHtml}${aiHtml}<div id="burst-${p.id}" class="heart-burst">❤</div></div>${locHtml}${songHtml}<div class="actions"><div class="left"><button id="likeBtn-${p.id}" class="act ${isLiked?'liked':''}" onclick="event.stopPropagation();fastLike(${p.id})"><svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg></button>${commentBtn}${shareText}</div><button class="act ${isSaved?'saved':''}" onclick="event.stopPropagation();savePost(${p.id})"><svg viewBox="0 0 24 24"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></button></div><div style="padding:0 14px"><b>${likeText}</b><br><b onclick="openProfileFast('${p.username}')" style="cursor:pointer">${displayNameFor(p.username)}</b> ${p.caption||''}</div></div>`
+let viralBadge = feedMode=='foryou' && viralScore(p)>2 ? `<span style="background:#ff3040;color:#fff;font-size:10px;padding:3px 7px;border-radius:10px;margin-left:6px">🔥 VIRAL</span>` : ''
+html+=`<div class="post"><div class="postTop"><div style="display:flex;align-items:center;gap:10px">${pfpHtml(p.username)}<b onclick="openProfileFast('${p.username}')" style="cursor:pointer">${displayNameFor(p.username)}</b>${viralBadge} ${p.is_pinned?'📌':''}</div><span onclick="openPostMenu(${p.id})" style="cursor:pointer;padding:4px 10px;font-size:20px;font-weight:900">⋮</span></div><div style="position:relative;overflow:hidden" ondblclick="doubleLike(${p.id})" onclick="handleTap(${p.id})">${mediaHtml}${aiHtml}<div id="burst-${p.id}" class="heart-burst">❤</div></div>${locHtml}${songHtml}<div class="actions"><div class="left"><button id="likeBtn-${p.id}" class="act ${isLiked?'liked':''}" onclick="event.stopPropagation();fastLike(${p.id})"><svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg></button>${commentBtn}${shareText}</div><button class="act ${isSaved?'saved':''}" onclick="event.stopPropagation();savePost(${p.id})"><svg viewBox="0 0 24 24"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></button></div><div style="padding:0 14px"><b>${likeText}</b><br><b onclick="openProfileFast('${p.username}')" style="cursor:pointer">${displayNameFor(p.username)}</b> ${p.caption||''}</div></div>`
 }
 document.getElementById('feed').innerHTML=html||'<p style="text-align:center;padding:60px;color:#666">No posts - + click panni upload pannu da!</p>'
 }
