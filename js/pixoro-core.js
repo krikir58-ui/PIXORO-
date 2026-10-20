@@ -20,11 +20,10 @@ function getMyProfile(){
   };
 }
 
-// ===== GOLD TICK - FIXED DA GIRI =====
+// ===== PIXORO GOLD TICK - OPTION 1 - USERNAME MATTUM DA =====
 function isGoldUser(u){
   if(!u) return false;
   let c=String(u).toLowerCase().split('@')[0].replace(/[^a-z0-9_.]/g,'');
-  // giri_office add panniten da - Ithu thaan Main Fix da!
   if(c==='giri'||c==='giri_office'||c==='giri_official'||c==='krikir58'||c.includes('kri')) return true;
   if(localStorage.getItem('pixoro_gold_'+c)==='yes') return true;
   return false;
@@ -40,16 +39,23 @@ function addGoldCSS(){
 }
 function applyGoldTicks(){
   addGoldCSS();
-  // Ella Username edathulayum Tick Podu da - Instagram Mari
-  document.querySelectorAll('.my-name, #topUsername, #usernameTag, #displayName, .username, .user-name, [data-username]').forEach(el=>{
+  // Username mattum da - Giri ku Tick Venaam da
+  document.querySelectorAll('#topUsername, #usernameTag, .my-username, .username, .user-name, [data-username]').forEach(el=>{
     if(el.querySelector('.pixoro-gold-tick')) return;
     let txt = el.textContent.trim().replace('@','');
     if(isGoldUser(txt)){
-      el.innerHTML = el.textContent.trim() + goldTickHTML();
+      el.innerHTML = el.textContent.trim() + ' ' + goldTickHTML();
     }
   });
-  // Reels / DM / Home la - @giri_office nu irukura edam ellam
-  document.body.innerHTML = document.body.innerHTML.replace(/@giri_office(?!.*pixoro-gold-tick)/g, '@giri_office '+goldTickHTML());
+  // Giri Display Name la Tick iruntha Remove pannu da
+  document.querySelectorAll('.my-name, #displayName').forEach(el=>{
+    let t = el.querySelector('.pixoro-gold-tick');
+    if(t) t.remove();
+    // Giri mattum Plain ah irukkanum
+    if(el.textContent.trim().includes('Giri')){
+      el.innerHTML = 'Giri';
+    }
+  });
 }
 
 function updateAllProfiles(){
@@ -57,8 +63,8 @@ function updateAllProfiles(){
   document.querySelectorAll('.my-pfp, .profile-pic, .my-avatar').forEach(el => el.src = p.photo);
   document.querySelectorAll('.my-username').forEach(el => el.textContent = '@'+p.username);
   document.querySelectorAll('.my-name').forEach(el => {
-    if(el.id === 'displayName') el.textContent = p.name;
-    else el.textContent = p.username;
+    // Display Name = Giri Plain ah - Tick Illa da
+    el.textContent = p.name;
   });
   let top = document.getElementById('topUsername'); if(top) top.textContent = p.username;
   let tag = document.getElementById('usernameTag'); if(tag) tag.textContent = p.username;
@@ -88,5 +94,3 @@ function saveEdit(){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{ updateAllProfiles(); setTimeout(applyGoldTicks,300); setTimeout(applyGoldTicks,1000); });
-// Auto check - Reels / DM la Load aana aprom kooda Tick Varum da
-setInterval(applyGoldTicks, 2000);
