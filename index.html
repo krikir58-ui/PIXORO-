@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="css/feed.css">
 <link rel="stylesheet" href="css/comments.css">
 <link rel="stylesheet" href="css/splash.css">
+<link rel="stylesheet" href="css/pixoro-verified.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
@@ -46,10 +47,6 @@
 .trendBar{display:flex;gap:8px;padding:10px 12px;overflow-x:auto;border-bottom:1px solid #111}.trendBar::-webkit-scrollbar{display:none}
 .trendChip{background:#111;border:1px solid #333;padding:7px 12px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer}
 .feedTabs{display:flex;border-bottom:1px solid #111}.feedTab{flex:1;text-align:center;padding:12px;font-size:13px;color:#888;cursor:pointer;font-weight:700}.feedTab.active{color:#fff;border-bottom:2px solid #fff}
-/* PIXORO GOLD TICK - FINAL CORRECT ADDED */
-.pixoro-gold-tick{width:16px;height:16px;display:inline-flex;background:radial-gradient(circle at 30% 30%,#FFF6A5,#FFD700 45%,#B8860B);border-radius:50%;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(255,215,0,.8);vertical-align:middle;margin-left:4px;flex-shrink:0}
-.pixoro-gold-tick svg{width:10px;height:10px}
-.sName .pixoro-gold-tick,.dm-note .pixoro-gold-tick,.notes-row .pixoro-gold-tick{display:none!important}
 </style></head><body>
 <div class="top"><b style="font-size:24px;font-weight:900">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="location.href='notifications.html'"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M6 8a6 6 0 0 1 12 0c0 7 6 9 6 9H0s6-2 6-9"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg></div></div></div>
 <div class="storySearchWrap"><input id="storySearch" placeholder="🔍 Search Story..." oninput="renderStories()"><span onclick="document.getElementById('storySearch').value='';renderStories()" style="color:#666;cursor:pointer">✕</span></div>
@@ -85,8 +82,8 @@ function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('
 let ME_RAW=cleanUser(localStorage.getItem('pixoro_user_id')||localStorage.getItem('pixoro_current_user')||'giri')
 let ME=ME_RAW
 function displayNameFor(u){ if(!u) return ME; return cleanUser(u); }
-// GOLD TICK - CORRECT
-function getTick(u){ let c=cleanUser(u); if(c=='giri_office' || c=='giri') return '<span class="pixoro-gold-tick"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'; return ''; }
+// PIXORO VERIFIED - ONLY 1 TICK
+function getTick(u){ let c=cleanUser(u); if(c=='giri_office' || c=='giri') return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'; return ''; }
 function isMyPost(u){ let c=cleanUser(u); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||'')||c===cleanUser(localStorage.getItem('pixoro_user_id')||'')||c==='krikir58'||c.includes('kri'); }
 let feedMode = localStorage.getItem('pixoro_feed_mode')||'foryou'
 function viralScore(p){ let likes=allLikes.filter(l=>l.post_id==p.id).length; let hours=(Date.now()-new Date(p.created_at||Date.now()).getTime())/3600000; return (likes*10)/(hours+2) }
