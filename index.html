@@ -82,9 +82,9 @@ function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('
 let ME_RAW=cleanUser(localStorage.getItem('pixoro_user_id')||localStorage.getItem('pixoro_current_user')||'giri')
 let ME=ME_RAW
 function displayNameFor(u){ if(!u) return ME; return cleanUser(u); }
-// PIXORO VERIFIED - ONLY 1 TICK
-function getTick(u){ let c=cleanUser(u); if(c=='giri_office' || c=='giri') return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'; return ''; }
-function isMyPost(u){ let c=cleanUser(u); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||'')||c===cleanUser(localStorage.getItem('pixoro_user_id')||'')||c==='krikir58'||c.includes('kri'); }
+// PIXORO VERIFIED - GIRI_OFFICE MATTUM DA - CORRECT FIX
+function getTick(u){ let c=cleanUser(u); if(c==='giri_office') return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'; return ''; }
+function isMyPost(u){ let c=cleanUser(u); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||'')||c===cleanUser(localStorage.getItem('pixoro_user_id')||''); }
 let feedMode = localStorage.getItem('pixoro_feed_mode')||'foryou'
 function viralScore(p){ let likes=allLikes.filter(l=>l.post_id==p.id).length; let hours=(Date.now()-new Date(p.created_at||Date.now()).getTime())/3600000; return (likes*10)/(hours+2) }
 function setFeedMode(m){ feedMode=m; localStorage.setItem('pixoro_feed_mode',m); document.getElementById('tabForYou').classList.toggle('active',m=='foryou'); document.getElementById('tabFollowing').classList.toggle('active',m=='following'); document.getElementById('tabLatest').classList.toggle('active',m=='latest'); renderFeed(); }
