@@ -28,11 +28,15 @@
 .cropOverlay{position:fixed;inset:0;background:#000;z-index:2000;display:none;flex-direction:column}.cropStage{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}.cropCircle{width:280px;height:280px;border-radius:50%;overflow:hidden;border:3px solid #fff;touch-action:none;background:#111;box-shadow:0 0 0 9999px rgba(0,0,0,.7);position:relative}.cropCircle img{position:absolute;left:50%;top:50%;max-width:none;cursor:grab;transform:translate(-50%,-50%)}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;display:none;white-space:nowrap}
 input[type=range]{width:100%;accent-color:#fff}
+/* PIXORO GOLD TICK - Instagram Style */
+.pixoro-gold-tick{width:18px;height:18px;display:inline-flex;background:radial-gradient(circle at 30% 30%,#FFF6A5,#FFD700 45%,#B8860B);border-radius:50%;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(255,215,0,.8);vertical-align:middle;margin-left:4px;flex-shrink:0}
+.pixoro-gold-tick svg{width:11px;height:11px}
+.pixoro-gold-tick-top{width:20px;height:20px;margin-left:6px}
 </style></head><body>
-<div class="top"><b style="font-size:20px;font-weight:900" id="topUsername" class="my-name">giri</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div><div class="bellWhite" onclick="location.href='notifications.html'">🔔</div><span onclick="openSettings()" style="font-size:20px;cursor:pointer">☰</span></div></div>
+<div class="top"><b style="font-size:20px;font-weight:900;display:flex;align-items:center" id="topUsername" class="my-name">giri<span id="goldTickTop" class="pixoro-gold-tick pixoro-gold-tick-top" style="display:none"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div><div class="bellWhite" onclick="location.href='notifications.html'">🔔</div><span onclick="openSettings()" style="font-size:20px;cursor:pointer">☰</span></div></div>
 <div style="padding:15px">
 <div style="display:flex;gap:18px;align-items:center"><div class="pfpBig" onclick="openEditSheet()"><div class="pfpBigInner"><img id="pfpImg" class="my-pfp" src=""></div></div><div class="stats"><div><b id="postCount">0</b><span>Posts</span></div><div><b id="followerCount">0</b><span>Followers</span></div><div><b id="followingCount">0</b><span>Following</span></div></div></div>
-<div style="margin-top:14px"><div style="display:flex;gap:6px"><b id="displayName" class="my-name">Giri</b><span style="width:16px;height:16px;background:#0095f6;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:10px">✓</span></div><div style="font-size:13px;color:#aaa"><span id="usernameTag" class="my-name">giri</span></div><div id="bioText" style="font-size:14px;margin-top:8px"></div><div id="linkText" style="font-size:13px;color:#0095f6;margin-top:6px"></div></div>
+<div style="margin-top:14px"><div style="display:flex;gap:6px;align-items:center"><b id="displayName" class="my-name">Giri</b><span id="goldTick" class="pixoro-gold-tick" style="display:none"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div style="font-size:13px;color:#aaa"><span id="usernameTag" class="my-name">giri</span></div><div id="bioText" style="font-size:14px;margin-top:8px"></div><div id="linkText" style="font-size:13px;color:#0095f6;margin-top:6px"></div></div>
 <div class="highlights" id="highlightList"></div>
 <div style="display:flex;gap:8px;margin-top:12px"><button class="btn btnPrimary" onclick="openEditSheet()">Edit Profile</button><button class="btn" onclick="shareProfile()">Share Profile</button></div>
 <div style="display:flex;border-top:1px solid #222;margin-top:18px"><div class="tab active" id="tabPosts" onclick="showTab('all')">⊞ Posts</div><div class="tab" id="tabReels" onclick="showTab('reels')">🎬 Reels</div><div class="tab" onclick="location.href='saved.html'">🔖 Saved</div></div>
@@ -84,12 +88,46 @@ function updateProtectUI(){ let t=document.getElementById('protectToggle'); if(t
 function toggleProtect(){ protectOn=!protectOn; localStorage.setItem('pixoro_protect_'+ME_RAW,JSON.stringify(protectOn)); updateProtectUI(); showToast(protectOn?'Photo Protection ON 🔒':'Protection OFF 🔓') }
 function renderGrid(list){ if(!list.length){ document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`; return; } document.getElementById('myGrid').innerHTML=list.map(p=>{ let mUrl=p.media_url||p.image_url||''; let isVid=p.media_type=='reel'||p.media_type=='video'||p.is_reel==true||mUrl.includes('.mp4'); if(isVid) return `<div style="position:relative"><video src="${mUrl}" muted playsinline style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px;font-size:14px">🎬</span></div>`; return `<img src="${mUrl}">`; }).join('') }
 function showTab(type){ document.getElementById('tabPosts').classList.toggle('active', type=='all'); document.getElementById('tabReels').classList.toggle('active', type=='reels'); let list=type=='reels'? myPosts.filter(p=> p.media_type=='reel'||p.media_type=='video'||p.is_reel==true||(p.media_url||'').includes('.mp4')||(p.image_url||'').includes('.mp4')) : myPosts; renderGrid(list); }
+
+// --- PIXORO GOLD TICK LOGIC - Instagram Style ---
+function isGoldUser(u){
+  let c=cleanUser(u);
+  if(c==='giri'||c==='krikir58'||c.includes('kri')) return true;
+  if(localStorage.getItem('pixoro_gold_'+c)==='yes') return true;
+  return false;
+}
+async function checkGoldTick(){
+  let target=new URLSearchParams(location.search).get('u')||ME_RAW;
+  let show = isGoldUser(target);
+  if(!show && supa){
+    try{
+      let {data:{user}} = await supa.auth.getUser();
+      if(user){
+        let {data} = await supa.from('verification_requests').select('status').eq('user_id', user.id).eq('status','approved').maybeSingle();
+        if(data) show=true;
+      }
+      // username wise check
+      let {data:v2} = await supa.from('verification_requests').select('*').eq('username', target).eq('status','approved').maybeSingle();
+      if(v2) show=true;
+    }catch(e){}
+  }
+  let t1=document.getElementById('goldTick'); if(t1) t1.style.display=show?'inline-flex':'none';
+  let t2=document.getElementById('goldTickTop'); if(t2) t2.style.display=show?'inline-flex':'none';
+  // topUsername text fix - textContent overwrites span, so restore
+  let top=document.getElementById('topUsername');
+  if(top && !top.querySelector('#goldTickTop')){
+    let uname=top.textContent.trim(); top.innerHTML=uname+'<span id="goldTickTop" class="pixoro-gold-tick pixoro-gold-tick-top" style="display:'+(show?'inline-flex':'none')+'"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+  }
+}
+
 function loadProfile(){
   let target=new URLSearchParams(location.search).get('u')||ME_RAW;
   let isMine=isMyUser(target)||isMyPostUser(target);
   let uname = isMine ? ME_RAW : cleanUser(target);
   let display = isMine ? (localStorage.getItem('pixoro_name_'+ME_RAW)||localStorage.getItem('pixoro_name_'+uname)||uname) : (localStorage.getItem('pixoro_name_'+target)||cleanUser(target));
-  document.getElementById('topUsername').textContent=uname;
+  // topUsername - span ah azhikama vechi set pannu
+  let topEl=document.getElementById('topUsername');
+  topEl.childNodes[0].textContent=uname;
   document.getElementById('displayName').textContent=display;
   document.getElementById('usernameTag').textContent=uname;
   document.getElementById('bioText').innerText=localStorage.getItem('pixoro_bio_'+ME_RAW)||localStorage.getItem('pixoro_bio_'+target)||'🔥 Tiruchengode ➡️ World\n👨‍💻 Pixoro Founder';
@@ -97,6 +135,7 @@ function loadProfile(){
   document.getElementById('pfpImg').src=getPfp(ME_RAW);
   document.getElementById('editPfpPreview').src=document.getElementById('pfpImg').src;
   updateProtectUI(); applyLoginSettings(); loadHighlights(); updateNavPfp();
+  checkGoldTick();
   let t=cleanUser(target); let oldC=cleanUser(localStorage.getItem('pixoro_old_user')||'');
   let local=JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
   myPosts=local.filter(p=> isMyPostUser(p.username) || cleanUser(p.username||'')==t || cleanUser(p.username||'')==oldC);
