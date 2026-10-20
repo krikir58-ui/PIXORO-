@@ -1,32 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Admin - Pixoro Verify</title>
+<title>Admin - Pixoro Gold Verify</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>body{font-family:Arial;padding:20px} .card{border:1px solid #ccc;padding:15px;margin:10px 0;border-radius:12px}</style>
+<style>
+body{font-family:Arial;padding:20px;background:#000;color:#fff}
+.card{border:1px solid #333;padding:15px;margin:10px 0;border-radius:12px;background:#111}
+button{cursor:pointer;font-weight:900}
+</style>
 </head>
 <body>
-<h2>💙 Admin Panel - Blue Tick Requests</h2>
+<h2>👑 Admin Panel - Gold Tick Requests</h2>
 <div id="list">Loading...</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPA_URL = 'https://yecpltndhlzfjpjlzchcpm.supabase.co';
-const SUPA_KEY = 'sb_publishable_byUfZPczrxfKYKTMuNco5w_oqabYQJ_';
+const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
+const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+
 async function loadRequests(){
   const { data } = await supa.from('verification_requests').select('*').eq('status','pending').order('created_at',{ascending:false});
   let html='';
   if(!data || data.length==0){ document.getElementById('list').innerHTML='No pending requests da!'; return; }
   data.forEach(r=>{
-    html+=`<div class="card"><b>${r.full_name}</b> - ${r.username}<br>Reason: ${r.reason}<br>Proof: <a href="${r.id_proof_url}" target="_blank">${r.id_proof_url}</a><br><button onclick="approve('${r.user_id}','${r.id}')" style="background:green;color:white;padding:8px 15px;border:none;border-radius:8px;">✅ Approve</button> <button onclick="reject('${r.id}')" style="background:red;color:white;padding:8px 15px;border:none;border-radius:8px;">❌ Reject</button></div>`;
+    html+=`<div class="card"><b>${r.username||r.full_name||'User'}</b><br>ID: <b style="color:#FFD700">${r.username}</b><br>Proof: <a href="${r.proof_url||r.id_proof_url}" target="_blank" style="color:#FFD700">${r.proof_url||r.id_proof_url}</a><br><br><button onclick="approve('${r.username}','${r.id}')" style="background:#FFD700;color:#000;padding:8px 15px;border:none;border-radius:8px;">👑 Approve Gold</button> <button onclick="reject('${r.id}')" style="background:red;color:white;padding:8px 15px;border:none;border-radius:8px;">❌ Reject</button></div>`;
   });
   document.getElementById('list').innerHTML=html;
 }
-window.approve = async (userId, reqId)=>{
-  await supa.from('profiles').update({is_verified:true}).eq('id',userId);
+
+window.approve = async (username, reqId)=>{
+  let clean = username.toLowerCase().trim();
+  // 1. Request ah Approve pannu da
   await supa.from('verification_requests').update({status:'approved'}).eq('id',reqId);
-  alert('💙 Blue tick kuduthachu da!'); loadRequests();
+  // 2. profiles table la Gold Tick kuduu da - ID vachu da
+  await supa.from('profiles').update({is_gold_verified:true, is_verified:true, gold_tick:true}).eq('username',clean);
+  // 3. Local la GOLD_IDS la Add pannu da - Profile la kaamikkanum da
+  let ids = JSON.parse(localStorage.getItem('pixoro_gold_ids')||'["giri_office"]');
+  if(!ids.includes(clean)) ids.push(clean);
+  localStorage.setItem('pixoro_gold_ids', JSON.stringify(ids));
+  alert('👑 Gold Tick Kuduthachu da! ID: '+clean);
+  loadRequests();
 }
+
 window.reject = async (reqId)=>{
   await supa.from('verification_requests').update({status:'rejected'}).eq('id',reqId);
   loadRequests();
