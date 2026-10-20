@@ -20,17 +20,16 @@ function getMyProfile(){
   };
 }
 
-// ===== PIXORO VERIFIED - ONE LINK - MATTUM GIRI_OFFICE DA =====
+// ===== PIXORO VERIFIED - GOLD TICK - MATTUM GIRI_OFFICE DA =====
 function isGoldUser(u){
   if(!u) return false;
   let c=String(u).toLowerCase().split('@')[0].replace(/[^a-z0-9_.]/g,'');
-  // MATTUM GIRI_OFFICE DA - GIRI KU ILLA DA
   if(c==='giri_office') return true;
   if(localStorage.getItem('pixoro_gold_'+c)==='yes') return true;
   return false;
 }
 function goldTickHTML(){
-  return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+  return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
 }
 function getTick(u){ return isGoldUser(u) ? goldTickHTML() : ''; }
 window.getTick = getTick;
@@ -40,17 +39,12 @@ window.goldTickHTML = goldTickHTML;
 function addGoldCSS(){
   if(document.getElementById('pixoro-verified-style')) return;
   let s=document.createElement('style'); s.id='pixoro-verified-style';
-  s.innerHTML='.pixoro-verified{width:16px;height:16px;min-width:16px;display:inline-flex;align-items:center;justify-content:center;background:#fff;border-radius:50%;vertical-align:middle;margin-left:5px;flex-shrink:0}.pixoro-verified svg{width:10px;height:10px}';
+  s.innerHTML='.pixoro-verified{width:20px!important;height:20px!important;min-width:20px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;background:linear-gradient(135deg,#FFD700,#FFA500)!important;border:1.5px solid #FFD700!important;border-radius:50%!important;vertical-align:middle!important;margin-left:5px!important;flex-shrink:0!important;box-shadow:0 0 6px rgba(255,215,0,.6)!important}.pixoro-verified svg{width:13px!important;height:13px!important;display:block!important}.pixoro-verified svg path{stroke:#000!important;fill:none!important;stroke-width:4.8!important}';
   document.head.appendChild(s);
 }
 addGoldCSS();
 
-// UPDATE - PFP MATTUM DA - NAME AH THODATHA DA
 function updateAllProfiles(){
   let p = getMyProfile();
   document.querySelectorAll('.my-pfp').forEach(el => { if(p.photo) el.src = p.photo; });
-  // NAME / USERNAME AH INGA MAATHATHA - PROFILE.HTML PAATHUKUM DA
 }
-
-// SAVE EDIT - CORE LA VECHIKATHA - PROFILE.HTML LA THAN IRUKANUM DA
-// ITHA DELETE PANNTEN DA - DOUBLE SAVE PROBLEM VARUM DA
