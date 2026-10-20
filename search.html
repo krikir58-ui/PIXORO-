@@ -1,4 +1,5 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Search - Pixoro</title>
+<link rel="stylesheet" href="css/pixoro-verified.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
@@ -27,9 +28,6 @@ input{flex:1;background:#181818;border:1px solid #222;padding:10px 12px;border-r
 .createRow:active{background:#222}
 .createIco{width:44px;height:44px;border-radius:50%;border:1px solid #555;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
-/* PIXORO GOLD TICK - ADDED */
-.pixoro-gold-tick{width:16px;height:16px;display:inline-flex;background:radial-gradient(circle at 30% 30%,#FFF6A5,#FFD700 45%,#B8860B);border-radius:50%;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(255,215,0,.8);vertical-align:middle;margin-left:4px;flex-shrink:0}
-.pixoro-gold-tick svg{width:10px;height:10px}
 </style></head><body>
 <div class="top">
 <input id="searchInput" placeholder="Search real people... @name" oninput="doSearch()" autofocus>
@@ -72,8 +70,7 @@ const supa=supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_
 const ME_RAW=localStorage.getItem('pixoro_current_user')||'Giri'
 const ME=localStorage.getItem('pixoro_display_name')||cleanUser(ME_RAW)
 function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||'giri'; }
-// GOLD TICK HELPER - ADDED DA GIRI
-function getTick(u){ try{ if(typeof isGoldUser!=='undefined' && isGoldUser(u)) return goldTickHTML(); }catch(e){} let c=cleanUser(u); if(c=='giri'||c=='giri_office'||c=='krikir58'||c.includes('kri')) return '<span class="pixoro-gold-tick"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'; return ''; }
+// TICK - CORE LA IRUNTHU VARUM DA - INGA LOCAL GETTICK ILLA DA - ONE LINK SYSTEM
 function getPfp(u){
   if(!u) return '';
   let clean = cleanUser(u);
