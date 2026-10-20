@@ -11,7 +11,7 @@ async function saveToSupabase(){
 }
 
 function getMyProfile(){
-  let uid = localStorage.getItem('pixoro_user_id') || localStorage.getItem('pixoro_current_user') || 'giri_official';
+  let uid = localStorage.getItem('pixoro_user_id') || localStorage.getItem('pixoro_current_user') || 'giri_office';
   uid = uid.trim().toLowerCase().replace('@','');
   return {
     username: uid,
@@ -20,11 +20,12 @@ function getMyProfile(){
   };
 }
 
-// ===== GOLD TICK - SINGLE LOGIC DA =====
+// ===== GOLD TICK - FIXED DA GIRI =====
 function isGoldUser(u){
   if(!u) return false;
   let c=String(u).toLowerCase().split('@')[0].replace(/[^a-z0-9_.]/g,'');
-  if(c==='giri'||c==='krikir58'||c.includes('kri')||c==='giri_official') return true;
+  // giri_office add panniten da - Ithu thaan Main Fix da!
+  if(c==='giri'||c==='giri_office'||c==='giri_official'||c==='krikir58'||c.includes('kri')) return true;
   if(localStorage.getItem('pixoro_gold_'+c)==='yes') return true;
   return false;
 }
@@ -39,18 +40,16 @@ function addGoldCSS(){
 }
 function applyGoldTicks(){
   addGoldCSS();
-  // Blue tick ah remove pannu da
-  document.querySelectorAll('span').forEach(sp=>{
-    if(sp.style.background==='#0095f6'||sp.style.background==='rgb(0, 149, 246)') sp.style.display='none';
-  });
-  let p=getMyProfile();
-  if(!isGoldUser(p.username)) return;
-  // Ella my-name, topUsername, usernameTag la Gold podu da
-  document.querySelectorAll('.my-name, #topUsername, #usernameTag, #displayName').forEach(el=>{
+  // Ella Username edathulayum Tick Podu da - Instagram Mari
+  document.querySelectorAll('.my-name, #topUsername, #usernameTag, #displayName, .username, .user-name, [data-username]').forEach(el=>{
     if(el.querySelector('.pixoro-gold-tick')) return;
-    // textContent ah azhikama - innerHTML la tick add pannu da
-    el.innerHTML = el.textContent.trim() + goldTickHTML();
+    let txt = el.textContent.trim().replace('@','');
+    if(isGoldUser(txt)){
+      el.innerHTML = el.textContent.trim() + goldTickHTML();
+    }
   });
+  // Reels / DM / Home la - @giri_office nu irukura edam ellam
+  document.body.innerHTML = document.body.innerHTML.replace(/@giri_office(?!.*pixoro-gold-tick)/g, '@giri_office '+goldTickHTML());
 }
 
 function updateAllProfiles(){
@@ -64,7 +63,6 @@ function updateAllProfiles(){
   let top = document.getElementById('topUsername'); if(top) top.textContent = p.username;
   let tag = document.getElementById('usernameTag'); if(tag) tag.textContent = p.username;
   let dn = document.getElementById('displayName'); if(dn) dn.textContent = p.name;
-  // Text set panna aprom Gold Tick podu da - Illana azhinjidum da
   setTimeout(applyGoldTicks, 50);
 }
 
@@ -90,3 +88,5 @@ function saveEdit(){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{ updateAllProfiles(); setTimeout(applyGoldTicks,300); setTimeout(applyGoldTicks,1000); });
+// Auto check - Reels / DM la Load aana aprom kooda Tick Varum da
+setInterval(applyGoldTicks, 2000);
