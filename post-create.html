@@ -1,5 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
 <style>
 *{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto}
 .top{padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #111}
@@ -21,11 +22,10 @@
 <div id="toast" class="toast"></div>
 <input type="file" id="f" hidden accept="image/*,video/*" onchange="h(event)">
 <script>
-const supa=supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_');
+let supa = window.supa
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
 window.confirm = function(msg){ showToast(msg); return true; };
-// ✅ LOGIN CHECK - Server Session da
 let ME_RAW=''
 async function checkAuth(){
   let { data: { session } } = await supa.auth.getSession()
@@ -68,14 +68,12 @@ async function h(e){
   if(error){ showToast('Adutha side la problem da - Try again'); document.getElementById('prog').style.display='none'; return; }
   let {data}=supa.storage.from(bucket).getPublicUrl(fileName);
   m=data.publicUrl;
-  // ✅ NO localStorage - URL la Thaan da Pass Pannurom da
   document.getElementById('progFill').style.width='100%';
   document.getElementById('progText').innerText='Upload Done ✅ Storage Saved!';
   showToast('Upload Done da Giri! 🔥 Next ku po da');
 }
 function go(){ 
   if(!m){showToast('Photo select pannu da Giri!');return} 
-  // ✅ URL Param la Media Pass da - Local Illa da
   location.href='post-upload.html?media='+encodeURIComponent(m)+'&type='+mType
 }
 </script></body></html>
