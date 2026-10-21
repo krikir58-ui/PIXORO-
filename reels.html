@@ -1,19 +1,17 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"><title>Pixoro Reels</title>
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="css/reels.css">
-<link rel="stylesheet" href="css/comments.css">
 <link rel="stylesheet" href="css/pixoro-verified.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
 body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden;margin:0}
 .reelWrap{width:100vw;height:100dvh;overflow-y:scroll;scroll-snap-type:y mandatory}
 .reelWrap::-webkit-scrollbar{display:none}
 .reel{width:100vw;height:100dvh;position:relative;scroll-snap-align:start;background:#000;overflow:hidden}
-.reel video,.reel img{width:100%;height:100%;object-fit:cover;object-position:center}
-.reel.fit video,.reel.fit img{object-fit:contain;background:#000}
-.progress{position:absolute;top:0;left:0;height:2px;background:#FFD700;width:0%;z-index:20;transition:width.1s linear}
+.reel video,.reel img{width:100%;height:100%;object-fit:cover}
+.reel.fit video,.reel.fit img{object-fit:contain}
+.progress{position:absolute;top:0;left:0;height:2px;background:#FFD700;width:0%;z-index:20}
 .topBar{position:absolute;top:8px;left:12px;right:12px;display:flex;justify-content:space-between;z-index:10}
 .muteBtn{background:rgba(0,0,0,.5);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
 .vBar{position:absolute;right:10px;bottom:95px;display:flex;flex-direction:column;gap:18px;align-items:center;z-index:10}
@@ -28,105 +26,86 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden;margin
 .reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex;justify-content:space-between;padding:10px 12px;background:linear-gradient(to bottom, rgba(0,0,0,.8), transparent);height:56px;align-items:center}
 .topPlus{width:32px;height:32px;background:#fff!important;color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;cursor:pointer}
 .bellWhite{width:32px;height:32px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.bellWhite svg{width:18px;height:18px}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;width:100vw;height:60px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100;padding-bottom:4px;padding-top:4px}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;width:100vw;height:60px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}
 .bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}
 .bottom-nav a.active{color:#fff}
 .bottom-nav a.active svg{stroke:#fff}
 .bottom-nav span{font-size:10px;color:#8e8e8e}
 .bottom-nav a.active span{color:#fff;font-weight:700}
-.bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #555;background:#111}
-.bottom-nav a.active img.navPfp{border-color:#fff}
+.bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #555}
 .adBadge{position:absolute;top:60px;left:12px;background:#FFD700;color:#000;font-size:10px;font-weight:800;padding:3px 8px;border-radius:4px;z-index:15}
 .createRow{display:flex;align-items:center;gap:16px;padding:18px 20px;border-bottom:1px solid #2a2a2a;cursor:pointer}
-.createRow:active{background:#222}
-.createIco{width:44px;height:44px;border-radius:50%;border:1px solid #555;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.sizeBtn{position:absolute;top:70px;right:10px;z-index:25;background:#fff;color:#000;border:0;padding:7px 13px;border-radius:20px;font-weight:800;font-size:12px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)}
-.reel video{width:100%;height:100%;object-fit:cover;aspect-ratio:9/16}
+.createIco{width:44px;height:44px;border-radius:50%;border:1px solid #555;display:flex;align-items:center;justify-content:center;font-size:22px}
+.sizeBtn{position:absolute;top:70px;right:10px;z-index:25;background:#fff;color:#000;border:0;padding:7px 13px;border-radius:20px;font-weight:800;font-size:12px;cursor:pointer}
 .menuSheet{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;display:none;align-items:flex-end;justify-content:center}
 .menuSheet.show{display:flex}
 .menuBox{background:#1a1a1a;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:12px 14px 30px}
 .menuItem{padding:14px 12px;border-bottom:1px solid #222;cursor:pointer;font-size:14px;display:flex;gap:10px;align-items:center}
-.reel-pfp-wrap{width:36px;height:36px;min-width:36px;max-width:36px;border-radius:50%;overflow:hidden;border:2px solid #fff;flex-shrink:0;cursor:pointer;background:#222;display:block}
-.reel-pfp-wrap img{width:100% !important;height:100% !important;object-fit:cover;display:block;border:0 !important}
+.reel-pfp-wrap{width:36px;height:36px;min-width:36px;border-radius:50%;overflow:hidden;border:2px solid #fff;flex-shrink:0;cursor:pointer;background:#222;display:block}
+.reel-pfp-wrap img{width:100%!important;height:100%!important;object-fit:cover;display:block}
 .reel-username{font-size:14px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;display:flex;align-items:center;gap:4px}
 </style></head><body>
-<div class="reelsTop"><b style="font-size:20px">Reels</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div><div class="bellWhite" onclick="location.href='notifications.html'"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M6 8a6 6 0 0 1 12 0c0 7 6 9 6 9H0s6-2 6-9"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg></div></div></div>
+<div class="reelsTop"><b style="font-size:20px">Reels</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div><div class="bellWhite" onclick="location.href='notifications.html'">🔔</div></div></div>
 <div class="reelWrap" id="reelWrap"><p style="text-align:center;padding-top:50vh;color:#666">Loading Reels... 🎬</p></div>
-<div class="bottom-nav"><a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a><a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a><a href="reels.html" class="active"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="#fff"/></svg><span>Reels</span></a><a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a><a href="profile.html"><img class="navPfp my-pfp" id="navPfp" src=""><span>Profile</span></a></div>
-<div id="createSheet" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:flex-end;justify-content:center" onclick="if(event.target.id=='createSheet')this.style.display='none'"><div style="background:#1a1a1a;border-radius:28px 28px 0 0;padding:20px 0 30px;width:100%;max-width:450px"><div style="width:50px;height:5px;background:#333;border-radius:10px;margin:0 auto 16px"></div><div style="text-align:center;font-size:22px;font-weight:900;margin-bottom:10px">Create</div><div class="createRow" onclick="location.href='post-create.html'"><div class="createIco">+</div><div style="flex:1"><b>Post</b><div style="font-size:12px;color:#888">Share a photo or update</div></div><span>›</span></div><div class="createRow" onclick="location.href='reel-create.html'"><div class="createIco">▶</div><div style="flex:1"><b>Reels</b><div style="font-size:12px;color:#888">Create a short reel video</div></div><span>›</span></div><div class="createRow" onclick="location.href='story-create.html'"><div class="createIco" style="border-style:dashed">◯</div><div style="flex:1"><b>Story</b><div style="font-size:12px;color:#888">Share a 24-hour story</div></div><span>›</span></div><div class="createRow" style="border-bottom:none" onclick="location.href='live.html'"><div class="createIco">((•))</div><div style="flex:1"><b>Live</b><div style="font-size:12px;color:#888">Go live now</div></div><span>›</span></div><div onclick="document.getElementById('createSheet').style.display='none'" style="margin-top:12px;text-align:center;padding:12px;color:#777">Cancel</div></div></div>
-<div id="cModal" style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:80vh;display:flex;flex-direction:column"><div style="padding:14px;display:flex;justify-content:center;border-bottom:1px solid #222;position:relative"><div style="width:40px;height:4px;background:#333;border-radius:10px"></div><b style="position:absolute;left:50%;transform:translateX(-50%);top:14px;font-size:14px">Comments</b><span onclick="closeC()" style="position:absolute;right:15px;top:10px;font-size:22px;cursor:pointer">✕</span></div><div id="cList" style="flex:1;overflow-y:auto;padding:10px 12px;min-height:200px"></div><div style="padding:10px;border-top:1px solid #222;display:flex;gap:10px;align-items:center;background:#000"><img id="myCPfp" class="my-pfp" src="" style="width:32px;height:32px;border-radius:50%;object-fit:cover"><input id="cInput" placeholder="Add a comment..." style="flex:1;background:#222;border:0;padding:10px 14px;border-radius:20px;color:#fff;outline:none"><button onclick="addC()" style="background:none;border:0;color:#FFD700;font-weight:700">Post</button></div></div></div>
+<div class="bottom-nav"><a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a><a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a><a href="reels.html" class="active"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="#fff"/></svg><span>Reels</span></a><a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
+<div id="createSheet" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:flex-end;justify-content:center" onclick="if(event.target.id=='createSheet')this.style.display='none'"><div style="background:#1a1a1a;border-radius:28px 28px 0 0;padding:20px 0 30px;width:100%;max-width:450px"><div style="width:50px;height:5px;background:#333;border-radius:10px;margin:0 auto 16px"></div><div style="text-align:center;font-size:22px;font-weight:900;margin-bottom:10px">Create</div><div class="createRow" onclick="location.href='post-create.html'"><div class="createIco">+</div><div style="flex:1"><b>Post</b><div style="font-size:12px;color:#888">Share a photo or update</div></div><span>›</span></div><div class="createRow" onclick="location.href='reel-create.html'"><div class="createIco">▶</div><div style="flex:1"><b>Reels</b><div style="font-size:12px;color:#888">Create a short reel video</div></div><span>›</span></div><div class="createRow" onclick="location.href='story-create.html'"><div class="createIco">◯</div><div style="flex:1"><b>Story</b><div style="font-size:12px;color:#888">Share a 24-hour story</div></div><span>›</span></div><div onclick="document.getElementById('createSheet').style.display='none'" style="margin-top:12px;text-align:center;padding:12px;color:#777">Cancel</div></div></div>
+<div id="cModal" style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:80vh;display:flex;flex-direction:column"><div style="padding:14px;display:flex;justify-content:center;border-bottom:1px solid #222;position:relative"><b style="font-size:14px">Comments</b><span onclick="closeC()" style="position:absolute;right:15px;top:10px;font-size:22px;cursor:pointer">✕</span></div><div id="cList" style="flex:1;overflow-y:auto;padding:10px 12px;min-height:200px"></div><div style="padding:10px;border-top:1px solid #222;display:flex;gap:10px;align-items:center;background:#000"><img id="myCPfp" src="" style="width:32px;height:32px;border-radius:50%;object-fit:cover"><input id="cInput" placeholder="Add a comment..." style="flex:1;background:#222;border:0;padding:10px 14px;border-radius:20px;color:#fff;outline:none"><button onclick="addC()" style="background:none;border:0;color:#FFD700;font-weight:700">Post</button></div></div></div>
 <div id="menuSheet" class="menuSheet" onclick="if(event.target==this)closeMenu()"><div class="menuBox" id="menuBox"></div></div>
 <div id="toast" style="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;display:none"></div>
 <script src="js/pixoro-core.js"></script>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
-window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
-window.confirm = function(msg){ showToast(msg); return true; };
-window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
-if(typeof getTick === 'undefined'){
-  window.getTick = function(u){
-    let c=String(u||'').toLowerCase().split('@')[0].replace(/[^a-z0-9_.]/g,'');
-    if(c==='giri_office') return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
-    return '';
-  }
+let supa = window.supa
+function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
+function getTick(u){ return window.getTick ? window.getTick(u) : '' }
+let ME_RAW='', ME='', profileMap={}, allPosts=[], allLikes=[], allSaves=[], allFollows=[], allComments=[], allCLikes=[], curPost=null, allAds=[], blocked=[]
+async function init(){
+  if(!supa){ location.href='login.html'; return }
+  let { data:{session} } = await supa.auth.getSession()
+  if(!session){ location.href='login.html'; return }
+  let { data: myProf } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
+  ME_RAW = cleanUser(myProf?.username || session.user.email.split('@')[0])
+  ME = ME_RAW
+  let { data: profs } = await supa.from('profiles').select('*')
+  ;(profs||[]).forEach(p=> profileMap[cleanUser(p.username)] = p)
+  updateNavPfp(); load()
 }
-function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||'giri'; }
-const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-const ME_RAW=cleanUser(localStorage.getItem('pixoro_current_user')||localStorage.getItem('pixoro_user_id')||'giri_office')
-const ME=cleanUser(ME_RAW)
-function displayNameFor(u){ if(!u) return ME; let c=cleanUser(u); let meC=cleanUser(ME_RAW); let oldC=cleanUser(localStorage.getItem('pixoro_old_user')||''); if(c===meC || (oldC && c===oldC)) return ME; return c; }
-function isMyPost(u){ let c=cleanUser(u); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||''); }
 function getPfp(u){
-  if(!u) return '';
-  let clean = cleanUser(u);
-  if(isMyPost(u)){ let my=localStorage.getItem('pixoro_profile_pic')||localStorage.getItem('pixoro_current_pfp')||localStorage.getItem('pixoro_pfp_'+ME)||localStorage.getItem('pixoro_pfp_'+ME_RAW); if(my && (my.startsWith('data:')||my.startsWith('http')||my.startsWith('blob:'))) return my; }
-  let keys = ['pixoro_pfp_'+u,'pixoro_pfp_'+clean,'pixoro_gilli_pfp_'+u,'pixoro_gilli_pfp_'+clean,'pixoro_pfp_'+ME_RAW,'pixoro_pfp_'+ME,'pixoro_profile_pic','pixoro_current_pfp','profile_pic'];
-  for(let k of keys){ let p=localStorage.getItem(k); if(p && (p.startsWith('data:')||p.startsWith('http')||p.startsWith('blob:'))) return p; }
-  return 'data:image/svg+xml;utf8,[STRIPPED]'+clean.charAt(0).toUpperCase()+'</text></svg>';
+  let p = profileMap[cleanUser(u)]
+  if(p?.avatar_url) return p.avatar_url
+  let c = cleanUser(u)||'P'
+  return 'https://ui-avatars.com/api/?name='+c.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true'
 }
-function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW); let m=document.getElementById('myCPfp'); if(m) m.src=getPfp(ME_RAW); }
-updateNavPfp(); setInterval(updateNavPfp,1000);
-function openProfileFast(u){ localStorage.setItem('pixoro_view_user',u); location.href='profile.html?u='+encodeURIComponent(u); }
-let blocked=JSON.parse(localStorage.getItem('pixoro_blocked')||'[]')
-let allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allCLikes=[],curPost=null, allAds=[]
+function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW); let m=document.getElementById('myCPfp'); if(m) m.src=getPfp(ME_RAW) }
+function openProfileFast(u){ location.href='profile.html?u='+encodeURIComponent(cleanUser(u)) }
+function isMyPost(u){ return cleanUser(u)===ME_RAW }
 async function load(){
- try{
   let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false})
   let {data:likes}=await supa.from('likes').select('*')
   let {data:saves}=await supa.from('saves').select('*').eq('username',ME_RAW)
   let {data:follows}=await supa.from('follows').select('*')
   let {data:ads}=await supa.from('pixoro_ads').select('*').eq('is_active',true)
-  let local = JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
-  let all = [...local, ...(posts||[])];
-  allPosts = all.filter(p=> (p.media_type=='reel' || p.media_type=='video' || (p.image_url && p.image_url.includes('.mp4')) || (p.media_url && p.media_url.includes('.mp4')) || (p.media_url && p.media_url.startsWith('data:video')) || (p.image_url && p.image_url.startsWith('data:video'))) && !blocked.includes(p.username));
+  allPosts = (posts||[]).filter(p=> (p.media_type=='reel' || p.media_type=='video' || (p.media_url||'').includes('.mp4') || (p.image_url||'').includes('.mp4')) && !blocked.includes(p.username))
   allLikes=likes||[]; allSaves=saves||[]; allFollows=follows||[]; allAds=ads||[]
-  if(!allPosts.length) throw new Error('empty')
- }catch(e){
-  let local = JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
-  allPosts = local.filter(p=> p.media_type=='reel' || p.media_type=='video');
- }
- render(); updateNavPfp();
+  render()
 }
 function render(){
  let wrap=document.getElementById('reelWrap')
- if(!allPosts.length){ wrap.innerHTML='<p style="text-align:center;padding-top:50vh;color:#666">No Reels - + click panni upload pannu da!</p>'; return; }
+ if(!allPosts.length){ wrap.innerHTML='<p style="text-align:center;padding-top:50vh;color:#666">No Reels - + click panni upload pannu da!</p>'; return }
  let merged=[]; let adIdx=0
  for(let i=0;i<allPosts.length;i++){ merged.push({type:'post', data:allPosts[i]}); if((i+1)%3===0 && allAds.length>0){ merged.push({type:'ad', data:allAds[adIdx%allAds.length]}); adIdx++ } }
  wrap.innerHTML=merged.map(item=>{
   if(item.type==='ad'){
     let ad=item.data; let mediaUrl=ad.video_url||ad.image_url; let isVideo=mediaUrl&&mediaUrl.includes('.mp4')
     let media=isVideo?`<video src="${mediaUrl}" loop muted playsinline></video>`:`<img src="${mediaUrl}">`
-    return `<div class="reel"><div class="progress"></div>${media}<button class="sizeBtn" onclick="event.stopPropagation();this.closest('.reel').classList.toggle('fit')">⛶ Full / Fit</button><div class="adBadge">Sponsored</div><div class="topBar"><b>Sponsored</b></div><div class="btm"><b>@${cleanUser(ad.business_name||'Shop')}</b><div>${ad.caption||''}</div><a href="${ad.link||'#'}" target="_blank" style="display:inline-block;margin-top:8px;background:#FFD700;color:#000;padding:6px 14px;border-radius:20px;font-weight:800;font-size:12px;text-decoration:none">Order Now 🛒</a></div></div>`
+    return `<div class="reel"><div class="progress"></div>${media}<button class="sizeBtn" onclick="event.stopPropagation();this.closest('.reel').classList.toggle('fit')">⛶ Full / Fit</button><div class="adBadge">Sponsored</div><div class="btm"><b>@${cleanUser(ad.business_name||'Shop')}</b><div>${ad.caption||''}</div><a href="${ad.link||'#'}" target="_blank" style="display:inline-block;margin-top:8px;background:#FFD700;color:#000;padding:6px 14px;border-radius:20px;font-weight:800;font-size:12px;text-decoration:none">Order Now 🛒</a></div></div>`
   } else {
     let p=item.data; let lc=allLikes.filter(l=>l.post_id==p.id).length; let liked=allLikes.some(l=>l.post_id==p.id&&l.username==ME_RAW); let saved=allSaves.some(s=>s.post_id==p.id); let isFollow=allFollows.some(f=>f.follower==ME_RAW&&f.following==p.username)
-    let isMine = isMyPost(p.username);
-    let mUrl = p.media_url || p.image_url || '';
-    let isVid = p.media_type=='reel' || p.media_type=='video' || mUrl.includes('.mp4') || mUrl.startsWith('blob:') || mUrl.startsWith('data:video') || mUrl.startsWith('data:');
-    let media = isVid ? `<video src="${mUrl}" loop muted playsinline autoplay></video>` : `<img src="${mUrl}">`;
+    let isMine = isMyPost(p.username); let mUrl = p.media_url || p.image_url || '';
+    let media = `<video src="${mUrl}" loop muted playsinline autoplay></video>`;
     let followBtn = isMine ? '' : `<button id="followBtn-${p.id}" class="followBtnR ${isFollow?'following':''}" onclick="event.stopPropagation();toggleF('${p.username}',${p.id})">${isFollow?'Following':'Follow'}</button>`;
-    return `<div class="reel" data-id="${p.id}" ondblclick="dblLike(${p.id})" onclick="togglePlay(this)"><div class="progress"></div>${media}<button class="sizeBtn" onclick="event.stopPropagation();this.closest('.reel').classList.toggle('fit')">⛶ Full / Fit</button><div class="heartBurst">❤️</div><div class="topBar" style="top:65px"><b>Reels</b><div class="muteBtn" onclick="event.stopPropagation();toggleMute(this)">🔇</div></div><div class="vBar"><div class="vBtn" id="likeBtn-${p.id}" onclick="event.stopPropagation();toggleLike(${p.id})"><svg id="likeSvg-${p.id}" viewBox="0 0 24 24" width="30" height="30" fill="${liked?'#ff3040':'none'}" stroke="${liked?'#ff3040':'#fff'}" stroke-width="1.8"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg><span id="likeCnt-${p.id}">${lc>0?lc:''}</span></div><div class="vBtn" onclick="event.stopPropagation();openC(${p.id})"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div><div class="vBtn" onclick="event.stopPropagation();shareR()"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div class="vBtn" onclick="event.stopPropagation();saveR(${p.id})"><svg id="saveSvg-${p.id}" viewBox="0 0 24 24" width="26" height="26" fill="${saved?'#FFD700':'none'}" stroke="#FFD700" stroke-width="1.8"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></div></div><div class="btm"><div style="display:flex;align-items:center;gap:10px"><div class="reel-pfp-wrap" onclick="event.stopPropagation();openProfileFast('${p.username}')"><img src="${getPfp(p.username)}"></div><b class="reel-username" onclick="event.stopPropagation();openProfileFast('${p.username}')">@${displayNameFor(p.username)} ${getTick(p.username)}</b>${followBtn}<span onclick="event.stopPropagation();openPostMenu('${p.username}',${p.id})" style="font-size:20px;font-weight:900;cursor:pointer;margin-left:4px">⋯</span></div><div style="margin-top:8px;font-size:13px;line-height:1.4">${p.caption||''}</div><div style="font-size:12px;color:#ddd;margin-top:4px">🎵 Original audio • ${displayNameFor(p.username)}</div></div></div>`
+    return `<div class="reel" data-id="${p.id}" ondblclick="dblLike(${p.id})" onclick="togglePlay(this)"><div class="progress"></div>${media}<button class="sizeBtn" onclick="event.stopPropagation();this.closest('.reel').classList.toggle('fit')">⛶ Full / Fit</button><div class="heartBurst">❤️</div><div class="topBar" style="top:65px"><b>Reels</b><div class="muteBtn" onclick="event.stopPropagation();toggleMute(this)">🔇</div></div><div class="vBar"><div class="vBtn" id="likeBtn-${p.id}" onclick="event.stopPropagation();toggleLike(${p.id})"><svg id="likeSvg-${p.id}" viewBox="0 0 24 24" width="30" height="30" fill="${liked?'#ff3040':'none'}" stroke="${liked?'#ff3040':'#fff'}" stroke-width="1.8"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg><span id="likeCnt-${p.id}">${lc>0?lc:''}</span></div><div class="vBtn" onclick="event.stopPropagation();openC(${p.id})"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div><div class="vBtn" onclick="event.stopPropagation();shareR()"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div class="vBtn" onclick="event.stopPropagation();saveR(${p.id})"><svg id="saveSvg-${p.id}" viewBox="0 0 24 24" width="26" height="26" fill="${saved?'#FFD700':'none'}" stroke="#FFD700" stroke-width="1.8"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></div></div><div class="btm"><div style="display:flex;align-items:center;gap:10px"><div class="reel-pfp-wrap" onclick="event.stopPropagation();openProfileFast('${p.username}')"><img src="${getPfp(p.username)}"></div><b class="reel-username" onclick="event.stopPropagation();openProfileFast('${p.username}')">@${cleanUser(p.username)} ${getTick(p.username)}</b>${followBtn}<span onclick="event.stopPropagation();openPostMenu('${p.username}',${p.id})" style="font-size:20px;font-weight:900;cursor:pointer;margin-left:4px">⋯</span></div><div style="margin-top:8px;font-size:13px;line-height:1.4">${p.caption||''}</div></div></div>`
   }
  }).join('')
  observe()
@@ -136,40 +115,33 @@ function togglePlay(el){ let v=el.querySelector('video'); if(!v) return; if(v.pa
 function toggleMute(btn){ let v=btn.closest('.reel').querySelector('video'); if(!v) return; v.muted=!v.muted; btn.textContent=v.muted?'🔇':'🔊' }
 function dblLike(id){
   let liked=allLikes.some(l=>l.post_id==id&&l.username==ME_RAW);
-  let reel=document.querySelector(`.reel[data-id="${id}"]`);
-  let b=reel?reel.querySelector('.heartBurst'):null;
+  let reel=document.querySelector(`.reel[data-id="${id}"]`); let b=reel?reel.querySelector('.heartBurst'):null;
   if(b){ b.classList.remove('show'); void b.offsetWidth; b.classList.add('show'); }
-  if(liked) return;
-  allLikes.push({post_id:id,username:ME_RAW});
-  updateLikeUI(id,true);
-  if(supa) supa.from('likes').insert({post_id:id,username:ME_RAW});
+  if(liked) return; allLikes.push({post_id:id,username:ME_RAW}); updateLikeUI(id,true); supa.from('likes').insert({post_id:id,username:ME_RAW});
 }
 async function toggleLike(id){
   let liked=allLikes.some(l=>l.post_id==id&&l.username==ME_RAW);
-  if(!liked){ allLikes.push({post_id:id,username:ME_RAW}); updateLikeUI(id,true); if(supa) supa.from('likes').insert({post_id:id,username:ME_RAW}); }
-  else{ allLikes=allLikes.filter(l=>!(l.post_id==id&&l.username==ME_RAW)); updateLikeUI(id,false); if(supa) supa.from('likes').delete().eq('post_id',id).eq('username',ME_RAW); }
+  if(!liked){ allLikes.push({post_id:id,username:ME_RAW}); updateLikeUI(id,true); supa.from('likes').insert({post_id:id,username:ME_RAW}); }
+  else{ allLikes=allLikes.filter(l=>!(l.post_id==id&&l.username==ME_RAW)); updateLikeUI(id,false); supa.from('likes').delete().eq('post_id',id).eq('username',ME_RAW); }
 }
 function updateLikeUI(id,liked){
   let svg=document.getElementById('likeSvg-'+id); let cnt=document.getElementById('likeCnt-'+id);
   if(svg){ svg.setAttribute('fill',liked?'#ff3040':'none'); svg.setAttribute('stroke',liked?'#ff3040':'#fff'); }
   if(cnt){ let n=parseInt(cnt.innerText||'0'); cnt.innerText=liked? (n+1||1) : Math.max(0,n-1); if(cnt.innerText=='0') cnt.innerText=''; }
 }
-function like(id,burst=false){ if(burst) return dblLike(id); return toggleLike(id); }
-async function saveR(id){ let s=allSaves.some(x=>x.post_id==id); let svg=document.getElementById('saveSvg-'+id); if(s){ allSaves=allSaves.filter(x=>x.post_id!=id); if(svg) svg.setAttribute('fill','none'); if(supa) supa.from('saves').delete().eq('post_id',id).eq('username',ME_RAW); } else { allSaves.push({post_id:id}); if(svg) svg.setAttribute('fill','#FFD700'); if(supa) supa.from('saves').insert({post_id:id,username:ME_RAW}); } }
-async function toggleF(u,pid){ let a=allFollows.some(f=>f.follower==ME_RAW&&f.following==u); let btn=document.getElementById('followBtn-'+pid); if(a){ allFollows=allFollows.filter(f=>!(f.follower==ME_RAW&&f.following==u)); if(btn){btn.classList.remove('following');btn.innerText='Follow'} if(supa) supa.from('follows').delete().eq('follower',ME_RAW).eq('following',u); } else { allFollows.push({follower:ME_RAW,following:u}); if(btn){btn.classList.add('following');btn.innerText='Following'} if(supa) supa.from('follows').insert({follower:ME_RAW,following:u}); } }
+async function saveR(id){ let s=allSaves.some(x=>x.post_id==id); let svg=document.getElementById('saveSvg-'+id); if(s){ allSaves=allSaves.filter(x=>x.post_id!=id); if(svg) svg.setAttribute('fill','none'); supa.from('saves').delete().eq('post_id',id).eq('username',ME_RAW); } else { allSaves.push({post_id:id}); if(svg) svg.setAttribute('fill','#FFD700'); supa.from('saves').insert({post_id:id,username:ME_RAW}); } }
+async function toggleF(u,pid){ let a=allFollows.some(f=>f.follower==ME_RAW&&f.following==u); let btn=document.getElementById('followBtn-'+pid); if(a){ allFollows=allFollows.filter(f=>!(f.follower==ME_RAW&&f.following==u)); if(btn){btn.classList.remove('following');btn.innerText='Follow'} supa.from('follows').delete().eq('follower',ME_RAW).eq('following',u); } else { allFollows.push({follower:ME_RAW,following:u}); if(btn){btn.classList.add('following');btn.innerText='Following'} supa.from('follows').insert({follower:ME_RAW,following:u}); } }
 function shareR(){ if(navigator.share) navigator.share({url:location.href}); else { navigator.clipboard.writeText(location.href); showToast('Link copied da!'); } }
-function openPostMenu(u,pid){ let isMine=isMyPost(u); let box=document.getElementById('menuBox'); box.innerHTML=`<div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 12px"></div><div style="text-align:center;font-weight:800;padding-bottom:8px">@${displayNameFor(u)} ${getTick(u)}</div>${isMine?`<div class="menuItem" onclick="deletePost(${pid})">🗑️ Delete Reel</div>`:''}<div class="menuItem" onclick="blockUser('${u}')">🚫 Block @${displayNameFor(u)}</div><div class="menuItem" onclick="reportUser('${u}')">🚩 Report</div><div class="menuItem" onclick="shareR()">🔗 Share</div><div class="menuItem" onclick="closeMenu()" style="justify-content:center;color:#888">Cancel</div>`; document.getElementById('menuSheet').classList.add('show'); }
+function openPostMenu(u,pid){ let isMine=isMyPost(u); let box=document.getElementById('menuBox'); box.innerHTML=`<div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 12px"></div><div style="text-align:center;font-weight:800;padding-bottom:8px">@${cleanUser(u)} ${getTick(u)}</div>${isMine?`<div class="menuItem" onclick="deletePost(${pid})">🗑️ Delete Reel</div>`:''}<div class="menuItem" onclick="blockUser('${u}')">🚫 Block @${cleanUser(u)}</div><div class="menuItem" onclick="shareR()">🔗 Share</div><div class="menuItem" onclick="closeMenu()" style="justify-content:center;color:#888">Cancel</div>`; document.getElementById('menuSheet').classList.add('show'); }
 function closeMenu(){ document.getElementById('menuSheet').classList.remove('show'); }
-function blockUser(u){ blocked.push(u); localStorage.setItem('pixoro_blocked',JSON.stringify(blocked)); closeMenu(); showToast('Blocked @'+displayNameFor(u)); allPosts=allPosts.filter(p=>p.username!==u); render(); }
-function reportUser(u){ closeMenu(); showToast('Reported da - Team paakum da'); }
-async function deletePost(pid){ if(supa) await supa.from('posts').delete().eq('id',pid); closeMenu(); allPosts=allPosts.filter(p=>p.id!=pid); render(); showToast('Deleted da'); }
+function blockUser(u){ blocked.push(u); closeMenu(); showToast('Blocked @'+cleanUser(u)); allPosts=allPosts.filter(p=>p.username!==u); render(); }
+async function deletePost(pid){ await supa.from('posts').delete().eq('id',pid); closeMenu(); allPosts=allPosts.filter(p=>p.id!=pid); render(); showToast('Deleted da'); }
 async function openC(pid){ curPost=pid; document.getElementById('cModal').style.display='flex'; updateNavPfp(); await loadC() }
 function closeC(){ document.getElementById('cModal').style.display='none'; curPost=null }
-async function loadC(){ let {data:cs}=await supa.from('comments').select('*').eq('post_id',curPost).order('created_at',{ascending:true}); let {data:ls}=await supa.from('comment_likes').select('*'); allComments=cs||[]; allCLikes=ls||[]; let list=document.getElementById('cList'); if(!allComments.length){ list.innerHTML=`<p style="text-align:center;color:#666;padding:30px">No comments yet!</p>`; return } list.innerHTML=allComments.map(c=>{ let cnt=allCLikes.filter(l=>l.comment_id==c.id).length; let liked=allCLikes.some(l=>l.comment_id==c.id&&l.username==ME_RAW); let isMe=isMyPost(c.username); return `<div style="display:flex;gap:8px;padding:10px 0;border-bottom:1px solid #111"><img src="${getPfp(c.username)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0"><div style="flex:1"><b style="font-size:13px">@${displayNameFor(c.username)} ${getTick(c.username)}</b> <span style="font-size:13px">${c.text}</span><div style="font-size:11px;color:#777;margin-top:3px;display:flex;gap:12px"><span onclick="likeC(${c.id})" style="font-weight:700;color:${liked?'#ff3040':'#777'};cursor:pointer">${cnt>0?cnt+' likes':'Like'}</span><span onclick="likeC(${c.id})" style="cursor:pointer">${liked?'❤️':'🤍'}</span>${isMe?`<span onclick="delC(${c.id})" style="color:#ff3040;cursor:pointer">Delete</span>`:''}<span onclick="openCommentMenu('${c.username}',${c.id})" style="cursor:pointer">⋯</span></div></div></div>` }).join('') }
-function openCommentMenu(u,cid){ let isMe=isMyPost(u); let box=document.getElementById('menuBox'); box.innerHTML=`<div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 12px"></div><div style="text-align:center;font-weight:800;padding-bottom:8px">@${displayNameFor(u)} ${getTick(u)}</div>${isMe?`<div class="menuItem" onclick="delC(${cid});closeMenu()">🗑️ Delete Comment</div>`:''}<div class="menuItem" onclick="blockUser('${u}')">🚫 Block @${displayNameFor(u)}</div><div class="menuItem" onclick="reportUser('${u}')">🚩 Report Comment</div><div class="menuItem" onclick="closeMenu()" style="justify-content:center;color:#888">Cancel</div>`; document.getElementById('menuSheet').classList.add('show'); }
+async function loadC(){ let {data:cs}=await supa.from('comments').select('*').eq('post_id',curPost).order('created_at',{ascending:true}); let {data:ls}=await supa.from('comment_likes').select('*'); allComments=cs||[]; allCLikes=ls||[]; let list=document.getElementById('cList'); if(!allComments.length){ list.innerHTML=`<p style="text-align:center;color:#666;padding:30px">No comments yet!</p>`; return } list.innerHTML=allComments.map(c=>{ let cnt=allCLikes.filter(l=>l.comment_id==c.id).length; let liked=allCLikes.some(l=>l.comment_id==c.id&&l.username==ME_RAW); let isMe=isMyPost(c.username); return `<div style="display:flex;gap:8px;padding:10px 0;border-bottom:1px solid #111"><img src="${getPfp(c.username)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0"><div style="flex:1"><b style="font-size:13px">@${cleanUser(c.username)} ${getTick(c.username)}</b> <span style="font-size:13px">${c.text}</span><div style="font-size:11px;color:#777;margin-top:3px;display:flex;gap:12px"><span onclick="likeC(${c.id})" style="font-weight:700;color:${liked?'#ff3040':'#777'};cursor:pointer">${cnt>0?cnt+' likes':'Like'}</span>${isMe?`<span onclick="delC(${c.id})" style="color:#ff3040;cursor:pointer">Delete</span>`:''}</div></div></div>` }).join('') }
 async function addC(){ let t=document.getElementById('cInput').value.trim(); if(!t||!curPost) return; await supa.from('comments').insert({post_id:curPost,username:ME_RAW,text:t}); document.getElementById('cInput').value=''; await loadC() }
-async function likeC(cid){ let liked=allCLikes.some(l=>l.comment_id==cid&&l.username==ME_RAW); if(liked){ allCLikes=allCLikes.filter(l=>!(l.comment_id==cid&&l.username==ME_RAW)); if(supa) await supa.from('comment_likes').delete().eq('comment_id',cid).eq('username',ME_RAW); } else { allCLikes.push({comment_id:cid,username:ME_RAW}); if(supa) await supa.from('comment_likes').insert({comment_id:cid,username:ME_RAW}); } await loadC() }
-async function delC(cid){ let c=allComments.find(x=>x.id==cid); if(c && !isMyPost(c.username)){ showToast('Ithu un comment illa da'); return; } await supa.from('comments').delete().eq('id',cid); await loadC(); showToast('Deleted da'); }
-load()
+async function likeC(cid){ let liked=allCLikes.some(l=>l.comment_id==cid&&l.username==ME_RAW); if(liked){ allCLikes=allCLikes.filter(l=>!(l.comment_id==cid&&l.username==ME_RAW)); await supa.from('comment_likes').delete().eq('comment_id',cid).eq('username',ME_RAW); } else { allCLikes.push({comment_id:cid,username:ME_RAW}); await supa.from('comment_likes').insert({comment_id:cid,username:ME_RAW}); } await loadC() }
+async function delC(cid){ await supa.from('comments').delete().eq('id',cid); await loadC(); showToast('Deleted da'); }
+init()
 </script>
 </body></html>
