@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Notifications - Pixoro</title>
+<link rel="stylesheet" href="css/pixoro-verified.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:80px}
 .top{padding:14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #222;position:sticky;top:0;background:#000;z-index:10}
 .notItem{display:flex;gap:12px;padding:14px;border-bottom:1px solid #111;align-items:center;cursor:pointer}
-.notItem img{width:44px;height:44px;border-radius:50%}
+.notItem img{width:44px;height:44px;border-radius:50%;object-fit:cover}
 .notText{flex:1;font-size:14px;line-height:1.4}.notTime{font-size:11px;color:#666;margin-top:2px}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;height:70px;background:#000;border-top:1px solid #1e1e1e;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:#777}
@@ -27,31 +29,44 @@
 <a href="profile.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg><span>Profile</span></a>
 </div>
 <script>
-const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-const ME=(localStorage.getItem('pixoro_current_user')||'Giri').trim()
-let allNots=[]
+let supa = window.supa
+function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
+let ME='', allNots=[], profileMap={}
+function getPfp(u){
+  let p = profileMap[cleanUser(u)]
+  if(p?.avatar_url) return p.avatar_url
+  let c = cleanUser(u)||'P'
+  return 'https://ui-avatars.com/api/?name='+c.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true'
+}
 async function loadNots(){
-try{
-let {data:likes}=await supa.from('likes').select('*').order('created_at',{ascending:false}).limit(100)
-let {data:comments}=await supa.from('comments').select('*').order('created_at',{ascending:false}).limit(100)
-let {data:follows}=await supa.from('follows').select('*').order('created_at',{ascending:false}).limit(100)
-let {data:posts}=await supa.from('posts').select('*')
-let myPostIds=(posts||[]).filter(p=> (p.username||'').toLowerCase()===ME.toLowerCase()).map(p=>p.id)
-let nots=[]
-;(likes||[]).forEach(l=>{ if(myPostIds.includes(l.post_id) && (l.username||'').toLowerCase()!==ME.toLowerCase()) nots.push({type:'likes', username:l.username, text:`liked your post ❤️`, time:l.created_at}) })
-;(comments||[]).forEach(c=>{ if(myPostIds.includes(c.post_id) && (c.username||'').toLowerCase()!==ME.toLowerCase()) nots.push({type:'comments', username:c.username, text:`commented: "${c.text}" 💬`, time:c.created_at}) })
-;(follows||[]).forEach(f=>{ if((f.following||'').toLowerCase()===ME.toLowerCase()) nots.push({type:'follows', username:f.follower, text:`started following you 👤`, time:f.created_at}) })
-nots.sort((a,b)=> new Date(b.time)-new Date(a.time))
-allNots=nots
-if(nots.length===0){ document.getElementById('notList').innerHTML=`<div style="text-align:center;padding:60px"><div style="font-size:50px">🔔</div><p style="color:#666;margin-top:10px">No notifications yet da<br><span style="font-size:12px">Like, comment, follow panna inga varum da!</span></p></div>`; return }
-renderNots('all')
-}catch(e){ document.getElementById('notList').innerHTML=`<p style="text-align:center;padding:40px;color:#666">${e.message}</p>` }
+  try{
+    if(!supa){ location.href='login.html'; return }
+    let { data:{session} } = await supa.auth.getSession()
+    if(!session){ location.href='login.html'; return }
+    let { data: myProf } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
+    ME = cleanUser(myProf?.username || session.user.email.split('@')[0])
+    let { data: profs } = await supa.from('profiles').select('*')
+    ;(profs||[]).forEach(p=> profileMap[cleanUser(p.username)] = p)
+    let {data:likes}=await supa.from('likes').select('*').order('created_at',{ascending:false}).limit(100)
+    let {data:comments}=await supa.from('comments').select('*').order('created_at',{ascending:false}).limit(100)
+    let {data:follows}=await supa.from('follows').select('*').order('created_at',{ascending:false}).limit(100)
+    let {data:posts}=await supa.from('posts').select('*')
+    let myPostIds=(posts||[]).filter(p=> cleanUser(p.username)===ME).map(p=>p.id)
+    let nots=[]
+    ;(likes||[]).forEach(l=>{ if(myPostIds.includes(l.post_id) && cleanUser(l.username)!==ME) nots.push({type:'likes', username:l.username, text:`liked your post ❤️`, time:l.created_at}) })
+    ;(comments||[]).forEach(c=>{ if(myPostIds.includes(c.post_id) && cleanUser(c.username)!==ME) nots.push({type:'comments', username:c.username, text:`commented: "${c.text}" 💬`, time:c.created_at}) })
+    ;(follows||[]).forEach(f=>{ if(cleanUser(f.following)===ME) nots.push({type:'follows', username:f.follower, text:`started following you 👤`, time:f.created_at}) })
+    nots.sort((a,b)=> new Date(b.time)-new Date(a.time))
+    allNots=nots
+    if(nots.length===0){ document.getElementById('notList').innerHTML=`<div style="text-align:center;padding:60px"><div style="font-size:50px">🔔</div><p style="color:#666;margin-top:10px">No notifications yet da<br><span style="font-size:12px">Like, comment, follow panna inga varum da!</span></p></div>`; return }
+    renderNots('all')
+  }catch(e){ document.getElementById('notList').innerHTML=`<p style="text-align:center;padding:40px;color:#666">${e.message}</p>` }
 }
 function renderNots(filter){
-let list=document.getElementById('notList')
-let filtered = filter==='all'?allNots:allNots.filter(n=>n.type===filter)
-if(filtered.length===0){ list.innerHTML=`<p style="text-align:center;padding:40px;color:#666">No ${filter} notifications da</p>`; return }
-list.innerHTML=filtered.map(n=>`<div class="notItem"><img src="https://i.pravatar.cc/100?u=${n.username}"><div class="notText"><b>@${n.username}</b> ${n.text}<div class="notTime">${timeAgo(n.time)}</div></div><div style="font-size:20px">${n.type==='likes'?'❤️':n.type==='follows'?'👤':'💬'}</div></div>`).join('')
+  let list=document.getElementById('notList')
+  let filtered = filter==='all'?allNots:allNots.filter(n=>n.type===filter)
+  if(filtered.length===0){ list.innerHTML=`<p style="text-align:center;padding:40px;color:#666">No ${filter} notifications da</p>`; return }
+  list.innerHTML=filtered.map(n=>`<div class="notItem" onclick="location.href='profile.html?u=${encodeURIComponent(cleanUser(n.username))}'"><img src="${getPfp(n.username)}"><div class="notText"><b>@${cleanUser(n.username)} ${window.getTick?window.getTick(n.username):''}</b> ${n.text}<div class="notTime">${timeAgo(n.time)}</div></div><div style="font-size:20px">${n.type==='likes'?'❤️':n.type==='follows'?'👤':'💬'}</div></div>`).join('')
 }
 function filterNot(type,el){ document.querySelectorAll('.tabBar div').forEach(d=>d.classList.remove('active')); el.classList.add('active'); renderNots(type) }
 function timeAgo(t){ if(!t) return 'now'; let diff=Math.floor((new Date()-new Date(t))/1000); if(diff<60) return `${diff}s ago`; if(diff<3600) return `${Math.floor(diff/60)}m ago`; if(diff<86400) return `${Math.floor(diff/3600)}h ago`; return `${Math.floor(diff/86400)}d ago` }
