@@ -27,6 +27,7 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-rad
 <script>
 let supa = window.supa
 function showErr(m){ document.getElementById('msg').innerText=m }
+function cleanU(u){ u=String(u||'').trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase() }
 async function checkSession(){
   let {data} = await supa.auth.getSession()
   if(data.session){
@@ -45,7 +46,6 @@ async function ensureProfile(user){
   await supa.from('profiles').insert({ id: user.id, username: username, email: user.email })
   return username
 }
-// ✅ NEW - Login Mudinja Aprom - Username Irukka nu Check Panu da
 async function goNext(user){
   let { data } = await supa.from('profiles').select('username').eq('id', user.id).single()
   if(!data?.username){ location.href='create-username.html' } else { location.href='index.html' }
@@ -55,8 +55,9 @@ async function doLogin(){
   if(!val || !pass) return showErr('Username & Password podu da')
   let email = val
   if(!val.includes('@')){
-    let {data:p} = await supa.from('profiles').select('email').eq('username', val.toLowerCase()).single()
-    if(!p) return showErr('Username illa da')
+    let u = cleanU(val)
+    let {data:p} = await supa.from('profiles').select('email,username').ilike('username', u).maybeSingle()
+    if(!p) return showErr('Username illa da - Create New Account pannu da')
     email = p.email
   }
   let {data, error}=await supa.auth.signInWithPassword({email,password:pass})
