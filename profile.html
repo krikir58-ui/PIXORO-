@@ -1,6 +1,7 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Profile - Pixoro</title>
 <link rel="stylesheet" href="css/pixoro-verified.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e1e1e;position:sticky;top:0;background:#000;z-index:50;height:56px}
@@ -48,13 +49,16 @@ input[type=range]{width:100%;accent-color:#fff}
 <script src="js/pixoro-core.js"></script>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
-let supa=null; try{ supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_') }catch(e){ supa=null }
-// ✅ SERVER ONLY - NO localStorage
+let supa = window.supa
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||''; }
 let ME_RAW='', ME_ID='', VIEW_USER='', VIEW_PROFILE=null, myPosts=[]
-window.getTick = function(u){ let c=cleanUser(u||''); if(c==='giri_office') return '<span class="goldTickSvg"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'; return ''; }
+if(typeof window.getTick === 'undefined'){
+  window.getTick = function(u){ let c=cleanUser(u||''); if(c==='giri_office') return '<span class="goldTickSvg"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'; return ''; }
+}
+function getTick(u){ return window.getTick ? window.getTick(u) : '' }
 function getPfpFrom(p){ return p?.avatar_url || p?.profile_pic || 'https://ui-avatars.com/api/?name='+(cleanUser(p?.username||'P').charAt(0).toUpperCase())+'&background=333&color=fff&size=200&bold=true' }
 async function init(){
+  if(!supa){ location.href='login.html'; return }
   let { data: { session } } = await supa.auth.getSession()
   if(!session){ location.href='login.html'; return; }
   let { data: myProfile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
@@ -63,7 +67,6 @@ async function init(){
   let urlU = cleanUser(new URLSearchParams(location.search).get('u') || '')
   VIEW_USER = urlU || ME_RAW
   let isMine = VIEW_USER===ME_RAW
-  // View Profile - Server la Irundhu da
   let { data: vp } = await supa.from('profiles').select('*').eq('username', VIEW_USER).single()
   VIEW_PROFILE = vp || myProfile
   document.getElementById('topUsername').innerHTML = cleanUser(VIEW_PROFILE.username)+' '+getTick(VIEW_PROFILE.username)
@@ -76,7 +79,6 @@ async function init(){
   document.getElementById('editPfpPreview').src = getPfpFrom(VIEW_PROFILE)
   document.getElementById('navPfp').src = getPfpFrom(myProfile)
   document.getElementById('editBtn').style.display = isMine ? 'block':'none'
-  // Posts - Server Only
   let { data: posts } = await supa.from('posts').select('*').eq('username', VIEW_USER).order('created_at',{ascending:false})
   myPosts = (posts||[]).filter(p=>!p.is_archived)
   document.getElementById('postCount').textContent = myPosts.length
