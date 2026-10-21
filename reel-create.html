@@ -24,20 +24,25 @@
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
-// === PIXORO NO FULL ALERT LOCK ===
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
 window.confirm = function(msg){ showToast(msg); return true; };
-window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
 function formatSize(b){ if(b<1024) return b+' B'; if(b<1048576) return (b/1024).toFixed(0)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
+// ✅ LOGIN CHECK - Server Only
+let ME_RAW=''
+async function checkAuth(){
+  let { data: { session } } = await supa.auth.getSession()
+  if(!session){ location.href='login.html'; return; }
+  let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
+  ME_RAW = (profile?.username || session.user.email.split('@')[0]).toLowerCase()
+}
+checkAuth()
 let m = '';
 async function h(e){
   let f = e.target.files[0];
   if(!f) return;
-  // SIZE CHECK - 15MB
   if(f.size > 15*1024*1024){ showToast('Video perusu da! 15MB kulla irukura video eduthuko'); e.target.value=''; return; }
   let u = URL.createObjectURL(f);
-  // DURATION CHECK - 30 SEC
   let vid=document.createElement('video'); vid.preload='metadata'; vid.onloadedmetadata=async()=>{
     if(vid.duration > 35){ showToast('Reel 30 sec ku mela irukku da! Cut pannitu vaa'); e.target.value=''; return; }
     document.getElementById('prev').innerHTML = `<video src="${u}" autoplay loop muted controls playsinline></video>`;
@@ -47,17 +52,12 @@ async function h(e){
     document.getElementById('progFill').style.width='30%';
     document.getElementById('info').innerText='✅ Size OK: '+formatSize(f.size)+' • Duration: '+Math.round(vid.duration)+' sec • Storage Saved!';
     showToast('Uploading... ⏳');
-    let fileName = Date.now() + '_' + f.name.replace(/[^a-zA-Z0-9.]/g,'_');
+    let fileName = Date.now() + '_' + ME_RAW + '_' + f.name.replace(/[^a-zA-Z0-9.]/g,'_');
     let {data, error} = await supa.storage.from('reels').upload(fileName, f);
     if(error){ showToast('Adutha side la problem da - Try again'); document.getElementById('prog').style.display='none'; return; }
     let {data: urlData} = supa.storage.from('reels').getPublicUrl(fileName);
     m = urlData.publicUrl;
-    sessionStorage.setItem('pixoro_pending_media', m);
-    sessionStorage.setItem('pixoro_pending_type','video');
-    localStorage.setItem('pix_media', m);
-    localStorage.setItem('pix_media_type','video');
-    localStorage.setItem('pix_media_is_reel','true');
-    localStorage.setItem('pix_video_name', f.name);
+    // ✅ NO localStorage / sessionStorage - URL la Thaan da
     document.getElementById('progFill').style.width='100%';
     document.getElementById('progText').innerText='Upload Done ✅';
     showToast('Upload Done da 🔥 Next ku po da');
@@ -66,6 +66,6 @@ async function h(e){
 }
 function go(){
   if(!m){ showToast('Video select pannu da - Upload aagattum'); return; }
-  location.href = 'reels-upload.html';
+  location.href = 'reels-upload.html?media='+encodeURIComponent(m)+'&type=video';
 }
 </script></body></html>
