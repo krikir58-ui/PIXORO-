@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pixoro Login</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
 <style>body{background:#000;color:#fff;font-family:sans-serif;display:flex;justify-content:center;padding:20px}
 .box{width:360px;text-align:center}.card{border:1px solid #262626;padding:20px;border-radius:10px;margin-bottom:10px}
 input{width:100%;padding:11px;margin:6px 0;background:#121212;border:1px solid #333;color:#fff;border-radius:6px;box-sizing:border-box}
@@ -8,7 +10,6 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-rad
 <div class="box">
 <h1 style="font-family:cursive;font-size:36px;color:#FFD700">Pixoro</h1>
 <div class="card">
-<!-- ✅ 1. PIXORO Mari - Username / Email Rendum da -->
 <input id="email" placeholder="Username / Email - Ex: giri_office">
 <input id="pass" type="password" placeholder="Password - Pazhaya Password">
 <button onclick="doLogin()">Log In</button>
@@ -17,21 +18,18 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-rad
 <button onclick="forgot()" style="background:none;color:#FFD700">Forgot Password?</button>
 <p id="msg" style="color:#ff3040;font-size:13px"></p>
 </div>
-<!-- ✅ 2. PIXORO Mari - Already Login Irundha - Continue As Kaatu da - Direct Home Pogatha da -->
 <div id="continueBox" style="display:none" class="card">
 <p>Continue as <b id="contName"></b> ?</p>
 <button onclick="location.href='index.html'">Continue</button>
 <button onclick="doPixoroLogout()" style="background:#262626;color:#fff">Log In to Another Account</button>
 </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const supa = supabase.createClient("https://yecpltndhlzfjplzhcpm.supabase.co","sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_")
+let supa = window.supa
 function showErr(m){ document.getElementById('msg').innerText=m }
 async function checkSession(){
   let {data} = await supa.auth.getSession()
   if(data.session){
-    // ✅ Direct Pogatha da - Yaar Login Irukkan nu Kaatu da
     let {data:p} = await supa.from('profiles').select('username').eq('id', data.session.user.id).single()
     document.getElementById('contName').innerText = p?.username || data.session.user.email.split('@')[0]
     document.getElementById('continueBox').style.display='block'
@@ -40,19 +38,22 @@ async function checkSession(){
 checkSession()
 async function ensureProfile(user){
   let { data } = await supa.from('profiles').select('id,username').eq('id', user.id).single()
-  if(data) return data.username // ✅ Pazhaya Username Thaan da - giri_office Maaraathu da
+  if(data) return data.username
   let username = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_.]/g,'')
-  // ✅ Username Already Irundha - _1 Podu da - Random ID Podatha da
   let { data: ex } = await supa.from('profiles').select('id').eq('username', username).single()
   if(ex) username = username + '_1'
   await supa.from('profiles').insert({ id: user.id, username: username, email: user.email })
   return username
 }
+// ✅ NEW - Login Mudinja Aprom - Username Irukka nu Check Panu da
+async function goNext(user){
+  let { data } = await supa.from('profiles').select('username').eq('id', user.id).single()
+  if(!data?.username){ location.href='create-username.html' } else { location.href='index.html' }
+}
 async function doLogin(){
   let val=document.getElementById('email').value.trim(), pass=document.getElementById('pass').value
   if(!val || !pass) return showErr('Username & Password podu da')
   let email = val
-  // ✅ Username Potta - Email ah Thedu da
   if(!val.includes('@')){
     let {data:p} = await supa.from('profiles').select('email').eq('username', val.toLowerCase()).single()
     if(!p) return showErr('Username illa da')
@@ -60,15 +61,14 @@ async function doLogin(){
   }
   let {data, error}=await supa.auth.signInWithPassword({email,password:pass})
   if(error) return showErr('Password Thappu da - Pazhaya Password Check Pannu da')
-  await ensureProfile(data.user); location.href='index.html'
+  await ensureProfile(data.user); goNext(data.user)
 }
 async function doSignup(){
   let email=document.getElementById('email').value.trim(), pass=document.getElementById('pass').value
   if(!email.includes('@')) return showErr('Signup ku Email Podu da')
   let {data, error}=await supa.auth.signUp({email,password:pass})
   if(error) return showErr(error.message)
-  if(data.user) await ensureProfile(data.user)
-  location.href='index.html'
+  if(data.user){ await ensureProfile(data.user); goNext(data.user) }
 }
 async function loginWithGoogle(){
   await supa.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: 'https://krikir58-ui.github.io/PIXORO-/login.html' } })
