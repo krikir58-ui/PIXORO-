@@ -4,20 +4,40 @@
 <button onclick="alert('LOCAL: '+localStorage.getItem('pixoro_all_verify'))" style="width:100%;background:#222;color:#fff;padding:10px;border-radius:10px;margin-top:8px;border:1px solid #555">🔍 Local Request Check</button>
 <script>
 const supa=supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+function isExpired3Days(created){ if(!created) return false; return (new Date().getTime()-new Date(created).getTime())/(1000*60*60*24) > 3; }
+function daysLeft(created){ if(!created) return 3; let diff=(new Date().getTime()-new Date(created).getTime())/(1000*60*60*24); return Math.max(0,Math.ceil(3-diff)); }
 async function load(){
   let local=JSON.parse(localStorage.getItem('pixoro_all_verify')||'[]');
+  let beforeCount=local.length;
+  // ===== 3 DAYS AUTO REMOVE DA GIRI =====
+  local=local.filter(r=>!isExpired3Days(r.created_at));
+  if(local.length!==beforeCount){
+    localStorage.setItem('pixoro_all_verify', JSON.stringify(local));
+    local.forEach(r=>{ localStorage.removeItem('pixoro_verify_'+r.username); });
+    // Expired users ku verify remove - local filter la already irukku da
+    // Extra: expired check pannitu remove panna users
+    let allKeys=Object.keys(localStorage); allKeys.forEach(k=>{ if(k.startsWith('pixoro_verify_')){ try{ let o=JSON.parse(localStorage.getItem(k)); if(isExpired3Days(o.created_at)) localStorage.removeItem(k); }catch(e){} }});
+  }
   let db=[];
   try{ let {data,error}=await supa.from('verification_requests').select('*').eq('status','pending').order('created_at',{ascending:false}); if(error){ document.getElementById('list').innerHTML='❌ Supabase Error: '+error.message+'<br><br>SQL Run Pannalaya da? Table Create Pannu da'; } else db=data||[]; }catch(e){}
+  // Supabase layum 3 days filter + auto expired update da
+  let dbValid=db.filter(d=>!isExpired3Days(d.created_at));
+  let dbExpired=db.filter(d=>isExpired3Days(d.created_at));
+  dbExpired.forEach(async d=>{ try{ await supa.from('verification_requests').update({status:'expired'}).eq('id',d.id); }catch(e){} });
+  db=dbValid;
   let all=[...local, ...db.filter(d=>!local.find(l=>l.username==d.username))];
-  document.getElementById('count').innerText=all.length+' Requests Irukku da - Local: '+local.length+' | Supabase: '+db.length;
-  if(!all.length){document.getElementById('list').innerHTML='No requests - All safe! 🛡️<br><br>Local Check Button Click Pannu da';return}
+  document.getElementById('count').innerText=all.length+' Requests Irukku da - Local: '+local.length+' | Supabase: '+db.length+' | ⏰ 3 Days ku Appuram Auto Remove da';
+  if(!all.length){document.getElementById('list').innerHTML='No requests - All safe! 🛡️<br><br>Local Check Button Click Pannu da<br><br><small style="color:#aaa">3 Days Mudinja Requests Auto Remove Aayidum da</small>';return}
   let h=''; all.forEach((r,i)=>{
     let idPhoto=r.id_photo||r.proof_url||'';
     let facePhoto=r.face_photo||'';
     let phoneOk = r.phone_verified ? '✅ Phone OTP Verified da' : '⚠️ OTP Verify Aagala da';
     let phoneColor = r.phone_verified ? '#00c853' : '#ff3040';
+    let left=daysLeft(r.created_at);
+    let leftTxt=left<=1 ? '🔴 '+left+' Day Left - Urgent da!' : '⏰ '+left+' Days Left';
     h+=`<div class="card"><b>@${r.username}</b> <span style="color:#FFD700">● Waitlist</span><br>
     <small style="color:#aaa">Aadhar: <b style="color:#FFD700">${r.aadhar_masked||'XXXX XXXX '+(r.aadhar_last4||'')}</b> | ${r.created_at||''}</small><br>
+    <small style="color:#FFD700;font-weight:800">${leftTxt} - 3 Days ku Appuram Auto Remove da</small><br>
     <small style="color:${phoneColor};font-weight:800">${phoneOk}</small><br>
     <small style="color:#aaa">Phone: ${r.phone||r.v_phone||'Hidden - OTP Verified'}</small><br>
     <div style="display:flex;gap:6px;margin-top:8px">
@@ -31,7 +51,6 @@ async function load(){
   }); document.getElementById('list').innerHTML=h;
 }
 function verifyUIDAI(last4){
-  // UIDAI Official Site Open Aagum da - Last4 Mattum Copy Aagum da
   window.open('https://myaadhaar.uidai.gov.in/verify-aadhaar','_blank');
   alert('UIDAI Site Open Aayiduchu da - Aadhar Full Number Anga Pottu Check Pannu da - Real ah Illaya nu Theriyum da');
 }
