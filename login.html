@@ -1,33 +1,19 @@
 <!DOCTYPE html>
 <html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pixoro Login</title>
-<script>
-// === PIXORO ANTI-HACK SHIELD 🔒 ===
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('keydown', e => {
-  if(e.key==='F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) || (e.ctrlKey && e.key==='U')){
-    e.preventDefault(); alert("Pixoro Protected 🔒 - Hack panna mudiyathu da!"); return false;
-  }
-});
-setInterval(()=>{ try{ console.clear(); }catch(e){} }, 800);
-async function hashPin(pin){ let b=new TextEncoder().encode(pin); let h=await crypto.subtle.digest('SHA-256',b); return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join(''); }
-</script>
 <style>body{background:#000;color:#fff;font-family:sans-serif;display:flex;justify-content:center;padding:20px}
 .box{width:360px;text-align:center}.card{border:1px solid #262626;padding:20px;border-radius:10px;margin-bottom:10px}
 input{width:100%;padding:11px;margin:6px 0;background:#121212;border:1px solid #333;color:#fff;border-radius:6px;box-sizing:border-box}
 button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:6px}
-.acc{display:flex;justify-content:space-between;padding:12px;border:1px solid #262626;border-radius:8px;margin:6px 0;cursor:pointer;text-align:left}
 </style></head><body>
 <div class="box">
 <h1 style="font-family:cursive;font-size:36px;color:#FFD700">Pixoro</h1>
-<div id="accList"></div>
 <div class="card">
 <input id="email" placeholder="Email - Ex: giri@gmail.com">
 <input id="pass" type="password" placeholder="Password">
-<label style="display:flex;gap:8px;align-items:center;font-size:12px;color:#aaa;margin-top:6px"><input type="checkbox" id="rememberMe" checked style="width:auto"> Remember Me - Login ah save pannu</label>
 <button onclick="doLogin()">Log In</button>
 <button onclick="doSignup()" style="background:#262626;color:#FFD700">Create New Account</button>
 <button onclick="showOtp()" style="background:#262626;color:#fff">OTP Login</button>
-<button onclick="loginWithGoogle()" style="background:#fff;color:#000;display:flex;align-items:center;justify-content:center;gap:8px"><span style="font-size:18px;font-weight:900">G</span> Continue with Google</button>
+<button onclick="loginWithGoogle()" style="background:#fff;color:#000">G Continue with Google</button>
 <div id="otpBox" style="display:none;margin-top:10px">
 <input id="otpCode" placeholder="6 Digit OTP">
 <button onclick="verifyOtp()" style="background:#00c853;color:#fff">Verify OTP</button>
@@ -35,59 +21,50 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-rad
 <button onclick="forgot()" style="background:none;color:#FFD700">Forgot Password?</button>
 <p id="msg" style="color:#ff3040;font-size:13px"></p>
 </div>
-<div class="card"><button onclick="addAccount()" style="background:#262626;color:#FFD700">+ Add Account</button></div>
-<button onclick="doPixoroLogout()" style="background:#ed4956;color:#fff">Log Out</button>
+<button onclick="doPixoroLogout()" style="background:#ed4956;color:#fff;width:360px;padding:11px;border:0;border-radius:8px;font-weight:bold">Log Out</button>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const supa = supabase.createClient("https://yecpltndhlzfjplzhcpm.supabase.co","sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_")
-let PIXORO_PIN = localStorage.getItem('pixoro_pin') || "2026";
-let loginSettings = JSON.parse(localStorage.getItem('pixoro_login_settings')||'{"google":true,"pass":true,"otp":true,"forgot":true,"remember":true,"auto":true}')
 function showErr(m){ document.getElementById('msg').innerText=m }
 function clearErr(){ document.getElementById('msg').innerText='' }
 async function checkGoogleLogin(){
   let {data} = await supa.auth.getSession()
-  if(data.session && data.session.user){
-    saveAcc(data.session.user.email); location.href='index.html'
-  }
+  if(data.session && data.session.user){ location.href='index.html' }
 }
 checkGoogleLogin()
 supa.auth.onAuthStateChange((event, session)=>{
-  if(event==='SIGNED_IN' && session?.user){ saveAcc(session.user.email); location.href='index.html' }
+  if(event==='SIGNED_IN' && session?.user){ location.href='index.html' }
 })
 async function loginWithGoogle(){
-  if(!loginSettings.google) return showErr('Google Login OFF la irukku da - Profile Settings la ON pannu da')
   clearErr()
   let {error} = await supa.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: 'https://krikir58-ui.github.io/PIXORO-/login.html' } })
   if(error) showErr(error.message)
 }
-let saved = JSON.parse(localStorage.getItem('pixoro_accounts')||'[]')
-let list = document.getElementById('accList')
-saved.forEach(e=>{ list.innerHTML+=`<div class="acc" onclick="switchAcc('${e}')"><b>${e}</b><span>Login →</span></div>` })
-function switchAcc(e){ let pin=prompt("PIN podu da Giri 🔒"); if(pin!==PIXORO_PIN) return alert("Wrong PIN da!"); document.getElementById('email').value=e; clearErr() }
-function saveAcc(email){ 
-  let remember = document.getElementById('rememberMe')?.checked ?? loginSettings.remember;
-  if(remember){
-    let a=JSON.parse(localStorage.getItem('pixoro_accounts')||'[]'); if(!a.includes(email)) a.push(email); localStorage.setItem('pixoro_accounts',JSON.stringify(a));
+async function ensureProfile(user){
+  // ✅ Server la Profile Create Pannu da - Local Illa da
+  let username = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_.]/g,'')
+  let { data } = await supa.from('profiles').select('id').eq('id', user.id).single()
+  if(!data){
+    await supa.from('profiles').insert({ id: user.id, username: username, email: user.email, verified: username==='giri_office' })
   }
-  localStorage.setItem('pixoro_current_user',email);
-  loginSettings.remember = remember; localStorage.setItem('pixoro_login_settings', JSON.stringify(loginSettings));
 }
 async function doLogin(){
   clearErr()
   let email=document.getElementById('email').value, pass=document.getElementById('pass').value
   if(!email || !pass) return showErr('Email & Password podu da')
-  let {error}=await supa.auth.signInWithPassword({email,password:pass})
+  let {data, error}=await supa.auth.signInWithPassword({email,password:pass})
   if(error) return showErr('Sorry, your password was incorrect. Please double-check your password.')
-  saveAcc(email); location.href='index.html'
+  await ensureProfile(data.user); location.href='index.html'
 }
 async function doSignup(){
   clearErr()
   let email=document.getElementById('email').value, pass=document.getElementById('pass').value
   if(!email || !pass) return showErr('Email & Password podu da')
-  let {error}=await supa.auth.signUp({email,password:pass})
+  let {data, error}=await supa.auth.signUp({email,password:pass})
   if(error) return showErr(error.message)
-  saveAcc(email); location.href='index.html'
+  if(data.user) await ensureProfile(data.user)
+  location.href='index.html'
 }
 async function showOtp(){
   clearErr()
@@ -100,9 +77,9 @@ async function verifyOtp(){
   clearErr()
   let email=document.getElementById('email').value.trim(), token=document.getElementById('otpCode').value.trim()
   if(!token) return showErr('OTP podu da')
-  let {error}=await supa.auth.verifyOtp({email,token,type:'email'})
+  let {data, error}=await supa.auth.verifyOtp({email,token,type:'email'})
   if(error) return showErr('OTP thappu da - Thirumba check pannu da')
-  saveAcc(email); location.href='index.html'
+  await ensureProfile(data.user); location.href='index.html'
 }
 async function forgot(){
   clearErr()
@@ -126,17 +103,10 @@ async function resetWithOtp(){
   if(error) return showErr('OTP thappu da')
   let {error:upErr}=await supa.auth.updateUser({password:newPass})
   if(upErr) return showErr(upErr.message)
-  saveAcc(email); location.href='index.html'
+  location.href='index.html'
 }
-function addAccount(){ document.getElementById('email').value=''; document.getElementById('pass').value=''; clearErr() }
 async function doPixoroLogout(){
-  if(!confirm("Logout pannava da Giri? Phone la ellam delete aagidum da, Account Pixoro la safe ah irukkum da.")) return;
   await supa.auth.signOut();
-  ['pixoro_current_user','pixoro_local_posts','pixoro_local_stories','pixoro_viewed_stories','pixoro_highlights','pixoro_plus'].forEach(k=>localStorage.removeItem(k));
-  sessionStorage.clear();
-  if('caches' in window){ caches.keys().then(k=>k.forEach(n=>caches.delete(n))); }
-  let remember = document.getElementById('rememberMe')?.checked ?? loginSettings.remember;
-  if(!remember) localStorage.removeItem('pixoro_accounts');
-  location.reload();
+  location.href='login.html';
 }
 </script></body></html>
