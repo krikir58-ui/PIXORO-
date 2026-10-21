@@ -70,7 +70,6 @@
 </div></div>
 <script src="js/pixoro-core.js"></script>
 <script>
-// FALLBACK - CORE LOAD AGALANA KOODA BLOCK AAGATHU DA
 if(typeof getTick === 'undefined'){
   window.getTick = function(u){
     let c=String(u||'').toLowerCase().split('@')[0].replace(/[^a-z0-9_.]/g,'');
@@ -81,46 +80,43 @@ if(typeof getTick === 'undefined'){
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
 window.confirm = function(msg){ showToast(msg); return true; };
-window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
 function showChoice(){document.getElementById('choice').classList.add('show')}
 function hideChoice(){document.getElementById('choice').classList.remove('show')}
 let supa=null; try{ supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_') }catch(e){ supa=null }
-function cleanUser(u){ if(!u) return 'giri'; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||'giri'; }
-let ME_RAW=cleanUser(localStorage.getItem('pixoro_user_id')||localStorage.getItem('pixoro_current_user')||'giri')
-let ME=ME_RAW
+// ✅ SERVER ONLY - NO localStorage - NO 'giri' DEFAULT
+function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||''; }
+let ME_RAW='', ME='', ME_ID='', ME_PFP=''
+let allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=[],currentPostId=null,currentMenuPost=null
+let viewedStories=[], lastTap=0
+let feedMode='foryou'
+let PLUS={ghost:false}
 function displayNameFor(u){ if(!u) return ME; return cleanUser(u); }
-function isMyPost(u){ let c=cleanUser(u); return c===cleanUser(ME_RAW)||c===cleanUser(ME)||c===cleanUser(localStorage.getItem('pixoro_old_user')||'')||c===cleanUser(localStorage.getItem('pixoro_user_id')||''); }
-let feedMode = localStorage.getItem('pixoro_feed_mode')||'foryou'
+function isMyPost(u){ let c=cleanUser(u); return c && c===cleanUser(ME_RAW); }
 function viralScore(p){ let likes=allLikes.filter(l=>l.post_id==p.id).length; let hours=(Date.now()-new Date(p.created_at||Date.now()).getTime())/3600000; return (likes*10)/(hours+2) }
-function setFeedMode(m){ feedMode=m; localStorage.setItem('pixoro_feed_mode',m); document.getElementById('tabForYou').classList.toggle('active',m=='foryou'); document.getElementById('tabFollowing').classList.toggle('active',m=='following'); document.getElementById('tabLatest').classList.toggle('active',m=='latest'); renderFeed(); }
+function setFeedMode(m){ feedMode=m; document.getElementById('tabForYou').classList.toggle('active',m=='foryou'); document.getElementById('tabFollowing').classList.toggle('active',m=='following'); document.getElementById('tabLatest').classList.toggle('active',m=='latest'); renderFeed(); }
 function renderTrending(){ let tags={}; allPosts.forEach(p=>{ (p.caption||'').match(/#\w+/g)?.forEach(t=>{ tags[t.toLowerCase()]=(tags[t.toLowerCase()]||0)+1 }) }); let top=Object.entries(tags).sort((a,b)=>b[1]-a[1]).slice(0,8); let bar=document.getElementById('trendBar'); if(!top.length){ bar.style.display='none'; return; } bar.style.display='flex'; bar.innerHTML=top.map(([t,c])=>`<span class="trendChip" onclick="showToast('${t} • ${c} posts 🔥')">🔥 ${t} • ${c}</span>`).join('') }
-async function compressImage(file,maxW=720,quality=0.72){ return new Promise(res=>{ let img=new Image(); let url=URL.createObjectURL(file); img.onload=()=>{ let w=img.width,h=img.height; if(w>maxW){ h=h*maxW/w; w=maxW; } let c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); c.toBlob(b=>{ res(new File([b],file.name,{type:'image/jpeg'})); },'image/jpeg',quality); URL.revokeObjectURL(url); }; img.src=url; }); }
-function updateStorageBar(){ let total=0; for(let k in localStorage){ try{ total+=localStorage.getItem(k).length*2; }catch(e){} } if(total>4000000){ cleanupExpired(); } }
-function cleanupExpired(){ let now=Date.now(); ['pixoro_local_stories','pixoro_viewed_stories'].forEach(k=>{ let arr=JSON.parse(localStorage.getItem(k)||'[]'); let f=arr.filter(s=> !s.expires_at || new Date(s.expires_at).getTime()>now); if(f.length!==arr.length) localStorage.setItem(k,JSON.stringify(f)); }); updateStorageBar(); }
-setInterval(cleanupExpired,60000); updateStorageBar();
-function openProfileFast(u){ localStorage.setItem('pixoro_view_user',cleanUser(u)); location.href='profile.html?u='+encodeURIComponent(cleanUser(u)); }
-let allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],currentPostId=null,currentMenuPost=null
-let viewedStories=JSON.parse(localStorage.getItem('pixoro_viewed_stories')||'[]')
-let lastTap=0
-let PLUS=JSON.parse(localStorage.getItem('pixoro_plus')||'{"ghost":false,"48h":true,"rewatch":true,"search":true,"audience":"everyone"}')
+function openProfileFast(u){ location.href='profile.html?u='+encodeURIComponent(cleanUser(u)); }
+// ✅ PFP - SERVER ONLY
 function getPfp(u){
-  let my = localStorage.getItem('pixoro_profile_pic') || localStorage.getItem('pixoro_current_pfp') || localStorage.getItem('pixoro_pfp_'+ME_RAW) || localStorage.getItem('pixoro_pfp_'+ME);
-  if(my && my.length > 100 && my.startsWith('data:')) return my;
-  if(my && my.startsWith('http') && !my.includes('pravatar')) return my;
   let clean = cleanUser(u);
-  let keys = ['pixoro_pfp_'+u,'pixoro_pfp_'+clean];
-  for(let k of keys){ let p=localStorage.getItem(k); if(p && p.length>100 && p.startsWith('data:')) return p; }
-  return 'https://ui-avatars.com/api/?name='+clean.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true';
+  let p = allProfiles.find(x=> cleanUser(x.username)===clean);
+  if(p && (p.avatar_url || p.profile_pic || p.photo_url)) return p.avatar_url || p.profile_pic || p.photo_url;
+  return 'https://ui-avatars.com/api/?name='+(clean.charAt(0).toUpperCase()||'P')+'&background=333&color=fff&size=200&bold=true';
 }
 function pfpHtml(u){return `<div class="pfpRing" onclick="event.stopPropagation();openProfileFast('${u}')"><div class="pfpInner"><img src="${getPfp(u)}"></div></div>`}
-function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW)||getPfp(ME); }
-updateNavPfp(); setInterval(updateNavPfp,1000);
+function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el && ME_RAW) el.src=getPfp(ME_RAW); }
+// ✅ LOGIN CHECK - SERVER SESSION ONLY
+async function checkLogin(){
+  if(!supa){ location.href='login.html'; return; }
+  let { data: { session } } = await supa.auth.getSession()
+  if(!session){ location.href='login.html'; return; }
+  let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
+  ME_RAW = cleanUser(profile?.username || session.user.email?.split('@')[0] || '')
+  ME = ME_RAW; ME_ID = session.user.id; ME_PFP = profile?.avatar_url || profile?.profile_pic || ''
+  window.ME = ME_RAW; window.ME_ID = ME_ID
+  loadAll();
+}
 async function loadAll(){
-  // 1. LOCAL AH MUDHALA KAATTU DA - BLOCK POGUM DA
-  allStories=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]');
-  allPosts=JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
-  setFeedMode(feedMode); renderStories();renderHighlights();renderTrending();renderFeed();updateNavPfp();
-  // 2. APROM SUPABASE TRY PANNU DA
   try{
     if(!supa) return;
     let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false});
@@ -128,23 +124,16 @@ async function loadAll(){
     let {data:saves}=await supa.from('saves').select('*').eq('username',ME_RAW);
     let {data:stories}=await supa.from('stories').select('*').order('created_at',{ascending:false});
     let {data:follows}=await supa.from('follows').select('*');
+    let {data:profiles}=await supa.from('profiles').select('*');
     let now=new Date()
-    let supaStories=(stories||[]).filter(s=>{ if(!s.expires_at) return true; return new Date(s.expires_at) > now })
-    let localStories=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]').filter(s=>{ if(!s.expires_at) return true; return new Date(s.expires_at) > now })
-    allStories=[...localStories,...supaStories]
-    allPosts=[...localStories ? [] : [], ...(posts||[]).filter(p=>!p.is_archived), ...JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]')]
+    allProfiles=profiles||[]
+    allStories=(stories||[]).filter(s=>{ if(!s.expires_at) return true; return new Date(s.expires_at) > now })
+    allPosts=(posts||[]).filter(p=>!p.is_archived)
     allLikes=likes||[];allSaves=saves||[];allFollows=follows||[];
-    setFeedMode(feedMode); renderStories();renderHighlights();renderTrending();renderFeed();updateNavPfp();updateStorageBar();
-  }catch(e){ console.log('supabase fail - local ok da', e); }
+    setFeedMode(feedMode); renderStories();renderTrending();renderFeed();updateNavPfp();
+  }catch(e){ console.log('supabase fail', e); }
 }
-function renderHighlights(){
-  let row=document.getElementById('highlightRow');
-  let hls=JSON.parse(localStorage.getItem('pixoro_highlights')||'[]');
-  if(!hls.length){ row.style.display='none'; return; }
-  row.style.display='flex';
-  row.innerHTML=hls.map((h,i)=>`<div class="hlItem" onclick="openHighlight(${i})"><div style="width:60px;height:60px;border-radius:50%;padding:2.3px;background:#fff;border:2px solid #fff"><div style="width:100%;height:100%;border-radius:50%;background:#000;padding:2px"><img src="${h.items[0].img}" style="width:100%;height:100%;border-radius:50%;object-fit:cover"></div></div><div style="font-size:10.5px;margin-top:6px;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.name} ⭐</div></div>`).join('');
-}
-function openHighlight(i){ let hls=JSON.parse(localStorage.getItem('pixoro_highlights')||'[]'); let h=hls[i]; localStorage.setItem('pixoro_temp_hl',JSON.stringify(h.items)); location.href='story-view.html?user='+ME_RAW+'&highlight='+i; }
+function renderHighlights(){ document.getElementById('highlightRow').style.display='none'; }
 function renderStories(){
   let bar=document.getElementById('storyBar');
   let searchQ=(document.getElementById('storySearch')?.value||'').toLowerCase().trim()
@@ -153,13 +142,13 @@ function renderStories(){
   let otherStories = allStories.filter(s=> !isMyPost(s.username));
   if(searchQ){otherStories = otherStories.filter(s=> displayNameFor(s.username).includes(searchQ));}
   let grouped={}; otherStories.forEach(s=>{ let key=cleanUser(s.username||''); if(!grouped[key]) grouped[key]=s })
-  let html=''; let myPfp = getPfp(ME_RAW) || getPfp(ME);
-  if(myStories.length>0){ let s=myStories[0]; let seen=viewedStories.includes(s.id); let isClose=(s.audience==='close_friends'||s.is_close_friends); let ringClass = isClose? 'sRing close' : 'sRing'; html+=`<div class="sItem" onclick="openMyStory()"><div class="${ringClass} ${seen?'seen':''}"><div class="sRingInner"><img src="${myPfp}"></div></div><div class="sName">Your Story ${isClose?'💚':''}</div></div>`; } else { html+=`<div class="sItem" onclick="location.href='story-add.html'"><div class="sAddWrap"><img class="sAddImg my-pfp" src="${myPfp}"><div class="sAddPlus">+</div></div><div class="sName">Your Story</div></div>`; }
-  Object.values(grouped).forEach(s=>{ let seen=viewedStories.includes(s.id); let isClose=(s.audience==='close_friends'||s.is_close_friends); let ringClass = isClose? 'sRing close' : 'sRing'; html+=`<div class="sItem" onclick="openOtherStory('${s.username}')"><div class="${ringClass} ${seen?'seen':''}"><div class="sRingInner"><img src="${getPfp(s.username)}"></div></div><div class="sName">${displayNameFor(s.username)} ${isClose?'💚':''}</div></div>` })
+  let html=''; let myPfp = getPfp(ME_RAW);
+  if(myStories.length>0){ let s=myStories[0]; let seen=viewedStories.includes(s.id); html+=`<div class="sItem" onclick="openMyStory()"><div class="sRing ${seen?'seen':''}"><div class="sRingInner"><img src="${myPfp}"></div></div><div class="sName">Your Story</div></div>`; } else { html+=`<div class="sItem" onclick="location.href='story-add.html'"><div class="sAddWrap"><img class="sAddImg my-pfp" src="${myPfp}"><div class="sAddPlus">+</div></div><div class="sName">Your Story</div></div>`; }
+  Object.values(grouped).forEach(s=>{ let seen=viewedStories.includes(s.id); html+=`<div class="sItem" onclick="openOtherStory('${s.username}')"><div class="sRing ${seen?'seen':''}"><div class="sRingInner"><img src="${getPfp(s.username)}"></div></div><div class="sName">${displayNameFor(s.username)}</div></div>` })
   bar.innerHTML=html;
 }
-function openMyStory(){let meLow=cleanUser(ME_RAW);let s=allStories.find(x=> isMyPost(x.username));if(!s) return location.href='story-add.html';if(!PLUS.ghost &&!viewedStories.includes(s.id)){viewedStories.push(s.id);localStorage.setItem('pixoro_viewed_stories',JSON.stringify(viewedStories))}location.href='story-view.html?user='+s.username+(PLUS.ghost?'&ghost=1':'')}
-function openOtherStory(u){let s=allStories.find(x=> x.username===u);if(PLUS.ghost){location.href='story-view.html?user='+u+'&ghost=1';return}if(s &&!viewedStories.includes(s.id)){viewedStories.push(s.id);localStorage.setItem('pixoro_viewed_stories',JSON.stringify(viewedStories))}location.href='story-view.html?user='+u}
+function openMyStory(){let s=allStories.find(x=> isMyPost(x.username));if(!s) return location.href='story-add.html';if(!viewedStories.includes(s.id)) viewedStories.push(s.id);location.href='story-view.html?user='+s.username}
+function openOtherStory(u){let s=allStories.find(x=> x.username===u);if(s &&!viewedStories.includes(s.id)) viewedStories.push(s.id);location.href='story-view.html?user='+u}
 function renderFeed(){
 let feedPosts=[...allPosts];
 if(feedMode=='foryou'){ feedPosts.sort((a,b)=>viralScore(b)-viralScore(a)) }
@@ -213,7 +202,7 @@ function fastLike(id){
 }
 function openPostMenu(postId){
 currentMenuPost = allPosts.find(p=> p.id == postId); let p=currentMenuPost; if(!p) return
-let userClean=cleanUser(p.username||''); let meClean=cleanUser(ME_RAW); let isMine = isMyPost(p.username)
+let isMine = isMyPost(p.username)
 let box=document.getElementById('postMenuBox')
 if(!isMine){box.innerHTML=`<div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 12px"></div><div class="menuItem" onclick="sharePost(${p.id});closePostMenu()">🔗 Share</div><div class="menuItem" onclick="closePostMenu()">🚩 Report</div><div class="menuItem" onclick="closePostMenu()" style="justify-content:center;background:#000;border-radius:12px;margin-top:10px;color:#888">Cancel</div>`}else{box.innerHTML=`<div style="width:40px;height:4px;background:#444;border-radius:10px;margin:0 auto 12px"></div><div class="menuItem" onclick="editPost()">✏️ Edit</div><div class="menuItem" onclick="toggleHideLikes()">${p.hide_likes?'👁️ Unhide':'❤️ Hide like count'}</div><div class="menuItem" onclick="toggleHideComments()">${p.hide_comments?'💬 Turn on':'🚫 Turn off commenting'}</div><div class="menuItem" onclick="togglePin()">${p.is_pinned?'📌 Unpin':'📌 Pin'}</div><div class="menuItem" onclick="archivePost()">📦 Archive</div><div class="menuItem delete" onclick="deletePost()">🗑️ Delete</div><div class="menuItem" onclick="closePostMenu()" style="justify-content:center;background:#000;border-radius:12px;margin-top:10px;color:#888">Cancel</div>`}
 document.getElementById('postMenu').classList.add('show')
@@ -230,6 +219,6 @@ function sharePost(id){let link=location.origin+'/post.html?id='+id; if(navigato
 async function openComment(id){if(allPosts.find(p=>p.id==id)?.hide_comments){showToast('Commenting off da!');return;}currentPostId=id;document.getElementById('commentModal').style.display='flex';document.getElementById('myCommentPfp').src=getPfp(ME);if(!supa) return; let {data}=await supa.from('comments').select('*').eq('post_id',id).order('created_at',{ascending:false});document.getElementById('commentList').innerHTML=(data||[]).map(c=>`<div style="display:flex;gap:10px;padding:10px 0;align-items:flex-start"><img src="${getPfp(c.username)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0"><div style="flex:1"><b style="font-size:13px;display:flex;align-items:center">${displayNameFor(c.username)} ${getTick(c.username)}</b><div style="font-size:13px;margin-top:2px">${c.text}</div></div><span onclick="this.innerText=this.innerText=='♡'?'❤️':'♡'" style="font-size:18px;cursor:pointer">♡</span></div>`).join('')||'No comments'}
 function closeComment(){document.getElementById('commentModal').style.display='none'}
 async function addComment(){let t=document.getElementById('commentInput').value.trim();if(!t||!currentPostId||!supa)return;await supa.from('comments').insert({post_id:currentPostId,username:ME_RAW,text:t});document.getElementById('commentInput').value='';openComment(currentPostId)}
-loadAll()
+checkLogin()
 </script>
 </body></html>
