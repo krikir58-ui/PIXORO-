@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Create Username - Pixoro</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
+</head>
+<body style="background:#111;color:#fff;padding:20px;font-family:sans-serif;margin:0">
+<h2 style="font-size:26px;margin:0">Create a username</h2>
+<p style="color:#aaa;font-size:14px;line-height:1.5">To begin creating a profile, add a username or use our suggestion. You can change this at any time.</p>
+
+<!-- VIDEO MARIYE INPUT BOX -->
+<div id="box" style="border:1px solid #555;border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center;margin-top:24px;background:#111">
+<input id="username" placeholder="Username" autocomplete="off" oninput="checkUser(this.value)" style="background:transparent;border:none;color:#fff;outline:none;width:85%;font-size:16px">
+<span id="icon" style="font-size:18px"></span>
+</div>
+<p id="err" style="color:#ff5a5a;font-size:13px;min-height:18px;margin:8px 0"></p>
+<p id="suggest" style="color:#888;font-size:13px"></p>
+
+<button id="nextBtn" disabled onclick="saveUser()" style="width:100%;background:#0095f6;color:#fff;padding:14px;border-radius:20px;border:none;font-weight:700;font-size:15px;margin-top:10px;opacity:.6">Next</button>
+
+<script>
+let supa = window.supa
+
+async function checkUser(v){
+  const box=document.getElementById('box'), err=document.getElementById('err'), icon=document.getElementById('icon'), btn=document.getElementById('nextBtn')
+  // 1. EMPTY - Video la Vantha Mariye
+  if(v.length===0){
+    box.style.border='1px solid #ff5a5a'
+    err.innerText='Choose a username to continue.'
+    icon.innerHTML='❗'
+    btn.disabled=true; btn.style.opacity='.6'
+    return
+  }
+  // 2. SPACE / COMMA - reels, giri Error da
+  if(/[^a-zA-Z0-9._]/.test(v)){
+    box.style.border='1px solid #ff5a5a'
+    err.innerText='Usernames can only include numbers, letters, underscores and periods. Try again.'
+    icon.innerHTML='❌'
+    btn.disabled=true; btn.style.opacity='.6'
+    return
+  }
+  // 3. SUPABASE CHECK - Taken ah
+  const { data } = await supa.from('profiles').select('id').eq('username',v).single()
+  if(data){
+    box.style.border='1px solid #ff5a5a'
+    err.innerText='Username taken'
+    icon.innerHTML='❌'
+    btn.disabled=true; btn.style.opacity='.6'
+  } else {
+    // 4. GREEN TICK - reelsgiri5828 Mariye
+    box.style.border='1px solid #555'
+    err.innerText=''
+    icon.innerHTML='✅'
+    btn.disabled=false; btn.style.opacity='1'
+  }
+}
+
+async function saveUser(){
+  const username = document.getElementById('username').value.trim().toLowerCase()
+  const { data:{user} } = await supa.auth.getUser()
+  if(!user){ location.href='login.html'; return }
+  const { error } = await supa.from('profiles').update({ username: username }).eq('id', user.id)
+  if(error){ alert(error.message); return }
+  location.href='add-picture.html'
+}
+
+// Suggestion - Instagram Mariye
+window.onload = () => {
+  const r = Math.floor(1000 + Math.random()*9000)
+  document.getElementById('suggest').innerHTML = `Suggestion: <b style="color:#fff;cursor:pointer" onclick="document.getElementById('username').value='reelsgiri${r}';checkUser('reelsgiri${r}')">reelsgiri${r}</b>`
+}
+</script>
+</body></html>
