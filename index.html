@@ -1,10 +1,7 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro - Final Mass</title>
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="css/feed.css">
-<link rel="stylesheet" href="css/comments.css">
-<link rel="stylesheet" href="css/splash.css">
-<link rel="stylesheet" href="css/pixoro-verified.css">
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="css/feed.css"><link rel="stylesheet" href="css/comments.css"><link rel="stylesheet" href="css/splash.css"><link rel="stylesheet" href="css/pixoro-verified.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;background:#000;position:sticky;top:0;z-index:50;border-bottom:1px solid #111;height:56px}
@@ -48,6 +45,7 @@
 .trendChip{background:#111;border:1px solid #333;padding:7px 12px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer}
 .feedTabs{display:flex;border-bottom:1px solid #111}.feedTab{flex:1;text-align:center;padding:12px;font-size:13px;color:#888;cursor:pointer;font-weight:700}.feedTab.active{color:#fff;border-bottom:2px solid #fff}
 </style></head><body>
+<div id="splash" style="height:100vh;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:900;background:#000;position:fixed;inset:0;z-index:9999">Pixoro 🔵</div>
 <div class="top"><b style="font-size:24px;font-weight:900">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="location.href='notifications.html'"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M6 8a6 6 0 0 1 12 0c0 7 6 9 6 9H0s6-2 6-9"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg></div></div></div>
 <div class="storySearchWrap"><input id="storySearch" placeholder="🔍 Search Story..." oninput="renderStories()"><span onclick="document.getElementById('storySearch').value='';renderStories()" style="color:#666;cursor:pointer">✕</span></div>
 <div class="storyBar" id="storyBar"></div>
@@ -82,8 +80,7 @@ window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha s
 window.confirm = function(msg){ showToast(msg); return true; };
 function showChoice(){document.getElementById('choice').classList.add('show')}
 function hideChoice(){document.getElementById('choice').classList.remove('show')}
-let supa=null; try{ supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_') }catch(e){ supa=null }
-// ✅ SERVER ONLY - NO localStorage - NO 'giri' DEFAULT
+let supa = window.supa
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||''; }
 let ME_RAW='', ME='', ME_ID='', ME_PFP=''
 let allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=[],currentPostId=null,currentMenuPost=null
@@ -96,7 +93,6 @@ function viralScore(p){ let likes=allLikes.filter(l=>l.post_id==p.id).length; le
 function setFeedMode(m){ feedMode=m; document.getElementById('tabForYou').classList.toggle('active',m=='foryou'); document.getElementById('tabFollowing').classList.toggle('active',m=='following'); document.getElementById('tabLatest').classList.toggle('active',m=='latest'); renderFeed(); }
 function renderTrending(){ let tags={}; allPosts.forEach(p=>{ (p.caption||'').match(/#\w+/g)?.forEach(t=>{ tags[t.toLowerCase()]=(tags[t.toLowerCase()]||0)+1 }) }); let top=Object.entries(tags).sort((a,b)=>b[1]-a[1]).slice(0,8); let bar=document.getElementById('trendBar'); if(!top.length){ bar.style.display='none'; return; } bar.style.display='flex'; bar.innerHTML=top.map(([t,c])=>`<span class="trendChip" onclick="showToast('${t} • ${c} posts 🔥')">🔥 ${t} • ${c}</span>`).join('') }
 function openProfileFast(u){ location.href='profile.html?u='+encodeURIComponent(cleanUser(u)); }
-// ✅ PFP - SERVER ONLY
 function getPfp(u){
   let clean = cleanUser(u);
   let p = allProfiles.find(x=> cleanUser(x.username)===clean);
@@ -105,16 +101,16 @@ function getPfp(u){
 }
 function pfpHtml(u){return `<div class="pfpRing" onclick="event.stopPropagation();openProfileFast('${u}')"><div class="pfpInner"><img src="${getPfp(u)}"></div></div>`}
 function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el && ME_RAW) el.src=getPfp(ME_RAW); }
-// ✅ LOGIN CHECK - SERVER SESSION ONLY
 async function checkLogin(){
   if(!supa){ location.href='login.html'; return; }
   let { data: { session } } = await supa.auth.getSession()
   if(!session){ location.href='login.html'; return; }
   let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
-  ME_RAW = cleanUser(profile?.username || session.user.email?.split('@')[0] || '')
+  if(!profile?.username){ location.href='create-username.html'; return; }
+  ME_RAW = cleanUser(profile?.username || '')
   ME = ME_RAW; ME_ID = session.user.id; ME_PFP = profile?.avatar_url || profile?.profile_pic || ''
   window.ME = ME_RAW; window.ME_ID = ME_ID
-  loadAll();
+  setTimeout(()=>{ let s=document.getElementById('splash'); if(s) s.style.display='none'; loadAll(); },1500)
 }
 async function loadAll(){
   try{
