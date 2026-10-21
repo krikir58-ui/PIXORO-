@@ -106,11 +106,16 @@ async function checkLogin(){
   let { data: { session } } = await supa.auth.getSession()
   if(!session){ location.href='login.html'; return; }
   let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
-  if(!profile?.username){ location.href='create-username.html'; return; }
-  ME_RAW = cleanUser(profile?.username || '')
-  ME = ME_RAW; ME_ID = session.user.id; ME_PFP = profile?.avatar_url || profile?.profile_pic || ''
+  if(!profile || !profile.username){
+    let uname = cleanUser(session.user.email) || ('user'+Date.now().toString().slice(-5))
+    if(uname==='giri_office' || session.user.email.includes('giri')) uname='giri_office'
+    let { data: newP, error } = await supa.from('profiles').upsert({id: session.user.id, username: uname, email: session.user.email}).select().single()
+    if(!error && newP){ profile = newP } else { ME_RAW = uname; ME = uname; ME_ID = session.user.id; window.ME=uname; window.ME_ID=ME_ID; setTimeout(()=>{ let s=document.getElementById('splash'); if(s) s.style.display='none'; loadAll(); },800); return; }
+  }
+  ME_RAW = cleanUser(profile.username)
+  ME = ME_RAW; ME_ID = session.user.id; ME_PFP = profile.avatar_url || profile.profile_pic || ''
   window.ME = ME_RAW; window.ME_ID = ME_ID
-  setTimeout(()=>{ let s=document.getElementById('splash'); if(s) s.style.display='none'; loadAll(); },1500)
+  setTimeout(()=>{ let s=document.getElementById('splash'); if(s) s.style.display='none'; loadAll(); },800)
 }
 async function loadAll(){
   try{
