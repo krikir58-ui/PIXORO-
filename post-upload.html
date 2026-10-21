@@ -1,5 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
 <style>*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;padding:14px}
 input,textarea{width:100%;background:#111;border:1px solid #222;padding:12px;border-radius:12px;color:#fff;margin:8px 0}
 .btn{background:#fff;color:#000;border:0;width:100%;padding:14px;border-radius:20px;font-weight:900;margin-top:10px}
@@ -14,11 +15,10 @@ input,textarea{width:100%;background:#111;border:1px solid #222;padding:12px;bor
 <button class="btn" style="background:#222;color:#fff" onclick="location.href='index.html'">Cancel</button>
 <div id="toast" class="toast"></div>
 <script>
-const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_');
+let supa = window.supa
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
 window.confirm = function(msg){ showToast(msg); return true; };
-// ✅ URL la Irundhu Media da - Local Illa da
 let params = new URLSearchParams(location.search)
 let media = params.get('media') || ''
 let typeParam = params.get('type') || ''
@@ -26,6 +26,7 @@ let isVid = typeParam==='video' || media.includes('.mp4')
 let ME = '', ME_ID = ''
 let prev = document.getElementById('prev');
 async function init(){
+  if(!supa){ location.href='login.html'; return }
   let { data: { session } } = await supa.auth.getSession()
   if(!session){ location.href='login.html'; return; }
   let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
@@ -46,7 +47,6 @@ async function share(){
   let cap = document.getElementById('cap').value || 'PIXORO Post 📸';
   let publicUrl = media;
   let type = isVid ? 'video' : 'image';
-  // ✅ SERVER ONLY - posts Table la Insert da - Local Illa da
   let {error} = await supa.from('posts').insert({username: ME, caption: cap, image_url: publicUrl, media_url: publicUrl, media_type: type});
   if(error){ showToast('Adutha side la problem da - '+error.message); document.getElementById('shareBtn').innerText='Share Post 🚀'; return; }
   showToast('Post Done da! 📸 Makkal paappanga');
