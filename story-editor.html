@@ -44,16 +44,31 @@ body{max-width:100% !important;margin:0}
 </div>
 <div id="toast" class="toast"></div>
 <script>
-// === PIXORO NO FULL ALERT LOCK ===
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
 window.confirm = function(msg){ showToast(msg); return true; };
-window.prompt = function(){ showToast('Caption la text eluthu da'); return null; };
-window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-const ME=localStorage.getItem('pixoro_current_user')||'Giri'
-let m=sessionStorage.getItem('pixoro_pending_media'); if(m) document.getElementById('eImg').src=m;
-let type=sessionStorage.getItem('pixoro_pending_type')||'image'
+// ✅ URL + Server Only - Local Illa da
+let params = new URLSearchParams(location.search)
+let m = params.get('media') || ''
+let type = params.get('type') || 'image'
+let ME = '', ME_ID = ''
+async function init(){
+  let { data: { session } } = await supa.auth.getSession()
+  if(!session){ location.href='login.html'; return; }
+  let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
+  ME = (profile?.username || session.user.email.split('@')[0]).toLowerCase()
+  ME_ID = session.user.id
+  if(m){
+    let el = document.getElementById('eImg')
+    if(type==='video'){
+      el.outerHTML = `<video class="photo" id="eImg" src="${m}" autoplay loop muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video>`
+    } else {
+      el.src = m
+    }
+  }
+}
+init()
 function addText(){
   let capEl=document.getElementById('cap');
   capEl.focus();
@@ -61,17 +76,18 @@ function addText(){
   showToast('Text inga eluthu da - Photo mela varum');
   capEl.addEventListener('input',()=>{
     document.getElementById('textOverlay').innerText = capEl.value;
-  },{once:false});
+  });
 }
 async function postStory(aud){
-  let media = sessionStorage.getItem('pixoro_pending_media') || document.getElementById('eImg').src
-  if(!media){ showToast('Photo illa da - Select pannu da'); return }
+  let media = m || document.getElementById('eImg').src
+  if(!media || media.includes('unsplash')){ showToast('Photo illa da - Select pannu da'); return }
+  if(!ME){ showToast('Login pannu da'); return; }
   let exp=new Date(); exp.setHours(exp.getHours()+24);
-  let story={ id:'local_'+Date.now(), username:ME, image_url:media, media_url:media, image:media, media_type:type, caption:document.getElementById('cap').value, audience:aud, created_at:new Date().toISOString(), expires_at:exp.toISOString() }
-  let arr=JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]'); arr.push(story); localStorage.setItem('pixoro_local_stories',JSON.stringify(arr));
-  try{ await supa.from('stories').insert({username:ME,image_url:media,media_type:type,caption:story.caption,audience:aud,expires_at:exp.toISOString()}) }catch(e){ console.log('supa skip',e) }
-  sessionStorage.removeItem('pixoro_pending_media');
-  showToast('Story Posted da Giri! 🔥');
+  let caption = document.getElementById('cap').value
+  // ✅ SERVER ONLY - stories Table la Insert da - Local Illa da
+  let { error } = await supa.from('stories').insert({username: ME, image_url: media, media_url: media, media_type: type, caption: caption, audience: aud, expires_at: exp.toISOString()})
+  if(error){ showToast('Adutha side la problem da - '+error.message); return; }
+  showToast('Story Posted da! 🔥');
   setTimeout(()=>{ location.href='index.html'; },800);
 }
 </script></body></html>
