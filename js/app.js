@@ -1,24 +1,25 @@
 import { supabase } from './supabase.js'
 import { getRealProfile } from './auth.js'
-import { loadFeed } from './feed.js'
+import { renderFeed } from './feed.js' // loadFeed Illa da - renderFeed da!
 import { loadStories } from './stories.js'
 import { loadExplore, initSearch } from './explore.js'
 import { initLikes } from './likes.js'
 import { initScreenshotAlert } from './safety.js'
 import { loadReels } from './reels.js'
 
-// === FIRST - SERVER CHECK DA - ITHU ILLANA - ELLAM WASTE DA ===
+// === FIRST - SERVER CHECK DA ===
 let real = await getRealProfile() // Login Illana - Auto login.html ku Poidum da
 
 if(real){
-  // Ne Thaan da - Server la Session Irukku da - Appa Thaan Feed Load Pannu da
-  window.ME = real.profile.username // giri_office da - Server la Irundhu da
+  window.ME = real.profile.username // Server la Irundhu da
   window.ME_VERIFIED = real.profile.verified // Gold Tick da - Server la Irundhu da
-  
-  loadStories()
-  loadFeed()
+  window.ME_ID = real.user.id // ID - Important da
+
+  // ID ah - Anuppu da - Illana - Feed - Yaarudunu - Theriyathu da
+  renderFeed(real.user.id) // ✅ Ithu Thaan da - Correct da
+  loadStories(real.user.id)
   loadExplore()
-  loadReels()
+  loadReels(real.user.id)
   initSearch()
   initLikes()
   initScreenshotAlert()
