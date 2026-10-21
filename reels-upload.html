@@ -9,45 +9,53 @@ input,textarea{width:100%;background:#111;border:1px solid #222;padding:12px;bor
 </style></head><body>
 <b id="title">PIXORO Reels - Share 🔥</b>
 <div class="prev" id="prev">Loading...</div>
-<input id="cap" placeholder="Caption eluthu da Giri...">
+<input id="cap" placeholder="Caption eluthu da...">
 <button class="btn" id="shareBtn" onclick="share()">Share Reel 🚀</button>
 <button class="btn" style="background:#222;color:#fff" onclick="location.href='index.html'">Cancel</button>
 <div id="toast" class="toast"></div>
 <script>
 const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_');
-// === PIXORO NO FULL ALERT LOCK ===
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
 window.confirm = function(msg){ showToast(msg); return true; };
-window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
-let media = sessionStorage.getItem('pixoro_pending_media') || localStorage.getItem('pix_media') || '';
-let ME = (localStorage.getItem('pixoro_current_user')||'Giri').trim();
+// ✅ URL la Irundhu da - Local Illa da
+let params = new URLSearchParams(location.search)
+let media = params.get('media') || ''
+let typeParam = params.get('type') || 'video'
+let isVid = typeParam==='video' || media.includes('.mp4')
+let ME = '', ME_ID = ''
 let prev = document.getElementById('prev');
-let isVid = !(media.startsWith('data:image') || media.includes('.jpg') || media.includes('.png') || media.includes('.jpeg') || media.includes('.webp'));
-if(media){
-  if(isVid){
-    document.getElementById('title').innerText='PIXORO Reels - Share 🔥';
-    document.getElementById('shareBtn').innerText='Share Reel 🚀';
-    prev.innerHTML = `<video src="${media}" autoplay loop muted playsinline controls style="width:100%;height:100%;object-fit:cover"></video>`;
+async function init(){
+  let { data: { session } } = await supa.auth.getSession()
+  if(!session){ location.href='login.html'; return; }
+  let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
+  ME = (profile?.username || session.user.email.split('@')[0]).toLowerCase()
+  ME_ID = session.user.id
+  if(media){
+    if(isVid){
+      document.getElementById('title').innerText='PIXORO Reels - Share 🔥';
+      document.getElementById('shareBtn').innerText='Share Reel 🚀';
+      prev.innerHTML = `<video src="${media}" autoplay loop muted playsinline controls style="width:100%;height:100%;object-fit:cover"></video>`;
+    } else {
+      document.getElementById('title').innerText='PIXORO Post - Share 📸';
+      document.getElementById('shareBtn').innerText='Share Post 🚀';
+      prev.innerHTML = `<img src="${media}" style="width:100%;height:100%;object-fit:cover">`;
+    }
   } else {
-    document.getElementById('title').innerText='PIXORO Post - Share 📸';
-    document.getElementById('shareBtn').innerText='Share Post 🚀';
-    prev.innerHTML = `<img src="${media}" style="width:100%;height:100%;object-fit:cover">`;
+    prev.innerHTML = 'Media Illa da - Thumba poi Select pannu da!';
   }
-} else {
-  prev.innerHTML = 'Media Illa da Giri - Thumba poi Select pannu da!';
 }
+init()
 async function share(){
   if(!media){ showToast('Media illa da - Select pannu da'); return; }
+  if(!ME){ showToast('Login pannu da'); return; }
+  document.getElementById('shareBtn').innerText='Uploading... ⏳';
   let cap = document.getElementById('cap').value || (isVid ? 'PIXORO Reel 🔥' : 'PIXORO Post 📸');
   let type = isVid ? 'reel' : 'image';
-  let newPost = {id: Date.now(), username: ME, caption: cap, image_url: media, media_url: media, media_type: type, created_at: new Date().toISOString()};
-  let local = JSON.parse(localStorage.getItem('pixoro_local_posts')||'[]');
-  local.unshift(newPost);
-  localStorage.setItem('pixoro_local_posts', JSON.stringify(local));
+  // ✅ SERVER ONLY - posts Table la Insert da
   let {error} = await supa.from('posts').insert({username: ME, caption: cap, image_url: media, media_url: media, media_type: type});
-  if(error){ showToast('Adutha side la problem da - Local la save aayiduchu'); }
-  else{ showToast(isVid ? 'Reel Done da Giri! 🔥' : 'Photo Done da Giri! 📸'); }
+  if(error){ showToast('Adutha side la problem da - '+error.message); document.getElementById('shareBtn').innerText='Share Reel 🚀'; return; }
+  showToast(isVid ? 'Reel Done da! 🔥' : 'Photo Done da! 📸');
   setTimeout(()=>{ location.href = isVid ? 'reels.html' : 'index.html'; },800);
 }
 </script></body></html>
