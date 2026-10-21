@@ -1,25 +1,23 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Admin - Pixoro 👑</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script><style>body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:0 auto;padding:16px}.card{background:#121212;padding:14px;border-radius:14px;margin:12px 0;border:1px solid #333}.card img{width:100%;border-radius:10px;margin-top:8px;border:1px solid #FFD700}</style></head><body>
-<h2>👑 Pixoro Admin - Gold Tick Requests</h2><p id="count" style="font-size:12px;color:#aaa"></p><div id="list">Loading...</div>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Admin - Pixoro 👑</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script><style>body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:0 auto;padding:16px;padding-bottom:80px}.card{background:#121212;padding:14px;border-radius:14px;margin:12px 0;border:1px solid #333}.card img{width:100%;border-radius:10px;margin-top:8px;border:1px solid #FFD700}</style></head><body>
+<h2>👑 Pixoro Admin - Gold Tick Requests</h2><p style="font-size:12px;color:#aaa">Pixoro Waitlist Requests - Pixoro Gold Tick</p><p id="count" style="font-size:12px;color:#FFD700"></p><div id="list">Loading...</div>
 <button onclick="load()" style="width:100%;background:#fff;color:#000;padding:12px;border-radius:10px;font-weight:900;margin-top:10px;border:0">🔄 Refresh Pannu</button>
 <button onclick="alert('LOCAL: '+localStorage.getItem('pixoro_all_verify'))" style="width:100%;background:#222;color:#fff;padding:10px;border-radius:10px;margin-top:8px;border:1px solid #555">🔍 Local Request Check</button>
 <script>
 const supa=supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 async function load(){
-  // 1. LOCAL - Same Browser la Irukku da
   let local=JSON.parse(localStorage.getItem('pixoro_all_verify')||'[]');
-  // 2. SUPABASE - Vera Phone la Irukku da
   let db=[];
-  try{ let {data,error}=await supa.from('verification_requests').select('*').eq('status','pending').order('created_at',{ascending:false}); console.log('ADMIN DB',data,error); if(error) document.getElementById('list').innerHTML='❌ Supabase Error: '+error.message+'<br><br>SQL Run Pannalaya da?'; else db=data||[]; }catch(e){ console.log(e); }
+  try{ let {data,error}=await supa.from('verification_requests').select('*').eq('status','pending').order('created_at',{ascending:false}); if(error){ document.getElementById('list').innerHTML='❌ Supabase Error: '+error.message+'<br><br>SQL Run Pannalaya da? Table Create Pannu da'; } else db=data||[]; }catch(e){}
   let all=[...local, ...db.filter(d=>!local.find(l=>l.username==d.username))];
   document.getElementById('count').innerText=all.length+' Requests Irukku da - Local: '+local.length+' | Supabase: '+db.length;
-  if(!all.length){document.getElementById('list').innerHTML='No requests - All safe! 🛡️<br><br>Local Check Button Click Pannu da - Enna Varuthu nu Paaru da';return}
+  if(!all.length){document.getElementById('list').innerHTML='No requests - All safe! 🛡️<br><br>Local Check Button Click Pannu da';return}
   let h=''; all.forEach(r=>{
     let idPhoto=r.id_photo||r.proof_url||'';
     let facePhoto=r.face_photo||'';
-    h+=`<div class="card"><b>@${r.username}</b> <span style="color:#FFD700">● Pending</span><br><small style="color:#aaa">Aadhar: <b style="color:#FFD700">${r.aadhar_masked||'XXXX XXXX '+(r.aadhar_last4||'')}</b> | ${r.created_at||''}</small>
+    h+=`<div class="card"><b>@${r.username}</b> <span style="color:#FFD700">● Waitlist</span><br><small style="color:#aaa">Aadhar: <b style="color:#FFD700">${r.aadhar_masked||'XXXX XXXX '+(r.aadhar_last4||'')}</b> | ${r.created_at||''}</small>
     <p style="font-size:12px;color:#FFD700;margin-top:10px">1. ID PHOTO:</p>${idPhoto?`<img src="${idPhoto}">`:'<p style="font-size:12px">Photo Illa da</p>'}
     <p style="font-size:12px;color:#FFD700;margin-top:10px">2. FACE PHOTO:</p>${facePhoto?`<img src="${facePhoto}">`:'<p style="font-size:12px">Photo Illa da</p>'}
-    <div style="display:flex;gap:8px;margin-top:12px"><button onclick="approve('${r.username}','${r.id||''}')" style="flex:1;background:#FFD700;border:0;padding:10px;border-radius:8px;font-weight:900">✅ Approve 👑</button><button onclick="reject('${r.username}','${r.id||''}')" style="flex:1;background:#ff3040;border:0;color:#fff;padding:10px;border-radius:8px;font-weight:900">❌ Reject</button></div></div>`
+    <div style="display:flex;gap:8px;margin-top:12px"><button onclick="approve('${r.username}','${r.id||''}')" style="flex:1;background:#FFD700;border:0;padding:12px;border-radius:8px;font-weight:900">✅ Approve 👑</button><button onclick="reject('${r.username}','${r.id||''}')" style="flex:1;background:#ff3040;border:0;color:#fff;padding:12px;border-radius:8px;font-weight:900">❌ Reject</button></div></div>`
   }); document.getElementById('list').innerHTML=h;
 }
 async function approve(u,reqId){
@@ -29,12 +27,14 @@ async function approve(u,reqId){
   let ids=JSON.parse(localStorage.getItem('pixoro_gold_ids')||'["giri_office"]');
   if(!ids.includes(clean)) ids.push(clean);
   localStorage.setItem('pixoro_gold_ids', JSON.stringify(ids));
+  localStorage.removeItem('pixoro_verify_'+clean);
   let all=JSON.parse(localStorage.getItem('pixoro_all_verify')||'[]'); all=all.filter(x=>x.username!==clean); localStorage.setItem('pixoro_all_verify', JSON.stringify(all));
   alert('@'+clean+' approved da! 👑 Gold Tick!');
   load();
 }
 async function reject(u,reqId){
   if(reqId) await supa.from('verification_requests').update({status:'rejected'}).eq('id',reqId);
+  localStorage.removeItem('pixoro_verify_'+u);
   let all=JSON.parse(localStorage.getItem('pixoro_all_verify')||'[]'); all=all.filter(x=>x.username!==u); localStorage.setItem('pixoro_all_verify', JSON.stringify(all));
   alert('Rejected da'); load();
 }
