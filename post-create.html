@@ -22,12 +22,18 @@
 <input type="file" id="f" hidden accept="image/*,video/*" onchange="h(event)">
 <script>
 const supa=supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_');
-// === PIXORO NO FULL ALERT LOCK ===
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
 window.confirm = function(msg){ showToast(msg); return true; };
-window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
-// === STORAGE SAVER - COMPRESS BEFORE UPLOAD ===
+// ✅ LOGIN CHECK - Server Session da
+let ME_RAW=''
+async function checkAuth(){
+  let { data: { session } } = await supa.auth.getSession()
+  if(!session){ location.href='login.html'; return; }
+  let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
+  ME_RAW = (profile?.username || session.user.email.split('@')[0]).toLowerCase()
+}
+checkAuth()
 async function compressImage(file){
   return new Promise(res=>{
     let img=new Image(); let url=URL.createObjectURL(file);
@@ -41,7 +47,6 @@ async function h(e){
   let f=e.target.files[0]; if(!f) return;
   let isVideo=f.type.startsWith('video');
   mType=isVideo?'video':'image';
-  // VIDEO SIZE CHECK - 15MB mela venaam
   if(isVideo && f.size > 15*1024*1024){ showToast('Video perusu da! 15MB kulla irukura video eduthuko'); e.target.value=''; return; }
   let url=URL.createObjectURL(f);
   document.getElementById('prev').innerHTML=isVideo?`<video src="${url}" autoplay muted loop></video>`:`<img src="${url}">`;
@@ -58,18 +63,19 @@ async function h(e){
     showToast('Compress aayiduchu da! '+formatSize(f.size)+' → '+formatSize(uploadFile.size));
   }
   let bucket=isVideo?'reels':'posts';
-  let fileName=Date.now()+'_'+uploadFile.name.replace(/[^a-zA-Z0-9.]/g,'_');
+  let fileName=Date.now()+'_'+ME_RAW+'_'+uploadFile.name.replace(/[^a-zA-Z0-9.]/g,'_');
   let {error}=await supa.storage.from(bucket).upload(fileName,uploadFile);
   if(error){ showToast('Adutha side la problem da - Try again'); document.getElementById('prog').style.display='none'; return; }
   let {data}=supa.storage.from(bucket).getPublicUrl(fileName);
   m=data.publicUrl;
-  localStorage.setItem('pix_media',m);
-  sessionStorage.setItem('pixoro_pending_media',m);
-  localStorage.setItem('pix_media_type',mType);
-  localStorage.setItem('pix_media_is_reel',isVideo?'true':'false');
+  // ✅ NO localStorage - URL la Thaan da Pass Pannurom da
   document.getElementById('progFill').style.width='100%';
   document.getElementById('progText').innerText='Upload Done ✅ Storage Saved!';
   showToast('Upload Done da Giri! 🔥 Next ku po da');
 }
-function go(){ if(!m){showToast('Photo select pannu da Giri!');return} location.href='post-upload.html' }
+function go(){ 
+  if(!m){showToast('Photo select pannu da Giri!');return} 
+  // ✅ URL Param la Media Pass da - Local Illa da
+  location.href='post-upload.html?media='+encodeURIComponent(m)+'&type='+mType
+}
 </script></body></html>
