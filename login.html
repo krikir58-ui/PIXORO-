@@ -8,105 +8,76 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-rad
 <div class="box">
 <h1 style="font-family:cursive;font-size:36px;color:#FFD700">Pixoro</h1>
 <div class="card">
-<input id="email" placeholder="Email - Ex: giri@gmail.com">
-<input id="pass" type="password" placeholder="Password">
+<!-- ✅ 1. Instagram Mari - Username / Email Rendum da -->
+<input id="email" placeholder="Username / Email - Ex: giri_office">
+<input id="pass" type="password" placeholder="Password - Pazhaya Password">
 <button onclick="doLogin()">Log In</button>
 <button onclick="doSignup()" style="background:#262626;color:#FFD700">Create New Account</button>
-<button onclick="showOtp()" style="background:#262626;color:#fff">OTP Login</button>
 <button onclick="loginWithGoogle()" style="background:#fff;color:#000">G Continue with Google</button>
-<div id="otpBox" style="display:none;margin-top:10px">
-<input id="otpCode" placeholder="6 Digit OTP">
-<button onclick="verifyOtp()" style="background:#00c853;color:#fff">Verify OTP</button>
-</div>
 <button onclick="forgot()" style="background:none;color:#FFD700">Forgot Password?</button>
 <p id="msg" style="color:#ff3040;font-size:13px"></p>
 </div>
-<button onclick="doPixoroLogout()" style="background:#ed4956;color:#fff;width:360px;padding:11px;border:0;border-radius:8px;font-weight:bold">Log Out</button>
+<!-- ✅ 2. Instagram Mari - Already Login Irundha - Continue As Kaatu da - Direct Home Pogatha da -->
+<div id="continueBox" style="display:none" class="card">
+<p>Continue as <b id="contName"></b> ?</p>
+<button onclick="location.href='index.html'">Continue</button>
+<button onclick="doPixoroLogout()" style="background:#262626;color:#fff">Log In to Another Account</button>
+</div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const supa = supabase.createClient("https://yecpltndhlzfjplzhcpm.supabase.co","sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_")
 function showErr(m){ document.getElementById('msg').innerText=m }
-function clearErr(){ document.getElementById('msg').innerText='' }
-async function checkGoogleLogin(){
+async function checkSession(){
   let {data} = await supa.auth.getSession()
-  if(data.session && data.session.user){ location.href='index.html' }
-}
-checkGoogleLogin()
-supa.auth.onAuthStateChange((event, session)=>{
-  if(event==='SIGNED_IN' && session?.user){ location.href='index.html' }
-})
-async function loginWithGoogle(){
-  clearErr()
-  let {error} = await supa.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: 'https://krikir58-ui.github.io/PIXORO-/login.html' } })
-  if(error) showErr(error.message)
-}
-async function ensureProfile(user){
-  // ✅ Server la Profile Create Pannu da - Local Illa da
-  let username = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_.]/g,'')
-  let { data } = await supa.from('profiles').select('id').eq('id', user.id).single()
-  if(!data){
-    await supa.from('profiles').insert({ id: user.id, username: username, email: user.email, verified: username==='giri_office' })
+  if(data.session){
+    // ✅ Direct Pogatha da - Yaar Login Irukkan nu Kaatu da
+    let {data:p} = await supa.from('profiles').select('username').eq('id', data.session.user.id).single()
+    document.getElementById('contName').innerText = p?.username || data.session.user.email.split('@')[0]
+    document.getElementById('continueBox').style.display='block'
   }
 }
+checkSession()
+async function ensureProfile(user){
+  let { data } = await supa.from('profiles').select('id,username').eq('id', user.id).single()
+  if(data) return data.username // ✅ Pazhaya Username Thaan da - giri_office Maaraathu da
+  let username = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_.]/g,'')
+  // ✅ Username Already Irundha - _1 Podu da - Random ID Podatha da
+  let { data: ex } = await supa.from('profiles').select('id').eq('username', username).single()
+  if(ex) username = username + '_1'
+  await supa.from('profiles').insert({ id: user.id, username: username, email: user.email })
+  return username
+}
 async function doLogin(){
-  clearErr()
-  let email=document.getElementById('email').value, pass=document.getElementById('pass').value
-  if(!email || !pass) return showErr('Email & Password podu da')
+  let val=document.getElementById('email').value.trim(), pass=document.getElementById('pass').value
+  if(!val || !pass) return showErr('Username & Password podu da')
+  let email = val
+  // ✅ Username Potta - Email ah Thedu da
+  if(!val.includes('@')){
+    let {data:p} = await supa.from('profiles').select('email').eq('username', val.toLowerCase()).single()
+    if(!p) return showErr('Username illa da')
+    email = p.email
+  }
   let {data, error}=await supa.auth.signInWithPassword({email,password:pass})
-  if(error) return showErr('Sorry, your password was incorrect. Please double-check your password.')
+  if(error) return showErr('Password Thappu da - Pazhaya Password Check Pannu da')
   await ensureProfile(data.user); location.href='index.html'
 }
 async function doSignup(){
-  clearErr()
-  let email=document.getElementById('email').value, pass=document.getElementById('pass').value
-  if(!email || !pass) return showErr('Email & Password podu da')
+  let email=document.getElementById('email').value.trim(), pass=document.getElementById('pass').value
+  if(!email.includes('@')) return showErr('Signup ku Email Podu da')
   let {data, error}=await supa.auth.signUp({email,password:pass})
   if(error) return showErr(error.message)
   if(data.user) await ensureProfile(data.user)
   location.href='index.html'
 }
-async function showOtp(){
-  clearErr()
-  let email=document.getElementById('email').value.trim()
-  if(!email) return showErr('Email podu da')
-  let {error}=await supa.auth.signInWithOtp({ email, options:{ shouldCreateUser: true } })
-  if(error) showErr(error.message); else document.getElementById('otpBox').style.display='block'
-}
-async function verifyOtp(){
-  clearErr()
-  let email=document.getElementById('email').value.trim(), token=document.getElementById('otpCode').value.trim()
-  if(!token) return showErr('OTP podu da')
-  let {data, error}=await supa.auth.verifyOtp({email,token,type:'email'})
-  if(error) return showErr('OTP thappu da - Thirumba check pannu da')
-  await ensureProfile(data.user); location.href='index.html'
+async function loginWithGoogle(){
+  await supa.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: 'https://krikir58-ui.github.io/PIXORO-/login.html' } })
 }
 async function forgot(){
-  clearErr()
   let email=document.getElementById('email').value.trim()
   if(!email) return showErr('Email podu da')
-  let {error}=await supa.auth.signInWithOtp({ email, options:{ shouldCreateUser: false } })
-  if(error) return showErr(error.message)
-  document.getElementById('otpBox').style.display='block'
-  document.getElementById('otpBox').innerHTML = `
-    <input id="otpCode" placeholder="6 Digit OTP">
-    <input id="newPass" type="password" placeholder="Pudhu Password">
-    <button onclick="resetWithOtp()" style="background:#00c853">Verify + Set New Password</button>`
+  let {error}=await supa.auth.resetPasswordForEmail(email, { redirectTo: location.href })
+  if(error) showErr(error.message); else showErr('Email la Link Anuppitom da')
 }
-async function resetWithOtp(){
-  clearErr()
-  let email=document.getElementById('email').value.trim()
-  let token=document.getElementById('otpCode').value.trim()
-  let newPass=document.getElementById('newPass').value.trim()
-  if(!token || !newPass) return showErr('OTP + Password rendu podu da')
-  let {error}=await supa.auth.verifyOtp({email,token,type:'email'})
-  if(error) return showErr('OTP thappu da')
-  let {error:upErr}=await supa.auth.updateUser({password:newPass})
-  if(upErr) return showErr(upErr.message)
-  location.href='index.html'
-}
-async function doPixoroLogout(){
-  await supa.auth.signOut();
-  location.href='login.html';
-}
+async function doPixoroLogout(){ await supa.auth.signOut(); location.reload(); }
 </script></body></html>
