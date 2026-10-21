@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Add Picture - Pixoro</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
+</head>
+<body style="background:#111;color:#fff;padding:20px;text-align:center;font-family:sans-serif;margin:0">
+<h2 style="text-align:left;font-size:24px;margin:0">Add a profile picture</h2>
+<p style="text-align:left;color:#aaa;font-size:14px;line-height:1.5">Add a profile picture to express this new profile. Your profile picture will be public.</p>
+
+<!-- GREY DP - Video Mariye da -->
+<div style="width:200px;height:200px;background:#d3d7dc;border-radius:50%;margin:40px auto;overflow:hidden;position:relative">
+<img id="preview" style="width:100%;height:100%;object-fit:cover;display:none">
+<div id="greyIcon">
+<div style="width:80px;height:80px;background:#fff;border-radius:50%;margin:35px auto 0"></div>
+<div style="width:150px;height:100px;background:#fff;border-radius:50% 50% 0 0;margin:10px auto"></div>
+</div>
+</div>
+
+<button onclick="document.getElementById('file').click()" style="width:100%;background:#0095f6;color:#fff;padding:14px;border-radius:20px;border:none;font-weight:700;font-size:15px">Add picture</button>
+<input type="file" id="file" hidden accept="image/*" onchange="uploadPic(this)">
+
+<button id="nextBtn" onclick="goHome()" style="width:100%;background:#333;color:#fff;padding:14px;border-radius:20px;border:none;margin-top:10px;font-weight:700;font-size:15px">Skip</button>
+<p id="msg" style="color:#00C853;font-size:13px;margin-top:10px"></p>
+
+<script>
+let supa = window.supa
+let uploadedUrl = ''
+
+async function uploadPic(input){
+  const file = input.files[0]
+  if(!file) return
+  // Preview Kaatu da
+  const reader = new FileReader()
+  reader.onload = e => {
+    document.getElementById('preview').src = e.target.result
+    document.getElementById('preview').style.display = 'block'
+    document.getElementById('greyIcon').style.display = 'none'
+  }
+  reader.readAsDataURL(file)
+  // Supabase Storage la Upload da
+  const { data: { user } } = await supa.auth.getUser()
+  const fileName = user.id + '/' + Date.now() + '.jpg'
+  const { error } = await supa.storage.from('avatars').upload(fileName, file, { upsert: true })
+  if(error){ document.getElementById('msg').innerText = error.message; return }
+  const { data: pub } = supa.storage.from('avatars').getPublicUrl(fileName)
+  uploadedUrl = pub.publicUrl
+  await supa.from('profiles').update({ avatar_url: uploadedUrl }).eq('id', user.id)
+  document.getElementById('msg').innerText = '✅ Picture saved da!'
+  document.getElementById('nextBtn').innerText = 'Continue'
+  document.getElementById('nextBtn').style.background = '#0095f6'
+}
+
+function goHome(){
+  location.href = 'index.html'
+}
+</script>
+</body></html>
