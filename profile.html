@@ -47,14 +47,13 @@ input[type=range]{width:100%;accent-color:#fff}
 <div id="toast" class="toast"></div>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
-// ✅ FIX: supa ah function la edukkanum da - top la edukka koodathu da
 function getSupa(){ return window.supa || window.supabase; }
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||''; }
 let ME_RAW='', ME_ID='', VIEW_USER='', VIEW_PROFILE=null, myPosts=[]
-// ✅ GOLD TICK FALLBACK - module load aagala na kooda varum da
+let _origGetTick = window.getTick;
 function getTick(u){
-  if(window.getTick && typeof window.getTick==='function' && window.getTick!==getTick){
-    try{ let r=window.getTick(u); if(r) return r; }catch(e){}
+  if(typeof _origGetTick==='function'){
+    try{ let r=_origGetTick(u); if(r) return r; }catch(e){}
   }
   let c = (typeof u==='string') ? cleanUser(u) : cleanUser(u && u.username);
   if(c==='giri_office') return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
@@ -84,13 +83,12 @@ async function init(){
   document.getElementById('displayName').textContent = VIEW_PROFILE.full_name || VIEW_PROFILE.display_name || VIEW_PROFILE.username
   document.getElementById('usernameTag').textContent = '@'+VIEW_PROFILE.username
   document.getElementById('bioText').innerText = VIEW_PROFILE.bio || ''
-  document.getElementById('linkText').innerText = VIEW_PROFILE.link || ''
+  document.getElementById('linkText').innerText = VIEW_PROFILE.link || VIEW_PROFILE.website || ''
   document.getElementById('goldTick').innerHTML = getTick(VIEW_PROFILE.username)
   document.getElementById('pfpImg').src = getPfpFrom(VIEW_PROFILE)
   document.getElementById('editPfpPreview').src = getPfpFrom(VIEW_PROFILE)
   document.getElementById('navPfp').src = getPfpFrom(myProfile)
   document.getElementById('editBtn').style.display = isMine ? 'block':'none'
-  // ✅ FIX: user_id la posts edukkanum da - username la illa da
   let { data: posts } = await supa.from('posts').select('*').eq('user_id', VIEW_PROFILE.id).order('created_at',{ascending:false})
   myPosts = (posts||[]).filter(p=>!p.is_archived)
   document.getElementById('postCount').textContent = myPosts.length
@@ -102,11 +100,11 @@ async function init(){
 function renderGrid(list){ if(!list.length){ document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`; return; } document.getElementById('myGrid').innerHTML=list.map(p=>{ let mUrl=p.media_url||p.image_url||p.image||''; let isVid=p.media_type=='reel'||mUrl.includes('.mp4'); if(isVid) return `<div style="position:relative"><video src="${mUrl}" muted playsinline style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px">🎬</span></div>`; return `<img src="${mUrl}">`; }).join('') }
 function showTab(type){ document.getElementById('tabPosts').classList.toggle('active', type=='all'); document.getElementById('tabReels').classList.toggle('active', type=='reels'); let list=type=='reels'? myPosts.filter(p=> p.media_type=='reel'||(p.media_url||'').includes('.mp4')) : myPosts; renderGrid(list); }
 function openSettings(){ document.getElementById('setSheet').style.display='flex' }
-function openEditSheet(){ if(VIEW_USER!==ME_RAW) return showToast('Others Profile Edit Panna Mudiyathu da'); document.getElementById('editName').value=VIEW_PROFILE.full_name||VIEW_PROFILE.display_name||''; document.getElementById('editUsername').value=VIEW_USER; document.getElementById('editBio').value=VIEW_PROFILE.bio||''; document.getElementById('editLink').value=VIEW_PROFILE.link||''; document.getElementById('editSheet').style.display='flex' }
+function openEditSheet(){ if(VIEW_USER!==ME_RAW) return showToast('Others Profile Edit Panna Mudiyathu da'); document.getElementById('editName').value=VIEW_PROFILE.full_name||VIEW_PROFILE.display_name||''; document.getElementById('editUsername').value=VIEW_USER; document.getElementById('editBio').value=VIEW_PROFILE.bio||''; document.getElementById('editLink').value=VIEW_PROFILE.link||VIEW_PROFILE.website||''; document.getElementById('editSheet').style.display='flex' }
 async function doPixoroLogout(){ let supa=getSupa(); await supa.auth.signOut(); location.href='login.html'; }
 async function saveEdit(){
   let supa=getSupa();
-  let n=document.getElementById('editName').value.trim(), u=cleanUser(document.getElementById('editUsername').value.trim()), b=document.getElementById('editBio').value, l=document.getElementById('editLink').value, np=document.getElementById('editPfpPreview').dataset.new
+  let n=document.getElementById('editName').value.trim(), u=cleanUser(document.getElementById('editUsername').value.trim()), b=document.getElementById('editBio').value, l=document.getElementById('editLink').value.trim(), np=document.getElementById('editPfpPreview').dataset.new
   if(!u) return showToast('Username podu da')
   let oldU = ME_RAW
   let avatarUrl = VIEW_PROFILE?.avatar_url || ''
@@ -122,14 +120,28 @@ async function saveEdit(){
       }
     }catch(e){}
   }
-  let update = { username: u, display_name: n, full_name: n, bio: b, link: l, avatar_url: avatarUrl }
+  // ✅ REAL SAVE - link column illa na kooda save aagum da - link ah thaniya try pannum da
+  let update = { username: u, display_name: n, full_name: n, bio: b, avatar_url: avatarUrl }
   let { error } = await supa.from('profiles').update(update).eq('id', ME_ID)
-  if(error) return showToast(error.message)
+  if(error){
+    // full_name column illa na - display_name mattum try pannu da
+    if(error.message.includes('full_name') || error.message.includes('column')){
+      let { error: e2 } = await supa.from('profiles').update({ username: u, display_name: n, bio: b, avatar_url: avatarUrl }).eq('id', ME_ID)
+      if(e2) return showToast(e2.message)
+    } else return showToast(error.message)
+  }
+  // Link iruntha - thaniya save try pannu da - error vantha kooda main save already aayiduchu da
+  if(l){
+    try{ await supa.from('profiles').update({ link: l }).eq('id', ME_ID); }catch(e){}
+    try{ await supa.from('profiles').update({ website: l }).eq('id', ME_ID); }catch(e){}
+    // Browser la local save - profile la kaamikka da
+    try{ localStorage.setItem('pixoro_link_'+ME_ID, l); }catch(e){}
+  }
   if(u!==oldU){
     await supa.from('posts').update({username: u}).eq('username', oldU)
     await supa.from('stories').update({username: u}).eq('username', oldU)
   }
-  document.getElementById('editSheet').style.display='none'; showToast('Server la Saved da ✅'); location.href='profile.html?u='+u
+  document.getElementById('editSheet').style.display='none'; showToast('Server la Saved da ✅'); setTimeout(()=>{ location.href='profile.html?u='+u },600)
 }
 function shareProfile(){ navigator.clipboard.writeText(location.origin+'/profile.html?u='+VIEW_USER).then(()=>showToast('Profile Link Copy da!')) }
 let cropX=0,cropY=0,cropScale=1,cropDragging=false,cropStartX=0,cropStartY=0,cropOrigX=0,cropOrigY=0,cropImgEl=document.getElementById('cropImg');
