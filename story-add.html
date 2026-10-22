@@ -35,21 +35,18 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto}
 <script>
 const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_');
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
-window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
-window.confirm = function(msg){ showToast(msg); return true; };
-let ME_RAW=''
+let ME_RAW='giri', ME_ID=null
 async function checkAuth(){
   let { data: { session } } = await supa.auth.getSession()
   if(!session){ location.href='login.html'; return; }
+  ME_ID = session.user.id
   let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
   ME_RAW = (profile?.username || session.user.email.split('@')[0]).toLowerCase()
 }
 checkAuth()
-// ✅ Direct Param Support - story-create.html la Irundhu Vantha da
 let urlParams = new URLSearchParams(location.search)
 let urlMedia = urlParams.get('media')
 if(urlMedia){
-  // Already Uploaded da - Direct Editor ku Po da
   setTimeout(()=>{ location.href='story-editor.html?media='+encodeURIComponent(urlMedia)+'&type='+(urlParams.get('type')||'image') }, 300)
 }
 function openPicker(){ document.getElementById('file').click() }
@@ -58,7 +55,6 @@ async function goNext(inp){
   if(!inp.files[0]) return
   let f=inp.files[0]
   showToast('Uploading Story... ⏳')
-  // ✅ Compress + Upload to Server - Data URL Illa da
   let uploadFile = f
   if(f.type.startsWith('image/')){
     uploadFile = await new Promise(res=>{
@@ -67,12 +63,12 @@ async function goNext(inp){
       img.onerror=()=>res(f); img.src=url;
     })
   }
+  if(!ME_RAW) ME_RAW='giri'
   let fileName = Date.now()+'_'+ME_RAW+'_'+uploadFile.name.replace(/[^a-zA-Z0-9.]/g,'_')
   let {error}=await supa.storage.from('stories').upload(fileName, uploadFile)
-  if(error){ showToast('Upload Fail da - Try again'); return; }
+  if(error){ showToast('Upload Fail: '+error.message); return; }
   let {data}=supa.storage.from('stories').getPublicUrl(fileName)
   let mType = f.type.startsWith('video')?'video':'image'
-  // ✅ URL la Pass da - Local / Session Illa da
   location.href='story-editor.html?media='+encodeURIComponent(data.publicUrl)+'&type='+mType
 }
 </script></body></html>
