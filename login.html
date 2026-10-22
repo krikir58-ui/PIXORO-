@@ -6,79 +6,137 @@
 .box{width:360px;text-align:center}.card{border:1px solid #262626;padding:20px;border-radius:10px;margin-bottom:10px}
 input{width:100%;padding:11px;margin:6px 0;background:#121212;border:1px solid #333;color:#fff;border-radius:6px;box-sizing:border-box}
 button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:6px}
+.hide{display:none}
+#pfpPrev{width:90px;height:90px;border-radius:50%;object-fit:cover;background:#222;display:block;margin:0 auto 12px;border:2px solid #FFD700}
 </style></head><body>
 <div class="box">
 <h1 style="font-family:cursive;font-size:36px;color:#FFD700">Pixoro</h1>
-<div class="card">
-<input id="email" placeholder="Username / Email - Ex: giri_office">
-<input id="pass" type="password" placeholder="Password - Pazhaya Password">
-<button onclick="doLogin()">Log In</button>
-<button onclick="doSignup()" style="background:#262626;color:#FFD700">Create New Account</button>
-<button onclick="loginWithGoogle()" style="background:#fff;color:#000">G Continue with Google</button>
-<button onclick="forgot()" style="background:none;color:#FFD700">Forgot Password?</button>
-<p id="msg" style="color:#ff3040;font-size:13px"></p>
+
+<!-- STEP 1 - FIRST PAGE - EMAIL / PHONE + OTP -->
+<div class="card" id="s1">
+<p style="font-size:14px;color:#888;margin-bottom:10px">Welcome to Pixoro 👋</p>
+<input id="email" type="email" placeholder="Email / Phone Number" autocomplete="off">
+<button onclick="sendOTP()">Send OTP ➡️</button>
+<p id="msg1" style="color:#ff3040;font-size:13px;margin-top:8px"></p>
+<p style="font-size:12px;color:#888;margin-top:10px">Already Account? <b onclick="showOld()" style="color:#FFD700;cursor:pointer">Log In</b></p>
 </div>
-<div id="continueBox" style="display:none" class="card">
-<p>Continue as <b id="contName"></b> ?</p>
-<button onclick="location.href='index.html'">Continue</button>
-<button onclick="doPixoroLogout()" style="background:#262626;color:#fff">Log In to Another Account</button>
+
+<!-- STEP 2 - OTP PAGE -->
+<div class="card hide" id="sOTP">
+<p style="font-size:14px;color:#888;margin-bottom:10px">Enter OTP 🔢</p>
+<p id="otpInfo" style="font-size:12px;color:#888"></p>
+<input id="otpCode" placeholder="6 Digit OTP" maxlength="6" autocomplete="off">
+<button onclick="verifyOTP()">Verify OTP ✅</button>
+<button onclick="go('s1')" style="background:#262626;color:#FFD700">Back</button>
+<p id="msgOTP" style="color:#ff3040;font-size:13px"></p>
 </div>
+
+<!-- STEP 3 - NEW USERNAME + NEW PASSWORD + SAVE -->
+<div class="card hide" id="s2">
+<p style="font-size:14px;color:#888;margin-bottom:10px">Create Profile ✨ - One Time Only</p>
+<input id="newUser" placeholder="New Username" autocomplete="off">
+<input id="newPass" type="password" placeholder="New Password">
+<input id="newPass2" type="password" placeholder="Confirm Password">
+<button onclick="saveProfile()">Save & Continue 🚀</button>
+<p id="msg2" style="color:#ff3040;font-size:13px"></p>
+</div>
+
+<!-- STEP 4 - PHOTO + SKIP -->
+<div class="card hide" id="s3">
+<p style="font-size:14px;color:#888;margin-bottom:10px">Profile Photo 📸</p>
+<img id="pfpPrev" src="https://ui-avatars.com/api/?name=G&background=222&color=fff&size=200">
+<input type="file" id="pfpFile" accept="image/*" onchange="previewPfp(this)" style="border:0">
+<button onclick="savePhoto()">Save Photo ✅</button>
+<button onclick="location.href='index.html'" style="background:#262626;color:#FFD700">Skip >>></button>
+</div>
+
+<!-- OLD LOGIN - LOGOUT PANNA MATTUM -->
+<div class="card hide" id="sOld">
+<p style="font-size:14px;color:#888;margin-bottom:10px">Log In 🔐</p>
+<input id="oldUser" placeholder="Username / Email" autocomplete="off">
+<input id="oldPass" type="password" placeholder="Password">
+<button onclick="loginOld()">Log In</button>
+<button onclick="go('s1')" style="background:#262626;color:#FFD700">Create New Account</button>
+<p id="msgOld" style="color:#ff3040;font-size:13px"></p>
+</div>
+
 </div>
 <script>
 let supa = window.supa
-function showErr(m){ document.getElementById('msg').innerText=m }
-function cleanU(u){ u=String(u||'').trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase() }
-async function checkSession(){
-  let {data} = await supa.auth.getSession()
-  if(data.session){
-    let {data:p} = await supa.from('profiles').select('username').eq('id', data.session.user.id).single()
-    document.getElementById('contName').innerText = p?.username || data.session.user.email.split('@')[0]
-    document.getElementById('continueBox').style.display='block'
+let curEmail = ''
+function go(id){ ['s1','sOTP','s2','s3','sOld'].forEach(x=>document.getElementById(x).classList.add('hide')); document.getElementById(id).classList.remove('hide') }
+function showOld(){ go('sOld') }
+function showErr(id,m){ document.getElementById(id).innerText=m }
+
+// STEP 1 - OTP ANUPPU
+async function sendOTP(){
+  curEmail = document.getElementById('email').value.trim()
+  if(!curEmail.includes('@')) return showErr('msg1','Valid Email Podu da')
+  let {error} = await supa.auth.signInWithOtp({email:curEmail, options:{shouldCreateUser:true}})
+  if(error) return showErr('msg1',error.message)
+  document.getElementById('otpInfo').innerText='OTP sent to '+curEmail
+  go('sOTP')
+}
+
+// STEP 2 - OTP VERIFY
+async function verifyOTP(){
+  let code=document.getElementById('otpCode').value.trim()
+  if(code.length<6) return showErr('msgOTP','6 Digit OTP Podu da')
+  let {error} = await supa.auth.verifyOtp({email:curEmail, token:code, type:'email'})
+  if(error) return showErr('msgOTP',error.message)
+  // Pazhaya User na Direct Home - One Time Setup Varaathu da
+  let {data:{user}} = await supa.auth.getUser()
+  if(user){
+    let {data:prof} = await supa.from('profiles').select('username').eq('id',user.id).single()
+    if(prof && prof.username){ location.href='index.html'; return }
   }
+  go('s2')
 }
-checkSession()
-async function ensureProfile(user){
-  let { data } = await supa.from('profiles').select('id,username').eq('id', user.id).single()
-  if(data) return data.username
-  let username = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_.]/g,'')
-  let { data: ex } = await supa.from('profiles').select('id').eq('username', username).single()
-  if(ex) username = username + '_1'
-  await supa.from('profiles').insert({ id: user.id, username: username, email: user.email })
-  return username
+
+// STEP 3 - NEW USERNAME + PASSWORD SAVE
+async function saveProfile(){
+  let u=document.getElementById('newUser').value.trim().toLowerCase().replace(/[^a-z0-9_.]/g,'')
+  let p1=document.getElementById('newPass').value
+  let p2=document.getElementById('newPass2').value
+  if(u.length<3) return showErr('msg2','Username 3+ Letters Podu da')
+  if(p1.length<6) return showErr('msg2','Password 6+ Letters Podu da')
+  if(p1!==p2) return showErr('msg2','Password Match Aagala da')
+  let {data:ex}=await supa.from('profiles').select('id').eq('username',u).single()
+  if(ex) return showErr('msg2','Username Already Irukku da - Vera Podu da')
+  await supa.auth.updateUser({password:p1})
+  let {data:{user}} = await supa.auth.getUser()
+  let {error}=await supa.from('profiles').upsert({id:user.id, username:u, email:curEmail, avatar_url:'https://ui-avatars.com/api/?name='+u.charAt(0).toUpperCase()+'&background=111&color=fff'})
+  if(error) return showErr('msg2',error.message)
+  go('s3')
 }
-async function goNext(user){
-  let { data } = await supa.from('profiles').select('username').eq('id', user.id).single()
-  if(!data?.username){ location.href='create-username.html' } else { location.href='index.html' }
+
+// STEP 4 - PHOTO
+function previewPfp(inp){ if(inp.files[0]) document.getElementById('pfpPrev').src=URL.createObjectURL(inp.files[0]) }
+async function savePhoto(){
+  let f=document.getElementById('pfpFile').files[0]
+  if(!f) return location.href='index.html'
+  let {data:{user}} = await supa.auth.getUser()
+  let {error}=await supa.storage.from('avatars').upload(user.id+'.jpg', f, {upsert:true})
+  if(error) return showErr('msg2',error.message)
+  let {data}=supa.storage.from('avatars').getPublicUrl(user.id+'.jpg')
+  await supa.from('profiles').update({avatar_url:data.publicUrl}).eq('id',user.id)
+  location.href='index.html'
 }
-async function doLogin(){
-  let val=document.getElementById('email').value.trim(), pass=document.getElementById('pass').value
-  if(!val || !pass) return showErr('Username & Password podu da')
-  let email = val
+
+// OLD LOGIN - LOGOUT APURAM
+async function loginOld(){
+  let val=document.getElementById('oldUser').value.trim()
+  let pass=document.getElementById('oldPass').value
+  if(!val||!pass) return showErr('msgOld','Username & Password Podu da')
+  let email=val
   if(!val.includes('@')){
-    let u = cleanU(val)
-    let {data:p} = await supa.from('profiles').select('email,username').ilike('username', u).maybeSingle()
-    if(!p) return showErr('Username illa da - Create New Account pannu da')
-    email = p.email
+    let u=val.toLowerCase().replace(/[^a-z0-9_.]/g,'')
+    let {data:p}=await supa.from('profiles').select('email').eq('username',u).maybeSingle()
+    if(!p) return showErr('msgOld','Username Illa da')
+    email=p.email
   }
-  let {data, error}=await supa.auth.signInWithPassword({email,password:pass})
-  if(error) return showErr('Password Thappu da - Pazhaya Password Check Pannu da')
-  await ensureProfile(data.user); goNext(data.user)
+  let {error}=await supa.auth.signInWithPassword({email, password:pass})
+  if(error) return showErr('msgOld','Password Thappu da')
+  location.href='index.html'
 }
-async function doSignup(){
-  let email=document.getElementById('email').value.trim(), pass=document.getElementById('pass').value
-  if(!email.includes('@')) return showErr('Signup ku Email Podu da')
-  let {data, error}=await supa.auth.signUp({email,password:pass})
-  if(error) return showErr(error.message)
-  if(data.user){ await ensureProfile(data.user); goNext(data.user) }
-}
-async function loginWithGoogle(){
-  await supa.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: 'https://krikir58-ui.github.io/PIXORO-/login.html' } })
-}
-async function forgot(){
-  let email=document.getElementById('email').value.trim()
-  if(!email) return showErr('Email podu da')
-  let {error}=await supa.auth.resetPasswordForEmail(email, { redirectTo: location.href })
-  if(error) showErr(error.message); else showErr('Email la Link Anuppitom da')
-}
-async function doPixoroLogout(){ await supa.auth.signOut(); location.reload(); }
 </script></body></html>
