@@ -66,7 +66,7 @@
 <div class="createRow" style="border-bottom:none" onclick="location.href='live.html'"><div class="createIco">((•))</div><div style="flex:1"><b style="font-size:16px">Live</b><div style="font-size:12px;color:#888">Go live now</div></div><span style="color:#666;font-size:20px">›</span></div>
 <div onclick="hideChoice()" style="text-align:center;padding:14px;color:#777;margin-top:10px">Cancel</div>
 </div></div>
-<script src="js/pixoro-core.js"></script>
+<script type="module" src="js/pixoro-core.js"></script>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
@@ -80,6 +80,14 @@ let allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=
 let viewedStories=[], lastTap=0
 let feedMode='foryou'
 let PLUS={ghost:false}
+// ✅ GOLD TICK FALLBACK - pixoro-core load aagala na kooda work aagum da
+if(typeof getTick === 'undefined'){
+  window.getTick = function(u){
+    let c = (typeof u === 'string') ? cleanUser(u) : cleanUser(u && u.username);
+    if(c==='giri_office') return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+    return '';
+  }
+}
 function profileById(id){ return allProfiles.find(x=> x.id===id) || null }
 function usernameById(id){ let p=profileById(id); return p? p.username : '' }
 function displayNameFor(u){ 
@@ -89,10 +97,16 @@ function displayNameFor(u){
   if(p && p.display_name) return p.display_name;
   return cleanUser(u) || 'Giri Office';
 }
+// ✅ FIXED getPfp - ME_ID la irunthu 4 varathu - ME_PFP / ME_RAW use pannum da
 function getPfp(u){
+  if(u===ME_ID && ME_PFP) return ME_PFP;
   let p = allProfiles.find(x=> x.id===u) || allProfiles.find(x=> cleanUser(x.username)===cleanUser(u));
   if(p && (p.avatar_url || p.profile_pic || p.photo_url)) return p.avatar_url || p.profile_pic || p.photo_url;
-  let clean = cleanUser(u);
+  // UUID first letter edukka koodathu da - username / ME_RAW first letter thaan da
+  let name = p ? (p.username||'') : (u===ME_ID ? ME_RAW : cleanUser(u));
+  // UUID maathiri long id na - G use pannu da
+  if(name.length>20) name = ME_RAW || 'giri_office';
+  let clean = cleanUser(name);
   return 'https://ui-avatars.com/api/?name='+(clean.charAt(0).toUpperCase()||'G')+'&background=111&color=fff&size=200&bold=true';
 }
 function isMyPost(u){ return u===ME_ID || cleanUser(u)===cleanUser(ME_RAW); }
