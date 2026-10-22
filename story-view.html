@@ -1,4 +1,5 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Story - Pixoro</title>
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Story - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
@@ -45,31 +46,53 @@
 <div class="hlSheet" id="hlSheet"><b>⭐ Add to Highlight</b><div id="hlList" style="margin:10px 0"></div><input id="hlName" placeholder="New Highlight name - Ex: Travel, Fav"><button onclick="createHighlight()" style="background:#fff;color:#000;font-weight:800;text-align:center">+ Create Highlight</button><button onclick="closeHighlight()" style="text-align:center">Cancel</button></div>
 <div id="toast" class="toast"></div>
 <script>
-// === PIXORO NO FULL ALERT LOCK ===
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
-window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
+window.alert = function(msg){ showToast(String(msg||'').slice(0,40)); };
 window.confirm = function(msg){ showToast(msg); return true; };
 window.prompt = function(){ showToast('Caption la type pannu da'); return null; };
-window.onerror = function(){ showToast('Adutha side la problem da - Try again'); return true; };
 const supa = window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-const ME = localStorage.getItem('pixoro_current_user') || 'Giri'
+let ME = 'giri', ME_ID = ''
 const user = new URLSearchParams(location.search).get('user')
-document.getElementById('uName').innerText=user || 'Unknown'
-document.getElementById('uPic').src=`https://i.pravatar.cc/100?u=${user}`
 let stories=[], cur=0, timer=null, prog=0
 let viewedStories=JSON.parse(localStorage.getItem('pixoro_viewed_stories')||'[]')
 function safeTime(ts){ if(!ts) return 'Just now'; let d=new Date(ts); if(isNaN(d.getTime())) return 'Just now'; return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) }
+async function initMe(){
+  let {data:{session}} = await supa.auth.getSession()
+  if(session){
+    ME_ID = session.user.id
+    let {data:prof} = await supa.from('profiles').select('username').eq('id', ME_ID).single()
+    if(prof && prof.username) ME = prof.username
+  }
+}
 async function load(){
+ await initMe()
  if(!user){ document.getElementById('view').innerHTML='<p>No user</p>'; return }
- let now = new Date()
- let localStories = JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]').filter(s=> s.username && s.username.toLowerCase()===user.toLowerCase() && new Date(s.expires_at) > now)
- let {data, error}=await supa.from('stories').select('*').ilike('username',user).gt('expires_at', new Date().toISOString()).order('created_at',{ascending:true})
- let supaStories = data||[]
- stories=[...localStories,...supaStories]
- if(stories.length==0){ document.getElementById('view').innerHTML=`<div style="text-align:center;padding:100px 20px"><p style="font-size:20px">😴</p><p style="margin-top:10px">No active story for @${user}</p><p style="color:#666;font-size:12px;margin-top:8px">Story 24hrs ku aprom expire aayidum da!</p><br><a href="./index.html" style="background:#fff;color:#000;padding:10px 22px;border-radius:20px;text-decoration:none;font-weight:900">Go Home</a></div>`; return }
+ // FIX: user_id OR username - rendu laiyum thedrom da
+ let q = supa.from('stories').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:true})
+ // UUID ah iruntha user_id la thedu, illa username la thedu
+ let isUUID = /^[0-9a-f-]{36}$/i.test(user)
+ let data, error
+ if(isUUID){
+   let res = await supa.from('stories').select('*').eq('user_id', user).gt('expires_at', new Date().toISOString()).order('created_at',{ascending:true})
+   data = res.data; error = res.error
+ } else {
+   let res = await supa.from('stories').select('*').ilike('username', user).gt('expires_at', new Date().toISOString()).order('created_at',{ascending:true})
+   data = res.data; error = res.error
+ }
+ stories = data || []
+ if(stories.length==0){
+   document.getElementById('view').innerHTML=`<div style="text-align:center;padding:100px 20px"><p style="font-size:20px">😴</p><p style="margin-top:10px">No active story for @${user}</p><p style="color:#666;font-size:12px;margin-top:8px">Story 24hrs ku aprom expire aayidum da!</p><br><a href="./index.html" style="background:#fff;color:#000;padding:10px 22px;border-radius:20px;text-decoration:none;font-weight:900">Go Home</a></div>`; return
+ }
+ // Profile la irundhu correct username + pfp kaatu da
+ let profRes = isUUID ? await supa.from('profiles').select('username,avatar_url').eq('id', user).single() : await supa.from('profiles').select('username,avatar_url').ilike('username', user).single()
+ let displayName = profRes.data?.username || stories[0].username || user
+ document.getElementById('uName').innerText = '@'+displayName
+ if(profRes.data?.avatar_url) document.getElementById('uPic').src = profRes.data.avatar_url
+ else document.getElementById('uPic').src = `https://i.pravatar.cc/100?u=${user}`
  let bar=document.getElementById('pBar'); bar.innerHTML=stories.map((_,i)=>`<div class="b"><div id="b${i}"></div></div>`).join('')
  show(0)
- if(user.toLowerCase()===ME.toLowerCase()){ document.getElementById('delBottom').style.display='block'; document.getElementById('moreBtn').style.display='block'; document.getElementById('replyHint').innerText='Your story • Eye click panni viewers paaru 👁️'; document.getElementById('replySection').style.display='none' } else { document.getElementById('replySection').style.display='block'; document.getElementById('viewEye').style.display='none'; document.getElementById('delBottom').style.display='none'; document.getElementById('moreBtn').style.display='none'; document.getElementById('replyHint').style.display='none' }
+ let isMine = (isUUID && user===ME_ID) || (!isUUID && user.toLowerCase()===ME.toLowerCase())
+ if(isMine){ document.getElementById('delBottom').style.display='block'; document.getElementById('moreBtn').style.display='block'; document.getElementById('replyHint').innerText='Your story • Eye click panni viewers paaru 👁️'; document.getElementById('replySection').style.display='none' } else { document.getElementById('replySection').style.display='block'; document.getElementById('viewEye').style.display='none'; document.getElementById('delBottom').style.display='none'; document.getElementById('moreBtn').style.display='none'; document.getElementById('replyHint').style.display='none' }
  addViewer(); loadViewers(); markAsViewed(stories[0].id)
 }
 function markAsViewed(id){ if(!viewedStories.includes(id)){ viewedStories.push(id); localStorage.setItem('pixoro_viewed_stories',JSON.stringify(viewedStories)) } }
@@ -95,10 +118,12 @@ function toggleMenu(){ let m=document.getElementById('menu'); m.style.display = 
 let delArmed=false;
 async function deleteCurrent(){
  let s=stories[cur]
- if(s.username.toLowerCase()!==ME.toLowerCase()){ showToast('Un story mattum delete pannalam da!'); return }
+ let isMine = (s.user_id===ME_ID) || (s.username && s.username.toLowerCase()===ME.toLowerCase())
+ if(!isMine){ showToast('Un story mattum delete pannalam da!'); return }
  if(!delArmed){ delArmed=true; showToast('Delete panna marubadiyum click pannu da 🗑️'); setTimeout(()=>delArmed=false,2500); document.getElementById('menu').style.display='none'; return; }
  delArmed=false; clearInterval(timer)
- if(s.id.toString().startsWith('local_')){ let allLocal = JSON.parse(localStorage.getItem('pixoro_local_stories')||'[]'); allLocal = allLocal.filter(x=> x.id!== s.id); localStorage.setItem('pixoro_local_stories', JSON.stringify(allLocal)) } else { let {error} = await supa.from('stories').delete().eq('id', s.id); if(error){ showToast('Adutha side la problem da'); return } }
+ let {error} = await supa.from('stories').delete().eq('id', s.id)
+ if(error){ showToast(error.message); return }
  stories.splice(cur,1)
  if(stories.length===0){ showToast('Deleted! ✅'); setTimeout(goHome,600); return }
  if(cur>=stories.length) cur=stories.length-1
