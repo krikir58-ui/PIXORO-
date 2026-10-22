@@ -1,74 +1,89 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Add to story</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Story Editor</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-body{background:#000;color:#fff;max-width:450px;margin:0 auto}
-.top{padding:14px;display:flex;justify-content:space-between;align-items:center}
-.top b{font-size:17px}.top span{font-size:22px}
-.chips{display:flex;gap:8px;padding:0 12px 12px}
-.chip{flex:1;background:#1a1a1a;border-radius:20px;padding:11px;text-align:center;font-size:13px;font-weight:600}
-.recHead{display:flex;justify-content:space-between;padding:14px 12px;font-size:15px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px}
-.cell{aspect-ratio:1/1.4;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:#888;font-size:12px;cursor:pointer;position:relative;overflow:hidden}
-.cell img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
-.tabs{display:flex;justify-content:center;gap:30px;padding:14px;background:#1a1a1a;margin:12px;border-radius:24px}
-.tabs span{color:#888;font-weight:700;font-size:13px;letter-spacing:.5px}.tabs span.act{color:#fff}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
+html,body{width:100%;height:100%;background:#000;overflow:hidden}
+body{max-width:100% !important;margin:0}
+.page{position:fixed;inset:0;width:100%;height:100dvh;background:#000;z-index:9999;isolation:isolate}
+.photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.top{position:absolute;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:16px 14px;background:linear-gradient(to bottom,rgba(0,0,0,.65),transparent)}
+.top span{font-size:24px;cursor:pointer}.top b{font-size:17px}
+.side{position:absolute;right:10px;top:75px;bottom:130px;width:60px;z-index:20;background:rgba(20,20,20,.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.3);border-radius:30px;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:14px;overflow-y:auto;scrollbar-width:none}
+.side::-webkit-scrollbar{display:none}
+.side div{font-size:21px;cursor:pointer;text-align:center;line-height:1}
+.side span{font-size:9px;display:block;color:#eee;margin-top:3px}
+.bottom{position:absolute;bottom:0;left:0;right:0;z-index:20;padding:12px 14px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,rgba(0,0,0,.75),transparent)}
+.cap{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.35);border-radius:12px;color:#fff;padding:11px;margin-bottom:10px;outline:none}
+.actions{display:flex;gap:8px}
+.pill{flex:1;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.45);color:#fff;padding:13px;border-radius:999px;font-weight:700;font-size:13px}
+.pill.green{color:#4ade80}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:99999;display:none;white-space:nowrap}
+.textOverlay{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);z-index:25;font-size:28px;font-weight:900;text-shadow:2px 2px 0 #000;text-align:center;max-width:90%}
 </style></head><body>
-<div class="top"><span onclick="location.href='index.html'">✕</span><b>Add to story</b><span>⚙️</span></div>
-<div class="chips"><div class="chip">✨ Templates</div><div class="chip">🎵 Music</div><div class="chip">🖼️ Collage</div></div>
-<div class="recHead"><b>Recents ∨</b><span>☐ Select</span></div>
-<div class="grid" id="grid">
-  <div class="cell" onclick="openPicker()">📷<span>Camera</span></div>
-  <div class="cell" onclick="openPicker()"><span style="font-size:22px">🖼️</span></div>
-  <div class="cell" onclick="openPicker()"></div>
-  <div class="cell" onclick="openPicker()"></div>
-  <div class="cell" onclick="openPicker()"></div>
-  <div class="cell" onclick="openPicker()"></div>
-  <div class="cell" onclick="openPicker()"></div>
-  <div class="cell" onclick="openPicker()"></div>
-  <div class="cell" onclick="openPicker()"></div>
+<div class="page">
+<img class="photo" id="eImg" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1080">
+<div id="textOverlay" class="textOverlay"></div>
+<div class="top"><span onclick="location.href='index.html'">✕</span><b>Story</b><span>⋯</span></div>
+<div class="side">
+<div onclick="addText()">Aa<span>Text</span></div>
+<div onclick="showToast('Sticker - Adutha update la da')">😊<span>Sticker</span></div>
+<div onclick="showToast('Music - Adutha update la da')">🎵<span>Music</span></div>
+<div onclick="showToast('Effect - Adutha update la da')">✨<span>Effect</span></div>
+<div onclick="showToast('Mention - Caption la @ podu da')">@<span>Mention</span></div>
+<div onclick="showToast('Draw - Adutha update la da')">✏️<span>Draw</span></div>
+<div onclick="showToast('Filter - Adutha update la da')">🎛️<span>Filter</span></div>
+<div onclick="showToast('Timer - 24h auto da')">⏱️<span>Timer</span></div>
+<div onclick="showToast('Close Friends - Keela button da')">👥<span>Close</span></div>
+<div onclick="showToast('Privacy - Everyone da')">🔒<span>Privacy</span></div>
+<div onclick="showToast('Quality - HD da 🔥')">⚙️<span>Quality</span></div>
 </div>
-<div class="tabs"><span id="tPOST" onclick="sw('POST',this)">POST</span><span id="tSTORY" class="act" onclick="sw('STORY',this)">STORY</span><span onclick="sw('REEL',this)">REEL</span><span onclick="sw('LIVE',this)">LIVE</span></div>
+<div class="bottom">
+<input class="cap" id="cap" placeholder="Add a caption...">
+<div class="actions"><button class="pill" onclick="postStory('public')">⊕ Your story</button><button class="pill green" onclick="postStory('close_friends')">★ Close Friends</button></div>
+</div>
+</div>
 <div id="toast" class="toast"></div>
-<input type="file" id="file" accept="image/*,video/*" hidden onchange="goNext(this)">
 <script>
-const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_');
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
-let ME_RAW='giri', ME_ID=null
-async function checkAuth(){
+const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+let params = new URLSearchParams(location.search)
+let m = params.get('media') || ''
+let type = params.get('type') || 'image'
+let ME = '', ME_ID = ''
+async function init(){
   let { data: { session } } = await supa.auth.getSession()
   if(!session){ location.href='login.html'; return; }
-  ME_ID = session.user.id
   let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
-  ME_RAW = (profile?.username || session.user.email.split('@')[0]).toLowerCase()
-}
-checkAuth()
-let urlParams = new URLSearchParams(location.search)
-let urlMedia = urlParams.get('media')
-if(urlMedia){
-  setTimeout(()=>{ location.href='story-editor.html?media='+encodeURIComponent(urlMedia)+'&type='+(urlParams.get('type')||'image') }, 300)
-}
-function openPicker(){ document.getElementById('file').click() }
-function sw(t,el){ document.querySelectorAll('.tabs span').forEach(s=>s.classList.remove('act')); el.classList.add('act'); if(t=='LIVE') location.href='live.html'; if(t=='POST') location.href='post-create.html'; if(t=='REEL') location.href='reel-create.html'; }
-async function goNext(inp){
-  if(!inp.files[0]) return
-  let f=inp.files[0]
-  showToast('Uploading Story... ⏳')
-  let uploadFile = f
-  if(f.type.startsWith('image/')){
-    uploadFile = await new Promise(res=>{
-      let img=new Image(); let url=URL.createObjectURL(f);
-      img.onload=()=>{ let w=img.width,h=img.height; let maxW=720; if(w>maxW){ h=h*maxW/w; w=maxW; } let c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); c.toBlob(b=>{ res(new File([b],f.name.replace(/\.[^.]+$/,'')+'.jpg',{type:'image/jpeg'})); },'image/jpeg',0.72); URL.revokeObjectURL(url); };
-      img.onerror=()=>res(f); img.src=url;
-    })
+  ME = (profile?.username || session.user.email.split('@')[0]).toLowerCase()
+  ME_ID = session.user.id
+  if(m){
+    let el = document.getElementById('eImg')
+    if(type==='video'){
+      el.outerHTML = `<video class="photo" id="eImg" src="${m}" autoplay loop muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video>`
+    } else {
+      el.src = m
+    }
   }
-  if(!ME_RAW) ME_RAW='giri'
-  let fileName = Date.now()+'_'+ME_RAW+'_'+uploadFile.name.replace(/[^a-zA-Z0-9.]/g,'_')
-  let {error}=await supa.storage.from('stories').upload(fileName, uploadFile)
-  if(error){ showToast('Upload Fail: '+error.message); return; }
-  let {data}=supa.storage.from('stories').getPublicUrl(fileName)
-  let mType = f.type.startsWith('video')?'video':'image'
-  location.href='story-editor.html?media='+encodeURIComponent(data.publicUrl)+'&type='+mType
+}
+init()
+function addText(){
+  let capEl=document.getElementById('cap');
+  capEl.focus();
+  capEl.placeholder='Text inga eluthu da - Photo mela varum...';
+  showToast('Text inga eluthu da - Photo mela varum');
+  capEl.addEventListener('input',()=>{
+    document.getElementById('textOverlay').innerText = capEl.value;
+  });
+}
+async function postStory(aud){
+  let media = m || document.getElementById('eImg').src
+  if(!media || media.includes('unsplash')){ showToast('Photo illa da - Select pannu da'); return }
+  if(!ME_ID){ let {data:{session}} = await supa.auth.getSession(); if(session) ME_ID = session.user.id }
+  if(!ME_ID){ showToast('Login pannu da'); return; }
+  let exp=new Date(); exp.setHours(exp.getHours()+24);
+  let { error } = await supa.from('stories').insert({user_id: ME_ID, username: ME, image_url: media, media_url: media, media_type: type, audience: aud, expires_at: exp.toISOString()})
+  if(error){ showToast('DB Error: '+error.message); return; }
+  showToast('Story Posted da! 🔥');
+  setTimeout(()=>{ location.href='index.html'; },800);
 }
 </script></body></html>
