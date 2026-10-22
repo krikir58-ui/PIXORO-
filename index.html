@@ -64,7 +64,7 @@
 <div style="text-align:center;font-size:22px;font-weight:900;margin-bottom:10px">Create</div>
 <div class="createRow" onclick="location.href='post-create.html'"><div class="createIco">+</div><div style="flex:1"><b style="font-size:16px">Post</b><div style="font-size:12px;color:#888">Share a photo or update</div></div><span style="color:#666;font-size:20px">›</span></div>
 <div class="createRow" onclick="location.href='reel-create.html'"><div class="createIco">▶</div><div style="flex:1"><b style="font-size:16px">Reels</b><div style="font-size:12px;color:#888">Create a short reel video</div></div><span style="color:#666;font-size:20px">›</span></div>
-<div class="createRow" onclick="location.href='story-create.html'"><div class="createIco" style="border-style:dashed">◯</div><div style="flex:1"><b style="font-size:16px">Story</b><div style="font-size:12px;color:#888">Share a 24-hour story</div></div><span style="color:#666;font-size:20px">›</span></div>
+<div class="createRow" onclick="location.href='story-upload.html'"><div class="createIco" style="border-style:dashed">◯</div><div style="flex:1"><b style="font-size:16px">Story</b><div style="font-size:12px;color:#888">Share a 24-hour story</div></div><span style="color:#666;font-size:20px">›</span></div>
 <div class="createRow" style="border-bottom:none" onclick="location.href='live.html'"><div class="createIco">((•))</div><div style="flex:1"><b style="font-size:16px">Live</b><div style="font-size:12px;color:#888">Go live now</div></div><span style="color:#666;font-size:20px">›</span></div>
 <div onclick="hideChoice()" style="text-align:center;padding:14px;color:#777;margin-top:10px">Cancel</div>
 </div></div>
@@ -165,12 +165,12 @@ function renderStories(){
   if(searchQ){otherStories = otherStories.filter(s=> displayNameFor(s.user_id || s.username).toLowerCase().includes(searchQ));}
   let grouped={}; otherStories.forEach(s=>{ let key=s.user_id || cleanUser(s.username||''); if(!grouped[key]) grouped[key]=s })
   let html=''; let myPfp = getPfp(ME_ID);
-  if(myStories.length>0){ let s=myStories[0]; let seen=viewedStories.includes(s.id); html+=`<div class="sItem" onclick="openMyStory()"><div class="sRing ${seen?'seen':''}"><div class="sRingInner"><img src="${myPfp}"></div></div><div class="sName">Your Story ${getTick(ME_RAW)}</div></div>`; } else { html+=`<div class="sItem" onclick="location.href='story-create.html'"><div class="sAddWrap"><img class="sAddImg my-pfp" src="${myPfp}"><div class="sAddPlus">+</div></div><div class="sName">Your Story ${getTick(ME_RAW)}</div></div>`; }
-  Object.values(grouped).forEach(s=>{ let seen=viewedStories.includes(s.id); html+=`<div class="sItem" onclick="openOtherStory('${s.user_id||s.username}')"><div class="sRing ${seen?'seen':''}"><div class="sRingInner"><img src="${getPfp(s.user_id||s.username)}"></div></div><div class="sName">${displayNameFor(s.user_id||s.username)} ${getTick(s.username)}</div></div>` })
+  if(myStories.length>0){ let s=myStories[0]; let seen=viewedStories.includes(s.id); html+=`<div class="sItem" onclick="openMyStory()"><div class="sRing ${seen?'seen':''}"><div class="sRingInner"><img src="${myPfp}"></div></div><div class="sName">Your Story ${getTick(ME_RAW)}</div></div>`; } else { html+=`<div class="sItem" onclick="location.href='story-upload.html'"><div class="sAddWrap"><img class="sAddImg my-pfp" src="${myPfp}"><div class="sAddPlus">+</div></div><div class="sName">Your Story ${getTick(ME_RAW)}</div></div>`; }
+  Object.values(grouped).forEach(s=>{ let seen=viewedStories.includes(s.id); let img = s.media_url || getPfp(s.user_id||s.username); html+=`<div class="sItem" onclick="openOtherStory('${s.user_id||s.username}')"><div class="sRing ${seen?'seen':''}"><div class="sRingInner"><img src="${getPfp(s.user_id||s.username)}"></div></div><div class="sName">${displayNameFor(s.user_id||s.username)} ${getTick(s.username)}</div></div>` })
   bar.innerHTML=html;
 }
 window.renderStories = renderStories;
-function openMyStory(){let s=allStories.find(x=> x.user_id===ME_ID || isMyPost(x.username));if(!s) return location.href='story-create.html';if(!viewedStories.includes(s.id)) viewedStories.push(s.id);location.href='story-view.html?user='+(s.user_id||s.username)}
+function openMyStory(){let s=allStories.find(x=> x.user_id===ME_ID || isMyPost(x.username));if(!s) return location.href='story-upload.html';if(!viewedStories.includes(s.id)) viewedStories.push(s.id);location.href='story-view.html?user='+(s.user_id||s.username)}
 function openOtherStory(u){let s=allStories.find(x=> (x.user_id===u || x.username===u));if(s &&!viewedStories.includes(s.id)) viewedStories.push(s.id);location.href='story-view.html?user='+u}
 window.openMyStory=openMyStory; window.openOtherStory=openOtherStory;
 function renderFeed(){
