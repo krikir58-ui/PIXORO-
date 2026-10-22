@@ -70,7 +70,7 @@
 <script>
 if(typeof getTick === 'undefined'){
   window.getTick = function(u){
-    let c=String(u||'').toLowerCase().split('@')[0].replace(/[^a-z0-9_.]/g,'');
+    let c=String(u||'').toLowerCase().replace(/[^a-z0-9_.]/g,'');
     if(c==='giri_office') return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
     return '';
   }
@@ -81,7 +81,7 @@ window.confirm = function(msg){ showToast(msg); return true; };
 function showChoice(){document.getElementById('choice').classList.add('show')}
 function hideChoice(){document.getElementById('choice').classList.remove('show')}
 let supa = window.supa
-function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||''; }
+function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) return ''; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||''; }
 let ME_RAW='', ME='', ME_ID='', ME_PFP=''
 let allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=[],currentPostId=null,currentMenuPost=null
 let viewedStories=[], lastTap=0
@@ -97,7 +97,7 @@ function getPfp(u){
   let clean = cleanUser(u);
   let p = allProfiles.find(x=> cleanUser(x.username)===clean);
   if(p && (p.avatar_url || p.profile_pic || p.photo_url)) return p.avatar_url || p.profile_pic || p.photo_url;
-  return 'https://ui-avatars.com/api/?name='+(clean.charAt(0).toUpperCase()||'P')+'&background=333&color=fff&size=200&bold=true';
+  return 'https://ui-avatars.com/api/?name='+(clean.charAt(0).toUpperCase()||'P')+'&background=cccccc&color=666&size=200&bold=true';
 }
 function pfpHtml(u){return `<div class="pfpRing" onclick="event.stopPropagation();openProfileFast('${u}')"><div class="pfpInner"><img src="${getPfp(u)}"></div></div>`}
 function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el && ME_RAW) el.src=getPfp(ME_RAW); }
@@ -107,12 +107,10 @@ async function checkLogin(){
   if(!session){ location.href='login.html'; return; }
   let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
   if(!profile || !profile.username){
-    let uname = cleanUser(session.user.email) || ('user'+Date.now().toString().slice(-5))
-    if(uname==='giri_office' || session.user.email.includes('giri')) uname='giri_office'
-    let { data: newP, error } = await supa.from('profiles').upsert({id: session.user.id, username: uname, email: session.user.email}).select().single()
-    if(!error && newP){ profile = newP } else { ME_RAW = uname; ME = uname; ME_ID = session.user.id; window.ME=uname; window.ME_ID=ME_ID; setTimeout(()=>{ let s=document.getElementById('splash'); if(s) s.style.display='none'; loadAll(); },800); return; }
+    location.href='setup-username.html';
+    return;
   }
-  ME_RAW = cleanUser(profile.username)
+  ME_RAW = profile.username
   ME = ME_RAW; ME_ID = session.user.id; ME_PFP = profile.avatar_url || profile.profile_pic || ''
   window.ME = ME_RAW; window.ME_ID = ME_ID
   setTimeout(()=>{ let s=document.getElementById('splash'); if(s) s.style.display='none'; loadAll(); },800)
