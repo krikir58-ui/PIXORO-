@@ -12,7 +12,6 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-rad
 <div class="box">
 <h1 style="font-family:cursive;font-size:36px;color:#FFD700">Pixoro</h1>
 
-<!-- STEP 1 - FIRST PAGE - EMAIL / PHONE + OTP -->
 <div class="card" id="s1">
 <p style="font-size:14px;color:#888;margin-bottom:10px">Welcome to Pixoro 👋</p>
 <input id="email" type="email" placeholder="Email / Phone Number" autocomplete="off">
@@ -21,7 +20,6 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-rad
 <p style="font-size:12px;color:#888;margin-top:10px">Already Account? <b onclick="showOld()" style="color:#FFD700;cursor:pointer">Log In</b></p>
 </div>
 
-<!-- STEP 2 - OTP PAGE -->
 <div class="card hide" id="sOTP">
 <p style="font-size:14px;color:#888;margin-bottom:10px">Enter OTP 🔢</p>
 <p id="otpInfo" style="font-size:12px;color:#888"></p>
@@ -31,7 +29,6 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-rad
 <p id="msgOTP" style="color:#ff3040;font-size:13px"></p>
 </div>
 
-<!-- STEP 3 - NEW USERNAME + NEW PASSWORD + SAVE -->
 <div class="card hide" id="s2">
 <p style="font-size:14px;color:#888;margin-bottom:10px">Create Profile ✨ - One Time Only</p>
 <input id="newUser" placeholder="New Username" autocomplete="off">
@@ -41,7 +38,6 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-rad
 <p id="msg2" style="color:#ff3040;font-size:13px"></p>
 </div>
 
-<!-- STEP 4 - PHOTO + SKIP -->
 <div class="card hide" id="s3">
 <p style="font-size:14px;color:#888;margin-bottom:10px">Profile Photo 📸</p>
 <img id="pfpPrev" src="https://ui-avatars.com/api/?name=G&background=222&color=fff&size=200">
@@ -50,7 +46,6 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-rad
 <button onclick="location.href='index.html'" style="background:#262626;color:#FFD700">Skip >>></button>
 </div>
 
-<!-- OLD LOGIN - LOGOUT PANNA MATTUM -->
 <div class="card hide" id="sOld">
 <p style="font-size:14px;color:#888;margin-bottom:10px">Log In 🔐</p>
 <input id="oldUser" placeholder="Username / Email" autocomplete="off">
@@ -68,7 +63,6 @@ function go(id){ ['s1','sOTP','s2','s3','sOld'].forEach(x=>document.getElementBy
 function showOld(){ go('sOld') }
 function showErr(id,m){ document.getElementById(id).innerText=m }
 
-// STEP 1 - OTP ANUPPU
 async function sendOTP(){
   curEmail = document.getElementById('email').value.trim()
   if(!curEmail.includes('@')) return showErr('msg1','Valid Email Podu da')
@@ -78,22 +72,20 @@ async function sendOTP(){
   go('sOTP')
 }
 
-// STEP 2 - OTP VERIFY
 async function verifyOTP(){
   let code=document.getElementById('otpCode').value.trim()
   if(code.length<6) return showErr('msgOTP','6 Digit OTP Podu da')
   let {error} = await supa.auth.verifyOtp({email:curEmail, token:code, type:'email'})
   if(error) return showErr('msgOTP',error.message)
-  // Pazhaya User na Direct Home - One Time Setup Varaathu da
   let {data:{user}} = await supa.auth.getUser()
   if(user){
-    let {data:prof} = await supa.from('profiles').select('username').eq('id',user.id).single()
+    // ✅ CORRECT DA - maybeSingle - Error Varaathu da
+    let {data:prof} = await supa.from('profiles').select('username').eq('id',user.id).maybeSingle()
     if(prof && prof.username){ location.href='index.html'; return }
   }
   go('s2')
 }
 
-// STEP 3 - NEW USERNAME + PASSWORD SAVE
 async function saveProfile(){
   let u=document.getElementById('newUser').value.trim().toLowerCase().replace(/[^a-z0-9_.]/g,'')
   let p1=document.getElementById('newPass').value
@@ -101,7 +93,7 @@ async function saveProfile(){
   if(u.length<3) return showErr('msg2','Username 3+ Letters Podu da')
   if(p1.length<6) return showErr('msg2','Password 6+ Letters Podu da')
   if(p1!==p2) return showErr('msg2','Password Match Aagala da')
-  let {data:ex}=await supa.from('profiles').select('id').eq('username',u).single()
+  let {data:ex}=await supa.from('profiles').select('id').eq('username',u).maybeSingle()
   if(ex) return showErr('msg2','Username Already Irukku da - Vera Podu da')
   await supa.auth.updateUser({password:p1})
   let {data:{user}} = await supa.auth.getUser()
@@ -110,7 +102,6 @@ async function saveProfile(){
   go('s3')
 }
 
-// STEP 4 - PHOTO
 function previewPfp(inp){ if(inp.files[0]) document.getElementById('pfpPrev').src=URL.createObjectURL(inp.files[0]) }
 async function savePhoto(){
   let f=document.getElementById('pfpFile').files[0]
@@ -123,7 +114,6 @@ async function savePhoto(){
   location.href='index.html'
 }
 
-// OLD LOGIN - LOGOUT APURAM
 async function loginOld(){
   let val=document.getElementById('oldUser').value.trim()
   let pass=document.getElementById('oldPass').value
@@ -132,11 +122,12 @@ async function loginOld(){
   if(!val.includes('@')){
     let u=val.toLowerCase().replace(/[^a-z0-9_.]/g,'')
     let {data:p}=await supa.from('profiles').select('email').eq('username',u).maybeSingle()
-    if(!p) return showErr('msgOld','Username Illa da')
+    if(!p || !p.email) return showErr('msgOld','Username Illa da - Email Pottu Paaru da')
     email=p.email
   }
   let {error}=await supa.auth.signInWithPassword({email, password:pass})
   if(error) return showErr('msgOld','Password Thappu da')
+  // ✅ Pazhaya Account - Direct Home da
   location.href='index.html'
 }
 </script></body></html>
