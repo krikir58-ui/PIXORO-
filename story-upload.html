@@ -33,6 +33,17 @@
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2500)}
 const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 let ME = localStorage.getItem('pixoro_current_user') || 'Giri'
+let ME_ID = null
+// Auth la irundhu user_id edukkurom da - ithu thaan fix da
+async function initUser(){
+  let {data:{session}} = await supa.auth.getSession()
+  if(session){
+    ME_ID = session.user.id
+    let {data:prof} = await supa.from('profiles').select('username').eq('id', ME_ID).single()
+    if(prof && prof.username) ME = prof.username
+  }
+}
+initUser()
 let curFilter='none', mediaType='image', fileData=null
 function preview(input){
   if(input.files && input.files[0]){
@@ -92,10 +103,11 @@ async function share(audience){
   if(!fileInput.files[0] &&!window.aiImageUrl){ showToast('File select pannu da Giri!'); return; }
   document.getElementById('ringWrap').style.display='flex'
   document.getElementById('st').innerText='Uploading... ⏳'
+  if(!ME_ID){ await initUser() }
   let mediaUrl = await uploadFile()
   if(!mediaUrl){ document.getElementById('ringWrap').style.display='none'; return }
   let {error}=await supa.from('stories').insert({
-    username: ME, media_url: mediaUrl, media_type: mediaType, caption: document.getElementById('caption').value, filter: curFilter, audience: audience, stickers: [], expires_at: new Date(Date.now()+24*60*60*1000).toISOString()
+    user_id: ME_ID, username: ME, media_url: mediaUrl, media_type: mediaType, caption: document.getElementById('caption').value, filter: curFilter, audience: audience, stickers: [], expires_at: new Date(Date.now()+24*60*60*1000).toISOString()
   })
   document.getElementById('ringWrap').style.display='none'
   if(error){ showToast('DB Error: '+error.message); document.getElementById('st').innerText='DB Error: '+error.message; return }
