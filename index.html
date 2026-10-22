@@ -81,13 +81,20 @@ window.confirm = function(msg){ showToast(msg); return true; };
 function showChoice(){document.getElementById('choice').classList.add('show')}
 function hideChoice(){document.getElementById('choice').classList.remove('show')}
 let supa = window.supa
-function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) return ''; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||''; }
+function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||''; }
 let ME_RAW='', ME='', ME_ID='', ME_PFP=''
 let allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=[],currentPostId=null,currentMenuPost=null
 let viewedStories=[], lastTap=0
 let feedMode='foryou'
 let PLUS={ghost:false}
-function displayNameFor(u){ if(!u) return ME; return cleanUser(u); }
+function displayNameFor(u){ 
+  if(!u) return ME; 
+  let c=cleanUser(u);
+  let p=allProfiles.find(x=> cleanUser(x.username)===c);
+  if(p && p.full_name) return p.full_name;
+  if(p && p.display_name) return p.display_name;
+  return c;
+}
 function isMyPost(u){ let c=cleanUser(u); return c && c===cleanUser(ME_RAW); }
 function viralScore(p){ let likes=allLikes.filter(l=>l.post_id==p.id).length; let hours=(Date.now()-new Date(p.created_at||Date.now()).getTime())/3600000; return (likes*10)/(hours+2) }
 function setFeedMode(m){ feedMode=m; document.getElementById('tabForYou').classList.toggle('active',m=='foryou'); document.getElementById('tabFollowing').classList.toggle('active',m=='following'); document.getElementById('tabLatest').classList.toggle('active',m=='latest'); renderFeed(); }
@@ -107,10 +114,9 @@ async function checkLogin(){
   if(!session){ location.href='login.html'; return; }
   let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
   if(!profile || !profile.username){
-    location.href='setup-username.html';
-    return;
+    location.href='setup-username.html'; return;
   }
-  ME_RAW = profile.username
+  ME_RAW = cleanUser(profile.username)
   ME = ME_RAW; ME_ID = session.user.id; ME_PFP = profile.avatar_url || profile.profile_pic || ''
   window.ME = ME_RAW; window.ME_ID = ME_ID
   setTimeout(()=>{ let s=document.getElementById('splash'); if(s) s.style.display='none'; loadAll(); },800)
