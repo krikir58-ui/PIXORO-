@@ -1,4 +1,5 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro - Final Mass</title>
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro - Final Mass</title>
 <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="css/feed.css"><link rel="stylesheet" href="css/comments.css"><link rel="stylesheet" href="css/splash.css"><link rel="stylesheet" href="css/pixoro-verified.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/supabase.js"></script>
@@ -122,7 +123,7 @@ async function checkLogin(){
   let { data: { session } } = await supa.auth.getSession()
   if(!session){ location.href='login.html'; return; }
   let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
-  if(!profile || !profile.username){ location.href='setup-username.html'; return; }
+  if(!profile || !profile.username){ location.href='login.html'; return; }
   ME_RAW = cleanUser(profile.username)
   ME = ME_RAW; ME_ID = session.user.id; ME_PFP = profile.avatar_url || profile.profile_pic || ''
   window.ME = ME_RAW; window.ME_ID = ME_ID
@@ -164,12 +165,12 @@ function renderStories(){
   if(searchQ){otherStories = otherStories.filter(s=> displayNameFor(s.user_id || s.username).toLowerCase().includes(searchQ));}
   let grouped={}; otherStories.forEach(s=>{ let key=s.user_id || cleanUser(s.username||''); if(!grouped[key]) grouped[key]=s })
   let html=''; let myPfp = getPfp(ME_ID);
-  if(myStories.length>0){ let s=myStories[0]; let seen=viewedStories.includes(s.id); html+=`<div class="sItem" onclick="openMyStory()"><div class="sRing ${seen?'seen':''}"><div class="sRingInner"><img src="${myPfp}"></div></div><div class="sName">Your Story ${getTick(ME_RAW)}</div></div>`; } else { html+=`<div class="sItem" onclick="location.href='story-add.html'"><div class="sAddWrap"><img class="sAddImg my-pfp" src="${myPfp}"><div class="sAddPlus">+</div></div><div class="sName">Your Story ${getTick(ME_RAW)}</div></div>`; }
+  if(myStories.length>0){ let s=myStories[0]; let seen=viewedStories.includes(s.id); html+=`<div class="sItem" onclick="openMyStory()"><div class="sRing ${seen?'seen':''}"><div class="sRingInner"><img src="${myPfp}"></div></div><div class="sName">Your Story ${getTick(ME_RAW)}</div></div>`; } else { html+=`<div class="sItem" onclick="location.href='story-create.html'"><div class="sAddWrap"><img class="sAddImg my-pfp" src="${myPfp}"><div class="sAddPlus">+</div></div><div class="sName">Your Story ${getTick(ME_RAW)}</div></div>`; }
   Object.values(grouped).forEach(s=>{ let seen=viewedStories.includes(s.id); html+=`<div class="sItem" onclick="openOtherStory('${s.user_id||s.username}')"><div class="sRing ${seen?'seen':''}"><div class="sRingInner"><img src="${getPfp(s.user_id||s.username)}"></div></div><div class="sName">${displayNameFor(s.user_id||s.username)} ${getTick(s.username)}</div></div>` })
   bar.innerHTML=html;
 }
 window.renderStories = renderStories;
-function openMyStory(){let s=allStories.find(x=> x.user_id===ME_ID || isMyPost(x.username));if(!s) return location.href='story-add.html';if(!viewedStories.includes(s.id)) viewedStories.push(s.id);location.href='story-view.html?user='+(s.user_id||s.username)}
+function openMyStory(){let s=allStories.find(x=> x.user_id===ME_ID || isMyPost(x.username));if(!s) return location.href='story-create.html';if(!viewedStories.includes(s.id)) viewedStories.push(s.id);location.href='story-view.html?user='+(s.user_id||s.username)}
 function openOtherStory(u){let s=allStories.find(x=> (x.user_id===u || x.username===u));if(s &&!viewedStories.includes(s.id)) viewedStories.push(s.id);location.href='story-view.html?user='+u}
 window.openMyStory=openMyStory; window.openOtherStory=openOtherStory;
 function renderFeed(){
@@ -266,7 +267,7 @@ async function savePost(id){
 }
 window.savePost = savePost;
 async function sharePost(id){
-  let link=location.origin+'/post.html?id='+id;
+  let link=location.origin+'/index.html?id='+id;
   try{ await navigator.clipboard.writeText(link); showToast('Link copied da! ✅'); }catch(e){ showToast(link); }
 }
 window.sharePost = sharePost;
