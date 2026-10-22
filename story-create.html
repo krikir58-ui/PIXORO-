@@ -21,19 +21,24 @@
 <script>
 const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_');
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
-window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
-window.confirm = function(msg){ showToast(msg); return true; };
 function formatSize(b){ if(b<1024) return b+' B'; if(b<1048576) return (b/1024).toFixed(0)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
-// ✅ Auth - Server Only
-let ME_RAW=''
+let ME_RAW='giri', ME_ID=null
 async function checkAuth(){
   let { data: { session } } = await supa.auth.getSession()
   if(!session){ location.href='login.html'; return; }
+  ME_ID = session.user.id
   let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
   ME_RAW = (profile?.username || session.user.email.split('@')[0]).toLowerCase()
 }
 checkAuth()
-let m=''; let mType='image';
+// URL la irundhu vantha media va direct kaamikkurom da
+let urlP = new URLSearchParams(location.search)
+let m = urlP.get('media') || ''
+let mType = urlP.get('type') || 'image'
+if(m){
+  document.getElementById('prev').innerHTML = mType==='video' ? `<video src="${decodeURIComponent(m)}" autoplay loop controls></video>` : `<img src="${decodeURIComponent(m)}">`
+  m = decodeURIComponent(m)
+}
 async function compressImage(file){
   return new Promise(res=>{
     let img=new Image(); let url=URL.createObjectURL(file);
@@ -54,10 +59,10 @@ if(f.type.startsWith('video/')){
     if(vid.duration>20){ showToast('Story 15 sec kulla irukanum da!'); e.target.value=''; return; }
     document.getElementById('prev').innerHTML=`<video src="${u}" autoplay loop controls></video>`;
     document.getElementById('progFill').style.width='70%';
-    // ✅ Upload to Server Storage da - Blob Illa da
+    if(!ME_RAW) ME_RAW='giri'
     let fileName = Date.now()+'_'+ME_RAW+'_'+f.name.replace(/[^a-zA-Z0-9.]/g,'_')
     let {error}=await supa.storage.from('stories').upload(fileName, f)
-    if(error){ showToast('Upload Fail da - Try again'); return; }
+    if(error){ showToast('Upload Fail: '+error.message); return; }
     let {data}=supa.storage.from('stories').getPublicUrl(fileName)
     m=data.publicUrl; mType='video';
     document.getElementById('progFill').style.width='100%'; document.getElementById('progText').innerText='Story Ready ✅ - 24h la Delete aagidum';
@@ -68,9 +73,10 @@ if(f.type.startsWith('video/')){
   let url=URL.createObjectURL(uploadFile)
   document.getElementById('prev').innerHTML=`<img src="${url}">`;
   document.getElementById('progFill').style.width='70%';
+  if(!ME_RAW) ME_RAW='giri'
   let fileName = Date.now()+'_'+ME_RAW+'_'+uploadFile.name.replace(/[^a-zA-Z0-9.]/g,'_')
   let {error}=await supa.storage.from('stories').upload(fileName, uploadFile)
-  if(error){ showToast('Upload Fail da - Try again'); return; }
+  if(error){ showToast('Upload Fail: '+error.message); return; }
   let {data}=supa.storage.from('stories').getPublicUrl(fileName)
   m=data.publicUrl; mType='image';
   document.getElementById('progFill').style.width='100%'; document.getElementById('progText').innerText='Compressed ✅ '+formatSize(f.size)+' → '+formatSize(uploadFile.size);
