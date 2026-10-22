@@ -39,16 +39,13 @@ body{max-width:100% !important;margin:0}
 </div>
 <div class="bottom">
 <input class="cap" id="cap" placeholder="Add a caption...">
-<div class="actions"><button class="pill" onclick="postStory('everyone')">⊕ Your story</button><button class="pill green" onclick="postStory('close_friends')">★ Close Friends</button></div>
+<div class="actions"><button class="pill" onclick="postStory('public')">⊕ Your story</button><button class="pill green" onclick="postStory('close_friends')">★ Close Friends</button></div>
 </div>
 </div>
 <div id="toast" class="toast"></div>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
-window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
-window.confirm = function(msg){ showToast(msg); return true; };
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
-// ✅ URL + Server Only - Local Illa da
 let params = new URLSearchParams(location.search)
 let m = params.get('media') || ''
 let type = params.get('type') || 'image'
@@ -81,12 +78,12 @@ function addText(){
 async function postStory(aud){
   let media = m || document.getElementById('eImg').src
   if(!media || media.includes('unsplash')){ showToast('Photo illa da - Select pannu da'); return }
-  if(!ME){ showToast('Login pannu da'); return; }
+  if(!ME_ID){ let {data:{session}} = await supa.auth.getSession(); if(session){ ME_ID = session.user.id } }
+  if(!ME_ID){ showToast('Login pannu da'); return; }
   let exp=new Date(); exp.setHours(exp.getHours()+24);
   let caption = document.getElementById('cap').value
-  // ✅ SERVER ONLY - stories Table la Insert da - Local Illa da
-  let { error } = await supa.from('stories').insert({username: ME, image_url: media, media_url: media, media_type: type, caption: caption, audience: aud, expires_at: exp.toISOString()})
-  if(error){ showToast('Adutha side la problem da - '+error.message); return; }
+  let { error } = await supa.from('stories').insert({user_id: ME_ID, username: ME, image_url: media, media_url: media, media_type: type, caption: caption, audience: aud, expires_at: exp.toISOString()})
+  if(error){ showToast('DB Error: '+error.message); return; }
   showToast('Story Posted da! 🔥');
   setTimeout(()=>{ location.href='index.html'; },800);
 }
