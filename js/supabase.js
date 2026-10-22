@@ -7,12 +7,10 @@ if(!window.supa){
 window.supabase = window.supa
 console.log('Supabase connected 🔵');
 
-// GOLD TICK - Giri_office ku Mattum da
+// GOLD TICK - Giri_office ku Mattum da 👑
 function isGoldUser(p){
   if(!p) return false
-  // String vantha - 'giri_office'
   if(typeof p === 'string') return p.toLowerCase().split('@')[0] === 'giri_office'
-  // Object vantha - {username, verified}
   return p.username === 'giri_office' || p.verified === true || p.is_verified === true
 }
 function goldTickHTML(){
