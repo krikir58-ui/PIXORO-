@@ -1,11 +1,11 @@
-// Supabase Connection - Pixoro 🔵
+// Supabase Connection - Pixoro 🔵 - FINAL CORRECTED
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
-if(!window.supa){
+
+if(!window.supa && window.supabase && window.supabase.createClient){
   window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  console.log('Supabase connected 🔵', !!window.supa);
 }
-window.supabase = window.supa
-console.log('Supabase connected 🔵');
 
 // GOLD TICK - Giri_office ku Mattum da 👑
 function isGoldUser(p){
