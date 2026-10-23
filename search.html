@@ -24,10 +24,10 @@ input{flex:1;background:#181818;border:1px solid #222;padding:10px 12px;border-r
 .createIco{width:44px;height:44px;border-radius:50%;border:1px solid #555;display:flex;align-items:center;justify-content:center;font-size:22px}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
 .viewer{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px}
-.viewer img{max-width:100%;max-height:70vh;border-radius:12px;object-fit:contain}
+.viewer img{max-width:100%;max-height:68vh;border-radius:12px;object-fit:contain}
 </style></head><body>
 <div class="top">
-<input id="searchInput" placeholder="Search people / photos... @name" oninput="doSearch()" autofocus>
+<input id="searchInput" placeholder="Search people / photos... @name" oninput="doSearch()" onfocus="showTrendingPhotos()" autofocus>
 <div style="display:flex;gap:8px;align-items:center">
 <div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div>
 <div class="bellWhite" onclick="location.href='notifications.html'">🔔</div>
@@ -36,13 +36,19 @@ input{flex:1;background:#181818;border:1px solid #222;padding:10px 12px;border-r
 </div>
 <div id="results"></div>
 <div id="hint" style="text-align:center;padding:30px 20px;color:#555"><div style="font-size:36px;margin-bottom:8px">🔒</div><b style="color:#fff">Private Search</b><p style="font-size:11px;margin-top:8px">Type pannu - yaarukku venalum msg pannalam<br>DM la avanga mattum varuvanga - 100% private</p></div>
-<div id="explore" style="margin-top:10px"><div style="padding:8px 12px;font-size:11px;color:#666;font-weight:700">EXPLORE • REELS MAARI</div><div class="grid" id="grid"></div></div>
+<div id="explore" style="margin-top:10px"><div style="padding:8px 12px;font-size:11px;color:#666;font-weight:700">EXPLORE • TRENDING PHOTOS</div><div class="grid" id="grid"></div></div>
 <div id="toast" class="toast"></div>
 
-<div id="viewer" class="viewer" onclick="this.style.display='none'">
+<div id="viewer" class="viewer" onclick="if(event.target.id=='viewer')this.style.display='none'">
 <img id="viewerImg" src="">
 <div id="viewerCredit" style="margin-top:12px;font-size:12px;color:#aaa"></div>
-<div style="margin-top:10px;font-size:12px;color:#777">Tap anywhere to close • Pixoro</div>
+<div style="display:flex;margin-top:18px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(255,255,255,.35);width:92%;max-width:380px">
+  <div id="likeBtn" onclick="likePhoto()" style="flex:1;text-align:center;padding:14px 0;cursor:pointer;border-right:1px solid #eee"><div style="font-size:24px;line-height:1">🤍</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">LIKE</div></div>
+  <div onclick="commentPhoto()" style="flex:1;text-align:center;padding:14px 0;cursor:pointer;border-right:1px solid #eee"><div style="font-size:24px;line-height:1">💬</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">COMMENT</div></div>
+  <div onclick="sharePhoto()" style="flex:1;text-align:center;padding:14px 0;cursor:pointer;border-right:1px solid #eee"><div style="font-size:24px;line-height:1">↗️</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">SHARE</div></div>
+  <div id="saveBtn" onclick="savePhoto()" style="flex:1;text-align:center;padding:14px 0;cursor:pointer"><div style="font-size:24px;line-height:1">🔖</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">SAVE</div></div>
+</div>
+<div style="margin-top:10px;font-size:12px;color:#777">Tap outside to close • Pixoro</div>
 </div>
 
 <div class="bottom-nav">
@@ -65,7 +71,7 @@ function showToast(m){let t=document.getElementById('toast');if(!t) return; t.in
 let supa = window.supa
 const UNSPLASH_KEY = "pm9Vjbdq6ec8oCyDFmVrm72uZks9RGA3Miy50caXF_c";
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
-let ME_RAW='', profileMap={}
+let ME_RAW='', profileMap={}, currentPhotoUrl='', isLiked=false, isSaved=false
 function getPfp(u){
   let p = profileMap[cleanUser(u)]
   if(p?.avatar_url) return p.avatar_url
@@ -80,9 +86,31 @@ async function loadUnsplashPhotos(query){
   }catch(e){ return [] }
 }
 function openPhoto(url, credit){
+  currentPhotoUrl = url; isLiked=false; isSaved=false;
   document.getElementById('viewerImg').src = url;
   document.getElementById('viewerCredit').innerText = 'Photo by @' + credit + ' • Pixoro • Unsplash';
+  document.getElementById('likeBtn').innerHTML = '<div style="font-size:24px;line-height:1">🤍</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">LIKE</div>';
+  document.getElementById('saveBtn').innerHTML = '<div style="font-size:24px;line-height:1">🔖</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">SAVE</div>';
   document.getElementById('viewer').style.display='flex';
+}
+function likePhoto(){
+  isLiked = !isLiked;
+  document.getElementById('likeBtn').innerHTML = isLiked ? '<div style="font-size:24px;line-height:1">❤️</div><div style="font-size:11px;font-weight:900;color:#ff0044;margin-top:4px">LIKED</div>' : '<div style="font-size:24px;line-height:1">🤍</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">LIKE</div>';
+  if(isLiked) showToast('Liked ❤️');
+}
+function commentPhoto(){ let c = prompt('Comment type pannu da:'); if(c) showToast('Comment posted ❤️'); }
+function sharePhoto(){ if(navigator.share){ navigator.share({title:'Pixoro', text:'Check this photo on Pixoro', url: currentPhotoUrl}) } else { navigator.clipboard.writeText(currentPhotoUrl); showToast('Link copied! Share pannu da'); } }
+function savePhoto(){
+  isSaved = !isSaved;
+  document.getElementById('saveBtn').innerHTML = isSaved ? '<div style="font-size:24px;line-height:1">✅</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">SAVED</div>' : '<div style="font-size:24px;line-height:1">🔖</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">SAVE</div>';
+  showToast(isSaved ? 'Saved! ✅' : 'Unsaved');
+}
+async function showTrendingPhotos(){
+  document.getElementById('hint').style.display='none';
+  let grid = document.getElementById('grid'); let exp = document.getElementById('explore');
+  if(grid && grid.innerHTML.trim() !== ''){ if(exp) exp.style.display='block'; return; }
+  let photos = await loadUnsplashPhotos('trending love beautiful');
+  if(photos.length){ grid.innerHTML = photos.map(p=>`<img src="${p.urls.small}" onclick="openPhoto('${p.urls.regular}','${p.user.username}')" loading="lazy">`).join(''); if(exp) exp.style.display='block'; document.getElementById('results').innerHTML = `<div style="padding:8px 12px;font-size:11px;color:#666;font-weight:700">TRENDING • PIXORO - Search Pannu Photos Varum</div>`; }
 }
 async function init(){
   if(!supa){ location.href='login.html'; return }
@@ -108,9 +136,7 @@ async function doSearch(){
    return `<div class="userRow"><div style="display:flex;align-items:center;gap:10px" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'"><img src="${getPfp(u)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover"><div><b>@${u} ${window.getTick?window.getTick(u):''}</b><div style="font-size:10px;color:#00ff66">🔒 Real private</div></div></div><div style="display:flex;gap:6px"><button class="viewBtn" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'">View</button><button class="msgBtn" onclick="goMsg('${u}')">Message</button></div></div>`
  }).join('')
  let photos = await loadUnsplashPhotos(q);
- if(photos.length){
-   html += `<div style="padding:12px;font-size:11px;color:#666;font-weight:700">PHOTOS • PIXORO</div><div class="grid">${photos.map(p=>`<img src="${p.urls.small}" onclick="openPhoto('${p.urls.regular}','${p.user.username}')" loading="lazy">`).join('')}</div>`;
- }
+ if(photos.length){ html += `<div style="padding:12px;font-size:11px;color:#666;font-weight:700">PHOTOS • PIXORO</div><div class="grid">${photos.map(p=>`<img src="${p.urls.small}" onclick="openPhoto('${p.urls.regular}','${p.user.username}')" loading="lazy">`).join('')}</div>`; }
  document.getElementById('results').innerHTML=html||`<p style="padding:20px;color:#777">No users found</p>`
 }
 function goMsg(u){ location.href='chat.html?user='+encodeURIComponent(u) }
@@ -126,7 +152,7 @@ async function loadExplore(){
    }
    document.getElementById('grid').innerHTML=data.map(p=>`<img src="${p.media_url||p.image_url}" onclick="location.href='reels.html'" loading="lazy">`).join('')
  } else {
-   let photos = await loadUnsplashPhotos('beautiful nature');
+   let photos = await loadUnsplashPhotos('beautiful nature love');
    document.getElementById('hint').style.display='none';
    document.getElementById('grid').innerHTML = photos.map(p=>`<img src="${p.urls.small}" onclick="openPhoto('${p.urls.regular}','${p.user.username}')" loading="lazy">`).join('');
  }
