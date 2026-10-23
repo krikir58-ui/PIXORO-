@@ -25,7 +25,7 @@ input{flex:1;background:#181818;border:1px solid #222;padding:10px 12px;border-r
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
 </style></head><body>
 <div class="top">
-<input id="searchInput" placeholder="Search real people... @name" oninput="doSearch()" autofocus>
+<input id="searchInput" placeholder="Search people / photos... @name" oninput="doSearch()" autofocus>
 <div style="display:flex;gap:8px;align-items:center">
 <div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div>
 <div class="bellWhite" onclick="location.href='notifications.html'">🔔</div>
@@ -54,6 +54,7 @@ input{flex:1;background:#181818;border:1px solid #222;padding:10px 12px;border-r
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 let supa = window.supa
+const UNSPLASH_KEY = "pm9Vjbdq6ec8oCyDFmVrm72uZks9RGA3Miy50caXF_c";
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
 let ME_RAW='', profileMap={}
 function getPfp(u){
@@ -61,6 +62,13 @@ function getPfp(u){
   if(p?.avatar_url) return p.avatar_url
   let c = cleanUser(u)||'P'
   return 'https://ui-avatars.com/api/?name='+c.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true'
+}
+async function loadUnsplashPhotos(query){
+  try{
+    let res = await fetch('https://api.unsplash.com/search/photos?query='+encodeURIComponent(query||'nature')+'&per_page=30&client_id='+UNSPLASH_KEY);
+    let data = await res.json();
+    return data.results || [];
+  }catch(e){ return [] }
 }
 async function init(){
   if(!supa){ location.href='login.html'; return }
@@ -85,6 +93,11 @@ async function doSearch(){
    let u=cleanUser(p.username)
    return `<div class="userRow"><div style="display:flex;align-items:center;gap:10px" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'"><img src="${getPfp(u)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover"><div><b>@${u} ${window.getTick?window.getTick(u):''}</b><div style="font-size:10px;color:#00ff66">🔒 Real private</div></div></div><div style="display:flex;gap:6px"><button class="viewBtn" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'">View</button><button class="msgBtn" onclick="goMsg('${u}')">Message</button></div></div>`
  }).join('')
+ // Unsplash Photos Search
+ let photos = await loadUnsplashPhotos(q);
+ if(photos.length){
+   html += `<div style="padding:12px;font-size:11px;color:#666;font-weight:700">PHOTOS • UNSPLASH</div><div class="grid">${photos.map(p=>`<img src="${p.urls.small}" onclick="window.open('${p.links.html}','_blank')" loading="lazy">`).join('')}</div>`;
+ }
  document.getElementById('results').innerHTML=html||`<p style="padding:20px;color:#777">No users found</p>`
 }
 function goMsg(u){ location.href='chat.html?user='+encodeURIComponent(u) }
@@ -99,6 +112,10 @@ async function loadExplore(){
      document.getElementById('results').innerHTML=html
    }
    document.getElementById('grid').innerHTML=data.map(p=>`<img src="${p.media_url||p.image_url}" onclick="location.href='reels.html'" loading="lazy">`).join('')
+ } else {
+   let photos = await loadUnsplashPhotos('beautiful nature');
+   document.getElementById('hint').style.display='none';
+   document.getElementById('grid').innerHTML = photos.map(p=>`<img src="${p.urls.small}" onclick="window.open('${p.links.html}','_blank')" loading="lazy">`).join('');
  }
 }
 init()
