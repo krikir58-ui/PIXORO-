@@ -4,14 +4,16 @@
 <style>*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;padding:14px}
 input,textarea{width:100%;background:#111;border:1px solid #222;padding:12px;border-radius:12px;color:#fff;margin:8px 0}
 .btn{background:#fff;color:#000;border:0;width:100%;padding:14px;border-radius:20px;font-weight:900;margin-top:10px}
-.prev{height:300px;background:#111;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.prev{height:300px;background:#111;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
 .prev video,.prev img{width:100%;height:100%;object-fit:cover}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
+.toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
+.soundBtn{position:absolute;bottom:12px;right:12px;background:#fff;color:#000;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;z-index:10}
+.tapHint{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.65);padding:6px 12px;border-radius:20px;font-size:11px;white-space:nowrap;z-index:10}
 </style></head><body>
 <b id="title">PIXORO Reels - Share 🔥</b>
 <div class="prev" id="prev">Loading...</div>
 <input id="cap" placeholder="Caption eluthu da...">
-<button class="btn" id="shareBtn" onclick="share()">Share Reel 🚀</button>
+<button class="btn" id="shareBtn" onclick="share()">upload Reel 🚀</button>
 <button class="btn" style="background:#222;color:#fff" onclick="location.href='index.html'">Cancel</button>
 <div id="toast" class="toast"></div>
 <script>
@@ -25,6 +27,15 @@ let typeParam = params.get('type') || 'video'
 let isVid = typeParam==='video' || media.includes('.mp4')
 let ME = '', ME_ID = ''
 let prev = document.getElementById('prev');
+let globalMuted = false;
+function toggleSound(btn){
+  let v = document.querySelector('#prev video');
+  if(!v) return;
+  globalMuted = !globalMuted;
+  v.muted = globalMuted;
+  btn.innerText = globalMuted ? '🔇' : '🔊';
+  if(!globalMuted) v.play();
+}
 async function init(){
   if(!supa){ location.href='login.html'; return }
   let { data: { session } } = await supa.auth.getSession()
@@ -36,10 +47,19 @@ async function init(){
     if(isVid){
       document.getElementById('title').innerText='PIXORO Reels - Share 🔥';
       document.getElementById('shareBtn').innerText='Share Reel 🚀';
-      prev.innerHTML = `<video src="${media}" autoplay loop muted playsinline controls style="width:100%;height:100%;object-fit:cover"></video>`;
+      // ✅ FIX - muted Thookiten - Sound On
+      prev.innerHTML = `<div class="tapHint">Tap pannu 🔊 Sound varum</div><video src="${media}" autoplay loop playsinline controls style="width:100%;height:100%;object-fit:cover" onclick="this.muted=false;this.play();document.getElementById('sndBtn').innerText='🔊'"></video><div class="soundBtn" id="sndBtn" onclick="toggleSound(this)">🔊</div>`;
+      let v = prev.querySelector('video');
+      v.muted = false; v.volume = 1;
+      v.play().catch(()=>{ v.muted=true; v.play(); document.getElementById('sndBtn').innerText='🔇'; globalMuted=true; });
+      // First Tap la Sound On - Instagram Mari
+      document.addEventListener('click', function firstTap(){
+        let vid = document.querySelector('#prev video');
+        if(vid && globalMuted){ vid.muted=false; vid.play(); globalMuted=false; let b=document.getElementById('sndBtn'); if(b) b.innerText='🔊'; }
+      }, {once:true});
     } else {
       document.getElementById('title').innerText='PIXORO Post - Share 📸';
-      document.getElementById('shareBtn').innerText='Share Post 🚀';
+      document.getElementById('shareBtn').innerText='upload Post 🚀';
       prev.innerHTML = `<img src="${media}" style="width:100%;height:100%;object-fit:cover">`;
     }
   } else {
