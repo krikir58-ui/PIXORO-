@@ -12,6 +12,7 @@
 .bar{height:6px;background:#333;border-radius:10px;overflow:hidden;margin-top:6px}
 .barFill{height:100%;background:#00C853;width:0%}
 .info{margin:0 12px;padding:8px;background:#111;border:1px solid #222;border-radius:10px;font-size:12px;color:#aaa;text-align:center}
+.soundBtn{position:absolute;bottom:12px;right:12px;background:#fff;color:#000;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;z-index:10}
 </style></head><body>
 <div class="top"><b>New Reel 🎬</b><span onclick="location.href='index.html'">✕</span></div>
 <div class="prev" id="prev">🎬 Video Select Pannu</div>
@@ -37,6 +38,13 @@ async function checkAuth(){
 }
 checkAuth()
 let m = '';
+function togglePreviewSound(btn){
+  let v = document.querySelector('#prev video');
+  if(!v) return;
+  v.muted = !v.muted;
+  btn.innerText = v.muted ? '🔇' : '🔊';
+  if(!v.muted) v.play();
+}
 async function h(e){
   let f = e.target.files[0];
   if(!f) return;
@@ -44,12 +52,15 @@ async function h(e){
   let u = URL.createObjectURL(f);
   let vid=document.createElement('video'); vid.preload='metadata'; vid.onloadedmetadata=async()=>{
     if(vid.duration > 35){ showToast('Reel 30 sec ku mela irukku da! Cut pannitu vaa'); e.target.value=''; return; }
-    document.getElementById('prev').innerHTML = `<video src="${u}" autoplay loop muted controls playsinline></video>`;
+    // FIX - muted illa, sound odane varum, click panna sound on
+    document.getElementById('prev').innerHTML = `<video src="${u}" autoplay loop playsinline controls onclick="this.muted=false;this.play()"></video><div class="soundBtn" onclick="togglePreviewSound(this)">🔊</div>`;
+    let pv = document.querySelector('#prev video');
+    pv.muted = false; pv.play().catch(()=>{ pv.muted=true; pv.play(); document.querySelector('.soundBtn').innerText='🔇'; });
     document.getElementById('prog').style.display='block';
     document.getElementById('progText').innerText='Uploading Reel... '+Math.round(vid.duration)+' sec • '+formatSize(f.size);
     document.getElementById('progSize').innerText=formatSize(f.size);
     document.getElementById('progFill').style.width='30%';
-    document.getElementById('info').innerText='✅ Size OK: '+formatSize(f.size)+' • Duration: '+Math.round(vid.duration)+' sec • Storage Saved!';
+    document.getElementById('info').innerText='✅ Size OK: '+formatSize(f.size)+' • Duration: '+Math.round(vid.duration)+' sec • Audio Saved 🔊';
     showToast('Uploading... ⏳');
     let fileName = Date.now() + '_' + ME_RAW + '_' + f.name.replace(/[^a-zA-Z0-9.]/g,'_');
     let {data, error} = await supa.storage.from('reels').upload(fileName, f);
@@ -57,7 +68,7 @@ async function h(e){
     let {data: urlData} = supa.storage.from('reels').getPublicUrl(fileName);
     m = urlData.publicUrl;
     document.getElementById('progFill').style.width='100%';
-    document.getElementById('progText').innerText='Upload Done ✅';
+    document.getElementById('progText').innerText='Upload Done ✅ Audio Saved 🔊';
     showToast('Upload Done da 🔥 Next ku po da');
   };
   vid.src=u;
