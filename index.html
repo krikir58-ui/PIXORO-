@@ -68,7 +68,6 @@
 <div class="createRow" style="border-bottom:none" onclick="location.href='live.html'"><div class="createIco">((•))</div><div style="flex:1"><b style="font-size:16px">Live</b><div style="font-size:12px;color:#888">Go live now</div></div><span style="color:#666;font-size:20px">›</span></div>
 <div onclick="hideChoice()" style="text-align:center;padding:14px;color:#777;margin-top:10px">Cancel</div>
 </div></div>
-<script type="module" src="js/pixoro-core.js"></script>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2500)}
 window.showToast = showToast;
@@ -92,18 +91,16 @@ window.getTick = getTick;
 function profileById(id){ return allProfiles.find(x=> x.id===id) || null }
 function usernameById(id){ let p=profileById(id); return p? p.username : '' }
 function displayNameFor(u){ 
-  if(!u) return 'Giri Office';
+  if(!u) return ME_RAW || 'giri_office';
   let p = allProfiles.find(x=> x.id===u) || allProfiles.find(x=> cleanUser(x.username)===cleanUser(u));
-  if(p && p.full_name) return p.full_name;
-  if(p && p.display_name) return p.display_name;
-  return cleanUser(u) || 'Giri Office';
+  if(p && p.username) return cleanUser(p.username);
+  return cleanUser(u) || ME_RAW || 'giri_office';
 }
 function getPfp(u){
   if(u===ME_ID && ME_PFP) return ME_PFP;
   let p = allProfiles.find(x=> x.id===u) || allProfiles.find(x=> cleanUser(x.username)===cleanUser(u));
   if(p && (p.avatar_url || p.profile_pic || p.photo_url)) return p.avatar_url || p.profile_pic || p.photo_url;
   let name = p ? (p.username||'') : (u===ME_ID ? ME_RAW : cleanUser(u));
-  if(name.length>20) name = ME_RAW || 'giri_office';
   let clean = cleanUser(name);
   return 'https://ui-avatars.com/api/?name='+(clean.charAt(0).toUpperCase()||'G')+'&background=111&color=fff&size=200&bold=true';
 }
@@ -143,13 +140,15 @@ async function loadAll(){
     allPosts=(posts||[]).map(p=>{
       let prof = profileById(p.user_id);
       p.username = prof ? prof.username : (p.username || '');
-      p._display = prof ? (prof.full_name||prof.display_name) : p.username;
+      p.username = cleanUser(p.username);
+      p._display = p.username;
       p.media_url = p.media_url || p.image || p.image_url || p.video_url || '';
       return p;
     }).filter(p=>!p.is_archived)
     allStories=(stories||[]).map(s=>{
       let prof = profileById(s.user_id);
       s.username = prof ? prof.username : (s.username || '');
+      s.username = cleanUser(s.username);
       return s;
     }).filter(s=>{ if(!s.expires_at) return true; return new Date(s.expires_at) > now })
     allLikes=likes||[]; allSaves=saves||[]; allFollows=follows||[];
