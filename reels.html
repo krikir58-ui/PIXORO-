@@ -60,9 +60,10 @@ let supa = window.supa
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
 function getTick(u){ return window.getTick ? window.getTick(u) : '' }
 let ME_RAW='', ME='', profileMap={}, allPosts=[], allLikes=[], allSaves=[], allFollows=[], allComments=[], allCLikes=[], curPost=null, allAds=[], blocked=[]
-let globalMuted = false; // ✅ SOUND ON BY DEFAULT - Instagram Mari
+let globalMuted = false;
+async function waitSupa(){ for(let i=0;i<20;i++){ if(window.supa) return window.supa; await new Promise(r=>setTimeout(r,200)); } return null; }
 async function init(){
-  if(!supa){ location.href='login.html'; return }
+  supa = await waitSupa(); if(!supa){ document.getElementById('reelWrap').innerHTML='<p style="text-align:center;padding-top:50vh;color:#fff">Supabase Load Aagala da - Refresh pannu</p>'; return; }
   let { data:{session} } = await supa.auth.getSession()
   if(!session){ location.href='login.html'; return }
   let { data: myProf } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
@@ -72,24 +73,23 @@ async function init(){
   ;(profs||[]).forEach(p=> profileMap[cleanUser(p.username)] = p)
   updateNavPfp(); load()
 }
-function getPfp(u){
-  let p = profileMap[cleanUser(u)]
-  if(p?.avatar_url) return p.avatar_url
-  let c = cleanUser(u)||'P'
-  return 'https://ui-avatars.com/api/?name='+c.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true'
-}
+function getPfp(u){ let p = profileMap[cleanUser(u)]; if(p?.avatar_url) return p.avatar_url; let c = cleanUser(u)||'P'; return 'https://ui-avatars.com/api/?name='+c.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true' }
 function updateNavPfp(){ let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW); let m=document.getElementById('myCPfp'); if(m) m.src=getPfp(ME_RAW) }
 function openProfileFast(u){ location.href='profile.html?u='+encodeURIComponent(cleanUser(u)) }
 function isMyPost(u){ return cleanUser(u)===ME_RAW }
 async function load(){
-  let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false})
-  let {data:likes}=await supa.from('likes').select('*')
-  let {data:saves}=await supa.from('saves').select('*').eq('username',ME_RAW)
-  let {data:follows}=await supa.from('follows').select('*')
-  let {data:ads}=await supa.from('pixoro_ads').select('*').eq('is_active',true)
-  allPosts = (posts||[]).filter(p=> (p.media_type=='reel' || p.media_type=='video' || (p.media_url||'').includes('.mp4') || (p.image_url||'').includes('.mp4')) && !blocked.includes(p.username))
-  allLikes=likes||[]; allSaves=saves||[]; allFollows=follows||[]; allAds=ads||[]
-  render()
+  try{
+    let {data:posts,error:pe}=await supa.from('posts').select('*').order('created_at',{ascending:false})
+    if(pe) throw pe;
+    let likes=[],saves=[],follows=[],ads=[];
+    try{ likes=(await supa.from('likes').select('*')).data||[] }catch(e){}
+    try{ saves=(await supa.from('saves').select('*').eq('username',ME_RAW)).data||[] }catch(e){}
+    try{ follows=(await supa.from('follows').select('*')).data||[] }catch(e){}
+    try{ ads=(await supa.from('pixoro_ads').select('*').eq('is_active',true)).data||[] }catch(e){}
+    allPosts = (posts||[]).filter(p=>{ let url=(p.media_url||p.image_url||'').toLowerCase(); return (p.media_type=='reel'||p.media_type=='video'||url.includes('.mp4')||url.includes('.mov')||url.includes('.webm')||url.includes('reels/')) && !blocked.includes(p.username) })
+    allLikes=likes; allSaves=saves; allFollows=follows; allAds=ads;
+    render()
+  }catch(err){ console.log(err); document.getElementById('reelWrap').innerHTML='<p style="text-align:center;padding-top:50vh;color:#fff">Error da - Refresh pannu 🔄<br><span style="font-size:12px;color:#888">'+(err.message||'')+'</span></p>'; }
 }
 function render(){
  let wrap=document.getElementById('reelWrap')
@@ -114,22 +114,9 @@ function render(){
 function observe(){ let reels=document.querySelectorAll('.reel video'); let io=new IntersectionObserver(entries=>{ entries.forEach(e=>{ let v=e.target; let prog=e.target.closest('.reel').querySelector('.progress'); if(!prog) return; if(e.isIntersecting){ v.muted=globalMuted; v.play().catch(()=>{ v.muted=true; v.play().catch(()=>{}) }); v.addEventListener('timeupdate',()=>{ if(v.duration) prog.style.width=(v.currentTime/v.duration*100)+'%' } ) } else { v.pause() } }) },{threshold:0.7}); reels.forEach(v=>io.observe(v)) }
 function togglePlay(el){ let v=el.querySelector('video'); if(!v) return; if(globalMuted){ globalMuted=false; document.querySelectorAll('.reel video').forEach(x=>x.muted=false); document.querySelectorAll('.muteBtn').forEach(b=>b.textContent='🔊'); v.play(); } else { if(v.paused) v.play(); else v.pause(); } }
 function toggleMute(btn){ globalMuted=!globalMuted; document.querySelectorAll('.reel video').forEach(v=>{ v.muted=globalMuted; if(!globalMuted) v.play(); }); document.querySelectorAll('.muteBtn').forEach(b=>b.textContent=globalMuted?'🔇':'🔊'); }
-function dblLike(id){
-  let liked=allLikes.some(l=>l.post_id==id&&l.username==ME_RAW);
-  let reel=document.querySelector(`.reel[data-id="${id}"]`); let b=reel?reel.querySelector('.heartBurst'):null;
-  if(b){ b.classList.remove('show'); void b.offsetWidth; b.classList.add('show'); }
-  if(liked) return; allLikes.push({post_id:id,username:ME_RAW}); updateLikeUI(id,true); supa.from('likes').insert({post_id:id,username:ME_RAW});
-}
-async function toggleLike(id){
-  let liked=allLikes.some(l=>l.post_id==id&&l.username==ME_RAW);
-  if(!liked){ allLikes.push({post_id:id,username:ME_RAW}); updateLikeUI(id,true); supa.from('likes').insert({post_id:id,username:ME_RAW}); }
-  else{ allLikes=allLikes.filter(l=>!(l.post_id==id&&l.username==ME_RAW)); updateLikeUI(id,false); supa.from('likes').delete().eq('post_id',id).eq('username',ME_RAW); }
-}
-function updateLikeUI(id,liked){
-  let svg=document.getElementById('likeSvg-'+id); let cnt=document.getElementById('likeCnt-'+id);
-  if(svg){ svg.setAttribute('fill',liked?'#ff3040':'none'); svg.setAttribute('stroke',liked?'#ff3040':'#fff'); }
-  if(cnt){ let n=parseInt(cnt.innerText||'0'); cnt.innerText=liked? (n+1||1) : Math.max(0,n-1); if(cnt.innerText=='0') cnt.innerText=''; }
-}
+function dblLike(id){ let liked=allLikes.some(l=>l.post_id==id&&l.username==ME_RAW); let reel=document.querySelector(`.reel[data-id="${id}"]`); let b=reel?reel.querySelector('.heartBurst'):null; if(b){ b.classList.remove('show'); void b.offsetWidth; b.classList.add('show'); } if(liked) return; allLikes.push({post_id:id,username:ME_RAW}); updateLikeUI(id,true); supa.from('likes').insert({post_id:id,username:ME_RAW}); }
+async function toggleLike(id){ let liked=allLikes.some(l=>l.post_id==id&&l.username==ME_RAW); if(!liked){ allLikes.push({post_id:id,username:ME_RAW}); updateLikeUI(id,true); supa.from('likes').insert({post_id:id,username:ME_RAW}); } else{ allLikes=allLikes.filter(l=>!(l.post_id==id&&l.username==ME_RAW)); updateLikeUI(id,false); supa.from('likes').delete().eq('post_id',id).eq('username',ME_RAW); } }
+function updateLikeUI(id,liked){ let svg=document.getElementById('likeSvg-'+id); let cnt=document.getElementById('likeCnt-'+id); if(svg){ svg.setAttribute('fill',liked?'#ff3040':'none'); svg.setAttribute('stroke',liked?'#ff3040':'#fff'); } if(cnt){ let n=parseInt(cnt.innerText||'0'); cnt.innerText=liked? (n+1||1) : Math.max(0,n-1); if(cnt.innerText=='0') cnt.innerText=''; } }
 async function saveR(id){ let s=allSaves.some(x=>x.post_id==id); let svg=document.getElementById('saveSvg-'+id); if(s){ allSaves=allSaves.filter(x=>x.post_id!=id); if(svg) svg.setAttribute('fill','none'); supa.from('saves').delete().eq('post_id',id).eq('username',ME_RAW); } else { allSaves.push({post_id:id}); if(svg) svg.setAttribute('fill','#FFD700'); supa.from('saves').insert({post_id:id,username:ME_RAW}); } }
 async function toggleF(u,pid){ let a=allFollows.some(f=>f.follower==ME_RAW&&f.following==u); let btn=document.getElementById('followBtn-'+pid); if(a){ allFollows=allFollows.filter(f=>!(f.follower==ME_RAW&&f.following==u)); if(btn){btn.classList.remove('following');btn.innerText='Follow'} supa.from('follows').delete().eq('follower',ME_RAW).eq('following',u); } else { allFollows.push({follower:ME_RAW,following:u}); if(btn){btn.classList.add('following');btn.innerText='Following'} supa.from('follows').insert({follower:ME_RAW,following:u}); } }
 function shareR(){ if(navigator.share) navigator.share({url:location.href}); else { navigator.clipboard.writeText(location.href); showToast('Link copied da!'); } }
