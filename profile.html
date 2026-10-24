@@ -84,28 +84,23 @@ async function init(){
   document.getElementById('editPfpPreview').src = getPfpFrom(VIEW_PROFILE)
   document.getElementById('navPfp').src = getPfpFrom(myProfile)
   document.getElementById('editBtn').style.display = isMine ? 'block':'none'
-  let posts2 = []
-  if(VIEW_PROFILE?.id){
-    let {data: p1} = await supa.from('posts').select('*').eq('user_id', VIEW_PROFILE.id).order('created_at',{ascending:false})
-    if(p1 && p1.length) posts2 = p1
-  }
-  if(!posts2.length){
-    let { data: posts } = await supa.from('posts').select('*').eq('username', VIEW_USER).order('created_at',{ascending:false})
-    if(posts && posts.length) posts2 = posts
-  }
-  if(!posts2.length){
-    let { data: posts3 } = await supa.from('posts').select('*').in('username', ['pixoro_giri','giri_office', VIEW_USER]).order('created_at',{ascending:false})
-    if(posts3 && posts3.length) posts2 = posts3
-  }
-  myPosts = posts2.filter(p=>!p.is_archived)
+  // --- PIXORO FIX - POSTS BULLETPROOF FETCH da ---
+  let { data: allPosts, error: postErr } = await supa.from('posts').select('*').order('created_at',{ascending:false})
+  console.log('ALL POSTS', allPosts, postErr)
+  let posts2 = (allPosts||[]).filter(p => {
+    if(p.is_archived) return false
+    let pu = cleanUser(p.username||'')
+    return pu===VIEW_USER || pu==='pixoro_giri' || pu==='giri_office' || p.user_id===VIEW_PROFILE.id || p.user_id===ME_ID
+  })
+  myPosts = posts2
   document.getElementById('postCount').textContent = myPosts.length
   renderGrid(myPosts)
   let { data: follows } = await supa.from('follows').select('*')
   document.getElementById('followerCount').textContent = (follows||[]).filter(f=> (f.following_id===VIEW_PROFILE.id) || cleanUser(f.following)===VIEW_USER || cleanUser(f.following)==='pixoro_giri' || cleanUser(f.following)==='giri_office').length
   document.getElementById('followingCount').textContent = (follows||[]).filter(f=> (f.follower_id===VIEW_PROFILE.id) || cleanUser(f.follower)===VIEW_USER || cleanUser(f.follower)==='pixoro_giri' || cleanUser(f.follower)==='giri_office').length
 }
-function renderGrid(list){ if(!list.length){ document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`; return; } document.getElementById('myGrid').innerHTML=list.map(p=>{ let mUrl=p.media_url||p.image_url||p.image||''; let isVid=p.media_type=='reel'||mUrl.includes('.mp4'); if(isVid) return `<div style="position:relative"><video src="${mUrl}" muted playsinline style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px">🎬</span></div>`; return `<img src="${mUrl}">`; }).join('') }
-function showTab(type){ document.getElementById('tabPosts').classList.toggle('active', type=='all'); document.getElementById('tabReels').classList.toggle('active', type=='reels'); let list=type=='reels'? myPosts.filter(p=> p.media_type=='reel'||(p.media_url||'').includes('.mp4')) : myPosts; renderGrid(list); }
+function renderGrid(list){ if(!list.length){ document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`; return; } document.getElementById('myGrid').innerHTML=list.map(p=>{ let mUrl=p.media_url||p.video_url||p.image_url||p.image||''; let isVid=p.media_type=='reel'||p.media_type=='video'||mUrl.includes('.mp4'); if(isVid) return `<div style="position:relative"><video src="${mUrl}" muted playsinline style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px">🎬</span></div>`; return `<img src="${mUrl}">`; }).join('') }
+function showTab(type){ document.getElementById('tabPosts').classList.toggle('active', type=='all'); document.getElementById('tabReels').classList.toggle('active', type=='reels'); let list=type=='reels'? myPosts.filter(p=> p.media_type=='reel'||(p.media_url||'').includes('.mp4')||(p.video_url||'').includes('.mp4')) : myPosts; renderGrid(list); }
 function openSettings(){ document.getElementById('setSheet').style.display='flex' }
 function openEditSheet(){ if(VIEW_USER!==ME_RAW) return showToast('Others Profile Edit Panna Mudiyathu da'); document.getElementById('editName').value=VIEW_PROFILE.full_name||VIEW_PROFILE.display_name||''; document.getElementById('editUsername').value=VIEW_USER; document.getElementById('editBio').value=VIEW_PROFILE.bio||''; document.getElementById('editLink').value=VIEW_PROFILE.link||VIEW_PROFILE.website||''; document.getElementById('editSheet').style.display='flex' }
 async function doPixoroLogout(){ let supa=getSupa(); await supa.auth.signOut(); location.href='login.html'; }
