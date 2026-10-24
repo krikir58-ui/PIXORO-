@@ -1,4 +1,4 @@
-// PIXORO CORE - Correct Version 🔥
+// PIXORO CORE - Correct Version 🔥 - Instagram Name illa da
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 
 const SB_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co'
@@ -7,12 +7,13 @@ const SB_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_'
 export const supabase = window.supa || createClient(SB_URL, SB_KEY)
 if(!window.supa) window.supa = supabase
 
+// Gold User Check - PIXORO Name mattum da
 export function isGoldUser(profile){
   if(!profile) return false
   if(typeof profile === 'string'){
-    return profile.toLowerCase().replace(/[^a-z0-9_.]/g,'') === 'giri_office'
+    return profile.toLowerCase().replace(/[^a-z0-9_.]/g,'') === 'pixoro_giri'
   }
-  return String(profile.username||'').toLowerCase() === 'giri_office' || profile.verified === true
+  return String(profile.username||'').toLowerCase() === 'pixoro_giri' || profile.verified === true
 }
 
 export function goldTickHTML(){
