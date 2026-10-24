@@ -131,7 +131,21 @@ async function loadAll(){
     supa = getSupa(); if(!supa) return;
     let {data:profiles}=await supa.from('profiles').select('*');
     allProfiles=profiles||[]
-    let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false});
+    let posts=null;
+    let {data: pAll} = await supa.from('posts').select('*').order('created_at',{ascending:false});
+    posts = pAll;
+    if(!posts || !posts.length){
+      let {data: p1} = await supa.from('posts').select('*').eq('user_id', ME_ID).order('created_at',{ascending:false});
+      if(p1 && p1.length) posts = p1;
+    }
+    if(!posts || !posts.length){
+      let {data: p2} = await supa.from('posts').select('*').eq('username', ME_RAW).order('created_at',{ascending:false});
+      if(p2 && p2.length) posts = p2;
+    }
+    if(!posts || !posts.length){
+      let {data: p3} = await supa.from('posts').select('*').in('username', ['giri_office', ME_RAW]).order('created_at',{ascending:false});
+      if(p3 && p3.length) posts = p3;
+    }
     let {data:likes}=await supa.from('likes').select('*');
     let {data:saves}=await supa.from('saves').select('*');
     let {data:stories}=await supa.from('stories').select('*').order('created_at',{ascending:false});
