@@ -49,9 +49,9 @@ function showToast(m){let t=document.getElementById('toast');if(!t) return; t.in
 function getSupa(){ return window.supa || window.supabase; }
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||''; }
 let ME_RAW='', ME_ID='', VIEW_USER='', VIEW_PROFILE=null, myPosts=[]
-function getTick(u){
+function getTick(u, profile){
   let c = cleanUser(u);
-  if(c==='pixoro_giri') return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+  if(c==='pixoro_giri' || c==='giri_office' || profile?.verified===true || profile?.is_gold===true) return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
   return '';
 }
 function getPfpFrom(p){ return p?.avatar_url || p?.profile_pic || p?.photo_url || 'https://ui-avatars.com/api/?name='+(cleanUser(p?.username||'G').charAt(0).toUpperCase())+'&background=333&color=fff&size=200&bold=true' }
@@ -74,28 +74,35 @@ async function init(){
     vp = data || myProfile;
   }
   VIEW_PROFILE = vp
-  document.getElementById('topUsername').innerHTML = cleanUser(VIEW_PROFILE.username)+' '+getTick(VIEW_PROFILE.username)
+  document.getElementById('topUsername').innerHTML = cleanUser(VIEW_PROFILE.username)+' '+getTick(VIEW_PROFILE.username, VIEW_PROFILE)
   document.getElementById('displayName').textContent = VIEW_PROFILE.full_name || VIEW_PROFILE.display_name || VIEW_PROFILE.username
   document.getElementById('usernameTag').textContent = '@'+VIEW_PROFILE.username
   document.getElementById('bioText').innerText = VIEW_PROFILE.bio || ''
   document.getElementById('linkText').innerText = VIEW_PROFILE.link || VIEW_PROFILE.website || ''
-  document.getElementById('goldTick').innerHTML = getTick(VIEW_PROFILE.username)
+  document.getElementById('goldTick').innerHTML = getTick(VIEW_PROFILE.username, VIEW_PROFILE)
   document.getElementById('pfpImg').src = getPfpFrom(VIEW_PROFILE)
   document.getElementById('editPfpPreview').src = getPfpFrom(VIEW_PROFILE)
   document.getElementById('navPfp').src = getPfpFrom(myProfile)
   document.getElementById('editBtn').style.display = isMine ? 'block':'none'
-  let { data: posts } = await supa.from('posts').select('*').eq('username', VIEW_USER).order('created_at',{ascending:false})
-  let posts2 = posts||[]
-  if(!posts2.length && VIEW_PROFILE?.id){
-    let {data: p2} = await supa.from('posts').select('*').eq('user_id', VIEW_PROFILE.id).order('created_at',{ascending:false})
-    posts2 = p2||[]
+  let posts2 = []
+  if(VIEW_PROFILE?.id){
+    let {data: p1} = await supa.from('posts').select('*').eq('user_id', VIEW_PROFILE.id).order('created_at',{ascending:false})
+    if(p1 && p1.length) posts2 = p1
+  }
+  if(!posts2.length){
+    let { data: posts } = await supa.from('posts').select('*').eq('username', VIEW_USER).order('created_at',{ascending:false})
+    if(posts && posts.length) posts2 = posts
+  }
+  if(!posts2.length){
+    let { data: posts3 } = await supa.from('posts').select('*').in('username', ['pixoro_giri','giri_office', VIEW_USER]).order('created_at',{ascending:false})
+    if(posts3 && posts3.length) posts2 = posts3
   }
   myPosts = posts2.filter(p=>!p.is_archived)
   document.getElementById('postCount').textContent = myPosts.length
   renderGrid(myPosts)
   let { data: follows } = await supa.from('follows').select('*')
-  document.getElementById('followerCount').textContent = (follows||[]).filter(f=> (f.following_id===VIEW_PROFILE.id) || cleanUser(f.following)===VIEW_USER).length
-  document.getElementById('followingCount').textContent = (follows||[]).filter(f=> (f.follower_id===VIEW_PROFILE.id) || cleanUser(f.follower)===VIEW_USER).length
+  document.getElementById('followerCount').textContent = (follows||[]).filter(f=> (f.following_id===VIEW_PROFILE.id) || cleanUser(f.following)===VIEW_USER || cleanUser(f.following)==='pixoro_giri' || cleanUser(f.following)==='giri_office').length
+  document.getElementById('followingCount').textContent = (follows||[]).filter(f=> (f.follower_id===VIEW_PROFILE.id) || cleanUser(f.follower)===VIEW_USER || cleanUser(f.follower)==='pixoro_giri' || cleanUser(f.follower)==='giri_office').length
 }
 function renderGrid(list){ if(!list.length){ document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`; return; } document.getElementById('myGrid').innerHTML=list.map(p=>{ let mUrl=p.media_url||p.image_url||p.image||''; let isVid=p.media_type=='reel'||mUrl.includes('.mp4'); if(isVid) return `<div style="position:relative"><video src="${mUrl}" muted playsinline style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px">🎬</span></div>`; return `<img src="${mUrl}">`; }).join('') }
 function showTab(type){ document.getElementById('tabPosts').classList.toggle('active', type=='all'); document.getElementById('tabReels').classList.toggle('active', type=='reels'); let list=type=='reels'? myPosts.filter(p=> p.media_type=='reel'||(p.media_url||'').includes('.mp4')) : myPosts; renderGrid(list); }
