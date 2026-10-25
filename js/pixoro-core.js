@@ -1,23 +1,27 @@
-// Supabase Connection - Pixoro 🔵 - FINAL CORRECTED - UMD
+// js/pixoro-core.js - PIXORO CORE - FINAL da 🔵👑
+// Un Code - Same thaan da
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
-
 if(!window.supa && window.supabase && window.supabase.createClient){
   window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-  console.log('Supabase connected 🔵', !!window.supa);
 }
 
-// GOLD TICK - giri_office ku Mattum da 👑
-function isGoldUser(p){
-  if(!p) return false
-  let u = ''
-  if(typeof p === 'string') u = p.toLowerCase().split('@')[0].replace(/[^a-z0-9_.]/g,'')
-  else u = String(p.username||'').toLowerCase()
-  return u === 'giri_office' || p.verified === true || p.is_verified === true || p.is_gold === true
+// Gold Tick - Un Code Same da
+function isGoldUser(p){ /* Un Code */ }
+function goldTickHTML(){ /* Un Code */ }
+window.isGoldUser = isGoldUser;
+window.goldTickHTML = goldTickHTML;
+
+// 🔥 NEW - Real Views - Same Table Ella Page kum da
+async function getViewsCount(postId){
+  let {data} = await supa.from('views').select('id').eq('post_id', postId);
+  return data ? data.length : 0;
 }
-function goldTickHTML(){
-  return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+async function trackRealView(postId, videoEl){
+  if(!videoEl || videoEl.currentTime < 3) return;
+  if(videoEl.dataset.viewed) return;
+  videoEl.dataset.viewed = '1';
+  await supa.from('views').insert({post_id: postId, username: localStorage.getItem('pixoro_user')});
 }
-window.isGoldUser = isGoldUser
-window.goldTickHTML = goldTickHTML
-window.getTick = (p) => isGoldUser(p) ? goldTickHTML() : ''
+window.getViewsCount = getViewsCount;
+window.trackRealView = trackRealView;
