@@ -82,6 +82,19 @@ let ME_RAW='', ME='', ME_ID='', ME_PFP=''
 let allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=[],currentPostId=null,currentMenuPost=null,allViews=[]
 let viewedStories=[], lastTap=0
 let feedMode='foryou'
+// ✅ PIXORO SECRET - VIEWS LINK BY user_id NOT username
+async function trackView(postId, ownerId){
+  if(!ME_ID || !postId) return;
+  if(String(ownerId)===String(ME_ID) || cleanUser(ownerId)===ME_RAW) return;
+  if(allViews.some(v=>String(v.post_id)==String(postId) && String(v.user_id)===String(ME_ID))) return;
+  setTimeout(async()=>{
+    if(allViews.some(v=>String(v.post_id)==String(postId) && String(v.user_id)===String(ME_ID))) return;
+    supa=getSupa(); if(!supa) return;
+    let {error}=await supa.from('views').insert({post_id: postId, user_id: ME_ID, username: ME_RAW});
+    if(!error){ allViews.push({post_id: postId, user_id: ME_ID, username: ME_RAW}); renderFeed(); }
+  },3000);
+}
+window.trackView = trackView;
 function getTick(u){
   let c = (typeof u === 'string') ? cleanUser(u) : cleanUser(u && u.username);
   if(c==='giri_office') return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
@@ -202,7 +215,7 @@ let commentBtn = p.hide_comments? '' : `<button class="act" onclick="event.stopP
 let shareText = p.hide_share? '' : `<button class="act" onclick="event.stopPropagation();sharePost('${p.id}')"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>`
 let mUrl = p.media_url || p.image || p.image_url || ''
 let isVid = p.media_type=='reel' || p.media_type=='video' || mUrl.includes('.mp4') || mUrl.includes('video')
-let mediaHtml = isVid ? `<video class="main" src="${mUrl}" loop muted playsinline autoplay></video>` : `<img class="main" src="${mUrl}" loading="lazy">`
+let mediaHtml = isVid ? `<video class="main" src="${mUrl}" loop muted playsinline autoplay onplay="trackView('${p.id}','${ownerKey}')"></video>` : `<img class="main" src="${mUrl}" loading="lazy" onclick="trackView('${p.id}','${ownerKey}')">`
 let locHtml = p.location? `<div class="locBadge">📍 ${p.location}</div>` : ''
 let songHtml = p.song? `<div class="songBadge">🎵 ${p.song}</div>` : ''
 let aiHtml = p.is_ai? `<div class="aiBadge">✨ AI-generated</div>` : ''
