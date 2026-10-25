@@ -30,7 +30,7 @@ input[type=range]{width:100%;accent-color:#fff}
 </style></head><body>
 <div class="top"><b style="font-size:20px;font-weight:900;display:flex;align-items:center" id="topUsername">Loading...</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div><div class="bellWhite" onclick="location.href='notifications.html'">🔔</div><span onclick="openSettings()" style="font-size:20px;cursor:pointer">☰</span></div></div>
 <div style="padding:15px">
-<div style="display:flex;gap:18px;align-items:center"><div class="pfpBig" onclick="openEditSheet()"><div class="pfpBigInner"><img id="pfpImg" src=""></div></div><div class="stats"><div><b id="postCount">0</b><span>Posts</span></div><div><b id="followerCount">0</b><span>Followers</span></div><div><b id="followingCount">0</b><span>Following</span></div><div><b id="totalViews">0</b><span>Views</span></div></div></div>
+<div style="display:flex;gap:18px;align-items:center"><div class="pfpBig" onclick="openEditSheet()"><div class="pfpBigInner"><img id="pfpImg" src=""></div></div><div class="stats"><div><b id="postCount">0</b><span>Posts</span></div><div><b id="followerCount">0</b><span>Followers</span></div><div><b id="followingCount">0</b><span>Following</span></div></div></div>
 <div style="margin-top:14px"><div style="display:flex;gap:6px;align-items:center"><b id="displayName">...</b><span id="goldTick"></span></div><div style="font-size:13px;color:#aaa"><span id="usernameTag">...</span></div><div id="bioText" style="font-size:14px;margin-top:8px"></div><div id="linkText" style="font-size:13px;color:#0095f6;margin-top:6px"></div></div>
 <div class="highlights" id="highlightList"></div>
 <div style="display:flex;gap:8px;margin-top:12px"><button class="btn btnPrimary" id="editBtn" onclick="openEditSheet()">Edit Profile</button><button class="btn" onclick="shareProfile()">Share Profile</button></div>
@@ -48,7 +48,7 @@ input[type=range]{width:100%;accent-color:#fff}
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 function getSupa(){ return window.supa || window.supabase; }
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||''; }
-let ME_RAW='', ME_ID='', VIEW_USER='', VIEW_PROFILE=null, myPosts=[], allViews=[]
+let ME_RAW='', ME_ID='', VIEW_USER='', VIEW_PROFILE=null, myPosts=[], allViews=[], currentTab='all'
 function getTick(u, profile){
   let c = cleanUser(u);
   if(c==='giri_office' || profile?.verified===true || profile?.is_gold===true) return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
@@ -99,20 +99,16 @@ async function init(){
     if(posts3 && posts3.length) posts2 = posts3
   }
   myPosts = posts2.filter(p=>!p.is_archived)
-  // PIXORO SECRET - Views Link - Same Table as Home & Reels
   let {data: views} = await supa.from('views').select('*');
   allViews = views || [];
-  let totalV = 0;
-  myPosts.forEach(p=>{ totalV += allViews.filter(v=>String(v.post_id)==String(p.id)).length });
-  document.getElementById('totalViews').textContent = fmtViews(totalV);
   document.getElementById('postCount').textContent = myPosts.length
   renderGrid(myPosts)
   let { data: follows } = await supa.from('follows').select('*')
   document.getElementById('followerCount').textContent = (follows||[]).filter(f=> (f.following_id===VIEW_PROFILE.id) || cleanUser(f.following)===VIEW_USER || cleanUser(f.following)==='giri_office').length
   document.getElementById('followingCount').textContent = (follows||[]).filter(f=> (f.follower_id===VIEW_PROFILE.id) || cleanUser(f.follower)===VIEW_USER || cleanUser(f.follower)==='giri_office').length
 }
-function renderGrid(list){ if(!list.length){ document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`; return; } document.getElementById('myGrid').innerHTML=list.map(p=>{ let mUrl=p.media_url||p.video_url||p.image_url||p.image||''; let isVid=p.media_type=='reel'||p.media_type=='video'||!!p.video_url||mUrl.includes('.mp4'); let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length; let vBadge=`<span style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.7);padding:3px 7px;border-radius:10px;font-size:11px">👁️ ${fmtViews(vCount)}</span>`; if(isVid) return `<div style="position:relative" onclick="location.href='reels.html?id=${p.id}'"><video src="${mUrl}" muted playsinline style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px">🎬</span>${vBadge}</div>`; return `<div style="position:relative" onclick="location.href='index.html'"><img src="${mUrl}">${vBadge}</div>`; }).join('') }
-function showTab(type){ document.getElementById('tabPosts').classList.toggle('active', type=='all'); document.getElementById('tabReels').classList.toggle('active', type=='reels'); let list=myPosts; if(type=='reels'){ list=myPosts.filter(p=>{ let u=(p.media_url||p.video_url||'').toLowerCase(); return p.media_type=='reel'||p.media_type=='video'||!!p.video_url||u.includes('.mp4') }); if(!list.length && myPosts.length>1) list=[myPosts[1]]; } renderGrid(list); }
+function renderGrid(list){ if(!list.length){ document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`; return; } document.getElementById('myGrid').innerHTML=list.map(p=>{ let mUrl=p.media_url||p.video_url||p.image_url||p.image||''; let isVid=p.media_type=='reel'||p.media_type=='video'||!!p.video_url||mUrl.includes('.mp4'); let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length; let vBadge = (currentTab==='reels' && isVid) ? `<span style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.7);padding:3px 7px;border-radius:10px;font-size:11px">👁️ ${fmtViews(vCount)}</span>` : ''; if(isVid) return `<div style="position:relative" onclick="location.href='reels.html?id=${p.id}'"><video src="${mUrl}" muted playsinline style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px">🎬</span>${vBadge}</div>`; return `<div style="position:relative" onclick="location.href='index.html'"><img src="${mUrl}"></div>`; }).join('') }
+function showTab(type){ currentTab=type; document.getElementById('tabPosts').classList.toggle('active', type=='all'); document.getElementById('tabReels').classList.toggle('active', type=='reels'); let list=myPosts; if(type=='reels'){ list=myPosts.filter(p=>{ let u=(p.media_url||p.video_url||'').toLowerCase(); return p.media_type=='reel'||p.media_type=='video'||!!p.video_url||u.includes('.mp4') }); if(!list.length && myPosts.length>1) list=[myPosts[1]]; } renderGrid(list); }
 function openSettings(){ document.getElementById('setSheet').style.display='flex' }
 function openEditSheet(){ if(VIEW_USER!==ME_RAW) return showToast('Others Profile Edit Panna Mudiyathu da'); document.getElementById('editName').value=VIEW_PROFILE.full_name||VIEW_PROFILE.display_name||''; document.getElementById('editUsername').value=VIEW_USER; document.getElementById('editBio').value=VIEW_PROFILE.bio||''; document.getElementById('editLink').value=VIEW_PROFILE.link||VIEW_PROFILE.website||''; document.getElementById('editSheet').style.display='flex' }
 async function doPixoroLogout(){ let supa=getSupa(); await supa.auth.signOut(); location.href='login.html'; }
