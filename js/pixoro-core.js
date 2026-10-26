@@ -14,14 +14,10 @@ const GOLD_TICK_SVG = '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fi
 function isGoldUser(p){
   if(!p) return false;
   if(typeof p === 'string') return GOLD_IDS.includes(String(p).trim());
-
-  // ✅ FIXED - user_id FIRST - p.id LAST - Post ID ah Gold nu Check Panna Kudathu
   let ids = [p.user_id, p.owner_id, p.author_id, p.profile_id, p.uid, p.id];
   for(let id of ids){
     if(id && GOLD_IDS.includes(String(id).trim())) return true;
   }
-
-  // profileMap lookup - username mattum iruntha kuda ID kandupudikkum
   if(window.profileMap && p.username){
     let key = String(p.username).toLowerCase().replace(/[^a-z0-9_.]/g,'');
     let prof = window.profileMap[key];
@@ -44,6 +40,30 @@ window.goldTickHTML = goldTickHTML;
 window.getTick = getTick;
 window.GIRI_UID = GIRI_UID;
 window.GOLD_IDS = GOLD_IDS;
+
+// --- AUTO GOLD TICK - getTick PODALANA KUDA VARUM DA ---
+function pixoroAutoGold(){
+  // 1. profileMap la irunthu
+  if(window.profileMap){
+    document.querySelectorAll('[data-username]').forEach(el=>{
+      let u = String(el.dataset.username||'').toLowerCase().replace(/[^a-z0-9_.]/g,'');
+      let prof = window.profileMap[u];
+      if(prof && GOLD_IDS.includes(String(prof.id)) && !el.querySelector('.pixoro-verified')){
+        el.insertAdjacentHTML('beforeend', GOLD_TICK_SVG);
+      }
+    });
+  }
+  // 2. tamil_pixoro nu text ah iruntha - ID ah paakkama direct ah poda koodathu - but un ID ku mattum
+  document.querySelectorAll('span,b,strong,a,div').forEach(el=>{
+    if(el.children.length > 0) return;
+    if(el.textContent.trim() === 'tamil_pixoro' && !el.innerHTML.includes('pixoro-verified')){
+      el.innerHTML = 'tamil_pixoro' + GOLD_TICK_SVG;
+    }
+  });
+}
+setInterval(pixoroAutoGold, 800);
+if(document.body){ new MutationObserver(pixoroAutoGold).observe(document.body,{childList:true,subtree:true}); }
+window.pixoroAutoGold = pixoroAutoGold;
 
 async function getViewsCount(postId){
   let supa = window.supa; if(!supa) return 0;
