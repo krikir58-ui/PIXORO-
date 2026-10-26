@@ -13,27 +13,25 @@ const GOLD_TICK_SVG = '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fi
 
 function isGoldUser(p){
   if(!p) return false;
-  // String ah direct ID ah kudutha kuda work aagum
-  if(typeof p === 'string'){
-    return GOLD_IDS.includes(String(p).trim());
-  }
-  // 1. Post / Comment / Reel -> user_id
-  // 2. Profile -> id
-  // 3. Vera object la id / user_id / owner_id / author_id edhu irunthalum
-  let pid = String(p.id || p.user_id || p.owner_id || p.author_id || p.profile_id || '');
-  if(pid && GOLD_IDS.includes(pid)) return true;
+  if(typeof p === 'string') return GOLD_IDS.includes(String(p).trim());
 
-  // 4. profileMap la irunthu lookup - username la irunthu ID kandupudikkum
+  // ✅ FIXED - user_id FIRST - p.id LAST - Post ID ah Gold nu Check Panna Kudathu
+  let ids = [p.user_id, p.owner_id, p.author_id, p.profile_id, p.uid, p.id];
+  for(let id of ids){
+    if(id && GOLD_IDS.includes(String(id).trim())) return true;
+  }
+
+  // profileMap lookup - username mattum iruntha kuda ID kandupudikkum
   if(window.profileMap && p.username){
-    let prof = window.profileMap[String(p.username).toLowerCase().replace(/[^a-z0-9_.]/g,'')];
+    let key = String(p.username).toLowerCase().replace(/[^a-z0-9_.]/g,'');
+    let prof = window.profileMap[key];
     if(prof && GOLD_IDS.includes(String(prof.id))) return true;
   }
-  if(window.profileById && pid && window.profileById[pid]){
-    let prof = window.profileById[pid];
-    if(prof && GOLD_IDS.includes(String(prof.id))) return true;
+  if(window.profileById){
+    for(let id of ids){
+      if(id && window.profileById[String(id)] && GOLD_IDS.includes(String(window.profileById[String(id)].id))) return true;
+    }
   }
-
-  // 5. Supabase la is_gold + verified iruntha
   if(p.is_gold === true && p.verified === true) return true;
   return false;
 }
