@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="css/pixoro-verified.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/supabase.js"></script>
+<script src="js/pixoro-core.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e1e1e;position:sticky;top:0;background:#000;z-index:50;height:56px}
@@ -48,16 +49,11 @@ input[type=range]{width:100%;accent-color:#fff}
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 function getSupa(){ return window.supa || window.supabase; }
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||''; }
-// --- GOLD TICK - USER ID ONLY ---
+// --- GOLD TICK - USER ID ONLY - CORE USE PANNROM ---
 const GIRI_UID = '47f16fa1-fe14-4161-8729-82e28c77286a';
 let ME_RAW='', ME_ID='', VIEW_USER='', VIEW_PROFILE=null, myPosts=[], allViews=[], allFollows=[], currentTab='all'
 function isReelPost(p){ let u=(p.media_url||p.video_url||'').toLowerCase(); return p.media_type=='reel'||p.media_type=='video'||!!p.video_url||u.includes('.mp4') }
-function getTick(u, profile){
-  if(!profile) return '';
-  if(String(profile.id)===String(GIRI_UID)) return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
-  if(profile.is_gold===true && profile.verified===true) return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
-  return '';
-}
+// Old custom getTick deleted - pixoro-core.js la ID Only getTick use aagum - Same for all pages
 function getPfpFrom(p){ return p?.avatar_url || p?.profile_pic || p?.photo_url || 'https://ui-avatars.com/api/?name='+(cleanUser(p?.username||'G').charAt(0).toUpperCase())+'&background=333&color=fff&size=200&bold=true' }
 function fmtViews(n){ return n>=1000 ? (n/1000).toFixed(1)+'K' : n }
 async function init(){
@@ -71,9 +67,8 @@ async function init(){
   ME_ID = session.user.id
   let urlU = cleanUser(new URLSearchParams(location.search).get('u') || '')
   VIEW_USER = urlU || ME_RAW
-  let isMine = VIEW_USER===ME_RAW
   let vp = null;
-  if(isMine) vp = myProfile;
+  if(urlU==='' || urlU===ME_RAW) vp = myProfile;
   else {
     let { data } = await supa.from('profiles').select('*').eq('username', VIEW_USER).single();
     if(data) vp = data;
@@ -84,18 +79,19 @@ async function init(){
     if(!vp){ document.getElementById('topUsername').innerText='User Not Found'; return; }
   }
   VIEW_PROFILE = vp
-  document.getElementById('topUsername').innerHTML = cleanUser(VIEW_PROFILE.username)+' '+getTick(VIEW_PROFILE.username, VIEW_PROFILE)
+  let isMine = VIEW_PROFILE.id===ME_ID
+  document.getElementById('topUsername').innerHTML = cleanUser(VIEW_PROFILE.username)+' '+getTick(VIEW_PROFILE)
   document.getElementById('displayName').textContent = VIEW_PROFILE.full_name || VIEW_PROFILE.display_name || VIEW_PROFILE.username
   document.getElementById('usernameTag').textContent = '@'+VIEW_PROFILE.username
   document.getElementById('bioText').innerText = VIEW_PROFILE.bio || ''
   document.getElementById('linkText').innerText = VIEW_PROFILE.link || VIEW_PROFILE.website || ''
-  document.getElementById('goldTick').innerHTML = getTick(VIEW_PROFILE.username, VIEW_PROFILE)
+  document.getElementById('goldTick').innerHTML = getTick(VIEW_PROFILE)
   document.getElementById('pfpImg').src = getPfpFrom(VIEW_PROFILE)
   document.getElementById('editPfpPreview').src = getPfpFrom(VIEW_PROFILE)
   document.getElementById('navPfp').src = getPfpFrom(myProfile)
   let { data: follows } = await supa.from('follows').select('*')
   allFollows = follows||[]
-  let isFollow = allFollows.some(f=>cleanUser(f.follower)===ME_RAW && cleanUser(f.following)===VIEW_USER)
+  let isFollow = allFollows.some(f=>f.follower_id===ME_ID && f.following_id===VIEW_PROFILE.id)
   if(isMine){
     document.getElementById('actionArea').innerHTML = `<button class="btn btnPrimary" id="editBtn" onclick="openEditSheet()">Edit Profile</button><button class="btn" onclick="shareProfile()">Share Profile</button>`
   } else {
@@ -108,7 +104,7 @@ async function init(){
   }
   if(!posts2.length){
     let { data: posts } = await supa.from('posts').select('*').order('created_at',{ascending:false})
-    posts2 = (posts||[]).filter(p=>cleanUser(p.username)===VIEW_USER)
+    posts2 = (posts||[]).filter(p=>p.user_id===VIEW_PROFILE.id)
   }
   myPosts = posts2.filter(p=>!p.is_archived)
   let {data: views} = await supa.from('views').select('*');
@@ -119,19 +115,19 @@ async function init(){
   document.getElementById('tabPosts').innerHTML = `⊞ Posts (${totalPosts})`
   document.getElementById('tabReels').innerHTML = `🎬 Reels (${totalReels})`
   renderGrid(myPosts)
-  document.getElementById('followerCount').textContent = allFollows.filter(f=>cleanUser(f.following)===VIEW_USER).length
-  document.getElementById('followingCount').textContent = allFollows.filter(f=>cleanUser(f.follower)===VIEW_USER).length
+  document.getElementById('followerCount').textContent = allFollows.filter(f=>f.following_id===VIEW_PROFILE.id).length
+  document.getElementById('followingCount').textContent = allFollows.filter(f=>f.follower_id===VIEW_PROFILE.id).length
 }
 async function toggleFollowMain(){
-  let supa=getSupa(); let btn=document.getElementById('followBtnMain'); let isF=allFollows.some(f=>cleanUser(f.follower)===ME_RAW && cleanUser(f.following)===VIEW_USER);
-  if(isF){ allFollows=allFollows.filter(f=>!(cleanUser(f.follower)===ME_RAW && cleanUser(f.following)===VIEW_USER)); btn.innerText='Follow'; await supa.from('follows').delete().eq('follower',ME_RAW).eq('following',VIEW_USER); }
-  else { allFollows.push({follower:ME_RAW,following:VIEW_USER}); btn.innerText='Following'; await supa.from('follows').insert({follower:ME_RAW,following:VIEW_USER}); }
-  document.getElementById('followerCount').textContent = allFollows.filter(f=>cleanUser(f.following)===VIEW_USER).length
+  let supa=getSupa(); let btn=document.getElementById('followBtnMain'); let isF=allFollows.some(f=>f.follower_id===ME_ID && f.following_id===VIEW_PROFILE.id);
+  if(isF){ allFollows=allFollows.filter(f=>!(f.follower_id===ME_ID && f.following_id===VIEW_PROFILE.id)); btn.innerText='Follow'; await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',VIEW_PROFILE.id); }
+  else { allFollows.push({follower_id:ME_ID,following_id:VIEW_PROFILE.id, follower:ME_RAW, following:VIEW_USER}); btn.innerText='Following'; await supa.from('follows').insert({follower_id:ME_ID,following_id:VIEW_PROFILE.id, follower:ME_RAW, following:VIEW_USER}); }
+  document.getElementById('followerCount').textContent = allFollows.filter(f=>f.following_id===VIEW_PROFILE.id).length
 }
 function renderGrid(list){ if(!list.length){ document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`; return; } document.getElementById('myGrid').innerHTML=list.map(p=>{ let mUrl=p.media_url||p.video_url||p.image_url||p.image||''; let isVid=isReelPost(p); let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length; let vBadge = (currentTab==='reels' && isVid) ? `<span style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.7);padding:3px 7px;border-radius:10px;font-size:11px">👁️ ${fmtViews(vCount)}</span>` : ''; if(isVid) return `<div style="position:relative" onclick="location.href='reels.html?id=${p.id}'"><video src="${mUrl}" muted playsinline style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px">🎬</span>${vBadge}</div>`; return `<div style="position:relative" onclick="location.href='index.html'"><img src="${mUrl}"></div>`; }).join('') }
 function showTab(type){ currentTab=type; document.getElementById('tabPosts').classList.toggle('active', type=='all'); document.getElementById('tabReels').classList.toggle('active', type=='reels'); let list=myPosts; if(type=='reels'){ list=myPosts.filter(isReelPost); } renderGrid(list); }
 function openSettings(){ document.getElementById('setSheet').style.display='flex' }
-function openEditSheet(){ if(VIEW_USER!==ME_RAW) return showToast('Others Profile Edit Panna Mudiyathu da'); document.getElementById('editName').value=VIEW_PROFILE.full_name||VIEW_PROFILE.display_name||''; document.getElementById('editUsername').value=VIEW_USER; document.getElementById('editBio').value=VIEW_PROFILE.bio||''; document.getElementById('editLink').value=VIEW_PROFILE.link||VIEW_PROFILE.website||''; document.getElementById('editSheet').style.display='flex' }
+function openEditSheet(){ if(VIEW_PROFILE.id!==ME_ID) return showToast('Others Profile Edit Panna Mudiyathu da'); document.getElementById('editName').value=VIEW_PROFILE.full_name||VIEW_PROFILE.display_name||''; document.getElementById('editUsername').value=VIEW_USER; document.getElementById('editBio').value=VIEW_PROFILE.bio||''; document.getElementById('editLink').value=VIEW_PROFILE.link||VIEW_PROFILE.website||''; document.getElementById('editSheet').style.display='flex' }
 async function doPixoroLogout(){ let supa=getSupa(); await supa.auth.signOut(); location.href='login.html'; }
 async function saveEdit(){
   let supa=getSupa();
