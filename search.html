@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="css/pixoro-verified.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/supabase.js"></script>
+<script src="js/pixoro-core.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
 body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
@@ -38,7 +39,6 @@ input{flex:1;background:#181818;border:1px solid #222;padding:10px 12px;border-r
 <div id="hint" style="text-align:center;padding:30px 20px;color:#555"><div style="font-size:36px;margin-bottom:8px">🔒</div><b style="color:#fff">Private Search</b><p style="font-size:11px;margin-top:8px">Type pannu - yaarukku venalum msg pannalam<br>DM la avanga mattum varuvanga - 100% private</p></div>
 <div id="explore" style="margin-top:10px"><div style="padding:8px 12px;font-size:11px;color:#666;font-weight:700">EXPLORE • TRENDING PHOTOS</div><div class="grid" id="grid"></div></div>
 <div id="toast" class="toast"></div>
-
 <div id="viewer" class="viewer" onclick="if(event.target.id=='viewer')this.style.display='none'">
 <img id="viewerImg" src="">
 <div id="viewerCredit" style="margin-top:12px;font-size:12px;color:#aaa"></div>
@@ -50,7 +50,6 @@ input{flex:1;background:#181818;border:1px solid #222;padding:10px 12px;border-r
 </div>
 <div style="margin-top:10px;font-size:12px;color:#777">Tap outside to close • Pixoro</div>
 </div>
-
 <div class="bottom-nav">
   <a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
   <a href="search.html" class="active"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
@@ -71,97 +70,21 @@ function showToast(m){let t=document.getElementById('toast');if(!t) return; t.in
 let supa = window.supa
 const UNSPLASH_KEY = "pm9Vjbdq6ec8oCyDFmVrm72uZks9RGA3Miy50caXF_c";
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
-let ME_RAW='', ME_ID='', profileMap={}, currentPhotoUrl='', isLiked=false, isSaved=false, allViews=[], allPosts=[]
-function getPfp(u){
-  let p = profileMap[cleanUser(u)]
-  if(p?.avatar_url) return p.avatar_url
-  let c = cleanUser(u)||'P'
-  return 'https://ui-avatars.com/api/?name='+c.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true'
-}
+let ME_RAW='', ME_ID='', profileMap={}, profileByIdMap={}, currentPhotoUrl='', isLiked=false, isSaved=false, allViews=[], allPosts=[]
+function getPfp(u){ let p = profileMap[cleanUser(u)]; if(p?.avatar_url) return p.avatar_url; let c = cleanUser(u)||'P'; return 'https://ui-avatars.com/api/?name='+c.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true' }
 function fmtViews(n){ return n>=1000 ? (n/1000).toFixed(1)+'K' : n }
-async function loadUnsplashPhotos(query){
-  try{
-    let res = await fetch('https://api.unsplash.com/search/photos?query='+encodeURIComponent(query||'nature')+'&per_page=30&client_id='+UNSPLASH_KEY);
-    let data = await res.json();
-    return data.results || [];
-  }catch(e){ return [] }
-}
-function openPhoto(url, credit){
-  currentPhotoUrl = url; isLiked=false; isSaved=false;
-  document.getElementById('viewerImg').src = url;
-  document.getElementById('viewerCredit').innerText = 'Photo by @' + credit + ' • Pixoro • Unsplash';
-  document.getElementById('likeBtn').innerHTML = '<div style="font-size:24px;line-height:1">🤍</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">LIKE</div>';
-  document.getElementById('saveBtn').innerHTML = '<div style="font-size:24px;line-height:1">🔖</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">SAVE</div>';
-  document.getElementById('viewer').style.display='flex';
-}
-function likePhoto(){
-  isLiked = !isLiked;
-  document.getElementById('likeBtn').innerHTML = isLiked ? '<div style="font-size:24px;line-height:1">❤️</div><div style="font-size:11px;font-weight:900;color:#ff0044;margin-top:4px">LIKED</div>' : '<div style="font-size:24px;line-height:1">🤍</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">LIKE</div>';
-  if(isLiked) showToast('Liked ❤️');
-}
+async function loadUnsplashPhotos(query){ try{ let res = await fetch('https://api.unsplash.com/search/photos?query='+encodeURIComponent(query||'nature')+'&per_page=30&client_id='+UNSPLASH_KEY); let data = await res.json(); return data.results || []; }catch(e){ return [] } }
+function openPhoto(url, credit){ currentPhotoUrl = url; isLiked=false; isSaved=false; document.getElementById('viewerImg').src = url; document.getElementById('viewerCredit').innerText = 'Photo by @' + credit + ' • Pixoro • Unsplash'; document.getElementById('likeBtn').innerHTML = '<div style="font-size:24px;line-height:1">🤍</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">LIKE</div>'; document.getElementById('saveBtn').innerHTML = '<div style="font-size:24px;line-height:1">🔖</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">SAVE</div>'; document.getElementById('viewer').style.display='flex'; }
+function likePhoto(){ isLiked = !isLiked; document.getElementById('likeBtn').innerHTML = isLiked ? '<div style="font-size:24px;line-height:1">❤️</div><div style="font-size:11px;font-weight:900;color:#ff0044;margin-top:4px">LIKED</div>' : '<div style="font-size:24px;line-height:1">🤍</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">LIKE</div>'; if(isLiked) showToast('Liked ❤️'); }
 function commentPhoto(){ let c = prompt('Comment type pannu da:'); if(c) showToast('Comment posted ❤️'); }
 function sharePhoto(){ if(navigator.share){ navigator.share({title:'Pixoro', text:'Check this photo on Pixoro', url: currentPhotoUrl}) } else { navigator.clipboard.writeText(currentPhotoUrl); showToast('Link copied! Share pannu da'); } }
-function savePhoto(){
-  isSaved = !isSaved;
-  document.getElementById('saveBtn').innerHTML = isSaved ? '<div style="font-size:24px;line-height:1">✅</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">SAVED</div>' : '<div style="font-size:24px;line-height:1">🔖</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">SAVE</div>';
-  showToast(isSaved ? 'Saved! ✅' : 'Unsaved');
-}
-async function showTrendingPhotos(){
-  document.getElementById('hint').style.display='none';
-  let grid = document.getElementById('grid'); let exp = document.getElementById('explore');
-  if(grid && grid.innerHTML.trim() !== ''){ if(exp) exp.style.display='block'; return; }
-  let photos = await loadUnsplashPhotos('trending love beautiful');
-  if(photos.length){ grid.innerHTML = photos.map(p=>`<img src="${p.urls.small}" onclick="openPhoto('${p.urls.regular}','${p.user.username}')" loading="lazy">`).join(''); if(exp) exp.style.display='block'; document.getElementById('results').innerHTML = `<div style="padding:8px 12px;font-size:11px;color:#666;font-weight:700">TRENDING • PIXORO - Search Pannu Photos Varum</div>`; }
-}
-async function init(){
-  if(!supa){ location.href='login.html'; return }
-  let { data:{session} } = await supa.auth.getSession()
-  if(!session){ location.href='login.html'; return }
-  ME_ID = session.user.id;
-  let { data: myProf } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
-  ME_RAW = cleanUser(myProf?.username || session.user.email.split('@')[0])
-  let { data: profs } = await supa.from('profiles').select('*')
-  ;(profs||[]).forEach(p=> profileMap[cleanUser(p.username)] = p)
-  let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW)
-  // PIXORO SECRET - Same Views Table
-  let {data: views} = await supa.from('views').select('*');
-  allViews = views || [];
-  loadExplore()
-}
+function savePhoto(){ isSaved = !isSaved; document.getElementById('saveBtn').innerHTML = isSaved ? '<div style="font-size:24px;line-height:1">✅</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">SAVED</div>' : '<div style="font-size:24px;line-height:1">🔖</div><div style="font-size:11px;font-weight:900;color:#000;margin-top:4px">SAVE</div>'; showToast(isSaved ? 'Saved! ✅' : 'Unsaved'); }
+async function showTrendingPhotos(){ document.getElementById('hint').style.display='none'; let grid = document.getElementById('grid'); let exp = document.getElementById('explore'); if(grid && grid.innerHTML.trim() !== ''){ if(exp) exp.style.display='block'; return; } let photos = await loadUnsplashPhotos('trending love beautiful'); if(photos.length){ grid.innerHTML = photos.map(p=>`<img src="${p.urls.small}" onclick="openPhoto('${p.urls.regular}','${p.user.username}')" loading="lazy">`).join(''); if(exp) exp.style.display='block'; document.getElementById('results').innerHTML = `<div style="padding:8px 12px;font-size:11px;color:#666;font-weight:700">TRENDING • PIXORO - Search Pannu Photos Varum</div>`; } }
+async function init(){ if(!supa){ location.href='login.html'; return } let { data:{session} } = await supa.auth.getSession(); if(!session){ location.href='login.html'; return } ME_ID = session.user.id; let { data: myProf } = await supa.from('profiles').select('*').eq('id', session.user.id).single(); ME_RAW = cleanUser(myProf?.username || session.user.email.split('@')[0]); let { data: profs } = await supa.from('profiles').select('*'); (profs||[]).forEach(p=>{ profileMap[cleanUser(p.username)] = p; profileByIdMap[p.id] = p; }); let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW); let {data: views} = await supa.from('views').select('*'); allViews = views || []; loadExplore(); }
 async function doSearch(){
- let q=document.getElementById('searchInput').value.trim()
- let hint=document.getElementById('hint'), exp=document.getElementById('explore')
- if(!q){ document.getElementById('results').innerHTML=''; hint.style.display='block'; exp.style.display='block'; return }
- hint.style.display='none'; exp.style.display='none'
- let {data:profs} = await supa.from('profiles').select('*').ilike('username','%'+cleanUser(q)+'%')
- let list = (profs||[]).filter(p=> cleanUser(p.username)!==ME_RAW)
- if(!list.length && q.length>=2){ list=[{username:q}] }
- let html = list.slice(0,20).map(p=>{
-   let u=cleanUser(p.username)
-   return `<div class="userRow"><div style="display:flex;align-items:center;gap:10px" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'"><img src="${getPfp(u)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover"><div><b>@${u} ${window.getTick?window.getTick(u):''}</b><div style="font-size:10px;color:#00ff66">🔒 Real private</div></div></div><div style="display:flex;gap:6px"><button class="viewBtn" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'">View</button><button class="msgBtn" onclick="goMsg('${u}')">Message</button></div></div>`
- }).join('')
- let photos = await loadUnsplashPhotos(q);
- if(photos.length){ html += `<div style="padding:12px;font-size:11px;color:#666;font-weight:700">PHOTOS • PIXORO</div><div class="grid">${photos.map(p=>`<img src="${p.urls.small}" onclick="openPhoto('${p.urls.regular}','${p.user.username}')" loading="lazy">`).join('')}</div>`; }
- document.getElementById('results').innerHTML=html||`<p style="padding:20px;color:#777">No users found</p>`
-}
+ let q=document.getElementById('searchInput').value.trim(); let hint=document.getElementById('hint'), exp=document.getElementById('explore'); if(!q){ document.getElementById('results').innerHTML=''; hint.style.display='block'; exp.style.display='block'; return } hint.style.display='none'; exp.style.display='none'; let {data:profs} = await supa.from('profiles').select('*').ilike('username','%'+cleanUser(q)+'%'); let list = (profs||[]).filter(p=> p.id!==ME_ID); if(!list.length && q.length>=2){ list=[{username:q, id:''}] } let html = list.slice(0,20).map(p=>{ let u=cleanUser(p.username); return `<div class="userRow"><div style="display:flex;align-items:center;gap:10px" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'"><img src="${getPfp(u)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover"><div><b>@${u} ${window.getTick?window.getTick(p):''}</b><div style="font-size:10px;color:#00ff66">🔒 Real private</div></div></div><div style="display:flex;gap:6px"><button class="viewBtn" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'">View</button><button class="msgBtn" onclick="goMsg('${u}')">Message</button></div></div>` }).join(''); let photos = await loadUnsplashPhotos(q); if(photos.length){ html += `<div style="padding:12px;font-size:11px;color:#666;font-weight:700">PHOTOS • PIXORO</div><div class="grid">${photos.map(p=>`<img src="${p.urls.small}" onclick="openPhoto('${p.urls.regular}','${p.user.username}')" loading="lazy">`).join('')}</div>`; } document.getElementById('results').innerHTML=html||`<p style="padding:20px;color:#777">No users found</p>`; }
 function goMsg(u){ location.href='chat.html?user='+encodeURIComponent(u) }
 async function loadExplore(){
- let {data} = await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(30)
- allPosts = data || [];
- if(data && data.length){
-   let uniq=[...new Set(data.map(d=>cleanUser(d.username)))].filter(u=>u!==ME_RAW).slice(0,15)
-   if(uniq.length){
-     document.getElementById('hint').style.display='none'
-     let html='<div style="padding:8px 12px;font-size:11px;color:#666;font-weight:700">SUGGESTED - REAL PEOPLE</div>'
-     uniq.forEach(u=>{ html+=`<div class="userRow"><div style="display:flex;align-items:center;gap:10px" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'"><img src="${getPfp(u)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover"><div><b>@${u} ${window.getTick?window.getTick(u):''}</b><div style="font-size:10px;color:#888">Tap message to start</div></div></div><div style="display:flex;gap:6px"><button class="viewBtn" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'">View</button><button class="msgBtn" onclick="goMsg('${u}')">Message</button></div></div>` })
-     document.getElementById('results').innerHTML=html
-   }
-   document.getElementById('grid').innerHTML=data.map(p=>{ let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length; return `<div style="position:relative"><img src="${p.media_url||p.image_url}" onclick="location.href='reels.html?id=${p.id}'" loading="lazy"><span style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.7);padding:3px 7px;border-radius:10px;font-size:11px">👁️ ${fmtViews(vCount)}</span></div>` }).join('')
- } else {
-   let photos = await loadUnsplashPhotos('beautiful nature love');
-   document.getElementById('hint').style.display='none';
-   document.getElementById('grid').innerHTML = photos.map(p=>`<img src="${p.urls.small}" onclick="openPhoto('${p.urls.regular}','${p.user.username}')" loading="lazy">`).join('');
- }
-}
+ let {data} = await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(30); allPosts = data || []; if(data && data.length){ let uniqIds=[...new Set(data.map(d=>d.user_id))].filter(id=>id!==ME_ID).slice(0,15); if(uniqIds.length){ document.getElementById('hint').style.display='none'; let html='<div style="padding:8px 12px;font-size:11px;color:#666;font-weight:700">SUGGESTED - REAL PEOPLE</div>'; uniqIds.forEach(uid=>{ let p = profileByIdMap[uid] || data.find(d=>d.user_id===uid); let u = cleanUser(p?.username||''); if(!u) return; html+=`<div class="userRow"><div style="display:flex;align-items:center;gap:10px" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'"><img src="${getPfp(u)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover"><div><b>@${u} ${window.getTick?window.getTick(p):''}</b><div style="font-size:10px;color:#888">Tap message to start</div></div></div><div style="display:flex;gap:6px"><button class="viewBtn" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'">View</button><button class="msgBtn" onclick="goMsg('${u}')">Message</button></div></div>` }); document.getElementById('results').innerHTML=html; } document.getElementById('grid').innerHTML=data.map(p=>{ let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length; return `<div style="position:relative"><img src="${p.media_url||p.image_url}" onclick="location.href='reels.html?id=${p.id}'" loading="lazy"><span style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.7);padding:3px 7px;border-radius:10px;font-size:11px">👁️ ${fmtViews(vCount)}</span></div>` }).join(''); } else { let photos = await loadUnsplashPhotos('beautiful nature love'); document.getElementById('hint').style.display='none'; document.getElementById('grid').innerHTML = photos.map(p=>`<img src="${p.urls.small}" onclick="openPhoto('${p.urls.regular}','${p.user.username}')" loading="lazy">`).join(''); } }
 init()
 </script></body></html>
