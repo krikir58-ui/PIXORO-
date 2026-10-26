@@ -48,16 +48,13 @@ input[type=range]{width:100%;accent-color:#fff}
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 function getSupa(){ return window.supa || window.supabase; }
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||''; }
-// --- GOLD TICK - USER ID ONLY - Username mathuna kuda pogathu ---
-// Supabase Auth la Un ID copy panni inga podu da
-const GIRI_UID = 'PASTE_YOUR_SUPABASE_USER_ID_HERE';
+// --- GOLD TICK - USER ID ONLY ---
+const GIRI_UID = '47f16fa1-fe14-4161-8729-82e28c77286a';
 let ME_RAW='', ME_ID='', VIEW_USER='', VIEW_PROFILE=null, myPosts=[], allViews=[], allFollows=[], currentTab='all'
 function isReelPost(p){ let u=(p.media_url||p.video_url||'').toLowerCase(); return p.media_type=='reel'||p.media_type=='video'||!!p.video_url||u.includes('.mp4') }
 function getTick(u, profile){
   if(!profile) return '';
-  // ID match aana mattum - Username paakave maatom
   if(String(profile.id)===String(GIRI_UID)) return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
-  // Vera yaarukku is_gold=true iruntha mattum - illa na illa
   if(profile.is_gold===true && profile.verified===true) return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
   return '';
 }
@@ -118,7 +115,6 @@ async function init(){
   allViews = views || [];
   let totalPosts = myPosts.length;
   let totalReels = myPosts.filter(isReelPost).length;
-  let totalPhotos = totalPosts - totalReels;
   document.getElementById('postCount').textContent = totalPosts
   document.getElementById('tabPosts').innerHTML = `⊞ Posts (${totalPosts})`
   document.getElementById('tabReels').innerHTML = `🎬 Reels (${totalReels})`
