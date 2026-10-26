@@ -48,10 +48,17 @@ input[type=range]{width:100%;accent-color:#fff}
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 function getSupa(){ return window.supa || window.supabase; }
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||''; }
+// --- GOLD TICK - USER ID ONLY - Username mathuna kuda pogathu ---
+// Supabase Auth la Un ID copy panni inga podu da
+const GIRI_UID = 'PASTE_YOUR_SUPABASE_USER_ID_HERE';
 let ME_RAW='', ME_ID='', VIEW_USER='', VIEW_PROFILE=null, myPosts=[], allViews=[], allFollows=[], currentTab='all'
+function isReelPost(p){ let u=(p.media_url||p.video_url||'').toLowerCase(); return p.media_type=='reel'||p.media_type=='video'||!!p.video_url||u.includes('.mp4') }
 function getTick(u, profile){
-  let c = cleanUser(u);
-  if(c==='giri_office' || profile?.verified===true || profile?.is_gold===true) return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+  if(!profile) return '';
+  // ID match aana mattum - Username paakave maatom
+  if(String(profile.id)===String(GIRI_UID)) return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+  // Vera yaarukku is_gold=true iruntha mattum - illa na illa
+  if(profile.is_gold===true && profile.verified===true) return '<span class="pixoro-verified"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6.5" stroke="black" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
   return '';
 }
 function getPfpFrom(p){ return p?.avatar_url || p?.profile_pic || p?.photo_url || 'https://ui-avatars.com/api/?name='+(cleanUser(p?.username||'G').charAt(0).toUpperCase())+'&background=333&color=fff&size=200&bold=true' }
@@ -109,7 +116,12 @@ async function init(){
   myPosts = posts2.filter(p=>!p.is_archived)
   let {data: views} = await supa.from('views').select('*');
   allViews = views || [];
-  document.getElementById('postCount').textContent = myPosts.length
+  let totalPosts = myPosts.length;
+  let totalReels = myPosts.filter(isReelPost).length;
+  let totalPhotos = totalPosts - totalReels;
+  document.getElementById('postCount').textContent = totalPosts
+  document.getElementById('tabPosts').innerHTML = `⊞ Posts (${totalPosts})`
+  document.getElementById('tabReels').innerHTML = `🎬 Reels (${totalReels})`
   renderGrid(myPosts)
   document.getElementById('followerCount').textContent = allFollows.filter(f=>cleanUser(f.following)===VIEW_USER).length
   document.getElementById('followingCount').textContent = allFollows.filter(f=>cleanUser(f.follower)===VIEW_USER).length
@@ -120,8 +132,8 @@ async function toggleFollowMain(){
   else { allFollows.push({follower:ME_RAW,following:VIEW_USER}); btn.innerText='Following'; await supa.from('follows').insert({follower:ME_RAW,following:VIEW_USER}); }
   document.getElementById('followerCount').textContent = allFollows.filter(f=>cleanUser(f.following)===VIEW_USER).length
 }
-function renderGrid(list){ if(!list.length){ document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`; return; } document.getElementById('myGrid').innerHTML=list.map(p=>{ let mUrl=p.media_url||p.video_url||p.image_url||p.image||''; let isVid=p.media_type=='reel'||p.media_type=='video'||!!p.video_url||mUrl.includes('.mp4'); let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length; let vBadge = (currentTab==='reels' && isVid) ? `<span style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.7);padding:3px 7px;border-radius:10px;font-size:11px">👁️ ${fmtViews(vCount)}</span>` : ''; if(isVid) return `<div style="position:relative" onclick="location.href='reels.html?id=${p.id}'"><video src="${mUrl}" muted playsinline style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px">🎬</span>${vBadge}</div>`; return `<div style="position:relative" onclick="location.href='index.html'"><img src="${mUrl}"></div>`; }).join('') }
-function showTab(type){ currentTab=type; document.getElementById('tabPosts').classList.toggle('active', type=='all'); document.getElementById('tabReels').classList.toggle('active', type=='reels'); let list=myPosts; if(type=='reels'){ list=myPosts.filter(p=>{ let u=(p.media_url||p.video_url||'').toLowerCase(); return p.media_type=='reel'||p.media_type=='video'||!!p.video_url||u.includes('.mp4') }); } renderGrid(list); }
+function renderGrid(list){ if(!list.length){ document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`; return; } document.getElementById('myGrid').innerHTML=list.map(p=>{ let mUrl=p.media_url||p.video_url||p.image_url||p.image||''; let isVid=isReelPost(p); let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length; let vBadge = (currentTab==='reels' && isVid) ? `<span style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.7);padding:3px 7px;border-radius:10px;font-size:11px">👁️ ${fmtViews(vCount)}</span>` : ''; if(isVid) return `<div style="position:relative" onclick="location.href='reels.html?id=${p.id}'"><video src="${mUrl}" muted playsinline style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px">🎬</span>${vBadge}</div>`; return `<div style="position:relative" onclick="location.href='index.html'"><img src="${mUrl}"></div>`; }).join('') }
+function showTab(type){ currentTab=type; document.getElementById('tabPosts').classList.toggle('active', type=='all'); document.getElementById('tabReels').classList.toggle('active', type=='reels'); let list=myPosts; if(type=='reels'){ list=myPosts.filter(isReelPost); } renderGrid(list); }
 function openSettings(){ document.getElementById('setSheet').style.display='flex' }
 function openEditSheet(){ if(VIEW_USER!==ME_RAW) return showToast('Others Profile Edit Panna Mudiyathu da'); document.getElementById('editName').value=VIEW_PROFILE.full_name||VIEW_PROFILE.display_name||''; document.getElementById('editUsername').value=VIEW_USER; document.getElementById('editBio').value=VIEW_PROFILE.bio||''; document.getElementById('editLink').value=VIEW_PROFILE.link||VIEW_PROFILE.website||''; document.getElementById('editSheet').style.display='flex' }
 async function doPixoroLogout(){ let supa=getSupa(); await supa.auth.signOut(); location.href='login.html'; }
