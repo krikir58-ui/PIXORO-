@@ -1,7 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Profile - Pixoro</title>
 <link rel="stylesheet" href="css/pixoro-verified.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js"></script>
 <script src="js/pixoro-core.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
@@ -47,13 +46,10 @@ input[type=range]{width:100%;accent-color:#fff}
 <div id="toast" class="toast"></div>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
-function getSupa(){ return window.supa || window.supabase; }
+function getSupa(){ return window.supa; }
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase(); return u||''; }
-// --- GOLD TICK - USER ID ONLY - CORE USE PANNROM ---
-const GIRI_UID = '47f16fa1-fe14-4161-8729-82e28c77286a';
 let ME_RAW='', ME_ID='', VIEW_USER='', VIEW_PROFILE=null, myPosts=[], allViews=[], allFollows=[], currentTab='all'
 function isReelPost(p){ let u=(p.media_url||p.video_url||'').toLowerCase(); return p.media_type=='reel'||p.media_type=='video'||!!p.video_url||u.includes('.mp4') }
-// Old custom getTick deleted - pixoro-core.js la ID Only getTick use aagum - Same for all pages
 function getPfpFrom(p){ return p?.avatar_url || p?.profile_pic || p?.photo_url || 'https://ui-avatars.com/api/?name='+(cleanUser(p?.username||'G').charAt(0).toUpperCase())+'&background=333&color=fff&size=200&bold=true' }
 function fmtViews(n){ return n>=1000 ? (n/1000).toFixed(1)+'K' : n }
 async function init(){
@@ -158,7 +154,6 @@ async function saveEdit(){
   if(l){
     try{ await supa.from('profiles').update({ link: l }).eq('id', ME_ID); }catch(e){}
     try{ await supa.from('profiles').update({ website: l }).eq('id', ME_ID); }catch(e){}
-    try{ localStorage.setItem('pixoro_link_'+ME_ID, l); }catch(e){}
   }
   if(u!==oldU){
     await supa.from('posts').update({username: u}).eq('username', oldU)
