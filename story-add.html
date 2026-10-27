@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Story Editor</title>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Story Editor - PIXORO</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
@@ -7,23 +7,25 @@ body{max-width:100% !important;margin:0}
 .page{position:fixed;inset:0;width:100%;height:100dvh;background:#000;z-index:9999;isolation:isolate}
 .photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .top{position:absolute;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:16px 14px;background:linear-gradient(to bottom,rgba(0,0,0,.65),transparent)}
-.top span{font-size:24px;cursor:pointer}.top b{font-size:17px}
-.side{position:absolute;right:10px;top:75px;bottom:130px;width:60px;z-index:20;background:rgba(20,20,20,.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.3);border-radius:30px;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:14px;overflow-y:auto;scrollbar-width:none}
+.top span{font-size:24px;cursor:pointer}.top b{font-size:17px;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900}
+.side{position:absolute;right:10px;top:75px;bottom:130px;width:62px;z-index:20;background:rgba(20,20,20,.55);backdrop-filter:blur(16px);border:1px solid #ff5ea866;border-radius:30px;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:14px;overflow-y:auto;scrollbar-width:none}
 .side::-webkit-scrollbar{display:none}
 .side div{font-size:21px;cursor:pointer;text-align:center;line-height:1}
 .side span{font-size:9px;display:block;color:#eee;margin-top:3px}
 .bottom{position:absolute;bottom:0;left:0;right:0;z-index:20;padding:12px 14px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,rgba(0,0,0,.75),transparent)}
-.cap{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.35);border-radius:12px;color:#fff;padding:11px;margin-bottom:10px;outline:none}
+.cap{width:100%;background:rgba(0,0,0,.5);border:1px solid #ff5ea8;border-radius:12px;color:#fff;padding:11px;margin-bottom:10px;outline:none}
 .actions{display:flex;gap:8px}
-.pill{flex:1;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.45);color:#fff;padding:13px;border-radius:999px;font-weight:700;font-size:13px}
-.pill.green{color:#4ade80}
-.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:99999;display:none;white-space:nowrap}
-.textOverlay{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);z-index:25;font-size:28px;font-weight:900;text-shadow:2px 2px 0 #000;text-align:center;max-width:90%}
+.pill{flex:1;background:linear-gradient(90deg,#ff5ea8,#a259ff);border:none;color:#fff;padding:13px;border-radius:999px;font-weight:700;font-size:13px}
+.pill.green{background:linear-gradient(90deg,#00ff66,#00d4ff);color:#000}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:99999;display:none;white-space:nowrap}
+.textOverlay{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);z-index:25;font-size:28px;font-weight:900;text-shadow:2px 2px 0 #000;text-align:center;max-width:90%;background:linear-gradient(90deg,#ff5ea8,#ff7a00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.heartBtn{position:absolute;bottom:130px;right:16px;z-index:30;width:46px;height:46px;background:rgba(0,0,0,.5);border:1.5px solid #fff;border-radius:50%;display:grid;place-items:center;font-size:26px;cursor:pointer}
+.heartBtn.liked{background:linear-gradient(135deg,#ff1493,#ff7a00);border-color:#ff1493}
 </style></head><body>
 <div class="page">
 <img class="photo" id="eImg" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1080">
 <div id="textOverlay" class="textOverlay"></div>
-<div class="top"><span onclick="location.href='index.html'">✕</span><b>Story</b><span>⋯</span></div>
+<div class="top"><span onclick="location.href='index.html'">✕</span><b>PIXORO Story</b><span>⋯</span></div>
 <div class="side">
 <div onclick="addText()">Aa<span>Text</span></div>
 <div onclick="showToast('Sticker - Adutha update la da')">😊<span>Sticker</span></div>
@@ -37,6 +39,7 @@ body{max-width:100% !important;margin:0}
 <div onclick="showToast('Privacy - Everyone da')">🔒<span>Privacy</span></div>
 <div onclick="showToast('Quality - HD da 🔥')">⚙️<span>Quality</span></div>
 </div>
+<div class="heartBtn" id="heartBtn" onclick="likeStory()">♡</div>
 <div class="bottom">
 <input class="cap" id="cap" placeholder="Add a caption...">
 <div class="actions"><button class="pill" onclick="postStory('public')">⊕ Your story</button><button class="pill green" onclick="postStory('close_friends')">★ Close Friends</button></div>
@@ -66,6 +69,7 @@ async function init(){
   }
 }
 init()
+function likeStory(){let b=document.getElementById('heartBtn');b.classList.toggle('liked');b.innerText=b.classList.contains('liked')?'♥':'♡';if(navigator.vibrate)navigator.vibrate(50);showToast(b.classList.contains('liked')?'Liked da ❤️ Mass da':'Unliked da')}
 function addText(){
   let capEl=document.getElementById('cap');
   capEl.focus();
