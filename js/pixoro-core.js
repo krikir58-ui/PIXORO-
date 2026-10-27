@@ -16,3 +16,11 @@ function goldTickHTML(p){ return isGoldUser(p) ? '<span class="pixoro-verified">
 window.isGoldUser = isGoldUser;
 window.goldTickHTML = goldTickHTML;
 window.getTick = goldTickHTML;
+
+// ✅ FIX - Ella Page layum Auto Tick - Profile la Irukka ID ah Direct ah Eduthukkum da
+function autoGoldTick(){
+  document.querySelectorAll('[data-uid="47f16fa1-fe14-4161-8729-82e28c77286a"]').forEach(el=>{
+    if(!el.querySelector('.pixoro-verified')) el.insertAdjacentHTML('beforeend', goldTickHTML({id:GIRI_UID}));
+  });
+}
+setInterval(autoGoldTick, 800);
