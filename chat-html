@@ -23,7 +23,7 @@
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:1000;display:none}
 </style></head><body>
 <div class="pinLock" id="pinLock"><div style="font-size:50px">🔒</div><b>Pixoro Secret Chat</b><p style="color:#888;font-size:13px">PIN Potta Thaan Open Aagum da</p><input id="pinInput" type="password" maxlength="4" placeholder="••••" inputmode="numeric"><button onclick="unlockChat()" style="background:#fff;color:#000;padding:12px 40px;border-radius:25px;font-weight:900;border:0">UNLOCK 🔓</button><p onclick="localStorage.removeItem('pixoro_pin');location.reload()" style="color:#666;font-size:12px;cursor:pointer">Forgot PIN? Reset</p></div>
-<div class="top"><span onclick="location.href='dm.html'" style="font-size:24px;cursor:pointer">←</span><img id="pfp" src=""><div style="flex:1"><b id="uname">...</b><br><small>● Private • E2E Safe • Only You Two</small></div><span style="background:#00ff88;color:#000;font-size:9px;padding:3px 7px;border-radius:20px;font-weight:900">E2E 🔒</span><span onclick="lockNow()" style="font-size:18px;cursor:pointer">🔒</span></div>
+<div class="top"><span onclick="location.href='dm.html'" style="font-size:24px;cursor:pointer">←</span><img id="pfp" src=""><div style="flex:1"><b id="uname">...</b><br><small>● Private • E2E Safe • Only You Two • Real Friend</small></div><span style="background:#00ff88;color:#000;font-size:9px;padding:3px 7px;border-radius:20px;font-weight:900">E2E 🔒</span><span onclick="lockNow()" style="font-size:18px;cursor:pointer">🔒</span></div>
 <div class="bar"><span id="vanishBtn" onclick="toggleVanish()">👻 Vanish OFF</span><span onclick="setPin()">🔐 Set PIN Lock</span><span onclick="clearChat()">🗑️ Clear For Me</span><span onclick="showToast('Screenshot Protection ON da 📸')">📸 No Screenshot</span></div>
 <div class="box" id="box"></div>
 <div class="input"><input id="inp" placeholder="Secret Message... 🔒" onkeydown="if(event.key==='Enter')send()"><span onclick="send()" class="sendBtn">➤</span></div>
@@ -46,13 +46,21 @@ async function init(){
   ME_ID = session.user.id
   let { data: myProf } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
   ME = cleanUser(myProf?.username || session.user.email.split('@')[0])
+  if(OTHER===ME){ showToast('Unakku nee chat panna mudiyathu da 😅'); setTimeout(()=>location.href='dm.html',800); return }
   let { data: otherProf } = await supa.from('profiles').select('*').eq('username', OTHER).maybeSingle()
   if(!otherProf){ let {data:all}=await supa.from('profiles').select('*'); otherProf=(all||[]).find(p=>cleanUser(p.username)===OTHER) }
-  if(otherProf) OTHER_ID = otherProf.id
-  document.getElementById('uname').innerText = '@'+OTHER
-  document.getElementById('pfp').src = otherProf?.avatar_url || 'https://ui-avatars.com/api/?name='+OTHER.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true'
+  // ✅ REAL FRIEND ONLY CHECK - Fake ID na DM ku thiruppi anuppidum da
+  if(!otherProf){
+    showToast('Real user illa da ❌ - Fake ID Blocked')
+    setTimeout(()=>location.href='dm.html',1000)
+    return
+  }
+  OTHER_ID = otherProf.id
+  document.getElementById('uname').innerText = '@'+cleanUser(otherProf.username)
+  document.getElementById('pfp').src = otherProf.avatar_url || 'https://ui-avatars.com/api/?name='+OTHER.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true'
   if(localStorage.getItem('pixoro_pin')) document.getElementById('pinLock').style.display='flex'
-  chatId=[ME,OTHER].sort().join('_')
+  chatId=[ME,cleanUser(otherProf.username)].sort().join('_')
+  OTHER = cleanUser(otherProf.username)
   try{ supa.channel('chat-'+chatId).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`chat_id=eq.${chatId}`},load).subscribe() }catch(e){}
   load()
 }
@@ -63,14 +71,15 @@ async function load(){
     if(d2 && d2.length) data = d2
   }
   let b=document.getElementById('box')
-  if(!data||!data.length){ b.innerHTML=`<div style="text-align:center;color:#666;margin-top:80px"><div style="font-size:40px">🔒</div><b>Secret Chat da</b><p style="font-size:12px;margin-top:8px">Say hi to @${OTHER} 👋<br>Only you two can read this • E2E Safe</p></div>`; return }
+  if(!data||!data.length){ b.innerHTML=`<div style="text-align:center;color:#666;margin-top:80px"><div style="font-size:40px">🔒</div><b>Secret Chat da</b><p style="font-size:12px;margin-top:8px">Say hi to @${OTHER} 👋<br>Only you two can read this • E2E Safe • Real Friend</p></div>`; return }
   b.innerHTML=data.map(m=>{ let isMe = m.sender===ME || m.sender_id===ME_ID; let txt = m.text||m.message||''; return `<div class="${isMe?'me':'other'} bub">${txt}<div class="time">${new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} ${isMe?'✓✓':''}</div></div>` }).join('')
   b.scrollTop=b.scrollHeight
 }
 async function send(){
   let i=document.getElementById('inp'); let t=i.value.trim(); if(!t) return; i.value=''
+  if(!OTHER_ID){ showToast('Real user illa da ❌'); return }
   document.getElementById('box').innerHTML+=`<div class="me bub">${t}<div class="time">now ✓</div></div>`; document.getElementById('box').scrollTop=document.getElementById('box').scrollHeight
-  let {error} = await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:t,message:t,sender_id:ME_ID,receiver_id:OTHER_ID||null})
+  let {error} = await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:t,message:t,sender_id:ME_ID,receiver_id:OTHER_ID})
   if(error){
     let {error:e2} = await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:t})
     if(e2) { showToast('Retry da - '+e2.message); i.value=t; return }
