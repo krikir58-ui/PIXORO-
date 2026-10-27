@@ -2,34 +2,37 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;display:flex;flex-direction:column}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;display:flex;flex-direction:column;background:radial-gradient(circle at 20% 10%,#ff4ecd33,transparent 50%),radial-gradient(circle at 80% 70%,#ff7a0033,transparent 50%),#000}
 .top{padding:12px 14px;display:flex;gap:10px;align-items:center;border-bottom:1px solid #262626;background:#000;position:sticky;top:0;z-index:50}
-.top img{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #fff}
+.top img{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #ff5ea8}
 .top b{font-size:15px;display:flex;align-items:center;gap:4px}
 .top small{font-size:11px;color:#00ff88}
+.pixoro-logo{font-size:18px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .box{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;padding-bottom:20px}
 .bub{max-width:78%;padding:10px 14px;border-radius:22px;font-size:14px;line-height:1.4;word-break:break-word}
-.me{align-self:flex-end;background:#fff;color:#000;border-bottom-right-radius:4px}
-.other{align-self:flex-start;background:#262626;color:#fff;border-bottom-left-radius:4px}
-.time{font-size:9px;opacity:.6;margin-top:3px;text-align:right}
+.me{align-self:flex-end;background:linear-gradient(135deg,#8b00ff,#ff1493,#ff7a00);color:#fff;border-bottom-right-radius:4px;box-shadow:0 0 15px #ff149355}
+.other{align-self:flex-start;background:#262626;color:#fff;border-bottom-left-radius:4px;border:1px solid #a259ff}
+.bub img{width:100%;border-radius:14px;margin:6px 0;display:block}
+.time{font-size:9px;opacity:.7;margin-top:3px;text-align:right}
 .input{display:flex;gap:8px;padding:12px;background:#000;border-top:1px solid #262626;position:sticky;bottom:0;align-items:center;padding-bottom:16px}
-.input input{flex:1;background:#262626;border:none;padding:12px 16px;border-radius:24px;color:#fff;outline:none;font-size:14px}
-.sendBtn{background:#fff;color:#000;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:900;flex-shrink:0}
+.input input{flex:1;background:#262626;border:none;padding:12px 16px;border-radius:24px;color:#fff;outline:none;font-size:14px;border:1px solid #a259ff}
+.sendBtn{background:linear-gradient(135deg,#ff5ea8,#ff7a00);color:#fff;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:900;flex-shrink:0}
 .bar{display:flex;gap:8px;padding:8px 12px;background:#0a0a0a;border-bottom:1px solid #1a1a1a;font-size:11px;overflow-x:auto;white-space:nowrap}
 .bar span{background:#111;border:1px solid #333;padding:6px 10px;border-radius:20px;cursor:pointer}
-.bar span.on{background:#fff;color:#000;font-weight:900}
+.bar span.on{background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;font-weight:900}
 .pinLock{position:fixed;inset:0;background:#000;z-index:999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px}
-.pinLock input{background:#111;border:1px solid #333;padding:14px;border-radius:12px;color:#fff;text-align:center;font-size:22px;letter-spacing:8px;width:180px;outline:none}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:1000;display:none}
+.pinLock input{background:#111;border:1px solid #a259ff;padding:14px;border-radius:12px;color:#fff;text-align:center;font-size:22px;letter-spacing:8px;width:180px;outline:none}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:1000;display:none}
 </style></head><body>
-<div class="pinLock" id="pinLock"><div style="font-size:50px">🔒</div><b>Pixoro Secret Chat</b><p style="color:#888;font-size:13px">PIN Potta Thaan Open Aagum da</p><input id="pinInput" type="password" maxlength="4" placeholder="••••" inputmode="numeric"><button onclick="unlockChat()" style="background:#fff;color:#000;padding:12px 40px;border-radius:25px;font-weight:900;border:0">UNLOCK 🔓</button><p onclick="localStorage.removeItem('pixoro_pin');location.reload()" style="color:#666;font-size:12px;cursor:pointer">Forgot PIN? Reset</p></div>
-<div class="top"><span onclick="location.href='dm.html'" style="font-size:24px;cursor:pointer">←</span><img id="pfp" src=""><div style="flex:1"><b id="uname">...</b><br><small>● Private • E2E Safe • Only You Two • Real Friend</small></div><span style="background:#00ff88;color:#000;font-size:9px;padding:3px 7px;border-radius:20px;font-weight:900">E2E 🔒</span><span onclick="lockNow()" style="font-size:18px;cursor:pointer">🔒</span></div>
+<div class="pinLock" id="pinLock"><div style="font-size:50px">🔒</div><b class="pixoro-logo">PIXORO SECRET</b><p style="color:#888;font-size:13px">PIN Potta Thaan Open Aagum da</p><input id="pinInput" type="password" maxlength="4" placeholder="••••" inputmode="numeric"><button onclick="unlockChat()" style="background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;padding:12px 40px;border-radius:25px;font-weight:900;border:0">UNLOCK 🔓</button><p onclick="localStorage.removeItem('pixoro_pin');location.reload()" style="color:#666;font-size:12px;cursor:pointer">Forgot PIN? Reset</p></div>
+<div class="top"><span onclick="location.href='dm.html'" style="font-size:24px;cursor:pointer">←</span><img id="pfp" src=""><div style="flex:1"><b id="uname">...</b><br><small>● Private • E2E Safe • Only You Two • Real Friend</small></div><span class="pixoro-logo">PIXORO</span><span style="background:#00ff88;color:#000;font-size:9px;padding:3px 7px;border-radius:20px;font-weight:900">E2E 🔒</span><span onclick="lockNow()" style="font-size:18px;cursor:pointer">🔒</span></div>
 <div class="bar"><span id="vanishBtn" onclick="toggleVanish()">👻 Vanish OFF</span><span onclick="setPin()">🔐 Set PIN Lock</span><span onclick="clearChat()">🗑️ Clear For Me</span><span onclick="showToast('Screenshot Protection ON da 📸')">📸 No Screenshot</span></div>
 <div class="box" id="box"></div>
-<div class="input"><input id="inp" placeholder="Secret Message... 🔒" onkeydown="if(event.key==='Enter')send()"><span onclick="send()" class="sendBtn">➤</span></div>
+<div class="input"><span onclick="document.getElementById('fileUp').click()" style="font-size:22px;cursor:pointer">📸</span><input id="inp" placeholder="Secret Message... 🔒" onkeydown="if(event.key==='Enter')send()"><input type="file" id="fileUp" hidden accept="image/*" onchange="sendPhoto(this)"><span onclick="send()" class="sendBtn">➤</span></div>
 <div id="toast" class="toast"></div>
 <script>
-function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
+function showToast(m){let t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 window.getTick = () => '';
 let supa = window.supa
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
@@ -49,15 +52,10 @@ async function init(){
   if(OTHER===ME){ showToast('Unakku nee chat panna mudiyathu da 😅'); setTimeout(()=>location.href='dm.html',800); return }
   let { data: otherProf } = await supa.from('profiles').select('*').eq('username', OTHER).maybeSingle()
   if(!otherProf){ let {data:all}=await supa.from('profiles').select('*'); otherProf=(all||[]).find(p=>cleanUser(p.username)===OTHER) }
-  // ✅ REAL FRIEND ONLY CHECK - Fake ID na DM ku thiruppi anuppidum da
-  if(!otherProf){
-    showToast('Real user illa da ❌ - Fake ID Blocked')
-    setTimeout(()=>location.href='dm.html',1000)
-    return
-  }
+  if(!otherProf){ showToast('Real user illa da ❌ - Fake ID Blocked'); setTimeout(()=>location.href='dm.html',1000); return }
   OTHER_ID = otherProf.id
   document.getElementById('uname').innerText = '@'+cleanUser(otherProf.username)
-  document.getElementById('pfp').src = otherProf.avatar_url || 'https://ui-avatars.com/api/?name='+OTHER.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true'
+  document.getElementById('pfp').src = otherProf.avatar_url || 'https://ui-avatars.com/api/?name='+OTHER.charAt(0).toUpperCase()+'&background=ff1493&color=fff&size=200&bold=true'
   if(localStorage.getItem('pixoro_pin')) document.getElementById('pinLock').style.display='flex'
   chatId=[ME,cleanUser(otherProf.username)].sort().join('_')
   OTHER = cleanUser(otherProf.username)
@@ -72,7 +70,7 @@ async function load(){
   }
   let b=document.getElementById('box')
   if(!data||!data.length){ b.innerHTML=`<div style="text-align:center;color:#666;margin-top:80px"><div style="font-size:40px">🔒</div><b>Secret Chat da</b><p style="font-size:12px;margin-top:8px">Say hi to @${OTHER} 👋<br>Only you two can read this • E2E Safe • Real Friend</p></div>`; return }
-  b.innerHTML=data.map(m=>{ let isMe = m.sender===ME || m.sender_id===ME_ID; let txt = m.text||m.message||''; return `<div class="${isMe?'me':'other'} bub">${txt}<div class="time">${new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} ${isMe?'✓✓':''}</div></div>` }).join('')
+  b.innerHTML=data.map(m=>{ let isMe = m.sender===ME || m.sender_id===ME_ID; let txt = m.text||m.message||''; let imgTag = m.image_url ? `<img src="${m.image_url}">` : (txt.startsWith('data:image')||txt.startsWith('http')&&txt.includes('.jpg')?`<img src="${txt}">`:''); return `<div class="${isMe?'me':'other'} bub">${imgTag}${imgTag?'':txt}<div class="time">${new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} ${isMe?'✓✓':''}</div></div>` }).join('')
   b.scrollTop=b.scrollHeight
 }
 async function send(){
@@ -80,12 +78,23 @@ async function send(){
   if(!OTHER_ID){ showToast('Real user illa da ❌'); return }
   document.getElementById('box').innerHTML+=`<div class="me bub">${t}<div class="time">now ✓</div></div>`; document.getElementById('box').scrollTop=document.getElementById('box').scrollHeight
   let {error} = await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:t,message:t,sender_id:ME_ID,receiver_id:OTHER_ID})
-  if(error){
-    let {error:e2} = await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:t})
-    if(e2) { showToast('Retry da - '+e2.message); i.value=t; return }
-  }
+  if(error){ let {error:e2} = await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:t}); if(e2) { showToast('Retry da - '+e2.message); i.value=t; return } }
   if(vanish) setTimeout(async()=>{ await supa.from('messages').delete().eq('chat_id',chatId).eq('sender',ME); load() },8000)
   load()
+}
+async function sendPhoto(input){
+  if(!input.files[0]) return;
+  let file=input.files[0];
+  let reader=new FileReader();
+  reader.onload=async function(e){
+    let url=e.target.result;
+    document.getElementById('box').innerHTML+=`<div class="me bub"><img src="${url}"><div class="time">now ✓</div></div>`;
+    document.getElementById('box').scrollTop=document.getElementById('box').scrollHeight;
+    await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:url,message:'📷 Photo',sender_id:ME_ID,receiver_id:OTHER_ID});
+    showToast('Photo Sent da Mass 🔥');
+    load();
+  }
+  reader.readAsDataURL(file);
 }
 function toggleVanish(){ vanish=!vanish; let b=document.getElementById('vanishBtn'); b.innerText=vanish?'👻 Vanish ON':'👻 Vanish OFF'; b.classList.toggle('on',vanish); showToast(vanish?'Vanish ON da - 8s la Marayum 👻':'Vanish OFF da') }
 async function clearChat(){ if(!confirm('Clear pannava da? Unakku mattum delete aagum da'))return; await supa.from('messages').delete().eq('chat_id',chatId).eq('sender',ME); load(); showToast('Cleared da 🔒') }
