@@ -1,21 +1,21 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto}
-.top{padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #FFD700}.top b{color:#FFD700}
-.prev{margin:12px;height:400px;background:#111;border:2px dashed #FFD700;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden}.prev img,.prev video{width:100%;height:100%;object-fit:cover}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}.cell{aspect-ratio:1;background:#111;display:flex;align-items:center;justify-content:center;color:#888;cursor:pointer}
-.btn{margin:12px;background:#FFD700;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900;color:#000}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
-.progress{margin:0 12px;background:#111;border:1px solid #222;border-radius:12px;padding:10px;display:none}
+*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;background:radial-gradient(circle at 20% 0%,#ff149333,transparent 50%),radial-gradient(circle at 80% 80%,#ff7a0033,transparent 50%),#000}
+.top{padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #262626;align-items:center}.top b{font-size:18px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.prev{margin:12px;height:400px;background:#111;border:2px dashed #ff5ea8;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 20px #ff5ea822}.prev img,.prev video{width:100%;height:100%;object-fit:cover}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 12px}.cell{aspect-ratio:1;background:#111;border:1px solid #262626;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;font-weight:700}
+.btn{margin:12px;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);border:0;width:calc(100% - 24px);padding:14px;border-radius:25px;font-weight:900;color:#fff;font-size:16px;box-shadow:0 5px 20px #ff149355}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
+.progress{margin:0 12px;background:#111;border:1px solid #a259ff;border-radius:12px;padding:10px;display:none}
 .bar{height:6px;background:#333;border-radius:10px;overflow:hidden;margin-top:6px}
-.barFill{height:100%;background:#FFD700;width:0%}
+.barFill{height:100%;background:linear-gradient(90deg,#ff5ea8,#ff7a00);width:0%}
 </style></head><body>
-<div class="top"><b>New Story ⭐</b><span onclick="location.href='index.html'">✕</span></div>
+<div class="top"><b>PIXORO New Story ⭐</b><span onclick="location.href='index.html'" style="font-size:20px;cursor:pointer;background:#222;width:32px;height:32px;border-radius:50%;display:grid;place-items:center">✕</span></div>
 <div class="prev" id="prev">⭐ Photo / Video Select Pannu</div>
 <div class="grid"><div class="cell" onclick="location.href='camera.html?type=story'">📷 Camera</div><div class="cell" onclick="document.getElementById('f').click()">🖼️ Gallery</div><div class="cell" onclick="document.getElementById('f').click()">➕ Add</div></div>
 <div class="progress" id="prog"><div style="display:flex;justify-content:space-between;font-size:11px;color:#aaa"><span id="progText">Compressing... 💾</span><span id="progSize"></span></div><div class="bar"><div class="barFill" id="progFill"></div></div></div>
-<button class="btn" onclick="go()">Next →</button>
+<button class="btn" onclick="go()">Next → 🔥</button>
 <div id="toast" class="toast"></div>
 <input type="file" id="f" hidden accept="image/*,video/*" onchange="h(event)">
 <script>
@@ -31,7 +31,6 @@ async function checkAuth(){
   ME_RAW = (profile?.username || session.user.email.split('@')[0]).toLowerCase()
 }
 checkAuth()
-// URL la irundhu vantha media va direct kaamikkurom da
 let urlP = new URLSearchParams(location.search)
 let m = urlP.get('media') || ''
 let mType = urlP.get('type') || 'image'
