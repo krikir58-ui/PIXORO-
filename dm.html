@@ -1,5 +1,4 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>DM - Pixoro</title>
-<link rel="stylesheet" href="css/pixoro-verified.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
 <style>
@@ -61,35 +60,42 @@
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 let supa = window.supa
+window.getTick = () => ''; // ✅ GOLD OFF da
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
-let ME_RAW='', profileMap={}
+let ME_RAW='', ME_ID='', profileMap={}, profileById={}
 function getPfp(u){
-  let p = profileMap[cleanUser(u)]
+  let p = profileMap[cleanUser(u)] || profileById[u]
   if(p?.avatar_url) return p.avatar_url
   let c = cleanUser(u)||'P'
   return 'https://ui-avatars.com/api/?name='+c.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true'
 }
 async function init(){
-  if(!supa){ location.href='login.html'; return }
+  if(!window.supa){ setTimeout(init,300); return }
+  supa = window.supa
   let { data:{session} } = await supa.auth.getSession()
   if(!session){ location.href='login.html'; return }
+  ME_ID = session.user.id
   let { data: myProf } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
   ME_RAW = cleanUser(myProf?.username || session.user.email.split('@')[0])
-  document.getElementById('topName').innerHTML = ME_RAW + ' ' + (window.getTick?window.getTick(ME_RAW):'') + ' ▾'
+  document.getElementById('topName').innerHTML = ME_RAW + ' ▾'
   let { data: profs } = await supa.from('profiles').select('*')
-  ;(profs||[]).forEach(p=> profileMap[cleanUser(p.username)] = p)
+  ;(profs||[]).forEach(p=>{ profileMap[cleanUser(p.username)] = p; profileById[p.id]=p })
   let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW)
   load()
 }
 function newChat(){ showToast('Search la name type pannu da'); setTimeout(()=>location.href='search.html',500); }
 async function load(){
-  let {data} = await supa.from('messages').select('*').or(`sender.eq.${ME_RAW},receiver.eq.${ME_RAW}`).order('created_at',{ascending:false}).limit(100)
-  let notesUsers = data? [...new Set(data.map(m=>m.sender===ME_RAW?m.receiver:m.sender))].slice(0,6) : []
-  document.getElementById('notes').innerHTML = `<div class="nItem"><div class="nRing" style="background:#222"><div class="nRingInner"><img src="${getPfp(ME_RAW)}"></div><div class="noteBubble">Your note</div></div><div style="font-size:10px;margin-top:4px;display:flex;justify-content:center;align-items:center">${ME_RAW} ${window.getTick?window.getTick(ME_RAW):''}</div></div>` + notesUsers.map(u=>`<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(u)}'"><div class="nRing"><div class="nRingInner"><img src="${getPfp(u)}"></div><div class="noteBubble">Hi da ❤️</div></div><div style="font-size:10px;margin-top:4px;display:flex;justify-content:center;align-items:center">${cleanUser(u)} ${window.getTick?window.getTick(u):''}</div></div>`).join('')
-  if(!data||!data.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#666">No chats da!<br><button onclick="newChat()" style="margin-top:12px;background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`; return }
-  let map={}; data.forEach(m=>{ let o=m.sender===ME_RAW?m.receiver:m.sender; if(!map[o]||new Date(m.created_at)>new Date(map[o].created_at)) map[o]=m })
-  let chats=Object.values(map)
-  document.getElementById('list').innerHTML = chats.map(c=>{ let o=c.sender===ME_RAW?c.receiver:c.sender; return `<div class="chatRow" onclick="location.href='chat.html?user=${encodeURIComponent(o)}'"><img src="${getPfp(o)}"><div style="flex:1;text-align:left"><b style="font-size:13px;display:flex;align-items:center">${cleanUser(o)} ${window.getTick?window.getTick(o):''}</b><div style="font-size:11px;color:#999">${c.sender===ME_RAW?'Sent':'New message'} • ${new Date(c.created_at).toLocaleTimeString()}</div></div><div style="font-size:16px">📷</div></div>` }).join('')
+  try{
+    // ✅ CORRECTED - ID + Username Rendayum Thedum da - Loading Fix da
+    let {data, error} = await supa.from('messages').select('*').or(`sender_id.eq.${ME_ID},receiver_id.eq.${ME_ID},sender.eq.${ME_RAW},receiver.eq.${ME_RAW}`).order('created_at',{ascending:false}).limit(100)
+    if(error) throw error
+    let notesUsers = data? [...new Set(data.map(m=>{ let s=m.sender_id||m.sender; let r=m.receiver_id||m.receiver; return s===ME_ID||s===ME_RAW?r:s }))].slice(0,6) : []
+    document.getElementById('notes').innerHTML = `<div class="nItem"><div class="nRing" style="background:#222"><div class="nRingInner"><img src="${getPfp(ME_RAW)}"></div><div class="noteBubble">Your note</div></div><div style="font-size:10px;margin-top:4px">${ME_RAW}</div></div>` + notesUsers.map(u=>{ let uname = profileById[u]?.username || u; return `<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(uname)}'"><div class="nRing"><div class="nRingInner"><img src="${getPfp(u)}"></div><div class="noteBubble">Hi da ❤️</div></div><div style="font-size:10px;margin-top:4px">${cleanUser(uname)}</div></div>` }).join('')
+    if(!data||!data.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#666">No chats da!<br><button onclick="newChat()" style="margin-top:12px;background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`; return }
+    let map={}; data.forEach(m=>{ let s=m.sender_id||m.sender; let r=m.receiver_id||m.receiver; let o=(s===ME_ID||s===ME_RAW)?r:s; if(!map[o]||new Date(m.created_at)>new Date(map[o].created_at)) map[o]=m })
+    let chats=Object.values(map)
+    document.getElementById('list').innerHTML = chats.map(c=>{ let s=c.sender_id||c.sender; let r=c.receiver_id||c.receiver; let o=(s===ME_ID||s===ME_RAW)?r:s; let uname = profileById[o]?.username || o; return `<div class="chatRow" onclick="location.href='chat.html?user=${encodeURIComponent(uname)}'"><img src="${getPfp(o)}"><div style="flex:1;text-align:left"><b style="font-size:13px">${cleanUser(uname)}</b><div style="font-size:11px;color:#999">${(s===ME_ID||s===ME_RAW)?'Sent':'New message'} • ${new Date(c.created_at).toLocaleTimeString()}</div><div style="font-size:12px;color:#ccc">${(c.text||c.content||c.message||'📷 Photo').slice(0,40)}</div></div><div style="font-size:16px">📷</div></div>` }).join('')
+  }catch(e){ console.log(e); document.getElementById('list').innerHTML = `<div style="padding:40px;color:#666">No chats da!<br><button onclick="newChat()" style="margin-top:12px;background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>` }
 }
 init()
 </script></body></html>
