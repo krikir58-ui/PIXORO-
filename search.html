@@ -6,8 +6,9 @@
 body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{padding:8px 12px;display:flex;gap:8px;border-bottom:1px solid #1e1e1e;position:sticky;top:0;background:#000;z-index:10;height:56px;align-items:center}
 input{flex:1;background:#181818;border:1px solid #ff5ea866;padding:10px 12px;border-radius:10px;color:#fff;outline:none;font-size:14px}
-.topPlus{width:32px;height:32px;background:linear-gradient(135deg,#ff5ea8,#ff7a00)!important;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;cursor:pointer;flex-shrink:0;box-shadow:0 0 12px #ff5ea855}
-.bellWhite{width:32px;height:32px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+/* SEARCH LA + & NOTIFICATION REMOVE DA */
+.topPlus{display:none!important}
+.bellWhite{display:none!important}
 .userRow{display:flex;align-items:center;justify-content:space-between;padding:12px 10px;border-bottom:1px solid #151515}
 .msgBtn{background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:0;color:#fff;padding:6px 14px;border-radius:20px;font-weight:800;font-size:12px;cursor:pointer}
 .viewBtn{background:#1a1a1a;border:1px solid #333;color:#fff;padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;margin-right:6px}
@@ -27,7 +28,7 @@ input{flex:1;background:#181818;border:1px solid #ff5ea866;padding:10px 12px;bor
 </style></head><body>
 <div class="top">
 <input id="searchInput" placeholder="Search people / photos... @name" oninput="doSearch()" autofocus>
-<div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div><div class="bellWhite" onclick="location.href='notifications.html'">🔔</div><span onclick="location.href='index.html'" style="cursor:pointer;font-size:18px">✕</span></div></div>
+<div style="display:flex;gap:8px;align-items:center"><span onclick="location.href='index.html'" style="cursor:pointer;font-size:18px">✕</span></div></div>
 <div id="results"></div>
 <div id="hint" style="text-align:center;padding:30px 20px;color:#555"><div style="font-size:36px">🔒</div><b style="color:#fff">Private Search</b><p style="font-size:11px;margin-top:8px">Type pannu - yaarukku venalum msg pannalam<br>DM la avanga mattum varuvanga - 100% private</p></div>
 <div id="explore" style="margin-top:10px"><div style="padding:8px 12px;font-size:11px;color:#888;font-weight:700">EXPLORE • TRENDING PHOTOS</div><div class="grid" id="grid"></div></div>
@@ -58,7 +59,6 @@ async function loadExplore(){
   if(data&&data.length){
     let uniqIds=[...new Set(data.map(d=>d.user_id))].filter(id=>id!==ME_ID).slice(0,15);
     if(uniqIds.length){document.getElementById('hint').style.display='none';let html='<div style="padding:8px 12px;font-size:11px;color:#888;font-weight:700">SUGGESTED - REAL PEOPLE</div>';uniqIds.forEach(uid=>{let p=profileByIdMap[uid]||data.find(d=>d.user_id===uid);let u=cleanUser(p?.username||'');if(!u)return;html+=`<div class="userRow"><div style="display:flex;align-items:center;gap:10px" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'"><img src="${getPfp(u)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover"><div><b>@${u}</b><div style="font-size:10px;color:#888">Tap message to start</div></div></div><div style="display:flex;gap:6px"><button class="viewBtn" onclick="location.href='profile.html?u=${encodeURIComponent(u)}'">View</button><button class="msgBtn" onclick="goMsg('${u}')">Message</button></div></div>`});document.getElementById('results').innerHTML=html}
-    // FIXED: Real Post first, broken image na hide, video na reels ku, photo na home ku
     document.getElementById('grid').innerHTML=data.map(p=>{let m=p.media_url||p.image_url||'';if(!m)return '';let isVid=m.includes('.mp4')||p.media_type=='reel'||p.media_type=='video';let link=isVid?`reels.html?id=${p.id}`:`index.html?id=${p.id}`;let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length;let tag=isVid?`<video src="${m}" muted playsinline preload="metadata" style="width:100%;aspect-ratio:1;object-fit:cover" onclick="location.href='${link}'"></video>`:`<img src="${m}" onerror="this.parentElement.style.display='none'" onclick="location.href='${link}'" loading="lazy">`;return `<div style="position:relative">${tag}<span style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.7);padding:3px 7px;border-radius:10px;font-size:11px">👁️ ${fmtViews(vCount)}</span></div>`}).join('');
     if(!document.getElementById('grid').innerHTML.trim()){let photos=await loadUnsplashPhotos('beautiful nature love');document.getElementById('grid').innerHTML=photos.map(p=>`<img src="${p.urls.small}" onerror="this.style.display='none'" onclick="openPhoto('${p.urls.regular}','${p.user.username}')" loading="lazy">`).join('')}
   } else { let photos=await loadUnsplashPhotos('beautiful nature love');document.getElementById('hint').style.display='none';document.getElementById('grid').innerHTML=photos.map(p=>`<img src="${p.urls.small}" onerror="this.style.display='none'" onclick="openPhoto('${p.urls.regular}','${p.user.username}')" loading="lazy">`).join('') }
