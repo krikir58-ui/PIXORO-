@@ -19,13 +19,16 @@ window.isGoldUser = isGoldUser;
 window.goldTickHTML = goldTickHTML;
 window.getTick = goldTickHTML;
 
-// ✅ ELLA PAGE LAIMUM SAME + STYLE DA - ITHA ADD PANNITEN DA
+// ✅ ELLA PAGE LAIMUM SAME + STYLE DA - + BACKGROUND REMOVE DA
 (function(){
   let css = `
-  .topPlus{
+  /* + BACKGROUND REMOVE - WHITE + MATTUM - ELLA PAGE LAIMUM SAME DA */
+  .topPlus, .createBtn, .plusBtn, .topAdd, [onclick*="createSheet"]{
     width: auto !important;
     height: auto !important;
     background: transparent !important;
+    background-image: none !important;
+    background-color: transparent !important;
     color: #fff !important;
     border-radius: 0 !important;
     display: flex !important;
@@ -51,10 +54,27 @@ window.getTick = goldTickHTML;
   .audioDisc{width:28px!important;height:28px!important;border:2px solid #fff!important}
   .reel-username{font-size:17px!important;font-weight:700!important}
   .followBtnRBig{background:transparent!important;color:#fff!important;border:1.2px solid #fff!important;font-size:14px!important;height:28px!important}
+
+  /* SEARCH, DM, NOTIFICATION REMOVE DA - TOP LA IRUKURA ELLAM HIDE DA */
+  .bell, .bellWhite, .notifBtn, .notificationBtn, .notifIcon, .searchTopBtn, .dmTopBtn, .topSearch, .topDM{
+    display: none !important;
+  }
   `;
   let s = document.createElement('style');
   s.innerText = css;
   document.head.appendChild(s);
+
+  // JS laiyum Bell / Notif ah Remove Pannu da - 500ms la Check Pannum da
+  function hideTopIcons(){
+    document.querySelectorAll('div,button,a,span').forEach(el=>{
+      let t = (el.innerText||'').trim();
+      if(t === '🔔' || t === '🔍' || t === '✉️') el.style.display = 'none';
+      let c = (el.className||'').toString().toLowerCase();
+      if(c.includes('bell') || c.includes('notif')) el.style.display = 'none';
+    });
+  }
+  setTimeout(hideTopIcons, 500);
+  setInterval(hideTopIcons, 2000);
 })();
 
 // ❌ AUTO TICK OFF da - Ithu Thaan 0.8 sec ku tick pottutu irunthuchu da
