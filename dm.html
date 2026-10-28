@@ -4,8 +4,9 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{padding:8px 12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#000;z-index:50;border-bottom:1px solid #1e1e1e;height:56px}
-.topPlus{width:32px;height:32px;background:#fff!important;color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;cursor:pointer}
-.bellWhite{width:32px;height:32px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+/* DM LA + & NOTIFICATION REMOVE DA */
+.topPlus{display:none!important}
+.bellWhite{display:none!important}
 .search{margin:8px 10px;background:#262626;border-radius:12px;padding:10px 12px;color:#888;display:flex;gap:8px;font-size:13px}
 .notes{display:flex;gap:12px;overflow-x:auto;padding:8px 10px;scrollbar-width:none;border-bottom:1px solid #151515}
 .notes::-webkit-scrollbar{display:none}
@@ -31,8 +32,6 @@
 <div class="top">
 <b style="font-size:19px;display:flex;align-items:center" id="topName">Loading...</b>
 <div style="display:flex;gap:8px;align-items:center">
-<div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div>
-<div class="bellWhite" onclick="location.href='notifications.html'">🔔</div>
 <span onclick="newChat()" style="font-size:18px;cursor:pointer">✏️</span>
 </div>
 </div>
@@ -98,7 +97,6 @@ async function load(){
       if(!other && cid){ let parts=cid.split('_'); other=parts[0]===ME_RAW?parts[1]:parts[0] }
       if(!other) return false
       if(cleanUser(other)===ME_RAW) return false
-      // ✅ REAL FRIEND ONLY - Profiles la irukkanum da
       let real = profileMap[cleanUser(other)] || profileById[other]
       if(!real) return false
       return true
