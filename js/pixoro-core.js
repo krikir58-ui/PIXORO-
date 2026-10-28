@@ -19,6 +19,44 @@ window.isGoldUser = isGoldUser;
 window.goldTickHTML = goldTickHTML;
 window.getTick = goldTickHTML;
 
+// ✅ ELLA PAGE LAIMUM SAME + STYLE DA - ITHA ADD PANNITEN DA
+(function(){
+  let css = `
+  .topPlus{
+    width: auto !important;
+    height: auto !important;
+    background: transparent !important;
+    color: #fff !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 28px !important;
+    font-weight: 300 !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    padding: 0 6px !important;
+    border: none !important;
+  }
+  /* Mella Reels Font Same Style da */
+  .reelsTop b, .topTitle{
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.5px !important;
+    color: #fff !important;
+  }
+  /* Keela Profile Circle 38px - Audio 28px - Full Same Size da */
+  .reel-pfp-wrap{width:38px!important;height:38px!important;min-width:38px!important;border:2px solid #fff!important}
+  .audioDisc{width:28px!important;height:28px!important;border:2px solid #fff!important}
+  .reel-username{font-size:17px!important;font-weight:700!important}
+  .followBtnRBig{background:transparent!important;color:#fff!important;border:1.2px solid #fff!important;font-size:14px!important;height:28px!important}
+  `;
+  let s = document.createElement('style');
+  s.innerText = css;
+  document.head.appendChild(s);
+})();
+
 // ❌ AUTO TICK OFF da - Ithu Thaan 0.8 sec ku tick pottutu irunthuchu da
 /*
 function autoGoldTick(){
