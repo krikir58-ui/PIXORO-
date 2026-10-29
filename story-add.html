@@ -13,6 +13,7 @@
 .aud button.active.green{background:linear-gradient(90deg,#00ff66,#00d4ff);color:#000}
 .postBtn{margin:0 12px;width:calc(100% - 24px);padding:14px;border-radius:25px;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);border:0;color:#fff;font-weight:900;font-size:16px;box-shadow:0 5px 20px #ff149355}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;display:none}
+.pollPreview{margin:0 12px 12px;background:#111;border:1px solid #a259ff;border-radius:12px;padding:10px;display:none}
 </style></head><body>
 <div class="top"><b>PIXORO Story Add ⭐</b><span onclick="location.href='index.html'" style="font-size:20px;cursor:pointer;background:#222;width:32px;height:32px;border-radius:50%;display:grid;place-items:center">✕</span></div>
 <div class="prev" id="prev">Photo Loading...</div>
@@ -21,6 +22,7 @@
 <button id="btnPublic" class="active" onclick="setAud('everyone',this)">🌍 Everyone</button>
 <button id="btnClose" onclick="setAud('close_friends',this)">💚 Close Friends</button>
 </div>
+<div class="pollPreview" id="pollPreview"></div>
 <button class="postBtn" onclick="postStory()">Share Story 🔥</button>
 <div id="toast" class="toast"></div>
 <script>
@@ -36,6 +38,9 @@ async function init(){
   let {data:prof}=await supa.from('profiles').select('username').eq('id',ME_ID).single()
   ME=(prof?.username||session.user.email.split('@')[0]).toLowerCase()
   if(m){document.getElementById('prev').innerHTML= type==='video'?`<video src="${m}" autoplay loop controls style="width:100%;height:100%"></video>`:`<img src="${m}">`}
+  // Poll Preview da
+  let pollStr=localStorage.getItem('pixoro_poll');
+  if(pollStr){ let p=JSON.parse(pollStr); let el=document.getElementById('pollPreview'); el.style.display='block'; el.innerHTML=`📊 Poll: <b>${p.q}</b><br><span style="font-size:12px;color:#aaa">${p.o1} vs ${p.o2}</span>` }
 }
 init()
 function setAud(v,btn){aud=v;document.querySelectorAll('.aud button').forEach(b=>b.classList.remove('active','green'));btn.classList.add('active');if(v==='close_friends')btn.classList.add('green');showToast(v==='close_friends'?'Close Friends Only da 💚':'Everyone Paakalam da 🌍')}
@@ -44,8 +49,15 @@ async function postStory(){
   if(!ME_ID){let {data:{session}}=await supa.auth.getSession();if(session)ME_ID=session.user.id}
   let exp=new Date();exp.setHours(exp.getHours()+24)
   let caption=document.getElementById('cap').value
-  let {error}=await supa.from('stories').insert({user_id:ME_ID,username:ME,image_url:m,media_url:m,media_type:type,caption:caption,audience:aud,expires_at:exp.toISOString()})
+  let {data,error}=await supa.from('stories').insert({user_id:ME_ID,username:ME,image_url:m,media_url:m,media_type:type,caption:caption,audience:aud,expires_at:exp.toISOString()}).select('id').single()
   if(error){showToast(error.message);return}
+  // Poll Save da - Idhu Thaan Secret da
+  let pollStr=localStorage.getItem('pixoro_poll');
+  if(pollStr && data && data.id){
+    let poll=JSON.parse(pollStr);
+    await supa.from('story_polls').insert({story_id:String(data.id), question:poll.q, option1:poll.o1, option2:poll.o2});
+    localStorage.removeItem('pixoro_poll');
+  }
   showToast('Story Posted da! 🔥')
   setTimeout(()=>location.href='index.html',800)
 }
