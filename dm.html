@@ -5,12 +5,18 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{padding:12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#000;z-index:50;border-bottom:1px solid #1e1e1e;height:56px}
+.search{margin:10px;background:#262626;border-radius:12px;padding:11px 12px;color:#888;display:flex;gap:8px;font-size:13px;cursor:pointer}
+.notes{display:flex;gap:12px;overflow-x:auto;padding:8px 10px;scrollbar-width:none}.notes::-webkit-scrollbar{display:none}
+.nItem{flex:0 0 66px;text-align:center;cursor:pointer}.nRing{width:60px;height:60px;border-radius:50%;padding:2.5px;background:linear-gradient(135deg,#ff5ea8,#ff7a00);position:relative}.nRingInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2px}.nRingInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.noteBubble{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#fff;color:#000;font-size:9px;padding:3px 6px;border-radius:10px;white-space:nowrap;font-weight:700}
+/* SYSTEM 2 - THREADS TABS DA */
+.tabs{display:flex;gap:6px;padding:8px 10px;overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{padding:7px 14px;border-radius:16px;background:#262626;color:#999;font-size:12px;cursor:pointer;white-space:nowrap}.tab.active{background:#fff;color:#000;font-weight:700}
 .chatRow{display:flex;gap:10px;padding:12px;border-bottom:1px solid #111;align-items:center}
 .chatRow img{width:46px;height:46px;border-radius:50%;border:2px solid #ff5ea8;object-fit:cover}
-/* PRESENCE - GREEN DOT DA */
 .dot{width:13px;height:13px;background:#00ff66;border-radius:50%;border:2.5px solid #000;position:absolute;bottom:2px;right:2px;box-shadow:0 0 8px #00ff66}
 .callBtn{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);display:grid;place-items:center;font-size:18px;cursor:pointer;border:2px solid #fff;box-shadow:0 0 15px #ff5ea8;animation:blink 1.2s infinite;flex-shrink:0}
-@keyframes blink{0%{transform:scale(1);box-shadow:0 0 8px #ff5ea8}50%{transform:scale(1.12);box-shadow:0 0 22px #ff5ea8,0 0 30px #ff7a00}100%{transform:scale(1);box-shadow:0 0 8px #ff5ea8}}
+@keyframes blink{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
 .callBox{position:fixed;inset:0;background:#000;z-index:999;display:none;flex-direction:column}
 .callBox video{width:100%;height:100%;object-fit:cover}
 .faceBox{position:absolute;border:3px solid #00ff66;border-radius:20px;box-shadow:0 0 20px #00ff66;width:150px;height:180px;left:50%;top:40%;transform:translate(-50%,-50%)}
@@ -18,86 +24,25 @@
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;height:60px;z-index:100}
 .bottom-nav a{color:#888;text-decoration:none;font-size:12px}.bottom-nav a.active{color:#fff}
 </style></head><body>
-
 <div class="top"><b id="topName" style="font-size:19px">Loading...</b><span onclick="location.href='search.html'">✏️</span></div>
+<div class="search" onclick="location.href='search.html'">🔍 Search or ask Meta AI <span style="margin-left:auto;color:#a259ff">Filter</span></div>
+<div class="notes" id="notes"></div>
+<div class="tabs"><div class="tab active" onclick="setTab('all',this)">All <span id="cAll"></span></div><div class="tab" onclick="setTab('primary',this)">Primary <span id="cPri"></span></div><div class="tab" onclick="setTab('general',this)">General</div><div class="tab" onclick="setTab('requests',this)">Requests</div></div>
 <div id="list" style="text-align:center;color:#555;padding:30px">Loading...</div>
-
-<div class="callBox" id="callBox">
-<div style="position:relative;flex:1">
-<video id="remoteV" autoplay playsinline></video>
-<video id="localV" autoplay muted playsinline style="width:120px;height:170px;position:absolute;bottom:20px;right:10px;border:2px solid #ff5ea8;border-radius:14px;object-fit:cover"></video>
-<div class="faceBox" id="faceBox"></div>
-<div style="position:absolute;top:20px;left:50%;transform:translateX(-50%);text-align:center"><b id="callName" style="font-size:18px"></b><p id="callStatus" style="font-size:12px;color:#00ff88">Calling...</p></div>
-</div>
-<div style="display:flex;gap:14px;justify-content:center;padding:20px">
-<button onclick="toggleMic()" id="micBtn" style="width:56px;height:56px;border-radius:50%;border:0;font-size:22px">🎙️</button>
-<button onclick="toggleCam()" id="camBtn" style="width:56px;height:56px;border-radius:50%;border:0;font-size:22px">📸</button>
-<button onclick="endCall()" style="width:56px;height:56px;border-radius:50%;border:0;background:#ff0000;font-size:22px">📵</button>
-</div>
-</div>
-
-<div class="bottom-nav">
-  <a href="index.html">🏠 Home</a><a href="search.html">🔍 Search</a><a href="reels.html">🎬 Reels</a><a href="dm.html" class="active">💬 DM</a><a href="profile.html">👤 Profile</a>
-</div>
-
+<div class="callBox" id="callBox"><div style="position:relative;flex:1"><video id="remoteV" autoplay playsinline></video><video id="localV" autoplay muted playsinline style="width:120px;height:170px;position:absolute;bottom:20px;right:10px;border:2px solid #ff5ea8;border-radius:14px;object-fit:cover"></video><div class="faceBox" id="faceBox"></div><div style="position:absolute;top:20px;left:50%;transform:translateX(-50%);text-align:center"><b id="callName" style="font-size:18px"></b><p id="callStatus" style="font-size:12px;color:#00ff88">Calling...</p></div></div><div style="display:flex;gap:14px;justify-content:center;padding:20px"><button onclick="toggleMic()" id="micBtn" style="width:56px;height:56px;border-radius:50%;border:0;font-size:22px">🎙️</button><button onclick="toggleCam()" id="camBtn" style="width:56px;height:56px;border-radius:50%;border:0;font-size:22px">📸</button><button onclick="endCall()" style="width:56px;height:56px;border-radius:50%;border:0;background:#ff0000;font-size:22px">📵</button></div></div>
+<div class="bottom-nav"><a href="index.html">🏠 Home</a><a href="search.html">🔍 Search</a><a href="reels.html">🎬 Reels</a><a href="dm.html" class="active">💬 DM</a><a href="profile.html">👤 Profile</a></div>
 <script>
-let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, peer=null, callObj=null, stream=null, micOn=true, camOn=true, CALL_TO='';
+let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, peer=null, callObj=null, stream=null, micOn=true, camOn=true, CUR_TAB='all', ALL_CHATS=[];
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
 function getPfp(u){ let p=profileMap[cleanUser(u)]||profileById[u]; if(p?.avatar_url) return p.avatar_url; return 'https://ui-avatars.com/api/?name='+(cleanUser(u)||'P').charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true' }
-
-// *** PRESENCE SYSTEM 1 - FULL DA ***
-async function updatePresence(online){
-  if(!ME_ID) return;
-  await supa.from('profiles').update({is_online:online, last_seen:new Date().toISOString()}).eq('id', ME_ID);
-}
-function getStatus(p){
-  if(!p) return 'Offline';
-  if(p.is_online) return 'Active now';
-  if(!p.last_seen) return 'Offline';
-  let diff=(Date.now()-new Date(p.last_seen))/1000/60;
-  if(diff<1) return 'Active now';
-  if(diff<60) return `Active ${Math.floor(diff)}m ago`;
-  if(diff<1440) return `Active ${Math.floor(diff/60)}h ago`;
-  return `Active ${Math.floor(diff/1440)}d ago`;
-}
-window.addEventListener('beforeunload', ()=> updatePresence(false));
-document.addEventListener('visibilitychange', ()=>{ if(document.hidden) updatePresence(false); else updatePresence(true); });
-
-async function init(){
-  if(!window.supa){setTimeout(init,300);return} supa=window.supa;
-  let {data:{session}}=await supa.auth.getSession(); if(!session){location.href='login.html';return}
-  ME_ID=session.user.id; let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).single(); ME_RAW=cleanUser(my?.username||session.user.email.split('@')[0]);
-  document.getElementById('topName').innerText=ME_RAW+' ▾';
-  let {data:profs}=await supa.from('profiles').select('*'); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p});
-  updatePresence(true);
-  setInterval(()=>updatePresence(true),30000);
-  load();
-  if(!window.peerInit){ window.peerInit=true; let p=new Peer(ME_RAW); p.on('call', async c=>{ if(confirm(c.peer+' Call Pannuraan da 🎥 Accept Pannava?')){ document.getElementById('callBox').style.display='flex'; stream=await navigator.mediaDevices.getUserMedia({audio:true,video:true}); document.getElementById('localV').srcObject=stream; c.answer(stream); c.on('stream',s=>document.getElementById('remoteV').srcObject=s); callObj=c; peer=p; } }); }
-  supa.channel('dm-list').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},()=>load()).subscribe();
-  // Presence Realtime - Yaaro Online Vanda Udane Dot Varum da
-  supa.channel('presence-live').on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles'},()=>load()).subscribe();
-}
-async function load(){
-  let {data}=await supa.from('messages').select('*').order('created_at',{ascending:false}).limit(200); if(!data)data=[];
-  data=data.filter(m=>{ let s=m.sender_id||m.sender||'', r=m.receiver_id||m.receiver||'', cid=m.chat_id||''; let isMine=s===ME_ID||s===ME_RAW||r===ME_ID||r===ME_RAW||cid.includes(ME_RAW); if(!isMine) return false; let o=(s===ME_ID||s===ME_RAW)?r:s; if(!o&&cid){let p=cid.split('_'); o=p[0]===ME_RAW?p[1]:p[0]} if(!o||cleanUser(o)===ME_RAW) return false; return profileMap[cleanUser(o)]||profileById[o]; });
-  if(!data.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#666">No chats da<br><button onclick="location.href='search.html'" style="margin-top:12px;background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`; return }
-  let map={}; data.forEach(m=>{ let s=m.sender_id||m.sender, r=m.receiver_id||m.receiver, o=(s===ME_ID||s===ME_RAW)?r:s; if(!o&&m.chat_id){let p=m.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0]} if(o&&(!map[o]||new Date(m.created_at)>new Date(map[o].created_at))) map[o]=m });
-  document.getElementById('list').innerHTML=Object.values(map).map(c=>{ let s=c.sender_id||c.sender, r=c.receiver_id||c.receiver, o=(s===ME_ID||s===ME_RAW)?r:s; if(!o&&c.chat_id){let p=c.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0]} let uname=profileById[o]?.username||o; let prof=profileById[o]; let preview=c.type==='voice'?'🎙️ Voice':c.type==='image'?'📸 Photo':c.type==='video'?'🎬 Video':(c.text||c.message||'').slice(0,35); let status=getStatus(prof); let dot=prof?.is_online?`<span class="dot"></span>`:``; return `<div class="chatRow"><div style="position:relative"><img src="${getPfp(o)}" onclick="location.href='chat.html?user=${encodeURIComponent(uname)}'">${dot}</div><div style="flex:1;text-align:left" onclick="location.href='chat.html?user=${encodeURIComponent(uname)}'"><b style="font-size:13px">${cleanUser(uname)}</b><div style="font-size:12px;color:#ccc">${c.seen?'✓✓ ':''}${preview}</div><div style="font-size:11px;color:${prof?.is_online?'#00ff66':'#888'}">${status}</div></div><span class="callBtn" onclick="event.stopPropagation();startCall('${cleanUser(uname)}',false)">📞</span><span class="callBtn" onclick="event.stopPropagation();startCall('${cleanUser(uname)}',true)">🎥</span></div>` }).join('');
-}
-async function startCall(user,isVideo){
-  CALL_TO=user; document.getElementById('callBox').style.display='flex'; document.getElementById('callName').innerText='@'+user; document.getElementById('callStatus').innerText=isVideo?'Video Calling...':'Audio Calling...';
-  if('FaceDetector' in window){
-    setInterval(async()=>{ try{ let fd=new FaceDetector(); let faces=await fd.detect(document.getElementById('localV')); if(faces.length){ let f=faces[0].boundingBox; let b=document.getElementById('faceBox'); b.style.left=(f.x+f.width/2)+'px'; b.style.top=(f.y+f.height/2)+'px'; b.style.width=f.width+'px'; b.style.height=f.height+'px'; } }catch(e){} },500);
-  }
-  peer=new Peer(ME_RAW);
-  peer.on('open', async()=>{
-    stream=await navigator.mediaDevices.getUserMedia({audio:true,video:isVideo});
-    document.getElementById('localV').srcObject=stream;
-    if(!isVideo) document.getElementById('localV').style.display='none'; else document.getElementById('localV').style.display='block';
-    callObj=peer.call(user, stream); callObj.on('stream', s=>{ document.getElementById('remoteV').srcObject=s; document.getElementById('callStatus').innerText='Connected ✅'; });
-  });
-  peer.on('call', async c=>{ stream=await navigator.mediaDevices.getUserMedia({audio:true,video:isVideo}); document.getElementById('localV').srcObject=stream; c.answer(stream); c.on('stream', s=>{ document.getElementById('remoteV').srcObject=s; }); callObj=c; });
-}
+async function updatePresence(o){ if(!ME_ID) return; await supa.from('profiles').update({is_online:o,last_seen:new Date().toISOString()}).eq('id',ME_ID); }
+function getStatus(p){ if(!p) return 'Offline'; if(p.is_online) return 'Active now'; if(!p.last_seen) return 'Offline'; let d=(Date.now()-new Date(p.last_seen))/1000/60; if(d<1) return 'Active now'; if(d<60) return `Active ${Math.floor(d)}m ago`; if(d<1440) return `Active ${Math.floor(d/60)}h ago`; return `Active ${Math.floor(d/1440)}d ago`; }
+window.addEventListener('beforeunload',()=>updatePresence(false)); document.addEventListener('visibilitychange',()=>{ if(document.hidden) updatePresence(false); else updatePresence(true); });
+function setTab(t,el){ CUR_TAB=t; document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); render(); }
+function render(){ let list=ALL_CHATS; if(CUR_TAB==='primary') list=list.filter(c=>c.threadType==='primary'); if(CUR_TAB==='general') list=list.filter(c=>c.threadType==='general'); if(CUR_TAB==='requests') list=list.filter(c=>c.threadType==='requests'); if(!list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#666">${CUR_TAB==='requests'?'No requests da':'No chats da'}<br><button onclick="location.href='search.html'" style="margin-top:12px;background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`; return; } document.getElementById('list').innerHTML=list.map(c=>{ let uname=profileById[c.other]?.username||c.other; let prof=profileById[c.other]; let status=getStatus(prof); let dot=prof?.is_online?`<span class="dot"></span>`:``; return `<div class="chatRow"><div style="position:relative"><img src="${getPfp(c.other)}" onclick="location.href='chat.html?user=${encodeURIComponent(uname)}'">${dot}</div><div style="flex:1;text-align:left" onclick="location.href='chat.html?user=${encodeURIComponent(uname)}'"><b style="font-size:13px">${cleanUser(uname)}</b><div style="font-size:12px;color:#ccc">${c.msg.seen?'✓✓ ':''}${c.preview}</div><div style="font-size:11px;color:${prof?.is_online?'#00ff66':'#888'}">${status}</div></div><span class="callBtn" onclick="event.stopPropagation();startCall('${cleanUser(uname)}',false)">📞</span><span class="callBtn" onclick="event.stopPropagation();startCall('${cleanUser(uname)}',true)">🎥</span></div>`}).join(''); }
+async function init(){ if(!window.supa){setTimeout(init,300);return} supa=window.supa; let {data:{session}}=await supa.auth.getSession(); if(!session){location.href='login.html';return} ME_ID=session.user.id; let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).single(); ME_RAW=cleanUser(my?.username||session.user.email.split('@')[0]); document.getElementById('topName').innerText=ME_RAW+' ▾'; let {data:profs}=await supa.from('profiles').select('*'); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p}); updatePresence(true); setInterval(()=>updatePresence(true),30000); load(); if(!window.peerInit){ window.peerInit=true; let p=new Peer(ME_RAW); p.on('call', async c=>{ if(confirm(c.peer+' Call Pannuraan da 🎥 Accept Pannava?')){ document.getElementById('callBox').style.display='flex'; stream=await navigator.mediaDevices.getUserMedia({audio:true,video:true}); document.getElementById('localV').srcObject=stream; c.answer(stream); c.on('stream',s=>document.getElementById('remoteV').srcObject=s); callObj=c; peer=p; } }); } supa.channel('dm-list').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},()=>load()).subscribe(); supa.channel('presence-live').on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles'},()=>load()).subscribe(); }
+async function load(){ let {data}=await supa.from('messages').select('*').order('created_at',{ascending:false}).limit(200); if(!data)data=[]; data=data.filter(m=>{ let s=m.sender_id||m.sender||'', r=m.receiver_id||m.receiver||'', cid=m.chat_id||''; let isMine=s===ME_ID||s===ME_RAW||r===ME_ID||r===ME_RAW||cid.includes(ME_RAW); if(!isMine) return false; let o=(s===ME_ID||s===ME_RAW)?r:s; if(!o&&cid){let p=cid.split('_'); o=p[0]===ME_RAW?p[1]:p[0]} if(!o||cleanUser(o)===ME_RAW) return false; return profileMap[cleanUser(o)]||profileById[o]; }); let map={}; data.forEach(m=>{ let s=m.sender_id||m.sender, r=m.receiver_id||m.receiver, o=(s===ME_ID||s===ME_RAW)?r:s; if(!o&&m.chat_id){let p=m.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0]} if(o&&(!map[o]||new Date(m.created_at)>new Date(map[o].created_at))) map[o]=m }); let users=[...Object.keys(map)]; document.getElementById('notes').innerHTML=`<div class="nItem"><div class="nRing" style="background:#333"><div class="nRingInner"><img src="${getPfp(ME_RAW)}"></div><div class="noteBubble">Your note</div></div><div style="font-size:10px;margin-top:4px">Your note</div></div>`+users.slice(0,6).map(u=>{let n=profileById[u]?.username||u; return `<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(n)}'"><div class="nRing"><div class="nRingInner"><img src="${getPfp(u)}"></div><div class="noteBubble">Hi da ❤️</div></div><div style="font-size:10px;margin-top:4px">${cleanUser(n)}</div></div>`}).join(''); ALL_CHATS=Object.values(map).map(c=>{ let s=c.sender_id||c.sender, r=c.receiver_id||c.receiver, o=(s===ME_ID||s===ME_RAW)?r:s; if(!o&&c.chat_id){let p=c.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0]} let preview=c.type==='voice'?'🎙️ Voice':c.type==='image'?'📸 Photo':c.type==='video'?'🎬 Video':(c.text||c.message||'').slice(0,35); let isFirstFromThem=(s!==ME_ID&&s!==ME_RAW); let threadType='primary'; if(isFirstFromThem && !c.seen) threadType='requests'; return {other:o,msg:c,preview,threadType}; }); let pri=ALL_CHATS.filter(x=>x.threadType==='primary').length; document.getElementById('cAll').innerText=ALL_CHATS.length||''; document.getElementById('cPri').innerText=pri||''; render(); }
+async function startCall(user,isVideo){ document.getElementById('callBox').style.display='flex'; document.getElementById('callName').innerText='@'+user; document.getElementById('callStatus').innerText=isVideo?'Video Calling...':'Audio Calling...'; peer=new Peer(ME_RAW); peer.on('open', async()=>{ stream=await navigator.mediaDevices.getUserMedia({audio:true,video:isVideo}); document.getElementById('localV').srcObject=stream; if(!isVideo) document.getElementById('localV').style.display='none'; else document.getElementById('localV').style.display='block'; callObj=peer.call(user, stream); callObj.on('stream', s=>{ document.getElementById('remoteV').srcObject=s; document.getElementById('callStatus').innerText='Connected ✅'; }); }); peer.on('call', async c=>{ stream=await navigator.mediaDevices.getUserMedia({audio:true,video:isVideo}); document.getElementById('localV').srcObject=stream; c.answer(stream); c.on('stream', s=>{ document.getElementById('remoteV').srcObject=s; }); callObj=c; }); }
 function toggleMic(){ micOn=!micOn; stream.getAudioTracks()[0].enabled=micOn; document.getElementById('micBtn').innerText=micOn?'🎙️':'🔇'; }
 function toggleCam(){ camOn=!camOn; stream.getVideoTracks()[0].enabled=camOn; document.getElementById('camBtn').innerText=camOn?'📸':'📷'; }
 function endCall(){ if(callObj) callObj.close(); if(peer) peer.destroy(); if(stream) stream.getTracks().forEach(t=>t.stop()); document.getElementById('callBox').style.display='none'; }
