@@ -48,6 +48,7 @@ input[type=range]{width:100%;accent-color:#ff5ea8}
 .pixoroMenu{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#111;border:1px solid #333;border-radius:16px;width:92%;max-width:420px;z-index:9999;display:none;padding:8px}
 .pixoroMenu div{padding:14px;border-bottom:1px solid #222;cursor:pointer;font-size:14px}
 .pixoroMenu div.delete{color:#ff3040}
+.hlCover{width:62px;height:62px;border-radius:50%;object-fit:cover;border:2px solid #ff5ea8;cursor:pointer}
 </style></head><body>
 <div class="top"><b style="font-size:20px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="topUsername"></b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div><span onclick="openSettings()" style="font-size:20px;cursor:pointer">☰</span></div></div>
 <div style="padding:15px">
@@ -58,6 +59,8 @@ input[type=range]{width:100%;accent-color:#ff5ea8}
 <div style="display:flex;border-top:1px solid #222;margin-top:18px"><div class="tab active" id="tabPosts" onclick="showTab('all')">⊞ Posts</div><div class="tab" id="tabReels" onclick="showTab('reels')">🎬 Reels</div><div class="tab" onclick="location.href='saved.html'">🔖 Saved</div></div>
 <div id="myGrid" class="grid"></div></div>
 <div id="pixoroMenu" class="pixoroMenu"></div>
+<div id="hlEditSheet" style="position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:none;align-items:flex-end;justify-content:center"><div style="background:#111;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:18px;border:1px solid #333"><div style="text-align:center;font-weight:900">⭐ Edit Highlight</div><div style="display:flex;gap:10px;margin:14px 0;overflow-x:auto" id="hlCoverPicker"></div><input id="hlEditName" placeholder="Highlight Name" style="width:100%;background:#222;border:1px solid #ff5ea8;color:#fff;padding:12px;border-radius:12px;outline:none"><button onclick="saveHighlightEdit()" style="width:100%;background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;border:0;padding:12px;border-radius:12px;font-weight:800;margin-top:10px">Save Changes ✅</button><button onclick="deleteHighlight()" style="width:100%;background:#ff0000;color:#fff;border:0;padding:12px;border-radius:12px;font-weight:800;margin-top:8px">🗑️ Delete Highlight</button><div onclick="document.getElementById('hlEditSheet').style.display='none'" style="text-align:center;padding:12px;color:#888">Cancel</div></div></div>
+<input type="file" id="hlCoverInput" accept="image/*" style="display:none">
 <div id="setSheet" class="setSheet"><div class="sheetBox"><div style="text-align:center;font-weight:900;padding-bottom:12px">Pixoro Settings ⚙️</div><div class="sItem" onclick="openEditSheet()"><span>👤 Edit Profile</span><span>›</span></div><div class="sItem" onclick="doPixoroLogout()" style="color:#ff3b30"><span>🚪 Log Out</span><span>›</span></div><div onclick="document.getElementById('setSheet').style.display='none'" style="margin:14px;background:#111;padding:12px;border-radius:12px;text-align:center;color:#888">Cancel</div></div></div>
 <div id="editSheet" class="editSheet"><div class="sheetBox"><b style="display:block;text-align:center">Edit Profile</b><div style="text-align:center;margin:14px"><img id="editPfpPreview" src="" style="width:90px;height:90px;border-radius:50%;border:2px solid #ff5ea8;object-fit:cover;background:transparent"><br><button onclick="document.getElementById('pfpInput').click()" style="margin-top:8px;background:transparent;border:1.2px solid #fff;color:#fff;padding:6px 14px;border-radius:20px">Change Photo</button><input type="file" id="pfpInput" accept="image/*" style="display:none"></div><div class="fieldBox"><span>Name</span><input id="editName"></div><div class="fieldBox"><span>Username</span><input id="editUsername"></div><div class="fieldBox"><span>Bio</span><textarea id="editBio" rows="2"></textarea></div><div class="fieldBox"><span>Link</span><input id="editLink"></div><button onclick="saveEdit()" style="width:100%;background:transparent;color:#fff;padding:12px;border-radius:20px;font-weight:700;margin-top:16px;border:1.2px solid #fff">Save - Server Sync</button><div onclick="document.getElementById('editSheet').style.display='none'" style="text-align:center;padding:12px;color:#888">Cancel</div></div></div>
 <div id="cropOverlay" class="cropOverlay"><div style="padding:14px;display:flex;justify-content:space-between"><span onclick="closeCrop()" style="font-size:20px;cursor:pointer">✕</span><b>Adjust Profile Photo</b><span onclick="applyCrop()" style="color:#ff5ea8;font-weight:900;cursor:pointer">Done ✓</span></div><div class="cropStage"><div class="cropCircle" id="cropCircle"><img id="cropImg"></div></div><div style="padding:18px"><input type="range" id="zoomRange" min="1" max="3" step="0.01" value="1"><div style="display:flex;gap:8px;margin-top:14px"><button onclick="resetCrop()" style="flex:1;background:transparent;color:#fff;padding:12px;border-radius:12px;border:1.2px solid #fff">Reset</button><button onclick="applyCrop()" style="flex:2;background:transparent;color:#fff;padding:12px;border-radius:20px;font-weight:700;border:1.2px solid #fff">Crop & Save ✓</button></div></div></div>
@@ -69,7 +72,7 @@ function showToast(m){return}
 function getSupa(){return window.supa}
 window.getTick=()=>''; 
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase();return u||''}
-let ME_RAW='',ME_ID='',VIEW_USER='',VIEW_PROFILE=null,myPosts=[],allViews=[],allFollows=[],currentTab='all',allHighlights=[]
+let ME_RAW='',ME_ID='',VIEW_USER='',VIEW_PROFILE=null,myPosts=[],allViews=[],allFollows=[],currentTab='all',allHighlights=[],editingHL=null,editingCover=''
 function isReelPost(p){let u=(p.media_url||p.video_url||'').toLowerCase();return p.media_type=='reel'||p.media_type=='video'||!!p.video_url||u.includes('.mp4')}
 function getPfpFrom(p){return p?.avatar_url||p?.profile_pic||p?.photo_url||'https://ui-avatars.com/api/?name='+(cleanUser(p?.username||'G').charAt(0).toUpperCase())+'&background=ff5ea8&color=fff&size=200&bold=true'}
 function fmtViews(n){return n>=1000?(n/1000).toFixed(1)+'K':n}
@@ -116,18 +119,42 @@ async function loadHighlights(){
   if(!list.length){ let fromPosts=myPosts.filter(p=>p.is_highlight===true); if(fromPosts.length) list=fromPosts; }
   allHighlights=list;
   if(!list.length){ h.style.display='none'; h.innerHTML=''; return; }
-  // Group by highlight_name - Pudicha Cover Mattum da
   let groups={};
   list.forEach(s=>{ let n=s.highlight_name||'Highlight'; if(!groups[n]) groups[n]=s; else if(s.highlight_cover) groups[n]=s; });
-  // Cover irukkura story ah first ah vei da
   let grouped=Object.entries(groups).map(([name,s])=>{
     let cover = s.highlight_cover || list.find(x=>(x.highlight_name||'Highlight')===name && x.highlight_cover)?.highlight_cover || s.image_url || s.media_url || s.image || '';
     return {name, cover, count: list.filter(x=>(x.highlight_name||'Highlight')===name).length};
   });
   h.style.display='flex';
-  h.innerHTML=grouped.map(g=>`<div class="h-item" onclick="location.href='story-view.html?user=${VIEW_USER}'"><div class="h-circle"><img src="${g.cover}"></div><div class="h-text">${g.name}</div></div>`).join('');
+  h.innerHTML=grouped.map(g=>`<div class="h-item" data-hl="${g.name}" oncontextmenu="event.preventDefault();openHighlightEdit('${g.name.replace(/'/g,"\\'")}');return false" onclick="location.href='story-view.html?user=${VIEW_USER}'"><div class="h-circle"><img src="${g.cover}"></div><div class="h-text">${g.name}</div><div style="font-size:9px;color:#888">${g.count} stories</div></div>`).join('');
+  document.querySelectorAll('.h-item').forEach(el=>{ let t; el.addEventListener('touchstart',()=>{ t=setTimeout(()=>{ openHighlightEdit(el.dataset.hl); },600) }); el.addEventListener('touchend',()=>clearTimeout(t)); el.addEventListener('touchmove',()=>clearTimeout(t)); });
 }
 function renderHighlights(){ loadHighlights(); }
+function openHighlightEdit(name){
+  if(VIEW_PROFILE.id!==ME_ID) return;
+  editingHL=name; editingCover='';
+  document.getElementById('hlEditName').value=name;
+  let covers = allHighlights.filter(s=>(s.highlight_name||'Highlight')===name).map(s=>s.image_url||s.media_url||s.image).filter(Boolean);
+  let unique=[...new Set(covers)];
+  document.getElementById('hlCoverPicker').innerHTML = `<div onclick="document.getElementById('hlCoverInput').click()" style="min-width:62px;height:62px;border-radius:50%;background:#222;display:grid;place-items:center;font-size:22px;border:2px dashed #ff5ea8;cursor:pointer">📸</div>` + unique.map(u=>`<img src="${u}" onclick="selectHLCover('${u}')" class="hlCover">`).join('');
+  document.getElementById('hlEditSheet').style.display='flex';
+}
+function selectHLCover(url){ editingCover=url; document.querySelectorAll('#hlCoverPicker .hlCover').forEach(i=>i.style.border='2px solid #333'); event.target.style.border='2px solid #00ff66'; }
+async function saveHighlightEdit(){
+  let newName=document.getElementById('hlEditName').value.trim()||editingHL;
+  let supa=getSupa();
+  let upd={highlight_name:newName}; if(editingCover) upd.highlight_cover=editingCover;
+  await supa.from('stories').update(upd).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true);
+  if(editingCover) await supa.from('stories').update({highlight_cover:editingCover}).eq('user_id',ME_ID).eq('highlight_name',newName).eq('is_highlight',true);
+  await supa.from('posts').update(upd).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true);
+  document.getElementById('hlEditSheet').style.display='none'; loadHighlights();
+}
+async function deleteHighlight(){
+  let supa=getSupa();
+  await supa.from('stories').update({is_highlight:false, highlight_name:null, highlight_cover:null}).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true);
+  await supa.from('posts').update({is_highlight:false}).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true);
+  document.getElementById('hlEditSheet').style.display='none'; loadHighlights();
+}
 async function toggleF(uid,pid){
   if(!uid||String(uid)==String(ME_ID)) return;
   let supa=getSupa(); if(!supa) return;
@@ -164,5 +191,6 @@ circle.addEventListener('pointermove',e=>{if(!cropDragging)return;cropX=cropOrig
 circle.addEventListener('pointerup',()=>cropDragging=false);
 function applyCrop(){let canvas=document.createElement('canvas');canvas.width=400;canvas.height=400;let ctx=canvas.getContext('2d');let img=new Image();img.onload=()=>{ctx.save();ctx.beginPath();ctx.arc(200,200,200,0,Math.PI*2);ctx.clip();let scale=Math.max(400/img.naturalWidth,400/img.naturalHeight)*cropScale;let dw=img.naturalWidth*scale,dh=img.naturalHeight*scale;let dx=200-dw/2+cropX*(400/280);let dy=200-dh/2+cropY*(400/280);ctx.drawImage(img,dx,dy,dw,dh);ctx.restore();let out=canvas.toDataURL('image/jpeg',0.92);document.getElementById('editPfpPreview').src=out;document.getElementById('editPfpPreview').dataset.new=out;document.getElementById('pfpImg').src=out;closeCrop();document.getElementById('editSheet').style.display='flex'};img.src=cropImgEl.src}
 document.getElementById('pfpInput').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{openCrop(ev.target.result)};r.readAsDataURL(f)})
+document.getElementById('hlCoverInput').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{editingCover=ev.target.result};r.readAsDataURL(f)})
 init()
 </script></body></html>
