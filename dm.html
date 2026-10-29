@@ -15,8 +15,9 @@
 .tabs{display:flex;gap:6px;padding:8px 10px}
 .tab{padding:5px 12px;border-radius:16px;background:#262626;color:#999;font-size:12px}
 .tab.active{background:#fff;color:#000;font-weight:700}
-.chatRow{display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid #111;cursor:pointer}
+.chatRow{display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid #111;cursor:pointer;position:relative}
 .chatRow img{width:46px;height:46px;border-radius:50%;border:2px solid #fff;object-fit:cover}
+.unread{position:absolute;right:12px;top:14px;background:#ff5ea8;color:#fff;font-size:11px;font-weight:800;min-width:20px;height:20px;border-radius:20px;display:grid;place-items:center;padding:0 5px}
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;height:60px;z-index:100}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}
 .bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}
@@ -69,12 +70,25 @@ async function init(){
   ;(profs||[]).forEach(p=>{ profileMap[cleanUser(p.username)] = p; profileById[p.id]=p })
   let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW)
   load()
+  // Realtime - New Msg Vantha Udane List Update da
+  supa.channel('dm-list').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},()=>load()).subscribe();
+  supa.channel('dm-list2').on('postgres_changes',{event:'INSERT',schema:'public',table:'dms'},()=>load()).subscribe();
 }
 function newChat(){ showToast('Search la real friend name type pannu da'); setTimeout(()=>location.href='search.html',500); }
+function lastPreview(c){
+  if(c.type==='voice' || c.media_type==='voice') return '🎙️ Voice Note';
+  if(c.type==='image' || c.media_type==='image') return '📸 Photo';
+  if(c.type==='video' || c.media_type==='video') return '🎬 Video';
+  if(c.media_url) return '📸 Photo';
+  return (c.text||c.content||c.message||'📷 Photo').slice(0,40);
+}
 async function load(){
   try{
     let {data} = await supa.from('messages').select('*').order('created_at',{ascending:false}).limit(200)
     if(!data) data=[]
+    // dms table la irundhum edukkurom da - Voice/Image ku
+    let {data:d2}=await supa.from('dms').select('*').order('created_at',{ascending:false}).limit(100)
+    if(d2) data=[...data,...d2].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))
     data = data.filter(m=>{
       let s = m.sender_id||m.sender||''
       let r = m.receiver_id||m.receiver||''
@@ -92,9 +106,10 @@ async function load(){
     let notesUsers = [...new Set(data.map(m=>{ let s=m.sender_id||m.sender; let r=m.receiver_id||m.receiver; let o=(s===ME_ID||s===ME_RAW)?r:s; if(!o && m.chat_id){ let p=m.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0] } return o }))].filter(Boolean).slice(0,6)
     document.getElementById('notes').innerHTML = `<div class="nItem"><div class="nRing" style="background:#222"><div class="nRingInner"><img src="${getPfp(ME_RAW)}"></div><div class="noteBubble">Your note</div></div><div style="font-size:10px;margin-top:4px">${ME_RAW}</div></div>` + notesUsers.map(u=>{ let uname = profileById[u]?.username || u; return `<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(uname)}'"><div class="nRing"><div class="nRingInner"><img src="${getPfp(u)}"></div><div class="noteBubble">Hi da ❤️</div></div><div style="font-size:10px;margin-top:4px">${cleanUser(uname)}</div></div>` }).join('')
     if(!data.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#666">No chats da!<br><span style="font-size:12px">🔒 Real Friends Only da - Fake ID Illa</span><br><button onclick="newChat()" style="margin-top:12px;background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat With Real Friend</button></div>`; return }
-    let map={}; data.forEach(m=>{ let s=m.sender_id||m.sender; let r=m.receiver_id||m.receiver; let o=(s===ME_ID||s===ME_RAW)?r:s; if(!o && m.chat_id){ let p=m.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0] } if(o && (!map[o]||new Date(m.created_at)>new Date(map[o].created_at))) map[o]=m })
+    let map={}; let unreadMap={};
+    data.forEach(m=>{ let s=m.sender_id||m.sender; let r=m.receiver_id||m.receiver; let o=(s===ME_ID||s===ME_RAW)?r:s; if(!o && m.chat_id){ let p=m.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0] } if(o){ if(!map[o]||new Date(m.created_at)>new Date(map[o].created_at)) map[o]=m; if((r===ME_ID||r===ME_RAW) && !m.seen) unreadMap[o]=(unreadMap[o]||0)+1; } })
     let chats=Object.values(map)
-    document.getElementById('list').innerHTML = chats.map(c=>{ let s=c.sender_id||c.sender; let r=c.receiver_id||c.receiver; let o=(s===ME_ID||s===ME_RAW)?r:s; if(!o && c.chat_id){ let p=c.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0] } let uname = profileById[o]?.username || o; return `<div class="chatRow" onclick="location.href='chat.html?user=${encodeURIComponent(uname)}'"><img src="${getPfp(o)}"><div style="flex:1;text-align:left"><b style="font-size:13px">${cleanUser(uname)} <span style="color:#00ff88;font-size:10px">🔒</span></b><div style="font-size:11px;color:#999">${(s===ME_ID||s===ME_RAW)?'You sent':'New message'} • ${new Date(c.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div><div style="font-size:12px;color:#ccc">${(c.text||c.content||c.message||'📷 Photo').slice(0,40)}</div></div><div style="font-size:16px">🔒</div></div>` }).join('')
+    document.getElementById('list').innerHTML = chats.map(c=>{ let s=c.sender_id||c.sender; let r=c.receiver_id||c.receiver; let o=(s===ME_ID||s===ME_RAW)?r:s; if(!o && c.chat_id){ let p=c.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0] } let uname = profileById[o]?.username || o; let isMe=(s===ME_ID||s===ME_RAW); let tick=isMe? (c.seen?`<span style="color:#00ff66">✓✓</span>`:`<span style="color:#888">✓</span>`):''; let unread=unreadMap[o]?`<span class="unread">${unreadMap[o]}</span>`:''; return `<div class="chatRow" onclick="location.href='chat.html?user=${encodeURIComponent(uname)}'"><img src="${getPfp(o)}"><div style="flex:1;text-align:left"><b style="font-size:13px">${cleanUser(uname)} <span style="color:#00ff88;font-size:10px">🔒</span></b><div style="font-size:11px;color:#999">${isMe?'You sent':'New message'} • ${new Date(c.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div><div style="font-size:12px;color:#ccc">${tick} ${lastPreview(c)}</div></div>${unread}<div style="font-size:16px">🔒</div></div>` }).join('')
   }catch(e){ console.log(e); document.getElementById('list').innerHTML = `<div style="padding:40px;color:#666">No chats da!<br><button onclick="newChat()" style="margin-top:12px;background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>` }
 }
 init()
