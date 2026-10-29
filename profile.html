@@ -90,7 +90,7 @@ async function init(){
   document.getElementById('editPfpPreview').src=getPfpFrom(VIEW_PROFILE);
   document.getElementById('navPfp').src=getPfpFrom(myProfile);
   let {data:follows}=await supa.from('follows').select('*'); allFollows=follows||[];
-  let isFollow=allFollows.some(f=>f.follower_id===ME_ID&&f.following_id===VIEW_PROFILE.id);
+  let isFollow=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(VIEW_PROFILE.id));
   if(isMine){ document.getElementById('actionArea').innerHTML=`<button class="btn btnPrimary" onclick="openEditSheet()">Edit Profile</button><button class="btn" onclick="shareProfile()">Share Profile</button>` }
   else { document.getElementById('actionArea').innerHTML=`<button class="btn btnPrimary" id="followBtnMain" onclick="toggleFollowMain()">${isFollow?'Following':'Follow'}</button><button class="btn" onclick="shareProfile()">Share Profile</button>` }
   let {data:p1}=await supa.from('posts').select('*').eq('user_id',VIEW_PROFILE.id).order('created_at',{ascending:false});
@@ -107,10 +107,22 @@ async function init(){
   document.getElementById('tabReels').innerHTML=`🎬 Reels (${totalReels})`;
   renderGrid(myPosts);
   renderHighlights();
-  document.getElementById('followerCount').textContent=allFollows.filter(f=>f.following_id===VIEW_PROFILE.id).length;
-  document.getElementById('followingCount').textContent=allFollows.filter(f=>f.follower_id===VIEW_PROFILE.id).length;
+  document.getElementById('followerCount').textContent=allFollows.filter(f=>String(f.following_id)==String(VIEW_PROFILE.id)).length;
+  document.getElementById('followingCount').textContent=allFollows.filter(f=>String(f.follower_id)==String(VIEW_PROFILE.id)).length;
 }
-async function toggleFollowMain(){let supa=getSupa();let btn=document.getElementById('followBtnMain');let isF=allFollows.some(f=>f.follower_id===ME_ID&&f.following_id===VIEW_PROFILE.id); if(isF){allFollows=allFollows.filter(f=>!(f.follower_id===ME_ID&&f.following_id===VIEW_PROFILE.id));btn.innerText='Follow';await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',VIEW_PROFILE.id)} else {allFollows.push({follower_id:ME_ID,following_id:VIEW_PROFILE.id});btn.innerText='Following';await supa.from('follows').insert({follower_id:ME_ID,following_id:VIEW_PROFILE.id,follower:ME_RAW,following:VIEW_USER})} document.getElementById('followerCount').textContent=allFollows.filter(f=>f.following_id===VIEW_PROFILE.id).length}
+async function toggleF(uid,pid){
+  if(!uid||String(uid)==String(ME_ID)) return;
+  let supa=getSupa(); if(!supa) return;
+  let isF=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid));
+  let newTxt=isF?'Follow':'Following';
+  let main=document.getElementById('followBtnMain'); if(main) main.innerText=newTxt;
+  if(isF){ allFollows=allFollows.filter(f=>!(String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid))); await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',uid); }
+  else { allFollows.push({follower_id:ME_ID,following_id:uid,follower:ME_RAW,following:VIEW_USER}); await supa.from('follows').insert({follower_id:ME_ID,following_id:uid,follower:ME_RAW,following:VIEW_USER}); }
+  let fc=document.getElementById('followerCount'); if(fc) fc.textContent=allFollows.filter(f=>String(f.following_id)==String(uid)).length;
+  let fg=document.getElementById('followingCount'); if(fg && String(uid)==String(VIEW_PROFILE.id)) {}
+}
+window.toggleF=toggleF;
+async function toggleFollowMain(){ await toggleF(VIEW_PROFILE.id,'main'); }
 function renderGrid(list){ if(!list.length){document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`;return} document.getElementById('myGrid').innerHTML=list.map(p=>{ let mUrl=p.media_url||p.video_url||p.image_url||p.image||''; let isVid=isReelPost(p); let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length; let vBadge=`<span style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.7);padding:3px 7px;border-radius:10px;font-size:11px">👁️ ${fmtViews(vCount)}</span>`; if(isVid) return `<div style="position:relative" onclick="openPixoroPost('${p.id}')"><video src="${mUrl}" muted playsinline style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px">🎬</span>${vBadge}</div>`; return `<div style="position:relative" onclick="openPixoroPost('${p.id}')"><img src="${mUrl}">${vBadge}</div>` }).join('') }
 function renderHighlights(){ let h=document.getElementById('highlightList'); if(!h) return; let stories = myPosts.filter(p=>p.media_type==='story'||p.is_highlight); if(!stories.length){ h.innerHTML=`<div class="h-item" onclick="location.href='story-create.html'"><div class="h-circle">+</div><div class="h-text">New</div></div>`; return } h.innerHTML=stories.map(s=>`<div class="h-item"><div class="h-circle"><img src="${s.media_url||''}"></div><div class="h-text">Highlight</div></div>`).join('') }
 function openPixoroPost(id){ let p=myPosts.find(x=>String(x.id)==String(id)); if(!p) return; let isMine=VIEW_PROFILE.id===ME_ID; let menu=document.getElementById('pixoroMenu'); if(isMine){ menu.innerHTML=`<div onclick="location.href='index.html?id=${id}'">👁️ Open Post</div><div onclick="location.href='reels.html?id=${id}'">🎬 Open Reel</div><div onclick="sharePixoroPost('${id}')">🔗 Share</div><div onclick="savePixoroPost('${id}')">🔖 Save</div><div class="delete" onclick="deletePixoroPost('${id}')">🗑️ Delete</div><div onclick="hideMenu()" style="text-align:center;color:#888">Cancel</div>` } else { menu.innerHTML=`<div onclick="location.href='index.html?id=${id}'">👁️ Open Post</div><div onclick="location.href='reels.html?id=${id}'">🎬 Open Reel</div><div onclick="sharePixoroPost('${id}')">🔗 Share</div><div onclick="savePixoroPost('${id}')">🔖 Save</div><div onclick="hideMenu()" style="text-align:center;color:#888">Cancel</div>` } menu.style.display='block' }
