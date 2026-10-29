@@ -4,22 +4,25 @@
 <style>
 *{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto}
 .top{padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #111}
-.prev{margin:12px;height:400px;background:#111;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}.prev video{width:100%;height:100%;object-fit:cover}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px}.cell{padding:16px;background:#1a1a1a;border-radius:14px;text-align:center;cursor:pointer}
-.btn{margin:12px;background:#fff;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900;color:#000}
+.prev{margin:12px;height:400px;background:#000;border:1px solid #222;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}.prev video{width:100%;height:100%;object-fit:cover}
+/* IMAGE ILLA DA - FULL WHITE BLOCK DA - BACKGROUND ILLA DA */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px}
+.cell{padding:18px;background:#fff!important;color:#000!important;border-radius:14px;text-align:center;cursor:pointer;font-weight:800;font-size:14px;border:none!important}
+.cell span{display:block;font-size:12px;font-weight:400;color:#555;margin-top:4px}
+.btn{margin:12px;background:#fff!important;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900;color:#000}
 .btn:disabled{opacity:.5}
 .toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
-.progress{margin:0 12px;background:#111;border:1px solid #222;border-radius:12px;padding:10px;display:none}
-.bar{height:6px;background:#333;border-radius:10px;overflow:hidden;margin-top:6px}
-.barFill{height:100%;background:#00C853;width:0%}
-.info{margin:0 12px;padding:8px;background:#111;border:1px solid #222;border-radius:10px;font-size:12px;color:#aaa;text-align:center}
+.progress{margin:0 12px;background:#000;border:1px solid #222;border-radius:12px;padding:10px;display:none}
+.bar{height:6px;background:#222;border-radius:10px;overflow:hidden;margin-top:6px}
+.barFill{height:100%;background:#fff;width:0%}
+.info{margin:0 12px;padding:8px;background:#000;border:1px solid #222;border-radius:10px;font-size:12px;color:#aaa;text-align:center}
 .soundBtn{position:absolute;bottom:12px;right:12px;background:#fff;color:#000;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;z-index:10}
 </style></head><body>
-<div class="top"><b>New Reel 🎬</b><span onclick="location.href='index.html'">✕</span></div>
-<div class="prev" id="prev">🎬 Video Select Pannu</div>
+<div class="top"><b>New Reel</b><span onclick="location.href='index.html'">✕</span></div>
+<div class="prev" id="prev">Video Select Pannu</div>
 <div class="info" id="info">Max: 30 Sec • Max: 15 MB • 720p Recommend da</div>
-<div class="grid"><div class="cell" onclick="document.getElementById('f').click()">🖼️ Gallery</div><div class="cell" onclick="document.getElementById('f').click()">➕ Add Video</div></div>
-<div class="progress" id="prog"><div style="display:flex;justify-content:space-between;font-size:11px;color:#aaa"><span id="progText">Checking... ⏳</span><span id="progSize"></span></div><div class="bar"><div class="barFill" id="progFill"></div></div></div>
+<div class="grid"><div class="cell" onclick="document.getElementById('f').click()">Gallery<span>Video Select</span></div><div class="cell" onclick="document.getElementById('f').click()">Add Video<span>From Phone</span></div></div>
+<div class="progress" id="prog"><div style="display:flex;justify-content:space-between;font-size:11px;color:#aaa"><span id="progText">Checking...</span><span id="progSize"></span></div><div class="bar"><div class="barFill" id="progFill"></div></div></div>
 <button class="btn" id="nextBtn" onclick="go()">Next →</button>
 <div id="toast" class="toast"></div>
 <input type="file" id="f" hidden accept="video/*" onchange="h(event)">
@@ -61,11 +64,10 @@ async function h(e){
     document.getElementById('progText').innerText='Uploading Reel... '+Math.round(vid.duration)+' sec • '+formatSize(f.size);
     document.getElementById('progSize').innerText=formatSize(f.size);
     document.getElementById('progFill').style.width='30%';
-    document.getElementById('info').innerText='✅ Size OK: '+formatSize(f.size)+' • Duration: '+Math.round(vid.duration)+' sec • Audio Saved 🔊';
-    showToast('Uploading... ⏳');
-    // NEXT LOCK
+    document.getElementById('info').innerText='Size OK: '+formatSize(f.size)+' • Duration: '+Math.round(vid.duration)+' sec • Audio Saved';
+    showToast('Uploading...');
     isUploading = true;
-    let nb = document.getElementById('nextBtn'); nb.disabled=true; nb.innerText='Uploading... ⏳';
+    let nb = document.getElementById('nextBtn'); nb.disabled=true; nb.innerText='Uploading...';
     let fileName = Date.now() + '_' + ME_RAW + '_' + f.name.replace(/[^a-zA-Z0-9.]/g,'_');
     let {data, error} = await supa.storage.from('reels').upload(fileName, f);
     if(error){ showToast('Adutha side la problem da - Try again'); document.getElementById('prog').style.display='none'; isUploading=false; nb.disabled=false; nb.innerText='Next →'; return; }
@@ -74,13 +76,13 @@ async function h(e){
     isUploading = false;
     nb.disabled=false; nb.innerText='Next →';
     document.getElementById('progFill').style.width='100%';
-    document.getElementById('progText').innerText='Upload Done ✅ Audio Saved 🔊';
-    showToast('Upload Done da 🔥 Next ku po da');
+    document.getElementById('progText').innerText='Upload Done - Audio Saved';
+    showToast('Upload Done da - Next ku po da');
   };
   vid.src=u;
 }
 function go(){
-  if(isUploading){ showToast('Upload aagitu irukku da - Wait pannu ⏳'); return; }
+  if(isUploading){ showToast('Upload aagitu irukku da - Wait pannu'); return; }
   if(!m){ showToast('Video select pannu da - Upload aagattum'); return; }
   location.href = 'reels-upload.html?media='+encodeURIComponent(m)+'&type=video';
 }
