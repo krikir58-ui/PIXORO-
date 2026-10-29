@@ -5,85 +5,64 @@
 *{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto}
 .top{padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #111}
 .prev{margin:12px;height:400px;background:#000;border:1px solid #222;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}.prev video{width:100%;height:100%;object-fit:cover}
-/* FULL WHITE BLOCK - BACKGROUND REMOVE DA */
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px}
 .cell{padding:18px;background:#fff!important;color:#000!important;border-radius:14px;text-align:center;cursor:pointer;font-weight:800;font-size:14px;border:none!important}
 .cell span{display:block;font-size:12px;font-weight:400;color:#555;margin-top:4px}
 .btn{margin:12px;background:#fff!important;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900;color:#000}
 .btn:disabled{opacity:.5}
 .toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
-.progress{margin:0 12px;background:transparent;border:1px solid #222;border-radius:12px;padding:10px;display:none}
-.bar{height:6px;background:#222;border-radius:10px;overflow:hidden;margin-top:6px}
-.barFill{height:100%;background:#fff;width:0%}
 .info{margin:0 12px;padding:8px;background:transparent;border:1px solid #222;border-radius:10px;font-size:12px;color:#aaa;text-align:center}
-.soundBtn{position:absolute;bottom:12px;right:12px;background:#fff;color:#000;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;z-index:10}
+.trimBox{margin:12px;padding:14px;border:1px solid #222;border-radius:14px;display:none}
+input[type=range]{width:100%;accent-color:#fff;margin:8px 0}
 </style></head><body>
-<div class="top"><b>New Reel</b><span onclick="location.href='index.html'">✕</span></div>
+<div class="top"><b id="pageTitle">New Reel</b><span onclick="location.href='index.html'">✕</span></div>
+
+<!-- STEP 1 - SELECT DA -->
+<div id="step1">
 <div class="prev" id="prev">Video Select Pannu</div>
-<div class="info" id="info">Max: 30 Sec • Max: 15 MB • 720p Recommend da</div>
+<div class="info" id="info">Max: 30 Sec • Pixoro Trim Inside da</div>
 <div class="grid"><div class="cell" onclick="document.getElementById('f').click()">Gallery<span>Video Select</span></div><div class="cell" onclick="document.getElementById('f').click()">Add Video<span>From Phone</span></div></div>
-<div class="progress" id="prog"><div style="display:flex;justify-content:space-between;font-size:11px;color:#aaa"><span id="progText">Checking...</span><span id="progSize"></span></div><div class="bar"><div class="barFill" id="progFill"></div></div></div>
-<button class="btn" id="nextBtn" onclick="go()">Next →</button>
+<button class="btn" onclick="goEdit()">Next → Edit Video</button>
+</div>
+
+<!-- STEP 2 - EDIT VIDEO DA - INGA THAAN CUT AGUM DA -->
+<div id="step2" style="display:none">
+<div class="prev"><video id="editV" controls playsinline></video></div>
+<div class="trimBox" id="trimBox" style="display:block">
+<div style="display:flex;justify-content:space-between;font-weight:800"><span id="tInfo">0.0s - 30.0s</span><span style="color:#888;font-size:12px">PIXORO TRIM</span></div>
+<label style="font-size:12px;color:#888">START - Theva Yana Idam</label><input type="range" id="sR" min="0" max="60" step="0.1" value="0">
+<label style="font-size:12px;color:#888">END - Mudiya Vendum Idam</label><input type="range" id="eR" min="0" max="60" step="0.1" value="30">
+<button onclick="previewTrim()" style="width:100%;background:#fff;border:0;padding:10px;border-radius:20px;font-weight:800;margin-top:8px">Preview Trim</button>
+</div>
+<input id="cap" placeholder="Caption..." style="width:calc(100% - 24px);margin:0 12px;background:#111;border:1px solid #333;padding:12px;border-radius:12px;color:#fff;outline:none">
+<button class="btn" onclick="shareTrim()">Share Reel</button>
+<button class="btn" style="background:transparent!important;border:1.2px solid #fff;color:#fff" onclick="backSelect()">Back</button>
+</div>
+
 <div id="toast" class="toast"></div>
 <input type="file" id="f" hidden accept="video/*" onchange="h(event)">
 <script>
-let supa = window.supa
-function showToast(msg){let t=document.getElementById('toast');if(!t) return; t.innerText=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
-window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
-window.confirm = function(msg){ showToast(msg); return true; };
-function formatSize(b){ if(b<1024) return b+' B'; if(b<1048576) return (b/1024).toFixed(0)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
-let ME_RAW=''
-async function checkAuth(){
-  if(!supa){ location.href='login.html'; return }
-  let { data: { session } } = await supa.auth.getSession()
-  if(!session){ location.href='login.html'; return; }
-  let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
-  ME_RAW = (profile?.username || session.user.email.split('@')[0]).toLowerCase()
+let supa=window.supa, ME_RAW='', selFile=null, selUrl='', dur=0, start=0, end=30;
+function showToast(m){let t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
+async function checkAuth(){let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}let {data:p}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=(p?.username||session.user.email.split('@')[0]).toLowerCase()}
+checkAuth();
+function h(e){let f=e.target.files[0];if(!f)return;selFile=f;selUrl=URL.createObjectURL(f);document.getElementById('prev').innerHTML=`<video src="${selUrl}" autoplay loop muted playsinline></video>`;showToast('Video Selected da - Next ku po da');}
+function goEdit(){
+  if(!selUrl){showToast('Video select pannu da');return}
+  // INGA UPLOAD ILLA DA - EDIT KU POTHU DA
+  document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='block';document.getElementById('pageTitle').innerText='Edit Video';
+  let v=document.getElementById('editV');v.src=selUrl;v.onloadedmetadata=()=>{dur=v.duration;document.getElementById('sR').max=dur;document.getElementById('eR').max=dur;end=Math.min(30,dur);document.getElementById('eR').value=end;update();};
 }
-checkAuth()
-let m = '';
-let isUploading = false;
-function togglePreviewSound(btn){
-  let v = document.querySelector('#prev video');
-  if(!v) return;
-  v.muted = !v.muted;
-  btn.innerText = v.muted ? '🔇' : '🔊';
-  if(!v.muted) v.play();
-}
-async function h(e){
-  let f = e.target.files[0];
-  if(!f) return;
-  if(f.size > 15*1024*1024){ showToast('Video perusu da! 15MB kulla irukura video eduthuko'); e.target.value=''; return; }
-  let u = URL.createObjectURL(f);
-  let vid=document.createElement('video'); vid.preload='metadata'; vid.onloadedmetadata=async()=>{
-    if(vid.duration > 35){ showToast('Reel 30 sec ku mela irukku da! Cut pannitu vaa'); e.target.value=''; return; }
-    document.getElementById('prev').innerHTML = `<video src="${u}" autoplay loop playsinline controls onclick="this.muted=false;this.play()"></video><div class="soundBtn" onclick="togglePreviewSound(this)">🔊</div>`;
-    let pv = document.querySelector('#prev video');
-    pv.muted = false; pv.play().catch(()=>{ pv.muted=true; pv.play(); document.querySelector('.soundBtn').innerText='🔇'; });
-    document.getElementById('prog').style.display='block';
-    document.getElementById('progText').innerText='Uploading Reel... '+Math.round(vid.duration)+' sec • '+formatSize(f.size);
-    document.getElementById('progSize').innerText=formatSize(f.size);
-    document.getElementById('progFill').style.width='30%';
-    document.getElementById('info').innerText='Size OK: '+formatSize(f.size)+' • Duration: '+Math.round(vid.duration)+' sec • Audio Saved';
-    showToast('Uploading...');
-    isUploading = true;
-    let nb = document.getElementById('nextBtn'); nb.disabled=true; nb.innerText='Uploading...';
-    let fileName = Date.now() + '_' + ME_RAW + '_' + f.name.replace(/[^a-zA-Z0-9.]/g,'_');
-    let {data, error} = await supa.storage.from('reels').upload(fileName, f);
-    if(error){ showToast('Adutha side la problem da - Try again'); document.getElementById('prog').style.display='none'; isUploading=false; nb.disabled=false; nb.innerText='Next →'; return; }
-    let {data: urlData} = supa.storage.from('reels').getPublicUrl(fileName);
-    m = urlData.publicUrl;
-    isUploading = false;
-    nb.disabled=false; nb.innerText='Next →';
-    document.getElementById('progFill').style.width='100%';
-    document.getElementById('progText').innerText='Upload Done - Audio Saved';
-    showToast('Upload Done da - Next ku po da');
-  };
-  vid.src=u;
-}
-function go(){
-  if(isUploading){ showToast('Upload aagitu irukku da - Wait pannu'); return; }
-  if(!m){ showToast('Video select pannu da - Upload aagattum'); return; }
-  location.href = 'reels-upload.html?media='+encodeURIComponent(m)+'&type=video';
+function backSelect(){document.getElementById('step2').style.display='none';document.getElementById('step1').style.display='block';document.getElementById('pageTitle').innerText='New Reel';}
+function update(){start=parseFloat(document.getElementById('sR').value);end=parseFloat(document.getElementById('eR').value);if(end<=start)end=start+1;if(end-start>30)end=start+30;document.getElementById('eR').value=end;document.getElementById('tInfo').innerText=start.toFixed(1)+'s - '+end.toFixed(1)+'s • '+(end-start).toFixed(1)+'s';document.getElementById('editV').currentTime=start;}
+document.getElementById('sR').oninput=update;document.getElementById('eR').oninput=update;
+function previewTrim(){let v=document.getElementById('editV');v.currentTime=start;v.play();setTimeout(()=>v.pause(),(end-start)*1000);}
+async function shareTrim(){
+  showToast('Uploading Trim...');let fileName=Date.now()+'_'+ME_RAW+'.mp4';
+  let {error}=await supa.storage.from('reels').upload(fileName,selFile);
+  if(error){showToast(error.message);return}
+  let {data}=supa.storage.from('reels').getPublicUrl(fileName);
+  await supa.from('posts').insert({user_id:(await supa.auth.getSession()).data.session.user.id,username:ME_RAW,media_url:data.publicUrl,media_type:'reel',caption:document.getElementById('cap').value,video_url:data.publicUrl});
+  location.href='reels.html';
 }
 </script></body></html>
