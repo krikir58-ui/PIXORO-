@@ -10,10 +10,14 @@
 .progress{margin:0 12px;background:#111;border:1px solid #a259ff;border-radius:12px;padding:10px;display:none}
 .bar{height:6px;background:#333;border-radius:10px;overflow:hidden;margin-top:6px}
 .barFill{height:100%;background:linear-gradient(90deg,#ff5ea8,#ff7a00);width:0%}
+.pollBox{margin:0 12px;background:#111;border:1px solid #333;border-radius:16px;padding:12px}
+.pollBox input{width:100%;background:#222;border:1px solid #ff5ea8;color:#fff;padding:10px;border-radius:10px;margin-top:8px;outline:none}
+.pollOpt{display:flex;gap:8px;margin-top:8px}.pollOpt input{flex:1}
 </style></head><body>
 <div class="top"><b>PIXORO New Story ⭐</b><span onclick="location.href='index.html'" style="font-size:20px;cursor:pointer;background:#222;width:32px;height:32px;border-radius:50%;display:grid;place-items:center">✕</span></div>
 <div class="prev" id="prev">⭐ Photo / Video Select Pannu</div>
 <div class="grid"><div class="cell" onclick="location.href='camera.html?type=story'">📷 Camera</div><div class="cell" onclick="document.getElementById('f').click()">🖼️ Gallery</div><div class="cell" onclick="document.getElementById('f').click()">➕ Add</div></div>
+<div class="pollBox"><b>📊 Poll Add Pannu da</b><input id="pollQ" placeholder="Question - Ex: Pudichirukka?"><div class="pollOpt"><input id="pollO1" placeholder="🔥 Yes" value="Yes"><input id="pollO2" placeholder="😴 No" value="No"></div><div style="font-size:11px;color:#888;margin-top:6px">Poll venda na empty ah vidu da</div></div>
 <div class="progress" id="prog"><div style="display:flex;justify-content:space-between;font-size:11px;color:#aaa"><span id="progText">Compressing... 💾</span><span id="progSize"></span></div><div class="bar"><div class="barFill" id="progFill"></div></div></div>
 <button class="btn" onclick="go()">Next → 🔥</button>
 <div id="toast" class="toast"></div>
@@ -82,5 +86,10 @@ if(f.type.startsWith('video/')){
   showToast('Story Compressed da! ⭐');
 }
 }
-function go(){if(!m){showToast('Story select pannu da!');return} location.href='story-add.html?media='+encodeURIComponent(m)+'&type='+mType}
+function go(){if(!m){showToast('Story select pannu da!');return}
+  // Poll Save Pannu da
+  let poll={q:document.getElementById('pollQ').value.trim(), o1:document.getElementById('pollO1').value.trim()||'Yes', o2:document.getElementById('pollO2').value.trim()||'No'};
+  if(poll.q) localStorage.setItem('pixoro_poll', JSON.stringify(poll)); else localStorage.removeItem('pixoro_poll');
+  location.href='story-add.html?media='+encodeURIComponent(m)+'&type='+mType
+}
 </script></body></html>
