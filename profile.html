@@ -39,6 +39,7 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70p
 .fieldBox span{display:block;font-size:12px;color:#888}
 .fieldBox input,.fieldBox textarea{width:100%;background:transparent;border:0;outline:0;color:#fff;font-size:16px;font-weight:600;padding:4px 0 0;font-family:sans-serif;resize:none}
 .toast{display:none!important}
+#displayName,#usernameTag{display:none!important}
 .cropOverlay{position:fixed;inset:0;background:#000;z-index:2000;display:none;flex-direction:column}
 .cropStage{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .cropCircle{width:280px;height:280px;border-radius:50%;overflow:hidden;border:3px solid #ff5ea8;touch-action:none;background:transparent!important;box-shadow:0 0 0 9999px rgba(0,0,0,.7);position:relative}
@@ -51,7 +52,7 @@ input[type=range]{width:100%;accent-color:#ff5ea8}
 <div class="top"><b style="font-size:20px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="topUsername"></b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div><span onclick="openSettings()" style="font-size:20px;cursor:pointer">☰</span></div></div>
 <div style="padding:15px">
 <div style="display:flex;gap:18px;align-items:center"><div class="pfpBig" onclick="openEditSheet()"><div class="pfpBigInner"><img id="pfpImg" src=""></div></div><div class="stats"><div><b id="postCount">0</b><span>Posts</span></div><div><b id="followerCount">0</b><span>Followers</span></div><div><b id="followingCount">0</b><span>Following</span></div></div></div>
-<div style="margin-top:14px"><b id="displayName"></b><div style="font-size:13px;color:#aaa"><span id="usernameTag"></span></div><div id="bioText" style="font-size:14px;margin-top:8px"></div><div id="linkText" style="font-size:13px;color:#ff5ea8;margin-top:6px"></div></div>
+<div style="margin-top:14px"><div id="bioText" style="font-size:14px;margin-top:8px"></div><div id="linkText" style="font-size:13px;color:#ff5ea8;margin-top:6px"></div></div>
 <div class="highlights" id="highlightList"></div>
 <div style="display:flex;gap:8px;margin-top:12px" id="actionArea"><button class="btn btnPrimary" onclick="openEditSheet()">Edit Profile</button><button class="btn" onclick="shareProfile()">Share Profile</button></div>
 <div style="display:flex;border-top:1px solid #222;margin-top:18px"><div class="tab active" id="tabPosts" onclick="showTab('all')">⊞ Posts</div><div class="tab" id="tabReels" onclick="showTab('reels')">🎬 Reels</div><div class="tab" onclick="location.href='saved.html'">🔖 Saved</div></div>
@@ -82,8 +83,6 @@ async function init(){
   if(urlU===''||urlU===ME_RAW) vp=myProfile; else { let {data}=await supa.from('profiles').select('*').eq('username',VIEW_USER).single(); if(data) vp=data; else { let {data:allP}=await supa.from('profiles').select('*'); vp=(allP||[]).find(p=>cleanUser(p.username)===VIEW_USER)||null } if(!vp){document.getElementById('topUsername').innerText='';return} }
   VIEW_PROFILE=vp; let isMine=VIEW_PROFILE.id===ME_ID;
   document.getElementById('topUsername').innerHTML=cleanUser(VIEW_PROFILE.username);
-  document.getElementById('displayName').textContent=VIEW_PROFILE.full_name||VIEW_PROFILE.display_name||VIEW_PROFILE.username;
-  document.getElementById('usernameTag').textContent='@'+VIEW_PROFILE.username;
   document.getElementById('bioText').innerText=VIEW_PROFILE.bio||'';
   document.getElementById('linkText').innerText=VIEW_PROFILE.link||VIEW_PROFILE.website||'';
   document.getElementById('pfpImg').src=getPfpFrom(VIEW_PROFILE);
@@ -119,7 +118,6 @@ async function toggleF(uid,pid){
   if(isF){ allFollows=allFollows.filter(f=>!(String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid))); await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',uid); }
   else { allFollows.push({follower_id:ME_ID,following_id:uid,follower:ME_RAW,following:VIEW_USER}); await supa.from('follows').insert({follower_id:ME_ID,following_id:uid,follower:ME_RAW,following:VIEW_USER}); }
   let fc=document.getElementById('followerCount'); if(fc) fc.textContent=allFollows.filter(f=>String(f.following_id)==String(uid)).length;
-  let fg=document.getElementById('followingCount'); if(fg && String(uid)==String(VIEW_PROFILE.id)) {}
 }
 window.toggleF=toggleF;
 async function toggleFollowMain(){ await toggleF(VIEW_PROFILE.id,'main'); }
