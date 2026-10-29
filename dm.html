@@ -1,116 +1,80 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>DM - Pixoro Secret</title>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>DM - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
-.top{padding:8px 12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#000;z-index:50;border-bottom:1px solid #1e1e1e;height:56px}
-.topPlus,.bellWhite,#createSheet{display:none!important}
-.search{margin:8px 10px;background:#262626;border-radius:12px;padding:10px 12px;color:#888;display:flex;gap:8px;font-size:13px}
-.notes{display:flex;gap:12px;overflow-x:auto;padding:8px 10px;scrollbar-width:none;border-bottom:1px solid #151515}
-.notes::-webkit-scrollbar{display:none}
-.nItem{flex:0 0 66px;text-align:center}
-.nRing{width:60px;height:60px;border-radius:50%;padding:2.5px;background:#fff;position:relative}
-.nRingInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2px}.nRingInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
-.noteBubble{position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:#fff;color:#000;font-size:9px;padding:3px 6px;border-radius:10px;white-space:nowrap;font-weight:700}
-.tabs{display:flex;gap:6px;padding:8px 10px}
-.tab{padding:5px 12px;border-radius:16px;background:#262626;color:#999;font-size:12px}
-.tab.active{background:#fff;color:#000;font-weight:700}
-.chatRow{display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid #111;cursor:pointer;position:relative}
-.chatRow img{width:46px;height:46px;border-radius:50%;border:2px solid #fff;object-fit:cover}
-.unread{position:absolute;right:12px;top:14px;background:#ff5ea8;color:#fff;font-size:11px;font-weight:800;min-width:20px;height:20px;border-radius:20px;display:grid;place-items:center;padding:0 5px}
+.top{padding:12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#000;z-index:50;border-bottom:1px solid #1e1e1e;height:56px}
+.chatRow{display:flex;gap:10px;padding:12px;border-bottom:1px solid #111;align-items:center}
+.chatRow img{width:46px;height:46px;border-radius:50%;border:2px solid #ff5ea8;object-fit:cover}
+.callBtn{width:36px;height:36px;border-radius:50%;background:#222;display:grid;place-items:center;font-size:16px;cursor:pointer}
+.callBox{position:fixed;inset:0;background:#000;z-index:999;display:none;flex-direction:column}
+.callBox video{width:100%;height:100%;object-fit:cover}
+.faceBox{position:absolute;border:3px solid #00ff66;border-radius:20px;box-shadow:0 0 20px #00ff66;width:150px;height:180px;left:50%;top:40%;transform:translate(-50%,-50%)}
+.faceBox::after{content:'● FACE TRACKING';position:absolute;top:-24px;left:0;background:#00ff66;color:#000;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:900}
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;height:60px;z-index:100}
-.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}
-.bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}
-.bottom-nav a.active{color:#fff}.bottom-nav a.active svg{stroke:#fff}
-.bottom-nav span{font-size:10px;color:#8e8e8e}.bottom-nav a.active span{color:#fff;font-weight:700}
-.bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #555}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
+.bottom-nav a{color:#888;text-decoration:none;font-size:12px}.bottom-nav a.active{color:#fff}
 </style></head><body>
-<div class="top">
-<b style="font-size:19px;display:flex;align-items:center" id="topName">Loading...</b>
-<div style="display:flex;gap:8px;align-items:center">
-<span onclick="newChat()" style="font-size:18px;cursor:pointer">✏️</span>
+
+<div class="top"><b id="topName" style="font-size:19px">Loading...</b><span onclick="location.href='search.html'">✏️</span></div>
+<div id="list" style="text-align:center;color:#555;padding:30px">Loading...</div>
+
+<!-- CALL SCREEN DA -->
+<div class="callBox" id="callBox">
+<div style="position:relative;flex:1">
+<video id="remoteV" autoplay playsinline></video>
+<video id="localV" autoplay muted playsinline style="width:120px;height:170px;position:absolute;bottom:20px;right:10px;border:2px solid #ff5ea8;border-radius:14px;object-fit:cover"></video>
+<div class="faceBox" id="faceBox"></div>
+</div>
+<div style="display:flex;gap:14px;justify-content:center;padding:20px">
+<button onclick="toggleMic()" id="micBtn" style="width:56px;height:56px;border-radius:50%;border:0;font-size:22px">🎙️</button>
+<button onclick="toggleCam()" id="camBtn" style="width:56px;height:56px;border-radius:50%;border:0;font-size:22px">📸</button>
+<button onclick="endCall()" style="width:56px;height:56px;border-radius:50%;border:0;background:#ff0000;font-size:22px">📵</button>
 </div>
 </div>
-<div class="search" onclick="location.href='search.html'">🔍 Search on Pixoro</div>
-<div style="padding:6px 12px;font-size:11px;color:#00ff88;font-weight:700">🔒 SECRET CHATS • Only You Can See • E2E Safe • Real Friends Only</div>
-<div class="notes" id="notes"></div>
-<div class="tabs"><div class="tab active">All</div><div class="tab">Primary</div><div class="tab">General</div><div class="tab">Requests</div></div>
-<div id="list" style="text-align:center;color:#555;padding:30px">Loading real chats da...</div>
-<div id="toast" class="toast"></div>
+
 <div class="bottom-nav">
-  <a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
-  <a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
-  <a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a>
-  <a href="dm.html" class="active"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
-  <a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a>
+  <a href="index.html">🏠 Home</a><a href="search.html">🔍 Search</a><a href="reels.html">🎬 Reels</a><a href="dm.html" class="active">💬 DM</a><a href="profile.html">👤 Profile</a>
 </div>
+
 <script>
-function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
-let supa = window.supa
-window.getTick = () => '';
+let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, peer=null, callObj=null, stream=null, micOn=true, camOn=true, CALL_TO='';
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
-let ME_RAW='', ME_ID='', profileMap={}, profileById={}
-function getPfp(u){
-  let p = profileMap[cleanUser(u)] || profileById[u]
-  if(p?.avatar_url) return p.avatar_url
-  let c = cleanUser(u)||'P'
-  return 'https://ui-avatars.com/api/?name='+c.charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true'
-}
+function getPfp(u){ let p=profileMap[cleanUser(u)]||profileById[u]; if(p?.avatar_url) return p.avatar_url; return 'https://ui-avatars.com/api/?name='+(cleanUser(u)||'P').charAt(0).toUpperCase()+'&background=333&color=fff&size=200&bold=true' }
 async function init(){
-  if(!window.supa){ setTimeout(init,300); return }
-  supa = window.supa
-  let { data:{session} } = await supa.auth.getSession()
-  if(!session){ location.href='login.html'; return }
-  ME_ID = session.user.id
-  let { data: myProf } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
-  ME_RAW = cleanUser(myProf?.username || session.user.email.split('@')[0])
-  document.getElementById('topName').innerHTML = ME_RAW + ' ▾'
-  let { data: profs } = await supa.from('profiles').select('*')
-  ;(profs||[]).forEach(p=>{ profileMap[cleanUser(p.username)] = p; profileById[p.id]=p })
-  let el=document.getElementById('navPfp'); if(el) el.src=getPfp(ME_RAW)
-  load()
-  // Realtime - New Msg Vantha Udane List Update da
+  if(!window.supa){setTimeout(init,300);return} supa=window.supa;
+  let {data:{session}}=await supa.auth.getSession(); if(!session){location.href='login.html';return}
+  ME_ID=session.user.id; let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).single(); ME_RAW=cleanUser(my?.username||session.user.email.split('@')[0]);
+  document.getElementById('topName').innerText=ME_RAW+' ▾';
+  let {data:profs}=await supa.from('profiles').select('*'); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p});
+  load();
   supa.channel('dm-list').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},()=>load()).subscribe();
-  supa.channel('dm-list2').on('postgres_changes',{event:'INSERT',schema:'public',table:'dms'},()=>load()).subscribe();
-}
-function newChat(){ showToast('Search la real friend name type pannu da'); setTimeout(()=>location.href='search.html',500); }
-function lastPreview(c){
-  if(c.type==='voice' || c.media_type==='voice') return '🎙️ Voice Note';
-  if(c.type==='image' || c.media_type==='image') return '📸 Photo';
-  if(c.type==='video' || c.media_type==='video') return '🎬 Video';
-  if(c.media_url) return '📸 Photo';
-  return (c.text||c.content||c.message||'📷 Photo').slice(0,40);
 }
 async function load(){
-  try{
-    let {data} = await supa.from('messages').select('*').order('created_at',{ascending:false}).limit(200)
-    if(!data) data=[]
-    // dms table la irundhum edukkurom da - Voice/Image ku
-    let {data:d2}=await supa.from('dms').select('*').order('created_at',{ascending:false}).limit(100)
-    if(d2) data=[...data,...d2].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))
-    data = data.filter(m=>{
-      let s = m.sender_id||m.sender||''
-      let r = m.receiver_id||m.receiver||''
-      let cid = m.chat_id||''
-      let isMine = s===ME_ID || s===ME_RAW || r===ME_ID || r===ME_RAW || cid.includes(ME_RAW)
-      if(!isMine) return false
-      let other = (s===ME_ID||s===ME_RAW)?r:s
-      if(!other && cid){ let parts=cid.split('_'); other=parts[0]===ME_RAW?parts[1]:parts[0] }
-      if(!other) return false
-      if(cleanUser(other)===ME_RAW) return false
-      let real = profileMap[cleanUser(other)] || profileById[other]
-      if(!real) return false
-      return true
-    })
-    let notesUsers = [...new Set(data.map(m=>{ let s=m.sender_id||m.sender; let r=m.receiver_id||m.receiver; let o=(s===ME_ID||s===ME_RAW)?r:s; if(!o && m.chat_id){ let p=m.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0] } return o }))].filter(Boolean).slice(0,6)
-    document.getElementById('notes').innerHTML = `<div class="nItem"><div class="nRing" style="background:#222"><div class="nRingInner"><img src="${getPfp(ME_RAW)}"></div><div class="noteBubble">Your note</div></div><div style="font-size:10px;margin-top:4px">${ME_RAW}</div></div>` + notesUsers.map(u=>{ let uname = profileById[u]?.username || u; return `<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(uname)}'"><div class="nRing"><div class="nRingInner"><img src="${getPfp(u)}"></div><div class="noteBubble">Hi da ❤️</div></div><div style="font-size:10px;margin-top:4px">${cleanUser(uname)}</div></div>` }).join('')
-    if(!data.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#666">No chats da!<br><span style="font-size:12px">🔒 Real Friends Only da - Fake ID Illa</span><br><button onclick="newChat()" style="margin-top:12px;background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat With Real Friend</button></div>`; return }
-    let map={}; let unreadMap={};
-    data.forEach(m=>{ let s=m.sender_id||m.sender; let r=m.receiver_id||m.receiver; let o=(s===ME_ID||s===ME_RAW)?r:s; if(!o && m.chat_id){ let p=m.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0] } if(o){ if(!map[o]||new Date(m.created_at)>new Date(map[o].created_at)) map[o]=m; if((r===ME_ID||r===ME_RAW) && !m.seen) unreadMap[o]=(unreadMap[o]||0)+1; } })
-    let chats=Object.values(map)
-    document.getElementById('list').innerHTML = chats.map(c=>{ let s=c.sender_id||c.sender; let r=c.receiver_id||c.receiver; let o=(s===ME_ID||s===ME_RAW)?r:s; if(!o && c.chat_id){ let p=c.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0] } let uname = profileById[o]?.username || o; let isMe=(s===ME_ID||s===ME_RAW); let tick=isMe? (c.seen?`<span style="color:#00ff66">✓✓</span>`:`<span style="color:#888">✓</span>`):''; let unread=unreadMap[o]?`<span class="unread">${unreadMap[o]}</span>`:''; return `<div class="chatRow" onclick="location.href='chat.html?user=${encodeURIComponent(uname)}'"><img src="${getPfp(o)}"><div style="flex:1;text-align:left"><b style="font-size:13px">${cleanUser(uname)} <span style="color:#00ff88;font-size:10px">🔒</span></b><div style="font-size:11px;color:#999">${isMe?'You sent':'New message'} • ${new Date(c.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div><div style="font-size:12px;color:#ccc">${tick} ${lastPreview(c)}</div></div>${unread}<div style="font-size:16px">🔒</div></div>` }).join('')
-  }catch(e){ console.log(e); document.getElementById('list').innerHTML = `<div style="padding:40px;color:#666">No chats da!<br><button onclick="newChat()" style="margin-top:12px;background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>` }
+  let {data}=await supa.from('messages').select('*').order('created_at',{ascending:false}).limit(200); if(!data)data=[];
+  data=data.filter(m=>{ let s=m.sender_id||m.sender||'', r=m.receiver_id||m.receiver||'', cid=m.chat_id||''; let isMine=s===ME_ID||s===ME_RAW||r===ME_ID||r===ME_RAW||cid.includes(ME_RAW); if(!isMine) return false; let o=(s===ME_ID||s===ME_RAW)?r:s; if(!o&&cid){let p=cid.split('_'); o=p[0]===ME_RAW?p[1]:p[0]} if(!o||cleanUser(o)===ME_RAW) return false; return profileMap[cleanUser(o)]||profileById[o]; });
+  if(!data.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#666">No chats da<br><button onclick="location.href='search.html'" style="margin-top:12px;background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`; return }
+  let map={}; data.forEach(m=>{ let s=m.sender_id||m.sender, r=m.receiver_id||m.receiver, o=(s===ME_ID||s===ME_RAW)?r:s; if(!o&&m.chat_id){let p=m.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0]} if(o&&(!map[o]||new Date(m.created_at)>new Date(map[o].created_at))) map[o]=m });
+  document.getElementById('list').innerHTML=Object.values(map).map(c=>{ let s=c.sender_id||c.sender, r=c.receiver_id||c.receiver, o=(s===ME_ID||s===ME_RAW)?r:s; if(!o&&c.chat_id){let p=c.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0]} let uname=profileById[o]?.username||o; let preview=c.type==='voice'?'🎙️ Voice':c.type==='image'?'📸 Photo':c.type==='video'?'🎬 Video':(c.text||c.message||'').slice(0,35); return `<div class="chatRow"><img src="${getPfp(o)}" onclick="location.href='chat.html?user=${encodeURIComponent(uname)}'"><div style="flex:1;text-align:left" onclick="location.href='chat.html?user=${encodeURIComponent(uname)}'"><b style="font-size:13px">${cleanUser(uname)}</b><div style="font-size:12px;color:#ccc">${c.seen?'✓✓ ':''}${preview}</div></div><span class="callBtn" onclick="startCall('${cleanUser(uname)}',false)">📞</span><span class="callBtn" onclick="startCall('${cleanUser(uname)}',true)">🎥</span></div>` }).join('');
 }
-init()
+
+// *** REAL CALL + FACE TRACKING - SECRET DA ***
+async function startCall(user,isVideo){
+  CALL_TO=user; document.getElementById('callBox').style.display='flex';
+  if('FaceDetector' in window){
+    setInterval(async()=>{ try{ let fd=new FaceDetector(); let faces=await fd.detect(document.getElementById('localV')); if(faces.length){ let f=faces[0].boundingBox; let b=document.getElementById('faceBox'); b.style.left=(f.x+f.width/2)+'px'; b.style.top=(f.y+f.height/2)+'px'; b.style.width=f.width+'px'; b.style.height=f.height+'px'; } }catch(e){} },500);
+  }
+  peer=new Peer(ME_RAW);
+  peer.on('open', async()=>{
+    stream=await navigator.mediaDevices.getUserMedia({audio:true,video:isVideo});
+    document.getElementById('localV').srcObject=stream;
+    if(!isVideo) document.getElementById('localV').style.display='none'; else document.getElementById('localV').style.display='block';
+    callObj=peer.call(user, stream); callObj.on('stream', s=>{ document.getElementById('remoteV').srcObject=s; });
+  });
+  peer.on('call', async c=>{ stream=await navigator.mediaDevices.getUserMedia({audio:true,video:isVideo}); document.getElementById('localV').srcObject=stream; c.answer(stream); c.on('stream', s=>{ document.getElementById('remoteV').srcObject=s; }); callObj=c; });
+}
+function toggleMic(){ micOn=!micOn; stream.getAudioTracks()[0].enabled=micOn; document.getElementById('micBtn').innerText=micOn?'🎙️':'🔇'; }
+function toggleCam(){ camOn=!camOn; stream.getVideoTracks()[0].enabled=camOn; document.getElementById('camBtn').innerText=camOn?'📸':'📷'; }
+function endCall(){ if(callObj) callObj.close(); if(peer) peer.destroy(); if(stream) stream.getTracks().forEach(t=>t.stop()); document.getElementById('callBox').style.display='none'; }
+init();
 </script></body></html>
