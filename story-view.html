@@ -69,7 +69,6 @@ async function initMe(){
 async function load(){
  await initMe()
  if(!user){ document.getElementById('view').innerHTML='<p>No user</p>'; return }
- let q = supa.from('stories').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:true})
  let isUUID = /^[0-9a-f-]{36}$/i.test(user)
  let data, error
  if(isUUID){
@@ -130,32 +129,35 @@ async function deleteCurrent(){
  show(cur); document.getElementById('menu').style.display='none'
 }
 function saveStory(){ let s=stories[cur]; let link=s.image_url||s.media_url||s.image; let a=document.createElement('a'); a.href=link; a.target='_blank'; a.download=`pixoro-story-${Date.now()}.jpg`; fetch(link).then(r=>r.blob()).then(b=>{ let url=URL.createObjectURL(b); a.href=url; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000) }).catch(()=>{ window.open(link,'_blank') }) }
-function openHighlight(){
+async function openHighlight(){
   toggleMenu(); clearInterval(timer);
-  let hls = JSON.parse(localStorage.getItem('pixoro_highlights')||'[]');
   let list = document.getElementById('hlList');
-  if(hls.length==0){ list.innerHTML='<p style="color:#888;font-size:13px">Innum Highlight illa da - Pudusa create pannu da</p>' }
-  else{ list.innerHTML = hls.map((h,i)=>`<button onclick="addToExisting(${i})">⭐ ${h.name} - ${h.items.length} stories</button>`).join('') }
+  let {data:hl} = await supa.from('stories').select('highlight_name').eq('user_id',ME_ID).eq('is_highlight',true);
+  let names=[...new Set((hl||[]).map(x=>x.highlight_name).filter(Boolean))];
+  if(!names.length){ list.innerHTML='<p style="color:#888;font-size:13px">Innum Highlight illa da - Pudusa create pannu da</p>' }
+  else{ list.innerHTML=names.map(n=>`<button onclick="addToExistingName('${n.replace(/'/g,"\\'")}')">⭐ ${n}</button>`).join('') }
   document.getElementById('hlSheet').style.display='block';
 }
 function closeHighlight(){ document.getElementById('hlSheet').style.display='none'; prog=0; timer=setInterval(()=>{ prog+=1; let bEl=document.getElementById(`b${cur}`); if(bEl) bEl.style.width=prog+'%'; if(prog>=100){ clearInterval(timer); next() } },50) }
-function createHighlight(){
+async function createHighlight(){
   let name = document.getElementById('hlName').value.trim();
   if(!name){ showToast('Name type pannu da!'); return }
   let s = stories[cur];
-  let hls = JSON.parse(localStorage.getItem('pixoro_highlights')||'[]');
-  hls.push({name:name, user: ME, items:[{img: s.image_url||s.media_url||s.image, caption: s.caption||'', created_at: s.created_at}]});
-  localStorage.setItem('pixoro_highlights', JSON.stringify(hls));
+  let {error}=await supa.from('stories').update({is_highlight:true, highlight_name:name}).eq('id',s.id);
+  if(error){ showToast(error.message); return; }
+  await supa.from('posts').update({is_highlight:true, highlight_name:name}).eq('id',s.id);
+  s.is_highlight=true; s.highlight_name=name;
   showToast(name+' Highlight la save aayiduchu da ⭐');
   document.getElementById('hlName').value='';
   closeHighlight();
 }
-function addToExisting(i){
+async function addToExistingName(name){
   let s = stories[cur];
-  let hls = JSON.parse(localStorage.getItem('pixoro_highlights')||'[]');
-  hls[i].items.push({img: s.image_url||s.media_url||s.image, caption: s.caption||'', created_at: s.created_at});
-  localStorage.setItem('pixoro_highlights', JSON.stringify(hls));
-  showToast(hls[i].name+' la add aayiduchu da ⭐');
+  let {error}=await supa.from('stories').update({is_highlight:true, highlight_name:name}).eq('id',s.id);
+  if(error){ showToast(error.message); return; }
+  await supa.from('posts').update({is_highlight:true, highlight_name:name}).eq('id',s.id);
+  s.is_highlight=true; s.highlight_name=name;
+  showToast(name+' la add aayiduchu da ⭐');
   closeHighlight();
 }
 async function addViewer(){ try{ let {data:exist}=await supa.from('story_views').select('*').eq('story_owner',user).eq('viewer',ME).limit(1); if(!exist || exist.length==0){ await supa.from('story_views').insert({story_owner:user, viewer:ME}) } loadViewers() }catch(e){} }
