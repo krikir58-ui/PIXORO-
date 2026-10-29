@@ -1,5 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/index.umd.js"></script>
 <style>
 *{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;background:radial-gradient(circle at 20% 0%,#ff149333,transparent 50%),radial-gradient(circle at 80% 80%,#ff7a0033,transparent 50%),#000}
 .top{padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #262626;align-items:center}.top b{font-size:18px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -13,10 +14,13 @@
 .pollBox{margin:0 12px;background:#111;border:1px solid #333;border-radius:16px;padding:12px}
 .pollBox input{width:100%;background:#222;border:1px solid #ff5ea8;color:#fff;padding:10px;border-radius:10px;margin-top:8px;outline:none}
 .pollOpt{display:flex;gap:8px;margin-top:8px}.pollOpt input{flex:1}
+.bgBox{margin:12px;background:#111;border:1px solid #00d4ff;border-radius:16px;padding:12px}
+.bgBox button{flex:1;padding:12px;border-radius:25px;font-weight:800;cursor:pointer;color:#fff}
 </style></head><body>
 <div class="top"><b>PIXORO New Story ⭐</b><span onclick="location.href='index.html'" style="font-size:20px;cursor:pointer;background:#222;width:32px;height:32px;border-radius:50%;display:grid;place-items:center">✕</span></div>
 <div class="prev" id="prev">⭐ Photo / Video Select Pannu</div>
 <div class="grid"><div class="cell" onclick="location.href='camera.html?type=story'">📷 Camera</div><div class="cell" onclick="document.getElementById('f').click()">🖼️ Gallery</div><div class="cell" onclick="document.getElementById('f').click()">➕ Add</div></div>
+<div class="bgBox"><b>✂️ Background Remove Block</b><div style="display:flex;gap:8px;margin-top:10px"><button id="rmBgBtn" onclick="removeBG()" style="background:linear-gradient(90deg,#00d4ff,#a259ff);border:0">✂️ Remove BG</button><button onclick="resetBG()" style="background:#222;border:1px solid #333">↩️ Original</button></div><div style="font-size:11px;color:#888;margin-top:6px">Image ku mattum da - Video ku aagathu da</div></div>
 <div class="pollBox"><b>📊 Poll Add Pannu da</b><input id="pollQ" placeholder="Question - Ex: Pudichirukka?"><div class="pollOpt"><input id="pollO1" placeholder="🔥 Yes" value="Yes"><input id="pollO2" placeholder="😴 No" value="No"></div><div style="font-size:11px;color:#888;margin-top:6px">Poll venda na empty ah vidu da</div></div>
 <div class="progress" id="prog"><div style="display:flex;justify-content:space-between;font-size:11px;color:#aaa"><span id="progText">Compressing... 💾</span><span id="progSize"></span></div><div class="bar"><div class="barFill" id="progFill"></div></div></div>
 <button class="btn" onclick="go()">Next → 🔥</button>
@@ -26,7 +30,7 @@
 const supa = supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_');
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 function formatSize(b){ if(b<1024) return b+' B'; if(b<1048576) return (b/1024).toFixed(0)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
-let ME_RAW='giri', ME_ID=null
+let ME_RAW='giri', ME_ID=null, originalM='', noBgM=''
 async function checkAuth(){
   let { data: { session } } = await supa.auth.getSession()
   if(!session){ location.href='login.html'; return; }
@@ -40,7 +44,7 @@ let m = urlP.get('media') || ''
 let mType = urlP.get('type') || 'image'
 if(m){
   document.getElementById('prev').innerHTML = mType==='video' ? `<video src="${decodeURIComponent(m)}" autoplay loop controls></video>` : `<img src="${decodeURIComponent(m)}">`
-  m = decodeURIComponent(m)
+  m = decodeURIComponent(m); originalM=m;
 }
 async function compressImage(file){
   return new Promise(res=>{
@@ -48,6 +52,27 @@ async function compressImage(file){
     img.onload=()=>{ let w=img.width,h=img.height; let maxW=720; if(w>maxW){ h=h*maxW/w; w=maxW; } let c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); c.toBlob(b=>{ res(new File([b],file.name.replace(/\.[^.]+$/,'')+'.jpg',{type:'image/jpeg'})); },'image/jpeg',0.72); URL.revokeObjectURL(url); };
     img.onerror=()=>res(file); img.src=url;
   });
+}
+async function removeBG(){
+  if(!m){ showToast('Photo select pannu da!'); return; }
+  if(mType==='video'){ showToast('Video ku BG remove aagathu da!'); return; }
+  let btn=document.getElementById('rmBgBtn'); btn.innerText='⏳ Removing...';
+  try{
+    originalM=m;
+    let blob = await ImglyBackgroundRemoval.removeBackground(m);
+    let url = URL.createObjectURL(blob); noBgM=url;
+    document.getElementById('prev').innerHTML=`<img src="${url}" style="background:repeating-conic-gradient(#333 0% 25%,#111 0% 50%) 50% / 20px 20px">`;
+    let file = new File([blob], 'pixoro-nobg-'+Date.now()+'.png', {type:'image/png'});
+    let fileName = Date.now()+'_'+ME_RAW+'_nobg.png';
+    let {error}=await supa.storage.from('stories').upload(fileName, file);
+    if(!error){ let {data}=supa.storage.from('stories').getPublicUrl(fileName); m=data.publicUrl; mType='image'; showToast('Background Removed da! 🔥'); }
+    else showToast('Preview Ready da - Upload Fail: '+error.message);
+  }catch(e){ showToast('BG Remove Fail da - Vera photo try pannu'); }
+  btn.innerText='✂️ Remove BG';
+}
+function resetBG(){
+  if(!originalM){ showToast('Original illa da!'); return; }
+  m=originalM; noBgM=''; document.getElementById('prev').innerHTML=`<img src="${m}">`; showToast('Original Restore da ↩️');
 }
 async function h(e){
 let f=e.target.files[0];if(!f)return;
@@ -67,7 +92,7 @@ if(f.type.startsWith('video/')){
     let {error}=await supa.storage.from('stories').upload(fileName, f)
     if(error){ showToast('Upload Fail: '+error.message); return; }
     let {data}=supa.storage.from('stories').getPublicUrl(fileName)
-    m=data.publicUrl; mType='video';
+    m=data.publicUrl; mType='video'; originalM=m;
     document.getElementById('progFill').style.width='100%'; document.getElementById('progText').innerText='Story Ready ✅ - 24h la Delete aagidum';
     showToast('Story Ready da! ⭐ Next ku po');
   }; vid.src=u;
@@ -81,13 +106,12 @@ if(f.type.startsWith('video/')){
   let {error}=await supa.storage.from('stories').upload(fileName, uploadFile)
   if(error){ showToast('Upload Fail: '+error.message); return; }
   let {data}=supa.storage.from('stories').getPublicUrl(fileName)
-  m=data.publicUrl; mType='image';
+  m=data.publicUrl; mType='image'; originalM=m;
   document.getElementById('progFill').style.width='100%'; document.getElementById('progText').innerText='Compressed ✅ '+formatSize(f.size)+' → '+formatSize(uploadFile.size);
   showToast('Story Compressed da! ⭐');
 }
 }
 function go(){if(!m){showToast('Story select pannu da!');return}
-  // Poll Save Pannu da
   let poll={q:document.getElementById('pollQ').value.trim(), o1:document.getElementById('pollO1').value.trim()||'Yes', o2:document.getElementById('pollO2').value.trim()||'No'};
   if(poll.q) localStorage.setItem('pixoro_poll', JSON.stringify(poll)); else localStorage.removeItem('pixoro_poll');
   location.href='story-add.html?media='+encodeURIComponent(m)+'&type='+mType
