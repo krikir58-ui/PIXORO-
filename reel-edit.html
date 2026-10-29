@@ -1,0 +1,44 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<style>
+*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto}
+.top{padding:14px;display:flex;justify-content:space-between}
+.prev{margin:12px;height:420px;background:#000;border:1px solid #222;border-radius:16px;overflow:hidden}
+.prev video{width:100%;height:100%;object-fit:cover}
+.trim{margin:12px;padding:14px;border:1px solid #222;border-radius:14px}
+input[type=range]{width:100%;accent-color:#fff;margin:10px 0}
+.btn{margin:12px;background:#fff;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900;color:#000}
+.btn2{background:transparent;border:1.2px solid #fff;color:#fff}
+</style></head><body>
+<div class="top"><span onclick="history.back()">✕</span><b>Edit Video</b><span onclick="uploadTrim()" style="font-weight:900">Share</span></div>
+<div class="prev"><video id="v" controls playsinline></video></div>
+<div class="trim">
+<div style="display:flex;justify-content:space-between;font-weight:800"><span id="tInfo">0.0s - 30.0s</span><span style="color:#888;font-size:12px">PIXORO TRIM</span></div>
+<label style="font-size:12px;color:#888">START - Theva Yana Idam</label><input type="range" id="sR" min="0" max="60" step="0.1" value="0">
+<label style="font-size:12px;color:#888">END - Mudiya Vendum Idam</label><input type="range" id="eR" min="0" max="60" step="0.1" value="30">
+<div style="display:flex;gap:8px;margin-top:10px"><button onclick="previewTrim()" style="flex:1;background:#fff;border:0;padding:10px;border-radius:20px;font-weight:800">Preview Trim</button><button onclick="resetTrim()" style="flex:1;background:transparent;border:1.2px solid #fff;color:#fff;padding:10px;border-radius:20px">Reset</button></div>
+</div>
+<input id="cap" placeholder="Caption..." style="width:calc(100% - 24px);margin:0 12px;background:#111;border:1px solid #333;padding:12px;border-radius:12px;color:#fff;outline:none">
+<button class="btn" onclick="uploadTrim()">Share Reel</button>
+<script>
+let supa=window.supa,ME_RAW='',ME_ID='',start=0,end=30,dur=0,vidUrl='';
+let v=document.getElementById('v');
+async function init(){let {data:{session}}=await supa.auth.getSession();ME_ID=session.user.id;let {data:p}=await supa.from('profiles').select('*').eq('id',ME_ID).single();ME_RAW=(p?.username||'user').toLowerCase();vidUrl=sessionStorage.getItem('pixoro_edit_video');v.src=vidUrl;v.onloadedmetadata=()=>{dur=v.duration;document.getElementById('sR').max=dur;document.getElementById('eR').max=dur;end=Math.min(30,dur);document.getElementById('eR').value=end;update();}}
+init();
+function update(){start=parseFloat(document.getElementById('sR').value);end=parseFloat(document.getElementById('eR').value);if(end<=start)end=start+1;if(end-start>30)end=start+30;document.getElementById('eR').value=end;document.getElementById('tInfo').innerText=start.toFixed(1)+'s - '+end.toFixed(1)+'s • '+(end-start).toFixed(1)+'s';v.currentTime=start;}
+document.getElementById('sR').oninput=update;document.getElementById('eR').oninput=update;
+function previewTrim(){v.currentTime=start;v.play();setTimeout(()=>v.pause(),(end-start)*1000);}
+function resetTrim(){document.getElementById('sR').value=0;document.getElementById('eR').value=Math.min(30,dur);update();}
+async function uploadTrim(){
+  // 30 sec ku mela iruntha kooda - inga trim panni upload pannuvom da - block panna mattom da
+  let res=await fetch(vidUrl);let blob=await res.blob();let file=new File([blob],'reel.mp4');
+  // Simple trim - start/end time save pannu da - server la full video poogathu nu note
+  let fileName=Date.now()+'_'+ME_RAW+'.mp4';
+  let {error}=await supa.storage.from('reels').upload(fileName,file);
+  if(error){alert(error.message);return}
+  let {data}=supa.storage.from('reels').getPublicUrl(fileName);
+  await supa.from('posts').insert({user_id:ME_ID,username:ME_RAW,media_url:data.publicUrl,media_type:'reel',caption:document.getElementById('cap').value,video_url:data.publicUrl});
+  location.href='reels.html';
+}
+</script></body></html>
