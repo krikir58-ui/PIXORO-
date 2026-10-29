@@ -32,7 +32,6 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70p
 .h-circle img{width:100%;height:100%;object-fit:cover}
 .h-text{font-size:10px;margin-top:6px}
 .editSheet,.setSheet{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:800;display:none;align-items:flex-end;justify-content:center;padding-bottom:60px}
-/* PROFILE CREATE - + CLICK PANNA MATTUM OPEN DA - AUTO OPEN AAGATHU DA */
 .createSheet{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:800;display:none;align-items:flex-end;justify-content:center}
 .sheetBox{background:#0a0a0a;width:100%;max-width:450px;border-radius:22px 22px 0 0;border:1px solid #333;max-height:calc(90vh - 60px);overflow-y:auto;padding:18px;padding-bottom:30px}
 .sItem{padding:16px 18px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
@@ -45,8 +44,10 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70p
 .cropCircle{width:280px;height:280px;border-radius:50%;overflow:hidden;border:3px solid #ff5ea8;touch-action:none;background:transparent!important;box-shadow:0 0 0 9999px rgba(0,0,0,.7);position:relative}
 .cropCircle img{position:absolute;left:50%;top:50%;max-width:none;cursor:grab;transform:translate(-50%,-50%)}
 input[type=range]{width:100%;accent-color:#ff5ea8}
+/* BLOCK MENU - CORRECT DA */
 .pixoroMenu{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#111;border:1px solid #333;border-radius:16px;width:92%;max-width:420px;z-index:9999;display:none;padding:8px}
-.pixoroMenu div{padding:14px;border-bottom:1px solid #222;cursor:pointer}
+.pixoroMenu div{padding:14px;border-bottom:1px solid #222;cursor:pointer;font-size:14px}
+.pixoroMenu div.delete{color:#ff3040}
 </style></head><body>
 <div class="top"><b style="font-size:20px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="topUsername">Loading...</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div><span onclick="openSettings()" style="font-size:20px;cursor:pointer">☰</span></div></div>
 <div style="padding:15px">
@@ -93,12 +94,18 @@ async function init(){
   let isFollow=allFollows.some(f=>f.follower_id===ME_ID&&f.following_id===VIEW_PROFILE.id);
   if(isMine){ document.getElementById('actionArea').innerHTML=`<button class="btn btnPrimary" onclick="openEditSheet()">Edit Profile</button><button class="btn" onclick="shareProfile()">Share Profile</button>` }
   else { document.getElementById('actionArea').innerHTML=`<button class="btn btnPrimary" id="followBtnMain" onclick="toggleFollowMain()">${isFollow?'Following':'Follow'}</button><button class="btn" onclick="shareProfile()">Share Profile</button>` }
-  let posts2=[];
-  let {data:p1}=await supa.from('posts').select('*').eq('user_id',VIEW_PROFILE.id).order('created_at',{ascending:false}); if(p1&&p1.length) posts2=p1;
+  // REAL COUNT - TABLE LA IRUNTHU DA - 3 NA 3 DA
+  let {data:p1}=await supa.from('posts').select('*').eq('user_id',VIEW_PROFILE.id).order('created_at',{ascending:false});
+  let posts2=p1||[];
   if(!posts2.length){ let {data:all}=await supa.from('posts').select('*').order('created_at',{ascending:false}); posts2=(all||[]).filter(p=>p.user_id===VIEW_PROFILE.id||cleanUser(p.username)===cleanUser(VIEW_PROFILE.username)) }
   myPosts=posts2.filter(p=>!p.is_archived);
+  let {count:realCount}=await supa.from('posts').select('id',{count:'exact',head:true}).eq('user_id',VIEW_PROFILE.id);
+  if(!realCount){ let {count:c2}=await supa.from('posts').select('id',{count:'exact',head:true}).eq('username',cleanUser(VIEW_PROFILE.username)); realCount=c2||myPosts.length }
   let {data:views}=await supa.from('views').select('*'); allViews=views||[];
-  let totalPosts=myPosts.length; let totalReels=myPosts.filter(isReelPost).length;
+  let totalPosts=realCount||myPosts.length; let totalReels=myPosts.filter(isReelPost).length;
+  // REELS REAL COUNT KODA DA
+  let {count:realReels}=await supa.from('posts').select('id',{count:'exact',head:true}).eq('user_id',VIEW_PROFILE.id).eq('media_type','reel');
+  if(realReels!==null&&realReels!==undefined) totalReels=realReels;
   document.getElementById('postCount').textContent=totalPosts;
   document.getElementById('tabPosts').innerHTML=`⊞ Posts (${totalPosts})`;
   document.getElementById('tabReels').innerHTML=`🎬 Reels (${totalReels})`;
@@ -110,10 +117,11 @@ async function init(){
 async function toggleFollowMain(){let supa=getSupa();let btn=document.getElementById('followBtnMain');let isF=allFollows.some(f=>f.follower_id===ME_ID&&f.following_id===VIEW_PROFILE.id); if(isF){allFollows=allFollows.filter(f=>!(f.follower_id===ME_ID&&f.following_id===VIEW_PROFILE.id));btn.innerText='Follow';await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',VIEW_PROFILE.id)} else {allFollows.push({follower_id:ME_ID,following_id:VIEW_PROFILE.id});btn.innerText='Following';await supa.from('follows').insert({follower_id:ME_ID,following_id:VIEW_PROFILE.id,follower:ME_RAW,following:VIEW_USER})} document.getElementById('followerCount').textContent=allFollows.filter(f=>f.following_id===VIEW_PROFILE.id).length}
 function renderGrid(list){ if(!list.length){document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`;return} document.getElementById('myGrid').innerHTML=list.map(p=>{ let mUrl=p.media_url||p.video_url||p.image_url||p.image||''; let isVid=isReelPost(p); let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length; let vBadge=`<span style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.7);padding:3px 7px;border-radius:10px;font-size:11px">👁️ ${fmtViews(vCount)}</span>`; if(isVid) return `<div style="position:relative" onclick="openPixoroPost('${p.id}')"><video src="${mUrl}" muted playsinline style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px">🎬</span>${vBadge}</div>`; return `<div style="position:relative" onclick="openPixoroPost('${p.id}')"><img src="${mUrl}">${vBadge}</div>` }).join('') }
 function renderHighlights(){ let h=document.getElementById('highlightList'); if(!h) return; let stories = myPosts.filter(p=>p.media_type==='story'||p.is_highlight); if(!stories.length){ h.innerHTML=`<div class="h-item" onclick="location.href='story-create.html'"><div class="h-circle">+</div><div class="h-text">New</div></div>`; return } h.innerHTML=stories.map(s=>`<div class="h-item"><div class="h-circle"><img src="${s.media_url||''}"></div><div class="h-text">Highlight</div></div>`).join('') }
-function openPixoroPost(id){ let p=myPosts.find(x=>String(x.id)==String(id)); if(!p) return; let isMine=VIEW_PROFILE.id===ME_ID; let menu=document.getElementById('pixoroMenu'); if(isMine){ menu.innerHTML=`<div onclick="location.href='index.html?id=${id}'">👁️ Open Post</div><div onclick="deletePixoroPost('${id}')">🗑️ Delete</div><div onclick="hideMenu()">Cancel</div>` } else { menu.innerHTML=`<div onclick="location.href='index.html?id=${id}'">👁️ Open Post</div><div onclick="savePixoroPost('${id}')">🔖 Save</div><div onclick="hideMenu()">Cancel</div>` } menu.style.display='block' }
+function openPixoroPost(id){ let p=myPosts.find(x=>String(x.id)==String(id)); if(!p) return; let isMine=VIEW_PROFILE.id===ME_ID; let isVid=isReelPost(p); let menu=document.getElementById('pixoroMenu'); if(isMine){ menu.innerHTML=`<div onclick="location.href='index.html?id=${id}'">👁️ Open Post</div><div onclick="location.href='reels.html?id=${id}'">🎬 Open Reel</div><div onclick="sharePixoroPost('${id}')">🔗 Share</div><div onclick="savePixoroPost('${id}')">🔖 Save</div><div class="delete" onclick="deletePixoroPost('${id}')">🗑️ Delete</div><div onclick="hideMenu()" style="text-align:center;color:#888">Cancel</div>` } else { menu.innerHTML=`<div onclick="location.href='index.html?id=${id}'">👁️ Open Post</div><div onclick="location.href='reels.html?id=${id}'">🎬 Open Reel</div><div onclick="sharePixoroPost('${id}')">🔗 Share</div><div onclick="savePixoroPost('${id}')">🔖 Save</div><div onclick="hideMenu()" style="text-align:center;color:#888">Cancel</div>` } menu.style.display='block' }
 function hideMenu(){ document.getElementById('pixoroMenu').style.display='none' }
 async function deletePixoroPost(id){ hideMenu(); let supa=getSupa(); await supa.from('posts').delete().eq('id',id); showToast('Delete Panniten da 🗑️'); setTimeout(()=>location.reload(),500) }
-function savePixoroPost(id){ hideMenu(); localStorage.setItem('pixoro_saved_'+id,'1'); showToast('Saved da 🔖') }
+async function savePixoroPost(id){ hideMenu(); let supa=getSupa(); let {error}=await supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}); if(error){localStorage.setItem('pixoro_saved_'+id,'1')} showToast('Saved da 🔖') }
+function sharePixoroPost(id){ hideMenu(); navigator.clipboard.writeText(location.origin+'/index.html?id='+id).then(()=>showToast('Link Copy da ✅')) }
 function showTab(type){ currentTab=type; document.getElementById('tabPosts').classList.toggle('active',type=='all'); document.getElementById('tabReels').classList.toggle('active',type=='reels'); let list=myPosts; if(type=='reels') list=myPosts.filter(isReelPost); renderGrid(list) }
 function openSettings(){document.getElementById('setSheet').style.display='flex'}
 function openEditSheet(){ if(VIEW_PROFILE.id!==ME_ID) return showToast('Others Profile Edit Panna Mudiyathu da'); document.getElementById('editName').value=VIEW_PROFILE.full_name||VIEW_PROFILE.display_name||''; document.getElementById('editUsername').value=VIEW_USER; document.getElementById('editBio').value=VIEW_PROFILE.bio||''; document.getElementById('editLink').value=VIEW_PROFILE.link||VIEW_PROFILE.website||''; document.getElementById('editSheet').style.display='flex' }
