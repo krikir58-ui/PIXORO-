@@ -111,18 +111,21 @@ async function init(){
 }
 async function loadHighlights(){
   let supa=getSupa(); let h=document.getElementById('highlightList'); if(!h) return;
-  // SECRET: Story table la Irundhu, is_highlight=true Mattum Thaan da
   let {data:st}=await supa.from('stories').select('*').eq('user_id',VIEW_PROFILE.id).order('created_at',{ascending:false});
   let list=(st||[]).filter(s=>s.is_highlight===true);
-  if(!list.length){
-    // posts la highlight ah save pannirundha athuvum eduthukko da
-    let fromPosts=myPosts.filter(p=>p.is_highlight===true);
-    if(fromPosts.length) list=fromPosts;
-  }
+  if(!list.length){ let fromPosts=myPosts.filter(p=>p.is_highlight===true); if(fromPosts.length) list=fromPosts; }
   allHighlights=list;
   if(!list.length){ h.style.display='none'; h.innerHTML=''; return; }
+  // Group by highlight_name - Pudicha Cover Mattum da
+  let groups={};
+  list.forEach(s=>{ let n=s.highlight_name||'Highlight'; if(!groups[n]) groups[n]=s; else if(s.highlight_cover) groups[n]=s; });
+  // Cover irukkura story ah first ah vei da
+  let grouped=Object.entries(groups).map(([name,s])=>{
+    let cover = s.highlight_cover || list.find(x=>(x.highlight_name||'Highlight')===name && x.highlight_cover)?.highlight_cover || s.image_url || s.media_url || s.image || '';
+    return {name, cover, count: list.filter(x=>(x.highlight_name||'Highlight')===name).length};
+  });
   h.style.display='flex';
-  h.innerHTML=list.map(s=>`<div class="h-item" onclick="location.href='story-view.html?user=${VIEW_USER}'"><div class="h-circle"><img src="${s.media_url||s.image_url||s.image||''}"></div><div class="h-text">${s.highlight_name||'Highlight'}</div></div>`).join('');
+  h.innerHTML=grouped.map(g=>`<div class="h-item" onclick="location.href='story-view.html?user=${VIEW_USER}'"><div class="h-circle"><img src="${g.cover}"></div><div class="h-text">${g.name}</div></div>`).join('');
 }
 function renderHighlights(){ loadHighlights(); }
 async function toggleF(uid,pid){
