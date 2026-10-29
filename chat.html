@@ -18,6 +18,9 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;displ
 .input input{flex:1;background:#262626;border:1px solid #a259ff;padding:12px 16px;border-radius:24px;color:#fff;outline:none;font-size:14px}
 .sendBtn{background:linear-gradient(135deg,#ff5ea8,#ff7a00);width:42px;height:42px;border-radius:50%;display:grid;place-items:center;cursor:pointer}
 .voiceBar{background:#111;padding:10px;display:none;align-items:center;gap:10px;border-top:1px solid #ff5ea8}
+/* CHAT KULLA MINNA MARI DA - ITHU THAAN FIX DA */
+.callBtn{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);display:grid;place-items:center;font-size:18px;cursor:pointer;border:2px solid #fff;box-shadow:0 0 15px #ff5ea8;animation:blink 1.2s infinite;flex-shrink:0}
+@keyframes blink{0%{transform:scale(1);box-shadow:0 0 8px #ff5ea8}50%{transform:scale(1.12);box-shadow:0 0 22px #ff5ea8,0 0 30px #ff7a00}100%{transform:scale(1);box-shadow:0 0 8px #ff5ea8}}
 .callBox{position:fixed;inset:0;background:#000;z-index:999;display:none;flex-direction:column}
 .callBox video{width:100%;height:100%;object-fit:cover}
 .faceBox{position:absolute;border:3px solid #00ff66;border-radius:20px;box-shadow:0 0 20px #00ff66;width:150px;height:180px;left:50%;top:40%;transform:translate(-50%,-50%);pointer-events:none}
@@ -25,19 +28,19 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;displ
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:1000;display:none}
 </style></head><body>
 
-<!-- TOP - CLEAN DA - CALL MATTUM -->
-<div class="top"><span onclick="location.href='dm.html'" style="font-size:24px;cursor:pointer">←</span><img id="pfp" src=""><div style="flex:1"><b id="uname">...</b></div><span onclick="startCall(false)" style="font-size:22px;cursor:pointer">📞</span><span onclick="startCall(true)" style="font-size:22px;cursor:pointer">🎥</span></div>
+<!-- TOP - VELIYA MAARI MINNUM DA -->
+<div class="top"><span onclick="location.href='dm.html'" style="font-size:24px;cursor:pointer">←</span><img id="pfp" src=""><div style="flex:1"><b id="uname">...</b></div><span class="callBtn" onclick="startCall(false)">📞</span><span class="callBtn" onclick="startCall(true)">🎥</span></div>
 
 <div class="box" id="box"></div>
 <div class="voiceBar" id="voiceBar"><span id="recTime">🔴 0s</span><button onclick="stopVoice()" style="background:#ff0000;color:#fff;border:0;padding:8px 16px;border-radius:20px">⏹️ STOP & SEND</button></div>
 <div class="input"><span onclick="document.getElementById('fileUp').click()" style="font-size:22px;cursor:pointer">📸</span><input id="inp" placeholder="Message..." onkeydown="if(event.key==='Enter')send()"><input type="file" id="fileUp" hidden accept="image/*,video/*" onchange="sendPhoto(this)"><span onclick="startVoice()" style="font-size:22px;cursor:pointer">🎙️</span><span onclick="send()" class="sendBtn">➤</span></div>
 
-<!-- CALL SCREEN - REAL CAMERA + FACE TRACKING -->
 <div class="callBox" id="callBox">
 <div style="position:relative;flex:1">
 <video id="remoteV" autoplay playsinline></video>
 <video id="localV" autoplay muted playsinline style="width:120px;height:170px;position:absolute;bottom:20px;right:10px;border:2px solid #ff5ea8;border-radius:14px;object-fit:cover"></video>
 <div class="faceBox" id="faceBox"></div>
+<div style="position:absolute;top:20px;left:50%;transform:translateX(-50%);text-align:center"><b id="callName" style="font-size:18px"></b><p id="callStatus" style="font-size:12px;color:#00ff88">Calling...</p></div>
 </div>
 <div style="display:flex;gap:14px;justify-content:center;padding:20px">
 <button onclick="toggleMic()" id="micBtn" style="width:56px;height:56px;border-radius:50%;border:0;font-size:22px">🎙️</button>
@@ -105,9 +108,8 @@ async function stopVoice(){
   mediaRec.onstop=async()=>{ let blob=new Blob(vChunks,{type:'audio/webm'}); let fileName=Date.now()+'_'+ME+'_voice.webm'; await supa.storage.from('dms').upload(fileName,blob); let {data}=supa.storage.from('dms').getPublicUrl(fileName); await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:'🎙️ Voice',message:'🎙️ Voice',sender_id:ME_ID,receiver_id:OTHER_ID,seen:false,type:'voice',media_url:data.publicUrl,media_type:'voice'}); showToast('Voice Sent da 🎙️'); load(); };
   mediaRec.stop();
 }
-// *** REAL CALL + FACE TRACKING - SECRET DA ***
 async function startCall(isVideo){
-  document.getElementById('callBox').style.display='flex';
+  document.getElementById('callBox').style.display='flex'; document.getElementById('callName').innerText='@'+OTHER; document.getElementById('callStatus').innerText=isVideo?'Video Calling...':'Audio Calling...';
   if('FaceDetector' in window){
     setInterval(async()=>{ try{ let fd=new FaceDetector(); let faces=await fd.detect(document.getElementById('localV')); if(faces.length){ let f=faces[0].boundingBox; let b=document.getElementById('faceBox'); b.style.left=(f.x+f.width/2)+'px'; b.style.top=(f.y+f.height/2)+'px'; b.style.width=f.width+'px'; b.style.height=f.height+'px'; } }catch(e){} },500);
   }
@@ -116,7 +118,7 @@ async function startCall(isVideo){
     stream=await navigator.mediaDevices.getUserMedia({audio:true,video:isVideo});
     document.getElementById('localV').srcObject=stream;
     if(!isVideo) document.getElementById('localV').style.display='none'; else document.getElementById('localV').style.display='block';
-    callObj=peer.call(OTHER, stream); callObj.on('stream', s=>{ document.getElementById('remoteV').srcObject=s; });
+    callObj=peer.call(OTHER, stream); callObj.on('stream', s=>{ document.getElementById('remoteV').srcObject=s; document.getElementById('callStatus').innerText='Connected ✅'; });
   });
   peer.on('call', async c=>{ stream=await navigator.mediaDevices.getUserMedia({audio:true,video:isVideo}); document.getElementById('localV').srcObject=stream; c.answer(stream); c.on('stream', s=>{ document.getElementById('remoteV').srcObject=s; }); callObj=c; });
 }
