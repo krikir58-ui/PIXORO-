@@ -1,64 +1,53 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/pixoro-core.js"></script>
 <style>
 *{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;background:radial-gradient(circle at 20% 0%,#ff149333,transparent 50%),#000}
-.top{padding:14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #262626}
-.top b{font-size:18px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.prev{margin:12px;height:380px;background:#111;border:2px solid #ff5ea866;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.prev img,.prev video{width:100%;height:100%;object-fit:cover}
+.top{padding:14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #262626}.top b{font-size:18px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.prev{margin:12px;height:380px;background:#111;border:2px solid #ff5ea866;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center}.prev img,.prev video{width:100%;height:100%;object-fit:cover}
 .cap{margin:0 12px;width:calc(100% - 24px);background:#111;border:1px solid #ff5ea8;border-radius:12px;color:#fff;padding:12px;outline:none}
-.aud{margin:12px;display:flex;gap:8px}
-.aud button{flex:1;padding:12px;border-radius:25px;border:1px solid #333;background:#111;color:#fff;font-weight:700;cursor:pointer}
-.aud button.active{background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:none;color:#fff}
-.aud button.active.green{background:linear-gradient(90deg,#00ff66,#00d4ff);color:#000}
-.postBtn{margin:0 12px;width:calc(100% - 24px);padding:14px;border-radius:25px;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);border:0;color:#fff;font-weight:900;font-size:16px;box-shadow:0 5px 20px #ff149355}
+.aud{margin:12px;display:flex;gap:8px}.aud button{flex:1;padding:12px;border-radius:25px;border:1px solid #333;background:#111;color:#fff;font-weight:700;cursor:pointer}.aud button.active{background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:none;color:#fff}.aud button.active.green{background:linear-gradient(90deg,#00ff66,#00d4ff);color:#000}
+.postBtn{margin:0 12px;width:calc(100% - 24px);padding:14px;border-radius:25px;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);border:0;color:#fff;font-weight:900;font-size:16px}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;display:none}
 .pollPreview{margin:0 12px 12px;background:#111;border:1px solid #a259ff;border-radius:12px;padding:10px;display:none}
 </style></head><body>
 <div class="top"><b>PIXORO Story Add ⭐</b><span onclick="location.href='index.html'" style="font-size:20px;cursor:pointer;background:#222;width:32px;height:32px;border-radius:50%;display:grid;place-items:center">✕</span></div>
 <div class="prev" id="prev">Photo Loading...</div>
 <input class="cap" id="cap" placeholder="Add a caption... 🔥">
-<div class="aud">
-<button id="btnPublic" class="active" onclick="setAud('everyone',this)">🌍 Everyone</button>
-<button id="btnClose" onclick="setAud('close_friends',this)">💚 Close Friends</button>
-</div>
+<div class="aud"><button id="btnPublic" class="active" onclick="setAud('everyone',this)">🌍 Everyone</button><button id="btnClose" onclick="setAud('close_friends',this)">💚 Close Friends</button></div>
 <div class="pollPreview" id="pollPreview"></div>
 <button class="postBtn" onclick="postStory()">Share Story 🔥</button>
 <div id="toast" class="toast"></div>
 <script>
-const supa=supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
+let supa=window.supa;
 function showToast(m){let t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
-let params=new URLSearchParams(location.search)
-let m=params.get('media')||'', type=params.get('type')||'image'
-let aud='everyone', ME='', ME_ID=''
+function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
+let params=new URLSearchParams(location.search); let m=params.get('media')||'', type=params.get('type')||'image';
+let aud='everyone', ME='', ME_ID='';
 async function init(){
-  let {data:{session}}=await supa.auth.getSession()
-  if(!session){location.href='login.html';return}
-  ME_ID=session.user.id
-  let {data:prof}=await supa.from('profiles').select('username').eq('id',ME_ID).single()
-  ME=(prof?.username||session.user.email.split('@')[0]).toLowerCase()
-  if(m){document.getElementById('prev').innerHTML= type==='video'?`<video src="${m}" autoplay loop controls style="width:100%;height:100%"></video>`:`<img src="${m}">`}
-  // Poll Preview da
+  if(!window.supa){ setTimeout(init,300); return }
+  supa=window.supa;
+  let {data:{session}}=await supa.auth.getSession(); if(!session){location.href='login.html';return}
+  ME_ID=session.user.id;
+  let {data:prof}=await supa.from('profiles').select('username').eq('id',ME_ID).single();
+  ME=cleanUser(prof?.username||session.user.email.split('@')[0]);
+  if(m){ document.getElementById('prev').innerHTML=type==='video'?`<video src="${m}" autoplay loop controls style="width:100%;height:100%"></video>`:`<img src="${m}">` }
   let pollStr=localStorage.getItem('pixoro_poll');
   if(pollStr){ let p=JSON.parse(pollStr); let el=document.getElementById('pollPreview'); el.style.display='block'; el.innerHTML=`📊 Poll: <b>${p.q}</b><br><span style="font-size:12px;color:#aaa">${p.o1} vs ${p.o2}</span>` }
 }
 init()
-function setAud(v,btn){aud=v;document.querySelectorAll('.aud button').forEach(b=>b.classList.remove('active','green'));btn.classList.add('active');if(v==='close_friends')btn.classList.add('green');showToast(v==='close_friends'?'Close Friends Only da 💚':'Everyone Paakalam da 🌍')}
+function setAud(v,btn){ aud=v; document.querySelectorAll('.aud button').forEach(b=>b.classList.remove('active','green')); btn.classList.add('active'); if(v==='close_friends') btn.classList.add('green'); showToast(v==='close_friends'?'Close Friends Only da 💚':'Everyone Paakalam da 🌍') }
 async function postStory(){
-  if(!m){showToast('Photo illa da!');return}
-  if(!ME_ID){let {data:{session}}=await supa.auth.getSession();if(session)ME_ID=session.user.id}
-  let exp=new Date();exp.setHours(exp.getHours()+24)
-  let caption=document.getElementById('cap').value
-  let {data,error}=await supa.from('stories').insert({user_id:ME_ID,username:ME,image_url:m,media_url:m,media_type:type,caption:caption,audience:aud,expires_at:exp.toISOString()}).select('id').single()
-  if(error){showToast(error.message);return}
-  // Poll Save da - Idhu Thaan Secret da
-  let pollStr=localStorage.getItem('pixoro_poll');
-  if(pollStr && data && data.id){
-    let poll=JSON.parse(pollStr);
-    await supa.from('story_polls').insert({story_id:String(data.id), question:poll.q, option1:poll.o1, option2:poll.o2});
-    localStorage.removeItem('pixoro_poll');
-  }
-  showToast('Story Posted da! 🔥')
+  if(!m){ showToast('Photo illa da!'); return }
+  if(!ME_ID){ let {data:{session}}=await supa.auth.getSession(); if(session) ME_ID=session.user.id }
+  let exp=new Date(); exp.setHours(exp.getHours()+24);
+  let caption=document.getElementById('cap').value;
+  let poll=null; let pollStr=localStorage.getItem('pixoro_poll');
+  if(pollStr){ let p=JSON.parse(pollStr); poll={question:p.q, options:[{text:p.o1,votes:0},{text:p.o2,votes:0}]} }
+  let {data,error}=await supa.from('stories').insert({user_id:ME_ID,username:ME,image_url:m,media_url:m,media_type:type,caption:caption,audience:aud,visibility:aud, poll:poll, expires_at:exp.toISOString()}).select('id').single();
+  if(error){ showToast(error.message); return }
+  if(pollStr) localStorage.removeItem('pixoro_poll');
+  showToast('Story Posted da! 🔥');
   setTimeout(()=>location.href='index.html',800)
 }
 </script></body></html>
