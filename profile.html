@@ -1,76 +1,44 @@
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Profile - Pixoro</title>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Profile - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e1e1e;position:sticky;top:0;background:#000;z-index:50;height:56px}
 .topPlus{width:auto!important;height:auto!important;background:transparent!important;background-image:none!important;color:#fff!important;border-radius:0!important;display:flex;align-items:center;justify-content:center;font-size:28px!important;font-weight:300!important;cursor:pointer;box-shadow:none!important;padding:0 6px!important;border:none!important}
-.bellWhite{display:none!important}
 .pfpBig{width:82px;height:82px;border-radius:50%;background:transparent!important;padding:0!important;cursor:pointer;border:none!important;box-shadow:none!important}
 .pfpBigInner{width:100%;height:100%;border-radius:50%;background:transparent!important;padding:0!important;overflow:hidden}
 .pfpBigInner img{width:100%;height:100%;border-radius:50%;object-fit:cover;background:transparent!important}
 .stats{display:flex;gap:22px;text-align:center}.stats b{display:block;font-size:17px}.stats span{font-size:12px;color:#aaa}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:10px}
-.grid img,.grid video{width:100%;aspect-ratio:1/1;object-fit:cover}
-.btn{border:1.2px solid #fff!important;background:transparent!important;background-image:none!important;color:#fff!important;padding:10px 0;border-radius:20px;width:100%;font-weight:700;font-size:14px}
-.btnPrimary{background:transparent!important;background-image:none!important;color:#fff!important;border:1.2px solid #fff!important;font-weight:700;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:10px}.grid img,.grid video{width:100%;aspect-ratio:1/1;object-fit:cover}
+.btn{border:1.2px solid #fff!important;background:transparent!important;color:#fff!important;padding:10px 0;border-radius:20px;width:100%;font-weight:700;font-size:14px}
+.btnPrimary{background:transparent!important;color:#fff!important;border:1.2px solid #fff!important;font-weight:700;font-size:14px}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:60px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:9999}
-.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}
-.bottom-nav a.active{color:#ff5ea8}.bottom-nav span{font-size:10px;color:#8e8e8e}
-.bottom-nav a.active span{color:#ff5ea8;font-weight:700}
-.bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}
-.bottom-nav a.active svg{stroke:#ff5ea8}
-.bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #ff5ea8;background:transparent!important}
-.tab{padding:12px 0;flex:1;text-align:center;font-size:13px;color:#666;border-bottom:2px solid transparent;cursor:pointer}
-.tab.active{color:#fff;border-bottom:2px solid #ff5ea8}
-.highlights{display:flex;gap:16px;margin:18px 0;overflow-x:auto}
-.h-item{text-align:center;min-width:62px}
-.h-circle{width:62px;height:62px;border-radius:50%;background:transparent!important;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #ff5ea8;overflow:hidden}
-.h-circle img{width:100%;height:100%;object-fit:cover}
-.h-text{font-size:10px;margin-top:6px}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}.bottom-nav a.active{color:#ff5ea8}.bottom-nav span{font-size:10px;color:#8e8e8e}.bottom-nav a.active span{color:#ff5ea8;font-weight:700}.bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}.bottom-nav a.active svg{stroke:#ff5ea8}.bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #ff5ea8;background:transparent!important}
+.tab{padding:12px 0;flex:1;text-align:center;font-size:13px;color:#666;border-bottom:2px solid transparent;cursor:pointer}.tab.active{color:#fff;border-bottom:2px solid #ff5ea8}
+.highlights{display:flex;gap:16px;margin:18px 0;overflow-x:auto}.h-item{text-align:center;min-width:62px}.h-circle{width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #ff5ea8;overflow:hidden}.h-circle img{width:100%;height:100%;object-fit:cover}.h-text{font-size:10px;margin-top:6px}
 .editSheet,.setSheet{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:800;display:none;align-items:flex-end;justify-content:center;padding-bottom:60px}
 .createSheet{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:800;display:none;align-items:flex-end;justify-content:center}
 .sheetBox{background:#0a0a0a;width:100%;max-width:450px;border-radius:22px 22px 0 0;border:1px solid #333;max-height:calc(90vh - 60px);overflow-y:auto;padding:18px;padding-bottom:30px}
 .sItem{padding:16px 18px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
-.fieldBox{border:1px solid #333;border-radius:14px;padding:10px 14px 12px;margin-top:12px;background:#111}
-.fieldBox span{display:block;font-size:12px;color:#888}
-.fieldBox input,.fieldBox textarea{width:100%;background:transparent;border:0;outline:0;color:#fff;font-size:16px;font-weight:600;padding:4px 0 0;font-family:sans-serif;resize:none}
-.toast{display:none!important}
-#displayName,#usernameTag{display:none!important}
-.cropOverlay{position:fixed;inset:0;background:#000;z-index:2000;display:none;flex-direction:column}
-.cropStage{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.cropCircle{width:280px;height:280px;border-radius:50%;overflow:hidden;border:3px solid #ff5ea8;touch-action:none;background:transparent!important;box-shadow:0 0 0 9999px rgba(0,0,0,.7);position:relative}
-.cropCircle img{position:absolute;left:50%;top:50%;max-width:none;cursor:grab;transform:translate(-50%,-50%)}
+.fieldBox{border:1px solid #333;border-radius:14px;padding:10px 14px 12px;margin-top:12px;background:#111}.fieldBox span{display:block;font-size:12px;color:#888}.fieldBox input,.fieldBox textarea{width:100%;background:transparent;border:0;outline:0;color:#fff;font-size:16px;font-weight:600;padding:4px 0 0;font-family:sans-serif;resize:none}
+.cropOverlay{position:fixed;inset:0;background:#000;z-index:2000;display:none;flex-direction:column}.cropStage{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}.cropCircle{width:280px;height:280px;border-radius:50%;overflow:hidden;border:3px solid #ff5ea8;touch-action:none;background:transparent!important;box-shadow:0 0 0 9999px rgba(0,0,0,.7);position:relative}.cropCircle img{position:absolute;left:50%;top:50%;max-width:none;cursor:grab;transform:translate(-50%,-50%)}
 input[type=range]{width:100%;accent-color:#ff5ea8}
-.pixoroMenu{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#111;border:1px solid #333;border-radius:16px;width:92%;max-width:420px;z-index:9999;display:none;padding:8px}
-.pixoroMenu div{padding:14px;border-bottom:1px solid #222;cursor:pointer;font-size:14px}
-.pixoroMenu div.delete{color:#ff3040}
+.pixoroMenu{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#111;border:1px solid #333;border-radius:16px;width:92%;max-width:420px;z-index:9999;display:none;padding:8px}.pixoroMenu div{padding:14px;border-bottom:1px solid #222;cursor:pointer;font-size:14px}.pixoroMenu div.delete{color:#ff3040}
 .hlCover{width:62px;height:62px;border-radius:50%;object-fit:cover;border:2px solid #ff5ea8;cursor:pointer}
 </style></head><body>
 <div class="top"><b style="font-size:20px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="topUsername"></b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="document.getElementById('createSheet').style.display='flex'">+</div><span onclick="openSettings()" style="font-size:20px;cursor:pointer">☰</span></div></div>
-<div style="padding:15px">
-<div style="display:flex;gap:18px;align-items:center"><div class="pfpBig" onclick="openEditSheet()"><div class="pfpBigInner"><img id="pfpImg" src=""></div></div><div class="stats"><div><b id="postCount">0</b><span>Posts</span></div><div><b id="followerCount">0</b><span>Followers</span></div><div><b id="followingCount">0</b><span>Following</span></div></div></div>
-<div style="margin-top:14px"><div id="bioText" style="font-size:14px;margin-top:8px"></div><div id="linkText" style="font-size:13px;color:#ff5ea8;margin-top:6px"></div></div>
-<div class="highlights" id="highlightList" style="display:none"></div>
-<div style="display:flex;gap:8px;margin-top:12px" id="actionArea"><button class="btn btnPrimary" onclick="openEditSheet()">Edit Profile</button><button class="btn" onclick="shareProfile()">Share Profile</button></div>
-<div style="display:flex;border-top:1px solid #222;margin-top:18px"><div class="tab active" id="tabPosts" onclick="showTab('all')">⊞ Posts</div><div class="tab" id="tabReels" onclick="showTab('reels')">🎬 Reels</div><div class="tab" onclick="location.href='saved.html'">🔖 Saved</div></div>
-<div id="myGrid" class="grid"></div></div>
+<div style="padding:15px"><div style="display:flex;gap:18px;align-items:center"><div class="pfpBig" onclick="openEditSheet()"><div class="pfpBigInner"><img id="pfpImg" src=""></div></div><div class="stats"><div><b id="postCount">0</b><span>Posts</span></div><div><b id="followerCount">0</b><span>Followers</span></div><div><b id="followingCount">0</b><span>Following</span></div></div></div><div style="margin-top:14px"><div id="bioText" style="font-size:14px;margin-top:8px"></div><div id="linkText" style="font-size:13px;color:#ff5ea8;margin-top:6px"></div></div><div class="highlights" id="highlightList" style="display:none"></div><div style="display:flex;gap:8px;margin-top:12px" id="actionArea"><button class="btn btnPrimary" onclick="openEditSheet()">Edit Profile</button><button class="btn" onclick="shareProfile()">Share Profile</button></div><div style="display:flex;border-top:1px solid #222;margin-top:18px"><div class="tab active" id="tabPosts" onclick="showTab('all')">⊞ Posts</div><div class="tab" id="tabReels" onclick="showTab('reels')">🎬 Reels</div><div class="tab" onclick="location.href='saved.html'">🔖 Saved</div></div><div id="myGrid" class="grid"></div></div>
 <div id="pixoroMenu" class="pixoroMenu"></div>
 <div id="hlEditSheet" style="position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:none;align-items:flex-end;justify-content:center"><div style="background:#111;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:18px;border:1px solid #333"><div style="text-align:center;font-weight:900">⭐ Edit Highlight</div><div style="display:flex;gap:10px;margin:14px 0;overflow-x:auto" id="hlCoverPicker"></div><input id="hlEditName" placeholder="Highlight Name" style="width:100%;background:#222;border:1px solid #ff5ea8;color:#fff;padding:12px;border-radius:12px;outline:none"><button onclick="saveHighlightEdit()" style="width:100%;background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;border:0;padding:12px;border-radius:12px;font-weight:800;margin-top:10px">Save Changes ✅</button><button onclick="deleteHighlight()" style="width:100%;background:#ff0000;color:#fff;border:0;padding:12px;border-radius:12px;font-weight:800;margin-top:8px">🗑️ Delete Highlight</button><div onclick="document.getElementById('hlEditSheet').style.display='none'" style="text-align:center;padding:12px;color:#888">Cancel</div></div></div>
 <input type="file" id="hlCoverInput" accept="image/*" style="display:none">
 <div id="setSheet" class="setSheet"><div class="sheetBox"><div style="text-align:center;font-weight:900;padding-bottom:12px">Pixoro Settings ⚙️</div><div class="sItem" onclick="openEditSheet()"><span>👤 Edit Profile</span><span>›</span></div><div class="sItem" onclick="doPixoroLogout()" style="color:#ff3b30"><span>🚪 Log Out</span><span>›</span></div><div onclick="document.getElementById('setSheet').style.display='none'" style="margin:14px;background:#111;padding:12px;border-radius:12px;text-align:center;color:#888">Cancel</div></div></div>
-<div id="editSheet" class="editSheet"><div class="sheetBox"><b style="display:block;text-align:center">Edit Profile</b><div style="text-align:center;margin:14px"><img id="editPfpPreview" src="" style="width:90px;height:90px;border-radius:50%;border:2px solid #ff5ea8;object-fit:cover;background:transparent"><br><button onclick="document.getElementById('pfpInput').click()" style="margin-top:8px;background:transparent;border:1.2px solid #fff;color:#fff;padding:6px 14px;border-radius:20px">Change Photo</button><input type="file" id="pfpInput" accept="image/*" style="display:none"></div><div class="fieldBox"><span>Name</span><input id="editName"></div><div class="fieldBox"><span>Username</span><input id="editUsername"></div><div class="fieldBox"><span>Bio</span><textarea id="editBio" rows="2"></textarea></div><div class="fieldBox"><span>Link</span><input id="editLink"></div><button onclick="saveEdit()" style="width:100%;background:transparent;color:#fff;padding:12px;border-radius:20px;font-weight:700;margin-top:16px;border:1.2px solid #fff">Save - Server Sync</button><div onclick="document.getElementById('editSheet').style.display='none'" style="text-align:center;padding:12px;color:#888">Cancel</div></div></div>
+<div id="editSheet" class="editSheet"><div class="sheetBox"><b style="display:block;text-align:center">Edit Profile</b><div style="text-align:center;margin:14px"><img id="editPfpPreview" src="" style="width:90px;height:90px;border-radius:50%;border:2px solid #ff5ea8;object-fit:cover"><br><button onclick="document.getElementById('pfpInput').click()" style="margin-top:8px;background:transparent;border:1.2px solid #fff;color:#fff;padding:6px 14px;border-radius:20px">Change Photo</button><input type="file" id="pfpInput" accept="image/*" style="display:none"></div><div class="fieldBox"><span>Name</span><input id="editName"></div><div class="fieldBox"><span>Username</span><input id="editUsername"></div><div class="fieldBox"><span>Bio</span><textarea id="editBio" rows="2"></textarea></div><div class="fieldBox"><span>Link</span><input id="editLink"></div><button onclick="saveEdit()" style="width:100%;background:transparent;color:#fff;padding:12px;border-radius:20px;font-weight:700;margin-top:16px;border:1.2px solid #fff">Save - Server Sync</button><div onclick="document.getElementById('editSheet').style.display='none'" style="text-align:center;padding:12px;color:#888">Cancel</div></div></div>
 <div id="cropOverlay" class="cropOverlay"><div style="padding:14px;display:flex;justify-content:space-between"><span onclick="closeCrop()" style="font-size:20px;cursor:pointer">✕</span><b>Adjust Profile Photo</b><span onclick="applyCrop()" style="color:#ff5ea8;font-weight:900;cursor:pointer">Done ✓</span></div><div class="cropStage"><div class="cropCircle" id="cropCircle"><img id="cropImg"></div></div><div style="padding:18px"><input type="range" id="zoomRange" min="1" max="3" step="0.01" value="1"><div style="display:flex;gap:8px;margin-top:14px"><button onclick="resetCrop()" style="flex:1;background:transparent;color:#fff;padding:12px;border-radius:12px;border:1.2px solid #fff">Reset</button><button onclick="applyCrop()" style="flex:2;background:transparent;color:#fff;padding:12px;border-radius:20px;font-weight:700;border:1.2px solid #fff">Crop & Save ✓</button></div></div></div>
 <div class="bottom-nav"><a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a><a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a><a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a><a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a><a href="profile.html" class="active"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
 <div id="createSheet" class="createSheet" onclick="if(event.target.id=='createSheet')this.style.display='none'"><div style="background:#1a1a1a;border-radius:28px 28px 0 0;padding:20px 0 30px;width:100%;max-width:450px"><div style="text-align:center;font-size:22px;font-weight:900;margin-bottom:10px">Create</div><div onclick="location.href='post-create.html'" style="padding:18px 20px;border-bottom:1px solid #2a2a2a">+ Post</div><div onclick="location.href='reel-create.html'" style="padding:18px 20px;border-bottom:1px solid #2a2a2a">▶ Reels</div><div onclick="location.href='story-create.html'" style="padding:18px 20px">◯ Story</div><div onclick="document.getElementById('createSheet').style.display='none'" style="margin-top:12px;text-align:center;padding:12px;color:#777">Cancel</div></div></div>
 <div id="toast" class="toast"></div>
 <script>
-function showToast(m){return}
-function getSupa(){return window.supa}
-window.getTick=()=>''; 
+function getSupa(){return window.supa} window.getTick=()=>'';
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase();return u||''}
 let ME_RAW='',ME_ID='',VIEW_USER='',VIEW_PROFILE=null,myPosts=[],allViews=[],allFollows=[],currentTab='all',allHighlights=[],editingHL=null,editingCover=''
 function isReelPost(p){let u=(p.media_url||p.video_url||'').toLowerCase();return p.media_type=='reel'||p.media_type=='video'||!!p.video_url||u.includes('.mp4')}
@@ -81,92 +49,33 @@ async function init(){
   let {data:{session}}=await supa.auth.getSession(); if(!session){location.href='login.html';return}
   let {data:myProfile}=await supa.from('profiles').select('*').eq('id',session.user.id).single(); if(!myProfile){location.href='setup-username.html';return}
   ME_RAW=cleanUser(myProfile.username||session.user.email.split('@')[0]); ME_ID=session.user.id;
-  let urlU=cleanUser(new URLSearchParams(location.search).get('u')||''); VIEW_USER=urlU||ME_RAW;
+  let urlU=cleanUser(new URLSearchParams(location.search).get('user')||new URLSearchParams(location.search).get('u')||''); VIEW_USER=urlU||ME_RAW;
   let vp=null;
   if(urlU===''||urlU===ME_RAW) vp=myProfile; else { let {data}=await supa.from('profiles').select('*').eq('username',VIEW_USER).single(); if(data) vp=data; else { let {data:allP}=await supa.from('profiles').select('*'); vp=(allP||[]).find(p=>cleanUser(p.username)===VIEW_USER)||null } if(!vp){document.getElementById('topUsername').innerText='';return} }
   VIEW_PROFILE=vp; let isMine=VIEW_PROFILE.id===ME_ID;
   document.getElementById('topUsername').innerHTML=cleanUser(VIEW_PROFILE.username);
-  document.getElementById('bioText').innerText=VIEW_PROFILE.bio||'';
-  document.getElementById('linkText').innerText=VIEW_PROFILE.link||VIEW_PROFILE.website||'';
-  document.getElementById('pfpImg').src=getPfpFrom(VIEW_PROFILE);
-  document.getElementById('editPfpPreview').src=getPfpFrom(VIEW_PROFILE);
-  document.getElementById('navPfp').src=getPfpFrom(myProfile);
+  document.getElementById('bioText').innerText=VIEW_PROFILE.bio||''; document.getElementById('linkText').innerText=VIEW_PROFILE.link||VIEW_PROFILE.website||'';
+  document.getElementById('pfpImg').src=getPfpFrom(VIEW_PROFILE); document.getElementById('editPfpPreview').src=getPfpFrom(VIEW_PROFILE); document.getElementById('navPfp').src=getPfpFrom(myProfile);
   let {data:follows}=await supa.from('follows').select('*'); allFollows=follows||[];
   let isFollow=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(VIEW_PROFILE.id));
-  if(isMine){ document.getElementById('actionArea').innerHTML=`<button class="btn btnPrimary" onclick="openEditSheet()">Edit Profile</button><button class="btn" onclick="shareProfile()">Share Profile</button>` }
-  else { document.getElementById('actionArea').innerHTML=`<button class="btn btnPrimary" id="followBtnMain" onclick="toggleFollowMain()">${isFollow?'Following':'Follow'}</button><button class="btn" onclick="shareProfile()">Share Profile</button>` }
-  let {data:p1}=await supa.from('posts').select('*').eq('user_id',VIEW_PROFILE.id).order('created_at',{ascending:false});
-  let posts2=p1||[];
+  if(isMine){ document.getElementById('actionArea').innerHTML=`<button class="btn btnPrimary" onclick="openEditSheet()">Edit Profile</button><button class="btn" onclick="shareProfile()">Share Profile</button>` } else { document.getElementById('actionArea').innerHTML=`<button class="btn btnPrimary" id="followBtnMain" onclick="toggleFollowMain()">${isFollow?'Following':'Follow'}</button><button class="btn" onclick="shareProfile()">Share Profile</button>` }
+  let {data:p1}=await supa.from('posts').select('*').eq('user_id',VIEW_PROFILE.id).order('created_at',{ascending:false}); let posts2=p1||[];
   if(!posts2.length){ let {data:all}=await supa.from('posts').select('*').order('created_at',{ascending:false}); posts2=(all||[]).filter(p=>p.user_id===VIEW_PROFILE.id||cleanUser(p.username)===cleanUser(VIEW_PROFILE.username)) }
   myPosts=posts2.filter(p=>!p.is_archived);
-  let {count:realCount}=await supa.from('posts').select('id',{count:'exact',head:true}).eq('user_id',VIEW_PROFILE.id);
-  if(!realCount){ let {count:c2}=await supa.from('posts').select('id',{count:'exact',head:true}).eq('username',cleanUser(VIEW_PROFILE.username)); realCount=c2||myPosts.length }
+  let {count:realCount}=await supa.from('posts').select('id',{count:'exact',head:true}).eq('user_id',VIEW_PROFILE.id); if(!realCount){ let {count:c2}=await supa.from('posts').select('id',{count:'exact',head:true}).eq('username',cleanUser(VIEW_PROFILE.username)); realCount=c2||myPosts.length }
   let {data:views}=await supa.from('views').select('*'); allViews=views||[];
-  let totalPosts=realCount||myPosts.length;
-  let totalReels=myPosts.filter(isReelPost).length;
-  document.getElementById('postCount').textContent=totalPosts;
-  document.getElementById('tabPosts').innerHTML=`⊞ Posts (${totalPosts})`;
-  document.getElementById('tabReels').innerHTML=`🎬 Reels (${totalReels})`;
-  renderGrid(myPosts);
-  await loadHighlights();
-  document.getElementById('followerCount').textContent=allFollows.filter(f=>String(f.following_id)==String(VIEW_PROFILE.id)).length;
-  document.getElementById('followingCount').textContent=allFollows.filter(f=>String(f.follower_id)==String(VIEW_PROFILE.id)).length;
+  let totalPosts=realCount||myPosts.length; let totalReels=myPosts.filter(isReelPost).length;
+  document.getElementById('postCount').textContent=totalPosts; document.getElementById('tabPosts').innerHTML=`⊞ Posts (${totalPosts})`; document.getElementById('tabReels').innerHTML=`🎬 Reels (${totalReels})`;
+  renderGrid(myPosts); await loadHighlights();
+  document.getElementById('followerCount').textContent=allFollows.filter(f=>String(f.following_id)==String(VIEW_PROFILE.id)).length; document.getElementById('followingCount').textContent=allFollows.filter(f=>String(f.follower_id)==String(VIEW_PROFILE.id)).length;
 }
-async function loadHighlights(){
-  let supa=getSupa(); let h=document.getElementById('highlightList'); if(!h) return;
-  let {data:st}=await supa.from('stories').select('*').eq('user_id',VIEW_PROFILE.id).order('created_at',{ascending:false});
-  let list=(st||[]).filter(s=>s.is_highlight===true);
-  if(!list.length){ let fromPosts=myPosts.filter(p=>p.is_highlight===true); if(fromPosts.length) list=fromPosts; }
-  allHighlights=list;
-  if(!list.length){ h.style.display='none'; h.innerHTML=''; return; }
-  let groups={};
-  list.forEach(s=>{ let n=s.highlight_name||'Highlight'; if(!groups[n]) groups[n]=s; else if(s.highlight_cover) groups[n]=s; });
-  let grouped=Object.entries(groups).map(([name,s])=>{
-    let cover = s.highlight_cover || list.find(x=>(x.highlight_name||'Highlight')===name && x.highlight_cover)?.highlight_cover || s.image_url || s.media_url || s.image || '';
-    return {name, cover, count: list.filter(x=>(x.highlight_name||'Highlight')===name).length};
-  });
-  h.style.display='flex';
-  h.innerHTML=grouped.map(g=>`<div class="h-item" data-hl="${g.name}" oncontextmenu="event.preventDefault();openHighlightEdit('${g.name.replace(/'/g,"\\'")}');return false" onclick="location.href='story-view.html?user=${VIEW_USER}'"><div class="h-circle"><img src="${g.cover}"></div><div class="h-text">${g.name}</div><div style="font-size:9px;color:#888">${g.count} stories</div></div>`).join('');
-  document.querySelectorAll('.h-item').forEach(el=>{ let t; el.addEventListener('touchstart',()=>{ t=setTimeout(()=>{ openHighlightEdit(el.dataset.hl); },600) }); el.addEventListener('touchend',()=>clearTimeout(t)); el.addEventListener('touchmove',()=>clearTimeout(t)); });
-}
-function renderHighlights(){ loadHighlights(); }
-function openHighlightEdit(name){
-  if(VIEW_PROFILE.id!==ME_ID) return;
-  editingHL=name; editingCover='';
-  document.getElementById('hlEditName').value=name;
-  let covers = allHighlights.filter(s=>(s.highlight_name||'Highlight')===name).map(s=>s.image_url||s.media_url||s.image).filter(Boolean);
-  let unique=[...new Set(covers)];
-  document.getElementById('hlCoverPicker').innerHTML = `<div onclick="document.getElementById('hlCoverInput').click()" style="min-width:62px;height:62px;border-radius:50%;background:#222;display:grid;place-items:center;font-size:22px;border:2px dashed #ff5ea8;cursor:pointer">📸</div>` + unique.map(u=>`<img src="${u}" onclick="selectHLCover('${u}')" class="hlCover">`).join('');
-  document.getElementById('hlEditSheet').style.display='flex';
-}
+async function loadHighlights(){ let supa=getSupa(); let h=document.getElementById('highlightList'); if(!h) return; let {data:st}=await supa.from('stories').select('*').eq('user_id',VIEW_PROFILE.id).order('created_at',{ascending:false}); let list=(st||[]).filter(s=>s.is_highlight===true); if(!list.length){ let fromPosts=myPosts.filter(p=>p.is_highlight===true); if(fromPosts.length) list=fromPosts; } allHighlights=list; if(!list.length){ h.style.display='none'; h.innerHTML=''; return; } let groups={}; list.forEach(s=>{ let n=s.highlight_name||'Highlight'; if(!groups[n]) groups[n]=s; else if(s.highlight_cover) groups[n]=s; }); let grouped=Object.entries(groups).map(([name,s])=>{ let cover=s.highlight_cover||list.find(x=>(x.highlight_name||'Highlight')===name&&x.highlight_cover)?.highlight_cover||s.image_url||s.media_url||s.image||''; return {name,cover,count:list.filter(x=>(x.highlight_name||'Highlight')===name).length}; }); h.style.display='flex'; h.innerHTML=grouped.map(g=>`<div class="h-item" data-hl="${g.name}" oncontextmenu="event.preventDefault();openHighlightEdit('${g.name.replace(/'/g,"\\'")}');return false" onclick="location.href='story-view.html?user=${VIEW_USER}'"><div class="h-circle"><img src="${g.cover}"></div><div class="h-text">${g.name}</div><div style="font-size:9px;color:#888">${g.count} stories</div></div>`).join(''); document.querySelectorAll('.h-item').forEach(el=>{ let t; el.addEventListener('touchstart',()=>{ t=setTimeout(()=>{ openHighlightEdit(el.dataset.hl); },600) }); el.addEventListener('touchend',()=>clearTimeout(t)); el.addEventListener('touchmove',()=>clearTimeout(t)); }); }
+function openHighlightEdit(name){ if(VIEW_PROFILE.id!==ME_ID) return; editingHL=name; editingCover=''; document.getElementById('hlEditName').value=name; let covers=allHighlights.filter(s=>(s.highlight_name||'Highlight')===name).map(s=>s.image_url||s.media_url||s.image).filter(Boolean); let unique=[...new Set(covers)]; document.getElementById('hlCoverPicker').innerHTML=`<div onclick="document.getElementById('hlCoverInput').click()" style="min-width:62px;height:62px;border-radius:50%;background:#222;display:grid;place-items:center;font-size:22px;border:2px dashed #ff5ea8;cursor:pointer">📸</div>`+unique.map(u=>`<img src="${u}" onclick="selectHLCover('${u}')" class="hlCover">`).join(''); document.getElementById('hlEditSheet').style.display='flex'; }
 function selectHLCover(url){ editingCover=url; document.querySelectorAll('#hlCoverPicker .hlCover').forEach(i=>i.style.border='2px solid #333'); event.target.style.border='2px solid #00ff66'; }
-async function saveHighlightEdit(){
-  let newName=document.getElementById('hlEditName').value.trim()||editingHL;
-  let supa=getSupa();
-  let upd={highlight_name:newName}; if(editingCover) upd.highlight_cover=editingCover;
-  await supa.from('stories').update(upd).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true);
-  if(editingCover) await supa.from('stories').update({highlight_cover:editingCover}).eq('user_id',ME_ID).eq('highlight_name',newName).eq('is_highlight',true);
-  await supa.from('posts').update(upd).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true);
-  document.getElementById('hlEditSheet').style.display='none'; loadHighlights();
-}
-async function deleteHighlight(){
-  let supa=getSupa();
-  await supa.from('stories').update({is_highlight:false, highlight_name:null, highlight_cover:null}).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true);
-  await supa.from('posts').update({is_highlight:false}).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true);
-  document.getElementById('hlEditSheet').style.display='none'; loadHighlights();
-}
-async function toggleF(uid,pid){
-  if(!uid||String(uid)==String(ME_ID)) return;
-  let supa=getSupa(); if(!supa) return;
-  let isF=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid));
-  let newTxt=isF?'Follow':'Following';
-  let main=document.getElementById('followBtnMain'); if(main) main.innerText=newTxt;
-  if(isF){ allFollows=allFollows.filter(f=>!(String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid))); await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',uid); }
-  else { allFollows.push({follower_id:ME_ID,following_id:uid,follower:ME_RAW,following:VIEW_USER}); await supa.from('follows').insert({follower_id:ME_ID,following_id:uid,follower:ME_RAW,following:VIEW_USER}); }
-  let fc=document.getElementById('followerCount'); if(fc) fc.textContent=allFollows.filter(f=>String(f.following_id)==String(uid)).length;
-}
-window.toggleF=toggleF;
-async function toggleFollowMain(){ await toggleF(VIEW_PROFILE.id,'main'); }
+async function saveHighlightEdit(){ let newName=document.getElementById('hlEditName').value.trim()||editingHL; let supa=getSupa(); let upd={highlight_name:newName}; if(editingCover) upd.highlight_cover=editingCover; await supa.from('stories').update(upd).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true); if(editingCover) await supa.from('stories').update({highlight_cover:editingCover}).eq('user_id',ME_ID).eq('highlight_name',newName).eq('is_highlight',true); await supa.from('posts').update(upd).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true); document.getElementById('hlEditSheet').style.display='none'; loadHighlights(); }
+async function deleteHighlight(){ let supa=getSupa(); await supa.from('stories').update({is_highlight:false,highlight_name:null,highlight_cover:null}).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true); await supa.from('posts').update({is_highlight:false}).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true); document.getElementById('hlEditSheet').style.display='none'; loadHighlights(); }
+async function toggleF(uid,pid){ if(!uid||String(uid)==String(ME_ID)) return; let supa=getSupa(); if(!supa) return; let isF=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid)); let newTxt=isF?'Follow':'Following'; let main=document.getElementById('followBtnMain'); if(main) main.innerText=newTxt; if(isF){ allFollows=allFollows.filter(f=>!(String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid))); await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',uid); } else { allFollows.push({follower_id:ME_ID,following_id:uid,follower:ME_RAW,following:VIEW_USER}); await supa.from('follows').insert({follower_id:ME_ID,following_id:uid,follower:ME_RAW,following:VIEW_USER}); } let fc=document.getElementById('followerCount'); if(fc) fc.textContent=allFollows.filter(f=>String(f.following_id)==String(uid)).length; }
+window.toggleF=toggleF; async function toggleFollowMain(){ await toggleF(VIEW_PROFILE.id,'main'); }
 function renderGrid(list){ if(!list.length){document.getElementById('myGrid').innerHTML=`<div style="grid-column:1/4;text-align:center;padding:40px;color:#666">No posts yet</div>`;return} document.getElementById('myGrid').innerHTML=list.map(p=>{ let mUrl=p.media_url||p.video_url||p.image_url||p.image||''; let isVid=isReelPost(p); let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length; let vBadge=`<span style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.7);padding:3px 7px;border-radius:10px;font-size:11px">👁️ ${fmtViews(vCount)}</span>`; if(isVid) return `<div style="position:relative" onclick="openPixoroPost('${p.id}')"><video src="${mUrl}" muted playsinline style="width:100%;aspect-ratio:1/1;object-fit:cover"></video><span style="position:absolute;top:6px;right:6px">🎬</span>${vBadge}</div>`; return `<div style="position:relative" onclick="openPixoroPost('${p.id}')"><img src="${mUrl}">${vBadge}</div>` }).join('') }
 function openPixoroPost(id){ let p=myPosts.find(x=>String(x.id)==String(id)); if(!p) return; let isMine=VIEW_PROFILE.id===ME_ID; let menu=document.getElementById('pixoroMenu'); if(isMine){ menu.innerHTML=`<div onclick="location.href='index.html?id=${id}'">👁️ Open Post</div><div onclick="location.href='reels.html?id=${id}'">🎬 Open Reel</div><div onclick="sharePixoroPost('${id}')">🔗 Share</div><div onclick="savePixoroPost('${id}')">🔖 Save</div><div class="delete" onclick="deletePixoroPost('${id}')">🗑️ Delete</div><div onclick="hideMenu()" style="text-align:center;color:#888">Cancel</div>` } else { menu.innerHTML=`<div onclick="location.href='index.html?id=${id}'">👁️ Open Post</div><div onclick="location.href='reels.html?id=${id}'">🎬 Open Reel</div><div onclick="sharePixoroPost('${id}')">🔗 Share</div><div onclick="savePixoroPost('${id}')">🔖 Save</div><div onclick="hideMenu()" style="text-align:center;color:#888">Cancel</div>` } menu.style.display='block' }
 function hideMenu(){ document.getElementById('pixoroMenu').style.display='none' }
@@ -177,8 +86,8 @@ function showTab(type){ currentTab=type; document.getElementById('tabPosts').cla
 function openSettings(){document.getElementById('setSheet').style.display='flex'}
 function openEditSheet(){ if(VIEW_PROFILE.id!==ME_ID) return; document.getElementById('editName').value=VIEW_PROFILE.full_name||VIEW_PROFILE.display_name||''; document.getElementById('editUsername').value=VIEW_USER; document.getElementById('editBio').value=VIEW_PROFILE.bio||''; document.getElementById('editLink').value=VIEW_PROFILE.link||VIEW_PROFILE.website||''; document.getElementById('editSheet').style.display='flex' }
 async function doPixoroLogout(){let supa=getSupa();await supa.auth.signOut();location.href='login.html'}
-async function saveEdit(){ let supa=getSupa(); let n=document.getElementById('editName').value.trim(),u=cleanUser(document.getElementById('editUsername').value.trim()),b=document.getElementById('editBio').value,l=document.getElementById('editLink').value.trim(),np=document.getElementById('editPfpPreview').dataset.new; if(!u) return; let oldU=ME_RAW; let avatarUrl=VIEW_PROFILE?.avatar_url||''; if(np&&np.startsWith('data:')){ try{let res=await fetch(np);let blob=await res.blob();let fileName=Date.now()+'_'+ME_RAW+'.jpg';let {error:upErr}=await supa.storage.from('avatars').upload(fileName,blob,{contentType:'image/jpeg'}); if(!upErr){let {data}=supa.storage.from('avatars').getPublicUrl(fileName); avatarUrl=data.publicUrl}}catch(e){} } let update={username:u,display_name:n,full_name:n,bio:b,avatar_url:avatarUrl}; let {error}=await supa.from('profiles').update(update).eq('id',ME_ID); if(error){ if(error.message.includes('full_name')){ let {error:e2}=await supa.from('profiles').update({username:u,display_name:n,bio:b,avatar_url:avatarUrl}).eq('id',ME_ID); if(e2) return} else return} if(l){try{await supa.from('profiles').update({link:l}).eq('id',ME_ID)}catch(e){} try{await supa.from('profiles').update({website:l}).eq('id',ME_ID)}catch(e){}} if(u!==oldU){await supa.from('posts').update({username:u}).eq('username',oldU); await supa.from('stories').update({username:u}).eq('username',oldU)} document.getElementById('editSheet').style.display='none'; setTimeout(()=>{location.href='profile.html?u='+u},600) }
-function shareProfile(){ navigator.clipboard.writeText(location.origin+'/profile.html?u='+VIEW_USER) }
+async function saveEdit(){ let supa=getSupa(); let n=document.getElementById('editName').value.trim(),u=cleanUser(document.getElementById('editUsername').value.trim()),b=document.getElementById('editBio').value,l=document.getElementById('editLink').value.trim(),np=document.getElementById('editPfpPreview').dataset.new; if(!u) return; let oldU=ME_RAW; let avatarUrl=VIEW_PROFILE?.avatar_url||''; if(np&&np.startsWith('data:')){ try{let res=await fetch(np);let blob=await res.blob();let fileName=Date.now()+'_'+ME_RAW+'.jpg';let {error:upErr}=await supa.storage.from('avatars').upload(fileName,blob,{contentType:'image/jpeg'}); if(!upErr){let {data}=supa.storage.from('avatars').getPublicUrl(fileName); avatarUrl=data.publicUrl}}catch(e){} } let update={username:u,display_name:n,full_name:n,bio:b,avatar_url:avatarUrl}; let {error}=await supa.from('profiles').update(update).eq('id',ME_ID); if(error){ if(error.message.includes('full_name')){ let {error:e2}=await supa.from('profiles').update({username:u,display_name:n,bio:b,avatar_url:avatarUrl}).eq('id',ME_ID); if(e2) return} else return} if(l){try{await supa.from('profiles').update({link:l}).eq('id',ME_ID)}catch(e){} try{await supa.from('profiles').update({website:l}).eq('id',ME_ID)}catch(e){}} if(u!==oldU){await supa.from('posts').update({username:u}).eq('username',oldU); await supa.from('stories').update({username:u}).eq('username',oldU)} document.getElementById('editSheet').style.display='none'; setTimeout(()=>{location.href='profile.html?user='+u},600) }
+function shareProfile(){ navigator.clipboard.writeText(location.origin+'/profile.html?user='+VIEW_USER) }
 let cropX=0,cropY=0,cropScale=1,cropDragging=false,cropStartX=0,cropStartY=0,cropOrigX=0,cropOrigY=0,cropImgEl=document.getElementById('cropImg');
 function updateCropTransform(){cropImgEl.style.transform=`translate(-50%,-50%) translate(${cropX}px,${cropY}px) scale(${cropScale})`}
 function openCrop(src){cropX=0;cropY=0;cropScale=1;document.getElementById('zoomRange').value=1;cropImgEl.src=src;cropImgEl.onload=()=>{let w=cropImgEl.naturalWidth,h=cropImgEl.naturalHeight;if(w>h){cropImgEl.style.width='auto';cropImgEl.style.height='280px'}else{cropImgEl.style.width='280px';cropImgEl.style.height='auto'}updateCropTransform()};document.getElementById('cropOverlay').style.display='flex';document.getElementById('editSheet').style.display='none'}
