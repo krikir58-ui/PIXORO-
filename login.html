@@ -3,37 +3,48 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <style>
-/* OPPO FONT NORMAL FIX DA GIRI */
-body{background:#000;color:#fff;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif !important; display:flex;justify-content:center;padding:20px; -webkit-text-size-adjust:100%; text-size-adjust:100%;}
-.box{width:360px;text-align:center}.card{border:1px solid #262626;padding:20px;border-radius:10px;margin-bottom:10px}
-input{width:100%;padding:11px;margin:6px 0;background:#121212;border:1px solid #333;color:#fff;border-radius:6px;box-sizing:border-box;font-family:inherit;font-size:14px}
-button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:6px;font-family:inherit}
-.hide{display:none}
-#pfpPrev{width:90px;height:90px;border-radius:50%;object-fit:cover;background:#222;display:block;margin:0 auto 12px;border:2px solid #FFD700}
-.logo{font-family:Arial, sans-serif !important;font-weight:900;font-size:36px;color:#FFD700;letter-spacing:1px}
+body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif!important;display:flex;justify-content:center;padding:20px}
+.box{width:360px;text-align:center}.card{border:1px solid #262626;padding:20px;border-radius:12px;margin-bottom:10px;background:#0a0a0a}
+input{width:100%;padding:12px;margin:6px 0;background:#121212;border:1px solid #333;color:#fff;border-radius:8px;box-sizing:border-box;font-family:inherit;font-size:14px}
+button{width:100%;padding:12px;background:#FFD700;color:#000;border:0;border-radius:10px;font-weight:800;cursor:pointer;margin-top:6px;font-family:inherit}
+.hide{display:none}.logo{font-family:Arial,sans-serif!important;font-weight:900;font-size:38px;color:#FFD700}
+.otp-box{display:flex;gap:8px;justify-content:center;margin:14px 0}
+.otp-box input{width:44px;height:52px;text-align:center;font-size:22px;font-weight:bold;padding:0;border:1px solid #333;background:#121212;border-radius:10px}
+.otp-box input:focus{border-color:#FFD700;outline:none}
+#timer{font-size:13px;color:#888;margin-top:8px}
+#pfpWarn{color:#ff3040;font-size:12px;display:none;background:#2a0000;padding:8px;border-radius:6px;border:1px solid #ff3040;margin:8px 0}
 </style></head><body>
 <div class="box">
 <h1 class="logo">Pixoro</h1>
 
 <div class="card" id="s1">
-<p style="font-size:14px;color:#888;margin-bottom:10px">Welcome to Pixoro 👋</p>
-<input id="email" type="email" placeholder="Email / Phone Number" autocomplete="off">
+<p style="font-size:14px;color:#888">Welcome to Pixoro 👋</p>
+<input id="email" type="email" placeholder="Email" autocomplete="off">
 <button onclick="sendOTP()">Send OTP ➡️</button>
-<p id="msg1" style="color:#ff3040;font-size:13px;margin-top:8px"></p>
-<p style="font-size:12px;color:#888;margin-top:10px">Already Account? <b onclick="showOld()" style="color:#FFD700;cursor:pointer">Log In</b></p>
+<p id="msg1" style="color:#ff3040;font-size:13px"></p>
+<p style="font-size:12px;color:#888">Already Account? <b onclick="showOld()" style="color:#FFD700;cursor:pointer">Log In</b></p>
 </div>
 
 <div class="card hide" id="sOTP">
-<p style="font-size:14px;color:#888;margin-bottom:10px">Enter OTP 🔢</p>
+<p style="font-weight:bold">Enter OTP 🔢</p>
 <p id="otpInfo" style="font-size:12px;color:#888"></p>
-<input id="otpCode" placeholder="6 Digit OTP" maxlength="6" autocomplete="off">
+<div class="otp-box">
+<input id="o1" maxlength="1" inputmode="numeric" oninput="moveNext(this,'o2')" onkeydown="moveBack(event,this,'')">
+<input id="o2" maxlength="1" inputmode="numeric" oninput="moveNext(this,'o3')" onkeydown="moveBack(event,this,'o1')">
+<input id="o3" maxlength="1" inputmode="numeric" oninput="moveNext(this,'o4')" onkeydown="moveBack(event,this,'o2')">
+<input id="o4" maxlength="1" inputmode="numeric" oninput="moveNext(this,'o5')" onkeydown="moveBack(event,this,'o3')">
+<input id="o5" maxlength="1" inputmode="numeric" oninput="moveNext(this,'o6')" onkeydown="moveBack(event,this,'o4')">
+<input id="o6" maxlength="1" inputmode="numeric" oninput="checkAuto()" onkeydown="moveBack(event,this,'o5')">
+</div>
 <button onclick="verifyOTP()">Verify OTP ✅</button>
+<p id="timer">Resend in 60s</p>
+<button id="resendBtn" onclick="sendOTP()" class="hide" style="background:#262626;color:#FFD700">Resend OTP 🔁</button>
 <button onclick="go('s1')" style="background:#262626;color:#FFD700">Back</button>
 <p id="msgOTP" style="color:#ff3040;font-size:13px"></p>
 </div>
 
 <div class="card hide" id="s2">
-<p style="font-size:14px;color:#888;margin-bottom:10px">Create Profile ✨ - One Time Only</p>
+<p style="color:#888">Create Profile ✨</p>
 <input id="newUser" placeholder="New Username" autocomplete="off">
 <input id="newPass" type="password" placeholder="New Password">
 <input id="newPass2" type="password" placeholder="Confirm Password">
@@ -42,29 +53,38 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-rad
 </div>
 
 <div class="card hide" id="s3">
-<p style="font-size:14px;color:#888;margin-bottom:10px">Profile Photo 📸</p>
-<img id="pfpPrev" src="https://ui-avatars.com/api/?name=G&background=222&color=fff&size=200">
-<input type="file" id="pfpFile" accept="image/*" onchange="previewPfp(this)" style="border:0">
+<p style="color:#888">Profile Photo 📸</p>
+<img id="pfpPrev" src="https://ui-avatars.com/api/?name=G&background=222&color=fff&size=200" style="width:90px;height:90px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 12px;border:2px solid #FFD700">
+<p id="pfpWarn"></p>
+<input type="file" id="pfpFile" accept="image/png,image/jpg,image/jpeg" onchange="previewPfp(this)" style="border:0">
+<p style="font-size:11px;color:#888">JPG / PNG mattum - 2MB kulla - Background Remove illa da</p>
 <button onclick="savePhoto()">Save Photo ✅</button>
 <button onclick="location.href='index.html'" style="background:#262626;color:#FFD700">Skip >>></button>
 </div>
 
 <div class="card hide" id="sOld">
-<p style="font-size:14px;color:#888;margin-bottom:10px">Log In 🔐</p>
+<p style="color:#888">Log In 🔐</p>
 <input id="oldUser" placeholder="Username / Email" autocomplete="off">
 <input id="oldPass" type="password" placeholder="Password">
 <button onclick="loginOld()">Log In</button>
-<p style="font-size:12px;color:#888;margin-top:10px"><b onclick="go('sForgot')" style="color:#FFD700;cursor:pointer">Forgot Password?</b></p>
+<p style="font-size:12px"><b onclick="go('sForgot')" style="color:#FFD700;cursor:pointer">Forgot Password?</b></p>
 <button onclick="go('s1')" style="background:#262626;color:#FFD700">Create New Account</button>
 <p id="msgOld" style="color:#ff3040;font-size:13px"></p>
 </div>
 
 <div class="card hide" id="sForgot">
-<p style="font-size:14px;color:#888;margin-bottom:10px">Forgot Password 🔑</p>
+<p style="color:#888">Forgot Password 🔑</p>
 <input id="forgotEmail" type="email" placeholder="Gmail Enter pannu da" autocomplete="off">
 <button onclick="sendForgotOTP()">Send OTP to Gmail 📩</button>
 <div id="forgotStep2" class="hide">
-<input id="forgotOtp" placeholder="6 Digit OTP" maxlength="6" autocomplete="off">
+<div class="otp-box">
+<input id="f1" maxlength="1" inputmode="numeric" oninput="moveNext(this,'f2')">
+<input id="f2" maxlength="1" inputmode="numeric" oninput="moveNext(this,'f3')" onkeydown="moveBack(event,this,'f1')">
+<input id="f3" maxlength="1" inputmode="numeric" oninput="moveNext(this,'f4')" onkeydown="moveBack(event,this,'f2')">
+<input id="f4" maxlength="1" inputmode="numeric" oninput="moveNext(this,'f5')" onkeydown="moveBack(event,this,'f3')">
+<input id="f5" maxlength="1" inputmode="numeric" oninput="moveNext(this,'f6')" onkeydown="moveBack(event,this,'f4')">
+<input id="f6" maxlength="1" inputmode="numeric" onkeydown="moveBack(event,this,'f5')">
+</div>
 <input id="forgotNew" type="password" placeholder="New Password">
 <input id="forgotNew2" type="password" placeholder="Confirm Password">
 <button onclick="resetPasswordNow()">Reset Password ✅</button>
@@ -75,94 +95,86 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-rad
 
 </div>
 <script>
-let supa = window.supa
-let curEmail = ''
-let forgotEmailVal = ''
-function go(id){ ['s1','sOTP','s2','s3','sOld','sForgot'].forEach(x=>document.getElementById(x).classList.add('hide')); document.getElementById(id).classList.remove('hide') }
-function showOld(){ go('sOld') }
-function showErr(id,m){ document.getElementById(id).innerText=m }
-
+let supa=window.supa, curEmail='', forgotEmailVal='', timerInt
+function go(id){['s1','sOTP','s2','s3','sOld','sForgot'].forEach(x=>document.getElementById(x).classList.add('hide'));document.getElementById(id).classList.remove('hide')}
+function showOld(){go('sOld')}
+function showErr(id,m){document.getElementById(id).innerText=m}
+function moveNext(el,next){if(el.value && next) document.getElementById(next).focus()}
+function moveBack(e,el,prev){if(e.key==='Backspace' && !el.value && prev) document.getElementById(prev).focus()}
+function getOTP(){return ['o1','o2','o3','o4','o5','o6'].map(id=>document.getElementById(id).value).join('')}
+function getForgotOTP(){return ['f1','f2','f3','f4','f5','f6'].map(id=>document.getElementById(id).value).join('')}
+function checkAuto(){if(getOTP().length===6) verifyOTP()}
+function startTimer(){let s=60;document.getElementById('resendBtn').classList.add('hide');clearInterval(timerInt);timerInt=setInterval(()=>{s--;document.getElementById('timer').innerText='Resend in '+s+'s';if(s<=0){clearInterval(timerInt);document.getElementById('timer').innerText='OTP Varala ya?';document.getElementById('resendBtn').classList.remove('hide')}},1000)}
+function showPfpWarn(msg){let w=document.getElementById('pfpWarn'); w.innerText='⚠️ '+msg; w.style.display='block'; document.getElementById('pfpFile').value=''}
 async function sendOTP(){
-  curEmail = document.getElementById('email').value.trim()
+  curEmail=document.getElementById('email').value.trim() || curEmail
   if(!curEmail.includes('@')) return showErr('msg1','Valid Email Podu da')
-  let {error} = await supa.auth.signInWithOtp({email:curEmail, options:{shouldCreateUser:true}})
+  let {error}=await supa.auth.signInWithOtp({email:curEmail, options:{shouldCreateUser:true}})
   if(error) return showErr('msg1',error.message)
   document.getElementById('otpInfo').innerText='OTP sent to '+curEmail
-  go('sOTP')
+  go('sOTP'); startTimer(); setTimeout(()=>document.getElementById('o1').focus(),100)
 }
 async function verifyOTP(){
-  let code=document.getElementById('otpCode').value.trim()
+  let code=getOTP()
   if(code.length<6) return showErr('msgOTP','6 Digit OTP Podu da')
-  let {error} = await supa.auth.verifyOtp({email:curEmail, token:code, type:'email'})
+  let {error}=await supa.auth.verifyOtp({email:curEmail, token:code, type:'email'})
   if(error) return showErr('msgOTP',error.message)
-  let {data:{user}} = await supa.auth.getUser()
-  if(user){
-    let {data:prof} = await supa.from('profiles').select('username').eq('id',user.id).maybeSingle()
-    if(prof && prof.username){ location.href='index.html'; return }
-  }
+  let {data:{user}}=await supa.auth.getUser()
+  if(user){let {data:prof}=await supa.from('profiles').select('username').eq('id',user.id).maybeSingle(); if(prof && prof.username){location.href='index.html'; return}}
   go('s2')
 }
 async function saveProfile(){
   let u=document.getElementById('newUser').value.trim().toLowerCase().replace(/[^a-z0-9_.]/g,'')
-  let p1=document.getElementById('newPass').value
-  let p2=document.getElementById('newPass2').value
+  let p1=document.getElementById('newPass').value, p2=document.getElementById('newPass2').value
   if(u.length<3) return showErr('msg2','Username 3+ Letters Podu da')
   if(p1.length<6) return showErr('msg2','Password 6+ Letters Podu da')
   if(p1!==p2) return showErr('msg2','Password Match Aagala da')
   let {data:ex}=await supa.from('profiles').select('id').eq('username',u).maybeSingle()
-  if(ex) return showErr('msg2','Username Already Irukku da - Vera Podu da')
+  if(ex) return showErr('msg2','Username Already Irukku da')
   await supa.auth.updateUser({password:p1})
-  let {data:{user}} = await supa.auth.getUser()
-  let {error}=await supa.from('profiles').upsert({id:user.id, username:u, email:curEmail, avatar_url:'https://ui-avatars.com/api/?name='+u.charAt(0).toUpperCase()+'&background=111&color=fff'})
-  if(error) return showErr('msg2',error.message)
+  let {data:{user}}=await supa.auth.getUser()
+  await supa.from('profiles').upsert({id:user.id, username:u, email:curEmail, avatar_url:'https://ui-avatars.com/api/?name='+u.charAt(0).toUpperCase()+'&background=111&color=fff'})
   go('s3')
 }
-function previewPfp(inp){ if(inp.files[0]) document.getElementById('pfpPrev').src=URL.createObjectURL(inp.files[0]) }
+function previewPfp(inp){
+  document.getElementById('pfpWarn').style.display='none'
+  let f=inp.files[0]; if(!f) return
+  if(!['image/jpeg','image/jpg','image/png'].includes(f.type)) return showPfpWarn('Thappu File da Giri! JPG / PNG mattum podu da! Image varathu da!')
+  if(f.size > 2*1024*1024) return showPfpWarn('Photo perusa irukku da! 2MB ku mela koodathu da!')
+  document.getElementById('pfpPrev').src=URL.createObjectURL(f)
+}
 async function savePhoto(){
-  let f=document.getElementById('pfpFile').files[0]
-  if(!f) return location.href='index.html'
-  let {data:{user}} = await supa.auth.getUser()
-  let {error}=await supa.storage.from('avatars').upload(user.id+'.jpg', f, {upsert:true})
-  if(error) return showErr('msg2',error.message)
-  let {data}=supa.storage.from('avatars').getPublicUrl(user.id+'.jpg')
-  await supa.from('profiles').update({avatar_url:data.publicUrl}).eq('id',user.id)
-  location.href='index.html'
+  let f=document.getElementById('pfpFile').files[0]; if(!f) return location.href='index.html'
+  if(!['image/jpeg','image/jpg','image/png'].includes(f.type)) return showPfpWarn('Thappu File da! JPG / PNG mattum da!')
+  if(f.size > 2*1024*1024) return showPfpWarn('Photo romba perusu da! 2MB ku kulla podu da!')
+  let {data:{user}}=await supa.auth.getUser(); let {error}=await supa.storage.from('avatars').upload(user.id+'.jpg', f, {upsert:true}); if(error) return showPfpWarn('Upload Fail da - Thumba try pannu da'); let {data}=supa.storage.from('avatars').getPublicUrl(user.id+'.jpg'); await supa.from('profiles').update({avatar_url:data.publicUrl}).eq('id',user.id); location.href='index.html'
 }
 async function loginOld(){
-  let val=document.getElementById('oldUser').value.trim()
-  let pass=document.getElementById('oldPass').value
+  let val=document.getElementById('oldUser').value.trim(), pass=document.getElementById('oldPass').value
   if(!val||!pass) return showErr('msgOld','Username & Password Podu da')
   let email=val
-  if(!val.includes('@')){
-    let u=val.toLowerCase().replace(/[^a-z0-9_.]/g,'')
-    let {data:p}=await supa.from('profiles').select('email').eq('username',u).maybeSingle()
-    if(!p || !p.email) return showErr('msgOld','Username Illa da - Email Pottu Paaru da')
-    email=p.email
-  }
+  if(!val.includes('@')){let u=val.toLowerCase().replace(/[^a-z0-9_.]/g,''); let {data:p}=await supa.from('profiles').select('email').eq('username',u).maybeSingle(); if(!p||!p.email) return showErr('msgOld','Username Illa da'); email=p.email}
   let {error}=await supa.auth.signInWithPassword({email, password:pass})
   if(error) return showErr('msgOld','Password Thappu da')
   location.href='index.html'
 }
 async function sendForgotOTP(){
-  forgotEmailVal = document.getElementById('forgotEmail').value.trim()
+  forgotEmailVal=document.getElementById('forgotEmail').value.trim()
   if(!forgotEmailVal.includes('@')) return showErr('msgForgot','Valid Gmail Podu da')
-  let {error} = await supa.auth.signInWithOtp({email:forgotEmailVal, options:{shouldCreateUser:false}})
+  let {error}=await supa.auth.signInWithOtp({email:forgotEmailVal, options:{shouldCreateUser:true}})
   if(error) return showErr('msgForgot',error.message)
   document.getElementById('forgotStep2').classList.remove('hide')
-  showErr('msgForgot','OTP Gmail ku pochu da - Check pannu da!')
+  showErr('msgForgot','OTP Gmail ku pochu da!')
 }
 async function resetPasswordNow(){
-  let code=document.getElementById('forgotOtp').value.trim()
-  let p1=document.getElementById('forgotNew').value
-  let p2=document.getElementById('forgotNew2').value
+  let code=getForgotOTP(), p1=document.getElementById('forgotNew').value, p2=document.getElementById('forgotNew2').value
   if(code.length<6) return showErr('msgForgot','6 Digit OTP Podu da')
   if(p1.length<6) return showErr('msgForgot','Password 6+ Letters Podu da')
   if(p1!==p2) return showErr('msgForgot','Password Match Aagala da')
-  let {error} = await supa.auth.verifyOtp({email:forgotEmailVal, token:code, type:'email'})
+  let {error}=await supa.auth.verifyOtp({email:forgotEmailVal, token:code, type:'email'})
   if(error) return showErr('msgForgot',error.message)
-  let {error:err2} = await supa.auth.updateUser({password:p1})
+  let {error:err2}=await supa.auth.updateUser({password:p1})
   if(err2) return showErr('msgForgot',err2.message)
-  alert('Super da Giri! Password Maathiduchu! Ippo Login pannu da')
-  go('sOld')
+  alert('Super da Giri! Password Maathiduchu!'); go('sOld')
 }
 </script></body></html>
