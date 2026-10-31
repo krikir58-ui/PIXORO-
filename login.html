@@ -2,15 +2,18 @@
 <html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pixoro Login</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
-<style>body{background:#000;color:#fff;font-family:sans-serif;display:flex;justify-content:center;padding:20px}
+<style>
+/* OPPO FONT NORMAL FIX DA GIRI */
+body{background:#000;color:#fff;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif !important; display:flex;justify-content:center;padding:20px; -webkit-text-size-adjust:100%; text-size-adjust:100%;}
 .box{width:360px;text-align:center}.card{border:1px solid #262626;padding:20px;border-radius:10px;margin-bottom:10px}
-input{width:100%;padding:11px;margin:6px 0;background:#121212;border:1px solid #333;color:#fff;border-radius:6px;box-sizing:border-box}
-button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:6px}
+input{width:100%;padding:11px;margin:6px 0;background:#121212;border:1px solid #333;color:#fff;border-radius:6px;box-sizing:border-box;font-family:inherit;font-size:14px}
+button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:6px;font-family:inherit}
 .hide{display:none}
 #pfpPrev{width:90px;height:90px;border-radius:50%;object-fit:cover;background:#222;display:block;margin:0 auto 12px;border:2px solid #FFD700}
+.logo{font-family:Arial, sans-serif !important;font-weight:900;font-size:36px;color:#FFD700;letter-spacing:1px}
 </style></head><body>
 <div class="box">
-<h1 style="font-family:cursive;font-size:36px;color:#FFD700">Pixoro</h1>
+<h1 class="logo">Pixoro</h1>
 
 <div class="card" id="s1">
 <p style="font-size:14px;color:#888;margin-bottom:10px">Welcome to Pixoro 👋</p>
@@ -51,15 +54,31 @@ button{width:100%;padding:11px;background:#FFD700;color:#000;border:0;border-rad
 <input id="oldUser" placeholder="Username / Email" autocomplete="off">
 <input id="oldPass" type="password" placeholder="Password">
 <button onclick="loginOld()">Log In</button>
+<p style="font-size:12px;color:#888;margin-top:10px"><b onclick="go('sForgot')" style="color:#FFD700;cursor:pointer">Forgot Password?</b></p>
 <button onclick="go('s1')" style="background:#262626;color:#FFD700">Create New Account</button>
 <p id="msgOld" style="color:#ff3040;font-size:13px"></p>
+</div>
+
+<div class="card hide" id="sForgot">
+<p style="font-size:14px;color:#888;margin-bottom:10px">Forgot Password 🔑</p>
+<input id="forgotEmail" type="email" placeholder="Gmail Enter pannu da" autocomplete="off">
+<button onclick="sendForgotOTP()">Send OTP to Gmail 📩</button>
+<div id="forgotStep2" class="hide">
+<input id="forgotOtp" placeholder="6 Digit OTP" maxlength="6" autocomplete="off">
+<input id="forgotNew" type="password" placeholder="New Password">
+<input id="forgotNew2" type="password" placeholder="Confirm Password">
+<button onclick="resetPasswordNow()">Reset Password ✅</button>
+</div>
+<button onclick="go('sOld')" style="background:#262626;color:#FFD700">Back to Login</button>
+<p id="msgForgot" style="color:#ff3040;font-size:13px"></p>
 </div>
 
 </div>
 <script>
 let supa = window.supa
 let curEmail = ''
-function go(id){ ['s1','sOTP','s2','s3','sOld'].forEach(x=>document.getElementById(x).classList.add('hide')); document.getElementById(id).classList.remove('hide') }
+let forgotEmailVal = ''
+function go(id){ ['s1','sOTP','s2','s3','sOld','sForgot'].forEach(x=>document.getElementById(x).classList.add('hide')); document.getElementById(id).classList.remove('hide') }
 function showOld(){ go('sOld') }
 function showErr(id,m){ document.getElementById(id).innerText=m }
 
@@ -71,7 +90,6 @@ async function sendOTP(){
   document.getElementById('otpInfo').innerText='OTP sent to '+curEmail
   go('sOTP')
 }
-
 async function verifyOTP(){
   let code=document.getElementById('otpCode').value.trim()
   if(code.length<6) return showErr('msgOTP','6 Digit OTP Podu da')
@@ -79,13 +97,11 @@ async function verifyOTP(){
   if(error) return showErr('msgOTP',error.message)
   let {data:{user}} = await supa.auth.getUser()
   if(user){
-    // ✅ CORRECT DA - maybeSingle - Error Varaathu da
     let {data:prof} = await supa.from('profiles').select('username').eq('id',user.id).maybeSingle()
     if(prof && prof.username){ location.href='index.html'; return }
   }
   go('s2')
 }
-
 async function saveProfile(){
   let u=document.getElementById('newUser').value.trim().toLowerCase().replace(/[^a-z0-9_.]/g,'')
   let p1=document.getElementById('newPass').value
@@ -101,7 +117,6 @@ async function saveProfile(){
   if(error) return showErr('msg2',error.message)
   go('s3')
 }
-
 function previewPfp(inp){ if(inp.files[0]) document.getElementById('pfpPrev').src=URL.createObjectURL(inp.files[0]) }
 async function savePhoto(){
   let f=document.getElementById('pfpFile').files[0]
@@ -113,7 +128,6 @@ async function savePhoto(){
   await supa.from('profiles').update({avatar_url:data.publicUrl}).eq('id',user.id)
   location.href='index.html'
 }
-
 async function loginOld(){
   let val=document.getElementById('oldUser').value.trim()
   let pass=document.getElementById('oldPass').value
@@ -127,7 +141,28 @@ async function loginOld(){
   }
   let {error}=await supa.auth.signInWithPassword({email, password:pass})
   if(error) return showErr('msgOld','Password Thappu da')
-  // ✅ Pazhaya Account - Direct Home da
   location.href='index.html'
+}
+async function sendForgotOTP(){
+  forgotEmailVal = document.getElementById('forgotEmail').value.trim()
+  if(!forgotEmailVal.includes('@')) return showErr('msgForgot','Valid Gmail Podu da')
+  let {error} = await supa.auth.signInWithOtp({email:forgotEmailVal, options:{shouldCreateUser:false}})
+  if(error) return showErr('msgForgot',error.message)
+  document.getElementById('forgotStep2').classList.remove('hide')
+  showErr('msgForgot','OTP Gmail ku pochu da - Check pannu da!')
+}
+async function resetPasswordNow(){
+  let code=document.getElementById('forgotOtp').value.trim()
+  let p1=document.getElementById('forgotNew').value
+  let p2=document.getElementById('forgotNew2').value
+  if(code.length<6) return showErr('msgForgot','6 Digit OTP Podu da')
+  if(p1.length<6) return showErr('msgForgot','Password 6+ Letters Podu da')
+  if(p1!==p2) return showErr('msgForgot','Password Match Aagala da')
+  let {error} = await supa.auth.verifyOtp({email:forgotEmailVal, token:code, type:'email'})
+  if(error) return showErr('msgForgot',error.message)
+  let {error:err2} = await supa.auth.updateUser({password:p1})
+  if(err2) return showErr('msgForgot',err2.message)
+  alert('Super da Giri! Password Maathiduchu! Ippo Login pannu da')
+  go('sOld')
 }
 </script></body></html>
