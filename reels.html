@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Pixoro Reels - Save Separate ~ Separate</title>
+<title>Pixoro Reels - CORRECT</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
 <style>
@@ -74,7 +74,7 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <div class="sheet" id="tildeSheet" onclick="if(event.target==this)closeSheet('tildeSheet')"><div class="sheetBox">
 <div class="sheetHandle"></div>
 <div style="font-weight:800;text-align:center;font-size:18px">~ Controls ~</div>
-<div style="font-size:11px;color:#888;text-align:center;margin-bottom:14px">Save kulla illa - Thaniya ~ settings</div>
+<div style="font-size:11px;color:#888;text-align:center;margin-bottom:14px">Save kulla illa - Thaniya ~ settings - Correct!</div>
 <div id="settingsList"></div>
 <div style="display:flex;gap:10px;margin-top:16px"><button onclick="resetSettings()" style="flex:1;padding:12px;background:#222;color:#fff;border:0;border-radius:12px;font-weight:700">Reset</button><button onclick="closeSheet('tildeSheet')" style="flex:1;padding:12px;background:#fff;color:#000;border:0;border-radius:12px;font-weight:800">Done</button></div>
 </div></div>
@@ -87,7 +87,6 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
 let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set()
-
 let defaultSettings={realInfo:true, views:true, location:true, time:true, aiBadge:true, hashtag:true, musicBar:true, disc:true, progress:true, followBtn:true, caption:true, likeBurst:true};
 let settings=JSON.parse(localStorage.getItem('pixoro_tilde')||JSON.stringify(defaultSettings));
 function saveSettings(){localStorage.setItem('pixoro_tilde',JSON.stringify(settings)); renderSettingsList(); applySettings();}
@@ -121,7 +120,6 @@ function applySettings(){
  });
 }
 renderSettingsList();
-
 function getAICaption(p){let base=cleanUser(p.username);let caps=[`POV: ${base} on another level ✨`,`That moment when everything clicks 💯 - ${base}`,`No filter, just ${base} being real 😎`];let idx=Math.abs(String(p.id).split('').reduce((a,c)=>a+c.charCodeAt(0),0))%caps.length;return caps[idx]+` #fyp #viral #pixoro #${base}`;}
 function isAIcaption(txt){return !txt||txt==='Just Reels'||txt.length<5}
 function parseHashtags(text){if(!settings.hashtag) return text||''; return (text||'').replace(/#(\w+)/g,'<span class="hashtag" onclick="event.stopPropagation();openHashtag(\'$1\')\">#$1</span>')}
