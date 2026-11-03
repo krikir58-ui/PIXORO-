@@ -29,11 +29,14 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .reel-username{font-size:13.5px!important;font-weight:600!important;margin-left:6px!important}
 .reel-caption{margin-top:5px!important;font-size:12.5px!important;color:#ddd!important}
 .followBtnPerusa{background:rgba(255,255,255,0.22)!important;color:#fff!important;border:1.2px solid #fff!important;padding:7px 20px!important;border-radius:8px!important;font-weight:700!important;font-size:14px!important;margin-left:10px!important;height:34px!important;min-width:80px!important;backdrop-filter:blur(8px)}
-.reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:54px;padding:0 14px;background:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)}
-.reelsTop b{color:#fff!important;font-size:18px!important;font-weight:700!important;flex:1;text-align:center;margin-left:58px}
-.topRight{display:flex!important;gap:16px!important;align-items:center!important}
-.topRight svg{width:22px!important;height:22px!important;stroke:#fff!important;stroke-width:1.9!important;fill:none!important;cursor:pointer}
-.topRight .dots{font-size:18px!important;font-weight:700!important;color:#fff!important;cursor:pointer;letter-spacing:1px}
+
+/* MELLA MATTUM CHANGE - LEFT CORNER */
+.reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:54px;padding:0 16px;background:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)}
+.reelsTop b{color:#fff!important;font-size:22px!important;font-weight:800!important;text-align:left!important;margin-left:0!important;flex:none!important}
+.topRight{display:flex!important;gap:20px!important;align-items:center!important;margin-left:auto!important}
+.topRight svg{width:24px!important;height:24px!important;stroke:#fff!important;stroke-width:1.9!important;fill:none!important;cursor:pointer}
+.topRight .dots{font-size:22px!important;font-weight:700!important;color:#fff!important;cursor:pointer;letter-spacing:2px}
+
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;width:100vw;height:52px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{color:#8e8e8e;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
 .bottom-nav a svg{width:24px;height:24px;stroke:#8e8e8e;stroke-width:1.8;fill:none}
@@ -78,14 +81,12 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
 let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,curOptPost=null
-
 function showCenter(reel,isPaused){let c=reel.querySelector('.centerCtrl');if(!c) return;c.innerHTML='<div class="centerIcon">'+(isPaused?'<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="#fff"/></svg>':'<svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z" fill="#fff"/></svg>')+'</div>';c.classList.add('show'); setTimeout(()=>c.classList.remove('show'),900);}
 async function waitSupa(){for(let i=0;i<50;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,200))}return window.supa}
 async function init(){supa=await waitSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);load()}
 function getPfp(u){let p=profileMap[cleanUser(u)];if(p?.avatar_url)return p.avatar_url;return 'https://ui-avatars.com/api/?name='+(cleanUser(u).charAt(0).toUpperCase()||'P')+'&background=fff&color=000&size=200&bold=true'}
 function isMyPostObj(p){if(!p)return false;if(p.user_id&&String(p.user_id)===String(ME_ID))return true;return cleanUser(p.username)===cleanUser(ME_RAW)}
 async function load(){try{let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false});let likes=[],saves=[],follows=[],comments=[];try{likes=(await supa.from('likes').select('*')).data||[]}catch(e){}try{saves=(await supa.from('saves').select('*')).data||[]}catch(e){}try{follows=(await supa.from('follows').select('*')).data||[]}catch(e){}try{comments=(await supa.from('comments').select('*').order('created_at',{ascending:false})).data||[]}catch(e){}allPosts=posts||[];allLikes=likes;allSaves=saves;allFollows=follows;allComments=comments;render()}catch(err){console.log(err)}}
-
 function render(){
 let wrap=document.getElementById('reelWrap');
 wrap.innerHTML=allPosts.map(p=>{
@@ -110,7 +111,6 @@ return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div c
 <div class="audioDiscPerusa"><img src="${getPfp(p.username)}"></div>
 <div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div style="margin-top:4px;font-size:12.5px">${p.caption||'Just Reels'}</div></div></div>`
 }).join('');observe()}
-
 function observe(){
 let reels=document.querySelectorAll('.reel-main');
 let io=new IntersectionObserver(entries=>{
