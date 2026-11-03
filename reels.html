@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Pixoro Reels - Both Dots Removed</title>
+<title>Pixoro Reels - AI + Sound System 10</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
 <style>
@@ -12,8 +12,6 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .reel{width:100vw!important;height:100dvh!important;flex-shrink:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#000!important}
 .reel-main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;z-index:2!important;display:block!important;background:#000}
 .progress{position:absolute;top:0;left:0;height:3px;background:#fff;width:0%;z-index:20}
-
-/* BOTTOM RIGHT - 4 ICONS ONLY - (:) REMOVE */
 .vBar{position:absolute!important;right:10px!important;bottom:135px!important;display:flex!important;flex-direction:column!important;gap:18px!important;align-items:center!important;z-index:15!important}
 .vBtn{display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;width:48px!important;cursor:pointer!important}
 .vBtn span{font-size:12px!important;font-weight:700!important;color:#fff!important;text-shadow:0 1px 4px rgba(0,0,0,0.9)!important}
@@ -21,23 +19,25 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .vBtn:active{transform:scale(0.85)}
 .vBtn.liked svg{fill:#ff3040!important;stroke:#ff3040!important}
 .vBtn.saved svg{fill:#fff!important;stroke:#fff!important}
-
 .audioDiscPerusa{position:absolute!important;right:12px!important;bottom:72px!important;width:36px!important;height:36px!important;border-radius:50%!important;border:2.2px solid #fff!important;overflow:hidden!important;animation:spin 3.5s linear infinite!important;z-index:11!important;background:#111!important}
 .audioDiscPerusa img{width:100%!important;height:100%!important;object-fit:cover!important}
 @keyframes spin{to{transform:rotate(360deg)}}
-.btm{position:absolute!important;left:10px!important;right:82px!important;bottom:66px!important;z-index:10!important;text-shadow:0 2px 8px rgba(0,0,0,0.9)!important}
+.btm{position:absolute!important;left:10px!important;right:82px!important;bottom:46px!important;z-index:10!important;text-shadow:0 2px 8px rgba(0,0,0,0.9)!important}
 .reel-pfp-wrap{width:32px!important;height:32px!important;min-width:32px!important;border-radius:50%!important;overflow:hidden!important;border:1.8px solid #fff!important}
 .reel-pfp-wrap img{width:100%!important;height:100%!important;object-fit:cover}
 .reel-username{font-size:13.5px!important;font-weight:600!important;margin-left:6px!important}
-.reel-caption{margin-top:5px!important;font-size:12.5px!important;color:#ddd!important}
+.reel-caption{margin-top:6px!important;font-size:12.5px!important;color:#ddd!important;line-height:1.3;display:flex;gap:5px;align-items:flex-start}
 .followBtnPerusa{background:rgba(255,255,255,0.22)!important;color:#fff!important;border:1.2px solid #fff!important;padding:7px 20px!important;border-radius:8px!important;font-weight:700!important;font-size:14px!important;margin-left:10px!important;height:34px!important;min-width:80px!important;backdrop-filter:blur(8px)}
-
-/* MELLA (...) REMOVE - REELS LEFT + SEARCH ONLY */
 .reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:56px;padding:0 16px;background:linear-gradient(to bottom, rgba(0,0,0,0.85), transparent)}
 .reelsTop b{color:#fff!important;font-size:24px!important;font-weight:800!important;text-align:left!important;margin-left:0!important;flex:none!important}
 .topRight{display:flex!important;gap:16px!important;align-items:center!important;margin-left:auto!important}
 .topRight svg{width:26px!important;height:26px!important;stroke:#fff!important;stroke-width:2!important;fill:none!important;cursor:pointer}
-
+/* 10 SYSTEM - AI + SOUND BAR */
+.musicBar{position:absolute!important;left:10px!important;right:78px!important;bottom:24px!important;z-index:11!important;display:flex!important;align-items:center!important;gap:6px!important;overflow:hidden!important;cursor:pointer;background:rgba(0,0,0,0.35);padding:3px 8px;border-radius:10px;backdrop-filter:blur(4px)}
+.musicBar svg{width:12px!important;height:12px!important;fill:#fff!important;flex-shrink:0!important}
+.musicScroll{font-size:11px!important;color:#fff!important;animation:musicScroll 9s linear infinite!important;display:inline-block!important;white-space:nowrap!important}
+@keyframes musicScroll{0%{transform:translateX(20%)}100%{transform:translateX(-100%)}}
+.aiBadge{background:linear-gradient(90deg,#8a2be2,#ff1493);font-size:8px;padding:2px 5px;border-radius:4px;font-weight:800;color:#fff;flex-shrink:0}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;width:100vw;height:52px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{color:#8e8e8e;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
 .bottom-nav a svg{width:24px;height:24px;stroke:#8e8e8e;stroke-width:1.8;fill:none}
@@ -75,12 +75,33 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 
 <div class="sheet" id="commentSheet" onclick="if(event.target==this)closeSheet('commentSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div style="font-weight:700;text-align:center;margin-bottom:12px">Comments</div><div id="commentList" style="overflow-y:auto;flex:1;max-height:45vh"></div><div class="sheetInputRow"><input id="commentInput" placeholder="Add a comment..."><button onclick="postComment()">Post</button></div></div></div>
 <div class="sheet" id="shareSheet" onclick="if(event.target==this)closeSheet('shareSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div style="font-weight:700;text-align:center;margin-bottom:12px">Share</div><div class="sheetItem" onclick="copyLink()">📋 Copy Link</div><div class="sheetItem" onclick="shareWhatsApp()">💬 WhatsApp</div><div class="sheetItem" onclick="closeSheet('shareSheet')">❌ Close</div></div></div>
-<div class="sheet" id="optionSheet" onclick="if(event.target==this)closeSheet('optionSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div style="font-weight:700;text-align:center;margin-bottom:12px" id="optTitle">Options</div><div id="optList"></div><div class="sheetItem" onclick="closeSheet('optionSheet')">❌ Cancel</div></div></div>
+<div class="sheet" id="audioSheet" onclick="if(event.target==this)closeSheet('audioSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div style="font-weight:700;text-align:center;margin-bottom:12px">🎵 Original Audio</div><div id="audioInfo" style="text-align:center;padding:20px;color:#aaa"></div><div class="sheetItem" onclick="useAudio()">🎬 Use This Audio</div><div class="sheetItem" onclick="closeSheet('audioSheet')">❌ Close</div></div></div>
 
 <script>
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
-let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,curOptPost=null
+let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,curAudioUser=null
+
+// 10 SYSTEM - AI CAPTION ENGINE
+function getAICaption(p){
+let base=cleanUser(p.username);
+let caps=[
+`POV: ${base} on another level ✨`,
+`That moment when everything clicks 💯 - ${base}`,
+`No filter, just ${base} being real 😎`,
+`Late night thoughts ft. ${base} 🌙`,
+`Main character energy - ${base} 🔥`,
+`Tell me you're ${base} without telling me 😂`,
+`${base} did it again 💫`,
+`Vibe check: ${base} approved ✅`,
+`Can't get over this - ${base} ✨`,
+`This is your sign to be like ${base} 💯`
+];
+let idx=Math.abs(String(p.id).split('').reduce((a,c)=>a+c.charCodeAt(0),0))%caps.length;
+return caps[idx]+` #fyp #viral #pixoro #${base}`;
+}
+function isAIcaption(txt){return !txt||txt==='Just Reels'||txt.length<5}
+
 function showCenter(reel,isPaused){let c=reel.querySelector('.centerCtrl');if(!c) return;c.innerHTML='<div class="centerIcon">'+(isPaused?'<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="#fff"/></svg>':'<svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z" fill="#fff"/></svg>')+'</div>';c.classList.add('show'); setTimeout(()=>c.classList.remove('show'),900);}
 async function waitSupa(){for(let i=0;i<50;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,200))}return window.supa}
 async function init(){supa=await waitSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);load()}
@@ -100,6 +121,8 @@ let isVid=mUrl.toLowerCase().includes('.mp4')||p.media_type=='video';
 let media=isVid?`<video class="reel-main" src="${mUrl}" playsinline preload="auto" loop muted autoplay></video>`:`<img class="reel-main" src="${mUrl}">`;
 let followBtn=isMine?`<span class="followBtnPerusa" style="border:0;background:rgba(255,255,255,0.2)!important">Details</span>`:`<button id="followBtn-${p.id}" class="followBtnPerusa" onclick="event.stopPropagation();toggleF('${p.user_id}','${p.id}')">${isFollow?'Following':'Follow'}</button>`;
 let likeCount = lc>0?lc:'1';
+let aiCap=isAIcaption(p.caption);
+let finalCaption=aiCap?getAICaption(p):p.caption;
 return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div class="progress"></div>${media}<div class="heartBurst"></div><div class="centerCtrl"></div>
 <div class="vBar">
 <div class="vBtn ${liked?'liked':''}" id="likeBtn-${p.id}" onclick="event.stopPropagation();toggleLike('${p.id}')"><svg id="likeSvg-${p.id}" viewBox="0 0 24 24" width="28" height="28" fill="${liked?'#ff3040':'none'}" stroke="${liked?'#ff3040':'#fff'}" stroke-width="1.8"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg><span id="likeCnt-${p.id}">${likeCount}</span></div>
@@ -108,7 +131,9 @@ return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div c
 <div class="vBtn ${saved?'saved':''}" id="saveBtn-${p.id}" onclick="event.stopPropagation();saveR('${p.id}')"><svg id="saveSvg-${p.id}" viewBox="0 0 24 24" width="28" height="28" fill="${saved?'#fff':'none'}" stroke="#fff" stroke-width="1.8"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></div>
 </div>
 <div class="audioDiscPerusa"><img src="${getPfp(p.username)}"></div>
-<div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div style="margin-top:4px;font-size:12.5px">${p.caption||'Just Reels'}</div></div></div>`
+<div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div class="reel-caption">${aiCap?`<span class="aiBadge">AI</span>`:''}<span>${finalCaption}</span></div></div>
+<div class="musicBar" onclick="event.stopPropagation();openAudioSheet('${cleanUser(p.username)}')"><svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg><div style="overflow:hidden;flex:1"><span class="musicScroll">🎵 Original audio • ${cleanUser(p.username)} • </span></div></div>
+</div>`
 }).join('');observe()}
 function observe(){
 let reels=document.querySelectorAll('.reel-main');
@@ -184,5 +209,7 @@ async function deleteComment(cid,pid){allComments=allComments.filter(c=>String(c
 function openShareSheet(pid){curShareId=pid;document.getElementById('shareSheet').classList.add('show')}
 function copyLink(){let link=location.origin+'/reels.html?id='+curShareId;navigator.clipboard.writeText(link);alert('Link copied!');closeSheet('shareSheet')}
 function shareWhatsApp(){let link=location.origin+'/reels.html?id='+curShareId;window.open('https://wa.me/?text='+encodeURIComponent(link),'_blank');closeSheet('shareSheet')}
+function openAudioSheet(user){curAudioUser=user;document.getElementById('audioInfo').innerHTML=`<b style="color:#fff;font-size:16px">Original audio</b><br><br>by ${user}<br><br>${allPosts.filter(p=>cleanUser(p.username)==cleanUser(user)).length} reels using this audio`;document.getElementById('audioSheet').classList.add('show')}
+function useAudio(){alert('Use audio: '+curAudioUser+' - Create new reel!');closeSheet('audioSheet');location.href='create.html?audio='+curAudioUser}
 init()
 </script></body></html>
