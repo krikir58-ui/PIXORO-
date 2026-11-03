@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Pixoro Reels - Play Fix Final</title>
+<title>Pixoro Reels - All Work Final</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
 <style>
@@ -12,35 +12,41 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .reel{width:100vw!important;height:100dvh!important;flex-shrink:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#000!important}
 .reel-bg{display:none!important}
 .reel-main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;z-index:2!important;display:block!important;background:#000}
-.progress{position:absolute;top:0;left:0;height:3px;background:#fff;width:0%;z-index:20}
-.vBar{position:absolute!important;right:12px!important;bottom:145px!important;display:flex!important;flex-direction:column!important;gap:20px!important;align-items:center!important;z-index:10!important}
-.vBtn{display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;width:50px!important;cursor:pointer!important}
-.vBtn span{font-size:12.5px!important;font-weight:600!important;color:#fff!important;text-shadow:0 1px 3px rgba(0,0,0,.8)!important}
-.vBtn svg{width:28px!important;height:28px!important;stroke:#fff!important;stroke-width:1.7!important;fill:none!important;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.6))!important}
+.progress{position:absolute;top:0;left:0;height:3px;background:#fff;width:0%;z-index:20;transition:width 0.15s linear}
+.vBar{position:absolute!important;right:12px!important;bottom:145px!important;display:flex!important;flex-direction:column!important;gap:22px!important;align-items:center!important;z-index:15!important}
+.vBtn{display:flex!important;flex-direction:column!important;align-items:center!important;gap:5px!important;width:52px!important;cursor:pointer!important}
+.vBtn span{font-size:13px!important;font-weight:700!important;color:#fff!important;text-shadow:0 1px 4px rgba(0,0,0,0.9)!important}
+.vBtn svg{width:30px!important;height:30px!important;stroke:#fff!important;stroke-width:1.8!important;fill:none!important;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8))!important}
+.vBtn:active{transform:scale(0.85)}
 .audioDiscKilla{position:absolute!important;right:14px!important;bottom:78px!important;width:38px!important;height:38px!important;border-radius:50%!important;border:2.5px solid #fff!important;overflow:hidden!important;animation:spin 3s linear infinite!important;z-index:11!important;background:#111!important;box-shadow:0 3px 12px rgba(0,0,0,0.8)!important}
 .audioDiscKilla img{width:100%!important;height:100%!important;object-fit:cover!important}
 @keyframes spin{to{transform:rotate(360deg)}}
-.btm{position:absolute;left:14px!important;right:70px!important;bottom:78px!important;z-index:10!important}
-.reel-pfp-wrap{width:38px!important;height:38px!important;border-radius:50%!important;overflow:hidden!important;border:2.5px solid #fff!important}
+
+/* LEFT KILLA - ID NAME 5px EXTRA */
+.btm{position:absolute!important;left:12px!important;right:82px!important;bottom:72px!important;z-index:10!important;text-shadow:0 2px 8px rgba(0,0,0,0.9)!important}
+.reel-pfp-wrap{width:44px!important;height:44px!important;min-width:44px!important;border-radius:50%!important;overflow:hidden!important;border:2.5px solid #fff!important;box-shadow:0 2px 8px rgba(0,0,0,0.6)!important}
 .reel-pfp-wrap img{width:100%!important;height:100%!important;object-fit:cover}
-.reel-username{font-size:14px!important;font-weight:600!important;margin-left:6px!important}
-.followBtnRBig{background:transparent!important;color:#fff!important;border:1.2px solid #fff!important;padding:4px 14px!important;border-radius:8px!important;font-size:12px!important;height:28px!important;margin-left:10px!important}
-.reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex;justify-content:center!important;height:54px;align-items:center;background:linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)}
+.reel-username{font-size:19px!important;font-weight:800!important;margin-left:8px!important;color:#fff!important} /* 14px + 5px = 19px EXTRA KILLA */
+.reel-caption{margin-top:8px!important;font-size:14px!important;line-height:1.35!important;color:#eee!important}
+.followBtnRBig{background:transparent!important;color:#fff!important;border:1.2px solid #fff!important;padding:5px 16px!important;border-radius:8px!important;font-weight:700!important;font-size:13px!important;margin-left:12px!important;height:30px!important}
+
+.reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex;justify-content:center!important;height:54px;align-items:center;background:linear-gradient(to bottom, rgba(0,0,0,0.7), transparent)}
 .reelsTop b{color:#fff!important;font-size:18px!important;font-weight:600!important}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;width:100vw;height:49px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;width:100vw;height:52px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{color:#8e8e8e;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
 .bottom-nav a svg{width:24px;height:24px;stroke:#8e8e8e;stroke-width:1.8;fill:none}
 .bottom-nav a.active{color:#fff!important}.bottom-nav a.active svg{stroke:#fff!important;fill:#fff!important}
 .bottom-nav span{font-size:10px}.bottom-nav a.active span{color:#fff!important;font-weight:700}
 .bottom-nav a img.navPfp{width:24px;height:24px;border-radius:50%;border:1.5px solid #fff}
-.heartBurst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);pointer-events:none;z-index:50;opacity:0;width:110px;height:110px;display:flex;align-items:center;justify-content:center}
-.heartBurst::before{content:'❤';font-size:86px!important;background:linear-gradient(180deg,#ff7a00 0%,#ff3040 50%,#ed4956 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.heartBurst.show{animation:igHeartPop 1.1s cubic-bezier(0.17,0.89,0.32,1.28) forwards}
-@keyframes igHeartPop{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(1.25);opacity:1}30%{transform:translate(-50%,-50%) scale(0.92)}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
-.centerCtrl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:0;transition:opacity .25s;z-index:25;background:rgba(0,0,0,0.45);width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+
+/* PLAY KILLA - PLAY AGURATHU THRIYANUM */
+.centerCtrl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:0;transition:opacity .25s;z-index:25;background:rgba(0,0,0,0.6);width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);border:1.5px solid rgba(255,255,255,0.2)}
 .centerCtrl.show{opacity:1}
-.centerIcon{width:64px!important;height:64px!important;display:flex;align-items:center;justify-content:center}
-.centerIcon svg{width:30px!important;height:30px!important;fill:#fff!important}
+.centerIcon svg{width:36px!important;height:36px!important;fill:#fff!important}
+.heartBurst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);pointer-events:none;z-index:50;opacity:0;width:120px;height:120px;display:flex;align-items:center;justify-content:center}
+.heartBurst::before{content:'❤';font-size:90px!important;background:linear-gradient(180deg,#ff7a00 0%,#ff3040 50%,#ed4956 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 14px rgba(237,73,86,0.7))}
+.heartBurst.show{animation:igHeartPop 1.1s cubic-bezier(0.17,0.89,0.32,1.28) forwards}
+@keyframes igHeartPop{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(1.25);opacity:1}30%{transform:translate(-50%,-50%) scale(0.92)}80%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
 </style></head><body>
 <div class="reelsTop"><b>Reels</b></div>
 <div class="reelWrap" id="reelWrap"></div>
@@ -67,9 +73,9 @@ if(!allPosts.length){wrap.innerHTML='<div style="display:flex;flex-direction:col
 wrap.innerHTML=allPosts.map(p=>{
 let lc=allLikes.filter(l=>String(l.post_id)==String(p.id)).length;let liked=allLikes.some(l=>String(l.post_id)==String(p.id)&&String(l.user_id)==String(ME_ID));let saved=allSaves.some(s=>String(s.post_id)==String(p.id)&&String(s.user_id)==String(ME_ID));let isFollow=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(p.user_id));let isMine=isMyPostObj(p);let mUrl=p.media_url||p.image_url||p.video_url||'';let isVid=mUrl.toLowerCase().includes('.mp4')||mUrl.toLowerCase().includes('.mov')||p.media_type=='video';
 let media=isVid?`<video class="reel-main" src="${mUrl}" playsinline preload="auto" loop muted autoplay poster="${p.thumbnail_url||''}"></video>`:`<img class="reel-main" src="${mUrl}">`;
-let followBtn=isMine?`<span class="detailsBtn">Details</span>`:`<button id="followBtn-${p.id}" class="followBtnRBig">${isFollow?'Following':'Follow'}</button>`;
-let likeCount = lc>0 ? lc : '2';
-return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div class="progress"></div>${media}<div class="heartBurst"></div><div class="centerCtrl"></div><div class="vBar"><div class="vBtn" onclick="event.stopPropagation();toggleLike('${p.id}')"><svg id="likeSvg-${p.id}" viewBox="0 0 24 24" width="28" height="28" fill="${liked?'#ed4956':'none'}" stroke="${liked?'#ed4956':'#fff'}" stroke-width="1.7"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg><span id="likeCnt-${p.id}">${likeCount}</span></div><div class="vBtn"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="1.7"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div><div class="vBtn"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="1.7"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div class="vBtn"><svg id="saveSvg-${p.id}" viewBox="0 0 24 24" width="28" height="28" fill="${saved?'#fff':'none'}" stroke="#fff" stroke-width="1.7"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></div><div class="vBtn"><span style="font-size:20px;font-weight:700">⋮</span></div></div><div class="audioDiscKilla"><img src="${getPfp(p.username)}"></div><div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div style="margin-top:6px;font-size:13px">${p.caption||''}</div></div></div>`
+let followBtn=isMine?`<span class="followBtnRBig" style="border:0">Details</span>`:`<button id="followBtn-${p.id}" class="followBtnRBig" onclick="event.stopPropagation();toggleF('${p.user_id}','${p.id}')">${isFollow?'Following':'Follow'}</button>`;
+let likeCount = lc>0 ? lc : '';
+return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div class="progress"></div>${media}<div class="heartBurst"></div><div class="centerCtrl"></div><div class="vBar"><div class="vBtn" onclick="event.stopPropagation();toggleLike('${p.id}')"><svg id="likeSvg-${p.id}" viewBox="0 0 24 24" width="30" height="30" fill="${liked?'#ed4956':'none'}" stroke="${liked?'#ed4956':'#fff'}" stroke-width="1.8"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg><span id="likeCnt-${p.id}">${likeCount}</span></div><div class="vBtn" onclick="event.stopPropagation();openC('${p.id}')"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div><div class="vBtn" onclick="event.stopPropagation();shareR('${p.id}')"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div class="vBtn" onclick="event.stopPropagation();saveR('${p.id}')"><svg id="saveSvg-${p.id}" viewBox="0 0 24 24" width="30" height="30" fill="${saved?'#fff':'none'}" stroke="#fff" stroke-width="1.8"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></div><div class="vBtn"><span style="font-size:22px;font-weight:700">⋮</span></div></div><div class="audioDiscKilla"><img src="${getPfp(p.username)}"></div><div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap" onclick="event.stopPropagation();location.href='profile.html?u=${cleanUser(p.username)}'"><img src="${getPfp(p.username)}"></div><b class="reel-username" onclick="event.stopPropagation();location.href='profile.html?u=${cleanUser(p.username)}'">${cleanUser(p.username)}</b>${followBtn}</div><div class="reel-caption">${p.caption||'Just Reels'}</div></div></div>`
 }).join('');observe()}
 function observe(){
 let reels=document.querySelectorAll('.reel-main');
@@ -79,8 +85,8 @@ let v=e.target;if(v.tagName!='VIDEO')return;
 let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;
 if(e.isIntersecting){
 document.querySelectorAll('.reel-main').forEach(o=>{if(o!==v&&o.tagName=='VIDEO')o.pause()});
-v.muted=globalMuted;v.play().catch(()=>{v.muted=true;v.play()});
-if(prog)v.addEventListener('timeupdate',()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'})
+v.muted=globalMuted;v.play().catch(()=>{v.muted=true;v.play().then(()=>{}).catch(()=>{})});
+if(prog){v.addEventListener('timeupdate',()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'})}
 }else{v.pause()}
 })
 },{threshold:0.6});
@@ -89,6 +95,10 @@ reels.forEach(v=>{if(v.tagName=='VIDEO')io.observe(v)})
 function handleReelTap(el){let now=Date.now();if(now-lastTap<300){clearTimeout(tapTimer);lastTap=0;dblLike(el.dataset.id);return}lastTap=now;tapTimer=setTimeout(()=>{let v=el.querySelector('.reel-main');if(v&&v.tagName=='VIDEO'){if(v.paused){v.muted=false;globalMuted=false;v.play();showCenter(el,false)}else{v.pause();showCenter(el,true)}}lastTap=0},300)}
 async function dblLike(id){let reel=document.querySelector(`.reel[data-id="${id}"]`);let b=reel?reel.querySelector('.heartBurst'):null;if(b){b.classList.remove('show');void b.offsetWidth;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1150)}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(liked)return;allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);try{await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}catch(e){}}
 async function toggleLike(id){let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);let r=await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});if(r.error){allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID)));updateLikeUI(id,false)}}else{allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID)));updateLikeUI(id,false);await supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID)}}
-function updateLikeUI(id,liked){let svg=document.getElementById('likeSvg-'+id);let cnt=document.getElementById('likeCnt-'+id);if(svg){svg.setAttribute('fill',liked?'#ed4956':'none');svg.setAttribute('stroke',liked?'#ed4956':'#fff');svg.style.transform= liked ? 'scale(1.15)' : 'scale(1)';setTimeout(()=>{svg.style.transform='scale(1)'},180);}if(cnt){let n=allLikes.filter(l=>String(l.post_id)==String(id)).length;cnt.innerText=n>0?n:2;}}
+function updateLikeUI(id,liked){let svg=document.getElementById('likeSvg-'+id);let cnt=document.getElementById('likeCnt-'+id);if(svg){svg.setAttribute('fill',liked?'#ed4956':'none');svg.setAttribute('stroke',liked?'#ed4956':'#fff');svg.style.transform= liked ? 'scale(1.15)' : 'scale(1)';setTimeout(()=>{svg.style.transform='scale(1)'},180);}if(cnt){let n=allLikes.filter(l=>String(l.post_id)==String(id)).length;cnt.innerText=n>0?n:'';}}
+async function saveR(id){let s=allSaves.some(x=>String(x.post_id)==String(id)&&String(x.user_id)==String(ME_ID));let svg=document.getElementById('saveSvg-'+id);if(s){allSaves=allSaves.filter(x=>!(String(x.post_id)==String(id)&&String(x.user_id)==String(ME_ID)));if(svg)svg.setAttribute('fill','none');supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID)}else{allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW});if(svg)svg.setAttribute('fill','#fff');await supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}}
+async function toggleF(uid,pid){if(!uid||String(uid)==String(ME_ID))return;let isF=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid));document.querySelectorAll('[id^="followBtn-"]').forEach(b=>{let bid=b.id.replace('followBtn-','');let pp=allPosts.find(x=>String(x.id)==String(bid));if(pp&&String(pp.user_id)==String(uid))b.innerText=isF?'Follow':'Following'});if(isF){allFollows=allFollows.filter(f=>!(String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid)));await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',uid)}else{allFollows.push({follower_id:ME_ID,following_id:uid});await supa.from('follows').insert({follower_id:ME_ID,following_id:uid})}}
+async function shareR(id){let link=location.origin+'/reels.html?id='+id;if(navigator.share){try{await navigator.share({url:link})}catch(e){}}else{navigator.clipboard.writeText(link);alert('Link copied! 📋')}}
+function openC(pid){let c=prompt('Add comment:');if(c&&c.trim()){supa.from('comments').insert({post_id:pid,user_id:ME_ID,username:ME_RAW,text:c.trim()}).then(()=>alert('Comment added!'))}}
 init()
 </script></body></html>
