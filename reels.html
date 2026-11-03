@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Pixoro Reels - RED FIX FINAL</title>
+<title>Pixoro Reels - Both Dots Removed</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
 <style>
@@ -10,16 +10,18 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .reelWrap{width:100vw;height:100dvh;overflow-y:scroll;overflow-x:hidden;scroll-snap-type:y mandatory;scroll-behavior:smooth;background:#000}
 .reelWrap::-webkit-scrollbar{display:none}
 .reel{width:100vw!important;height:100dvh!important;flex-shrink:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#000!important}
-.reel-bg{display:none!important}
 .reel-main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;z-index:2!important;display:block!important;background:#000}
 .progress{position:absolute;top:0;left:0;height:3px;background:#fff;width:0%;z-index:20}
+
+/* BOTTOM RIGHT - 4 ICONS ONLY - (:) REMOVE */
 .vBar{position:absolute!important;right:10px!important;bottom:135px!important;display:flex!important;flex-direction:column!important;gap:18px!important;align-items:center!important;z-index:15!important}
 .vBtn{display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;width:48px!important;cursor:pointer!important}
 .vBtn span{font-size:12px!important;font-weight:700!important;color:#fff!important;text-shadow:0 1px 4px rgba(0,0,0,0.9)!important}
-.vBtn svg{width:28px;height:28px;stroke:#fff;fill:none;stroke-width:1.8;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8));transition:all 0.2s ease}
+.vBtn svg{width:28px!important;height:28px!important;stroke:#fff!important;fill:none!important;stroke-width:1.8!important;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8))!important;transition:all 0.2s ease!important}
 .vBtn:active{transform:scale(0.85)}
 .vBtn.liked svg{fill:#ff3040!important;stroke:#ff3040!important}
 .vBtn.saved svg{fill:#fff!important;stroke:#fff!important}
+
 .audioDiscPerusa{position:absolute!important;right:12px!important;bottom:72px!important;width:36px!important;height:36px!important;border-radius:50%!important;border:2.2px solid #fff!important;overflow:hidden!important;animation:spin 3.5s linear infinite!important;z-index:11!important;background:#111!important}
 .audioDiscPerusa img{width:100%!important;height:100%!important;object-fit:cover!important}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -30,12 +32,11 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .reel-caption{margin-top:5px!important;font-size:12.5px!important;color:#ddd!important}
 .followBtnPerusa{background:rgba(255,255,255,0.22)!important;color:#fff!important;border:1.2px solid #fff!important;padding:7px 20px!important;border-radius:8px!important;font-weight:700!important;font-size:14px!important;margin-left:10px!important;height:34px!important;min-width:80px!important;backdrop-filter:blur(8px)}
 
-/* MELLA MATTUM CHANGE - LEFT CORNER */
-.reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:54px;padding:0 16px;background:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)}
-.reelsTop b{color:#fff!important;font-size:22px!important;font-weight:800!important;text-align:left!important;margin-left:0!important;flex:none!important}
-.topRight{display:flex!important;gap:20px!important;align-items:center!important;margin-left:auto!important}
-.topRight svg{width:24px!important;height:24px!important;stroke:#fff!important;stroke-width:1.9!important;fill:none!important;cursor:pointer}
-.topRight .dots{font-size:22px!important;font-weight:700!important;color:#fff!important;cursor:pointer;letter-spacing:2px}
+/* MELLA (...) REMOVE - REELS LEFT + SEARCH ONLY */
+.reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:56px;padding:0 16px;background:linear-gradient(to bottom, rgba(0,0,0,0.85), transparent)}
+.reelsTop b{color:#fff!important;font-size:24px!important;font-weight:800!important;text-align:left!important;margin-left:0!important;flex:none!important}
+.topRight{display:flex!important;gap:16px!important;align-items:center!important;margin-left:auto!important}
+.topRight svg{width:26px!important;height:26px!important;stroke:#fff!important;stroke-width:2!important;fill:none!important;cursor:pointer}
 
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;width:100vw;height:52px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{color:#8e8e8e;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
@@ -62,7 +63,7 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .cRow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #252525}
 .cRow .del{color:#ff3040;font-size:12px;font-weight:700;cursor:pointer}
 </style></head><body>
-<div class="reelsTop"><b>Reels</b><div class="topRight"><svg onclick="location.href='search.html'" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><div class="dots" onclick="openTopMenu()">•••</div></div></div>
+<div class="reelsTop"><b>Reels</b><div class="topRight"><svg onclick="location.href='search.html'" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg></div></div>
 <div class="reelWrap" id="reelWrap"></div>
 <div class="bottom-nav">
 <a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
@@ -75,7 +76,6 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <div class="sheet" id="commentSheet" onclick="if(event.target==this)closeSheet('commentSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div style="font-weight:700;text-align:center;margin-bottom:12px">Comments</div><div id="commentList" style="overflow-y:auto;flex:1;max-height:45vh"></div><div class="sheetInputRow"><input id="commentInput" placeholder="Add a comment..."><button onclick="postComment()">Post</button></div></div></div>
 <div class="sheet" id="shareSheet" onclick="if(event.target==this)closeSheet('shareSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div style="font-weight:700;text-align:center;margin-bottom:12px">Share</div><div class="sheetItem" onclick="copyLink()">📋 Copy Link</div><div class="sheetItem" onclick="shareWhatsApp()">💬 WhatsApp</div><div class="sheetItem" onclick="closeSheet('shareSheet')">❌ Close</div></div></div>
 <div class="sheet" id="optionSheet" onclick="if(event.target==this)closeSheet('optionSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div style="font-weight:700;text-align:center;margin-bottom:12px" id="optTitle">Options</div><div id="optList"></div><div class="sheetItem" onclick="closeSheet('optionSheet')">❌ Cancel</div></div></div>
-<div class="sheet" id="topMenuSheet" onclick="if(event.target==this)closeSheet('topMenuSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div style="font-weight:700;text-align:center;margin-bottom:12px">Reels</div><div class="sheetItem" onclick="location.href='search.html'">🔍 Search</div><div class="sheetItem" onclick="closeSheet('topMenuSheet')">❌ Close</div></div></div>
 
 <script>
 let supa=window.supa;
@@ -99,14 +99,13 @@ let mUrl=p.media_url||p.image_url||p.video_url||'';
 let isVid=mUrl.toLowerCase().includes('.mp4')||p.media_type=='video';
 let media=isVid?`<video class="reel-main" src="${mUrl}" playsinline preload="auto" loop muted autoplay></video>`:`<img class="reel-main" src="${mUrl}">`;
 let followBtn=isMine?`<span class="followBtnPerusa" style="border:0;background:rgba(255,255,255,0.2)!important">Details</span>`:`<button id="followBtn-${p.id}" class="followBtnPerusa" onclick="event.stopPropagation();toggleF('${p.user_id}','${p.id}')">${isFollow?'Following':'Follow'}</button>`;
-let likeCount = lc>0?lc:'';
+let likeCount = lc>0?lc:'1';
 return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div class="progress"></div>${media}<div class="heartBurst"></div><div class="centerCtrl"></div>
 <div class="vBar">
 <div class="vBtn ${liked?'liked':''}" id="likeBtn-${p.id}" onclick="event.stopPropagation();toggleLike('${p.id}')"><svg id="likeSvg-${p.id}" viewBox="0 0 24 24" width="28" height="28" fill="${liked?'#ff3040':'none'}" stroke="${liked?'#ff3040':'#fff'}" stroke-width="1.8"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg><span id="likeCnt-${p.id}">${likeCount}</span></div>
 <div class="vBtn" onclick="event.stopPropagation();openCommentSheet('${p.id}')"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
 <div class="vBtn" onclick="event.stopPropagation();openShareSheet('${p.id}')"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
 <div class="vBtn ${saved?'saved':''}" id="saveBtn-${p.id}" onclick="event.stopPropagation();saveR('${p.id}')"><svg id="saveSvg-${p.id}" viewBox="0 0 24 24" width="28" height="28" fill="${saved?'#fff':'none'}" stroke="#fff" stroke-width="1.8"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></div>
-<div class="vBtn" onclick="event.stopPropagation();openOptionSheet('${p.id}')"><span style="font-size:20px;font-weight:700">⋮</span></div>
 </div>
 <div class="audioDiscPerusa"><img src="${getPfp(p.username)}"></div>
 <div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div style="margin-top:4px;font-size:12.5px">${p.caption||'Just Reels'}</div></div></div>`
@@ -185,9 +184,5 @@ async function deleteComment(cid,pid){allComments=allComments.filter(c=>String(c
 function openShareSheet(pid){curShareId=pid;document.getElementById('shareSheet').classList.add('show')}
 function copyLink(){let link=location.origin+'/reels.html?id='+curShareId;navigator.clipboard.writeText(link);alert('Link copied!');closeSheet('shareSheet')}
 function shareWhatsApp(){let link=location.origin+'/reels.html?id='+curShareId;window.open('https://wa.me/?text='+encodeURIComponent(link),'_blank');closeSheet('shareSheet')}
-function openOptionSheet(pid){curOptPost=pid;let p=allPosts.find(x=>String(x.id)==String(pid));let isMine=isMyPostObj(p);let html='';if(isMine){html+=`<div class="sheetItem danger" onclick="deletePost('${pid}')">🗑️ Delete Post</div>`}else{html+=`<div class="sheetItem" onclick="alert('Reported')">🚩 Report</div>`}html+=`<div class="sheetItem" onclick="copyLinkOpt('${pid}')">📋 Copy Link</div>`;document.getElementById('optList').innerHTML=html;document.getElementById('optionSheet').classList.add('show');}
-function copyLinkOpt(pid){let link=location.origin+'/reels.html?id='+pid;navigator.clipboard.writeText(link);alert('Copied!');closeSheet('optionSheet')}
-async function deletePost(pid){if(!confirm('Delete this reel?'))return;allPosts=allPosts.filter(p=>String(p.id)!=String(pid));render();closeSheet('optionSheet');try{await supa.from('posts').delete().eq('id',pid)}catch(e){}}
-function openTopMenu(){document.getElementById('topMenuSheet').classList.add('show')}
 init()
 </script></body></html>
