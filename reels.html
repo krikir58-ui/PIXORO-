@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Pixoro Reels - 20px Gap</title>
+<title>Pixoro Reels - 20px Secret</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
 <style>
@@ -36,8 +36,6 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .topRight{display:flex!important;gap:12px!important;align-items:center!important}
 .volBtn,.searchTopBtn{background:transparent!important;border:none!important;backdrop-filter:none!important;box-shadow:none!important;width:28px!important;height:28px!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important}
 .musicBar{position:absolute!important;left:10px!important;right:82px!important;bottom:16px!important;z-index:11!important;display:flex!important;align-items:center!important;gap:6px!important;background:rgba(0,0,0,0.5)!important;padding:5px 10px!important;border-radius:14px!important;backdrop-filter:blur(6px)!important;border:1px solid rgba(255,255,255,0.15)!important}
-.realInfo{display:none!important}
-.aiBadge{display:none!important}
 .hashtag{color:#00bfff!important;font-weight:700!important;cursor:pointer!important}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;width:100vw;height:52px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{color:#8e8e8e;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
@@ -52,9 +50,9 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .heartBurst::before{content:'❤';font-size:90px!important;background:linear-gradient(180deg,#ff7a00 0%,#ff3040 50%,#ed4956 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .heartBurst.show{animation:igHeartPop 1.1s cubic-bezier(0.17,0.89,0.32,1.28) forwards}
 @keyframes igHeartPop{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(1.25);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
-.sheet{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:999;display:none;align-items:flex-end;justify-content:center}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;display:none;align-items:flex-end;justify-content:center}
 .sheet.show{display:flex}
-.sheetBox{background:#121212;width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:12px 16px 30px;max-height:85vh;display:flex;flex-direction:column;overflow-y:auto}
+.sheetBox{background:#121212;width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:12px 16px 30px;max-height:88vh;display:flex;flex-direction:column;overflow-y:auto}
 .sheetHandle{width:38px;height:4px;background:#444;border-radius:10px;margin:0 auto 14px}
 .sheetItem{padding:14px 12px;border-bottom:1px solid #222;display:flex;gap:12px;align-items:center;cursor:pointer;justify-content:space-between}
 .toggle{width:44px;height:26px;background:#333;border-radius:13px;position:relative;transition:0.3s;cursor:pointer;flex-shrink:0}
@@ -63,6 +61,8 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .toggle.on::after{left:21px}
 .cRow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #252525}
 .cRow .del{color:#ff3040;font-size:12px;font-weight:700;cursor:pointer}
+.secretOpt{padding:14px 12px;border-bottom:1px solid #1a1a1a;display:flex;gap:12px;align-items:center;cursor:pointer}
+.secretOpt:active{background:#1a1a1a}
 </style></head><body>
 <div class="reelsTop"><b>Reels</b><div class="topRight">
 <div class="searchTopBtn" onclick="location.href='search.html'"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg></div>
@@ -80,7 +80,9 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <div class="sheet" id="tildeSheet" onclick="if(event.target==this)closeSheet('tildeSheet')"><div class="sheetBox">
 <div class="sheetHandle"></div>
 <div style="font-weight:800;text-align:center;font-size:18px">~ Controls ~</div>
-<div style="font-size:11px;color:#888;text-align:center;margin-bottom:14px">20px gap only - vera edhu illa</div>
+<div style="font-size:11px;color:#555;text-align:center;margin-bottom:14px" id="controlSub">Secret mode</div>
+<div id="ownerControls"></div>
+<div id="secretControls"></div>
 <div id="settingsList"></div>
 <div style="display:flex;gap:10px;margin-top:16px"><button onclick="resetSettings()" style="flex:1;padding:12px;background:#222;color:#fff;border:0;border-radius:12px;font-weight:700">Reset</button><button onclick="closeSheet('tildeSheet')" style="flex:1;padding:12px;background:#fff;color:#000;border:0;border-radius:12px;font-weight:800">Done</button></div>
 </div></div>
@@ -92,18 +94,18 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <script>
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
-let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set()
-let defaultSettings={caption:true, likeBurst:true, followBtn:true, disc:true, progress:true, musicBar:true};
-let settings=JSON.parse(localStorage.getItem('pixoro_20px_only')||JSON.stringify(defaultSettings));
-function saveSettings(){localStorage.setItem('pixoro_20px_only',JSON.stringify(settings)); renderSettingsList(); applySettings();}
+let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curTildePost=null,blockedUsers=JSON.parse(localStorage.getItem('pixoro_blocked')||'[]'),hiddenPosts=JSON.parse(localStorage.getItem('pixoro_hidden')||'[]')
+let defaultSettings={caption:true, likeBurst:true, followBtn:true, disc:true, progress:true, musicBar:true, hideLike:false, hideComment:false, hideShare:false, hideSave:false};
+let settings=JSON.parse(localStorage.getItem('pixoro_secret_20px')||JSON.stringify(defaultSettings));
+function saveSettings(){localStorage.setItem('pixoro_secret_20px',JSON.stringify(settings)); renderSettingsList(); applySettings();}
 function resetSettings(){settings={...defaultSettings}; saveSettings(); render();}
 function toggleSetting(k){settings[k]=!settings[k]; saveSettings();}
 function renderSettingsList(){
  let items=[
-  ['musicBar','🎵 Audio - 20px gap','Like Comment Share Save ~ Audio'],
-  ['caption','💬 Caption','POV visible'],
-  ['followBtn','👤 Follow','Follow'],
-  ['disc','💿 Disc','Audio'],
+  ['musicBar','🎵 Audio','Audio control'],
+  ['caption','💬 Caption','POV caption'],
+  ['followBtn','👤 Follow','Follow button'],
+  ['disc','💿 Disc','Audio disc'],
   ['progress','⏩ Progress','Bar'],
   ['likeBurst','❤️ Heart','Double tap'],
  ];
@@ -133,7 +135,8 @@ function getRealViewCount(postId){return allViews.filter(v=>String(v.post_id)==S
 async function addRealView(postId){ if(viewedPosts.has(postId)) return; viewedPosts.add(postId); let already = allViews.some(v=>String(v.post_id)==String(postId) && String(v.user_id)==String(ME_ID)); if(already) return; allViews.push({post_id:postId, user_id:ME_ID}); try{await supa.from('views').insert({post_id:postId, user_id:ME_ID})}catch(e){} }
 function render(){
 let wrap=document.getElementById('reelWrap');
-wrap.innerHTML=allPosts.map(p=>{
+let visiblePosts=allPosts.filter(p=>!hiddenPosts.includes(String(p.id)) && !blockedUsers.includes(String(p.user_id)));
+wrap.innerHTML=visiblePosts.map(p=>{
 let lc=allLikes.filter(l=>String(l.post_id)==String(p.id)).length;
 let liked=allLikes.some(l=>String(l.post_id)==String(p.id)&&String(l.user_id)==String(ME_ID));
 let saved=allSaves.some(s=>String(s.post_id)==String(p.id)&&String(s.user_id)==String(ME_ID));
@@ -148,13 +151,13 @@ let commentCount = allComments.filter(c=>String(c.post_id)==String(p.id)).length
 let aiCap=isAIcaption(p.caption);
 let finalCaption=aiCap?getAICaption(p):(p.caption||'Just Reels');
 let parsedCaption=parseHashtags(finalCaption);
-return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div class="progress"></div>${media}<div class="heartBurst"></div><div class="centerCtrl"></div>
+return `<div class="reel" data-id="${p.id}" data-uid="${p.user_id}" data-un="${cleanUser(p.username)}" onclick="handleReelTap(this)"><div class="progress"></div>${media}<div class="heartBurst"></div><div class="centerCtrl"></div>
 <div class="vBar">
-<div class="vBtn ${liked?'liked':''}" id="likeBtn-${p.id}" onclick="event.stopPropagation();toggleLike('${p.id}')"><svg id="likeSvg-${p.id}" viewBox="0 0 24 24" width="28" height="28" fill="${liked?'#ff3040':'none'}" stroke="${liked?'#ff3040':'#fff'}" stroke-width="1.8"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg><span id="likeCnt-${p.id}">${likeCount}</span></div>
-<div class="vBtn" onclick="event.stopPropagation();openCommentSheet('${p.id}')"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span>${commentCount||''}</span></div>
-<div class="vBtn" onclick="event.stopPropagation();openShareSheet('${p.id}')"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
-<div class="vBtn ${saved?'saved':''}" id="saveBtn-${p.id}" onclick="event.stopPropagation();saveR('${p.id}')"><svg id="saveSvg-${p.id}" viewBox="0 0 24 24" width="28" height="28" fill="${saved?'#fff':'none'}" stroke="#fff" stroke-width="1.8"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></div>
-<div class="vBtn tildeBtn" onclick="event.stopPropagation();openTildeSheet()"><span>~</span></div>
+<div class="vBtn ${liked?'liked':''}" id="likeBtn-${p.id}" style="display:${settings.hideLike?'none':'flex'}" onclick="event.stopPropagation();toggleLike('${p.id}')"><svg id="likeSvg-${p.id}" viewBox="0 0 24 24" width="28" height="28" fill="${liked?'#ff3040':'none'}" stroke="${liked?'#ff3040':'#fff'}" stroke-width="1.8"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg><span id="likeCnt-${p.id}">${likeCount}</span></div>
+<div class="vBtn" style="display:${settings.hideComment?'none':'flex'}" onclick="event.stopPropagation();openCommentSheet('${p.id}')"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span>${commentCount||''}</span></div>
+<div class="vBtn" style="display:${settings.hideShare?'none':'flex'}" onclick="event.stopPropagation();openShareSheet('${p.id}')"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+<div class="vBtn ${saved?'saved':''}" id="saveBtn-${p.id}" style="display:${settings.hideSave?'none':'flex'}" onclick="event.stopPropagation();saveR('${p.id}')"><svg id="saveSvg-${p.id}" viewBox="0 0 24 24" width="28" height="28" fill="${saved?'#fff':'none'}" stroke="#fff" stroke-width="1.8"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></div>
+<div class="vBtn tildeBtn" onclick="event.stopPropagation();openTildeSheet('${p.id}','${p.user_id}','${cleanUser(p.username)}')"><span>~</span></div>
 <div class="audioWrap"><div class="audioDiscInBar"><img src="${getPfp(p.username)}"></div></div>
 </div>
 <div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div class="reel-caption"><span>${parsedCaption}</span></div></div>
@@ -181,7 +184,54 @@ function handleReelTap(el){let now=Date.now();if(now-lastTap<300){clearTimeout(t
 async function dblLike(id){let reel=document.querySelector(`.reel[data-id="${id}"]`);let b=reel?reel.querySelector('.heartBurst'):null;if(b && settings.likeBurst){b.classList.remove('show');void b.offsetWidth;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1150)}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);try{await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}catch(e){}}}
 async function toggleLike(id){let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).then(()=>{}).catch(()=>{});}else{allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID)));updateLikeUI(id,false);supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}).catch(()=>{});}}
 function updateLikeUI(id,liked){let btn=document.getElementById('likeBtn-'+id);let svg=document.getElementById('likeSvg-'+id);let cnt=document.getElementById('likeCnt-'+id);if(btn){if(liked)btn.classList.add('liked');else btn.classList.remove('liked')}if(svg){svg.setAttribute('fill',liked?'#ff3040':'none');svg.setAttribute('stroke',liked?'#ff3040':'#fff');}if(cnt){let n=allLikes.filter(l=>String(l.post_id)==String(id)).length;cnt.innerText=n>0?n:''}}
-function openTildeSheet(){renderSettingsList(); document.getElementById('tildeSheet').classList.add('show');}
+
+function openTildeSheet(postId, userId, username){
+ curTildePost=postId;
+ let isMine = String(userId)===String(ME_ID) || cleanUser(username)===cleanUser(ME_RAW);
+ let ownerDiv=document.getElementById('ownerControls');
+ let secretDiv=document.getElementById('secretControls');
+ let sub=document.getElementById('controlSub');
+ if(isMine){
+  sub.innerText='Namba patha - Owner mode';
+  ownerDiv.innerHTML=`
+   <div style="font-size:12px;color:#888;margin:8px 0 4px">OWNER - Namba reels</div>
+   <div class="secretOpt" onclick="editReel('${postId}')"><span>✏️</span><div><div style="font-weight:600;font-size:13px">Edit Reel</div><div style="font-size:11px;color:#777">Caption edit pannu</div></div></div>
+   <div class="secretOpt"><div><div style="font-weight:600;font-size:13px">Hide Like</div><div style="font-size:11px;color:#777">Like hide - varavunga paakamatanga</div></div><div class="toggle ${settings.hideLike?'on':''}" onclick="toggleSetting('hideLike')"></div></div>
+   <div class="secretOpt"><div><div style="font-weight:600;font-size:13px">Hide Comment</div><div style="font-size:11px;color:#777">Comment hide</div></div><div class="toggle ${settings.hideComment?'on':''}" onclick="toggleSetting('hideComment')"></div></div>
+   <div class="secretOpt"><div><div style="font-weight:600;font-size:13px">Hide Share / Save</div><div style="font-size:11px;color:#777">Share save hide</div></div><div class="toggle ${(settings.hideShare||settings.hideSave)?'on':''}" onclick="toggleSetting('hideShare');toggleSetting('hideSave')"></div></div>
+   <div class="secretOpt" onclick="deleteReel('${postId}')"><span>🗑️</span><div><div style="font-weight:600;font-size:13px;color:#ff4444">Delete Reel</div><div style="font-size:11px;color:#777">Permanent delete</div></div></div>
+  `;
+  secretDiv.innerHTML=`
+   <div style="font-size:12px;color:#888;margin:12px 0 4px">Viewers - Enoda reels pathavanga</div>
+   <div class="secretOpt" onclick="viewViewers('${postId}')"><span>👁️</span><div><div style="font-weight:600;font-size:13px">Viewed List</div><div style="font-size:11px;color:#777">Yaar paathanga - secret</div></div></div>
+   <div class="secretOpt" onclick="blockViewerList('${postId}')"><span>🚫</span><div><div style="font-weight:600;font-size:13px">Block Viewers</div><div style="font-size:11px;color:#777">Pathavangala block - no alert</div></div></div>
+  `;
+ } else {
+  sub.innerText='Secret - No alert';
+  ownerDiv.innerHTML='';
+  secretDiv.innerHTML=`
+   <div style="font-size:12px;color:#888;margin:8px 0 4px">Secret - ${username} - No alert</div>
+   <div class="secretOpt" onclick="secretBlock('${userId}','${username}')"><span>🚫</span><div><div style="font-weight:600;font-size:13px">Block - Secret</div><div style="font-size:11px;color:#777">Block - avanuku alert varathu</div></div></div>
+   <div class="secretOpt" onclick="secretHide('${postId}')"><span>🙈</span><div><div style="font-weight:600;font-size:13px">Hide Reel - Secret</div><div style="font-size:11px;color:#777">Itha hide - unaku mattum</div></div></div>
+   <div class="secretOpt" onclick="secretReport('${postId}','${username}')"><span>🚩</span><div><div style="font-weight:600;font-size:13px">Report - Secret</div><div style="font-size:11px;color:#777">Report - no alert - secret</div></div></div>
+   <div class="secretOpt" onclick="secretNotInterested('${postId}')"><span>💤</span><div><div style="font-weight:600;font-size:13px">Not Interested</div><div style="font-size:11px;color:#777">Intha maari vara koodathu</div></div></div>
+   <div class="secretOpt" onclick="secretMuteUser('${userId}','${username}')"><span>🔇</span><div><div style="font-weight:600;font-size:13px">Mute User - Secret</div><div style="font-size:11px;color:#777">Avan reels vara koodathu - secret</div></div></div>
+  `;
+ }
+ renderSettingsList();
+ document.getElementById('tildeSheet').classList.add('show');
+}
+
+function secretBlock(uid, un){ blockedUsers.push(String(uid)); localStorage.setItem('pixoro_blocked',JSON.stringify(blockedUsers)); closeSheet('tildeSheet'); setTimeout(()=>{render();},300); }
+function secretHide(pid){ hiddenPosts.push(String(pid)); localStorage.setItem('pixoro_hidden',JSON.stringify(hiddenPosts)); closeSheet('tildeSheet'); setTimeout(()=>{render();},300); }
+function secretReport(pid, un){ let reports=JSON.parse(localStorage.getItem('pixoro_reports')||'[]'); reports.push({postId:pid, username:un, time:Date.now()}); localStorage.setItem('pixoro_reports',JSON.stringify(reports)); closeSheet('tildeSheet'); }
+function secretNotInterested(pid){ secretHide(pid); }
+function secretMuteUser(uid, un){ secretBlock(uid, un); }
+function viewViewers(pid){ let vcount=allViews.filter(v=>String(v.post_id)==String(pid)).length; alert('Viewers: '+vcount); }
+function blockViewerList(pid){ let viewers=[...new Set(allViews.filter(v=>String(v.post_id)==String(pid)).map(v=>String(v.user_id)))]; viewers.forEach(uid=>{ if(!blockedUsers.includes(uid)) blockedUsers.push(uid); }); localStorage.setItem('pixoro_blocked',JSON.stringify(blockedUsers)); closeSheet('tildeSheet'); setTimeout(()=>render(),300); }
+function editReel(pid){ location.href='edit.html?id='+pid; }
+async function deleteReel(pid){ if(confirm('Delete?')){ allPosts=allPosts.filter(p=>String(p.id)!=String(pid)); render(); try{await supa.from('posts').delete().eq('id',pid)}catch(e){} closeSheet('tildeSheet'); } }
+
 async function saveR(id){let isSaved=allSaves.some(x=>String(x.post_id)==String(id)&&String(x.user_id)==String(ME_ID));let btn=document.getElementById('saveBtn-'+id);let svg=document.getElementById('saveSvg-'+id);if(isSaved){allSaves=allSaves.filter(x=>!(String(x.post_id)==String(id)&&String(x.user_id)==String(ME_ID)));if(btn)btn.classList.remove('saved');if(svg)svg.setAttribute('fill','none');supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}).catch(()=>{});}else{allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW});if(btn)btn.classList.add('saved');if(svg)svg.setAttribute('fill','#fff');supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).then(()=>{}).catch(()=>{});}}
 async function toggleF(uid,pid){if(!uid||String(uid)==String(ME_ID))return;let isF=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid));document.querySelectorAll('[id^="followBtn-"]').forEach(b=>{let bid=b.id.replace('followBtn-','');let pp=allPosts.find(x=>String(x.id)==String(bid));if(pp&&String(pp.user_id)==String(uid))b.innerText=isF?'Follow':'Following'});if(isF){allFollows=allFollows.filter(f=>!(String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid)));try{await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',uid)}catch(e){}}else{allFollows.push({follower_id:ME_ID,following_id:uid});try{await supa.from('follows').insert({follower_id:ME_ID,following_id:uid})}catch(e){}}}
 function openCommentSheet(pid){curCommentPost=pid;let list=allComments.filter(c=>String(c.post_id)==String(pid));document.getElementById('commentList').innerHTML=list.length?list.map(c=>{let isMyC=String(c.user_id)==String(ME_ID)||cleanUser(c.username)==cleanUser(ME_RAW);return `<div class="cRow"><div><b>${cleanUser(c.username)}</b> <span style="font-size:13px;color:#ddd"> ${c.text||''}</span></div>${isMyC?`<span class="del" onclick="deleteComment('${c.id}','${pid}')">Delete</span>`:''}</div>`}).join(''):'<div style="text-align:center;color:#888;padding:20px">No comments yet</div>';document.getElementById('commentSheet').classList.add('show');}
@@ -189,7 +239,7 @@ function closeSheet(id){document.getElementById(id).classList.remove('show')}
 async function postComment(){let inp=document.getElementById('commentInput');let t=inp.value.trim();if(!t||!curCommentPost)return;let tmp={id:'tmp_'+Date.now(),post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t};allComments.unshift(tmp);inp.value='';openCommentSheet(curCommentPost);try{await supa.from('comments').insert({post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t})}catch(e){}}
 async function deleteComment(cid,pid){allComments=allComments.filter(c=>String(c.id)!=String(cid));openCommentSheet(pid);try{await supa.from('comments').delete().eq('id',cid)}catch(e){}}
 function openShareSheet(pid){curShareId=pid;document.getElementById('shareSheet').classList.add('show')}
-function copyLink(){let link=location.origin+'/reels.html?id='+curShareId;navigator.clipboard.writeText(link);alert('Link copied!');closeSheet('shareSheet')}
+function copyLink(){let link=location.origin+'/reels.html?id='+curShareId;navigator.clipboard.writeText(link);closeSheet('shareSheet')}
 function shareWhatsApp(){let link=location.origin+'/reels.html?id='+curShareId;window.open('https://wa.me/?text='+encodeURIComponent(link),'_blank');closeSheet('shareSheet')}
 function toggleMuteAll(){globalMuted=!globalMuted;document.querySelectorAll('video').forEach(v=>v.muted=globalMuted);document.getElementById('volIcon').innerHTML=globalMuted?'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>':'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>'}
 init()
