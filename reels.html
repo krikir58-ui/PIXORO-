@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Pixoro Reels</title>
+<title>Pixoro Reels - Full Settings</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
 <style>
@@ -49,8 +49,8 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .centerIcon svg{width:36px!important;height:36px!important;fill:#fff!important}
 .heartBurst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);pointer-events:none;z-index:50;opacity:0;width:120px;height:120px;display:flex;align-items:center;justify-content:center}
 .heartBurst::before{content:'❤';font-size:90px!important;background:linear-gradient(180deg,#ff7a00 0%,#ff3040 50%,#ed4956 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.heartBurst.show{animation:pixoroHeartPop 1.1s cubic-bezier(0.17,0.89,0.32,1.28) forwards}
-@keyframes pixoroHeartPop{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(1.25);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
+.heartBurst.show{animation:igHeartPop 1.1s cubic-bezier(0.17,0.89,0.32,1.28) forwards}
+@keyframes igHeartPop{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(1.25);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
 .sheet{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;align-items:flex-end;justify-content:center}
 .sheet.show{display:flex}
 .sheetBox{background:#1a1a1d;width:100%;max-width:480px;border-radius:28px 28px 0 0;padding:10px 0 34px;max-height:88vh;display:flex;flex-direction:column;overflow-y:auto}
@@ -69,9 +69,17 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .undoBtn{color:#0a84ff;font-weight:700;cursor:pointer}
 .cRow{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;border-bottom:1px solid #2c2c2e}
 .cRow .del{color:#ff3b30;font-size:12px;font-weight:700;cursor:pointer}
+.toggle{width:48px;height:28px;border-radius:20px;background:#3a3a3c;position:relative;flex-shrink:0;cursor:pointer}
+.toggle.on{background:#34c759}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}
+.toggle.on::after{left:22px}
+.uploadBox{margin:0 12px 12px;background:#2c2c2e;border-radius:18px;padding:16px 18px}
+.uploadBar{height:8px;background:#3a3a3c;border-radius:10px;overflow:hidden;margin:10px 0}
+.uploadBar div{height:100%;background:#fff;width:0%}
 </style></head><body>
 <div class="reelsTop"><b>Pixoro</b><div class="topRight">
 <div class="searchTopBtn" onclick="location.href='search.html'"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg></div>
+<div class="volBtn" onclick="openSettingsPage()">⚙️</div>
 <div class="volBtn" id="volIcon" onclick="toggleMuteAll()"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></div>
 </div></div>
 <div class="reelWrap" id="reelWrap"></div>
@@ -83,6 +91,7 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a>
 </div>
 
+<!-- OWNER -->
 <div class="sheet" id="ownerSheet" onclick="if(event.target==this)closeSheet('ownerSheet')"><div class="sheetBox">
 <div class="sheetHandle"></div><div class="pixHead"><b>Your Pixoro ✨</b><p>Namba reels - safe ah</p></div>
 <div class="safeCard">
@@ -91,12 +100,13 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <div class="safeItem" onclick="shareQR()"><div class="icon">🔗</div><div class="txt"><div class="title">Share link</div><div class="sub">Friends ku share - enjoy</div></div></div>
 </div>
 <div class="safeCard">
-<div class="safeItem" onclick="archiveSafe()"><div class="icon">🗃️</div><div class="txt"><div class="title">Archive - Safe keep</div><div class="sub">Delete illa - Profile Settings la irukkum</div></div></div>
+<div class="safeItem" onclick="archiveSafe()"><div class="icon">🗃️</div><div class="txt"><div class="title">Archive - Safe keep</div><div class="sub">Delete illa - safe ah vechukalam</div></div></div>
 <div class="safeItem" onclick="removeGridSafe()"><div class="icon">➖</div><div class="txt"><div class="title">Remove from grid</div><div class="sub">Grid la irunthu mattum - Image safe</div></div></div>
 </div>
 <div class="safeCard"><div class="safeItem" onclick="deleteSafe()"><div class="icon">🗑️</div><div class="txt"><div class="title" style="color:#ff3b30">Delete - Safe</div><div class="sub">30 days archive la irukkum</div></div></div></div>
 </div></div>
 
+<!-- VIEWER - Neenga anupuna ithu -->
 <div class="sheet" id="viewerSheet" onclick="if(event.target==this)closeSheet('viewerSheet')"><div class="sheetBox">
 <div class="sheetHandle"></div><div class="pixHead"><b>Pixoro Safe 🌿</b><p>Safe enjoy - No alert da</p></div>
 <div class="safeCard">
@@ -104,14 +114,47 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <div class="safeItem" onclick="copyLinkSafe()"><div class="icon">📤</div><div class="txt"><div class="title">Share</div><div class="sub">Jolly ah share pannu</div></div></div>
 </div>
 <div class="safeCard">
-<div class="safeItem" onclick="notInterestedSafe()"><div class="icon">😶</div><div class="txt"><div class="title">Show less like this</div><div class="sub">Intha maari venda - Safe - Profile Settings la irukkum</div></div></div>
-<div class="safeItem" onclick="hideReelSafe()"><div class="icon">🙈</div><div class="txt"><div class="title">Hide this reel</div><div class="sub">Ippo paaka venda - Hide mattum - Profile Settings la irukkum</div></div></div>
-<div class="safeItem" onclick="muteUserSafe()"><div class="icon">🌙</div><div class="txt"><div class="title">Mute - No alert block</div><div class="sub">Avanuku theriyathu - Silent - 7 days - Profile la irukkum</div></div></div>
-<div class="safeItem" onclick="blockUserSafe()"><div class="icon">🚫</div><div class="txt"><div class="title">Block - No alert</div><div class="sub">Full block - Avanuku theriyathu - Profile Setting la irukkum</div></div></div>
+<div class="safeItem" onclick="notInterestedSafe()"><div class="icon">😶</div><div class="txt"><div class="title">Show less like this</div><div class="sub">Intha maari venda - Safe</div></div></div>
+<div class="safeItem" onclick="hideReelSafe()"><div class="icon">🙈</div><div class="txt"><div class="title">Hide this reel</div><div class="sub">Ippo paaka venda - Image remove illa - Hide mattum</div></div></div>
+<div class="safeItem" onclick="muteUserSafe()"><div class="icon">🌙</div><div class="txt"><div class="title">Mute - No alert block</div><div class="sub">Avanuku theriyathu - Silent block - 7 days</div></div></div>
+<div class="safeItem" onclick="blockUserSafe()"><div class="icon">🚫</div><div class="txt"><div class="title">Block - No alert</div><div class="sub">Full block - Avanuku theriyathu - Setting la irukkum</div></div></div>
 </div>
-<div class="safeCard"><div class="safeItem" onclick="reportSafe()"><div class="icon">🛡️</div><div class="txt"><div class="title">Report - Keep safe</div><div class="sub">No alert - Safe</div></div></div></div>
-<div class="safeCard"><div class="safeItem" onclick="location.href='profile.html'"><div class="icon">👤</div><div class="txt"><div class="title">Profile Settings la paaru</div><div class="sub">Hide pannathu - Profile > Settings kulla - Thottu Allow pannalam</div></div></div></div>
+<div class="safeCard">
+<div class="safeItem" onclick="reportSafe()"><div class="icon">🛡️</div><div class="txt"><div class="title">Report - Keep safe</div><div class="sub">No alert - Safe - Pixoro safe ah irukkum</div></div></div>
+</div>
+<div class="safeCard"><div class="safeItem" onclick="closeSheet('viewerSheet');openSettingsPage()"><div class="icon">⚙️</div><div class="txt"><div class="title">Settings - Hidden / Block</div><div class="sub">Hide pannathu inga - Mela paaru</div></div></div></div>
 <div id="undoArea"></div>
+</div></div>
+
+<!-- SETTINGS PAGE - MELA FULL -->
+<div class="sheet" id="settingsPage" onclick="if(event.target==this)closeSheet('settingsPage')"><div class="sheetBox">
+<div class="sheetHandle"></div><div class="pixHead"><b>Settings ⚙️</b><p>Pixoro - Namba pudicha mari</p></div>
+
+<!-- MELA 1 - HIDDEN -->
+<div class="safeCard"><div style="padding:14px 18px 6px"><b>🙈 Hidden Reels - Mela</b><p style="font-size:12px;color:#8e8e93;margin-top:2px">Hide / Show less pannathu - Delete illa</p></div><div id="hiddenList"></div><div style="padding:0 18px 14px"><button onclick="restoreAllPixoro()" style="width:100%;padding:10px;background:#fff;color:#000;border:0;border-radius:12px;font-weight:800">♻️ Ellam thirumba kaatu</button></div></div>
+
+<!-- MELA 2 - MUTED + BLOCKED -->
+<div class="safeCard"><div style="padding:14px 18px 6px"><b>🌙 Muted - No alert</b><p style="font-size:12px;color:#8e8e93;margin-top:2px">Avanuku theriyathu - Silent</p></div><div id="mutedList"></div></div>
+<div class="safeCard"><div style="padding:14px 18px 6px"><b>🚫 Blocked - No alert</b><p style="font-size:12px;color:#8e8e93;margin-top:2px">Full block - Setting la mattum theriyum</p></div><div id="blockedList"></div></div>
+
+<!-- MELA 3 - BACKGROUND REMOVE + UPLOAD SIZE -->
+<div class="uploadBox"><b>🪄 Background Remove</b><p style="font-size:12px;color:#8e8e93;margin-top:4px">Photo upload panna background remove pannalama?</p>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px"><span style="font-size:14px">Background Remove</span><div class="toggle" id="bgToggle" onclick="toggleBgRemove()"></div></div>
+<p id="bgStatus" style="font-size:12px;color:#8e8e93;margin-top:8px">Off - Original image - Safe</p>
+</div>
+
+<div class="uploadBox"><b>📤 Upload Size</b><p style="font-size:12px;color:#8e8e93;margin-top:4px">Pixoro Upload Limit - Safe</p>
+<div style="display:flex;justify-content:space-between;margin-top:12px;font-size:13px"><span>Photo</span><b>10 MB Max</b></div>
+<div class="uploadBar"><div id="photoBar" style="width:35%"></div></div>
+<div style="display:flex;justify-content:space-between;font-size:13px"><span>Video / Reel</span><b>100 MB Max</b></div>
+<div class="uploadBar"><div id="videoBar" style="width:65%"></div></div>
+<div style="display:flex;justify-content:space-between;font-size:13px"><span>Your Last Upload</span><b id="lastUploadSize">0 MB</b></div>
+<p style="font-size:12px;color:#8e8e93;margin-top:8px" id="uploadMsg">Size kulla iruntha than upload aagum da - Perusa iruntha compress pannu da</p>
+<input type="file" id="uploadInput" accept="image/*,video/*" style="display:none" onchange="checkUploadSize(this)">
+<button onclick="document.getElementById('uploadInput').click()" style="width:100%;margin-top:12px;padding:12px;background:#fff;color:#000;border:0;border-radius:12px;font-weight:800">📤 Check Upload Size - File Select pannu</button>
+</div>
+
+<div class="safeCard"><div class="safeItem" onclick="clearAllSettings()"><div class="icon">🧹</div><div class="txt"><div class="title">Clear All Settings</div><div class="sub">Ellam reset - Pudhu maari</div></div></div></div>
 </div></div>
 
 <div class="sheet" id="commentSheet" onclick="if(event.target==this)closeSheet('commentSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Comments</b></div><div id="commentList" style="overflow-y:auto;flex:1;max-height:45vh;padding:0 20px"></div><div style="display:flex;gap:10px;align-items:center;padding:10px 20px;border-top:1px solid #2c2c2e;margin-top:10px"><input id="commentInput" style="flex:1;background:#2c2c2e;border:0;border-radius:20px;padding:12px 14px;color:#fff;outline:none" placeholder="Add kind comment..."><button onclick="postComment()" style="background:#fff;color:#000;border:0;border-radius:20px;padding:10px 18px;font-weight:800">Post</button></div></div></div>
@@ -120,12 +163,12 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <script>
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
-let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=JSON.parse(localStorage.getItem('pixoro_hidden')||'[]'),mutedUsers=JSON.parse(localStorage.getItem('pixoro_muted')||'[]'),blockedUsers=JSON.parse(localStorage.getItem('pixoro_blocked')||'[]'),lastAction=null,bgRemoveOn=localStorage.getItem('pixoro_bg_remove')==='on'
+let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=JSON.parse(localStorage.getItem('pixoro_hidden')||'[]'),mutedUsers=JSON.parse(localStorage.getItem('pixoro_muted')||'[]'),blockedUsers=JSON.parse(localStorage.getItem('pixoro_blocked')||'[]'),lastAction=null,bgRemoveOn=localStorage.getItem('pixoro_bg_remove')==='on',lastUploadMB=parseFloat(localStorage.getItem('pixoro_last_upload')||'0')
 async function waitSupa(){for(let i=0;i<50;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,200))}return window.supa}
-async function init(){supa=await waitSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;window.ME_ID=ME_ID;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);load()}
+async function init(){supa=await waitSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);applyBgRemoveUI();load()}
 function getPfp(u){let p=profileMap[cleanUser(u)];if(p?.avatar_url)return p.avatar_url;return 'https://ui-avatars.com/api/?name='+(cleanUser(u).charAt(0).toUpperCase()||'P')+'&background=fff&color=000&size=200&bold=true'}
 function isMyPostObj(p){if(!p)return false;if(p.user_id&&String(p.user_id)===String(ME_ID))return true;return cleanUser(p.username)===cleanUser(ME_RAW)}
-async function load(){try{let {data:posts,error}=await supa.from('posts').select('*').order('created_at',{ascending:false});if(error) console.log("Pixoro Load Error:",error);let likes=[],saves=[],follows=[],comments=[],views=[];try{likes=(await supa.from('likes').select('*')).data||[]}catch(e){}try{saves=(await supa.from('saves').select('*')).data||[]}catch(e){}try{follows=(await supa.from('follows').select('*')).data||[]}catch(e){}try{comments=(await supa.from('comments').select('*').order('created_at',{ascending:false})).data||[]}catch(e){}try{views=(await supa.from('views').select('*')).data||[]}catch(e){}allPosts=(posts||[]).filter(p=>(p.media_url||p.image_url||p.video_url||'')!=='');console.log("Pixoro Reels Found:",allPosts.length,allPosts);allLikes=likes;allSaves=saves;allFollows=follows;allComments=comments;allViews=views;render()}catch(err){console.log(err)}}
+async function load(){try{let {data:posts}=await supa.from('posts').select('*').order('created_at',{ascending:false});let likes=[],saves=[],follows=[],comments=[],views=[];try{likes=(await supa.from('likes').select('*')).data||[]}catch(e){}try{saves=(await supa.from('saves').select('*')).data||[]}catch(e){}try{follows=(await supa.from('follows').select('*')).data||[]}catch(e){}try{comments=(await supa.from('comments').select('*').order('created_at',{ascending:false})).data||[]}catch(e){}try{views=(await supa.from('views').select('*')).data||[]}catch(e){}allPosts=posts||[];allLikes=likes;allSaves=saves;allFollows=follows;allComments=comments;allViews=views;render()}catch(err){console.log(err)}}
 async function addRealView(postId){ if(viewedPosts.has(postId)) return; viewedPosts.add(postId); let already = allViews.some(v=>String(v.post_id)==String(postId) && String(v.user_id)==String(ME_ID)); if(already) return; allViews.push({post_id:postId, user_id:ME_ID}); try{await supa.from('views').insert({post_id:postId, user_id:ME_ID})}catch(e){} }
 function getAICaption(p){let base=cleanUser(p.username);return `POV: ${base} on another level ✨ #fyp #viral #pixoro #${base}`;}
 function isAIcaption(txt){return !txt||txt==='Just Reels'||txt.length<5}
@@ -134,7 +177,6 @@ function showCenter(reel,isPaused){let c=reel.querySelector('.centerCtrl');if(!c
 function render(){
 let wrap=document.getElementById('reelWrap');
 let visiblePosts=allPosts.filter(p=>!hiddenPosts.includes(String(p.id)) && !mutedUsers.includes(String(p.user_id)) && !blockedUsers.includes(String(p.user_id)));
-if(visiblePosts.length===0){ wrap.innerHTML=`<div style="color:#fff;text-align:center;padding:120px 20px;font-size:16px">No Reels da<br><span style="color:#888;font-size:13px">Plus button la poi oru Reel podu da</span><br><br><button onclick="location.href='index.html'" style="background:#fff;color:#000;border:0;padding:10px 20px;border-radius:20px;font-weight:800">Go Home</button></div>`; return; }
 wrap.innerHTML=visiblePosts.map(p=>{
 let lc=allLikes.filter(l=>String(l.post_id)==String(p.id)).length;
 let liked=allLikes.some(l=>String(l.post_id)==String(p.id)&&String(l.user_id)==String(ME_ID));
@@ -142,9 +184,8 @@ let saved=allSaves.some(s=>String(s.post_id)==String(p.id)&&String(s.user_id)==S
 let isFollow=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(p.user_id));
 let isMine=isMyPostObj(p);
 let mUrl=p.media_url||p.image_url||p.video_url||'';
-let low=mUrl.toLowerCase();
-let isVid=low.includes('.mp4')||low.includes('.mov')||low.includes('.webm')||low.includes('video')||p.media_type=='video'||p.media_type=='reel'||p.media_type=='reels';
-let media=isVid?`<video class="reel-main ${bgRemoveOn?'bgRemove':''}" src="${mUrl}" playsinline preload="auto" loop muted autoplay onerror="this.style.display='none';this.nextElementSibling.style.display='block'"></video><img class="reel-main" src="${mUrl}" style="display:none">`:`<img class="reel-main ${bgRemoveOn?'bgRemove':''}" src="${mUrl}">`;
+let isVid=mUrl.toLowerCase().includes('.mp4')||p.media_type=='video';
+let media=isVid?`<video class="reel-main ${bgRemoveOn?'bgRemove':''}" src="${mUrl}" playsinline preload="auto" loop muted autoplay></video>`:`<img class="reel-main ${bgRemoveOn?'bgRemove':''}" src="${mUrl}">`;
 let followBtn=isMine?`<span class="followBtnPerusa" style="border:0;background:rgba(255,255,255,0.2)!important">You</span>`:`<button id="followBtn-${p.id}" class="followBtnPerusa" onclick="event.stopPropagation();toggleF('${p.user_id}','${p.id}')">${isFollow?'Following':'Follow'}</button>`;
 let likeCount = lc>0?lc:''; let commentCount = allComments.filter(c=>String(c.post_id)==String(p.id)).length;
 let finalCaption=isAIcaption(p.caption)?getAICaption(p):(p.caption||'Just Reels'); let parsedCaption=parseHashtags(finalCaption);
@@ -166,25 +207,79 @@ function handleReelTap(el){let now=Date.now();if(now-lastTap<300){clearTimeout(t
 async function dblLike(id){let reel=document.querySelector(`.reel[data-id="${id}"]`);let b=reel?reel.querySelector('.heartBurst'):null;if(b){b.classList.remove('show');void b.offsetWidth;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1150)}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);try{await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}catch(e){}}}
 async function toggleLike(id){let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).then(()=>{}).catch(()=>{});}else{allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID)));updateLikeUI(id,false);supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}).catch(()=>{});}}
 function updateLikeUI(id,liked){let btn=document.getElementById('likeBtn-'+id);let svg=document.getElementById('likeSvg-'+id);let cnt=document.getElementById('likeCnt-'+id);if(btn){if(liked)btn.classList.add('liked');else btn.classList.remove('liked')}if(svg){svg.setAttribute('fill',liked?'#ff3040':'none');svg.setAttribute('stroke',liked?'#ff3040':'#fff');}if(cnt){let n=allLikes.filter(l=>String(l.post_id)==String(id)).length;cnt.innerText=n>0?n:''}}
-function openPixoroSheet(postId, userId, username){ curSheetId=postId; curSheetUser=userId; curSheetUsername=username; let isMine = String(userId)===String(ME_ID) || cleanUser(username)===cleanUser(ME_RAW); if(isMine){ document.getElementById('ownerSheet').classList.add('show'); } else { document.getElementById('viewerSheet').classList.add('show'); document.getElementById('undoArea').innerHTML=''; } }
+
+function openPixoroSheet(postId, userId, username){
+ curSheetId=postId; curSheetUser=userId; curSheetUsername=username;
+ let isMine = String(userId)===String(ME_ID) || cleanUser(username)===cleanUser(ME_RAW);
+ if(isMine){ document.getElementById('ownerSheet').classList.add('show'); }
+ else { document.getElementById('viewerSheet').classList.add('show'); document.getElementById('undoArea').innerHTML=''; }
+}
 function editReel(){ if(curSheetId) location.href='edit.html?id='+curSheetId; }
 function shareQR(){ let link=location.origin+'/reels.html?id='+curSheetId; navigator.clipboard.writeText(link); closeSheet('ownerSheet'); }
 function viewInsights(){ let vcount=allViews.filter(v=>String(v.post_id)==String(curSheetId)).length; alert('Your Pixoro is doing well 🌟 Views: '+vcount); closeSheet('ownerSheet'); }
-function archiveSafe(){ if(hiddenPosts.includes(String(curSheetId)))return; hiddenPosts.push(String(curSheetId)); localStorage.setItem('pixoro_hidden',JSON.stringify(hiddenPosts)); saveHiddenMeta(curSheetId,'Archived'); lastAction={type:'archive',id:curSheetId}; showUndo('Archived - Profile Settings la irukku 📦',true); setTimeout(()=>render(),400); closeSheet('ownerSheet'); }
-function removeGridSafe(){ if(hiddenPosts.includes(String(curSheetId)))return; hiddenPosts.push(String(curSheetId)); localStorage.setItem('pixoro_hidden',JSON.stringify(hiddenPosts)); saveHiddenMeta(curSheetId,'Remove from grid'); lastAction={type:'hide',id:curSheetId}; showUndo('Removed - Profile Settings la irukku 🗃️',true); setTimeout(()=>render(),400); closeSheet('ownerSheet'); }
+function archiveSafe(){ if(hiddenPosts.includes(String(curSheetId)))return; hiddenPosts.push(String(curSheetId)); localStorage.setItem('pixoro_hidden',JSON.stringify(hiddenPosts)); saveHiddenMeta(curSheetId,'Archived'); lastAction={type:'archive',id:curSheetId}; showUndo('Archived - Image safe 📦',true,true); setTimeout(()=>render(),400); closeSheet('ownerSheet'); }
+function removeGridSafe(){ if(hiddenPosts.includes(String(curSheetId)))return; hiddenPosts.push(String(curSheetId)); localStorage.setItem('pixoro_hidden',JSON.stringify(hiddenPosts)); saveHiddenMeta(curSheetId,'Remove from grid'); lastAction={type:'hide',id:curSheetId}; showUndo('Removed from grid - Safe 🗃️',true,true); setTimeout(()=>render(),400); closeSheet('ownerSheet'); }
 function deleteSafe(){ if(confirm('Archive pannalama? Safe ah 30 days irukkum')){ archiveSafe(); } }
 function saveReel(){ saveR(curSheetId); showUndo('Saved 🔖'); closeSheet('viewerSheet'); }
 function copyLinkSafe(){ let link=location.origin+'/reels.html?id='+curSheetId; navigator.clipboard.writeText(link); showUndo('Link copied 📤'); closeSheet('viewerSheet'); closeSheet('shareSheet'); }
 function shareWA(){ let link=location.origin+'/reels.html?id='+curShareId; window.open('https://wa.me/?text='+encodeURIComponent(link),'_blank'); }
 function saveHiddenMeta(id,reason){ let meta=JSON.parse(localStorage.getItem('pixoro_hidden_meta')||'{}'); meta[String(id)]={reason:reason,time:Date.now(),username:curSheetUsername||''}; localStorage.setItem('pixoro_hidden_meta',JSON.stringify(meta)); }
-function notInterestedSafe(){ if(hiddenPosts.includes(String(curSheetId))){closeSheet('viewerSheet');return;} hiddenPosts.push(String(curSheetId)); localStorage.setItem('pixoro_hidden',JSON.stringify(hiddenPosts)); saveHiddenMeta(curSheetId,'Show less like this'); lastAction={type:'hide',id:curSheetId}; showUndo('Got it - Profile Settings la irukku 😊',true); setTimeout(()=>render(),400); closeSheet('viewerSheet'); }
-function hideReelSafe(){ if(hiddenPosts.includes(String(curSheetId))){closeSheet('viewerSheet');return;} hiddenPosts.push(String(curSheetId)); localStorage.setItem('pixoro_hidden',JSON.stringify(hiddenPosts)); saveHiddenMeta(curSheetId,'Hide this reel'); lastAction={type:'hide',id:curSheetId}; showUndo('Hidden - Profile Settings la irukku 🙈',true); setTimeout(()=>render(),400); closeSheet('viewerSheet'); }
-function muteUserSafe(){ if(mutedUsers.includes(String(curSheetUser))){closeSheet('viewerSheet');return;} mutedUsers.push(String(curSheetUser)); localStorage.setItem('pixoro_muted',JSON.stringify(mutedUsers)); lastAction={type:'mute',id:curSheetUser}; showUndo('Muted - No alert - Profile la irukku 🌙',true); setTimeout(()=>render(),400); closeSheet('viewerSheet'); }
-function blockUserSafe(){ if(blockedUsers.includes(String(curSheetUser))){closeSheet('viewerSheet');return;} blockedUsers.push(String(curSheetUser)); localStorage.setItem('pixoro_blocked',JSON.stringify(blockedUsers)); lastAction={type:'block',id:curSheetUser}; showUndo('Blocked - No alert - Profile la irukku 🚫',true); setTimeout(()=>render(),400); closeSheet('viewerSheet'); }
+function notInterestedSafe(){ if(hiddenPosts.includes(String(curSheetId))){closeSheet('viewerSheet');return;} hiddenPosts.push(String(curSheetId)); localStorage.setItem('pixoro_hidden',JSON.stringify(hiddenPosts)); saveHiddenMeta(curSheetId,'Show less like this'); lastAction={type:'hide',id:curSheetId}; showUndo('Got it - Setting mela irukku 😊',true,true); setTimeout(()=>render(),400); closeSheet('viewerSheet'); }
+function hideReelSafe(){ if(hiddenPosts.includes(String(curSheetId))){closeSheet('viewerSheet');return;} hiddenPosts.push(String(curSheetId)); localStorage.setItem('pixoro_hidden',JSON.stringify(hiddenPosts)); saveHiddenMeta(curSheetId,'Hide this reel'); lastAction={type:'hide',id:curSheetId}; showUndo('Hidden - Setting mela irukku 🙈',true,true); setTimeout(()=>render(),400); closeSheet('viewerSheet'); }
+function muteUserSafe(){ if(mutedUsers.includes(String(curSheetUser))){closeSheet('viewerSheet');return;} mutedUsers.push(String(curSheetUser)); localStorage.setItem('pixoro_muted',JSON.stringify(mutedUsers)); lastAction={type:'mute',id:curSheetUser}; showUndo('Muted - No alert 🌙 - Setting la irukku',true,true); setTimeout(()=>render(),400); closeSheet('viewerSheet'); }
+function blockUserSafe(){ if(blockedUsers.includes(String(curSheetUser))){closeSheet('viewerSheet');return;} blockedUsers.push(String(curSheetUser)); localStorage.setItem('pixoro_blocked',JSON.stringify(blockedUsers)); lastAction={type:'block',id:curSheetUser}; showUndo('Blocked - No alert 🚫 - Setting la irukku',true,true); setTimeout(()=>render(),400); closeSheet('viewerSheet'); }
 function reportSafe(){ let reports=JSON.parse(localStorage.getItem('pixoro_reports')||'[]'); reports.push({postId:curSheetId, time:Date.now()}); localStorage.setItem('pixoro_reports',JSON.stringify(reports)); showUndo('Thanks - Pixoro safe 🛡️ - No alert'); }
-function showUndo(msg,canUndo){ let area=document.getElementById('undoArea'); area.innerHTML=`<div class="undoBar"><span>${msg}</span><div style="display:flex;gap:10px">${canUndo?'<span class="undoBtn" onclick="undoLast()">Undo</span>':''}<span class="undoBtn" onclick="location.href='profile.html'">Profile ⚙️</span></div></div>`; if(!canUndo) setTimeout(()=>area.innerHTML='',3000); }
-function undoLast(){ if(!lastAction) return; if(lastAction.type==='archive' || lastAction.type==='hide'){ hiddenPosts=hiddenPosts.filter(id=>id!==String(lastAction.id)); localStorage.setItem('pixoro_hidden',JSON.stringify(hiddenPosts)); } if(lastAction.type==='mute'){ mutedUsers=mutedUsers.filter(id=>id!==String(lastAction.id)); localStorage.setItem('pixoro_muted',JSON.stringify(mutedUsers)); } if(lastAction.type==='block'){ blockedUsers=blockedUsers.filter(id=>id!==String(lastAction.id)); localStorage.setItem('pixoro_blocked',JSON.stringify(blockedUsers)); } render(); document.getElementById('undoArea').innerHTML='<div class="undoBar"><span>Undone - Back ✨</span></div>'; setTimeout(()=>document.getElementById('undoArea').innerHTML='',2000); }
-function openSettingsPage(){ location.href='profile.html'; }
+function showUndo(msg,canUndo,showSettings){
+ let area=document.getElementById('undoArea');
+ area.innerHTML=`<div class="undoBar"><span>${msg}</span><div style="display:flex;gap:10px">${canUndo?'<span class="undoBtn" onclick="undoLast()">Undo</span>':''}${showSettings?'<span class="undoBtn" onclick="closeSheet(\'viewerSheet\');openSettingsPage()">Settings ⚙️</span>':''}</div></div>`;
+ if(!canUndo) setTimeout(()=>area.innerHTML='',3000);
+}
+function undoLast(){
+ if(!lastAction) return;
+ if(lastAction.type==='archive' || lastAction.type==='hide'){ hiddenPosts=hiddenPosts.filter(id=>id!==String(lastAction.id)); localStorage.setItem('pixoro_hidden',JSON.stringify(hiddenPosts)); }
+ if(lastAction.type==='mute'){ mutedUsers=mutedUsers.filter(id=>id!==String(lastAction.id)); localStorage.setItem('pixoro_muted',JSON.stringify(mutedUsers)); }
+ if(lastAction.type==='block'){ blockedUsers=blockedUsers.filter(id=>id!==String(lastAction.id)); localStorage.setItem('pixoro_blocked',JSON.stringify(blockedUsers)); }
+ render(); document.getElementById('undoArea').innerHTML='<div class="undoBar"><span>Undone - Back ✨</span></div>'; setTimeout(()=>document.getElementById('undoArea').innerHTML='',2000);
+}
+
+// SETTINGS PAGE - MELA FULL
+function openSettingsPage(){
+ let meta=JSON.parse(localStorage.getItem('pixoro_hidden_meta')||'{}');
+ let hList=document.getElementById('hiddenList');
+ if(!hiddenPosts.length){ hList.innerHTML=`<div style="padding:12px 18px;color:#8e8e93;font-size:13px">Onnum hide pannala da - Ellam safe ✨</div>`; }
+ else { hList.innerHTML=hiddenPosts.map(pid=>{ let p=allPosts.find(x=>String(x.id)===String(pid)); let name=p?cleanUser(p.username):(meta[pid]?.username||'Reel'); let reason=meta[pid]?.reason||'Hidden'; let img=p?(p.media_url||p.image_url||''):''; return `<div class="safeItem"><div class="icon" style="background:none;overflow:hidden;padding:0"><img src="${img}" onerror="this.style.display='none'" style="width:36px;height:36px;object-fit:cover;border-radius:10px"></div><div class="txt"><div class="title">${name}</div><div class="sub">${reason} - Image safe</div></div><div style="display:flex;gap:6px"><button onclick="unhideOne('${pid}')" style="background:#fff;color:#000;border:0;border-radius:10px;padding:8px 10px;font-weight:700">Kaatu</button><button onclick="removeOnePermanent('${pid}')" style="background:#3a3a3c;color:#ff3b30;border:0;border-radius:10px;padding:8px 10px;font-weight:700">Remove</button></div></div>`; }).join(''); }
+ let mList=document.getElementById('mutedList');
+ if(!mutedUsers.length){ mList.innerHTML=`<div style="padding:12px 18px;color:#8e8e93;font-size:13px">Yaarayum mute pannala da 🌿</div>`; }
+ else { mList.innerHTML=mutedUsers.map(uid=>{ let p=allPosts.find(x=>String(x.user_id)===String(uid)); let name=p?cleanUser(p.username):'User'; return `<div class="safeItem"><div class="icon">🌙</div><div class="txt"><div class="title">${name}</div><div class="sub">Muted - No alert - Silent</div></div><button onclick="unmuteOne('${uid}')" style="background:#fff;color:#000;border:0;border-radius:10px;padding:8px 12px;font-weight:700">Unmute</button></div>`; }).join(''); }
+ let bList=document.getElementById('blockedList');
+ if(!blockedUsers.length){ bList.innerHTML=`<div style="padding:12px 18px;color:#8e8e93;font-size:13px">Yaarayum block pannala da 🛡️</div>`; }
+ else { bList.innerHTML=blockedUsers.map(uid=>{ let p=allPosts.find(x=>String(x.user_id)===String(uid)); let name=p?cleanUser(p.username):'User'; return `<div class="safeItem"><div class="icon">🚫</div><div class="txt"><div class="title">${name}</div><div class="sub">Blocked - No alert - Silent</div></div><button onclick="unblockOne('${uid}')" style="background:#fff;color:#000;border:0;border-radius:10px;padding:8px 12px;font-weight:700">Unblock</button></div>`; }).join(''); }
+ applyBgRemoveUI(); updateUploadUI();
+ document.getElementById('settingsPage').classList.add('show');
+}
+function unhideOne(pid){ hiddenPosts=hiddenPosts.filter(id=>String(id)!==String(pid)); localStorage.setItem('pixoro_hidden',JSON.stringify(hiddenPosts)); render(); openSettingsPage(); }
+function unmuteOne(uid){ mutedUsers=mutedUsers.filter(id=>String(id)!==String(uid)); localStorage.setItem('pixoro_muted',JSON.stringify(mutedUsers)); render(); openSettingsPage(); }
+function unblockOne(uid){ blockedUsers=blockedUsers.filter(id=>String(id)!==String(uid)); localStorage.setItem('pixoro_blocked',JSON.stringify(blockedUsers)); render(); openSettingsPage(); }
+function removeOnePermanent(pid){ if(confirm('Permanent ah remove pannalama?')){ hiddenPosts=hiddenPosts.filter(id=>String(id)!==String(pid)); allPosts=allPosts.filter(p=>String(p.id)!==String(pid)); localStorage.setItem('pixoro_hidden',JSON.stringify(hiddenPosts)); try{supa.from('posts').delete().eq('id',pid).then(()=>{})}catch(e){} render(); openSettingsPage(); } }
+function restoreAllPixoro(){ localStorage.removeItem('pixoro_hidden'); localStorage.removeItem('pixoro_muted'); localStorage.removeItem('pixoro_blocked'); localStorage.removeItem('pixoro_hidden_meta'); hiddenPosts=[]; mutedUsers=[]; blockedUsers=[]; render(); openSettingsPage(); }
+function clearAllSettings(){ if(confirm('Ellam reset pannalama?')){ restoreAllPixoro(); } }
+
+// BACKGROUND REMOVE
+function toggleBgRemove(){ bgRemoveOn=!bgRemoveOn; localStorage.setItem('pixoro_bg_remove',bgRemoveOn?'on':'off'); applyBgRemoveUI(); render(); }
+function applyBgRemoveUI(){ let t=document.getElementById('bgToggle'); let s=document.getElementById('bgStatus'); if(t) t.className='toggle'+(bgRemoveOn?' on':''); if(s) s.innerText=bgRemoveOn?'On - Background remove - Photo clean ah theriyum 🪄':'Off - Original image - Safe'; }
+
+// UPLOAD SIZE
+function updateUploadUI(){ let el=document.getElementById('lastUploadSize'); if(el) el.innerText=lastUploadMB.toFixed(2)+' MB'; }
+function checkUploadSize(input){
+ if(!input.files || !input.files[0]) return;
+ let f=input.files[0]; let mb=f.size/(1024*1024); lastUploadMB=mb; localStorage.setItem('pixoro_last_upload',String(mb));
+ let isVideo=f.type.startsWith('video'); let limit=isVideo?100:10;
+ let msg=document.getElementById('uploadMsg');
+ if(mb>limit){ msg.innerText=`❌ Too big da - ${mb.toFixed(2)} MB - Limit ${limit} MB - Compress pannu da`; msg.style.color='#ff3b30'; }
+ else { msg.innerText=`✅ Safe da - ${mb.toFixed(2)} MB / ${limit} MB - Upload pannalam da - ${bgRemoveOn?'Background remove ON 🪄':''}`; msg.style.color='#34c759'; }
+ updateUploadUI();
+}
+
 async function saveR(id){let isSaved=allSaves.some(x=>String(x.post_id)==String(id)&&String(x.user_id)==String(ME_ID));let btn=document.getElementById('saveBtn-'+id);let svg=document.getElementById('saveSvg-'+id);if(isSaved){allSaves=allSaves.filter(x=>!(String(x.post_id)==String(id)&&String(x.user_id)==String(ME_ID)));if(btn)btn.classList.remove('saved');if(svg)svg.setAttribute('fill','none');supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}).catch(()=>{});}else{allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW});if(btn)btn.classList.add('saved');if(svg)svg.setAttribute('fill','#fff');supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).then(()=>{}).catch(()=>{});}}
 async function toggleF(uid,pid){if(!uid||String(uid)==String(ME_ID))return;let isF=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid));document.querySelectorAll('[id^="followBtn-"]').forEach(b=>{let bid=b.id.replace('followBtn-','');let pp=allPosts.find(x=>String(x.id)==String(bid));if(pp&&String(pp.user_id)==String(uid))b.innerText=isF?'Follow':'Following'});if(isF){allFollows=allFollows.filter(f=>!(String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid)));try{await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',uid)}catch(e){}}else{allFollows.push({follower_id:ME_ID,following_id:uid});try{await supa.from('follows').insert({follower_id:ME_ID,following_id:uid})}catch(e){}}}
 function openCommentSheet(pid){curCommentPost=pid;let list=allComments.filter(c=>String(c.post_id)==String(pid));document.getElementById('commentList').innerHTML=list.length?list.map(c=>{let isMyC=String(c.user_id)==String(ME_ID)||cleanUser(c.username)==cleanUser(ME_RAW);return `<div class="cRow"><div><b>${cleanUser(c.username)}</b> <span style="font-size:13px;color:#ddd"> ${c.text||''}</span></div>${isMyC?`<span class="del" onclick="deleteComment('${c.id}','${pid}')">Delete</span>`:''}</div>`}).join(''):'<div style="text-align:center;color:#888;padding:20px">No comments yet - Be kind 💜</div>';document.getElementById('commentSheet').classList.add('show');}
