@@ -7,7 +7,6 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
-/* FIX 2 - OVERLAP FIX - 100dvh vendaam da - Bottom Nav 52px ah Minus pannu da */
 .reelWrap{width:100vw;height:calc(100dvh - 52px);overflow-y:scroll;overflow-x:hidden;scroll-snap-type:y mandatory;scroll-behavior:smooth;background:#000;position:fixed;top:0;left:0}
 .reelWrap::-webkit-scrollbar{display:none}
 .reel{width:100vw!important;height:calc(100dvh - 52px)!important;flex-shrink:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#000!important}
@@ -162,12 +161,13 @@ async function load(){try{
 let all=[];
 try{ let r=await supa.from('posts').select('*').order('created_at',{ascending:false}); if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'posts'}))); }catch(e){}
 try{ let r=await supa.from('reels').select('*').order('created_at',{ascending:false}); if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'reels'}))); }catch(e){}
-// FIX 1 - DUPLICATE FIX - Same URL / Same ID 2 vaati vara koodathu da
+// CORRECT - Dedupe - ?token ah thookitu compare pannu da
 let seenUrl=new Set(); let seenId=new Set(); let deduped=[];
 for(let p of all){
-  let url=(p.media_url||p.image_url||p.video_url||'').trim();
-  if(!url) continue;
+  let raw=(p.media_url||p.image_url||p.video_url||'').trim();
+  if(!raw) continue;
   if(p.is_archived) continue;
+  let url=raw.split('?')[0].toLowerCase();
   if(seenUrl.has(url)) continue;
   if(seenId.has(String(p.id))) continue;
   seenUrl.add(url); seenId.add(String(p.id)); deduped.push(p);
@@ -180,21 +180,12 @@ function getAICaption(p){let base=cleanUser(p.username);return `POV: ${base} on 
 function isAIcaption(txt){return !txt||txt==='Just Reels'||txt.length<5}
 function parseHashtags(text){return (text||'').replace(/#(\w+)/g,'<span class="hashtag" onclick="event.stopPropagation();openHashtag(\'$1\')\">#$1</span>')}
 function showCenter(reel,isPaused){let c=reel.querySelector('.centerCtrl');if(!c) return;c.innerHTML='<div class="centerIcon">'+(isPaused?'<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="#fff"/></svg>':'<svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z" fill="#fff"/></svg>')+'</div>';c.classList.add('show'); setTimeout(()=>c.classList.remove('show'),900);}
-// FIX 3 - BLACK FIX - Real Video mattum Video da - Photo va Video nu nenaikaatha da
-function isRealVideo(p){
-  let vUrl=(p.video_url||'').toLowerCase();
-  let mUrl=(p.media_url||'').toLowerCase();
-  let iUrl=(p.image_url||'').toLowerCase();
-  if(vUrl && (vUrl.includes('.mp4')||vUrl.includes('.mov')||vUrl.includes('.webm'))) return true;
-  if(mUrl.includes('.mp4')||mUrl.includes('.mov')||mUrl.includes('.webm')) return true;
-  if(mUrl.includes('.jpg')||mUrl.includes('.jpeg')||mUrl.includes('.png')||mUrl.includes('.webp')||mUrl.includes('.heic')||mUrl.includes('.avif')) return false;
-  if(iUrl.includes('.jpg')||iUrl.includes('.jpeg')||iUrl.includes('.png')||iUrl.includes('.webp')) return false;
-  if(p.media_type==='video') return true;
-  return false;
-}
+// CORRECT - getBestMedia - Table ah nambuda - Extension ah nambaatha da
 function getBestMedia(p){
-  if(isRealVideo(p)) return {url: p.video_url||p.media_url, poster: p.image_url||p.media_url, isVid:true};
-  return {url: p.image_url||p.media_url||p.video_url, poster:'', isVid:false};
+  if(p._from==='reels'){ return {url: p.video_url||p.media_url||'', poster:'', isVid:true}; }
+  let m=(p.media_url||p.video_url||'').toLowerCase().split('?')[0];
+  if(m.endsWith('.mp4')||m.endsWith('.mov')||m.endsWith('.webm')||m.endsWith('.m4v')){ return {url: p.media_url||p.video_url, poster:'', isVid:true}; }
+  return {url: p.media_url||p.video_url||p.image_url||'', poster:'', isVid:false};
 }
 function render(){
 let wrap=document.getElementById('reelWrap');
@@ -209,7 +200,7 @@ let isMine=isMyPostObj(p);
 let best=getBestMedia(p);
 let media='';
 if(best.isVid){
-  media=`<video class="reel-main ${bgRemoveOn?'bgRemove':''}" src="${best.url}" poster="${best.poster}" playsinline preload="auto" loop muted autoplay onerror="this.style.display='none';this.nextElementSibling.style.display='block'"></video><img class="reel-main" src="${best.poster}" style="display:none" onerror="this.style.display='none'">`;
+  media=`<video class="reel-main ${bgRemoveOn?'bgRemove':''}" src="${best.url}" playsinline preload="auto" loop muted autoplay onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"></video><div class="vidFallback" style="display:none;position:absolute;inset:0;z-index:2;background:#111;color:#888;align-items:center;justify-content:center;font-size:13px">Video load aagala - Tap to retry</div>`;
 } else {
   media=`<img class="reel-main ${bgRemoveOn?'bgRemove':''}" src="${best.url}" onerror="this.style.display='none'">`;
 }
