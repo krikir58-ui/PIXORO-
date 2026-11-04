@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Pixoro Reels - Screenshot Fix</title>
+<title>Pixoro Reels - Final Fix</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
 <style>
@@ -12,19 +12,20 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .reel{width:100vw!important;height:100dvh!important;flex-shrink:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#000!important}
 .reel-main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;z-index:2!important;display:block!important;background:#000}
 .progress{position:absolute;top:0;left:0;height:2px;background:#fff;width:0%;z-index:20}
-.vBar{position:absolute!important;right:10px!important;bottom:130px!important;display:flex!important;flex-direction:column!important;gap:18px!important;align-items:center!important;z-index:15!important}
+.vBar{position:absolute!important;right:10px!important;bottom:100px!important;display:flex!important;flex-direction:column!important;gap:18px!important;align-items:center!important;z-index:15!important}
 .vBtn{display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;width:48px!important;cursor:pointer!important}
 .vBtn span{font-size:11px!important;font-weight:700!important;color:#fff!important;text-shadow:0 1px 4px rgba(0,0,0,0.9)!important}
 .vBtn svg{width:28px!important;height:28px!important;stroke:#fff!important;fill:none!important;stroke-width:1.8!important;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8))!important}
 .vBtn:active{transform:scale(0.85)}
 .vBtn.liked svg{fill:#ff3040!important;stroke:#ff3040!important}
 .vBtn.saved svg{fill:#fff!important;stroke:#fff!important}
-.vBtn.tildeBtn{background:rgba(255,255,255,0.18)!important;border:1.2px solid rgba(255,255,255,0.5)!important;border-radius:50%!important;width:36px!important;height:36px!important;display:flex!important;align-items:center!important;justify-content:center!important;backdrop-filter:blur(8px)!important}
-.vBtn.tildeBtn span{font-size:18px!important;font-weight:900!important;margin:0!important}
-.audioDiscPerusa{position:absolute!important;right:12px!important;bottom:72px!important;width:32px!important;height:32px!important;border-radius:50%!important;border:2px solid #fff!important;overflow:hidden!important;animation:spin 3.5s linear infinite!important;z-index:11!important;background:#111!important}
+/* ~ Background Remove - Audio nera - 5px gap */
+.vBtn.tildeBtn{background:transparent!important;border:none!important;backdrop-filter:none!important;box-shadow:none!important;width:36px!important;height:36px!important;margin-top:5px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.vBtn.tildeBtn span{font-size:20px!important;font-weight:900!important;color:#fff!important;text-shadow:0 2px 6px rgba(0,0,0,0.9)!important}
+.audioDiscPerusa{position:absolute!important;right:12px!important;bottom:18px!important;width:34px!important;height:34px!important;border-radius:50%!important;border:2px solid #fff!important;overflow:hidden!important;animation:spin 3.5s linear infinite!important;z-index:11!important;background:#111!important}
 .audioDiscPerusa img{width:100%!important;height:100%!important;object-fit:cover!important}
 @keyframes spin{to{transform:rotate(360deg)}}
-.btm{position:absolute!important;left:10px!important;right:82px!important;bottom:88px!important;z-index:10!important;text-shadow:0 2px 8px rgba(0,0,0,0.9)!important;display:block!important;visibility:visible!important;opacity:1!important}
+.btm{position:absolute!important;left:10px!important;right:82px!important;bottom:26px!important;z-index:10!important;text-shadow:0 2px 8px rgba(0,0,0,0.9)!important;display:block!important;visibility:visible!important;opacity:1!important}
 .reel-pfp-wrap{width:32px!important;height:32px!important;min-width:32px!important;border-radius:50%!important;overflow:hidden!important;border:1.8px solid #fff!important}
 .reel-pfp-wrap img{width:100%!important;height:100%!important;object-fit:cover}
 .reel-username{font-size:13.5px!important;font-weight:600!important;margin-left:6px!important}
@@ -32,9 +33,10 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .followBtnPerusa{background:rgba(255,255,255,0.22)!important;color:#fff!important;border:1.2px solid #fff!important;padding:7px 16px!important;border-radius:8px!important;font-weight:700!important;font-size:13px!important;margin-left:8px!important;height:32px!important;backdrop-filter:blur(8px)}
 .reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:56px;padding:0 16px;background:linear-gradient(to bottom, rgba(0,0,0,0.85), transparent)}
 .reelsTop b{color:#fff!important;font-size:24px!important;font-weight:800!important}
-.musicBar{position:absolute!important;left:10px!important;right:78px!important;bottom:62px!important;z-index:11!important;display:flex!important;align-items:center!important;gap:6px!important;overflow:hidden!important;cursor:pointer;background:rgba(0,0,0,0.35);padding:3px 8px;border-radius:10px;backdrop-filter:blur(4px)}
-.realInfo{display:none!important} /* Mela views time remove - Un sonna maari */
-.aiBadge{background:linear-gradient(90deg,#8a2be2,#ff1493);font-size:8px;padding:2px 5px;border-radius:4px;font-weight:800;color:#fff;flex-shrink:0}
+/* Killa Audio Name + AI Remove */
+.musicBar{display:none!important}
+.aiBadge{display:none!important}
+.realInfo{display:none!important}
 .hashtag{color:#00bfff!important;font-weight:700!important;cursor:pointer!important}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;width:100vw;height:52px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{color:#8e8e8e;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
@@ -74,7 +76,7 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <div class="sheet" id="tildeSheet" onclick="if(event.target==this)closeSheet('tildeSheet')"><div class="sheetBox">
 <div class="sheetHandle"></div>
 <div style="font-weight:800;text-align:center;font-size:18px">~ Controls ~</div>
-<div style="font-size:11px;color:#888;text-align:center;margin-bottom:14px">Top views removed - Bottom full visible</div>
+<div style="font-size:11px;color:#888;text-align:center;margin-bottom:14px">~ bg remove + Audio AI removed</div>
 <div id="settingsList"></div>
 <div style="display:flex;gap:10px;margin-top:16px"><button onclick="resetSettings()" style="flex:1;padding:12px;background:#222;color:#fff;border:0;border-radius:12px;font-weight:700">Reset</button><button onclick="closeSheet('tildeSheet')" style="flex:1;padding:12px;background:#fff;color:#000;border:0;border-radius:12px;font-weight:800">Done</button></div>
 </div></div>
@@ -87,27 +89,23 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
 let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set()
-let defaultSettings={aiBadge:true, hashtag:true, musicBar:true, disc:true, progress:true, followBtn:true, caption:true, likeBurst:true};
-let settings=JSON.parse(localStorage.getItem('pixoro_tilde_final')||JSON.stringify(defaultSettings));
-function saveSettings(){localStorage.setItem('pixoro_tilde_final',JSON.stringify(settings)); renderSettingsList(); applySettings();}
+let defaultSettings={caption:true, likeBurst:true, followBtn:true, disc:true, progress:true};
+let settings=JSON.parse(localStorage.getItem('pixoro_final_correct')||JSON.stringify(defaultSettings));
+function saveSettings(){localStorage.setItem('pixoro_final_correct',JSON.stringify(settings)); renderSettingsList(); applySettings();}
 function resetSettings(){settings={...defaultSettings}; saveSettings(); render();}
 function toggleSetting(k){settings[k]=!settings[k]; saveSettings();}
 function renderSettingsList(){
  let items=[
-  ['aiBadge','🤖 AI Badge','AI label'],
-  ['hashtag',' #️⃣ Hashtags','Blue #fyp'],
-  ['musicBar','🎵 Music Bar','Original audio - killa visible'],
-  ['disc','💿 Disc','Disc anim'],
-  ['progress','⏩ Progress','White bar'],
-  ['followBtn','👤 Follow','Follow btn'],
   ['caption','💬 Caption','Full visible - maraiyathu'],
+  ['followBtn','👤 Follow','Follow btn'],
+  ['disc','💿 Disc','Disc near ~ - audio nera'],
+  ['progress','⏩ Progress','White bar'],
   ['likeBurst','❤️ Heart','Double tap'],
  ];
  document.getElementById('settingsList').innerHTML=items.map(([k,l,d])=>`<div class="sheetItem"><div><div style="font-weight:600;font-size:13px">${l}</div><div style="font-size:11px;color:#777">${d}</div></div><div class="toggle ${settings[k]?'on':''}" onclick="toggleSetting('${k}')"></div></div>`).join('');
 }
 function applySettings(){
  document.querySelectorAll('.reel').forEach(reel=>{
-  let music=reel.querySelector('.musicBar'); if(music) music.style.display=settings.musicBar?'flex':'none';
   let disc=reel.querySelector('.audioDiscPerusa'); if(disc) disc.style.display=settings.disc?'block':'none';
   let prog=reel.querySelector('.progress'); if(prog) prog.style.display=settings.progress?'block':'none';
   let follow=reel.querySelector('.followBtnPerusa'); if(follow) follow.style.display=settings.followBtn?'inline-flex':'none';
@@ -115,9 +113,9 @@ function applySettings(){
  });
 }
 renderSettingsList();
-function getAICaption(p){let base=cleanUser(p.username);let caps=[`POV: ${base} on another level ✨`,`That moment when everything clicks 💯 - ${base}`];let idx=Math.abs(String(p.id).split('').reduce((a,c)=>a+c.charCodeAt(0),0))%caps.length;return caps[idx]+` #fyp #viral #pixoro #${base}`;}
+function getAICaption(p){let base=cleanUser(p.username);let caps=[`POV: ${base} on another level ✨`];let idx=Math.abs(String(p.id).split('').reduce((a,c)=>a+c.charCodeAt(0),0))%caps.length;return caps[idx]+` #fyp #viral #pixoro #${base}`;}
 function isAIcaption(txt){return !txt||txt==='Just Reels'||txt.length<5}
-function parseHashtags(text){if(!settings.hashtag) return text||''; return (text||'').replace(/#(\w+)/g,'<span class="hashtag" onclick="event.stopPropagation();openHashtag(\'$1\')\">#$1</span>')}
+function parseHashtags(text){return (text||'').replace(/#(\w+)/g,'<span class="hashtag" onclick="event.stopPropagation();openHashtag(\'$1\')\">#$1</span>')}
 function openHashtag(tag){document.getElementById('hashtagTitle').innerText='#'+tag;let filtered=allPosts.filter(p=>{let c=(p.caption||'')+' '+getAICaption(p);return c.toLowerCase().includes('#'+tag.toLowerCase())});document.getElementById('hashtagList').innerHTML=filtered.length?filtered.map(p=>`<div style="padding:10px;border-bottom:1px solid #222;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="location.href='reels.html?id=${p.id}'"><img src="${getPfp(p.username)}" style="width:40px;height:40px;border-radius:8px;object-fit:cover"><div><b>${cleanUser(p.username)}</b></div></div>`).join(''):'<div style="text-align:center;padding:20px;color:#888">No reels for #'+tag+'</div>';document.getElementById('hashtagSheet').classList.add('show')}
 function showCenter(reel,isPaused){let c=reel.querySelector('.centerCtrl');if(!c) return;c.innerHTML='<div class="centerIcon">'+(isPaused?'<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="#fff"/></svg>':'<svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z" fill="#fff"/></svg>')+'</div>';c.classList.add('show'); setTimeout(()=>c.classList.remove('show'),900);}
 async function waitSupa(){for(let i=0;i<50;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,200))}return window.supa}
@@ -153,8 +151,7 @@ return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div c
 <div class="vBtn tildeBtn" onclick="event.stopPropagation();openTildeSheet()"><span>~</span></div>
 </div>
 <div class="audioDiscPerusa"><img src="${getPfp(p.username)}"></div>
-<div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div class="reel-caption">${settings.aiBadge&&aiCap?`<span class="aiBadge">AI</span>`:''}<span>${parsedCaption}</span></div></div>
-<div class="musicBar"><svg viewBox="0 0 24 24" width="12" height="12" fill="#fff"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg><div style="overflow:hidden;flex:1"><span class="musicScroll">🎵 Original audio • ${cleanUser(p.username)}</span></div></div>
+<div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div class="reel-caption"><span>${parsedCaption}</span></div></div>
 </div>`
 }).join('');observe(); setTimeout(applySettings,100)}
 function observe(){
