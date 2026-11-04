@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Pixoro Reels - Audio Neratha 15px</title>
+<title>Pixoro Reels - 18px Uniform Gap</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
 <style>
@@ -12,18 +12,18 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .reel{width:100vw!important;height:100dvh!important;flex-shrink:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#000!important}
 .reel-main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;z-index:2!important;display:block!important;background:#000}
 .progress{position:absolute;top:0;left:0;height:2px;background:#fff;width:0%;z-index:20}
-.vBar{position:absolute!important;right:10px!important;bottom:72px!important;display:flex!important;flex-direction:column!important;gap:15px!important;align-items:center!important;z-index:15!important}
+.vBar{position:absolute!important;right:10px!important;bottom:68px!important;display:flex!important;flex-direction:column!important;gap:18px!important;align-items:center!important;z-index:15!important}
 .vBtn{display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;width:48px!important;cursor:pointer!important}
 .vBtn span{font-size:11px!important;font-weight:700!important;color:#fff!important;text-shadow:0 1px 4px rgba(0,0,0,0.9)!important}
 .vBtn svg{width:28px!important;height:28px!important;stroke:#fff!important;fill:none!important;stroke-width:1.8!important;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8))!important}
 .vBtn:active{transform:scale(0.85)}
 .vBtn.liked svg{fill:#ff3040!important;stroke:#ff3040!important}
 .vBtn.saved svg{fill:#fff!important;stroke:#fff!important}
-.vBtn.tildeBtn{background:transparent!important;border:none!important;backdrop-filter:none!important;box-shadow:none!important;width:36px!important;height:36px!important;margin-top:15px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.vBtn.tildeBtn{background:transparent!important;border:none!important;backdrop-filter:none!important;box-shadow:none!important;width:36px!important;height:36px!important;display:flex!important;align-items:center!important;justify-content:center!important}
 .vBtn.tildeBtn span{font-size:20px!important;font-weight:900!important;color:#fff!important;text-shadow:0 2px 6px rgba(0,0,0,0.9)!important}
 .audioDiscInBar{width:34px!important;height:34px!important;border-radius:50%!important;border:2px solid #fff!important;overflow:hidden!important;animation:spin 3.5s linear infinite!important;background:#111!important;flex-shrink:0!important}
 .audioDiscInBar img{width:100%!important;height:100%!important;object-fit:cover!important}
-.audioWrap{margin-top:15px!important;display:flex!important;flex-direction:column!important;align-items:center!important}
+.audioWrap{display:flex!important;flex-direction:column!important;align-items:center!important}
 @keyframes spin{to{transform:rotate(360deg)}}
 .btm{position:absolute!important;left:10px!important;right:82px!important;bottom:62px!important;z-index:10!important;text-shadow:0 2px 8px rgba(0,0,0,0.9)!important}
 .reel-pfp-wrap{width:32px!important;height:32px!important;min-width:32px!important;border-radius:50%!important;overflow:hidden!important;border:1.8px solid #fff!important}
@@ -80,7 +80,7 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <div class="sheet" id="tildeSheet" onclick="if(event.target==this)closeSheet('tildeSheet')"><div class="sheetBox">
 <div class="sheetHandle"></div>
 <div style="font-weight:800;text-align:center;font-size:18px">~ Controls ~</div>
-<div style="font-size:11px;color:#888;text-align:center;margin-bottom:14px">Audio neratha 15px gap</div>
+<div style="font-size:11px;color:#888;text-align:center;margin-bottom:14px">18px uniform gap - Audio ~ same</div>
 <div id="settingsList"></div>
 <div style="display:flex;gap:10px;margin-top:16px"><button onclick="resetSettings()" style="flex:1;padding:12px;background:#222;color:#fff;border:0;border-radius:12px;font-weight:700">Reset</button><button onclick="closeSheet('tildeSheet')" style="flex:1;padding:12px;background:#fff;color:#000;border:0;border-radius:12px;font-weight:800">Done</button></div>
 </div></div>
@@ -94,16 +94,16 @@ let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
 let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set()
 let defaultSettings={caption:true, likeBurst:true, followBtn:true, disc:true, progress:true, musicBar:true};
-let settings=JSON.parse(localStorage.getItem('pixoro_15px_audio_neratha')||JSON.stringify(defaultSettings));
-function saveSettings(){localStorage.setItem('pixoro_15px_audio_neratha',JSON.stringify(settings)); renderSettingsList(); applySettings();}
+let settings=JSON.parse(localStorage.getItem('pixoro_18px_uniform')||JSON.stringify(defaultSettings));
+function saveSettings(){localStorage.setItem('pixoro_18px_uniform',JSON.stringify(settings)); renderSettingsList(); applySettings();}
 function resetSettings(){settings={...defaultSettings}; saveSettings(); render();}
 function toggleSetting(k){settings[k]=!settings[k]; saveSettings();}
 function renderSettingsList(){
  let items=[
-  ['musicBar','🎵 Audio - Neratha 15px','Like Comment Share Save ku neratha'],
+  ['musicBar','🎵 Audio - 18px uniform','Like Comment Share Save ~ Audio same gap'],
   ['caption','💬 Caption - Visible','POV cut aagathu'],
   ['followBtn','👤 Follow','Follow btn'],
-  ['disc','💿 Disc - Audio','Audio disc 15px gap'],
+  ['disc','💿 Disc - Audio','Audio 18px gap'],
   ['progress','⏩ Progress','White bar'],
   ['likeBurst','❤️ Heart','Double tap'],
  ];
