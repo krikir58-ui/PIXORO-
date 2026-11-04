@@ -76,7 +76,6 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
 <a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a>
 </div>
-
 <div class="sheet" id="tildeSheet" onclick="if(event.target==this)closeSheet('tildeSheet')"><div class="sheetBox">
 <div class="sheetHandle"></div>
 <div style="font-weight:800;text-align:center;font-size:18px">~ Controls ~</div>
@@ -86,11 +85,9 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <div id="settingsList"></div>
 <div style="display:flex;gap:10px;margin-top:16px"><button onclick="resetSettings()" style="flex:1;padding:12px;background:#222;color:#fff;border:0;border-radius:12px;font-weight:700">Reset</button><button onclick="closeSheet('tildeSheet')" style="flex:1;padding:12px;background:#fff;color:#000;border:0;border-radius:12px;font-weight:800">Done</button></div>
 </div></div>
-
 <div class="sheet" id="commentSheet" onclick="if(event.target==this)closeSheet('commentSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div style="font-weight:700;text-align:center;margin-bottom:12px">Comments</div><div id="commentList" style="overflow-y:auto;flex:1;max-height:45vh"></div><div style="display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #222;margin-top:10px"><input id="commentInput" style="flex:1;background:#1e1e1e;border:1px solid #333;border-radius:20px;padding:10px 14px;color:#fff;outline:none" placeholder="Add a comment..."><button onclick="postComment()" style="background:#fff;color:#000;border:0;border-radius:20px;padding:10px 18px;font-weight:800">Post</button></div></div></div>
 <div class="sheet" id="shareSheet" onclick="if(event.target==this)closeSheet('shareSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div style="font-weight:700;text-align:center;margin-bottom:12px">Share</div><div class="sheetItem" onclick="copyLink()">📋 Copy Link</div><div class="sheetItem" onclick="shareWhatsApp()">💚 WhatsApp</div></div></div>
 <div class="sheet" id="hashtagSheet" onclick="if(event.target==this)closeSheet('hashtagSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div style="font-weight:700;text-align:center;margin-bottom:12px" id="hashtagTitle">#hashtag</div><div id="hashtagList" style="overflow-y:auto;max-height:50vh"></div><div class="sheetItem" onclick="closeSheet('hashtagSheet')">❌ Close</div></div></div>
-
 <script>
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
@@ -101,25 +98,10 @@ function saveSettings(){localStorage.setItem('pixoro_secret_20px',JSON.stringify
 function resetSettings(){settings={...defaultSettings}; saveSettings(); render();}
 function toggleSetting(k){settings[k]=!settings[k]; saveSettings();}
 function renderSettingsList(){
- let items=[
-  ['musicBar','🎵 Audio','Audio control'],
-  ['caption','💬 Caption','POV caption'],
-  ['followBtn','👤 Follow','Follow button'],
-  ['disc','💿 Disc','Audio disc'],
-  ['progress','⏩ Progress','Bar'],
-  ['likeBurst','❤️ Heart','Double tap'],
- ];
+ let items=[['musicBar','🎵 Audio','Audio control'],['caption','💬 Caption','POV caption'],['followBtn','👤 Follow','Follow button'],['disc','💿 Disc','Audio disc'],['progress','⏩ Progress','Bar'],['likeBurst','❤️ Heart','Double tap']];
  document.getElementById('settingsList').innerHTML=items.map(([k,l,d])=>`<div class="sheetItem"><div><div style="font-weight:600;font-size:13px">${l}</div><div style="font-size:11px;color:#777">${d}</div></div><div class="toggle ${settings[k]?'on':''}" onclick="toggleSetting('${k}')"></div></div>`).join('');
 }
-function applySettings(){
- document.querySelectorAll('.reel').forEach(reel=>{
-  let music=reel.querySelector('.musicBar'); if(music) music.style.display=settings.musicBar?'flex':'none';
-  let disc=reel.querySelector('.audioWrap'); if(disc) disc.style.display=settings.disc?'flex':'none';
-  let prog=reel.querySelector('.progress'); if(prog) prog.style.display=settings.progress?'block':'none';
-  let follow=reel.querySelector('.followBtnPerusa'); if(follow) follow.style.display=settings.followBtn?'inline-flex':'none';
-  let cap=reel.querySelector('.reel-caption'); if(cap) cap.style.display=settings.caption?'block':'none';
- });
-}
+function applySettings(){document.querySelectorAll('.reel').forEach(reel=>{let music=reel.querySelector('.musicBar'); if(music) music.style.display=settings.musicBar?'flex':'none';let disc=reel.querySelector('.audioWrap'); if(disc) disc.style.display=settings.disc?'flex':'none';let prog=reel.querySelector('.progress'); if(prog) prog.style.display=settings.progress?'block':'none';let follow=reel.querySelector('.followBtnPerusa'); if(follow) follow.style.display=settings.followBtn?'inline-flex':'none';let cap=reel.querySelector('.reel-caption'); if(cap) cap.style.display=settings.caption?'block':'none';});}
 renderSettingsList();
 function getAICaption(p){let base=cleanUser(p.username);let caps=[`POV: ${base} on another level ✨`];let idx=Math.abs(String(p.id).split('').reduce((a,c)=>a+c.charCodeAt(0),0))%caps.length;return caps[idx]+` #fyp #viral #pixoro #${base}`;}
 function isAIcaption(txt){return !txt||txt==='Just Reels'||txt.length<5}
@@ -146,11 +128,8 @@ let mUrl=p.media_url||p.image_url||p.video_url||'';
 let isVid=mUrl.toLowerCase().includes('.mp4')||p.media_type=='video';
 let media=isVid?`<video class="reel-main" src="${mUrl}" playsinline preload="auto" loop muted autoplay></video>`:`<img class="reel-main" src="${mUrl}">`;
 let followBtn=isMine?`<span class="followBtnPerusa" style="border:0;background:rgba(255,255,255,0.2)!important">You</span>`:`<button id="followBtn-${p.id}" class="followBtnPerusa" onclick="event.stopPropagation();toggleF('${p.user_id}','${p.id}')">${isFollow?'Following':'Follow'}</button>`;
-let likeCount = lc>0?lc:'';
-let commentCount = allComments.filter(c=>String(c.post_id)==String(p.id)).length;
-let aiCap=isAIcaption(p.caption);
-let finalCaption=aiCap?getAICaption(p):(p.caption||'Just Reels');
-let parsedCaption=parseHashtags(finalCaption);
+let likeCount = lc>0?lc:''; let commentCount = allComments.filter(c=>String(c.post_id)==String(p.id)).length;
+let aiCap=isAIcaption(p.caption); let finalCaption=aiCap?getAICaption(p):(p.caption||'Just Reels'); let parsedCaption=parseHashtags(finalCaption);
 return `<div class="reel" data-id="${p.id}" data-uid="${p.user_id}" data-un="${cleanUser(p.username)}" onclick="handleReelTap(this)"><div class="progress"></div>${media}<div class="heartBurst"></div><div class="centerCtrl"></div>
 <div class="vBar">
 <div class="vBtn ${liked?'liked':''}" id="likeBtn-${p.id}" style="display:${settings.hideLike?'none':'flex'}" onclick="event.stopPropagation();toggleLike('${p.id}')"><svg id="likeSvg-${p.id}" viewBox="0 0 24 24" width="28" height="28" fill="${liked?'#ff3040':'none'}" stroke="${liked?'#ff3040':'#fff'}" stroke-width="1.8"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg><span id="likeCnt-${p.id}">${likeCount}</span></div>
@@ -164,74 +143,41 @@ return `<div class="reel" data-id="${p.id}" data-uid="${p.user_id}" data-un="${c
 <div class="musicBar"><span style="font-size:11px">🎵 ${cleanUser(p.username)} • Original audio</span></div>
 </div>`
 }).join('');observe(); setTimeout(applySettings,100)}
-function observe(){
-let reels=document.querySelectorAll('.reel-main');
-let io=new IntersectionObserver(entries=>{
-entries.forEach(e=>{
-let v=e.target;if(v.tagName!='VIDEO')return;
-let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;
-if(e.isIntersecting){
-document.querySelectorAll('.reel-main').forEach(o=>{if(o!==v&&o.tagName=='VIDEO')o.pause()});
-v.muted=globalMuted;currentVideo=v;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})});
-if(prog){v.addEventListener('timeupdate',()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'})}
-setTimeout(()=>{if(e.isIntersecting) addRealView(reel.dataset.id)},1000);
-}else{v.pause()}
-})
-},{threshold:0.6});
-reels.forEach(v=>{if(v.tagName=='VIDEO')io.observe(v)})
-}
+function observe(){let reels=document.querySelectorAll('.reel-main');let io=new IntersectionObserver(entries=>{entries.forEach(e=>{let v=e.target;if(v.tagName!='VIDEO')return;let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;if(e.isIntersecting){document.querySelectorAll('.reel-main').forEach(o=>{if(o!==v&&o.tagName=='VIDEO')o.pause()});v.muted=globalMuted;currentVideo=v;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})});if(prog){v.addEventListener('timeupdate',()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'})}setTimeout(()=>{if(e.isIntersecting) addRealView(reel.dataset.id)},1000);}else{v.pause()}})}, {threshold:0.6}); reels.forEach(v=>{if(v.tagName=='VIDEO')io.observe(v)})}
 function handleReelTap(el){let now=Date.now();if(now-lastTap<300){clearTimeout(tapTimer);lastTap=0;dblLike(el.dataset.id);return}lastTap=now;tapTimer=setTimeout(()=>{let v=el.querySelector('.reel-main');if(v&&v.tagName=='VIDEO'){if(v.paused){v.muted=false;globalMuted=false;currentVideo=v;v.play();showCenter(el,false)}else{v.pause();showCenter(el,true)}}lastTap=0},300)}
 async function dblLike(id){let reel=document.querySelector(`.reel[data-id="${id}"]`);let b=reel?reel.querySelector('.heartBurst'):null;if(b && settings.likeBurst){b.classList.remove('show');void b.offsetWidth;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1150)}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);try{await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}catch(e){}}}
 async function toggleLike(id){let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).then(()=>{}).catch(()=>{});}else{allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID)));updateLikeUI(id,false);supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}).catch(()=>{});}}
 function updateLikeUI(id,liked){let btn=document.getElementById('likeBtn-'+id);let svg=document.getElementById('likeSvg-'+id);let cnt=document.getElementById('likeCnt-'+id);if(btn){if(liked)btn.classList.add('liked');else btn.classList.remove('liked')}if(svg){svg.setAttribute('fill',liked?'#ff3040':'none');svg.setAttribute('stroke',liked?'#ff3040':'#fff');}if(cnt){let n=allLikes.filter(l=>String(l.post_id)==String(id)).length;cnt.innerText=n>0?n:''}}
-
 function openTildeSheet(postId, userId, username){
- curTildePost=postId;
- let isMine = String(userId)===String(ME_ID) || cleanUser(username)===cleanUser(ME_RAW);
- let ownerDiv=document.getElementById('ownerControls');
- let secretDiv=document.getElementById('secretControls');
- let sub=document.getElementById('controlSub');
- if(isMine){
-  sub.innerText='Namba patha - Owner mode';
-  ownerDiv.innerHTML=`
-   <div style="font-size:12px;color:#888;margin:8px 0 4px">OWNER - Namba reels</div>
+ curTildePost=postId; let isMine = String(userId)===String(ME_ID) || cleanUser(username)===cleanUser(ME_RAW);
+ let ownerDiv=document.getElementById('ownerControls'); let secretDiv=document.getElementById('secretControls'); let sub=document.getElementById('controlSub');
+ if(isMine){sub.innerText='Namba patha - Owner mode';
+  ownerDiv.innerHTML=`<div style="font-size:12px;color:#888;margin:8px 0 4px">OWNER - Namba reels</div>
    <div class="secretOpt" onclick="editReel('${postId}')"><span>✏️</span><div><div style="font-weight:600;font-size:13px">Edit Reel</div><div style="font-size:11px;color:#777">Caption edit pannu</div></div></div>
    <div class="secretOpt"><div><div style="font-weight:600;font-size:13px">Hide Like</div><div style="font-size:11px;color:#777">Like hide - varavunga paakamatanga</div></div><div class="toggle ${settings.hideLike?'on':''}" onclick="toggleSetting('hideLike')"></div></div>
    <div class="secretOpt"><div><div style="font-weight:600;font-size:13px">Hide Comment</div><div style="font-size:11px;color:#777">Comment hide</div></div><div class="toggle ${settings.hideComment?'on':''}" onclick="toggleSetting('hideComment')"></div></div>
    <div class="secretOpt"><div><div style="font-weight:600;font-size:13px">Hide Share / Save</div><div style="font-size:11px;color:#777">Share save hide</div></div><div class="toggle ${(settings.hideShare||settings.hideSave)?'on':''}" onclick="toggleSetting('hideShare');toggleSetting('hideSave')"></div></div>
-   <div class="secretOpt" onclick="deleteReel('${postId}')"><span>🗑️</span><div><div style="font-weight:600;font-size:13px;color:#ff4444">Delete Reel</div><div style="font-size:11px;color:#777">Permanent delete</div></div></div>
-  `;
-  secretDiv.innerHTML=`
-   <div style="font-size:12px;color:#888;margin:12px 0 4px">Viewers - Enoda reels pathavanga</div>
+   <div class="secretOpt" onclick="deleteReel('${postId}')"><span>🗑️</span><div><div style="font-weight:600;font-size:13px;color:#ff4444">Delete Reel</div><div style="font-size:11px;color:#777">Permanent delete</div></div></div>`;
+  secretDiv.innerHTML=`<div style="font-size:12px;color:#888;margin:12px 0 4px">Viewers - Enoda reels pathavanga</div>
    <div class="secretOpt" onclick="viewViewers('${postId}')"><span>👁️</span><div><div style="font-weight:600;font-size:13px">Viewed List</div><div style="font-size:11px;color:#777">Yaar paathanga - secret</div></div></div>
-   <div class="secretOpt" onclick="blockViewerList('${postId}')"><span>🚫</span><div><div style="font-weight:600;font-size:13px">Block Viewers</div><div style="font-size:11px;color:#777">Pathavangala block - no alert</div></div></div>
-  `;
- } else {
-  sub.innerText='Secret - No alert';
-  ownerDiv.innerHTML='';
-  secretDiv.innerHTML=`
-   <div style="font-size:12px;color:#888;margin:8px 0 4px">Secret - ${username} - No alert</div>
+   <div class="secretOpt" onclick="blockViewerList('${postId}')"><span>🚫</span><div><div style="font-weight:600;font-size:13px">Block Viewers</div><div style="font-size:11px;color:#777">Pathavangala block - no alert</div></div></div>`;
+ } else {sub.innerText='Secret - No alert'; ownerDiv.innerHTML='';
+  secretDiv.innerHTML=`<div style="font-size:12px;color:#888;margin:8px 0 4px">Secret - ${username} - No alert</div>
    <div class="secretOpt" onclick="secretBlock('${userId}','${username}')"><span>🚫</span><div><div style="font-weight:600;font-size:13px">Block - Secret</div><div style="font-size:11px;color:#777">Block - avanuku alert varathu</div></div></div>
    <div class="secretOpt" onclick="secretHide('${postId}')"><span>🙈</span><div><div style="font-weight:600;font-size:13px">Hide Reel - Secret</div><div style="font-size:11px;color:#777">Itha hide - unaku mattum</div></div></div>
    <div class="secretOpt" onclick="secretReport('${postId}','${username}')"><span>🚩</span><div><div style="font-weight:600;font-size:13px">Report - Secret</div><div style="font-size:11px;color:#777">Report - no alert - secret</div></div></div>
    <div class="secretOpt" onclick="secretNotInterested('${postId}')"><span>💤</span><div><div style="font-weight:600;font-size:13px">Not Interested</div><div style="font-size:11px;color:#777">Intha maari vara koodathu</div></div></div>
-   <div class="secretOpt" onclick="secretMuteUser('${userId}','${username}')"><span>🔇</span><div><div style="font-weight:600;font-size:13px">Mute User - Secret</div><div style="font-size:11px;color:#777">Avan reels vara koodathu - secret</div></div></div>
-  `;
- }
- renderSettingsList();
- document.getElementById('tildeSheet').classList.add('show');
-}
-
-function secretBlock(uid, un){ blockedUsers.push(String(uid)); localStorage.setItem('pixoro_blocked',JSON.stringify(blockedUsers)); closeSheet('tildeSheet'); setTimeout(()=>{render();},300); }
+   <div class="secretOpt" onclick="secretMuteUser('${userId}','${username}')"><span>🔇</span><div><div style="font-weight:600;font-size:13px">Mute User - Secret</div><div style="font-size:11px;color:#777">Avan reels vara koodathu - secret</div></div></div>`;}
+ renderSettingsList(); document.getElementById('tildeSheet').classList.add('show');}
+function secretBlock(uid){ blockedUsers.push(String(uid)); localStorage.setItem('pixoro_blocked',JSON.stringify(blockedUsers)); closeSheet('tildeSheet'); setTimeout(()=>{render();},300); }
 function secretHide(pid){ hiddenPosts.push(String(pid)); localStorage.setItem('pixoro_hidden',JSON.stringify(hiddenPosts)); closeSheet('tildeSheet'); setTimeout(()=>{render();},300); }
 function secretReport(pid, un){ let reports=JSON.parse(localStorage.getItem('pixoro_reports')||'[]'); reports.push({postId:pid, username:un, time:Date.now()}); localStorage.setItem('pixoro_reports',JSON.stringify(reports)); closeSheet('tildeSheet'); }
 function secretNotInterested(pid){ secretHide(pid); }
-function secretMuteUser(uid, un){ secretBlock(uid, un); }
+function secretMuteUser(uid){ secretBlock(uid); }
 function viewViewers(pid){ let vcount=allViews.filter(v=>String(v.post_id)==String(pid)).length; alert('Viewers: '+vcount); }
 function blockViewerList(pid){ let viewers=[...new Set(allViews.filter(v=>String(v.post_id)==String(pid)).map(v=>String(v.user_id)))]; viewers.forEach(uid=>{ if(!blockedUsers.includes(uid)) blockedUsers.push(uid); }); localStorage.setItem('pixoro_blocked',JSON.stringify(blockedUsers)); closeSheet('tildeSheet'); setTimeout(()=>render(),300); }
 function editReel(pid){ location.href='edit.html?id='+pid; }
 async function deleteReel(pid){ if(confirm('Delete?')){ allPosts=allPosts.filter(p=>String(p.id)!=String(pid)); render(); try{await supa.from('posts').delete().eq('id',pid)}catch(e){} closeSheet('tildeSheet'); } }
-
 async function saveR(id){let isSaved=allSaves.some(x=>String(x.post_id)==String(id)&&String(x.user_id)==String(ME_ID));let btn=document.getElementById('saveBtn-'+id);let svg=document.getElementById('saveSvg-'+id);if(isSaved){allSaves=allSaves.filter(x=>!(String(x.post_id)==String(id)&&String(x.user_id)==String(ME_ID)));if(btn)btn.classList.remove('saved');if(svg)svg.setAttribute('fill','none');supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}).catch(()=>{});}else{allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW});if(btn)btn.classList.add('saved');if(svg)svg.setAttribute('fill','#fff');supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).then(()=>{}).catch(()=>{});}}
 async function toggleF(uid,pid){if(!uid||String(uid)==String(ME_ID))return;let isF=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid));document.querySelectorAll('[id^="followBtn-"]').forEach(b=>{let bid=b.id.replace('followBtn-','');let pp=allPosts.find(x=>String(x.id)==String(bid));if(pp&&String(pp.user_id)==String(uid))b.innerText=isF?'Follow':'Following'});if(isF){allFollows=allFollows.filter(f=>!(String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid)));try{await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',uid)}catch(e){}}else{allFollows.push({follower_id:ME_ID,following_id:uid});try{await supa.from('follows').insert({follower_id:ME_ID,following_id:uid})}catch(e){}}}
 function openCommentSheet(pid){curCommentPost=pid;let list=allComments.filter(c=>String(c.post_id)==String(pid));document.getElementById('commentList').innerHTML=list.length?list.map(c=>{let isMyC=String(c.user_id)==String(ME_ID)||cleanUser(c.username)==cleanUser(ME_RAW);return `<div class="cRow"><div><b>${cleanUser(c.username)}</b> <span style="font-size:13px;color:#ddd"> ${c.text||''}</span></div>${isMyC?`<span class="del" onclick="deleteComment('${c.id}','${pid}')">Delete</span>`:''}</div>`}).join(''):'<div style="text-align:center;color:#888;padding:20px">No comments yet</div>';document.getElementById('commentSheet').classList.add('show');}
