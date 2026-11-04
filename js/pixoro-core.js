@@ -1,8 +1,8 @@
 // ===== PIXORO MAIN - Correct File da =====
 // SUPA_URL / SUPA_KEY - Unakku theriyum la - Atha Inga Podu da - Chat la Anuppatha da
 
-const SUPA_URL = 'YOUR_SUPA_URL_HERE';
-const SUPA_KEY = 'YOUR_SUPA_KEY_HERE';
+const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
+const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 
 if(!window.supa && window.supabase && window.supabase.createClient){
   window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
