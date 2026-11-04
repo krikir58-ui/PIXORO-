@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Pixoro Reels - Killa Visible + Search</title>
+<title>Pixoro Reels - 2px Gap + Search Top</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
 <style>
@@ -12,29 +12,31 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .reel{width:100vw!important;height:100dvh!important;flex-shrink:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#000!important}
 .reel-main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;z-index:2!important;display:block!important;background:#000}
 .progress{position:absolute;top:0;left:0;height:2px;background:#fff;width:0%;z-index:20}
-.vBar{position:absolute!important;right:10px!important;bottom:110px!important;display:flex!important;flex-direction:column!important;gap:18px!important;align-items:center!important;z-index:15!important}
+.vBar{position:absolute!important;right:10px!important;bottom:95px!important;display:flex!important;flex-direction:column!important;gap:14px!important;align-items:center!important;z-index:15!important}
 .vBtn{display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;width:48px!important;cursor:pointer!important}
 .vBtn span{font-size:11px!important;font-weight:700!important;color:#fff!important;text-shadow:0 1px 4px rgba(0,0,0,0.9)!important}
 .vBtn svg{width:28px!important;height:28px!important;stroke:#fff!important;fill:none!important;stroke-width:1.8!important;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8))!important}
 .vBtn:active{transform:scale(0.85)}
 .vBtn.liked svg{fill:#ff3040!important;stroke:#ff3040!important}
 .vBtn.saved svg{fill:#fff!important;stroke:#fff!important}
-.vBtn.tildeBtn{background:transparent!important;border:none!important;backdrop-filter:none!important;box-shadow:none!important;width:36px!important;height:36px!important;margin-top:5px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.vBtn.tildeBtn{background:transparent!important;border:none!important;backdrop-filter:none!important;box-shadow:none!important;width:36px!important;height:36px!important;margin-top:2px!important;display:flex!important;align-items:center!important;justify-content:center!important}
 .vBtn.tildeBtn span{font-size:20px!important;font-weight:900!important;color:#fff!important;text-shadow:0 2px 6px rgba(0,0,0,0.9)!important}
-.audioDiscPerusa{position:absolute!important;right:12px!important;bottom:68px!important;width:32px!important;height:32px!important;border-radius:50%!important;border:2px solid #fff!important;overflow:hidden!important;animation:spin 3.5s linear infinite!important;z-index:12!important;background:#111!important}
+.audioDiscPerusa{position:absolute!important;right:12px!important;bottom:16px!important;width:34px!important;height:34px!important;border-radius:50%!important;border:2px solid #fff!important;overflow:hidden!important;animation:spin 3.5s linear infinite!important;z-index:12!important;background:#111!important}
 .audioDiscPerusa img{width:100%!important;height:100%!important;object-fit:cover!important}
 @keyframes spin{to{transform:rotate(360deg)}}
-.btm{position:absolute!important;left:10px!important;right:82px!important;bottom:68px!important;z-index:10!important;text-shadow:0 2px 8px rgba(0,0,0,0.9)!important;display:block!important}
+.btm{position:absolute!important;left:10px!important;right:82px!important;bottom:58px!important;z-index:10!important;text-shadow:0 2px 8px rgba(0,0,0,0.9)!important}
 .reel-pfp-wrap{width:32px!important;height:32px!important;min-width:32px!important;border-radius:50%!important;overflow:hidden!important;border:1.8px solid #fff!important}
 .reel-pfp-wrap img{width:100%!important;height:100%!important;object-fit:cover}
 .reel-username{font-size:13.5px!important;font-weight:600!important;margin-left:6px!important}
-.reel-caption{margin-top:6px!important;font-size:12.5px!important;color:#ddd!important;line-height:1.3;display:block!important;max-height:46px!important;overflow:hidden!important}
+.reel-caption{margin-top:6px!important;font-size:12px!important;color:#ddd!important;line-height:1.3;display:block!important;max-height:38px!important;overflow:hidden!important}
 .followBtnPerusa{background:rgba(255,255,255,0.22)!important;color:#fff!important;border:1.2px solid #fff!important;padding:7px 16px!important;border-radius:8px!important;font-weight:700!important;font-size:13px!important;margin-left:8px!important;height:32px!important;backdrop-filter:blur(8px)}
 .reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:56px;padding:0 16px;background:linear-gradient(to bottom, rgba(0,0,0,0.85), transparent)}
 .reelsTop b{color:#fff!important;font-size:24px!important;font-weight:800!important}
-/* Audio + Search mella - Killa visible */
-.musicBar{position:absolute!important;left:10px!important;right:82px!important;bottom:18px!important;z-index:11!important;display:flex!important;align-items:center!important;gap:8px!important;background:rgba(0,0,0,0.5)!important;padding:6px 12px!important;border-radius:16px!important;backdrop-filter:blur(8px)!important;border:1px solid rgba(255,255,255,0.18)!important}
-.musicBar .searchBtnMella{width:28px!important;height:28px!important;background:rgba(255,255,255,0.15)!important;border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;border:1px solid rgba(255,255,255,0.2)!important;flex-shrink:0!important}
+.topRight{display:flex!important;gap:12px!important;align-items:center!important}
+/* Mute + Search - No background - Transparent */
+.volBtn,.searchTopBtn{background:transparent!important;border:none!important;backdrop-filter:none!important;box-shadow:none!important;width:28px!important;height:28px!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important}
+.volBtn svg,.searchTopBtn svg{filter:drop-shadow(0 2px 4px rgba(0,0,0,0.8))!important}
+.musicBar{position:absolute!important;left:10px!important;right:82px!important;bottom:16px!important;z-index:11!important;display:flex!important;align-items:center!important;gap:6px!important;background:rgba(0,0,0,0.5)!important;padding:5px 10px!important;border-radius:14px!important;backdrop-filter:blur(6px)!important;border:1px solid rgba(255,255,255,0.15)!important}
 .realInfo{display:none!important}
 .aiBadge{display:none!important}
 .hashtag{color:#00bfff!important;font-weight:700!important;cursor:pointer!important}
@@ -63,7 +65,10 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .cRow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #252525}
 .cRow .del{color:#ff3040;font-size:12px;font-weight:700;cursor:pointer}
 </style></head><body>
-<div class="reelsTop"><b>Reels</b><div class="topRight"><div class="volBtn" id="volIcon" onclick="toggleMuteAll()" style="width:28px;height:28px;background:rgba(0,0,0,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;border:1px solid rgba(255,255,255,0.3)">🔊</div></div></div>
+<div class="reelsTop"><b>Reels</b><div class="topRight">
+<div class="searchTopBtn" onclick="location.href='search.html'"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg></div>
+<div class="volBtn" id="volIcon" onclick="toggleMuteAll()"><svg id="volSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></div>
+</div></div>
 <div class="reelWrap" id="reelWrap"></div>
 <div class="bottom-nav">
 <a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
@@ -76,7 +81,7 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <div class="sheet" id="tildeSheet" onclick="if(event.target==this)closeSheet('tildeSheet')"><div class="sheetBox">
 <div class="sheetHandle"></div>
 <div style="font-weight:800;text-align:center;font-size:18px">~ Controls ~</div>
-<div style="font-size:11px;color:#888;text-align:center;margin-bottom:14px">Killa visible + Audio + Search near audio</div>
+<div style="font-size:11px;color:#888;text-align:center;margin-bottom:14px">2px gap + Audio nera + Search top no bg</div>
 <div id="settingsList"></div>
 <div style="display:flex;gap:10px;margin-top:16px"><button onclick="resetSettings()" style="flex:1;padding:12px;background:#222;color:#fff;border:0;border-radius:12px;font-weight:700">Reset</button><button onclick="closeSheet('tildeSheet')" style="flex:1;padding:12px;background:#fff;color:#000;border:0;border-radius:12px;font-weight:800">Done</button></div>
 </div></div>
@@ -90,16 +95,16 @@ let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
 let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set()
 let defaultSettings={caption:true, likeBurst:true, followBtn:true, disc:true, progress:true, musicBar:true};
-let settings=JSON.parse(localStorage.getItem('pixoro_killa_visible')||JSON.stringify(defaultSettings));
-function saveSettings(){localStorage.setItem('pixoro_killa_visible',JSON.stringify(settings)); renderSettingsList(); applySettings();}
+let settings=JSON.parse(localStorage.getItem('pixoro_2px_top_search')||JSON.stringify(defaultSettings));
+function saveSettings(){localStorage.setItem('pixoro_2px_top_search',JSON.stringify(settings)); renderSettingsList(); applySettings();}
 function resetSettings(){settings={...defaultSettings}; saveSettings(); render();}
 function toggleSetting(k){settings[k]=!settings[k]; saveSettings();}
 function renderSettingsList(){
  let items=[
-  ['musicBar','🎵 Audio + Search','Mella audio pakkathula search'],
-  ['caption','💬 Caption','POV #fyp - Killa visible - Cut aagathu'],
+  ['musicBar','🎵 Audio - Ore nera','Audio disc nera - mella'],
+  ['caption','💬 Caption','POV #fyp - visible'],
   ['followBtn','👤 Follow','Follow btn'],
-  ['disc','💿 Disc','Disc - audio nera'],
+  ['disc','💿 Disc','Disc + ~ 2px gap'],
   ['progress','⏩ Progress','White bar'],
   ['likeBurst','❤️ Heart','Double tap'],
  ];
@@ -154,7 +159,7 @@ return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div c
 </div>
 <div class="audioDiscPerusa"><img src="${getPfp(p.username)}"></div>
 <div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div class="reel-caption"><span>${parsedCaption}</span></div></div>
-<div class="musicBar"><div class="searchBtnMella" onclick="event.stopPropagation();location.href='search.html'"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg></div><div style="overflow:hidden;flex:1"><span style="font-size:11px;color:#fff;white-space:nowrap">🔍 Search • 🎵 ${cleanUser(p.username)}</span></div></div>
+<div class="musicBar"><span style="font-size:11px">🎵 ${cleanUser(p.username)} • Original audio</span></div>
 </div>`
 }).join('');observe(); setTimeout(applySettings,100)}
 function observe(){
@@ -187,6 +192,6 @@ async function deleteComment(cid,pid){allComments=allComments.filter(c=>String(c
 function openShareSheet(pid){curShareId=pid;document.getElementById('shareSheet').classList.add('show')}
 function copyLink(){let link=location.origin+'/reels.html?id='+curShareId;navigator.clipboard.writeText(link);alert('Link copied!');closeSheet('shareSheet')}
 function shareWhatsApp(){let link=location.origin+'/reels.html?id='+curShareId;window.open('https://wa.me/?text='+encodeURIComponent(link),'_blank');closeSheet('shareSheet')}
-function toggleMuteAll(){globalMuted=!globalMuted;document.querySelectorAll('video').forEach(v=>v.muted=globalMuted);document.getElementById('volIcon').innerText=globalMuted?'🔇':'🔊'}
+function toggleMuteAll(){globalMuted=!globalMuted;let icon=document.getElementById('volIcon');let svg=document.getElementById('volSvg');document.querySelectorAll('video').forEach(v=>v.muted=globalMuted);if(icon){icon.innerHTML=globalMuted?'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>':'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>'}}
 init()
 </script></body></html>
