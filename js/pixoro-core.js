@@ -234,49 +234,105 @@ window.loadProfileRealCount = loadProfileRealCount;
 window.pixoroOpenFollowList = pixoroOpenFollowList;
 window.pixoroLoadFollowCounts = pixoroLoadFollowCounts;
 
-// ===== PIXORO FOLLOW SYNC - CORE LA IRUNDHU ELLA PAGE KUM CONNECT DA =====
-// Core Ella Page layum Irukku - Athe na Follow um Ella Page kum Varum da - Vera Page la Thani Link Theva Illa da
-(function(){
-  if(document.querySelector('script[data-pixoro-follow]')) return;
-  let s = document.createElement('script');
-  s.src = 'js/follow.js';
-  s.type = 'module';
-  s.setAttribute('data-pixoro-follow','1');
-  document.head.appendChild(s);
-})();
+// ===== PIXORO FOLLOW - PROFILE PHOTO MARI - ORU EDAM MATTUM DA - CORE LA MATTUM DA =====
+// follow.js ah Load Panna Venda da - Core la ye Irukku da - Ella Page layum Core Irukku da
+window.PIXORO_FOLLOWING = window.PIXORO_FOLLOWING || new Set();
+let _pixoroFollowBusy = {};
 
-function pixoroSyncFollowBtn(targetId, state){
-  targetId = String(targetId);
-  let txt = state==='following' ? 'Following ✓' : state==='requested' ? 'Requested' : 'Follow';
+function pixoroPaintAllFollowBtns(){
   document.querySelectorAll('[data-follow-user]').forEach(btn=>{
-    if(String(btn.dataset.followUser)===targetId){
-      btn.innerText = btn.id==='followBtnMain' ? (state==='following' ? 'Following' : state==='requested' ? 'Requested' : 'Follow') : txt;
-      btn.classList.toggle('following', state==='following');
-      btn.classList.toggle('requested', state==='requested');
-      btn.dataset.followState = state;
+    let id = String(btn.dataset.followUser || '');
+    if(!id) return;
+    let isFollowing = window.PIXORO_FOLLOWING.has(id);
+    // Profile page main button ku tick venda - matha page ku tick venum
+    if(btn.id === 'followBtnMain'){
+      btn.innerText = isFollowing ? 'Following' : 'Follow';
+    } else {
+      btn.innerText = isFollowing ? 'Following ✓' : 'Follow';
     }
+    btn.classList.toggle('following', isFollowing);
+    btn.dataset.followState = isFollowing ? 'following' : 'follow';
   });
-  document.querySelectorAll('.followBtnPost, .followBtnPerusa, .followBtnRBig, [id^="followBtn-"]').forEach(btn=>{
-    let bid = btn.dataset.followUser;
-    if(!bid){
-      let oc = btn.getAttribute('onclick')||'';
-      let m = oc.match(/['"]([^'"]+)['"]/);
-      if(m) bid = m[1];
-    }
-    if(bid && String(bid)===targetId){
-      btn.innerText = txt;
-      btn.classList.toggle('following', state==='following');
-      btn.classList.toggle('requested', state==='requested');
+  // Pazhaya button style - data-follow-user illatha button kum
+  document.querySelectorAll('.followBtnPost, .followBtnPerusa, .followBtnRBig').forEach(btn=>{
+    if(btn.dataset.followUser) return;
+    let oc = btn.getAttribute('onclick') || '';
+    let m = oc.match(/['"]([^'"]+)['"]/);
+    if(m && window.PIXORO_FOLLOWING.has(String(m[1]))){
+      btn.innerText = 'Following ✓';
+      btn.classList.add('following');
     }
   });
 }
+
+async function pixoroLoadFollowing(){
+  if(!window.supa || !window.ME_ID) return;
+  try{
+    let {data} = await window.supa.from('follows').select('following_id').eq('follower_id', window.ME_ID);
+    window.PIXORO_FOLLOWING = new Set((data||[]).map(x=>String(x.following_id)));
+    pixoroPaintAllFollowBtns();
+    pixoroLoadFollowCounts();
+  }catch(e){}
+}
+
+async function pixoroToggleFollow(targetId, btn){
+  targetId = String(targetId);
+  if(!targetId || targetId === String(window.ME_ID)) return;
+  if(_pixoroFollowBusy[targetId]) return;
+  _pixoroFollowBusy[targetId] = true;
+  let wasFollowing = window.PIXORO_FOLLOWING.has(targetId);
+  // Udane UI maathu da - Supabase ku wait panna venda da - Profile photo mari fast da
+  if(wasFollowing) window.PIXORO_FOLLOWING.delete(targetId);
+  else window.PIXORO_FOLLOWING.add(targetId);
+  pixoroPaintAllFollowBtns();
+  try{
+    if(wasFollowing){
+      await window.supa.from('follows').delete().eq('follower_id', window.ME_ID).eq('following_id', targetId);
+    } else {
+      await window.supa.from('follows').insert({follower_id: window.ME_ID, following_id: targetId});
+    }
+    // Vera tab / vera page ku sollu da
+    try{ localStorage.setItem('pixoro_follow_sync', JSON.stringify({targetId, following: !wasFollowing, t: Date.now()})); }catch(e){}
+    window.dispatchEvent(new CustomEvent('pixoroFollowChanged', {detail:{targetId, following: !wasFollowing}}));
+    pixoroLoadFollowCounts();
+  }catch(e){
+    // Fail aana thirumba pazhaya state ku po da
+    if(wasFollowing) window.PIXORO_FOLLOWING.add(targetId);
+    else window.PIXORO_FOLLOWING.delete(targetId);
+    pixoroPaintAllFollowBtns();
+  }
+  setTimeout(()=>{ _pixoroFollowBusy[targetId] = false; }, 800);
+}
+
+function pixoroSyncFollowBtn(targetId, following){
+  targetId = String(targetId);
+  if(following) window.PIXORO_FOLLOWING.add(targetId);
+  else window.PIXORO_FOLLOWING.delete(targetId);
+  pixoroPaintAllFollowBtns();
+}
+
+// Pazhaya code ku - ella page layum toggleF nu irundha ithu than work aagum da
+window.pixoroToggleFollow = pixoroToggleFollow;
+window.toggleF = pixoroToggleFollow;
+window.pixoroLoadFollowing = pixoroLoadFollowing;
+window.pixoroPaintAllFollowBtns = pixoroPaintAllFollowBtns;
 window.pixoroSyncFollowBtn = pixoroSyncFollowBtn;
 
 window.addEventListener('storage', (e)=>{
-  if(e.key==='pixoro_follow_sync' && e.newValue){
+  if(e.key === 'pixoro_follow_sync' && e.newValue){
     try{ let d = JSON.parse(e.newValue); pixoroSyncFollowBtn(d.targetId, d.following); }catch(err){}
   }
 });
 window.addEventListener('pixoroFollowChanged', (e)=>{
   pixoroSyncFollowBtn(e.detail.targetId, e.detail.following);
 });
+
+// Page load aana udane + reels mari dynamic ah button vanthaalum paint pannu da
+document.addEventListener('DOMContentLoaded', ()=>{ pixoroLoadFollowing(); });
+if(document.readyState !== 'loading') pixoroLoadFollowing();
+setInterval(()=>{ if(window.ME_ID) pixoroLoadFollowing(); }, 3000);
+// Reels scroll la pudhu button vantha - auto paint aagum da
+if(window.MutationObserver){
+  let _mo = new MutationObserver(()=>{ pixoroPaintAllFollowBtns(); });
+  _mo.observe(document.documentElement, {childList:true, subtree:true});
+}
