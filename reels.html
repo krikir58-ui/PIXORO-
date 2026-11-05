@@ -30,8 +30,11 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .reel-pfp-wrap img{width:100%!important;height:100%!important;object-fit:cover}
 .reel-username{font-size:13.5px!important;font-weight:600!important;margin-left:6px!important}
 .reel-caption{margin-top:6px!important;font-size:12px!important;color:#ddd!important;line-height:1.3;display:block!important;max-height:42px!important;overflow:hidden!important}
-.followBtnPerusa{background:rgba(255,255,255,0.22)!important;color:#fff!important;border:1.2px solid #fff!important;padding:7px 16px!important;border-radius:8px!important;font-weight:700!important;font-size:13px!important;margin-left:8px!important;height:32px!important;backdrop-filter:blur(8px)}
-.followBtnPerusa.following{background:#fff!important;color:#000!important}
+/* ===== CORRECTED - FOLLOW WHITE REMOVE - Transparent than da ✅ ===== */
+.followBtnPerusa{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.2px solid #fff!important;padding:7px 16px!important;border-radius:8px!important;font-weight:700!important;font-size:13px!important;margin-left:8px!important;height:32px!important;backdrop-filter:blur(8px);box-shadow:none!important}
+.followBtnPerusa.following{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.2px solid #fff!important}
+[data-follow-user]{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.2px solid #fff!important}
+[data-follow-user].following{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.2px solid #fff!important}
 .reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:56px;padding:0 16px;background:linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);pointer-events:none}
 .reelsTop b{color:#fff!important;font-size:24px!important;font-weight:800!important}
 .topRight{display:flex!important;gap:12px!important;align-items:center!important;pointer-events:auto}
@@ -40,7 +43,10 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;width:100vw;height:52px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{color:#8e8e8e;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
 .bottom-nav a svg{width:24px;height:24px;stroke:#8e8e8e;stroke-width:1.8;fill:none}
-.bottom-nav a.active{color:#fff!important}.bottom-nav a.active svg{stroke:#fff!important;fill:#fff!important}
+/* ===== CORRECTED - BOTTOM WHITE SQUARE REMOVE da ✅ ===== */
+.bottom-nav a.active{color:#fff!important}.bottom-nav a.active svg{stroke:#fff!important;fill:none!important}
+.bottom-nav a.active svg rect{fill:none!important;stroke:#fff!important}
+.bottom-nav a.active svg path{fill:#fff!important}
 .bottom-nav span{font-size:10px}.bottom-nav a.active span{color:#fff!important;font-weight:700}
 .bottom-nav a img.navPfp{width:24px;height:24px;border-radius:50%;border:1.5px solid #fff}
 .centerCtrl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:0;transition:opacity .25s;z-index:25;background:rgba(0,0,0,0.6);width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
@@ -112,7 +118,7 @@ function showToast(m){let t=document.getElementById('toast');if(!t)return;t.inne
 function fmtViews(n){if(n>=1000000)return (n/1000000).toFixed(1).replace('.0','')+'M';if(n>=1000)return (n/1000).toFixed(1).replace('.0','')+'K';return String(n)}
 let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=[],mutedUsers=[],blockedUsers=[],hiddenMeta={},lastAction=null,savingIds=new Set()
 async function waitSupa(){for(let i=0;i<20;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
-async function init(){supa=await waitSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;window.ME_ID=ME_ID;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;if(window.pixoroLoadFollowing) window.pixoroLoadFollowing();let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);load()}
+async function init(){supa=await waitSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;window.ME_ID=ME_ID;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;if(window.pixoroLoadFollowing) await window.pixoroLoadFollowing();let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);load()}
 function getPfp(u){let p=profileMap[cleanUser(u)];if(p?.avatar_url)return p.avatar_url;return 'https://ui-avatars.com/api/?name='+(cleanUser(u).charAt(0).toUpperCase()||'P')+'&background=fff&color=000&size=200&bold=true'}
 function isMyPostObj(p){if(!p)return false;if(p.user_id&&String(p.user_id)===String(ME_ID))return true;return cleanUser(p.username)===cleanUser(ME_RAW)}
 async function load(){try{
@@ -131,7 +137,7 @@ for(let p of all){
 }
 all=deduped;
 let likes=[],saves=[],follows=[],comments=[],views=[];try{likes=(await supa.from('likes').select('*').limit(500)).data||[]}catch(e){}try{saves=(await supa.from('saves').select('*').eq('user_id',ME_ID)).data||[]}catch(e){}try{follows=(await supa.from('follows').select('*').limit(1000)).data||[]}catch(e){}try{comments=(await supa.from('comments').select('*').order('created_at',{ascending:false}).limit(200)).data||[]}catch(e){}try{views=(await supa.from('views').select('*').limit(500)).data||[]}catch(e){}
-allPosts=all;allLikes=likes;allSaves=saves;allFollows=follows;allComments=comments;allViews=views;if(window.PIXORO_FOLLOWING) window.PIXORO_FOLLOWING=new Set((follows||[]).filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));render();if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();}catch(err){console.log(err)}}
+allPosts=all;allLikes=likes;allSaves=saves;allFollows=follows;allComments=comments;allViews=views;if(window.PIXORO_FOLLOWING) window.PIXORO_FOLLOWING=new Set((follows||[]).filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));render();if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();setTimeout(()=>{if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();},500);}catch(err){console.log(err)}}
 async function addRealView(postId){
   postId=String(postId);
   if(viewedPosts.has(postId)) return;
@@ -231,9 +237,10 @@ async function saveR(id){
       let {data,error}=await supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).select().single();
       if(!error){ allSaves.push(data||{post_id:id,user_id:ME_ID,username:ME_RAW}); updateSaveUI(id,true); }
     }
+    // NO ALERT - Silent Save da - Toast Illa da
   } finally { savingIds.delete(id); }
 }
-// ===== CORRECTED - Thani toggleF illa da - Core than da =====
+// ===== CORRECTED - Thani toggleF illa da - Core than da - NO ALERT / NO TOAST da =====
 async function toggleF(uid,pid){
   if(window.pixoroToggleFollow) return window.pixoroToggleFollow(uid);
 }
