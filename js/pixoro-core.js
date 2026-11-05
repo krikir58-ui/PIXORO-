@@ -34,9 +34,8 @@ window.getTick = goldTickHTML;
   if(location.pathname.includes('index') || location.pathname.endsWith('/')) document.body.classList.add('isHome');
 })();
 
-// ===== FIXED getPfp - String + Object Rendum Work Aagum da ✅ =====
+// ===== FIXED getPfp - String + Object Rendum Work Aagum da =====
 window.getPfp = function(p){
-  // Reels la getPfp('sanjay_0') nu String varum da - Profile la getPfp({username, avatar_url}) nu Object varum da
   if(typeof p === 'string'){
     let name = p.replace('@','').trim() || 'G';
     return 'https://ui-avatars.com/api/?name=' + name.charAt(0).toUpperCase() + '&background=111&color=fff&size=300&bold=true';
@@ -240,7 +239,7 @@ window.loadProfileRealCount = loadProfileRealCount;
 window.pixoroOpenFollowList = pixoroOpenFollowList;
 window.pixoroLoadFollowCounts = pixoroLoadFollowCounts;
 
-// ===== PIXORO FOLLOW - ORU EDAM MATTUM DA =====
+// ===== PIXORO FOLLOW - ORU EDAM MATTUM DA - SAM AH IRUKKUM DA =====
 window.PIXORO_FOLLOWING = window.PIXORO_FOLLOWING || new Set();
 let _pixoroFollowBusy = {};
 let _pixoroLoadingFollow = false;
@@ -250,8 +249,8 @@ function pixoroPaintAllFollowBtns(){
     let id = String(btn.dataset.followUser || '');
     if(!id) return;
     let isFollowing = window.PIXORO_FOLLOWING.has(id);
-    let wantText = (btn.id === 'followBtnMain') ? (isFollowing ? 'Following' : 'Follow') : (isFollowing ? 'Following ✓' : 'Follow');
-    // FIXED - Text already same ah irundha thodatha da - Illana Observer Loop da
+    // CORRECTED - Ella Button kum ORE Text da - Main / Home / Reels / Profile / Search - Ellam Same da
+    let wantText = isFollowing ? 'Following ✓' : 'Follow';
     if(btn.innerText !== wantText) btn.innerText = wantText;
     if(btn.classList.contains('following') !== isFollowing) btn.classList.toggle('following', isFollowing);
     btn.dataset.followState = isFollowing ? 'following' : 'follow';
@@ -272,28 +271,28 @@ async function pixoroLoadFollowing(){
 
 async function pixoroToggleFollow(targetId, btn){
   targetId = String(targetId);
-  if(!targetId || targetId === String(window.ME_ID)) return;
-  if(_pixoroFollowBusy[targetId]) return;
+  if(!targetId || targetId === String(window.ME_ID)) return false;
+  if(_pixoroFollowBusy[targetId]) return false;
   _pixoroFollowBusy[targetId] = true;
   let wasFollowing = window.PIXORO_FOLLOWING.has(targetId);
-  if(wasFollowing) window.PIXORO_FOLLOWING.delete(targetId);
-  else window.PIXORO_FOLLOWING.add(targetId);
+  let wantFollowing = !wasFollowing;
+  if(wantFollowing) window.PIXORO_FOLLOWING.add(targetId);
+  else window.PIXORO_FOLLOWING.delete(targetId);
   pixoroPaintAllFollowBtns();
   try{
-    if(wasFollowing){
-      await window.supa.from('follows').delete().eq('follower_id', window.ME_ID).eq('following_id', targetId);
+    if(wantFollowing){
+      let {error} = await window.supa.from('follows').insert({follower_id: window.ME_ID, following_id: targetId});
+      // 23505 = Already Following da - Ithu Error Illa da - Revert Panna Koodathu da
+      if(error && error.code !== '23505') console.log('FOLLOW ERROR', error.message);
     } else {
-      await window.supa.from('follows').insert({follower_id: window.ME_ID, following_id: targetId});
+      await window.supa.from('follows').delete().eq('follower_id', window.ME_ID).eq('following_id', targetId);
     }
-    try{ localStorage.setItem('pixoro_follow_sync', JSON.stringify({targetId, following: !wasFollowing, t: Date.now()})); }catch(e){}
-    window.dispatchEvent(new CustomEvent('pixoroFollowChanged', {detail:{targetId, following: !wasFollowing}}));
+    try{ localStorage.setItem('pixoro_follow_sync', JSON.stringify({targetId, following: wantFollowing, t: Date.now()})); }catch(e){}
     pixoroLoadFollowCounts();
-  }catch(e){
-    if(wasFollowing) window.PIXORO_FOLLOWING.add(targetId);
-    else window.PIXORO_FOLLOWING.delete(targetId);
-    pixoroPaintAllFollowBtns();
-  }
+    // CORRECTED - Revert Illa da - Catch la Revert Panna Koodathu da - Athe than Flicker da
+  }catch(e){ console.log('FOLLOW CATCH', e); }
   setTimeout(()=>{ _pixoroFollowBusy[targetId] = false; }, 800);
+  return wantFollowing;
 }
 
 function pixoroSyncFollowBtn(targetId, following){
@@ -303,8 +302,10 @@ function pixoroSyncFollowBtn(targetId, following){
   pixoroPaintAllFollowBtns();
 }
 
+// CORRECTED - Ella Page kum SAME Name da - Home / Reels / Profile / Search Ellam Ithu than da
 window.pixoroToggleFollow = pixoroToggleFollow;
-if(!window.toggleF) window.toggleF = pixoroToggleFollow;
+window.toggleFollow = pixoroToggleFollow;
+window.toggleF = pixoroToggleFollow;
 window.pixoroLoadFollowing = pixoroLoadFollowing;
 window.pixoroPaintAllFollowBtns = pixoroPaintAllFollowBtns;
 window.pixoroSyncFollowBtn = pixoroSyncFollowBtn;
@@ -314,11 +315,8 @@ window.addEventListener('storage', (e)=>{
     try{ let d = JSON.parse(e.newValue); pixoroSyncFollowBtn(d.targetId, d.following); }catch(err){}
   }
 });
-window.addEventListener('pixoroFollowChanged', (e)=>{
-  pixoroSyncFollowBtn(e.detail.targetId, e.detail.following);
-});
+// CORRECTED - pixoroFollowChanged Event ah Delete Panniten da - Athe than Loop Panni Flicker Pannichu da
 
-// ===== FIXED - setInterval + MutationObserver DELETE PANNITEN DA - ITHU THAN FREEZE PANNUCHU DA ❌ =====
 // Page load aana udane oru thadava mattum load pannu da - Loop venda da
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroLoadFollowing(); });
 if(document.readyState !== 'loading') pixoroLoadFollowing();
