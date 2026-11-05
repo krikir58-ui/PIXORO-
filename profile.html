@@ -68,10 +68,20 @@ async function init(){
   let {data:{session}}=await supa.auth.getSession(); if(!session){location.href='login.html';return}
   let {data:myProfile}=await supa.from('profiles').select('*').eq('id',session.user.id).single(); if(!myProfile){location.href='setup-username.html';return}
   ME_RAW=cleanUser(myProfile.username||session.user.email.split('@')[0]); ME_ID=session.user.id; window.ME_ID=ME_ID; window.ME_RAW=ME_RAW;
-  let urlU=cleanUser(new URLSearchParams(location.search).get('user')||new URLSearchParams(location.search).get('u')||''); VIEW_USER=urlU||ME_RAW;
+  let rawParam = new URLSearchParams(location.search).get('u') || new URLSearchParams(location.search).get('user') || '';
   let vp=null;
-  if(urlU===''||urlU===ME_RAW) vp=myProfile; else { let {data}=await supa.from('profiles').select('*').eq('username',VIEW_USER).single(); if(data) vp=data; else { let {data:allP}=await supa.from('profiles').select('*'); vp=(allP||[]).find(p=>cleanUser(p.username)===VIEW_USER)||null } if(!vp){document.getElementById('topUsername').innerText='';return} }
-  VIEW_PROFILE=vp; let isMine=VIEW_PROFILE.id===ME_ID;
+  if(rawParam && rawParam.includes('-') && rawParam.length>20){
+    let {data}=await supa.from('profiles').select('*').eq('id', rawParam).single();
+    if(data) vp=data;
+  }
+  if(!vp){
+    let urlU=cleanUser(rawParam); VIEW_USER=urlU||ME_RAW;
+    if(urlU===''||urlU===ME_RAW) vp=myProfile;
+    else { let {data}=await supa.from('profiles').select('*').eq('username',VIEW_USER).single(); if(data) vp=data; else { let {data:allP}=await supa.from('profiles').select('*'); vp=(allP||[]).find(p=>cleanUser(p.username)===VIEW_USER)||null } }
+  }
+  if(!vp){document.getElementById('topUsername').innerText='User Not Found';return}
+  VIEW_PROFILE=vp; VIEW_USER=cleanUser(vp.username);
+  let isMine=VIEW_PROFILE.id===ME_ID;
   if(!isMine){ let t=document.getElementById('tabSaved'); if(t) t.style.display='none'; }
   document.getElementById('topUsername').innerHTML=cleanUser(VIEW_PROFILE.username);
   document.getElementById('bioText').innerText=VIEW_PROFILE.bio||''; document.getElementById('linkText').innerText=VIEW_PROFILE.link||VIEW_PROFILE.website||'';
@@ -113,7 +123,7 @@ async function pixoroOpenFollowList(type){
     let uname=pr?.username || f.following || f.follower || 'user';
     let pfp=pr?.avatar_url||'https://ui-avatars.com/api/?name='+uname[0]+'&background=fff&color=000';
     let isF=allFollows.some(x=> String(x.follower_id)===String(ME_ID) && String(x.following_id)===String(pid));
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><img src="${pfp}" style="width:36px;height:36px;border-radius:50%;object-fit:cover"><b style="flex:1;color:#fff" onclick="location.href='profile.html?user=${cleanUser(uname)}'">${cleanUser(uname)}</b>${String(pid)===String(ME_ID)?'<span style="color:#888;font-size:12px">You</span>':`<button onclick="toggleF('${pid}','list')" class="whiteBtn">${isF?'Following':'Follow'}</button>`}</div>`;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><img src="${pfp}" style="width:36px;height:36px;border-radius:50%;object-fit:cover"><b style="flex:1;color:#fff" onclick="location.href='profile.html?u=${pid}'">${cleanUser(uname)}</b>${String(pid)===String(ME_ID)?'<span style="color:#888;font-size:12px">You</span>':`<button onclick="toggleF('${pid}','list')" class="whiteBtn">${isF?'Following':'Follow'}</button>`}</div>`;
   }).join('')||`<div style="color:#888;text-align:center;padding:20px">No ${type} yet</div>`;
   listEl.innerHTML=html; modal.classList.add('show');
 }
@@ -122,7 +132,26 @@ function openHighlightEdit(name){ if(VIEW_PROFILE.id!==ME_ID) return; editingHL=
 function selectHLCover(url){ editingCover=url; document.querySelectorAll('#hlCoverPicker .hlCover').forEach(i=>i.style.border='2px solid #333'); event.target.style.border='2px solid #00ff66'; }
 async function saveHighlightEdit(){ let newName=document.getElementById('hlEditName').value.trim()||editingHL; let supa=getSupa(); let upd={highlight_name:newName}; if(editingCover) upd.highlight_cover=editingCover; await supa.from('stories').update(upd).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true); if(editingCover) await supa.from('stories').update({highlight_cover:editingCover}).eq('user_id',ME_ID).eq('highlight_name',newName).eq('is_highlight',true); await supa.from('posts').update(upd).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true); document.getElementById('hlEditSheet').style.display='none'; loadHighlights(); }
 async function deleteHighlight(){ let supa=getSupa(); await supa.from('stories').update({is_highlight:false,highlight_name:null,highlight_cover:null}).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true); await supa.from('posts').update({is_highlight:false}).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true); document.getElementById('hlEditSheet').style.display='none'; loadHighlights(); }
-async function toggleF(uid,pid){ if(!uid||String(uid)==String(ME_ID)) return; let supa=getSupa(); if(!supa) return; let isF=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid)); let newTxt=isF?'Follow':'Following'; let main=document.getElementById('followBtnMain'); if(main) main.innerText=newTxt; if(isF){ allFollows=allFollows.filter(f=>!(String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid))); await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',uid); } else { allFollows.push({follower_id:ME_ID,following_id:uid,follower:ME_RAW,following:VIEW_USER}); await supa.from('follows').insert({follower_id:ME_ID,following_id:uid,follower:ME_RAW,following:VIEW_USER}); } let fc=document.getElementById('followerCount'); if(fc) fc.textContent=allFollows.filter(f=>String(f.following_id)==String(uid)).length; if(pid==='list') pixoroOpenFollowList('followers'); }
+async function toggleF(uid,pid){
+  if(!uid||String(uid)==String(ME_ID)) return;
+  let supa=getSupa(); if(!supa) return;
+  let isF=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid));
+  if(isF){
+    allFollows=allFollows.filter(f=>!(String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid)));
+    await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',uid);
+    showToast('Unfollowed da 😴');
+  } else {
+    allFollows.push({follower_id:ME_ID,following_id:uid});
+    let {error}=await supa.from('follows').insert({follower_id:ME_ID,following_id:uid});
+    if(error){ showToast('Follow Mudiyala da - Table Paaru da'); return; }
+    showToast('Followed da 🔥');
+  }
+  let targetId = VIEW_PROFILE ? VIEW_PROFILE.id : uid;
+  let fc=document.getElementById('followerCount'); if(fc) fc.textContent=allFollows.filter(f=>String(f.following_id)==String(targetId)).length;
+  let fgc=document.getElementById('followingCount'); if(fgc) fgc.textContent=allFollows.filter(f=>String(f.follower_id)==String(targetId)).length;
+  let main=document.getElementById('followBtnMain'); if(main && String(uid)===String(VIEW_PROFILE.id)) main.innerText = isF ? 'Follow' : 'Following';
+  if(pid==='list'){ let title=document.getElementById('followModalTitle').innerText; if(title.includes('Followers')) pixoroOpenFollowList('followers'); else if(title.includes('Following')) pixoroOpenFollowList('following'); }
+}
 window.toggleF=toggleF; async function toggleFollowMain(){ await toggleF(VIEW_PROFILE.id,'main'); }
 async function blockUserMain(){ if(!confirm('Block pannalama? Avanuku theriyathu da - Silent Block da')) return; let supa=getSupa(); try{ await supa.from('blocked_users').insert({user_id:ME_ID,blocked_user_id:VIEW_PROFILE.id}); }catch(e){} try{ await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',VIEW_PROFILE.id); }catch(e){} blockedUsers.push(String(VIEW_PROFILE.id)); showToast('Blocked - White Style 🚫'); setTimeout(()=>location.reload(),600); }
 async function unblockUserMain(){ let supa=getSupa(); try{ await supa.from('blocked_users').delete().eq('user_id',ME_ID).eq('blocked_user_id',VIEW_PROFILE.id); }catch(e){} blockedUsers=blockedUsers.filter(x=>x!==String(VIEW_PROFILE.id)); showToast('Unblocked ✅'); setTimeout(()=>location.reload(),600); }
@@ -171,8 +200,8 @@ async function showTab(type){ currentTab=type; document.getElementById('tabPosts
 function openSettings(){document.getElementById('setSheet').style.display='flex'}
 function openEditSheet(){ if(VIEW_PROFILE.id!==ME_ID) return; document.getElementById('editName').value=VIEW_PROFILE.full_name||VIEW_PROFILE.display_name||''; document.getElementById('editUsername').value=VIEW_USER; document.getElementById('editBio').value=VIEW_PROFILE.bio||''; document.getElementById('editLink').value=VIEW_PROFILE.link||VIEW_PROFILE.website||''; document.getElementById('editSheet').style.display='flex' }
 async function doPixoroLogout(){let supa=getSupa();await supa.auth.signOut();location.href='login.html'}
-async function saveEdit(){ let supa=getSupa(); let n=document.getElementById('editName').value.trim(),u=cleanUser(document.getElementById('editUsername').value.trim()),b=document.getElementById('editBio').value,l=document.getElementById('editLink').value.trim(),np=document.getElementById('editPfpPreview').dataset.new; if(!u) return; let oldU=ME_RAW; let avatarUrl=VIEW_PROFILE?.avatar_url||''; if(np&&np.startsWith('data:')){ try{let res=await fetch(np);let blob=await res.blob();let fileName=Date.now()+'_'+ME_RAW+'.jpg';let {error:upErr}=await supa.storage.from('avatars').upload(fileName,blob,{contentType:'image/jpeg'}); if(!upErr){let {data}=supa.storage.from('avatars').getPublicUrl(fileName); avatarUrl=data.publicUrl}}catch(e){} } let update={username:u,display_name:n,full_name:n,bio:b,avatar_url:avatarUrl}; let {error}=await supa.from('profiles').update(update).eq('id',ME_ID); if(error){ if(error.message.includes('full_name')){ let {error:e2}=await supa.from('profiles').update({username:u,display_name:n,bio:b,avatar_url:avatarUrl}).eq('id',ME_ID); if(e2) return} else return} if(l){try{await supa.from('profiles').update({link:l}).eq('id',ME_ID)}catch(e){} try{await supa.from('profiles').update({website:l}).eq('id',ME_ID)}catch(e){}} if(u!==oldU){await supa.from('posts').update({username:u}).eq('username',oldU); await supa.from('stories').update({username:u}).eq('username',oldU)} document.getElementById('editSheet').style.display='none'; setTimeout(()=>{location.href='profile.html?user='+u},600) }
-function shareProfile(){ navigator.clipboard.writeText(location.origin+'/profile.html?user='+VIEW_USER); showToast('Profile Link Copied 📤'); }
+async function saveEdit(){ let supa=getSupa(); let n=document.getElementById('editName').value.trim(),u=cleanUser(document.getElementById('editUsername').value.trim()),b=document.getElementById('editBio').value,l=document.getElementById('editLink').value.trim(),np=document.getElementById('editPfpPreview').dataset.new; if(!u) return; let oldU=ME_RAW; let avatarUrl=VIEW_PROFILE?.avatar_url||''; if(np&&np.startsWith('data:')){ try{let res=await fetch(np);let blob=await res.blob();let fileName=Date.now()+'_'+ME_RAW+'.jpg';let {error:upErr}=await supa.storage.from('avatars').upload(fileName,blob,{contentType:'image/jpeg'}); if(!upErr){let {data}=supa.storage.from('avatars').getPublicUrl(fileName); avatarUrl=data.publicUrl}}catch(e){} } let update={username:u,display_name:n,full_name:n,bio:b,avatar_url:avatarUrl}; let {error}=await supa.from('profiles').update(update).eq('id',ME_ID); if(error){ if(error.message.includes('full_name')){ let {error:e2}=await supa.from('profiles').update({username:u,display_name:n,bio:b,avatar_url:avatarUrl}).eq('id',ME_ID); if(e2) return} else return} if(l){try{await supa.from('profiles').update({link:l}).eq('id',ME_ID)}catch(e){} try{await supa.from('profiles').update({website:l}).eq('id',ME_ID)}catch(e){}} if(u!==oldU){await supa.from('posts').update({username:u}).eq('username',oldU); await supa.from('stories').update({username:u}).eq('username',oldU)} document.getElementById('editSheet').style.display='none'; setTimeout(()=>{location.href='profile.html?u='+ME_ID},600) }
+function shareProfile(){ navigator.clipboard.writeText(location.origin+'/profile.html?u='+VIEW_PROFILE.id); showToast('Profile Link Copied 📤'); }
 let cropX=0,cropY=0,cropScale=1,cropDragging=false,cropStartX=0,cropStartY=0,cropOrigX=0,cropOrigY=0,cropImgEl=document.getElementById('cropImg');
 function updateCropTransform(){cropImgEl.style.transform=`translate(-50%,-50%) translate(${cropX}px,${cropY}px) scale(${cropScale})`}
 function openCrop(src){cropX=0;cropY=0;cropScale=1;document.getElementById('zoomRange').value=1;cropImgEl.src=src;cropImgEl.onload=()=>{let w=cropImgEl.naturalWidth,h=cropImgEl.naturalHeight;if(w>h){cropImgEl.style.width='auto';cropImgEl.style.height='280px'}else{cropImgEl.style.width='280px';cropImgEl.style.height='auto'}updateCropTransform()};document.getElementById('cropOverlay').style.display='flex';document.getElementById('editSheet').style.display='none'}
