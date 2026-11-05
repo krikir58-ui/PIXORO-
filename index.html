@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="css/feed.css">
 <link rel="stylesheet" href="css/comments.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=99"></script>
+<script src="js/pixoro-core.js?v=103"></script>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -16,7 +16,7 @@
     OneSignalDeferred.push(async function(OneSignal) {
       if(OneSignal.Notifications.permission){ location.href='notifications.html'; return; }
       await OneSignal.Notifications.requestPermission();
-      if(OneSignal.Notifications.permission){ alert('Super da! Notification ON da! 🔥'); }
+      if(OneSignal.Notifications.permission){ alert('Super da! Notification ON da!'); }
     });
   }
   setTimeout(() => {
@@ -68,11 +68,11 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 #feed{min-height:300px}
 </style></head><body>
 <div class="top"><b style="font-size:26px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="enableNotif()"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div></div></div>
-<div id="singleBanner" class="singleBanner" style="display:none">📌 Single Post View - <span onclick="location.href='index.html'" style="text-decoration:underline;cursor:pointer">Back to Feed</span></div>
+<div id="singleBanner" class="singleBanner" style="display:none">Single Post View - <span onclick="location.href='index.html'" style="text-decoration:underline;cursor:pointer">Back to Feed</span></div>
 <div class="storyBar" id="storyBar"></div>
-<div class="feedTabs"><div class="feedTab active" id="tabForYou" onclick="setFeedMode('foryou')">✨ For You</div><div class="feedTab" id="tabFollowing" onclick="setFeedMode('following')">👥 Following</div><div class="feedTab" id="tabLatest" onclick="setFeedMode('latest')">🕒 Latest</div></div>
+<div class="feedTabs"><div class="feedTab active" id="tabForYou" onclick="setFeedMode('foryou')">For You</div><div class="feedTab" id="tabFollowing" onclick="setFeedMode('following')">Following</div><div class="feedTab" id="tabLatest" onclick="setFeedMode('latest')">Latest</div></div>
 <div id="trendBar" class="trendBar" style="display:none"></div>
-<div id="feed"><p style="text-align:center;padding:40px;color:#888">Loading Pixoro... 🔥</p></div>
+<div id="feed"><p style="text-align:center;padding:40px;color:#888">Loading Pixoro...</p></div>
 <div id="toast" class="toast"></div>
 <div class="bottom-nav">
 <a class="active" href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
@@ -81,9 +81,9 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 <a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
 <a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a>
 </div>
-<div id="commentModal" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #333"><b>Comments</b><span onclick="closeComment()" style="font-size:22px">✕</span></div><div id="commentList" style="flex:1;overflow-y:auto;padding:12px"></div><div style="padding:10px;border-top:1px solid #333;display:flex;gap:10px"><img src="" id="myCommentPfp" style="width:34px;height:34px;border-radius:50%;object-fit:cover"><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#000;border:1px solid #333;padding:12px 14px;border-radius:20px;color:#fff"><button onclick="addComment()" style="background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:0;color:#fff;font-weight:900;padding:10px 16px;border-radius:20px">Post</button></div></div></div>
+<div id="commentModal" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #333"><b>Comments</b><span onclick="closeComment()" style="font-size:22px">X</span></div><div id="commentList" style="flex:1;overflow-y:auto;padding:12px"></div><div style="padding:10px;border-top:1px solid #333;display:flex;gap:10px"><img src="" id="myCommentPfp" style="width:34px;height:34px;border-radius:50%;object-fit:cover"><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#000;border:1px solid #333;padding:12px 14px;border-radius:20px;color:#fff"><button onclick="addComment()" style="background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:0;color:#fff;font-weight:900;padding:10px 16px;border-radius:20px">Post</button></div></div></div>
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
-<div id="choice" class="choiceSheet" onclick="if(event.target==this)hideChoice()"><div style="background:#1a1a1a;border-radius:28px 28px 0 0;padding:20px 0 30px;width:100%;max-width:450px"><div style="width:50px;height:5px;background:#333;border-radius:10px;margin:0 auto 16px"></div><div style="text-align:center;font-size:22px;font-weight:900;margin-bottom:10px">Create</div><div class="createRow" onclick="location.href='post-create.html'"><div class="createIco">+</div><div style="flex:1"><b>Post</b><div style="font-size:12px;color:#888">Share a photo</div></div><span>›</span></div><div class="createRow" onclick="location.href='reel-create.html'"><div class="createIco">▶</div><div style="flex:1"><b>Reels</b><div style="font-size:12px;color:#888">Create a short reel</div></div><span>›</span></div><div class="createRow" onclick="location.href='story-upload.html'"><div class="createIco">◯</div><div style="flex:1"><b>Story</b><div style="font-size:12px;color:#888">Share 24h story</div></div><span>›</span></div><div onclick="hideChoice()" style="text-align:center;padding:14px;color:#777">Cancel</div></div></div>
+<div id="choice" class="choiceSheet" onclick="if(event.target==this)hideChoice()"><div style="background:#1a1a1a;border-radius:28px 28px 0 0;padding:20px 0 30px;width:100%;max-width:450px"><div style="width:50px;height:5px;background:#333;border-radius:10px;margin:0 auto 16px"></div><div style="text-align:center;font-size:22px;font-weight:900;margin-bottom:10px">Create</div><div class="createRow" onclick="location.href='post-create.html'"><div class="createIco">+</div><div style="flex:1"><b>Post</b><div style="font-size:12px;color:#888">Share a photo</div></div><span>></span></div><div class="createRow" onclick="location.href='reel-create.html'"><div class="createIco">></div><div style="flex:1"><b>Reels</b><div style="font-size:12px;color:#888">Create a short reel</div></div><span>></span></div><div class="createRow" onclick="location.href='story-upload.html'"><div class="createIco">O</div><div style="flex:1"><b>Story</b><div style="font-size:12px;color:#888">Share 24h story</div></div><span>></span></div><div onclick="hideChoice()" style="text-align:center;padding:14px;color:#777">Cancel</div></div></div>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 window.showToast=showToast; function showChoice(){document.getElementById('choice').classList.add('show')} function hideChoice(){document.getElementById('choice').classList.remove('show')}
@@ -130,19 +130,26 @@ async function checkLogin(){
 async function loadAll(){
   try{
     supa=getSupa();if(!supa)return;
-    let pr={data:[]},[STRIPPED]
-    try{ pr=await supa.from('profiles').select('*'); }catch(e){}
-    try{ po=await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(30); }catch(e){}
-    try{ re=await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(30); }catch(e){}
-    try{ li=await supa.from('likes').select('*').limit(500); }catch(e){}
-    try{ vi=await supa.from('views').select('*').limit(500); }catch(e){}
-    try{ sa=await supa.from('saves').select('*').limit(200); }catch(e){}
-    try{ st=await supa.from('stories').select('*').order('created_at',{ascending:false}).limit(50); }catch(e){}
-    try{ fo=await supa.from('follows').select('*').limit(1000); }catch(e){}
+    var pr = {data: []};
+    var po = {data: []};
+    var re = {data: []};
+    var li = {data: []};
+    var vi = {data: []};
+    var sa = {data: []};
+    var st = {data: []};
+    var fo = {data: []};
+    try{ pr = await supa.from('profiles').select('*'); }catch(e){}
+    try{ po = await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(30); }catch(e){}
+    try{ re = await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(30); }catch(e){}
+    try{ li = await supa.from('likes').select('*').limit(500); }catch(e){}
+    try{ vi = await supa.from('views').select('*').limit(500); }catch(e){}
+    try{ sa = await supa.from('saves').select('*').limit(200); }catch(e){}
+    try{ st = await supa.from('stories').select('*').order('created_at',{ascending:false}).limit(50); }catch(e){}
+    try{ fo = await supa.from('follows').select('*').limit(1000); }catch(e){}
     allProfiles=pr.data||[];allLikes=li.data||[];allViews=vi.data||[];allSaves=sa.data||[];allFollows=fo.data||[];
     if(window.PIXORO_FOLLOWING) window.PIXORO_FOLLOWING=new Set((allFollows||[]).filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));
-    let merged=[];(po.data||[]).forEach(p=>merged.push({...p,_from:'posts'}));(re.data||[]).forEach(p=>merged.push({...p,_from:'reels'}));
-    let seenUrl=new Set(),seenId=new Set(),deduped=[];
+    var merged=[];(po.data||[]).forEach(p=>merged.push({...p,_from:'posts'}));(re.data||[]).forEach(p=>merged.push({...p,_from:'reels'}));
+    var seenUrl=new Set(),seenId=new Set(),deduped=[];
     for(let p of merged){
       let prof=profileById(p.user_id);p.username=prof?prof.username:(p.username||'');p.username=cleanUser(p.username);
       p.media_url=p.media_url||p.image||p.image_url||p.video_url||'';
@@ -164,18 +171,17 @@ async function loadAll(){
     console.log('Load Error',e);
     let feed=document.getElementById('feed');
     if(feed && (!allPosts || !allPosts.length)){
-      feed.innerHTML='<p style="text-align:center;padding:40px;color:#888">No posts da 😴<br><span style="font-size:12px">Pull to refresh pannu da</span></p>';
+      feed.innerHTML='<p style="text-align:center;padding:40px;color:#888">No posts da</p>';
     }
   }
 }
 function renderStories(){let bar=document.getElementById('storyBar');let myStories=allStories.filter(s=>s.user_id===ME_ID);let otherStories=allStories.filter(s=>s.user_id!==ME_ID);let grouped={};otherStories.forEach(s=>{let key=s.user_id||cleanUser(s.username||'');if(!grouped[key])grouped[key]=s});let html='';let myPfp=getPfp(ME_ID);if(myStories.length>0){let s=myStories[0];html+=`<div class="sItem" onclick="openMyStory()"><div class="sRing ${viewedStories.includes(s.id)?'seen':''}"><div class="sRingInner"><img src="${myPfp}"></div></div><div class="sName">Your Story</div></div>`}else{html+=`<div class="sItem" onclick="location.href='story-upload.html'"><div class="sAddWrap"><img class="sAddImg" src="${myPfp}"><div class="sAddPlus">+</div></div><div class="sName">Your Story</div></div>`}Object.values(grouped).forEach(s=>{html+=`<div class="sItem" onclick="openOtherStory('${s.user_id||s.username}')"><div class="sRing ${viewedStories.includes(s.id)?'seen':''}"><div class="sRingInner"><img src="${getPfp(s.user_id||s.username)}"></div></div><div class="sName">${displayNameFor(s.user_id||s.username)}</div></div>`});bar.innerHTML=html}
 function openMyStory(){let s=allStories.find(x=>x.user_id===ME_ID);if(!s)return location.href='story-upload.html';location.href='story-view.html?user='+(s.user_id||s.username)} function openOtherStory(u){location.href='story-view.html?user='+u}
-function renderFeed(){let feedPosts=[...allPosts];if(feedMode=='foryou'){feedPosts.sort((a,b)=>viralScore(b)-viralScore(a))}else if(feedMode=='following'){let followingIds=new Set(allFollows.filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));feedPosts=feedPosts.filter(p=>String(p.user_id)===String(ME_ID)||followingIds.has(String(p.user_id)));feedPosts.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));}else if(feedMode=='latest'){feedPosts.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));}let html='';for(let p of feedPosts){let ownerKey=p.user_id;if(!ownerKey || String(ownerKey).length<20){let pr=allProfiles.find(x=>cleanUser(x.username)===cleanUser(p.username));if(pr) ownerKey=pr.id;else ownerKey=p.username}let lCount=allLikes.filter(l=>String(l.post_id)==String(p.id)).length;let isLiked=allLikes.some(l=>String(l.post_id)==String(p.id)&&(l.user_id==ME_ID));let isSaved=allSaves.some(s=>String(s.post_id)==String(p.id)&&(s.user_id==ME_ID));let best=getBestMedia(p);let mUrl=best.url||'';let mediaHtml=best.isVid?`<video class="main" src="${mUrl}" loop muted playsinline preload="auto"></video>`:`<img class="main" src="${mUrl}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x500/111/fff?text=Pixoro'">`;let isMe=String(ownerKey)===String(ME_ID);let isFollowing = window.PIXORO_FOLLOWING ? window.PIXORO_FOLLOWING.has(String(ownerKey)) : allFollows.some(f=>String(f.follower_id)===String(ME_ID)&&String(f.following_id)===String(ownerKey));let followBtnHtml='';if(!isMe){followBtnHtml=`<button data-follow-user="${ownerKey}" class="followBtnPost ${isFollowing?'following':''}" onclick="event.stopPropagation();toggleFollow('${ownerKey}',this)">${isFollowing?'Following ✓':'Follow'}</button>`}html+=`<div class="post" id="post-${p.id}"><div class="postTop"><div style="display:flex;align-items:center;gap:10px"><div class="pfpRing" onclick="location.href='profile.html?u=${ownerKey}'"><div class="pfpInner"><img src="${getPfp(ownerKey)}"></div></div><div style="display:flex;align-items:center;gap:8px"><b>${displayNameFor(ownerKey)}</b>${followBtnHtml}</div>${p._from==='reels'?'<span style="font-size:10px;background:#ff5ea8;padding:2px 6px;border-radius:10px">REEL</span>':''}</div><span>⋮</span></div><div style="position:relative" onclick="handleTap('${p.id}')">${mediaHtml}<div id="burst-${p.id}" class="heart-burst">❤</div></div><div class="actions"><div class="left"><button id="likeBtn-${p.id}" class="act ${isLiked?'liked':''}" onclick="fastLike('${p.id}')"><svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg></button><button class="act" onclick="openComment('${p.id}')"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button></div><button class="act ${isSaved?'saved':''}" onclick="savePost('${p.id}')"><svg viewBox="0 0 24 24"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></button></div><div style="padding:0 14px"><b><span id="likeCount-${p.id}">${lCount}</span> likes</b><br><b>${displayNameFor(ownerKey)}</b> ${p.caption||''}</div></div>`}document.getElementById('feed').innerHTML=html||'<p style="text-align:center;padding:40px;color:#888">No posts da 😴</p>';observeHomeVideos();if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();}
+function renderFeed(){let feedPosts=[...allPosts];if(feedMode=='foryou'){feedPosts.sort((a,b)=>viralScore(b)-viralScore(a))}else if(feedMode=='following'){let followingIds=new Set(allFollows.filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));feedPosts=feedPosts.filter(p=>String(p.user_id)===String(ME_ID)||followingIds.has(String(p.user_id)));feedPosts.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));}else if(feedMode=='latest'){feedPosts.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));}let html='';for(let p of feedPosts){let ownerKey=p.user_id;if(!ownerKey || String(ownerKey).length<20){let pr=allProfiles.find(x=>cleanUser(x.username)===cleanUser(p.username));if(pr) ownerKey=pr.id;else ownerKey=p.username}let lCount=allLikes.filter(l=>String(l.post_id)==String(p.id)).length;let isLiked=allLikes.some(l=>String(l.post_id)==String(p.id)&&(l.user_id==ME_ID));let isSaved=allSaves.some(s=>String(s.post_id)==String(p.id)&&(s.user_id==ME_ID));let best=getBestMedia(p);let mUrl=best.url||'';let mediaHtml=best.isVid?`<video class="main" src="${mUrl}" loop muted playsinline preload="auto"></video>`:`<img class="main" src="${mUrl}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x500/111/fff?text=Pixoro'">`;let isMe=String(ownerKey)===String(ME_ID);let isFollowing = window.PIXORO_FOLLOWING ? window.PIXORO_FOLLOWING.has(String(ownerKey)) : allFollows.some(f=>String(f.follower_id)===String(ME_ID)&&String(f.following_id)===String(ownerKey));let followBtnHtml='';if(!isMe){followBtnHtml=`<button data-follow-user="${ownerKey}" class="followBtnPost ${isFollowing?'following':''}" onclick="event.stopPropagation();toggleFollow('${ownerKey}',this)">${isFollowing?'Following ✓':'Follow'}</button>`}html+=`<div class="post" id="post-${p.id}"><div class="postTop"><div style="display:flex;align-items:center;gap:10px"><div class="pfpRing" onclick="location.href='profile.html?u=${ownerKey}'"><div class="pfpInner"><img src="${getPfp(ownerKey)}"></div></div><div style="display:flex;align-items:center;gap:8px"><b>${displayNameFor(ownerKey)}</b>${followBtnHtml}</div>${p._from==='reels'?'<span style="font-size:10px;background:#ff5ea8;padding:2px 6px;border-radius:10px">REEL</span>':''}</div><span>⋮</span></div><div style="position:relative" onclick="handleTap('${p.id}')">${mediaHtml}<div id="burst-${p.id}" class="heart-burst">❤</div></div><div class="actions"><div class="left"><button id="likeBtn-${p.id}" class="act ${isLiked?'liked':''}" onclick="fastLike('${p.id}')"><svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg></button><button class="act" onclick="openComment('${p.id}')"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button></div><button class="act ${isSaved?'saved':''}" onclick="savePost('${p.id}')"><svg viewBox="0 0 24 24"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></button></div><div style="padding:0 14px"><b><span id="likeCount-${p.id}">${lCount}</span> likes</b><br><b>${displayNameFor(ownerKey)}</b> ${p.caption||''}</div></div>`}document.getElementById('feed').innerHTML=html||'<p style="text-align:center;padding:40px;color:#888">No posts da</p>';observeHomeVideos();if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();}
 function observeHomeVideos(){let vs=document.querySelectorAll('.post video.main');let io=new IntersectionObserver(es=>{es.forEach(e=>{let v=e.target;if(e.isIntersecting){v.muted=true;v.play().catch(()=>{})}else{v.pause()}})},{threshold:0.6});vs.forEach(v=>io.observe(v))}
 function handleTap(id){let now=Date.now();if(now-lastTap<300){doubleLike(id);lastTap=0}else{lastTap=now}}
 async function doubleLike(id){let burst=document.getElementById('burst-'+id);if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show')}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&(l.user_id==ME_ID));if(liked)return;allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});let btn=document.getElementById('likeBtn-'+id);if(btn)btn.classList.add('liked');let c=document.getElementById('likeCount-'+id);if(c)c.innerText=parseInt(c.innerText||'0')+1;supa=getSupa();if(supa){await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}}
 async function fastLike(id){let liked=allLikes.some(l=>String(l.post_id)==String(id)&&(l.user_id==ME_ID));let btn=document.getElementById('likeBtn-'+id);let c=document.getElementById('likeCount-'+id);if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});if(btn)btn.classList.add('liked');if(c)c.innerText=parseInt(c.innerText||'0')+1;let burst=document.getElementById('burst-'+id);if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show')}supa=getSupa();if(supa)await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}else{allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&(l.user_id==ME_ID)));if(btn)btn.classList.remove('liked');if(c)c.innerText=Math.max(0,parseInt(c.innerText||'1')-1);supa=getSupa();if(supa)await supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID)}}
-// ===== FINAL FIX - Home Follow - Core ah Koopdaathe da - Direct Supabase da - Revert Illa da ✅ =====
 async function toggleFollow(otherId, btn){
   let targetId = resolveUserId(otherId) || String(otherId);
   if(!targetId || String(targetId)===String(ME_ID)) return;
@@ -187,7 +193,6 @@ async function toggleFollow(otherId, btn){
     }catch(e){}
   }
   if(!targetId || !String(targetId).includes('-')) return;
-  // 1. Udane UI maathu da - Supabase ku wait panna venda da
   if(!window.PIXORO_FOLLOWING) window.PIXORO_FOLLOWING=new Set();
   let wasFollowing = window.PIXORO_FOLLOWING.has(String(targetId));
   let wantFollowing = !wasFollowing;
@@ -199,7 +204,6 @@ async function toggleFollow(otherId, btn){
   else window.PIXORO_FOLLOWING.delete(String(targetId));
   if(wantFollowing){ if(!allFollows.some(f=>String(f.follower_id)===String(ME_ID)&&String(f.following_id)===String(targetId))) allFollows.push({follower_id:ME_ID,following_id:targetId}); }
   else { allFollows = allFollows.filter(f=>!(String(f.follower_id)===String(ME_ID)&&String(f.following_id)===String(targetId))); }
-  // 2. Supabase la save pannu da - Fail aana kooda UI ah revert pannaathe da
   try{
     let s=getSupa();
     if(wantFollowing){
