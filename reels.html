@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Pixoro Reels - Full Settings</title>
+<title>Pixoro Reels - Full Screen</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
-.reelWrap{width:100vw;height:calc(100dvh - 56px - 52px);overflow-y:scroll;overflow-x:hidden;scroll-snap-type:y mandatory;scroll-behavior:smooth;background:#000;position:fixed;top:56px;left:0}
+.reelWrap{width:100vw;height:100dvh;overflow-y:scroll;overflow-x:hidden;scroll-snap-type:y mandatory;scroll-behavior:smooth;background:#000;position:fixed;top:0;left:0}
 .reelWrap::-webkit-scrollbar{display:none}
-.reel{width:100vw!important;height:calc(100dvh - 56px - 52px)!important;flex-shrink:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#000!important}
-.reel-main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;z-index:2!important;display:block!important;background:#000}
-.reel-main.bgRemove{object-fit:contain!important;background:#000!important}
+.reel{width:100vw!important;height:100dvh!important;flex-shrink:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#000!important}
+.reel-main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;z-index:2!important;display:block!important;background:#000}
 .progress{position:absolute;top:0;left:0;height:2px;background:#fff;width:0%;z-index:20}
-.vBar{position:absolute!important;right:10px!important;bottom:100px!important;display:flex!important;flex-direction:column!important;gap:20px!important;align-items:center!important;z-index:15!important}
+.vBar{position:absolute!important;right:10px!important;bottom:110px!important;display:flex!important;flex-direction:column!important;gap:20px!important;align-items:center!important;z-index:15!important}
 .vBtn{display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;width:48px!important;cursor:pointer!important}
 .vBtn span{font-size:11px!important;font-weight:700!important;color:#fff!important;text-shadow:0 1px 4px rgba(0,0,0,0.9)!important}
 .vBtn svg{width:28px!important;height:28px!important;stroke:#fff!important;fill:none!important;stroke-width:1.8!important;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8))!important}
@@ -26,17 +25,17 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .audioDiscInBar img{width:100%!important;height:100%!important;object-fit:cover!important}
 .audioWrap{display:flex!important;flex-direction:column!important;align-items:center!important}
 @keyframes spin{to{transform:rotate(360deg)}}
-.btm{position:absolute!important;left:10px!important;right:82px!important;bottom:10px!important;z-index:10!important;text-shadow:0 2px 8px rgba(0,0,0,0.9)!important;background:linear-gradient(to top, rgba(0,0,0,0.6), transparent);padding:20px 0 0 0}
+.btm{position:absolute!important;left:10px!important;right:82px!important;bottom:65px!important;z-index:10!important;text-shadow:0 2px 8px rgba(0,0,0,0.9)!important;background:linear-gradient(to top, rgba(0,0,0,0.6), transparent);padding:20px 0 0 0}
 .reel-pfp-wrap{width:32px!important;height:32px!important;min-width:32px!important;border-radius:50%!important;overflow:hidden!important;border:1.8px solid #fff!important}
 .reel-pfp-wrap img{width:100%!important;height:100%!important;object-fit:cover}
 .reel-username{font-size:13.5px!important;font-weight:600!important;margin-left:6px!important}
 .reel-caption{margin-top:6px!important;font-size:12px!important;color:#ddd!important;line-height:1.3;display:block!important;max-height:42px!important;overflow:hidden!important}
 .followBtnPerusa{background:rgba(255,255,255,0.22)!important;color:#fff!important;border:1.2px solid #fff!important;padding:7px 16px!important;border-radius:8px!important;font-weight:700!important;font-size:13px!important;margin-left:8px!important;height:32px!important;backdrop-filter:blur(8px)}
-.reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:56px;padding:0 16px;background:linear-gradient(to bottom, rgba(0,0,0,0.85), transparent)}
+.followBtnPerusa.following{background:#fff!important;color:#000!important}
+.reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:56px;padding:0 16px;background:linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);pointer-events:none}
 .reelsTop b{color:#fff!important;font-size:24px!important;font-weight:800!important}
-.topRight{display:flex!important;gap:12px!important;align-items:center!important}
+.topRight{display:flex!important;gap:12px!important;align-items:center!important;pointer-events:auto}
 .volBtn,.searchTopBtn{background:transparent!important;border:none!important;width:28px!important;height:28px!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:20px}
-.musicBar{display:none!important}
 .hashtag{color:#00bfff!important;font-weight:700!important;cursor:pointer!important}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;width:100vw;height:52px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{color:#8e8e8e;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
@@ -69,18 +68,10 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .undoBtn{color:#0a84ff;font-weight:700;cursor:pointer}
 .cRow{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;border-bottom:1px solid #2c2c2e}
 .cRow .del{color:#ff3b30;font-size:12px;font-weight:700;cursor:pointer}
-.toggle{width:48px;height:28px;border-radius:20px;background:#3a3a3c;position:relative;flex-shrink:0;cursor:pointer}
-.toggle.on{background:#34c759}
-.toggle::after{content:'';position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}
-.toggle.on::after{left:22px}
-.uploadBox{margin:0 12px 12px;background:#2c2c2e;border-radius:18px;padding:16px 18px}
-.uploadBar{height:8px;background:#3a3a3c;border-radius:10px;overflow:hidden;margin:10px 0}
-.uploadBar div{height:100%;background:#fff;width:0%}
 .toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:800;z-index:9999;display:none;white-space:nowrap;max-width:90vw}
 </style></head><body>
 <div class="reelsTop"><b>Pixoro</b><div class="topRight">
 <div class="searchTopBtn" onclick="location.href='search.html'"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg></div>
-<div class="volBtn" onclick="openSettingsPage()">⚙️</div>
 <div class="volBtn" id="volIcon" onclick="toggleMuteAll()"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></div>
 </div></div>
 <div class="reelWrap" id="reelWrap"></div>
@@ -96,12 +87,7 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <div class="sheetHandle"></div><div class="pixHead"><b>Your Pixoro ✨</b><p>Namba reels - safe ah</p></div>
 <div class="safeCard">
 <div class="safeItem" onclick="editReel()"><div class="icon">✏️</div><div class="txt"><div class="title">Edit caption</div><div class="sub">Words maathu - safe</div></div></div>
-<div class="safeItem" onclick="viewInsights()"><div class="icon">📊</div><div class="txt"><div class="title">See how it's doing</div><div class="sub">Views - Owner ku mattum</div></div></div>
 <div class="safeItem" onclick="shareQR()"><div class="icon">🔗</div><div class="txt"><div class="title">Share link</div><div class="sub">Friends ku share - enjoy</div></div></div>
-</div>
-<div class="safeCard">
-<div class="safeItem" onclick="archiveSafe()"><div class="icon">🗃️</div><div class="txt"><div class="title">Archive - Safe keep</div><div class="sub">Delete illa - safe ah vechukalam</div></div></div>
-<div class="safeItem" onclick="removeGridSafe()"><div class="icon">➖</div><div class="txt"><div class="title">Remove from grid</div><div class="sub">Grid la irunthu mattum - Image safe</div></div></div>
 </div>
 <div class="safeCard"><div class="safeItem" onclick="deleteSafe()"><div class="icon">🗑️</div><div class="txt"><div class="title" style="color:#ff3b30">Delete - Safe</div><div class="sub">30 days archive la irukkum</div></div></div></div>
 </div></div>
@@ -113,58 +99,26 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 </div>
 <div class="safeCard">
 <div class="safeItem" onclick="notInterestedSafe()"><div class="icon">😶</div><div class="txt"><div class="title">Show less like this</div><div class="sub">Intha maari venda - Safe</div></div></div>
-<div class="safeItem" onclick="hideReelSafe()"><div class="icon">🙈</div><div class="txt"><div class="title">Hide this reel</div><div class="sub">Ippo paaka venda - Image remove illa - Hide mattum</div></div></div>
-<div class="safeItem" onclick="muteUserSafe()"><div class="icon">🌙</div><div class="txt"><div class="title">Mute - No alert block</div><div class="sub">Avanuku theriyathu - Silent block - 7 days</div></div></div>
-<div class="safeItem" onclick="blockUserSafe()"><div class="icon">🚫</div><div class="txt"><div class="title">Block - No alert</div><div class="sub">Full block - Avanuku theriyathu - Setting la irukkum</div></div></div>
+<div class="safeItem" onclick="hideReelSafe()"><div class="icon">🙈</div><div class="txt"><div class="title">Hide this reel</div><div class="sub">Ippo paaka venda</div></div></div>
+<div class="safeItem" onclick="reportSafe()"><div class="icon">🛡️</div><div class="txt"><div class="title">Report - Keep safe</div><div class="sub">No alert - Safe</div></div></div>
 </div>
-<div class="safeCard">
-<div class="safeItem" onclick="reportSafe()"><div class="icon">🛡️</div><div class="txt"><div class="title">Report - Keep safe</div><div class="sub">No alert - Safe - Pixoro safe ah irukkum</div></div></div>
-</div>
-<div class="safeCard"><div class="safeItem" onclick="closeSheet('viewerSheet');openSettingsPage()"><div class="icon">⚙️</div><div class="txt"><div class="title">Settings - Hidden / Block</div><div class="sub">Hide pannathu inga - Mela paaru</div></div></div></div>
-<div id="undoArea"></div>
-</div></div>
-<div class="sheet" id="settingsPage" onclick="if(event.target==this)closeSheet('settingsPage')"><div class="sheetBox">
-<div class="sheetHandle"></div><div class="pixHead"><b>Settings ⚙️</b><p>Pixoro - Namba pudicha mari</p></div>
-<div class="safeCard"><div style="padding:14px 18px 6px"><b>🙈 Hidden Reels - Mela</b><p style="font-size:12px;color:#8e8e93;margin-top:2px">Hide / Show less pannathu - Delete illa</p></div><div id="hiddenList"></div><div style="padding:0 18px 14px"><button onclick="restoreAllPixoro()" style="width:100%;padding:10px;background:#fff;color:#000;border:0;border-radius:12px;font-weight:800">♻️ Ellam thirumba kaatu</button></div></div>
-<div class="safeCard"><div style="padding:14px 18px 6px"><b>🌙 Muted - No alert</b><p style="font-size:12px;color:#8e8e93;margin-top:2px">Avanuku theriyathu - Silent</p></div><div id="mutedList"></div></div>
-<div class="safeCard"><div style="padding:14px 18px 6px"><b>🚫 Blocked - No alert</b><p style="font-size:12px;color:#8e8e93;margin-top:2px">Full block - Setting la mattum theriyum</p></div><div id="blockedList"></div></div>
-<div class="uploadBox"><b>🪄 Background Remove</b><p style="font-size:12px;color:#8e8e93;margin-top:4px">Photo upload panna background remove pannalama?</p>
-<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px"><span style="font-size:14px">Background Remove</span><div class="toggle" id="bgToggle" onclick="toggleBgRemove()"></div></div>
-<p id="bgStatus" style="font-size:12px;color:#8e8e93;margin-top:8px">Off - Original image - Safe</p>
-</div>
-<div class="uploadBox"><b>📤 Upload Size</b><p style="font-size:12px;color:#8e8e93;margin-top:4px">Pixoro Upload Limit - Safe</p>
-<div style="display:flex;justify-content:space-between;margin-top:12px;font-size:13px"><span>Photo</span><b>10 MB Max</b></div>
-<div class="uploadBar"><div id="photoBar" style="width:35%"></div></div>
-<div style="display:flex;justify-content:space-between;font-size:13px"><span>Video / Reel</span><b>100 MB Max</b></div>
-<div class="uploadBar"><div id="videoBar" style="width:65%"></div></div>
-<div style="display:flex;justify-content:space-between;font-size:13px"><span>Your Last Upload</span><b id="lastUploadSize">0 MB</b></div>
-<p style="font-size:12px;color:#8e8e93;margin-top:8px" id="uploadMsg">Size kulla iruntha than upload aagum da - Perusa iruntha compress pannu da</p>
-<input type="file" id="uploadInput" accept="image/*,video/*" style="display:none" onchange="checkUploadSize(this)">
-<button onclick="document.getElementById('uploadInput').click()" style="width:100%;margin-top:12px;padding:12px;background:#fff;color:#000;border:0;border-radius:12px;font-weight:800">📤 Check Upload Size - File Select pannu</button>
-</div>
-<div class="safeCard"><div class="safeItem" onclick="clearAllSettings()"><div class="icon">🧹</div><div class="txt"><div class="title">Clear All Settings</div><div class="sub">Ellam reset - Pudhu maari</div></div></div></div>
 </div></div>
 <div class="sheet" id="commentSheet" onclick="if(event.target==this)closeSheet('commentSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Comments</b></div><div id="commentList" style="overflow-y:auto;flex:1;max-height:45vh;padding:0 20px"></div><div style="display:flex;gap:10px;align-items:center;padding:10px 20px;border-top:1px solid #2c2c2e;margin-top:10px"><input id="commentInput" style="flex:1;background:#2c2c2e;border:0;border-radius:20px;padding:12px 14px;color:#fff;outline:none" placeholder="Add kind comment..."><button onclick="postComment()" style="background:#fff;color:#000;border:0;border-radius:20px;padding:10px 18px;font-weight:800">Post</button></div></div></div>
 <div class="sheet" id="shareSheet" onclick="if(event.target==this)closeSheet('shareSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Share</b></div><div class="safeCard"><div class="safeItem" onclick="copyLinkSafe()"><div class="txt"><div class="title">📋 Copy Link</div></div></div><div class="safeItem" onclick="shareWA()"><div class="txt"><div class="title">💚 WhatsApp</div></div></div></div></div></div>
 <script>
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
-function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2500)}
+function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 function fmtViews(n){if(n>=1000000)return (n/1000000).toFixed(1).replace('.0','')+'M';if(n>=1000)return (n/1000).toFixed(1).replace('.0','')+'K';return String(n)}
-let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=[],mutedUsers=[],blockedUsers=[],hiddenMeta={},lastAction=null,bgRemoveOn=false,lastUploadMB=0,allReports=[],savingIds=new Set()
-async function waitSupa(){for(let i=0;i<50;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,200))}return window.supa}
-async function init(){supa=await waitSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;window.ME_ID=ME_ID;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);applyBgRemoveUI();await loadHiddenMutedBlocked();load()}
-async function loadHiddenMutedBlocked(){
-  try{let {data}=await supa.from('posts').select('id').eq('is_archived',true);hiddenPosts=(data||[]).map(x=>String(x.id));}catch(e){hiddenPosts=[]}
-  try{let {data}=await supa.from('muted_users').select('muted_user_id').eq('user_id',ME_ID);mutedUsers=(data||[]).map(x=>String(x.muted_user_id));}catch(e){mutedUsers=[]}
-  try{let {data}=await supa.from('blocked_users').select('blocked_user_id').eq('user_id',ME_ID);blockedUsers=(data||[]).map(x=>String(x.blocked_user_id));}catch(e){blockedUsers=[]}
-}
+let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=[],mutedUsers=[],blockedUsers=[],hiddenMeta={},lastAction=null,savingIds=new Set()
+async function waitSupa(){for(let i=0;i<20;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
+async function init(){supa=await waitSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;window.ME_ID=ME_ID;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);load()}
 function getPfp(u){let p=profileMap[cleanUser(u)];if(p?.avatar_url)return p.avatar_url;return 'https://ui-avatars.com/api/?name='+(cleanUser(u).charAt(0).toUpperCase()||'P')+'&background=fff&color=000&size=200&bold=true'}
 function isMyPostObj(p){if(!p)return false;if(p.user_id&&String(p.user_id)===String(ME_ID))return true;return cleanUser(p.username)===cleanUser(ME_RAW)}
 async function load(){try{
 let all=[];
-try{ let r=await supa.from('posts').select('*').order('created_at',{ascending:false}); if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'posts'}))); }catch(e){}
-try{ let r=await supa.from('reels').select('*').order('created_at',{ascending:false}); if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'reels'}))); }catch(e){}
+try{ let r=await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(50); if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'posts'}))); }catch(e){}
+try{ let r=await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(50); if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'reels'}))); }catch(e){}
 let seenUrl=new Set(); let seenId=new Set(); let deduped=[];
 for(let p of all){
   let raw=(p.media_url||p.image_url||p.video_url||'').trim();
@@ -176,9 +130,8 @@ for(let p of all){
   seenUrl.add(url); seenId.add(String(p.id)); deduped.push(p);
 }
 all=deduped;
-let likes=[],saves=[],follows=[],comments=[],views=[];try{likes=(await supa.from('likes').select('*')).data||[]}catch(e){}try{saves=(await supa.from('saves').select('*').eq('user_id',ME_ID)).data||[]}catch(e){}try{follows=(await supa.from('follows').select('*')).data||[]}catch(e){}try{comments=(await supa.from('comments').select('*').order('created_at',{ascending:false})).data||[]}catch(e){}try{views=(await supa.from('views').select('*')).data||[]}catch(e){}
-allPosts=all;allLikes=likes;allSaves=saves;allFollows=follows;allComments=comments;allViews=views;console.log("Pixoro After Dedupe:",allPosts.length);render()}catch(err){console.log(err)}}
-// PIXORO REAL VIEWS - PUBLIC - Oruvan ku Oru View mattum da - Replay la Eraathu da
+let likes=[],saves=[],follows=[],comments=[],views=[];try{likes=(await supa.from('likes').select('*').limit(500)).data||[]}catch(e){}try{saves=(await supa.from('saves').select('*').eq('user_id',ME_ID)).data||[]}catch(e){}try{follows=(await supa.from('follows').select('*').limit(1000)).data||[]}catch(e){}try{comments=(await supa.from('comments').select('*').order('created_at',{ascending:false}).limit(200)).data||[]}catch(e){}try{views=(await supa.from('views').select('*').limit(500)).data||[]}catch(e){}
+allPosts=all;allLikes=likes;allSaves=saves;allFollows=follows;allComments=comments;allViews=views;render()}catch(err){console.log(err)}}
 async function addRealView(postId){
   postId=String(postId);
   if(viewedPosts.has(postId)) return;
@@ -196,17 +149,15 @@ function nextReel(currentVideo){
   let cur=currentVideo.closest('.reel');
   let idx=reels.indexOf(cur);
   let next=reels[idx+1] || reels[0];
-  if(next){ next.scrollIntoView({behavior:'smooth',block:'start'}); let nv=next.querySelector('video'); if(nv){ nv.muted=globalMuted; nv.play().catch(()=>{nv.muted=true;nv.play().catch(()=>{})}); } }
+  if(next){ next.scrollIntoView({behavior:'smooth',block:'start'}); }
 }
-function getAICaption(p){return '';}
-function isAIcaption(txt){return !txt||txt==='Just Reels'||txt.length<5}
 function parseHashtags(text){return (text||'').replace(/#(\w+)/g,'<span class="hashtag" onclick="event.stopPropagation();openHashtag(\'$1\')\">#$1</span>')}
-function showCenter(reel,isPaused){let c=reel.querySelector('.centerCtrl');if(!c) return;c.innerHTML='<div class="centerIcon">'+(isPaused?'<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="#fff"/></svg>':'<svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z" fill="#fff"/></svg>')+'</div>';c.classList.add('show'); setTimeout(()=>c.classList.remove('show'),900);}
+function showCenter(reel,isPaused){let c=reel.querySelector('.centerCtrl');if(!c) return;c.innerHTML='<div class="centerIcon">'+(isPaused?'<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="#fff"/></svg>':'<svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z" fill="#fff"/></svg>')+'</div>';c.classList.add('show'); setTimeout(()=>c.classList.remove('show'),700);}
 function getBestMedia(p){
-  if(p._from==='reels'){ return {url: p.video_url||p.media_url||'', poster:'', isVid:true}; }
+  if(p._from==='reels'){ return {url: p.video_url||p.media_url||'', isVid:true}; }
   let m=(p.media_url||p.video_url||'').toLowerCase().split('?')[0];
-  if(m.endsWith('.mp4')||m.endsWith('.mov')||m.endsWith('.webm')||m.endsWith('.m4v')){ return {url: p.media_url||p.video_url, poster:'', isVid:true}; }
-  return {url: p.media_url||p.video_url||p.image_url||'', poster:'', isVid:false};
+  if(m.endsWith('.mp4')||m.endsWith('.mov')||m.endsWith('.webm')||m.endsWith('.m4v')){ return {url: p.media_url||p.video_url, isVid:true}; }
+  return {url: p.media_url||p.video_url||p.image_url||'', isVid:false};
 }
 function render(){
 let wrap=document.getElementById('reelWrap');
@@ -222,13 +173,13 @@ let best=getBestMedia(p);
 let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length;
 let media='';
 if(best.isVid){
-  media=`<video class="reel-main ${bgRemoveOn?'bgRemove':''}" src="${best.url}" playsinline preload="auto" muted autoplay onended="nextReel(this)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"></video><div class="vidFallback" style="display:none;position:absolute;inset:0;z-index:2;background:#111;color:#888;align-items:center;justify-content:center;font-size:13px">Video load aagala - Tap to retry</div>`;
+  media=`<video class="reel-main" src="${best.url}" playsinline preload="auto" muted loop onended="nextReel(this)"></video>`;
 } else {
-  media=`<img class="reel-main ${bgRemoveOn?'bgRemove':''}" src="${best.url}" onerror="this.style.display='none'">`;
+  media=`<img class="reel-main" src="${best.url}">`;
 }
-let followBtn=isMine?'':`<button id="followBtn-${p.id}" class="followBtnPerusa" onclick="event.stopPropagation();toggleF('${p.user_id}','${p.id}')">${isFollow?'Following':'Follow'}</button>`;
+let followBtn=isMine?'':`<button id="followBtn-${p.id}" class="followBtnPerusa ${isFollow?'following':''}" onclick="event.stopPropagation();toggleF('${p.user_id}','${p.id}')">${isFollow?'Following':'Follow'}</button>`;
 let likeCount = lc>0?lc:''; let commentCount = allComments.filter(c=>String(c.post_id)==String(p.id)).length;
-let finalCaption=isAIcaption(p.caption)?'':(p.caption||''); let parsedCaption=parseHashtags(finalCaption);
+let parsedCaption=parseHashtags(p.caption||'');
 let captionHtml = parsedCaption ? `<div class="reel-caption"><span>${parsedCaption}</span></div>` : '';
 return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div class="progress"></div>${media}<div class="heartBurst"></div><div class="centerCtrl"></div>
 <div class="vBar">
@@ -242,50 +193,27 @@ return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div c
 <div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div>${captionHtml}<div style="font-size:12px;color:#ddd;margin-top:6px;font-weight:700">▶ <span data-viewcount="${p.id}">${fmtViews(vCount)}</span> views</div></div>
 </div>`
 }).join('');observe()}
-function observe(){let reels=document.querySelectorAll('.reel-main');let io=new IntersectionObserver(entries=>{entries.forEach(e=>{let v=e.target;if(v.tagName!='VIDEO')return;let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;if(e.isIntersecting){document.querySelectorAll('video.reel-main').forEach(o=>{if(o!==v)o.pause()});v.muted=globalMuted;currentVideo=v;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})});if(prog){v.addEventListener('timeupdate',()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'})}addRealView(reel.dataset.id);}else{v.pause()}})}, {threshold:0.6}); reels.forEach(v=>{if(v.tagName=='VIDEO')io.observe(v)})}
+function observe(){let reels=document.querySelectorAll('.reel-main');let io=new IntersectionObserver(entries=>{entries.forEach(e=>{let v=e.target;if(v.tagName!='VIDEO')return;let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;if(e.isIntersecting){document.querySelectorAll('video.reel-main').forEach(o=>{if(o!==v)o.pause()});v.muted=globalMuted;currentVideo=v;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})});if(prog){v.ontimeupdate=()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'}}addRealView(reel.dataset.id);}else{v.pause()}})}, {threshold:0.6}); reels.forEach(v=>{if(v.tagName=='VIDEO')io.observe(v)})}
 function handleReelTap(el){let now=Date.now();if(now-lastTap<300){clearTimeout(tapTimer);lastTap=0;dblLike(el.dataset.id);return}lastTap=now;tapTimer=setTimeout(()=>{let v=el.querySelector('video.reel-main');if(v){if(v.paused){v.muted=false;globalMuted=false;currentVideo=v;v.play();showCenter(el,false)}else{v.pause();showCenter(el,true)}}lastTap=0},300)}
-async function dblLike(id){let reel=document.querySelector(`.reel[data-id="${id}"]`);let b=reel?reel.querySelector('.heartBurst'):null;if(b){b.classList.remove('show');void b.offsetWidth;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1150)}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);try{await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}catch(e){}}}
+async function dblLike(id){let reel=document.querySelector(`.reel[data-id="${id}"]`);let b=reel?reel.querySelector('.heartBurst'):null;if(b){b.classList.remove('show');void b.offsetWidth;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),900)}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);try{await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}catch(e){}}}
 async function toggleLike(id){let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).then(()=>{}).catch(()=>{});}else{allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID)));updateLikeUI(id,false);supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}).catch(()=>{});}}
 function updateLikeUI(id,liked){let btn=document.getElementById('likeBtn-'+id);let svg=document.getElementById('likeSvg-'+id);let cnt=document.getElementById('likeCnt-'+id);if(btn){if(liked)btn.classList.add('liked');else btn.classList.remove('liked')}if(svg){svg.setAttribute('fill',liked?'#ff3040':'none');svg.setAttribute('stroke',liked?'#ff3040':'#fff');}if(cnt){let n=allLikes.filter(l=>String(l.post_id)==String(id)).length;cnt.innerText=n>0?n:''}}
-function openPixoroSheet(postId, userId, username){ curSheetId=postId; curSheetUser=userId; curSheetUsername=username; let isMine = String(userId)===String(ME_ID) || cleanUser(username)===cleanUser(ME_RAW); if(isMine){ document.getElementById('ownerSheet').classList.add('show'); } else { document.getElementById('viewerSheet').classList.add('show'); document.getElementById('undoArea').innerHTML=''; } }
+function openPixoroSheet(postId, userId, username){ curSheetId=postId; curSheetUser=userId; curSheetUsername=username; let isMine = String(userId)===String(ME_ID) || cleanUser(username)===cleanUser(ME_RAW); if(isMine){ document.getElementById('ownerSheet').classList.add('show'); } else { document.getElementById('viewerSheet').classList.add('show'); } }
 function editReel(){ if(curSheetId) location.href='edit.html?id='+curSheetId; }
-function shareQR(){ let link=location.origin+'/reels.html?id='+curSheetId; navigator.clipboard.writeText(link); closeSheet('ownerSheet'); showToast('Link copied 📤'); }
-function viewInsights(){ let vcount=allViews.filter(v=>String(v.post_id)==String(curSheetId)).length; showToast('🌟 Views: ' + vcount + ' - Super da'); closeSheet('ownerSheet'); }
-async function archiveSafe(){ if(hiddenPosts.includes(String(curSheetId)))return; hiddenPosts.push(String(curSheetId)); hiddenMeta[String(curSheetId)]={reason:'Archived',username:curSheetUsername}; try{await supa.from('posts').update({is_archived:true}).eq('id',curSheetId)}catch(e){} try{await supa.from('reels').update({is_archived:true}).eq('id',curSheetId)}catch(e){} lastAction={type:'archive',id:curSheetId}; showUndo('Archived - Image safe 📦',true,true); setTimeout(()=>render(),400); closeSheet('ownerSheet'); }
-async function removeGridSafe(){ if(hiddenPosts.includes(String(curSheetId)))return; hiddenPosts.push(String(curSheetId)); hiddenMeta[String(curSheetId)]={reason:'Remove from grid',username:curSheetUsername}; try{await supa.from('posts').update({is_archived:true}).eq('id',curSheetId)}catch(e){} try{await supa.from('reels').update({is_archived:true}).eq('id',curSheetId)}catch(e){} lastAction={type:'hide',id:curSheetId}; showUndo('Removed from grid - Safe 🗃️',true,true); setTimeout(()=>render(),400); closeSheet('ownerSheet'); }
-function deleteSafe(){ archiveSafe(); }
+function shareQR(){ let link=location.origin+'/reels.html?id='+curSheetId; navigator.clipboard.writeText(link); closeSheet('ownerSheet'); }
+async function deleteSafe(){ if(hiddenPosts.includes(String(curSheetId)))return; hiddenPosts.push(String(curSheetId)); try{await supa.from('posts').update({is_archived:true}).eq('id',curSheetId)}catch(e){} try{await supa.from('reels').update({is_archived:true}).eq('id',curSheetId)}catch(e){} setTimeout(()=>render(),200); closeSheet('ownerSheet'); }
 async function saveReel(){ await saveR(curSheetId); closeSheet('viewerSheet'); }
-function copyLinkSafe(){ let link=location.origin+'/reels.html?id='+curSheetId; navigator.clipboard.writeText(link); showUndo('Link copied 📤'); closeSheet('viewerSheet'); closeSheet('shareSheet'); }
+function copyLinkSafe(){ let link=location.origin+'/reels.html?id='+curSheetId; navigator.clipboard.writeText(link); closeSheet('viewerSheet'); closeSheet('shareSheet'); }
 function shareWA(){ let link=location.origin+'/reels.html?id='+curShareId; window.open('https://wa.me/?text='+encodeURIComponent(link),'_blank'); }
-async function notInterestedSafe(){ if(hiddenPosts.includes(String(curSheetId))){closeSheet('viewerSheet');return;} hiddenPosts.push(String(curSheetId)); hiddenMeta[String(curSheetId)]={reason:'Show less like this',username:curSheetUsername}; try{await supa.from('posts').update({is_archived:true}).eq('id',curSheetId)}catch(e){} lastAction={type:'hide',id:curSheetId}; showUndo('Got it - Setting mela irukku 😊',true,true); setTimeout(()=>render(),400); closeSheet('viewerSheet'); }
-async function hideReelSafe(){ if(hiddenPosts.includes(String(curSheetId))){closeSheet('viewerSheet');return;} hiddenPosts.push(String(curSheetId)); hiddenMeta[String(curSheetId)]={reason:'Hide this reel',username:curSheetUsername}; try{await supa.from('posts').update({is_archived:true}).eq('id',curSheetId)}catch(e){} lastAction={type:'hide',id:curSheetId}; showUndo('Hidden - Setting mela irukku 🙈',true,true); setTimeout(()=>render(),400); closeSheet('viewerSheet'); }
-async function muteUserSafe(){ if(mutedUsers.includes(String(curSheetUser))){closeSheet('viewerSheet');return;} mutedUsers.push(String(curSheetUser)); try{await supa.from('muted_users').insert({user_id:ME_ID,muted_user_id:curSheetUser})}catch(e){} lastAction={type:'mute',id:curSheetUser}; showUndo('Muted - No alert 🌙 - Setting la irukku',true,true); setTimeout(()=>render(),400); closeSheet('viewerSheet'); }
-async function blockUserSafe(){ if(blockedUsers.includes(String(curSheetUser))){closeSheet('viewerSheet');return;} blockedUsers.push(String(curSheetUser)); try{await supa.from('blocked_users').insert({user_id:ME_ID,blocked_user_id:curSheetUser})}catch(e){} lastAction={type:'block',id:curSheetUser}; showUndo('Blocked - No alert 🚫 - Setting la irukku',true,true); setTimeout(()=>render(),400); closeSheet('viewerSheet'); }
-function reportSafe(){ allReports.push({postId:curSheetId, time:Date.now()}); showUndo('Thanks - Pixoro safe 🛡️ - No alert'); }
-function showUndo(msg,canUndo,showSettings){ let area=document.getElementById('undoArea'); area.innerHTML=`<div class="undoBar"><span>${msg}</span><div style="display:flex;gap:10px">${canUndo?'<span class="undoBtn" onclick="undoLast()">Undo</span>':''}${showSettings?'<span class="undoBtn" onclick="closeSheet(\'viewerSheet\');openSettingsPage()">Settings ⚙️</span>':''}</div></div>`; if(!canUndo) setTimeout(()=>area.innerHTML='',3000); }
-async function undoLast(){ if(!lastAction) return; if(lastAction.type==='archive' || lastAction.type==='hide'){ hiddenPosts=hiddenPosts.filter(id=>id!==String(lastAction.id)); try{await supa.from('posts').update({is_archived:false}).eq('id',lastAction.id)}catch(e){} try{await supa.from('reels').update({is_archived:false}).eq('id',lastAction.id)}catch(e){} } if(lastAction.type==='mute'){ mutedUsers=mutedUsers.filter(id=>id!==String(lastAction.id)); try{await supa.from('muted_users').delete().eq('user_id',ME_ID).eq('muted_user_id',lastAction.id)}catch(e){} } if(lastAction.type==='block'){ blockedUsers=blockedUsers.filter(id=>id!==String(lastAction.id)); try{await supa.from('blocked_users').delete().eq('user_id',ME_ID).eq('blocked_user_id',lastAction.id)}catch(e){} } render(); document.getElementById('undoArea').innerHTML='<div class="undoBar"><span>Undone - Back ✨</span></div>'; setTimeout(()=>document.getElementById('undoArea').innerHTML='',2000); }
-function openSettingsPage(){
- let hList=document.getElementById('hiddenList');
- if(!hiddenPosts.length){ hList.innerHTML=`<div style="padding:12px 18px;color:#8e8e93;font-size:13px">Onnum hide pannala da - Ellam safe ✨</div>`; }
- else { hList.innerHTML=hiddenPosts.map(pid=>{ let p=allPosts.find(x=>String(x.id)===String(pid)); let name=p?cleanUser(p.username):(hiddenMeta[pid]?.username||'Reel'); let reason=hiddenMeta[pid]?.reason||'Hidden'; let img=p?(p.media_url||p.image_url||p.video_url||''):''; return `<div class="safeItem"><div class="icon" style="background:none;overflow:hidden;padding:0"><img src="${img}" onerror="this.style.display='none'" style="width:36px;height:36px;object-fit:cover;border-radius:10px"></div><div class="txt"><div class="title">${name}</div><div class="sub">${reason} - Image safe</div></div><div style="display:flex;gap:6px"><button onclick="unhideOne('${pid}')" style="background:#fff;color:#000;border:0;border-radius:10px;padding:8px 10px;font-weight:700">Kaatu</button><button onclick="removeOnePermanent('${pid}')" style="background:#3a3a3c;color:#ff3b30;border:0;border-radius:10px;padding:8px 10px;font-weight:700">Remove</button></div></div>`; }).join(''); }
- let mList=document.getElementById('mutedList');
- if(!mutedUsers.length){ mList.innerHTML=`<div style="padding:12px 18px;color:#8e8e93;font-size:13px">Yaarayum mute pannala da 🌿</div>`; }
- else { mList.innerHTML=mutedUsers.map(uid=>{ let p=allPosts.find(x=>String(x.user_id)===String(uid)); let name=p?cleanUser(p.username):'User'; return `<div class="safeItem"><div class="icon">🌙</div><div class="txt"><div class="title">${name}</div><div class="sub">Muted - No alert - Silent</div></div><button onclick="unmuteOne('${uid}')" style="background:#fff;color:#000;border:0;border-radius:10px;padding:8px 12px;font-weight:700">Unmute</button></div>`; }).join(''); }
- let bList=document.getElementById('blockedList');
- if(!blockedUsers.length){ bList.innerHTML=`<div style="padding:12px 18px;color:#8e8e93;font-size:13px">Yaarayum block pannala da 🛡️</div>`; }
- else { bList.innerHTML=blockedUsers.map(uid=>{ let p=allPosts.find(x=>String(x.user_id)===String(uid)); let name=p?cleanUser(p.username):'User'; return `<div class="safeItem"><div class="icon">🚫</div><div class="txt"><div class="title">${name}</div><div class="sub">Blocked - No alert - Silent</div></div><button onclick="unblockOne('${uid}')" style="background:#fff;color:#000;border:0;border-radius:10px;padding:8px 12px;font-weight:700">Unblock</button></div>`; }).join(''); }
- applyBgRemoveUI(); updateUploadUI(); document.getElementById('settingsPage').classList.add('show');
-}
-async function unhideOne(pid){ hiddenPosts=hiddenPosts.filter(id=>String(id)!==String(pid)); try{await supa.from('posts').update({is_archived:false}).eq('id',pid)}catch(e){} try{await supa.from('reels').update({is_archived:false}).eq('id',pid)}catch(e){} render(); openSettingsPage(); }
-async function unmuteOne(uid){ mutedUsers=mutedUsers.filter(id=>String(id)!==String(uid)); try{await supa.from('muted_users').delete().eq('user_id',ME_ID).eq('muted_user_id',uid)}catch(e){} render(); openSettingsPage(); }
-async function unblockOne(uid){ blockedUsers=blockedUsers.filter(id=>String(id)!==String(uid)); try{await supa.from('blocked_users').delete().eq('user_id',ME_ID).eq('blocked_user_id',uid)}catch(e){} render(); openSettingsPage(); }
-async function removeOnePermanent(pid){ hiddenPosts=hiddenPosts.filter(id=>String(id)!==String(pid)); allPosts=allPosts.filter(p=>String(p.id)!==String(pid)); try{await supa.from('posts').delete().eq('id',pid)}catch(e){} try{await supa.from('reels').delete().eq('id',pid)}catch(e){} showToast('Removed 🗑️'); render(); openSettingsPage(); }
-async function restoreAllPixoro(){ hiddenPosts=[]; mutedUsers=[]; blockedUsers=[]; hiddenMeta={}; try{await supa.from('posts').update({is_archived:false}).eq('is_archived',true)}catch(e){} try{await supa.from('muted_users').delete().eq('user_id',ME_ID)}catch(e){} try{await supa.from('blocked_users').delete().eq('user_id',ME_ID)}catch(e){} render(); openSettingsPage(); }
-function clearAllSettings(){ restoreAllPixoro(); showToast('Ellam Reset Aayiruchu ✨'); }
-function toggleBgRemove(){ bgRemoveOn=!bgRemoveOn; applyBgRemoveUI(); render(); }
-function applyBgRemoveUI(){ let t=document.getElementById('bgToggle'); let s=document.getElementById('bgStatus'); if(t) t.className='toggle'+(bgRemoveOn?' on':''); if(s) s.innerText=bgRemoveOn?'On - Background remove - Photo clean ah theriyum 🪄':'Off - Original image - Safe'; }
-function updateUploadUI(){ let el=document.getElementById('lastUploadSize'); if(el) el.innerText=lastUploadMB.toFixed(2)+' MB'; }
-function checkUploadSize(input){ if(!input.files || !input.files[0]) return; let f=input.files[0]; let mb=f.size/(1024*1024); lastUploadMB=mb; let isVideo=f.type.startsWith('video'); let limit=isVideo?100:10; let msg=document.getElementById('uploadMsg'); if(mb>limit){ msg.innerText=`❌ Too big da - ${mb.toFixed(2)} MB - Limit ${limit} MB - Compress pannu da`; msg.style.color='#ff3b30'; } else { msg.innerText=`✅ Safe da - ${mb.toFixed(2)} MB / ${limit} MB - Upload pannalam da - ${bgRemoveOn?'Background remove ON 🪄':''}`; msg.style.color='#34c759'; } updateUploadUI(); }
+async function notInterestedSafe(){ if(hiddenPosts.includes(String(curSheetId))){closeSheet('viewerSheet');return;} hiddenPosts.push(String(curSheetId)); try{await supa.from('posts').update({is_archived:true}).eq('id',curSheetId)}catch(e){} setTimeout(()=>render(),200); closeSheet('viewerSheet'); }
+async function hideReelSafe(){ if(hiddenPosts.includes(String(curSheetId))){closeSheet('viewerSheet');return;} hiddenPosts.push(String(curSheetId)); try{await supa.from('posts').update({is_archived:true}).eq('id',curSheetId)}catch(e){} setTimeout(()=>render(),200); closeSheet('viewerSheet'); }
+function reportSafe(){ closeSheet('viewerSheet'); }
+function openCommentSheet(pid){curCommentPost=pid;let list=allComments.filter(c=>String(c.post_id)==String(pid));document.getElementById('commentList').innerHTML=list.length?list.map(c=>{let isMyC=String(c.user_id)==String(ME_ID)||cleanUser(c.username)==cleanUser(ME_RAW);return `<div class="cRow"><div><b>${cleanUser(c.username)}</b> <span style="font-size:13px;color:#ddd"> ${c.text||''}</span></div>${isMyC?`<span class="del" onclick="deleteComment('${c.id}','${pid}')">Delete</span>`:''}</div>`}).join(''):'<div style="text-align:center;color:#888;padding:20px">No comments yet - Be kind 💜</div>';document.getElementById('commentSheet').classList.add('show');}
+function closeSheet(id){document.getElementById(id).classList.remove('show')}
+async function postComment(){let inp=document.getElementById('commentInput');let t=inp.value.trim();if(!t||!curCommentPost)return;let tmp={id:'tmp_'+Date.now(),post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t};allComments.unshift(tmp);inp.value='';openCommentSheet(curCommentPost);try{await supa.from('comments').insert({post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t})}catch(e){}}
+async function deleteComment(cid,pid){allComments=allComments.filter(c=>String(c.id)!=String(cid));openCommentSheet(pid);try{await supa.from('comments').delete().eq('id',cid)}catch(e){}}
+function openShareSheet(pid){curShareId=pid;document.getElementById('shareSheet').classList.add('show')}
+function toggleMuteAll(){globalMuted=!globalMuted;document.querySelectorAll('video').forEach(v=>v.muted=globalMuted);document.getElementById('volIcon').innerHTML=globalMuted?'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>':'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>'}
 function updateSaveUI(id,saved){
   let btn=document.getElementById('saveBtn-'+id); let svg=document.getElementById('saveSvg-'+id);
   if(btn) btn.classList.toggle('saved',saved);
@@ -298,35 +226,20 @@ async function saveR(id){
     let isSaved=allSaves.some(x=>String(x.post_id)===id && String(x.user_id)===String(ME_ID));
     if(isSaved){
       let {error}=await supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID);
-      if(error){ console.log('UNSAVE ERROR',error); showToast('Unsave Aagala da ❌ '+error.message); return; }
-      allSaves=allSaves.filter(x=>!(String(x.post_id)===id && String(x.user_id)===String(ME_ID)));
-      updateSaveUI(id,false);
-      showToast('Unsaved ✅');
+      if(!error){ allSaves=allSaves.filter(x=>!(String(x.post_id)===id && String(x.user_id)===String(ME_ID))); updateSaveUI(id,false); }
     } else {
       let {data,error}=await supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).select().single();
-      if(error){
-        console.log('SAVE ERROR',error);
-        if(String(error.message||'').includes('duplicate') || error.code==='23505'){
-          allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW});
-          updateSaveUI(id,true);
-          showToast('Already Saved 🔖');
-          return;
-        }
-        showToast('Save Aagala da ❌ '+error.message);
-        return;
-      }
-      allSaves.push(data||{post_id:id,user_id:ME_ID,username:ME_RAW});
-      updateSaveUI(id,true);
-      showToast('Saved 🔖 - Profile > Saved la Paaru da');
+      if(!error){ allSaves.push(data||{post_id:id,user_id:ME_ID,username:ME_RAW}); updateSaveUI(id,true); }
     }
+    // NO ALERT - Silent Save da - Toast Illa da
   } finally { savingIds.delete(id); }
 }
-async function toggleF(uid,pid){if(!uid||String(uid)==String(ME_ID))return;let isF=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid));document.querySelectorAll('[id^="followBtn-"]').forEach(b=>{let bid=b.id.replace('followBtn-','');let pp=allPosts.find(x=>String(x.id)==String(bid));if(pp&&String(pp.user_id)==String(uid))b.innerText=isF?'Follow':'Following'});if(isF){allFollows=allFollows.filter(f=>!(String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid)));try{await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',uid)}catch(e){}}else{allFollows.push({follower_id:ME_ID,following_id:uid});try{await supa.from('follows').insert({follower_id:ME_ID,following_id:uid})}catch(e){}}}
-function openCommentSheet(pid){curCommentPost=pid;let list=allComments.filter(c=>String(c.post_id)==String(pid));document.getElementById('commentList').innerHTML=list.length?list.map(c=>{let isMyC=String(c.user_id)==String(ME_ID)||cleanUser(c.username)==cleanUser(ME_RAW);return `<div class="cRow"><div><b>${cleanUser(c.username)}</b> <span style="font-size:13px;color:#ddd"> ${c.text||''}</span></div>${isMyC?`<span class="del" onclick="deleteComment('${c.id}','${pid}')">Delete</span>`:''}</div>`}).join(''):'<div style="text-align:center;color:#888;padding:20px">No comments yet - Be kind 💜</div>';document.getElementById('commentSheet').classList.add('show');}
-function closeSheet(id){document.getElementById(id).classList.remove('show')}
-async function postComment(){let inp=document.getElementById('commentInput');let t=inp.value.trim();if(!t||!curCommentPost)return;let tmp={id:'tmp_'+Date.now(),post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t};allComments.unshift(tmp);inp.value='';openCommentSheet(curCommentPost);try{await supa.from('comments').insert({post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t})}catch(e){}}
-async function deleteComment(cid,pid){allComments=allComments.filter(c=>String(c.id)!=String(cid));openCommentSheet(pid);try{await supa.from('comments').delete().eq('id',cid)}catch(e){}}
-function openShareSheet(pid){curShareId=pid;document.getElementById('shareSheet').classList.add('show')}
-function toggleMuteAll(){globalMuted=!globalMuted;document.querySelectorAll('video').forEach(v=>v.muted=globalMuted);document.getElementById('volIcon').innerHTML=globalMuted?'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>':'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>'}
+async function toggleF(uid,pid){
+  if(!uid||String(uid)==String(ME_ID))return;
+  let isF=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid));
+  document.querySelectorAll('[id^="followBtn-"]').forEach(b=>{let bid=b.id.replace('followBtn-','');let pp=allPosts.find(x=>String(x.id)==String(bid));if(pp&&String(pp.user_id)==String(uid)){b.innerText=isF?'Follow':'Following';b.classList.toggle('following',!isF)}});
+  if(isF){allFollows=allFollows.filter(f=>!(String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(uid)));try{await supa.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',uid)}catch(e){}}
+  else{allFollows.push({follower_id:ME_ID,following_id:uid});try{await supa.from('follows').insert({follower_id:ME_ID,following_id:uid})}catch(e){}}
+}
 init()
 </script></body></html>
