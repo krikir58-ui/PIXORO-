@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Pixoro Reels - Full Screen</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=106"></script>
+<script src="js/pixoro-core.js?v=115"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
@@ -135,7 +135,15 @@ for(let p of all){
 }
 all=deduped;
 let likes=[],saves=[],follows=[],comments=[],views=[];try{likes=(await supa.from('likes').select('*').limit(500)).data||[]}catch(e){}try{saves=(await supa.from('saves').select('*').eq('user_id',ME_ID)).data||[]}catch(e){}try{follows=(await supa.from('follows').select('*').limit(1000)).data||[]}catch(e){}try{comments=(await supa.from('comments').select('*').order('created_at',{ascending:false}).limit(200)).data||[]}catch(e){}try{views=(await supa.from('views').select('*').limit(500)).data||[]}catch(e){}
-allPosts=all;allLikes=likes;allSaves=saves;allFollows=follows;allComments=comments;allViews=views;if(window.PIXORO_FOLLOWING) window.PIXORO_FOLLOWING=new Set((follows||[]).filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));render();if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();setTimeout(()=>{if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();},500);}catch(err){console.log(err)}}
+allPosts=all;allLikes=likes;allSaves=saves;allFollows=follows;allComments=comments;allViews=views;
+if(window.PIXORO_FOLLOWING){
+  window.PIXORO_FOLLOWING=new Set((follows||[]).filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));
+  window.PIXORO_ID_TO_NAME=window.PIXORO_ID_TO_NAME||{};
+  window.PIXORO_NAME_TO_ID=window.PIXORO_NAME_TO_ID||{};
+  (Object.values(profileMap)||[]).forEach(pp=>{ window.PIXORO_ID_TO_NAME[String(pp.id)]=cleanUser(pp.username); window.PIXORO_NAME_TO_ID[cleanUser(pp.username)]=String(pp.id); });
+  window.PIXORO_FOLLOWING_NAMES=new Set([...window.PIXORO_FOLLOWING].map(id=>cleanUser(window.PIXORO_ID_TO_NAME[id]||'')));
+}
+render();if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();setTimeout(()=>{if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();},500);}catch(err){console.log(err)}}
 async function addRealView(postId){
   postId=String(postId);
   if(viewedPosts.has(postId)) return;
@@ -171,7 +179,8 @@ wrap.innerHTML=visiblePosts.map(p=>{
 let lc=allLikes.filter(l=>String(l.post_id)==String(p.id)).length;
 let liked=allLikes.some(l=>String(l.post_id)==String(p.id)&&String(l.user_id)==String(ME_ID));
 let saved=allSaves.some(s=>String(s.post_id)==String(p.id)&&String(s.user_id)==String(ME_ID));
-let isFollow = window.PIXORO_FOLLOWING ? window.PIXORO_FOLLOWING.has(String(p.user_id)) : allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(p.user_id));
+let followName=cleanUser(p.username||'');
+let isFollow = window.PIXORO_FOLLOWING_NAMES ? window.PIXORO_FOLLOWING_NAMES.has(followName) : (window.PIXORO_FOLLOWING ? window.PIXORO_FOLLOWING.has(String(p.user_id)) : allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(p.user_id)));
 let isMine=isMyPostObj(p);
 let best=getBestMedia(p);
 let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length;
@@ -181,7 +190,8 @@ if(best.isVid){
 } else {
   media=`<img class="reel-main" src="${best.url}">`;
 }
-let followBtn=isMine?'':`<button data-follow-user="${p.user_id}" id="followBtn-${p.id}" class="followBtnPerusa ${isFollow?'following':''}" onclick="event.stopPropagation();toggleFollow('${p.user_id}')">${isFollow?'Following ✓':'Follow'}</button>`;
+// FIXED v115 - UUID Illa da - Username than da - sanjay_0 nu Pogum da
+let followBtn=isMine||!followName||followName==='null'?'':`<button data-follow-user="${followName}" data-follow-username="${followName}" id="followBtn-${p.id}" class="followBtnPerusa ${isFollow?'following':''}" onclick="event.stopPropagation();toggleFollow('${followName}',this)">${isFollow?'Following ✓':'Follow'}</button>`;
 let likeCount = lc>0?lc:''; let commentCount = allComments.filter(c=>String(c.post_id)==String(p.id)).length;
 let parsedCaption=parseHashtags(p.caption||'');
 let captionHtml = parsedCaption ? `<div class="reel-caption"><span>${parsedCaption}</span></div>` : '';
@@ -237,6 +247,68 @@ async function saveR(id){
     }
   } finally { savingIds.delete(id); }
 }
-// CORRECTED - Reels la Thani toggleFollow / toggleF Venda da - Core la Irukka ORE Function than da - Sam ah Irukkum da
+// ===== REELS FOLLOW FINAL v115 - CORE AH OVERRIDE PANNITEN DA - USERNAME ILLANA PAKKATHULA IRUNDHU EDUKKUM DA =====
+window.toggleFollow = async function(target, btn){
+  try{
+    let name = String(target||'').trim().toLowerCase().replace('@','');
+    // UUID vantha - Username ah Maathu da
+    let isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(name);
+    if(isUuid){
+      let pr = profileMap[name] || Object.values(profileMap||{}).find(x=>String(x.id)===name);
+      if(pr) name = cleanUser(pr.username);
+      else {
+        let pp = allPosts.find(p=>String(p.user_id)===name);
+        if(pp) name = cleanUser(pp.username);
+        else name = '';
+      }
+    }
+    if(!name || name==='null' || name==='undefined'){
+      name = String(btn?.dataset?.followUsername || btn?.dataset?.followUser || '').toLowerCase().replace('@','');
+      if(/^[0-9a-f-]{36}$/.test(name)) name='';
+    }
+    // Button la Kooda Illana - Pakkathula Irukka .reel-username la Irundhu Edu da
+    if(!name || name==='null'){
+      let reel = btn?.closest('.reel');
+      let bTag = reel?.querySelector('.reel-username') || btn?.parentElement?.querySelector('b');
+      if(bTag) name = cleanUser(bTag.innerText||'');
+    }
+    name = String(name||'').replace(/[^a-z0-9_.]/g,'');
+    if(!name || name==='null'){
+      alert('Username kedaikala da - ' + String(target||''));
+      return false;
+    }
+    if(name === cleanUser(ME_RAW)) return false;
+    let b = btn;
+    let wasFollowing = b ? b.innerText.includes('Following') : false;
+    if(b){ b.innerText = wasFollowing ? 'Follow' : 'Following ✓'; b.classList.toggle('following', !wasFollowing); }
+    if(window.PIXORO_FOLLOWING_NAMES){ if(!wasFollowing) window.PIXORO_FOLLOWING_NAMES.add(name); else window.PIXORO_FOLLOWING_NAMES.delete(name); }
+    let s = window.supa;
+    if(!s){ alert('Supa load aagala da'); return false; }
+    let {data:{session}} = await s.auth.getSession();
+    if(!session){ location.href='login.html'; return false; }
+    let {data, error} = await s.rpc('toggle_follow_by_name', {target_name: name});
+    if(error){
+      let {data:prof} = await s.from('profiles').select('id').ilike('username', name).single();
+      let tid = prof?.id;
+      if(!tid){
+        let {data:pp} = await s.from('posts').select('user_id').ilike('username', name).limit(1).single();
+        tid = pp?.user_id;
+      }
+      if(!tid){ alert('User Not Found da - ' + name); if(b) b.innerText = wasFollowing ? 'Following ✓' : 'Follow'; return false; }
+      if(!wasFollowing){
+        let r = await s.from('follows').insert({follower_id: session.user.id, following_id: tid});
+        if(r.error){ alert('Follow Fail da - ' + r.error.message); if(b) b.innerText='Follow'; return false; }
+        data = true;
+      } else {
+        await s.from('follows').delete().eq('follower_id', session.user.id).eq('following_id', tid);
+        data = false;
+      }
+    }
+    if(b){ b.innerText = data ? 'Following ✓' : 'Follow'; b.classList.toggle('following', !!data); }
+    return !!data;
+  }catch(e){ alert('Follow Error da - ' + e.message); return false; }
+};
+window.pixoroToggleFollow = window.toggleFollow;
+window.toggleF = window.toggleFollow;
 init()
 </script></body></html>
