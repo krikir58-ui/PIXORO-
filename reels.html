@@ -31,6 +31,8 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .reel-pfp-wrap img{width:100%!important;height:100%!important;object-fit:cover}
 .reel-username{font-size:13.5px!important;font-weight:600!important;margin-left:6px!important}
 .reel-caption{margin-top:6px!important;font-size:12px!important;color:#ddd!important;line-height:1.3;display:block!important;max-height:42px!important;overflow:hidden!important}
+/* REAL VIEWS BADGE da - Namma Pixoro Style da */
+.viewBadge{display:inline-flex;align-items:center;gap:5px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.35);padding:5px 10px;border-radius:99px;font-size:12px;font-weight:800;color:#fff;margin-top:8px;backdrop-filter:blur(6px)}
 .followBtnPerusa{background:rgba(255,255,255,0.22)!important;color:#fff!important;border:1.2px solid #fff!important;padding:7px 16px!important;border-radius:8px!important;font-weight:700!important;font-size:13px!important;margin-left:8px!important;height:32px!important;backdrop-filter:blur(8px)}
 .reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:56px;padding:0 16px;background:linear-gradient(to bottom, rgba(0,0,0,0.85), transparent)}
 .reelsTop b{color:#fff!important;font-size:24px!important;font-weight:800!important}
@@ -150,6 +152,7 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2500)}
+function fmtViews(n){if(n>=1000000)return (n/1000000).toFixed(1).replace('.0','')+'M';if(n>=1000)return (n/1000).toFixed(1).replace('.0','')+'K';return String(n)}
 let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=[],mutedUsers=[],blockedUsers=[],hiddenMeta={},lastAction=null,bgRemoveOn=false,lastUploadMB=0,allReports=[],savingIds=new Set()
 async function waitSupa(){for(let i=0;i<50;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,200))}return window.supa}
 async function init(){supa=await waitSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;window.ME_ID=ME_ID;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);applyBgRemoveUI();await loadHiddenMutedBlocked();load()}
@@ -177,7 +180,16 @@ for(let p of all){
 all=deduped;
 let likes=[],saves=[],follows=[],comments=[],views=[];try{likes=(await supa.from('likes').select('*')).data||[]}catch(e){}try{saves=(await supa.from('saves').select('*').eq('user_id',ME_ID)).data||[]}catch(e){}try{follows=(await supa.from('follows').select('*')).data||[]}catch(e){}try{comments=(await supa.from('comments').select('*').order('created_at',{ascending:false})).data||[]}catch(e){}try{views=(await supa.from('views').select('*')).data||[]}catch(e){}
 allPosts=all;allLikes=likes;allSaves=saves;allFollows=follows;allComments=comments;allViews=views;console.log("Pixoro After Dedupe:",allPosts.length);render()}catch(err){console.log(err)}}
-async function addRealView(postId){ if(viewedPosts.has(postId)) return; viewedPosts.add(postId); let already = allViews.some(v=>String(v.post_id)==String(postId) && String(v.user_id)==String(ME_ID)); if(already) return; allViews.push({post_id:postId, user_id:ME_ID}); try{await supa.from('views').insert({post_id:postId, user_id:ME_ID})}catch(e){} }
+// REAL VIEWS da - 2 Sec Paatha than Count da - Oru User ku Oru View than da
+async function addRealView(postId){ postId=String(postId); if(viewedPosts.has(postId)) return; viewedPosts.add(postId); let already = allViews.some(v=>String(v.post_id)==String(postId) && String(v.user_id)==String(ME_ID)); if(already) return; allViews.push({post_id:postId, user_id:ME_ID, username:ME_RAW}); try{let {error}=await supa.from('views').insert({post_id:postId, user_id:ME_ID, username:ME_RAW}); if(error) return; let cnt=allViews.filter(v=>String(v.post_id)==String(postId)).length; let el=document.querySelector(`[data-viewcount="${postId}"]`); if(el) el.innerHTML='👁️ '+fmtViews(cnt)+' Views'; }catch(e){} }
+// REELS MUDICHA NEXT KU AUTO SCROLL da - Loop Illa da
+function nextReel(currentVideo){
+  let reels=[...document.querySelectorAll('.reel')];
+  let cur=currentVideo.closest('.reel');
+  let idx=reels.indexOf(cur);
+  let next=reels[idx+1] || reels[0];
+  if(next){ next.scrollIntoView({behavior:'smooth',block:'start'}); let nv=next.querySelector('video'); if(nv){ nv.muted=globalMuted; nv.play().catch(()=>{nv.muted=true;nv.play().catch(()=>{})}); } }
+}
 function getAICaption(p){let base=cleanUser(p.username);return `POV: ${base} on another level ✨ #fyp #viral #pixoro #${base}`;}
 function isAIcaption(txt){return !txt||txt==='Just Reels'||txt.length<5}
 function parseHashtags(text){return (text||'').replace(/#(\w+)/g,'<span class="hashtag" onclick="event.stopPropagation();openHashtag(\'$1\')\">#$1</span>')}
@@ -199,9 +211,10 @@ let saved=allSaves.some(s=>String(s.post_id)==String(p.id)&&String(s.user_id)==S
 let isFollow=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(p.user_id));
 let isMine=isMyPostObj(p);
 let best=getBestMedia(p);
+let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length;
 let media='';
 if(best.isVid){
-  media=`<video class="reel-main ${bgRemoveOn?'bgRemove':''}" src="${best.url}" playsinline preload="auto" loop muted autoplay onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"></video><div class="vidFallback" style="display:none;position:absolute;inset:0;z-index:2;background:#111;color:#888;align-items:center;justify-content:center;font-size:13px">Video load aagala - Tap to retry</div>`;
+  media=`<video class="reel-main ${bgRemoveOn?'bgRemove':''}" src="${best.url}" playsinline preload="auto" muted autoplay onended="nextReel(this)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"></video><div class="vidFallback" style="display:none;position:absolute;inset:0;z-index:2;background:#111;color:#888;align-items:center;justify-content:center;font-size:13px">Video load aagala - Tap to retry</div>`;
 } else {
   media=`<img class="reel-main ${bgRemoveOn?'bgRemove':''}" src="${best.url}" onerror="this.style.display='none'">`;
 }
@@ -217,11 +230,11 @@ return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div c
 <div class="vBtn tildeBtn" onclick="event.stopPropagation();openPixoroSheet('${p.id}','${p.user_id}','${cleanUser(p.username)}')"><span>~</span></div>
 <div class="audioWrap"><div class="audioDiscInBar"><img src="${getPfp(p.username)}"></div></div>
 </div>
-<div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div class="reel-caption"><span>${parsedCaption}</span></div></div>
+<div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div class="reel-caption"><span>${parsedCaption}</span></div><div class="viewBadge" data-viewcount="${p.id}">👁️ ${fmtViews(vCount)} Views</div></div>
 <div class="musicBar"><span style="font-size:11px">🎵 ${cleanUser(p.username)} • Original audio</span></div>
 </div>`
 }).join('');observe()}
-function observe(){let reels=document.querySelectorAll('.reel-main');let io=new IntersectionObserver(entries=>{entries.forEach(e=>{let v=e.target;if(v.tagName!='VIDEO')return;let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;if(e.isIntersecting){document.querySelectorAll('video.reel-main').forEach(o=>{if(o!==v)o.pause()});v.muted=globalMuted;currentVideo=v;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})});if(prog){v.addEventListener('timeupdate',()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'})}setTimeout(()=>{if(e.isIntersecting) addRealView(reel.dataset.id)},1000);}else{v.pause()}})}, {threshold:0.6}); reels.forEach(v=>{if(v.tagName=='VIDEO')io.observe(v)})}
+function observe(){let reels=document.querySelectorAll('.reel-main');let io=new IntersectionObserver(entries=>{entries.forEach(e=>{let v=e.target;if(v.tagName!='VIDEO')return;let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;if(e.isIntersecting){document.querySelectorAll('video.reel-main').forEach(o=>{if(o!==v)o.pause()});v.muted=globalMuted;currentVideo=v;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})});if(prog){v.addEventListener('timeupdate',()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'})}setTimeout(()=>{if(e.isIntersecting) addRealView(reel.dataset.id)},2000);}else{v.pause()}})}, {threshold:0.6}); reels.forEach(v=>{if(v.tagName=='VIDEO')io.observe(v)})}
 function handleReelTap(el){let now=Date.now();if(now-lastTap<300){clearTimeout(tapTimer);lastTap=0;dblLike(el.dataset.id);return}lastTap=now;tapTimer=setTimeout(()=>{let v=el.querySelector('video.reel-main');if(v){if(v.paused){v.muted=false;globalMuted=false;currentVideo=v;v.play();showCenter(el,false)}else{v.pause();showCenter(el,true)}}lastTap=0},300)}
 async function dblLike(id){let reel=document.querySelector(`.reel[data-id="${id}"]`);let b=reel?reel.querySelector('.heartBurst'):null;if(b){b.classList.remove('show');void b.offsetWidth;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1150)}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);try{await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}catch(e){}}}
 async function toggleLike(id){let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).then(()=>{}).catch(()=>{});}else{allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID)));updateLikeUI(id,false);supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}).catch(()=>{});}}
@@ -265,7 +278,6 @@ function toggleBgRemove(){ bgRemoveOn=!bgRemoveOn; applyBgRemoveUI(); render(); 
 function applyBgRemoveUI(){ let t=document.getElementById('bgToggle'); let s=document.getElementById('bgStatus'); if(t) t.className='toggle'+(bgRemoveOn?' on':''); if(s) s.innerText=bgRemoveOn?'On - Background remove - Photo clean ah theriyum 🪄':'Off - Original image - Safe'; }
 function updateUploadUI(){ let el=document.getElementById('lastUploadSize'); if(el) el.innerText=lastUploadMB.toFixed(2)+' MB'; }
 function checkUploadSize(input){ if(!input.files || !input.files[0]) return; let f=input.files[0]; let mb=f.size/(1024*1024); lastUploadMB=mb; let isVideo=f.type.startsWith('video'); let limit=isVideo?100:10; let msg=document.getElementById('uploadMsg'); if(mb>limit){ msg.innerText=`❌ Too big da - ${mb.toFixed(2)} MB - Limit ${limit} MB - Compress pannu da`; msg.style.color='#ff3b30'; } else { msg.innerText=`✅ Safe da - ${mb.toFixed(2)} MB / ${limit} MB - Upload pannalam da - ${bgRemoveOn?'Background remove ON 🪄':''}`; msg.style.color='#34c759'; } updateUploadUI(); }
-// KILLA FIX - saveR - DB la Success Aana mattum Button Maaranum da - Error ah Maraikka Koodathu da
 function updateSaveUI(id,saved){
   let btn=document.getElementById('saveBtn-'+id); let svg=document.getElementById('saveSvg-'+id);
   if(btn) btn.classList.toggle('saved',saved);
@@ -277,18 +289,15 @@ async function saveR(id){
   try{
     let isSaved=allSaves.some(x=>String(x.post_id)===id && String(x.user_id)===String(ME_ID));
     if(isSaved){
-      // UNSAVE - DB la Delete Aana mattum UI Maathu da
       let {error}=await supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID);
       if(error){ console.log('UNSAVE ERROR',error); showToast('Unsave Aagala da ❌ '+error.message); return; }
       allSaves=allSaves.filter(x=>!(String(x.post_id)===id && String(x.user_id)===String(ME_ID)));
       updateSaveUI(id,false);
       showToast('Unsaved ✅');
     } else {
-      // SAVE - DB la Insert Aana mattum UI Maathu da
       let {data,error}=await supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).select().single();
       if(error){
         console.log('SAVE ERROR',error);
-        // Duplicate na - Already Saved nu Nenaikalam da - DB la irukku nu Check Pannu da
         if(String(error.message||'').includes('duplicate') || error.code==='23505'){
           allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW});
           updateSaveUI(id,true);
