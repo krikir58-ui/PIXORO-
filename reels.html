@@ -178,9 +178,19 @@ for(let p of all){
 all=deduped;
 let likes=[],saves=[],follows=[],comments=[],views=[];try{likes=(await supa.from('likes').select('*')).data||[]}catch(e){}try{saves=(await supa.from('saves').select('*').eq('user_id',ME_ID)).data||[]}catch(e){}try{follows=(await supa.from('follows').select('*')).data||[]}catch(e){}try{comments=(await supa.from('comments').select('*').order('created_at',{ascending:false})).data||[]}catch(e){}try{views=(await supa.from('views').select('*')).data||[]}catch(e){}
 allPosts=all;allLikes=likes;allSaves=saves;allFollows=follows;allComments=comments;allViews=views;console.log("Pixoro After Dedupe:",allPosts.length);render()}catch(err){console.log(err)}}
-// VIEWS - PUBLIC LA KAAMIKATHU da - DB la mattum Save Aagum da - Owner ku mattum Insights la Theriyum da
-async function addRealView(postId){ postId=String(postId); if(viewedPosts.has(postId)) return; viewedPosts.add(postId); let already = allViews.some(v=>String(v.post_id)==String(postId) && String(v.user_id)==String(ME_ID)); if(already) return; allViews.push({post_id:postId, user_id:ME_ID, username:ME_RAW}); try{await supa.from('views').insert({post_id:postId, user_id:ME_ID, username:ME_RAW});}catch(e){} }
-// REELS MUDICHA NEXT KU AUTO SCROLL da - Loop Illa da
+// PIXORO REAL VIEWS - PUBLIC - Oruvan ku Oru View mattum da - Replay la Eraathu da
+async function addRealView(postId){
+  postId=String(postId);
+  if(viewedPosts.has(postId)) return;
+  viewedPosts.add(postId);
+  let already = allViews.some(v=>String(v.post_id)==String(postId) && String(v.user_id)==String(ME_ID));
+  if(already) return;
+  allViews.push({post_id:postId, user_id:ME_ID, username:ME_RAW});
+  let cnt = allViews.filter(v=>String(v.post_id)==String(postId)).length;
+  let el = document.querySelector(`[data-viewcount="${postId}"]`);
+  if(el) el.innerText = fmtViews(cnt);
+  try{ await supa.from('views').insert({post_id:postId, user_id:ME_ID, username:ME_RAW}); }catch(e){}
+}
 function nextReel(currentVideo){
   let reels=[...document.querySelectorAll('.reel')];
   let cur=currentVideo.closest('.reel');
@@ -209,6 +219,7 @@ let saved=allSaves.some(s=>String(s.post_id)==String(p.id)&&String(s.user_id)==S
 let isFollow=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(p.user_id));
 let isMine=isMyPostObj(p);
 let best=getBestMedia(p);
+let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length;
 let media='';
 if(best.isVid){
   media=`<video class="reel-main ${bgRemoveOn?'bgRemove':''}" src="${best.url}" playsinline preload="auto" muted autoplay onended="nextReel(this)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"></video><div class="vidFallback" style="display:none;position:absolute;inset:0;z-index:2;background:#111;color:#888;align-items:center;justify-content:center;font-size:13px">Video load aagala - Tap to retry</div>`;
@@ -227,11 +238,11 @@ return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div c
 <div class="vBtn tildeBtn" onclick="event.stopPropagation();openPixoroSheet('${p.id}','${p.user_id}','${cleanUser(p.username)}')"><span>~</span></div>
 <div class="audioWrap"><div class="audioDiscInBar"><img src="${getPfp(p.username)}"></div></div>
 </div>
-<div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div class="reel-caption"><span>${parsedCaption}</span></div></div>
+<div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div class="reel-caption"><span>${parsedCaption}</span></div><div style="font-size:12px;color:#ddd;margin-top:6px;font-weight:700">▶ <span data-viewcount="${p.id}">${fmtViews(vCount)}</span> views</div></div>
 <div class="musicBar"><span style="font-size:11px">🎵 ${cleanUser(p.username)} • Original audio</span></div>
 </div>`
 }).join('');observe()}
-function observe(){let reels=document.querySelectorAll('.reel-main');let io=new IntersectionObserver(entries=>{entries.forEach(e=>{let v=e.target;if(v.tagName!='VIDEO')return;let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;if(e.isIntersecting){document.querySelectorAll('video.reel-main').forEach(o=>{if(o!==v)o.pause()});v.muted=globalMuted;currentVideo=v;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})});if(prog){v.addEventListener('timeupdate',()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'})}setTimeout(()=>{if(e.isIntersecting) addRealView(reel.dataset.id)},2000);}else{v.pause()}})}, {threshold:0.6}); reels.forEach(v=>{if(v.tagName=='VIDEO')io.observe(v)})}
+function observe(){let reels=document.querySelectorAll('.reel-main');let io=new IntersectionObserver(entries=>{entries.forEach(e=>{let v=e.target;if(v.tagName!='VIDEO')return;let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;if(e.isIntersecting){document.querySelectorAll('video.reel-main').forEach(o=>{if(o!==v)o.pause()});v.muted=globalMuted;currentVideo=v;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})});if(prog){v.addEventListener('timeupdate',()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'})}addRealView(reel.dataset.id);}else{v.pause()}})}, {threshold:0.6}); reels.forEach(v=>{if(v.tagName=='VIDEO')io.observe(v)})}
 function handleReelTap(el){let now=Date.now();if(now-lastTap<300){clearTimeout(tapTimer);lastTap=0;dblLike(el.dataset.id);return}lastTap=now;tapTimer=setTimeout(()=>{let v=el.querySelector('video.reel-main');if(v){if(v.paused){v.muted=false;globalMuted=false;currentVideo=v;v.play();showCenter(el,false)}else{v.pause();showCenter(el,true)}}lastTap=0},300)}
 async function dblLike(id){let reel=document.querySelector(`.reel[data-id="${id}"]`);let b=reel?reel.querySelector('.heartBurst'):null;if(b){b.classList.remove('show');void b.offsetWidth;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1150)}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);try{await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}catch(e){}}}
 async function toggleLike(id){let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).then(()=>{}).catch(()=>{});}else{allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID)));updateLikeUI(id,false);supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}).catch(()=>{});}}
