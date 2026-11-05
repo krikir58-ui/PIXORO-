@@ -60,21 +60,17 @@ function pixoroIsRealPhoto(url){
 }
 
 // ===== NO LOCAL STORAGE - Hide / Mute / Block - Supabase la mattum da =====
-// Hide = posts table la is_archived = true pannu da - Vera Phone layum Hide aagum da
 async function pixoroRemoveFromGrid(postId){
   await window.supa.from('posts').update({is_archived:true}).eq('id',postId);
   try{ await window.supa.from('reels').update({is_archived:true}).eq('id',postId); }catch(e){}
   location.reload();
 }
-// Undo = is_archived = false pannu da
 async function pixoroUnhidePost(postId){
   await window.supa.from('posts').update({is_archived:false}).eq('id',postId);
   try{ await window.supa.from('reels').update({is_archived:false}).eq('id',postId); }catch(e){}
   location.reload();
 }
-// Mute = follows table la mute - Vera table vendaam da - Supabase la than da
 async function pixoroMuteUser(userId){
-  // muted_users table iruntha anga - Illana follows la note pannu da
   try{ await window.supa.from('muted_users').insert({user_id:window.ME_ID, muted_user_id:userId}); }catch(e){ console.log("Mute table illa - Supabase la muted_users table create pannu da"); }
   location.reload();
 }
@@ -82,7 +78,6 @@ async function pixoroBlockUser(userId){
   try{ await window.supa.from('blocked_users').insert({user_id:window.ME_ID, blocked_user_id:userId}); }catch(e){ console.log("Block table illa - Supabase la blocked_users table create pannu da"); }
   location.reload();
 }
-// Hidden / Muted / Blocked List ah Supabase la irunthu Edu da - Local la illa da
 async function pixoroGetHiddenIds(){
   let {data} = await window.supa.from('posts').select('id').eq('is_archived',true);
   return (data||[]).map(p=>String(p.id));
@@ -109,12 +104,10 @@ async function getPixoroFeed(){
   let hidden = await pixoroGetHiddenIds();
   let muted = await pixoroGetMutedIds();
   let blocked = await pixoroGetBlockedIds();
-  // Likes / Saves / Views - Supabase la irunthu Edu da - Local la illa da
   let {data:likes} = await window.supa.from('likes').select('*');
   let {data:saves} = await window.supa.from('saves').select('*');
   let {data:views} = await window.supa.from('views').select('*');
   let likedUserIds = [...new Set((likes||[]).filter(l=>String(l.user_id)===String(window.ME_ID)).map(l=>String(l.post_id)))];
-  // Real logic - liked post oda user ah score ku use pannu da
   let likedUsers = (likes||[]).filter(l=>String(l.user_id)===String(window.ME_ID)).map(l=>l.post_id);
   let savedIds = (saves||[]).filter(s=>String(s.user_id)===String(window.ME_ID)).map(s=>String(s.post_id));
   let watchMap = {}; (views||[]).forEach(v=>{ watchMap[v.post_id]=(watchMap[v.post_id]||0)+1; });
@@ -130,7 +123,6 @@ function pixoroReelSetup(videoEl, postId, userId){
   if(!videoEl) return;
   videoEl.loop = true; videoEl.muted = true; videoEl.playsInline = true; videoEl.autoplay = true;
   videoEl.addEventListener('timeupdate', async ()=>{
-    // 3 sec paatha - Views table la Save pannu da - Local la illa da
     if(!videoEl.dataset.counted && videoEl.currentTime > 3){
       videoEl.dataset.counted='1';
       await window.supa.from('views').insert({post_id:postId, user_id:window.ME_ID||null});
@@ -158,7 +150,6 @@ async function pixoroSave(postId, userId){
 }
 
 function pixoroOnDMSent(toUserId){
-  // DM sent ah - Likes la Count pannu da - Local vendaam da
   console.log("Pixoro DM Sent to:", toUserId);
 }
 
@@ -242,3 +233,50 @@ window.pixoroBlockUser = pixoroBlockUser;
 window.loadProfileRealCount = loadProfileRealCount;
 window.pixoroOpenFollowList = pixoroOpenFollowList;
 window.pixoroLoadFollowCounts = pixoroLoadFollowCounts;
+
+// ===== PIXORO FOLLOW SYNC - CORE LA IRUNDHU ELLA PAGE KUM CONNECT DA =====
+// Core Ella Page layum Irukku - Athe na Follow um Ella Page kum Varum da - Vera Page la Thani Link Theva Illa da
+(function(){
+  if(document.querySelector('script[data-pixoro-follow]')) return;
+  let s = document.createElement('script');
+  s.src = 'js/follow.js';
+  s.type = 'module';
+  s.setAttribute('data-pixoro-follow','1');
+  document.head.appendChild(s);
+})();
+
+function pixoroSyncFollowBtn(targetId, state){
+  targetId = String(targetId);
+  let txt = state==='following' ? 'Following ✓' : state==='requested' ? 'Requested' : 'Follow';
+  document.querySelectorAll('[data-follow-user]').forEach(btn=>{
+    if(String(btn.dataset.followUser)===targetId){
+      btn.innerText = btn.id==='followBtnMain' ? (state==='following' ? 'Following' : state==='requested' ? 'Requested' : 'Follow') : txt;
+      btn.classList.toggle('following', state==='following');
+      btn.classList.toggle('requested', state==='requested');
+      btn.dataset.followState = state;
+    }
+  });
+  document.querySelectorAll('.followBtnPost, .followBtnPerusa, .followBtnRBig, [id^="followBtn-"]').forEach(btn=>{
+    let bid = btn.dataset.followUser;
+    if(!bid){
+      let oc = btn.getAttribute('onclick')||'';
+      let m = oc.match(/['"]([^'"]+)['"]/);
+      if(m) bid = m[1];
+    }
+    if(bid && String(bid)===targetId){
+      btn.innerText = txt;
+      btn.classList.toggle('following', state==='following');
+      btn.classList.toggle('requested', state==='requested');
+    }
+  });
+}
+window.pixoroSyncFollowBtn = pixoroSyncFollowBtn;
+
+window.addEventListener('storage', (e)=>{
+  if(e.key==='pixoro_follow_sync' && e.newValue){
+    try{ let d = JSON.parse(e.newValue); pixoroSyncFollowBtn(d.targetId, d.following); }catch(err){}
+  }
+});
+window.addEventListener('pixoroFollowChanged', (e)=>{
+  pixoroSyncFollowBtn(e.detail.targetId, e.detail.following);
+});
