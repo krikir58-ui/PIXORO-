@@ -31,8 +31,6 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .reel-pfp-wrap img{width:100%!important;height:100%!important;object-fit:cover}
 .reel-username{font-size:13.5px!important;font-weight:600!important;margin-left:6px!important}
 .reel-caption{margin-top:6px!important;font-size:12px!important;color:#ddd!important;line-height:1.3;display:block!important;max-height:42px!important;overflow:hidden!important}
-/* REAL VIEWS BADGE da - Namma Pixoro Style da */
-.viewBadge{display:inline-flex;align-items:center;gap:5px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.35);padding:5px 10px;border-radius:99px;font-size:12px;font-weight:800;color:#fff;margin-top:8px;backdrop-filter:blur(6px)}
 .followBtnPerusa{background:rgba(255,255,255,0.22)!important;color:#fff!important;border:1.2px solid #fff!important;padding:7px 16px!important;border-radius:8px!important;font-weight:700!important;font-size:13px!important;margin-left:8px!important;height:32px!important;backdrop-filter:blur(8px)}
 .reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:56px;padding:0 16px;background:linear-gradient(to bottom, rgba(0,0,0,0.85), transparent)}
 .reelsTop b{color:#fff!important;font-size:24px!important;font-weight:800!important}
@@ -98,7 +96,7 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 <div class="sheetHandle"></div><div class="pixHead"><b>Your Pixoro ✨</b><p>Namba reels - safe ah</p></div>
 <div class="safeCard">
 <div class="safeItem" onclick="editReel()"><div class="icon">✏️</div><div class="txt"><div class="title">Edit caption</div><div class="sub">Words maathu - safe</div></div></div>
-<div class="safeItem" onclick="viewInsights()"><div class="icon">📊</div><div class="txt"><div class="title">See how it's doing</div><div class="sub">Views - jolly ah paaru</div></div></div>
+<div class="safeItem" onclick="viewInsights()"><div class="icon">📊</div><div class="txt"><div class="title">See how it's doing</div><div class="sub">Views - Owner ku mattum</div></div></div>
 <div class="safeItem" onclick="shareQR()"><div class="icon">🔗</div><div class="txt"><div class="title">Share link</div><div class="sub">Friends ku share - enjoy</div></div></div>
 </div>
 <div class="safeCard">
@@ -180,8 +178,8 @@ for(let p of all){
 all=deduped;
 let likes=[],saves=[],follows=[],comments=[],views=[];try{likes=(await supa.from('likes').select('*')).data||[]}catch(e){}try{saves=(await supa.from('saves').select('*').eq('user_id',ME_ID)).data||[]}catch(e){}try{follows=(await supa.from('follows').select('*')).data||[]}catch(e){}try{comments=(await supa.from('comments').select('*').order('created_at',{ascending:false})).data||[]}catch(e){}try{views=(await supa.from('views').select('*')).data||[]}catch(e){}
 allPosts=all;allLikes=likes;allSaves=saves;allFollows=follows;allComments=comments;allViews=views;console.log("Pixoro After Dedupe:",allPosts.length);render()}catch(err){console.log(err)}}
-// REAL VIEWS da - 2 Sec Paatha than Count da - Oru User ku Oru View than da
-async function addRealView(postId){ postId=String(postId); if(viewedPosts.has(postId)) return; viewedPosts.add(postId); let already = allViews.some(v=>String(v.post_id)==String(postId) && String(v.user_id)==String(ME_ID)); if(already) return; allViews.push({post_id:postId, user_id:ME_ID, username:ME_RAW}); try{let {error}=await supa.from('views').insert({post_id:postId, user_id:ME_ID, username:ME_RAW}); if(error) return; let cnt=allViews.filter(v=>String(v.post_id)==String(postId)).length; let el=document.querySelector(`[data-viewcount="${postId}"]`); if(el) el.innerHTML='👁️ '+fmtViews(cnt)+' Views'; }catch(e){} }
+// VIEWS - PUBLIC LA KAAMIKATHU da - DB la mattum Save Aagum da - Owner ku mattum Insights la Theriyum da
+async function addRealView(postId){ postId=String(postId); if(viewedPosts.has(postId)) return; viewedPosts.add(postId); let already = allViews.some(v=>String(v.post_id)==String(postId) && String(v.user_id)==String(ME_ID)); if(already) return; allViews.push({post_id:postId, user_id:ME_ID, username:ME_RAW}); try{await supa.from('views').insert({post_id:postId, user_id:ME_ID, username:ME_RAW});}catch(e){} }
 // REELS MUDICHA NEXT KU AUTO SCROLL da - Loop Illa da
 function nextReel(currentVideo){
   let reels=[...document.querySelectorAll('.reel')];
@@ -211,7 +209,6 @@ let saved=allSaves.some(s=>String(s.post_id)==String(p.id)&&String(s.user_id)==S
 let isFollow=allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(p.user_id));
 let isMine=isMyPostObj(p);
 let best=getBestMedia(p);
-let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length;
 let media='';
 if(best.isVid){
   media=`<video class="reel-main ${bgRemoveOn?'bgRemove':''}" src="${best.url}" playsinline preload="auto" muted autoplay onended="nextReel(this)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"></video><div class="vidFallback" style="display:none;position:absolute;inset:0;z-index:2;background:#111;color:#888;align-items:center;justify-content:center;font-size:13px">Video load aagala - Tap to retry</div>`;
@@ -230,7 +227,7 @@ return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div c
 <div class="vBtn tildeBtn" onclick="event.stopPropagation();openPixoroSheet('${p.id}','${p.user_id}','${cleanUser(p.username)}')"><span>~</span></div>
 <div class="audioWrap"><div class="audioDiscInBar"><img src="${getPfp(p.username)}"></div></div>
 </div>
-<div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div class="reel-caption"><span>${parsedCaption}</span></div><div class="viewBadge" data-viewcount="${p.id}">👁️ ${fmtViews(vCount)} Views</div></div>
+<div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div><div class="reel-caption"><span>${parsedCaption}</span></div></div>
 <div class="musicBar"><span style="font-size:11px">🎵 ${cleanUser(p.username)} • Original audio</span></div>
 </div>`
 }).join('');observe()}
