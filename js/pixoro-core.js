@@ -7,14 +7,12 @@ if(!window.supa && window.supabase && window.supabase.createClient){
   console.log("✅ Pixoro Supa Connected da!");
 }
 
-// GOLD TICK OFF - Thodatha da
 function isGoldUser(p){ return false; }
 function goldTickHTML(p){ return ''; }
 window.isGoldUser = isGoldUser;
 window.goldTickHTML = goldTickHTML;
 window.getTick = goldTickHTML;
 
-// ===== STYLE - Plus / Bell / White Remove =====
 (function(){
   let css = `
   .topPlus, .createBtn, .plusBtn, .topAdd{ width:auto!important;height:auto!important;background:transparent!important;background-image:none!important;color:#fff!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:28px!important;font-weight:300!important;cursor:pointer!important;box-shadow:none!important;padding:0 6px!important;border:none!important; }
@@ -34,7 +32,6 @@ window.getTick = goldTickHTML;
   if(location.pathname.includes('index') || location.pathname.endsWith('/')) document.body.classList.add('isHome');
 })();
 
-// ===== FIXED getPfp - String + Object Rendum Work Aagum da =====
 window.getPfp = function(p){
   if(typeof p === 'string'){
     let name = p.replace('@','').trim() || 'G';
@@ -49,21 +46,17 @@ window.getPfp = function(p){
 window.ME_ID = window.ME_ID || null;
 window.ME_RAW = window.ME_RAW || 'giri_ceo';
 
-// ===== REAL TABLE SECRET - posts + reels Rendum da =====
 async function getAllPixoroPosts(){
   let all = [];
   try{ let r1 = await window.supa.from('posts').select('*').order('created_at',{ascending:false}); if(r1.data) all = all.concat(r1.data.map(p=>({...p,_from:'posts'}))); }catch(e){}
   try{ let r2 = await window.supa.from('reels').select('*').order('created_at',{ascending:false}); if(r2.data) all = all.concat(r2.data.map(p=>({...p,_from:'reels'}))); }catch(e){}
-  console.log("Pixoro Total Found:", all.length, all);
   return all;
 }
-
 function pixoroIsRealPhoto(url){
   if(!url) return false;
   if(url.includes('ui-avatars') || url.includes('placeholder') || url.includes('undefined')) return false;
   return true;
 }
-
 async function pixoroRemoveFromGrid(postId){
   await window.supa.from('posts').update({is_archived:true}).eq('id',postId);
   try{ await window.supa.from('reels').update({is_archived:true}).eq('id',postId); }catch(e){}
@@ -75,11 +68,11 @@ async function pixoroUnhidePost(postId){
   location.reload();
 }
 async function pixoroMuteUser(userId){
-  try{ await window.supa.from('muted_users').insert({user_id:window.ME_ID, muted_user_id:userId}); }catch(e){ console.log("Mute table illa da"); }
+  try{ await window.supa.from('muted_users').insert({user_id:window.ME_ID, muted_user_id:userId}); }catch(e){}
   location.reload();
 }
 async function pixoroBlockUser(userId){
-  try{ await window.supa.from('blocked_users').insert({user_id:window.ME_ID, blocked_user_id:userId}); }catch(e){ console.log("Block table illa da"); }
+  try{ await window.supa.from('blocked_users').insert({user_id:window.ME_ID, blocked_user_id:userId}); }catch(e){}
   location.reload();
 }
 async function pixoroGetHiddenIds(){
@@ -92,7 +85,6 @@ async function pixoroGetMutedIds(){
 async function pixoroGetBlockedIds(){
   try{ let {data} = await window.supa.from('blocked_users').select('blocked_user_id').eq('user_id',window.ME_ID); return (data||[]).map(x=>String(x.blocked_user_id)); }catch(e){ return []; }
 }
-
 function pixoroScore(post, likedUserIds, watchMap, savedIds){
   let score = 0;
   let hours = (Date.now() - new Date(post.created_at).getTime())/3600000;
@@ -102,7 +94,6 @@ function pixoroScore(post, likedUserIds, watchMap, savedIds){
   if(savedIds.includes(String(post.id))) score += 60;
   return score;
 }
-
 async function getPixoroFeed(){
   let all = await getAllPixoroPosts();
   let hidden = await pixoroGetHiddenIds();
@@ -111,7 +102,6 @@ async function getPixoroFeed(){
   let {data:likes} = await window.supa.from('likes').select('*');
   let {data:saves} = await window.supa.from('saves').select('*');
   let {data:views} = await window.supa.from('views').select('*');
-  let likedUserIds = [...new Set((likes||[]).filter(l=>String(l.user_id)===String(window.ME_ID)).map(l=>String(l.post_id)))];
   let likedUsers = (likes||[]).filter(l=>String(l.user_id)===String(window.ME_ID)).map(l=>l.post_id);
   let savedIds = (saves||[]).filter(s=>String(s.user_id)===String(window.ME_ID)).map(s=>String(s.post_id));
   let watchMap = {}; (views||[]).forEach(v=>{ watchMap[v.post_id]=(watchMap[v.post_id]||0)+1; });
@@ -122,7 +112,6 @@ async function getPixoroFeed(){
   clean.sort((a,b)=> pixoroScore(b, likedUsers, watchMap, savedIds) - pixoroScore(a, likedUsers, watchMap, savedIds));
   return clean;
 }
-
 function pixoroReelSetup(videoEl, postId, userId){
   if(!videoEl) return;
   videoEl.loop = true; videoEl.muted = true; videoEl.playsInline = true; videoEl.autoplay = true;
@@ -144,24 +133,13 @@ function pixoroReelSetup(videoEl, postId, userId){
     lastTap = now;
   });
 }
-
-async function pixoroLike(postId, userId){
-  await window.supa.from('likes').insert({post_id:postId, user_id:window.ME_ID});
-}
-
-async function pixoroSave(postId, userId){
-  await window.supa.from('saves').insert({post_id:postId, user_id:window.ME_ID});
-}
-
-function pixoroOnDMSent(toUserId){
-  console.log("Pixoro DM Sent to:", toUserId);
-}
-
+async function pixoroLike(postId, userId){ await window.supa.from('likes').insert({post_id:postId, user_id:window.ME_ID}); }
+async function pixoroSave(postId, userId){ await window.supa.from('saves').insert({post_id:postId, user_id:window.ME_ID}); }
+function pixoroOnDMSent(toUserId){ console.log("Pixoro DM Sent to:", toUserId); }
 async function getPixoroExplore(myId, myFollows){
   let all = await getAllPixoroPosts();
   return (all||[]).filter(p=> String(p.user_id)!==String(myId) && !myFollows.includes(String(p.user_id)));
 }
-
 async function pixoroSavePost(fileUrl, isReel, caption){
   let {data:{session}} = await window.supa.auth.getSession();
   if(!session) return;
@@ -170,7 +148,6 @@ async function pixoroSavePost(fileUrl, isReel, caption){
   try{ await window.supa.from('reels').insert(row); }catch(e){}
   location.href = 'reels.html';
 }
-
 async function loadProfileRealCount(){
   let all = await getAllPixoroPosts();
   let myId = window.ME_ID;
@@ -185,12 +162,10 @@ async function loadProfileRealCount(){
     let url = (p.video_url||p.media_url||p.image_url||'').toLowerCase();
     return url.includes('.mp4') || url.includes('.mov') || p.media_type==='reel' || p.media_type==='video' || p._from==='reels';
   });
-  console.log("Pixoro Mine:", mine.length, "Reels:", reels.length);
   document.querySelectorAll('#postCount, .postCount').forEach(e=> e.innerText = mine.length);
   document.querySelectorAll('#reelCount, .reelCount').forEach(e=> e.innerText = reels.length);
   return {mine, reels};
 }
-
 async function pixoroOpenFollowList(type){
   let {data:allFollows} = await window.supa.from('follows').select('*');
   let list = [];
@@ -211,7 +186,6 @@ async function pixoroOpenFollowList(type){
   m.innerHTML = `<div style="background:#1a1a1d;width:100%;max-width:480px;border-radius:20px 20px 0 0;max-height:70vh;overflow-y:auto;padding:10px 0 30px"><div style="text-align:center;color:#fff;font-weight:800;padding:10px">${type==='following'?'Following':'Followers'} (${list.length})</div>${html}</div>`;
   document.body.appendChild(m);
 }
-
 async function pixoroLoadFollowCounts(){
   if(!window.ME_ID) return;
   let {data:allFollows} = await window.supa.from('follows').select('*');
@@ -221,7 +195,6 @@ async function pixoroLoadFollowCounts(){
   document.querySelectorAll('#followingCount, .followingCount').forEach(e=>{ if(String(e.innerText)!==String(following)) e.innerText = following; });
   return {followers, following};
 }
-
 window.getPixoroFeed = getPixoroFeed;
 window.pixoroReelSetup = pixoroReelSetup;
 window.pixoroLike = pixoroLike;
@@ -239,17 +212,33 @@ window.loadProfileRealCount = loadProfileRealCount;
 window.pixoroOpenFollowList = pixoroOpenFollowList;
 window.pixoroLoadFollowCounts = pixoroLoadFollowCounts;
 
-// ===== PIXORO FOLLOW - ORU EDAM MATTUM DA - SAM AH IRUKKUM DA =====
+// ===== PIXORO FOLLOW - ORU EDAM MATTUM DA - ID + USERNAME RENDUM CHECK PANNUVOM DA =====
 window.PIXORO_FOLLOWING = window.PIXORO_FOLLOWING || new Set();
+window.PIXORO_FOLLOWING_NAMES = window.PIXORO_FOLLOWING_NAMES || new Set();
+window.PIXORO_ID_TO_NAME = window.PIXORO_ID_TO_NAME || {};
+window.PIXORO_NAME_TO_ID = window.PIXORO_NAME_TO_ID || {};
 let _pixoroFollowBusy = {};
 let _pixoroLoadingFollow = false;
+
+function pixoroCleanName(n){ return String(n||'').trim().replace('@','').toLowerCase(); }
+
+function pixoroIsFollowing(checkId){
+  checkId = String(checkId||'');
+  if(!checkId) return false;
+  if(window.PIXORO_FOLLOWING.has(checkId)) return true;
+  // ID kodutha - Name la check pannu da - Name kodutha - ID la check pannu da - Ithu than Sam ah Irukka Vaikkum da
+  let name = window.PIXORO_ID_TO_NAME[checkId] || pixoroCleanName(checkId);
+  if(window.PIXORO_FOLLOWING_NAMES.has(pixoroCleanName(name))) return true;
+  let idFromName = window.PIXORO_NAME_TO_ID[pixoroCleanName(checkId)];
+  if(idFromName && window.PIXORO_FOLLOWING.has(String(idFromName))) return true;
+  return false;
+}
 
 function pixoroPaintAllFollowBtns(){
   document.querySelectorAll('[data-follow-user]').forEach(btn=>{
     let id = String(btn.dataset.followUser || '');
     if(!id) return;
-    let isFollowing = window.PIXORO_FOLLOWING.has(id);
-    // CORRECTED - Ella Button kum ORE Text da - Main / Home / Reels / Profile / Search - Ellam Same da
+    let isFollowing = pixoroIsFollowing(id);
     let wantText = isFollowing ? 'Following ✓' : 'Follow';
     if(btn.innerText !== wantText) btn.innerText = wantText;
     if(btn.classList.contains('following') !== isFollowing) btn.classList.toggle('following', isFollowing);
@@ -262,61 +251,111 @@ async function pixoroLoadFollowing(){
   if(_pixoroLoadingFollow) return;
   _pixoroLoadingFollow = true;
   try{
+    let {data:profs} = await window.supa.from('profiles').select('id,username');
+    (profs||[]).forEach(p=>{
+      window.PIXORO_ID_TO_NAME[String(p.id)] = pixoroCleanName(p.username);
+      window.PIXORO_NAME_TO_ID[pixoroCleanName(p.username)] = String(p.id);
+    });
     let {data} = await window.supa.from('follows').select('following_id').eq('follower_id', window.ME_ID);
     window.PIXORO_FOLLOWING = new Set((data||[]).map(x=>String(x.following_id)));
+    window.PIXORO_FOLLOWING_NAMES = new Set([...window.PIXORO_FOLLOWING].map(id=>pixoroCleanName(window.PIXORO_ID_TO_NAME[id]||'')));
     pixoroPaintAllFollowBtns();
   }catch(e){}
   _pixoroLoadingFollow = false;
 }
 
+async function pixoroResolveId(targetId){
+  targetId = String(targetId||'').trim();
+  if(!targetId) return null;
+  if(targetId.includes('-') && targetId.length > 20) return targetId;
+  // Username vantha - ID ah Edu da
+  if(window.PIXORO_NAME_TO_ID[pixoroCleanName(targetId)]) return window.PIXORO_NAME_TO_ID[pixoroCleanName(targetId)];
+  try{
+    let {data} = await window.supa.from('profiles').select('id,username').eq('username', pixoroCleanName(targetId)).single();
+    if(data){
+      window.PIXORO_ID_TO_NAME[String(data.id)] = pixoroCleanName(data.username);
+      window.PIXORO_NAME_TO_ID[pixoroCleanName(data.username)] = String(data.id);
+      return String(data.id);
+    }
+  }catch(e){}
+  return targetId;
+}
+
 async function pixoroToggleFollow(targetId, btn){
-  targetId = String(targetId);
-  if(!targetId || targetId === String(window.ME_ID)) return false;
-  if(_pixoroFollowBusy[targetId]) return false;
-  _pixoroFollowBusy[targetId] = true;
-  let wasFollowing = window.PIXORO_FOLLOWING.has(targetId);
+  let raw = String(targetId||'');
+  if(!raw || raw === String(window.ME_ID)) return false;
+  if(_pixoroFollowBusy[raw]) return false;
+  _pixoroFollowBusy[raw] = true;
+
+  // 1. ID ah Resolve Pannu da - Username / UUID - Ethu Vanthalum ORE ID aakkidu da
+  let resolvedId = await pixoroResolveId(raw);
+  if(!resolvedId || resolvedId === String(window.ME_ID)){ _pixoroFollowBusy[raw] = false; return false; }
+
+  let wasFollowing = pixoroIsFollowing(resolvedId);
   let wantFollowing = !wasFollowing;
-  if(wantFollowing) window.PIXORO_FOLLOWING.add(targetId);
-  else window.PIXORO_FOLLOWING.delete(targetId);
-  pixoroPaintAllFollowBtns();
+
+  // 2. Muthalla DB la Save Pannu da - UI ah Aprom Maathu da - Poi Solla Koodathu da
   try{
     if(wantFollowing){
-      let {error} = await window.supa.from('follows').insert({follower_id: window.ME_ID, following_id: targetId});
-      // 23505 = Already Following da - Ithu Error Illa da - Revert Panna Koodathu da
-      if(error && error.code !== '23505') console.log('FOLLOW ERROR', error.message);
+      let {error} = await window.supa.from('follows').insert({follower_id: window.ME_ID, following_id: resolvedId});
+      if(error && error.code !== '23505'){
+        console.log('FOLLOW FAIL - RLS PAARU DA:', error.message);
+        alert('Follow Save Aagala da - Supabase follows la Policy Paaru da - ' + error.message);
+        _pixoroFollowBusy[raw] = false;
+        return false;
+      }
     } else {
-      await window.supa.from('follows').delete().eq('follower_id', window.ME_ID).eq('following_id', targetId);
+      let {error} = await window.supa.from('follows').delete().eq('follower_id', window.ME_ID).eq('following_id', resolvedId);
+      if(error){ console.log('UNFOLLOW FAIL:', error.message); _pixoroFollowBusy[raw] = false; return false; }
     }
-    try{ localStorage.setItem('pixoro_follow_sync', JSON.stringify({targetId, following: wantFollowing, t: Date.now()})); }catch(e){}
+    // 3. DB la Save Aana Aprom than UI ah Maathu da - ID + Name Rendum Update Pannu da
+    if(wantFollowing){
+      window.PIXORO_FOLLOWING.add(String(resolvedId));
+      let nm = window.PIXORO_ID_TO_NAME[String(resolvedId)] || pixoroCleanName(raw);
+      if(nm) window.PIXORO_FOLLOWING_NAMES.add(pixoroCleanName(nm));
+    } else {
+      window.PIXORO_FOLLOWING.delete(String(resolvedId));
+      let nm = window.PIXORO_ID_TO_NAME[String(resolvedId)] || pixoroCleanName(raw);
+      if(nm) window.PIXORO_FOLLOWING_NAMES.delete(pixoroCleanName(nm));
+    }
+    pixoroPaintAllFollowBtns();
+    try{ localStorage.setItem('pixoro_follow_sync', JSON.stringify({targetId: resolvedId, following: wantFollowing, t: Date.now()})); }catch(e){}
     pixoroLoadFollowCounts();
-    // CORRECTED - Revert Illa da - Catch la Revert Panna Koodathu da - Athe than Flicker da
+    // 4. Confirm - DB la Irundhu Thirumba Edu da - Home / Reels Sam ah Irukkanum da
+    setTimeout(()=>{ pixoroLoadFollowing(); }, 500);
   }catch(e){ console.log('FOLLOW CATCH', e); }
-  setTimeout(()=>{ _pixoroFollowBusy[targetId] = false; }, 800);
+  setTimeout(()=>{ _pixoroFollowBusy[raw] = false; }, 800);
   return wantFollowing;
 }
 
 function pixoroSyncFollowBtn(targetId, following){
   targetId = String(targetId);
-  if(following) window.PIXORO_FOLLOWING.add(targetId);
-  else window.PIXORO_FOLLOWING.delete(targetId);
+  if(following){
+    window.PIXORO_FOLLOWING.add(targetId);
+    let nm = window.PIXORO_ID_TO_NAME[targetId];
+    if(nm) window.PIXORO_FOLLOWING_NAMES.add(pixoroCleanName(nm));
+  } else {
+    window.PIXORO_FOLLOWING.delete(targetId);
+    let nm = window.PIXORO_ID_TO_NAME[targetId];
+    if(nm) window.PIXORO_FOLLOWING_NAMES.delete(pixoroCleanName(nm));
+  }
   pixoroPaintAllFollowBtns();
 }
 
-// CORRECTED - Ella Page kum SAME Name da - Home / Reels / Profile / Search Ellam Ithu than da
 window.pixoroToggleFollow = pixoroToggleFollow;
 window.toggleFollow = pixoroToggleFollow;
 window.toggleF = pixoroToggleFollow;
 window.pixoroLoadFollowing = pixoroLoadFollowing;
 window.pixoroPaintAllFollowBtns = pixoroPaintAllFollowBtns;
 window.pixoroSyncFollowBtn = pixoroSyncFollowBtn;
+window.pixoroIsFollowing = pixoroIsFollowing;
+window.pixoroResolveId = pixoroResolveId;
 
 window.addEventListener('storage', (e)=>{
   if(e.key === 'pixoro_follow_sync' && e.newValue){
     try{ let d = JSON.parse(e.newValue); pixoroSyncFollowBtn(d.targetId, d.following); }catch(err){}
   }
 });
-// CORRECTED - pixoroFollowChanged Event ah Delete Panniten da - Athe than Loop Panni Flicker Pannichu da
 
-// Page load aana udane oru thadava mattum load pannu da - Loop venda da
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroLoadFollowing(); });
 if(document.readyState !== 'loading') pixoroLoadFollowing();
