@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="css/feed.css">
 <link rel="stylesheet" href="css/comments.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=114"></script>
+<script src="js/pixoro-core.js?v=115"></script>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -188,8 +188,57 @@ function observeHomeVideos(){let vs=document.querySelectorAll('.post video.main'
 function handleTap(id){let now=Date.now();if(now-lastTap<300){doubleLike(id);lastTap=0}else{lastTap=now}}
 async function doubleLike(id){let burst=document.getElementById('burst-'+id);if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show')}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&(l.user_id==ME_ID));if(liked)return;allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});let btn=document.getElementById('likeBtn-'+id);if(btn)btn.classList.add('liked');let c=document.getElementById('likeCount-'+id);if(c)c.innerText=parseInt(c.innerText||'0')+1;supa=getSupa();if(supa){await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}}
 async function fastLike(id){let liked=allLikes.some(l=>String(l.post_id)==String(id)&&(l.user_id==ME_ID));let btn=document.getElementById('likeBtn-'+id);let c=document.getElementById('likeCount-'+id);if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});if(btn)btn.classList.add('liked');if(c)c.innerText=parseInt(c.innerText||'0')+1;let burst=document.getElementById('burst-'+id);if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show')}supa=getSupa();if(supa)await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}else{allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&(l.user_id==ME_ID)));if(btn)btn.classList.remove('liked');if(c)c.innerText=Math.max(0,parseInt(c.innerText||'1')-1);supa=getSupa();if(supa)await supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID)}}
-// CORRECTED - Home la Thani toggleFollow Illa da - Core oda ORE Function than da - Sam ah Irukkum da
-// toggleFollow / pixoroToggleFollow ellam pixoro-core.js?v=114 la Irukku da - Inga Define Panna Koodathu da
+// ===== HOME FOLLOW FINAL - CORE AH OVERRIDE PANNITEN DA - ITHU THAN WORK AAGUM DA =====
+window.toggleFollow = async function(target, btn){
+  try{
+    let name = String(target||'').trim().toLowerCase().replace('@','');
+    if(!name || name==='null' || name==='undefined'){
+      name = String(btn?.dataset?.followUsername || btn?.dataset?.followUser || '').toLowerCase();
+    }
+    if(!name || name==='null'){ alert('Username kedaikala da'); return false; }
+    if(name === String(ME_RAW||'').toLowerCase()){ alert('Unna ye Follow panna mudiyaathu da'); return false; }
+    let b = btn || document.querySelector('[data-follow-username="'+name+'"]');
+    let wasFollowing = b ? b.innerText.includes('Following') : false;
+    if(b){ b.innerText = wasFollowing ? 'Follow' : 'Following ✓'; b.classList.toggle('following', !wasFollowing); }
+    if(window.PIXORO_FOLLOWING_NAMES){ if(!wasFollowing) window.PIXORO_FOLLOWING_NAMES.add(name); else window.PIXORO_FOLLOWING_NAMES.delete(name); }
+    let s = window.supa || supa;
+    if(!s){ alert('Supa load aagala da - Refresh pannu da'); return false; }
+    let {data:{session}} = await s.auth.getSession();
+    if(!session){ alert('Login pannala da'); location.href='login.html'; return false; }
+    let {data, error} = await s.rpc('toggle_follow_by_name', {target_name: name});
+    if(error){
+      console.log('RPC FAIL da:', error.message);
+      let {data:prof} = await s.from('profiles').select('id').ilike('username', name).single();
+      let tid = prof?.id;
+      if(!tid){
+        let {data:pp} = await s.from('posts').select('user_id').ilike('username', name).limit(1).single();
+        tid = pp?.user_id;
+      }
+      if(!tid){ alert('User Not Found da - ' + name); if(b) b.innerText = wasFollowing ? 'Following ✓' : 'Follow'; return false; }
+      if(!wasFollowing){
+        let r = await s.from('follows').insert({follower_id: session.user.id, following_id: tid});
+        if(r.error){ alert('Follow Fail da - ' + r.error.message); if(b) b.innerText='Follow'; return false; }
+        data = true;
+      } else {
+        await s.from('follows').delete().eq('follower_id', session.user.id).eq('following_id', tid);
+        data = false;
+      }
+    }
+    if(b){ b.innerText = data ? 'Following ✓' : 'Follow'; b.classList.toggle('following', !!data); }
+    try{
+      let {data:fl} = await s.from('follows').select('*').eq('follower_id', session.user.id);
+      allFollows = fl || [];
+      if(window.PIXORO_FOLLOWING) window.PIXORO_FOLLOWING = new Set(allFollows.map(f=>String(f.following_id)));
+    }catch(e){}
+    return !!data;
+  }catch(e){
+    alert('Follow Error da - ' + e.message);
+    console.log(e);
+    return false;
+  }
+};
+window.pixoroToggleFollow = window.toggleFollow;
+window.toggleF = window.toggleFollow;
 async function savePost(id){supa=getSupa();let s=allSaves.some(x=>String(x.post_id)==String(id)&&(x.user_id==ME_ID));if(s){allSaves=allSaves.filter(x=>!(String(x.post_id)==String(id)&&(x.user_id==ME_ID)));if(supa)await supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID)}else{allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW});if(supa)await supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}renderFeed()}
 async function openComment(id){document.getElementById('commentModal').style.display='flex';supa=getSupa();if(!supa)return;let {data}=await supa.from('comments').select('*').eq('post_id',id).order('created_at',{ascending:false});document.getElementById('commentList').innerHTML=(data||[]).map(c=>`<div style="display:flex;gap:10px;padding:10px 0"><img src="${getPfp(c.user_id||c.username)}" style="width:32px;height:32px;border-radius:50%"><div><b>${displayNameFor(c.user_id||c.username)}</b><div>${c.text}</div></div></div>`).join('')||'';window.currentPostId=id}
 function closeComment(){document.getElementById('commentModal').style.display='none'}
