@@ -2,10 +2,8 @@
 <html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Pixoro Reels - Full Screen</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=120"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+html{background:#000}*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 .reelWrap{width:100vw;height:100dvh;overflow-y:scroll;overflow-x:hidden;scroll-snap-type:y mandatory;scroll-behavior:auto;background:#000;position:fixed;top:0;left:0;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .reelWrap::-webkit-scrollbar{display:none}
@@ -109,20 +107,29 @@ body{background:#000;color:#fff;width:100vw;height:100dvh;overflow:hidden}
 </div></div>
 <div class="sheet" id="commentSheet" onclick="if(event.target==this)closeSheet('commentSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Comments</b></div><div id="commentList" style="overflow-y:auto;flex:1;max-height:45vh;padding:0 20px"></div><div style="display:flex;gap:10px;align-items:center;padding:10px 20px;border-top:1px solid #2c2c2e;margin-top:10px"><input id="commentInput" style="flex:1;background:#2c2c2e;border:0;border-radius:20px;padding:12px 14px;color:#fff;outline:none" placeholder="Add kind comment..."><button onclick="postComment()" style="background:#fff;color:#000;border:0;border-radius:20px;padding:10px 18px;font-weight:800">Post</button></div></div></div>
 <div class="sheet" id="shareSheet" onclick="if(event.target==this)closeSheet('shareSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Share</b></div><div class="safeCard"><div class="safeItem" onclick="copyLinkSafe()"><div class="txt"><div class="title">📋 Copy Link</div></div></div><div class="safeItem" onclick="shareWA()"><div class="txt"><div class="title">💚 WhatsApp</div></div></div></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js" defer></script>
+<script src="js/pixoro-core.js?v=123" defer></script>
 <script>
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 function fmtViews(n){if(n>=1000000)return (n/1000000).toFixed(1).replace('.0','')+'M';if(n>=1000)return (n/1000).toFixed(1).replace('.0','')+'K';return String(n)}
 let ME_RAW='',ME_ID='',profileMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=[],mutedUsers=[],blockedUsers=[],hiddenMeta={},lastAction=null,savingIds=new Set()
-async function waitSupa(){for(let i=0;i<20;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
+async function waitSupa(){for(let i=0;i<30;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
 async function init(){supa=await waitSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;window.ME_ID=ME_ID;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;if(window.pixoroLoadFollowing) await window.pixoroLoadFollowing();let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);load()}
 function getPfp(u){let p=profileMap[cleanUser(u)];if(p?.avatar_url)return p.avatar_url;return 'https://ui-avatars.com/api/?name='+(cleanUser(u).charAt(0).toUpperCase()||'P')+'&background=fff&color=000&size=200&bold=true'}
 function isMyPostObj(p){if(!p)return false;if(p.user_id&&String(p.user_id)===String(ME_ID))return true;return cleanUser(p.username)===cleanUser(ME_RAW)}
 async function load(){try{
-let all=[];
-try{ let r=await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(20); if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'posts'}))); }catch(e){}
-try{ let r=await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(20); if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'reels'}))); }catch(e){}
+let [r1,r2,likes,saves,follows,comments,views] = await Promise.all([
+  supa.from('posts').select('*').order('created_at',{ascending:false}).limit(12).then(r=>r).catch(()=>({data:[]})),
+  supa.from('reels').select('*').order('created_at',{ascending:false}).limit(12).then(r=>r).catch(()=>({data:[]})),
+  supa.from('likes').select('*').limit(200).then(r=>r).catch(()=>({data:[]})),
+  supa.from('saves').select('*').eq('user_id',ME_ID).then(r=>r).catch(()=>({data:[]})),
+  supa.from('follows').select('*').limit(500).then(r=>r).catch(()=>({data:[]})),
+  supa.from('comments').select('*').order('created_at',{ascending:false}).limit(100).then(r=>r).catch(()=>({data:[]})),
+  supa.from('views').select('*').limit(200).then(r=>r).catch(()=>({data:[]})),
+]);
+let all=[]; if(r1.data) all=all.concat(r1.data.map(p=>({...p,_from:'posts'}))); if(r2.data) all=all.concat(r2.data.map(p=>({...p,_from:'reels'})));
 let seenUrl=new Set(); let deduped=[];
 for(let p of all){
   let raw=(p.media_url||p.image_url||p.video_url||'').trim();
@@ -134,15 +141,15 @@ for(let p of all){
   seenUrl.add(url); seenUrl.add(fileKey); deduped.push(p);
 }
 all=deduped;
-let likes=[],saves=[],follows=[],comments=[],views=[];try{likes=(await supa.from('likes').select('*').limit(200)).data||[]}catch(e){}try{saves=(await supa.from('saves').select('*').eq('user_id',ME_ID)).data||[]}catch(e){}try{follows=(await supa.from('follows').select('*').limit(500)).data||[]}catch(e){}try{comments=(await supa.from('comments').select('*').order('created_at',{ascending:false}).limit(100)).data||[]}catch(e){}try{views=(await supa.from('views').select('*').limit(200)).data||[]}catch(e){}
-allPosts=all;allLikes=likes;allSaves=saves;allFollows=follows;allComments=comments;allViews=views;
+allPosts=all;allLikes=likes.data||[];allSaves=saves.data||[];allFollows=follows.data||[];allComments=comments.data||[];allViews=views.data||[];
 if(window.PIXORO_FOLLOWING){
-  window.PIXORO_FOLLOWING=new Set((follows||[]).filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));
+  window.PIXORO_FOLLOWING=new Set((allFollows||[]).filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));
   window.PIXORO_ID_TO_NAME=window.PIXORO_ID_TO_NAME||{};
   window.PIXORO_NAME_TO_ID=window.PIXORO_NAME_TO_ID||{};
   (Object.values(profileMap)||[]).forEach(pp=>{ window.PIXORO_ID_TO_NAME[String(pp.id)]=cleanUser(pp.username); window.PIXORO_NAME_TO_ID[cleanUser(pp.username)]=String(pp.id); });
   window.PIXORO_FOLLOWING_NAMES=new Set([...window.PIXORO_FOLLOWING].map(id=>cleanUser(window.PIXORO_ID_TO_NAME[id]||'')));
 }
+// SERVER ONLY DA - NO CACHE DA - NO LOCAL STORAGE DA
 render();if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();}catch(err){console.log(err)}}
 async function addRealView(postId){
   postId=String(postId);
@@ -154,7 +161,7 @@ async function addRealView(postId){
   let cnt = allViews.filter(v=>String(v.post_id)==String(postId)).length;
   let el = document.querySelector(`[data-viewcount="${postId}"]`);
   if(el) el.innerText = fmtViews(cnt);
-  try{ await supa.from('views').insert({post_id:postId, user_id:ME_ID, username:ME_RAW}); }catch(e){}
+  supa.from('views').insert({post_id:postId, user_id:ME_ID, username:ME_RAW}).then(()=>{}).catch(()=>{});
 }
 function nextReel(currentVideo){
   let reels=[...document.querySelectorAll('.reel')];
@@ -180,13 +187,13 @@ let lc=allLikes.filter(l=>String(l.post_id)==String(p.id)).length;
 let liked=allLikes.some(l=>String(l.post_id)==String(p.id)&&String(l.user_id)==String(ME_ID));
 let saved=allSaves.some(s=>String(s.post_id)==String(p.id)&&String(s.user_id)==String(ME_ID));
 let followName=cleanUser(p.username||'');
-let isFollow = window.PIXORO_FOLLOWING_NAMES ? window.PIXORO_FOLLOWING_NAMES.has(followName) : (window.PIXORO_FOLLOWING ? window.PIXORO_FOLLOWING.has(String(p.user_id)) : allFollows.some(f=>String(f.follower_id)==String(ME_ID)&&String(f.following_id)==String(p.user_id)));
+let isFollow = window.PIXORO_FOLLOWING_NAMES ? window.PIXORO_FOLLOWING_NAMES.has(followName) : (window.PIXORO_FOLLOWING ? window.PIXORO_FOLLOWING.has(String(p.user_id)) : allFollows.some(f=>String(f.follower_id)===String(ME_ID)&&String(f.following_id)==String(p.user_id)));
 let isMine=isMyPostObj(p);
 let best=getBestMedia(p);
 let vCount=allViews.filter(v=>String(v.post_id)==String(p.id)).length;
 let media='';
 if(best.isVid){
-  if(idx===0) media=`<video class="reel-main" src="${best.url}" playsinline preload="auto" muted loop onended="nextReel(this)"></video>`;
+  if(idx===0) media=`<video class="reel-main" src="${best.url}" playsinline preload="metadata" muted loop onended="nextReel(this)"></video>`;
   else media=`<video class="reel-main" data-src="${best.url}" playsinline preload="none" muted loop onended="nextReel(this)"></video>`;
 } else {
   media=`<img class="reel-main" src="${best.url}" loading="${idx===0?'eager':'lazy'}" decoding="async" fetchpriority="${idx===0?'high':'low'}">`;
@@ -207,25 +214,26 @@ return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div c
 <div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap"><img src="${getPfp(p.username)}" loading="lazy"></div><b class="reel-username">${cleanUser(p.username)}</b>${followBtn}</div>${captionHtml}<div style="font-size:12px;color:#ddd;margin-top:6px;font-weight:700">▶ <span data-viewcount="${p.id}">${fmtViews(vCount)}</span> views</div></div>
 </div>`
 }).join('');observe(); if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();}
-function observe(){let reels=document.querySelectorAll('video.reel-main');let io=new IntersectionObserver(entries=>{entries.forEach(e=>{let v=e.target;if(v.tagName!='VIDEO')return;let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;if(e.isIntersecting){if(!v.src && v.dataset.src){ v.src=v.dataset.src; v.load(); }document.querySelectorAll('video.reel-main').forEach(o=>{if(o!==v)o.pause()});v.muted=globalMuted;currentVideo=v;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})});if(prog){v.ontimeupdate=()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'}}addRealView(reel.dataset.id);}else{v.pause()}})}, {threshold:0.5, rootMargin:'200px 0px'}); reels.forEach(v=>io.observe(v))}
+let _reelIO=null;
+function observe(){let reels=document.querySelectorAll('video.reel-main');if(_reelIO) _reelIO.disconnect();_reelIO=new IntersectionObserver(entries=>{entries.forEach(e=>{let v=e.target;if(v.tagName!='VIDEO')return;let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;if(e.isIntersecting){if(!v.src && v.dataset.src){ v.src=v.dataset.src; v.load(); }document.querySelectorAll('video.reel-main').forEach(o=>{if(o!==v)o.pause()});v.muted=globalMuted;currentVideo=v;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})});if(prog){v.ontimeupdate=()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'}}addRealView(reel.dataset.id);}else{v.pause()}})}, {threshold:0.5, rootMargin:'200px 0px'}); reels.forEach(v=>_reelIO.observe(v))}
 function handleReelTap(el){let now=Date.now();if(now-lastTap<300){clearTimeout(tapTimer);lastTap=0;dblLike(el.dataset.id);return}lastTap=now;tapTimer=setTimeout(()=>{let v=el.querySelector('video.reel-main');if(v){if(!v.src && v.dataset.src){v.src=v.dataset.src;v.load();}if(v.paused){v.muted=false;globalMuted=false;currentVideo=v;v.play();showCenter(el,false)}else{v.pause();showCenter(el,true)}}lastTap=0},300)}
-async function dblLike(id){let reel=document.querySelector(`.reel[data-id="${id}"]`);let b=reel?reel.querySelector('.heartBurst'):null;if(b){b.classList.remove('show');void b.offsetWidth;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),900)}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);try{await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}catch(e){}}}
+async function dblLike(id){let reel=document.querySelector(`.reel[data-id="${id}"]`);let b=reel?reel.querySelector('.heartBurst'):null;if(b){b.classList.remove('show');void b.offsetWidth;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),900)}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).then(()=>{}).catch(()=>{});}}
 async function toggleLike(id){let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).then(()=>{}).catch(()=>{});}else{allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID)));updateLikeUI(id,false);supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}).catch(()=>{});}}
 function updateLikeUI(id,liked){let btn=document.getElementById('likeBtn-'+id);let svg=document.getElementById('likeSvg-'+id);let cnt=document.getElementById('likeCnt-'+id);if(btn){if(liked)btn.classList.add('liked');else btn.classList.remove('liked')}if(svg){svg.setAttribute('fill',liked?'#ff3040':'none');svg.setAttribute('stroke',liked?'#ff3040':'#fff');}if(cnt){let n=allLikes.filter(l=>String(l.post_id)==String(id)).length;cnt.innerText=n>0?n:''}}
 function openPixoroSheet(postId, userId, username){ curSheetId=postId; curSheetUser=userId; curSheetUsername=username; let isMine = String(userId)===String(ME_ID) || cleanUser(username)===cleanUser(ME_RAW); if(isMine){ document.getElementById('ownerSheet').classList.add('show'); } else { document.getElementById('viewerSheet').classList.add('show'); } }
 function editReel(){ if(curSheetId) location.href='edit.html?id='+curSheetId; }
 function shareQR(){ let link=location.origin+'/reels.html?id='+curSheetId; navigator.clipboard.writeText(link); closeSheet('ownerSheet'); }
-async function deleteSafe(){ if(hiddenPosts.includes(String(curSheetId)))return; hiddenPosts.push(String(curSheetId)); try{await supa.from('posts').update({is_archived:true}).eq('id',curSheetId)}catch(e){} try{await supa.from('reels').update({is_archived:true}).eq('id',curSheetId)}catch(e){} setTimeout(()=>render(),200); closeSheet('ownerSheet'); }
+async function deleteSafe(){ if(hiddenPosts.includes(String(curSheetId)))return; hiddenPosts.push(String(curSheetId)); supa.from('posts').update({is_archived:true}).eq('id',curSheetId).then(()=>{}); supa.from('reels').update({is_archived:true}).eq('id',curSheetId).then(()=>{}); setTimeout(()=>render(),200); closeSheet('ownerSheet'); }
 async function saveReel(){ await saveR(curSheetId); closeSheet('viewerSheet'); }
 function copyLinkSafe(){ let link=location.origin+'/reels.html?id='+curSheetId; navigator.clipboard.writeText(link); closeSheet('viewerSheet'); closeSheet('shareSheet'); }
 function shareWA(){ let link=location.origin+'/reels.html?id='+curShareId; window.open('https://wa.me/?text='+encodeURIComponent(link),'_blank'); }
-async function notInterestedSafe(){ if(hiddenPosts.includes(String(curSheetId))){closeSheet('viewerSheet');return;} hiddenPosts.push(String(curSheetId)); try{await supa.from('posts').update({is_archived:true}).eq('id',curSheetId)}catch(e){} setTimeout(()=>render(),200); closeSheet('viewerSheet'); }
-async function hideReelSafe(){ if(hiddenPosts.includes(String(curSheetId))){closeSheet('viewerSheet');return;} hiddenPosts.push(String(curSheetId)); try{await supa.from('posts').update({is_archived:true}).eq('id',curSheetId)}catch(e){} setTimeout(()=>render(),200); closeSheet('viewerSheet'); }
+async function notInterestedSafe(){ if(hiddenPosts.includes(String(curSheetId))){closeSheet('viewerSheet');return;} hiddenPosts.push(String(curSheetId)); supa.from('posts').update({is_archived:true}).eq('id',curSheetId).then(()=>{}); setTimeout(()=>render(),200); closeSheet('viewerSheet'); }
+async function hideReelSafe(){ if(hiddenPosts.includes(String(curSheetId))){closeSheet('viewerSheet');return;} hiddenPosts.push(String(curSheetId)); supa.from('posts').update({is_archived:true}).eq('id',curSheetId).then(()=>{}); setTimeout(()=>render(),200); closeSheet('viewerSheet'); }
 function reportSafe(){ closeSheet('viewerSheet'); }
 function openCommentSheet(pid){curCommentPost=pid;let list=allComments.filter(c=>String(c.post_id)==String(pid));document.getElementById('commentList').innerHTML=list.length?list.map(c=>{let isMyC=String(c.user_id)==String(ME_ID)||cleanUser(c.username)==cleanUser(ME_RAW);return `<div class="cRow"><div><b>${cleanUser(c.username)}</b> <span style="font-size:13px;color:#ddd"> ${c.text||''}</span></div>${isMyC?`<span class="del" onclick="deleteComment('${c.id}','${pid}')">Delete</span>`:''}</div>`}).join(''):'<div style="text-align:center;color:#888;padding:20px">No comments yet - Be kind 💜</div>';document.getElementById('commentSheet').classList.add('show');}
 function closeSheet(id){document.getElementById(id).classList.remove('show')}
-async function postComment(){let inp=document.getElementById('commentInput');let t=inp.value.trim();if(!t||!curCommentPost)return;let tmp={id:'tmp_'+Date.now(),post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t};allComments.unshift(tmp);inp.value='';openCommentSheet(curCommentPost);try{await supa.from('comments').insert({post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t})}catch(e){}}
-async function deleteComment(cid,pid){allComments=allComments.filter(c=>String(c.id)!=String(cid));openCommentSheet(pid);try{await supa.from('comments').delete().eq('id',cid)}catch(e){}}
+async function postComment(){let inp=document.getElementById('commentInput');let t=inp.value.trim();if(!t||!curCommentPost)return;let tmp={id:'tmp_'+Date.now(),post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t};allComments.unshift(tmp);inp.value='';openCommentSheet(curCommentPost);supa.from('comments').insert({post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t}).then(()=>{}).catch(()=>{});}
+async function deleteComment(cid,pid){allComments=allComments.filter(c=>String(c.id)!=String(cid));openCommentSheet(pid);supa.from('comments').delete().eq('id',cid).then(()=>{}).catch(()=>{});}
 function openShareSheet(pid){curShareId=pid;document.getElementById('shareSheet').classList.add('show')}
 function toggleMuteAll(){globalMuted=!globalMuted;document.querySelectorAll('video').forEach(v=>v.muted=globalMuted);document.getElementById('volIcon').innerHTML=globalMuted?'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>':'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>'}
 function updateSaveUI(id,saved){
@@ -239,11 +247,11 @@ async function saveR(id){
   try{
     let isSaved=allSaves.some(x=>String(x.post_id)===id && String(x.user_id)===String(ME_ID));
     if(isSaved){
-      let {error}=await supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID);
-      if(!error){ allSaves=allSaves.filter(x=>!(String(x.post_id)===id && String(x.user_id)===String(ME_ID))); updateSaveUI(id,false); }
+      allSaves=allSaves.filter(x=>!(String(x.post_id)===id && String(x.user_id)===String(ME_ID))); updateSaveUI(id,false);
+      supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}).catch(()=>{});
     } else {
-      let {data,error}=await supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).select().single();
-      if(!error){ allSaves.push(data||{post_id:id,user_id:ME_ID,username:ME_RAW}); updateSaveUI(id,true); }
+      allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW}); updateSaveUI(id,true);
+      supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).select().single().then(({data})=>{ if(data) allSaves[allSaves.length-1]=data; }).catch(()=>{});
     }
   } finally { savingIds.delete(id); }
 }
@@ -294,5 +302,7 @@ window.toggleFollow = async function(target, btn){
 };
 window.pixoroToggleFollow = window.toggleFollow;
 window.toggleF = window.toggleFollow;
+setInterval(()=>{ document.querySelectorAll('[data-follow-user]').forEach(b=>{ if(b.innerText.includes('✓')) b.innerText='Following'; }); },1000);
+// SERVER ONLY DA - NO LOCAL STORAGE DA - init mattum da
 init()
 </script></body></html>
