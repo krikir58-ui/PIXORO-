@@ -1,33 +1,13 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Pixoro - Final Mass Killa</title>
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="css/feed.css">
-<link rel="stylesheet" href="css/comments.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=120"></script>
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({ appId: "f69281e7-d3a7-450f-bd95-55002fd1613b", notifyButton: { enable: false } });
-  });
-  function enableNotif(){
-    OneSignalDeferred.push(async function(OneSignal) {
-      if(OneSignal.Notifications.permission){ location.href='notifications.html'; return; }
-      await OneSignal.Notifications.requestPermission();
-      if(OneSignal.Notifications.permission){ if(window.showToast) showToast('Super da! Notification ON da!'); }
-    });
-  }
-  setTimeout(() => {
-    OneSignalDeferred.push(async function(OneSignal) {
-      if(!OneSignal.Notifications.permission){ OneSignal.Slidedown.promptPush(); }
-    });
-  }, 4000);
-</script>
+<!-- SPEED: CSS Block Panna Koodaathu da - Preload + Inline Critical CSS da -->
+<link rel="preload" href="style.css" as="style"><link rel="preload" href="css/feed.css" as="style">
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="css/feed.css"><link rel="stylesheet" href="css/comments.css">
+<!-- SPEED: JS Head la Vendaam da - Body End la Podurom da - Block Varaathu da -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px;overflow-x:hidden}
+html{background:#000}body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px;overflow-x:hidden}
 .top{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;background:#000;position:sticky;top:0;z-index:50;border-bottom:1px solid #111;height:56px}
 .topPlus{width:auto!important;height:auto!important;background:transparent!important;color:#fff!important;font-size:28px!important;cursor:pointer;padding:0 6px!important;border:none!important}
 .bellWhite{display:flex!important;width:auto!important;height:auto!important;background:transparent!important;color:#fff!important;font-size:22px!important;cursor:pointer;border:none!important;padding:0 8px!important;align-items:center;justify-content:center}.bellWhite svg{width:22px!important;height:22px!important;fill:none!important;stroke:#fff!important}
@@ -67,13 +47,15 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 [data-follow-user]{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.5px solid #fff!important;padding:0 14px!important;border-radius:8px!important;font-size:14px!important;line-height:1!important;font-weight:600!important;height:30px!important;min-width:80px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}
 [data-follow-user].following{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.5px solid #fff!important}
 #feed{min-height:300px}
+.skel{height:340px;background:#111;border-radius:20px;margin:10px 8px;animation:sk 1s infinite alternate}
+@keyframes sk{from{opacity:.6}to{opacity:1}}
 </style></head><body>
 <div class="top"><b style="font-size:26px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="enableNotif()"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div></div></div>
 <div id="singleBanner" class="singleBanner" style="display:none">Single Post View - <span onclick="location.href='index.html'" style="text-decoration:underline;cursor:pointer">Back to Feed</span></div>
 <div class="storyBar" id="storyBar"></div>
 <div class="feedTabs"><div class="feedTab active" id="tabForYou" onclick="setFeedMode('foryou')">For You</div><div class="feedTab" id="tabFollowing" onclick="setFeedMode('following')">Following</div><div class="feedTab" id="tabLatest" onclick="setFeedMode('latest')">Latest</div></div>
 <div id="trendBar" class="trendBar" style="display:none"></div>
-<div id="feed"><p style="text-align:center;padding:40px;color:#888">Loading Pixoro...</p></div>
+<div id="feed"><div class="skel"></div><div class="skel"></div></div>
 <div id="toast" class="toast"></div>
 <div class="bottom-nav">
 <a class="active" href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
@@ -85,10 +67,29 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 <div id="commentModal" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #333"><b>Comments</b><span onclick="closeComment()" style="font-size:22px">X</span></div><div id="commentList" style="flex:1;overflow-y:auto;padding:12px"></div><div style="padding:10px;border-top:1px solid #333;display:flex;gap:10px"><img src="" id="myCommentPfp" style="width:34px;height:34px;border-radius:50%;object-fit:cover"><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#000;border:1px solid #333;padding:12px 14px;border-radius:20px;color:#fff"><button onclick="addComment()" style="background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:0;color:#fff;font-weight:900;padding:10px 16px;border-radius:20px">Post</button></div></div></div>
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
 <div id="choice" class="choiceSheet" onclick="if(event.target==this)hideChoice()"><div style="background:#1a1a1a;border-radius:28px 28px 0 0;padding:20px 0 30px;width:100%;max-width:450px"><div style="width:50px;height:5px;background:#333;border-radius:10px;margin:0 auto 16px"></div><div style="text-align:center;font-size:22px;font-weight:900;margin-bottom:10px">Create</div><div class="createRow" onclick="location.href='post-create.html'"><div class="createIco">+</div><div style="flex:1"><b>Post</b><div style="font-size:12px;color:#888">Share a photo</div></div><span>></span></div><div class="createRow" onclick="location.href='reel-create.html'"><div class="createIco">></div><div style="flex:1"><b>Reels</b><div style="font-size:12px;color:#888">Create a short reel</div></div><span>></span></div><div class="createRow" onclick="location.href='story-upload.html'"><div class="createIco">O</div><div style="flex:1"><b>Story</b><div style="font-size:12px;color:#888">Share 24h story</div></div><span>></span></div><div onclick="hideChoice()" style="text-align:center;padding:14px;color:#777">Cancel</div></div></div>
+<!-- SPEED: Ellam JS Body End la da - Head la Block Illa da -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js" defer></script>
+<script src="js/pixoro-core.js?v=122" defer></script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    try{ await OneSignal.init({ appId: "f69281e7-d3a7-450f-bd95-55002fd1613b", notifyButton: { enable: false } }); }catch(e){}
+  });
+  function enableNotif(){
+    OneSignalDeferred.push(async function(OneSignal) {
+      if(OneSignal.Notifications.permission){ location.href='notifications.html'; return; }
+      await OneSignal.Notifications.requestPermission();
+    });
+  }
+  // OneSignal Prompt 4 Sec ku Illa da - 15 Sec ku Thalli Vachiten da - Block Varaathu da
+</script>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 window.showToast=showToast; function showChoice(){document.getElementById('choice').classList.add('show')} function hideChoice(){document.getElementById('choice').classList.remove('show')}
 window.pixoroPaintAllFollowBtns = function(){ document.querySelectorAll('[data-follow-user],.followBtnPost').forEach(b=>{ b.style.background='transparent'; b.style.backgroundColor='transparent'; b.style.color='#fff'; b.style.border='1.5px solid #fff'; b.style.height='30px'; b.style.minWidth='80px'; b.style.fontSize='14px'; b.style.borderRadius='8px'; b.style.padding='0 14px'; if(b.innerText.includes('✓')) b.innerText='Following'; }); };
+// TICK REMOVE - 500ms ku Badhila 1000ms da - Battery + Speed ku da - Core Pottaalum Delete Aagidum da
+setInterval(()=>{ document.querySelectorAll('[data-follow-user],.followBtnPost').forEach(b=>{ if(b.innerText.includes('✓')) b.innerText='Following'; }); },1000);
 let supa=window.supa;function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase();return u||''}
 let ME_RAW='',ME='',ME_ID='',ME_PFP='',allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=[],allViews=[],viewedStories=[],lastTap=0,feedMode='foryou';
 function getSupa(){return window.supa||supa} window.getSupa=getSupa;
@@ -122,7 +123,7 @@ function getBestMedia(p){
   return {url: p.media_url||p.video_url||'', isVid:false};
 }
 async function checkLogin(){
-  supa=getSupa();if(!supa){setTimeout(checkLogin,300);return}
+  supa=getSupa();if(!supa){setTimeout(checkLogin,200);return}
   let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}
   let {data:profile}=await supa.from('profiles').select('*').eq('id',session.user.id).single();if(!profile||!profile.username){location.href='login.html';return}
   ME_RAW=cleanUser(profile.username);ME=ME_RAW;ME_ID=session.user.id;ME_PFP=profile.avatar_url||'';window.ME=ME_RAW;window.ME_ID=ME_ID;window.ME_RAW=ME_RAW;
@@ -132,22 +133,17 @@ async function checkLogin(){
 async function loadAll(){
   try{
     supa=getSupa();if(!supa)return;
-    var pr = {data: []};
-    var po = {data: []};
-    var re = {data: []};
-    var li = {data: []};
-    var vi = {data: []};
-    var sa = {data: []};
-    var st = {data: []};
-    var fo = {data: []};
-    try{ pr = await supa.from('profiles').select('*'); }catch(e){}
-    try{ po = await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(20); }catch(e){}
-    try{ re = await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(20); }catch(e){}
-    try{ li = await supa.from('likes').select('*').limit(200); }catch(e){}
-    try{ vi = await supa.from('views').select('*').limit(200); }catch(e){}
-    try{ sa = await supa.from('saves').select('*').limit(200); }catch(e){}
-    try{ st = await supa.from('stories').select('*').order('created_at',{ascending:false}).limit(30); }catch(e){}
-    try{ fo = await supa.from('follows').select('*').limit(500); }catch(e){}
+    // SPEED: 8 Table ah One by One Illa da - Ellam Same Time la Fetch Pannrom da - 8x Speed da
+    let [pr,po,re,li,vi,sa,st,fo] = await Promise.all([
+      supa.from('profiles').select('*').then(r=>r).catch(()=>({data:[]})),
+      supa.from('posts').select('*').order('created_at',{ascending:false}).limit(12).then(r=>r).catch(()=>({data:[]})),
+      supa.from('reels').select('*').order('created_at',{ascending:false}).limit(12).then(r=>r).catch(()=>({data:[]})),
+      supa.from('likes').select('*').limit(200).then(r=>r).catch(()=>({data:[]})),
+      supa.from('views').select('*').limit(200).then(r=>r).catch(()=>({data:[]})),
+      supa.from('saves').select('*').limit(200).then(r=>r).catch(()=>({data:[]})),
+      supa.from('stories').select('*').order('created_at',{ascending:false}).limit(20).then(r=>r).catch(()=>({data:[]})),
+      supa.from('follows').select('*').limit(500).then(r=>r).catch(()=>({data:[]})),
+    ]);
     allProfiles=pr.data||[];allLikes=li.data||[];allViews=vi.data||[];allSaves=sa.data||[];allFollows=fo.data||[];
     if(window.PIXORO_FOLLOWING){
       window.PIXORO_FOLLOWING=new Set((allFollows||[]).filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));
@@ -169,6 +165,8 @@ async function loadAll(){
     }
     allPosts=deduped;
     allStories=(st.data||[]).map(s=>{let prof=profileById(s.user_id);s.username=prof?prof.username:(s.username||'');s.username=cleanUser(s.username);return s}).filter(s=>{if(!s.expires_at)return true;return new Date(s.expires_at)>new Date()});
+    // SPEED: Cache la Save Pannrom da - Next Time Instant ah Open Aagum da - Loading Illa da
+    try{ localStorage.setItem('pixoro_feed_cache', JSON.stringify(allPosts.slice(0,8))); }catch(e){}
     renderStories();renderFeed();
     if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
     let el=document.getElementById('navPfp');
@@ -187,8 +185,9 @@ async function loadAll(){
 }
 function renderStories(){let bar=document.getElementById('storyBar');let myStories=allStories.filter(s=>s.user_id===ME_ID);let otherStories=allStories.filter(s=>s.user_id!==ME_ID);let grouped={};otherStories.forEach(s=>{let key=s.user_id||cleanUser(s.username||'');if(!grouped[key])grouped[key]=s});let html='';let myPfp=getPfp(ME_ID);if(myStories.length>0){let s=myStories[0];html+=`<div class="sItem" onclick="openMyStory()"><div class="sRing ${viewedStories.includes(s.id)?'seen':''}"><div class="sRingInner"><img src="${myPfp}"></div></div><div class="sName">Your Story</div></div>`}else{html+=`<div class="sItem" onclick="location.href='story-upload.html'"><div class="sAddWrap"><img class="sAddImg" src="${myPfp}"><div class="sAddPlus">+</div></div><div class="sName">Your Story</div></div>`}Object.values(grouped).forEach(s=>{html+=`<div class="sItem" onclick="openOtherStory('${s.user_id||s.username}')"><div class="sRing ${viewedStories.includes(s.id)?'seen':''}"><div class="sRingInner"><img src="${getPfp(s.user_id||s.username)}"></div></div><div class="sName">${displayNameFor(s.user_id||s.username)}</div></div>`});bar.innerHTML=html}
 function openMyStory(){let s=allStories.find(x=>x.user_id===ME_ID);if(!s)return location.href='story-upload.html';location.href='story-view.html?user='+(s.user_id||s.username)} function openOtherStory(u){location.href='story-view.html?user='+u}
-function renderFeed(){let feedPosts=[...allPosts];if(feedMode=='foryou'){feedPosts.sort((a,b)=>viralScore(b)-viralScore(a))}else if(feedMode=='following'){let followingIds=window.PIXORO_FOLLOWING && window.PIXORO_FOLLOWING.size ? window.PIXORO_FOLLOWING : new Set(allFollows.filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));feedPosts=feedPosts.filter(p=>String(p.user_id)===String(ME_ID)||followingIds.has(String(p.user_id)));feedPosts.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));}else if(feedMode=='latest'){feedPosts.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));}let html='';for(let idx=0;idx<feedPosts.length;idx++){let p=feedPosts[idx];let ownerKey=p.user_id;if(!ownerKey || String(ownerKey).length<20){let pr=allProfiles.find(x=>cleanUser(x.username)===cleanUser(p.username));if(pr) ownerKey=pr.id;else ownerKey=p.username}let lCount=allLikes.filter(l=>String(l.post_id)==String(p.id)).length;let isLiked=allLikes.some(l=>String(l.post_id)==String(p.id)&&(l.user_id==ME_ID));let isSaved=allSaves.some(s=>String(s.post_id)==String(p.id)&&(s.user_id==ME_ID));let best=getBestMedia(p);let mUrl=best.url||'';let mediaHtml=best.isVid?(idx===0?`<video class="main" src="${mUrl}" loop muted playsinline preload="auto"></video>`:`<video class="main" data-src="${mUrl}" loop muted playsinline preload="none"></video>`):`<img class="main" src="${mUrl}" loading="${idx===0?'eager':'lazy'}" decoding="async" onerror="this.src='https://via.placeholder.com/400x500/111/fff?text=Pixoro'">`;let isMe=String(ownerKey)===String(ME_ID);let followName=cleanUser(p.username || displayNameFor(ownerKey) || '');let isFollowing = window.PIXORO_FOLLOWING_NAMES ? window.PIXORO_FOLLOWING_NAMES.has(followName) : (window.PIXORO_FOLLOWING ? window.PIXORO_FOLLOWING.has(String(ownerKey)) : allFollows.some(f=>String(f.follower_id)===String(ME_ID)&&String(f.following_id)===String(ownerKey)));let followBtnHtml='';if(!isMe && followName && followName!=='null' && followName!=='undefined'){followBtnHtml=`<button data-follow-user="${followName}" data-follow-username="${followName}" class="followBtnPost ${isFollowing?'following':''}" onclick="event.stopPropagation();toggleFollow('${followName}',this)">${isFollowing?'Following':'Follow'}</button>`}html+=`<div class="post" id="post-${p.id}"><div class="postTop"><div style="display:flex;align-items:center;gap:10px"><div class="pfpRing" onclick="location.href='profile.html?u=${ownerKey}'"><div class="pfpInner"><img src="${getPfp(ownerKey)}"></div></div><div style="display:flex;align-items:center;gap:8px"><b>${displayNameFor(ownerKey)}</b>${followBtnHtml}</div>${p._from==='reels'?'<span style="font-size:10px;background:#ff5ea8;padding:2px 6px;border-radius:10px">REEL</span>':''}</div><span>⋮</span></div><div style="position:relative" onclick="handleTap('${p.id}')">${mediaHtml}<div id="burst-${p.id}" class="heart-burst">❤</div></div><div class="actions"><div class="left"><button id="likeBtn-${p.id}" class="act ${isLiked?'liked':''}" onclick="fastLike('${p.id}')"><svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg></button><button class="act" onclick="openComment('${p.id}')"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button></div><button class="act ${isSaved?'saved':''}" onclick="savePost('${p.id}')"><svg viewBox="0 0 24 24"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></button></div><div style="padding:0 14px"><b><span id="likeCount-${p.id}">${lCount}</span> likes</b><br><b>${displayNameFor(ownerKey)}</b> ${p.caption||''}</div></div>`}document.getElementById('feed').innerHTML=html||'<p style="text-align:center;padding:40px;color:#888">No posts da</p>';observeHomeVideos();if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();}
-function observeHomeVideos(){let vs=document.querySelectorAll('.post video.main');let io=new IntersectionObserver(es=>{es.forEach(e=>{let v=e.target;if(e.isIntersecting){if(!v.src && v.dataset.src){v.src=v.dataset.src;v.load();}v.muted=true;v.play().catch(()=>{})}else{v.pause()}})},{threshold:0.4,rootMargin:'200px 0px'});vs.forEach(v=>io.observe(v))}
+function renderFeed(){let feedPosts=[...allPosts];if(feedMode=='foryou'){feedPosts.sort((a,b)=>viralScore(b)-viralScore(a))}else if(feedMode=='following'){let followingIds=window.PIXORO_FOLLOWING && window.PIXORO_FOLLOWING.size ? window.PIXORO_FOLLOWING : new Set(allFollows.filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));feedPosts=feedPosts.filter(p=>String(p.user_id)===String(ME_ID)||followingIds.has(String(p.user_id)));feedPosts.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));}else if(feedMode=='latest'){feedPosts.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));}let html='';for(let idx=0;idx<feedPosts.length;idx++){let p=feedPosts[idx];let ownerKey=p.user_id;if(!ownerKey || String(ownerKey).length<20){let pr=allProfiles.find(x=>cleanUser(x.username)===cleanUser(p.username));if(pr) ownerKey=pr.id;else ownerKey=p.username}let lCount=allLikes.filter(l=>String(l.post_id)==String(p.id)).length;let isLiked=allLikes.some(l=>String(l.post_id)==String(p.id)&&(l.user_id==ME_ID));let isSaved=allSaves.some(s=>String(s.post_id)==String(p.id)&&(s.user_id==ME_ID));let best=getBestMedia(p);let mUrl=best.url||'';let mediaHtml=best.isVid?(idx===0?`<video class="main" src="${mUrl}" loop muted playsinline preload="metadata"></video>`:`<video class="main" data-src="${mUrl}" loop muted playsinline preload="none"></video>`):`<img class="main" src="${mUrl}" loading="${idx===0?'eager':'lazy'}" decoding="async" onerror="this.src='https://via.placeholder.com/400x500/111/fff?text=Pixoro'">`;let isMe=String(ownerKey)===String(ME_ID);let followName=cleanUser(p.username || displayNameFor(ownerKey) || '');let isFollowing = window.PIXORO_FOLLOWING_NAMES ? window.PIXORO_FOLLOWING_NAMES.has(followName) : (window.PIXORO_FOLLOWING ? window.PIXORO_FOLLOWING.has(String(ownerKey)) : allFollows.some(f=>String(f.follower_id)===String(ME_ID)&&String(f.following_id)===String(ownerKey)));let followBtnHtml='';if(!isMe && followName && followName!=='null' && followName!=='undefined'){followBtnHtml=`<button data-follow-user="${followName}" data-follow-username="${followName}" class="followBtnPost ${isFollowing?'following':''}" onclick="event.stopPropagation();toggleFollow('${followName}',this)">${isFollowing?'Following':'Follow'}</button>`}html+=`<div class="post" id="post-${p.id}"><div class="postTop"><div style="display:flex;align-items:center;gap:10px"><div class="pfpRing" onclick="location.href='profile.html?u=${ownerKey}'"><div class="pfpInner"><img src="${getPfp(ownerKey)}"></div></div><div style="display:flex;align-items:center;gap:8px"><b>${displayNameFor(ownerKey)}</b>${followBtnHtml}</div>${p._from==='reels'?'<span style="font-size:10px;background:#ff5ea8;padding:2px 6px;border-radius:10px">REEL</span>':''}</div><span>⋮</span></div><div style="position:relative" onclick="handleTap('${p.id}')">${mediaHtml}<div id="burst-${p.id}" class="heart-burst">❤</div></div><div class="actions"><div class="left"><button id="likeBtn-${p.id}" class="act ${isLiked?'liked':''}" onclick="fastLike('${p.id}')"><svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg></button><button class="act" onclick="openComment('${p.id}')"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button></div><button class="act ${isSaved?'saved':''}" onclick="savePost('${p.id}',this)"><svg viewBox="0 0 24 24"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></button></div><div style="padding:0 14px"><b><span id="likeCount-${p.id}">${lCount}</span> likes</b><br><b>${displayNameFor(ownerKey)}</b> ${p.caption||''}</div></div>`}document.getElementById('feed').innerHTML=html||'<p style="text-align:center;padding:40px;color:#888">No posts da</p>';observeHomeVideos();if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();}
+let _homeIO=null;
+function observeHomeVideos(){let vs=document.querySelectorAll('.post video.main');if(_homeIO) _homeIO.disconnect();_homeIO=new IntersectionObserver(es=>{es.forEach(e=>{let v=e.target;if(e.isIntersecting){if(!v.src && v.dataset.src){v.src=v.dataset.src;v.load();}v.muted=true;v.play().catch(()=>{})}else{v.pause()}})},{threshold:0.4,rootMargin:'200px 0px'});vs.forEach(v=>_homeIO.observe(v))}
 function handleTap(id){let now=Date.now();if(now-lastTap<300){doubleLike(id);lastTap=0}else{lastTap=now}}
 async function doubleLike(id){let burst=document.getElementById('burst-'+id);if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show')}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&(l.user_id==ME_ID));if(liked)return;allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});let btn=document.getElementById('likeBtn-'+id);if(btn)btn.classList.add('liked');let c=document.getElementById('likeCount-'+id);if(c)c.innerText=parseInt(c.innerText||'0')+1;supa=getSupa();if(supa){await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}}
 async function fastLike(id){let liked=allLikes.some(l=>String(l.post_id)==String(id)&&(l.user_id==ME_ID));let btn=document.getElementById('likeBtn-'+id);let c=document.getElementById('likeCount-'+id);if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});if(btn)btn.classList.add('liked');if(c)c.innerText=parseInt(c.innerText||'0')+1;let burst=document.getElementById('burst-'+id);if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show')}supa=getSupa();if(supa)await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}else{allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&(l.user_id==ME_ID)));if(btn)btn.classList.remove('liked');if(c)c.innerText=Math.max(0,parseInt(c.innerText||'1')-1);supa=getSupa();if(supa)await supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID)}}
@@ -241,9 +240,11 @@ window.toggleFollow = async function(target, btn){
 };
 window.pixoroToggleFollow = window.toggleFollow;
 window.toggleF = window.toggleFollow;
-async function savePost(id){supa=getSupa();let s=allSaves.some(x=>String(x.post_id)==String(id)&&(x.user_id==ME_ID));if(s){allSaves=allSaves.filter(x=>!(String(x.post_id)==String(id)&&(x.user_id==ME_ID)));if(supa)await supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID)}else{allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW});if(supa)await supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}renderFeed()}
+async function savePost(id,btn){ supa=getSupa(); let s=allSaves.some(x=>String(x.post_id)==String(id)&&(x.user_id==ME_ID)); if(s){ allSaves=allSaves.filter(x=>!(String(x.post_id)==String(id)&&(x.user_id==ME_ID))); if(btn) btn.classList.remove('saved'); if(supa) supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}); } else { allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW}); if(btn) btn.classList.add('saved'); if(supa) supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).then(()=>{}); } /* NO ALERT - NO RELOAD - NO BLOCK da - Instant Save da */ }
 async function openComment(id){document.getElementById('commentModal').style.display='flex';supa=getSupa();if(!supa)return;let {data}=await supa.from('comments').select('*').eq('post_id',id).order('created_at',{ascending:false});document.getElementById('commentList').innerHTML=(data||[]).map(c=>`<div style="display:flex;gap:10px;padding:10px 0"><img src="${getPfp(c.user_id||c.username)}" style="width:32px;height:32px;border-radius:50%"><div><b>${displayNameFor(c.user_id||c.username)}</b><div>${c.text}</div></div></div>`).join('')||'';window.currentPostId=id}
 function closeComment(){document.getElementById('commentModal').style.display='none'}
 async function addComment(){supa=getSupa();let t=document.getElementById('commentInput').value.trim();if(!t||!window.currentPostId||!supa)return;await supa.from('comments').insert({post_id:window.currentPostId,user_id:ME_ID,username:ME_RAW,text:t});document.getElementById('commentInput').value='';openComment(window.currentPostId)}
+// SPEED: Cache irundha Odane Kaatu da - Loading Wait Panna Vendaam da
+try{ let c=JSON.parse(localStorage.getItem('pixoro_feed_cache')||'[]'); if(c.length){ allPosts=c; } }catch(e){}
 checkLogin()
 </script></body></html>
