@@ -1,4 +1,4 @@
-// ===== PIXORO MAIN - SERVER ONLY - v113 - FULL FIX DA =====
+// ===== PIXORO MAIN - SERVER ONLY - v114 - NULL FIX DA =====
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 
@@ -65,7 +65,6 @@ async function getAllPixoroPosts(){
   try{ let r2 = await window.supa.from('reels').select('*').order('created_at',{ascending:false}); if(r2.data) all = all.concat(r2.data.map(p=>({...p,_from:'reels'}))); }catch(e){}
   return all;
 }
-// FIXED - Ella Photo ah Real nu Sollu da - Filter Panna Venda da
 function pixoroIsRealPhoto(url){ return true; }
 
 async function pixoroRemoveFromGrid(postId){
@@ -82,15 +81,12 @@ async function pixoroMuteUser(userId){
   try{ await window.supa.from('muted_users').insert({user_id:window.ME_ID, muted_user_id:userId}); }catch(e){}
   location.reload();
 }
-// FIXED - Block ah RPC la than Pannu da - Direct Insert Illa da
 async function pixoroBlockUser(target){
-  let raw = String(target||'').trim(); if(!raw) return;
+  let raw = String(target||'').trim(); if(!raw || raw==='null' || raw==='undefined') return;
   if(!confirm('Full ah Block Pannava da?')) return;
-  let {id, name} = await pixoroResolveName(raw);
-  if(!id || id === String(window.ME_ID)) return;
-  let {data, error} = await window.supa.rpc('toggle_block', {target_id: id});
+  let {data, error} = await window.supa.rpc('toggle_block_by_name', {target_name: raw});
   if(error){ alert('Block Fail da - ' + error.message); return; }
-  alert(data ? (name + ' Block Aayiduchu da') : (name + ' Unblock Aayiduchu da'));
+  alert(data ? (raw + ' Block Aayiduchu da') : (raw + ' Unblock Aayiduchu da'));
   setTimeout(()=> location.reload(), 500);
 }
 async function pixoroGetHiddenIds(){
@@ -111,7 +107,6 @@ function pixoroScore(post, likedUserIds, watchMap, savedIds){
   if(savedIds.includes(String(post.id))) score += 60;
   return score;
 }
-// FIXED - Strict Filter Illa da - Post Vara Vei da
 async function getPixoroFeed(){
   let all = await getAllPixoroPosts();
   console.log('TOTAL POSTS da:', all.length);
@@ -122,7 +117,6 @@ async function getPixoroFeed(){
     if(blocked.includes(String(p.user_id))) return false;
     return true;
   });
-  console.log('AFTER FILTER da:', clean.length);
   clean.sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
   return clean;
 }
@@ -233,6 +227,7 @@ window.PIXORO_NAME_TO_ID = window.PIXORO_NAME_TO_ID || {};
 let _pixoroFollowBusy = {};
 let _pixoroLoadingFollow = false;
 function pixoroCleanName(n){ return String(n||'').trim().replace('@','').toLowerCase(); }
+function pixoroIsUuid(s){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(s||'')); }
 function pixoroIsFollowing(check){
   check = String(check||'');
   if(!check) return false;
@@ -247,7 +242,7 @@ function pixoroIsFollowing(check){
 function pixoroPaintAllFollowBtns(){
   document.querySelectorAll('[data-follow-user]').forEach(btn=>{
     let raw = String(btn.dataset.followUser || btn.dataset.followUsername || '');
-    if(!raw) return;
+    if(!raw || raw==='null' || raw==='undefined') return;
     let isFollowing = pixoroIsFollowing(raw);
     let wantText = isFollowing ? 'Following ✓' : 'Follow';
     if(btn.innerText !== wantText) btn.innerText = wantText;
@@ -272,56 +267,72 @@ async function pixoroLoadFollowing(){
   }catch(e){}
   _pixoroLoadingFollow = false;
 }
+// FIXED v114 - null ah ID nu return panna koodathu da
 async function pixoroResolveName(raw){
   raw = pixoroCleanName(raw);
-  if(!raw) return {id:null, name:null};
+  if(!raw || raw==='null' || raw==='undefined' || raw==='nan') return {id:null, name:null};
   if(window.PIXORO_NAME_TO_ID[raw]) return {id: window.PIXORO_NAME_TO_ID[raw], name: raw};
-  if(window.PIXORO_ID_TO_NAME[raw]) return {id: raw, name: pixoroCleanName(window.PIXORO_ID_TO_NAME[raw])};
+  if(pixoroIsUuid(raw) && window.PIXORO_ID_TO_NAME[raw]) return {id: raw, name: pixoroCleanName(window.PIXORO_ID_TO_NAME[raw])};
   try{
     let {data} = await window.supa.from('profiles').select('id,username').ilike('username', raw).single();
-    if(data){
+    if(data && data.id){
       window.PIXORO_ID_TO_NAME[String(data.id)] = pixoroCleanName(data.username);
       window.PIXORO_NAME_TO_ID[pixoroCleanName(data.username)] = String(data.id);
       return {id: String(data.id), name: pixoroCleanName(data.username)};
     }
   }catch(e){}
-  return {id: raw, name: raw};
+  try{
+    let {data} = await window.supa.from('posts').select('user_id,username').ilike('username', raw).limit(1).single();
+    if(data && data.user_id && pixoroIsUuid(data.user_id)){
+      window.PIXORO_NAME_TO_ID[raw] = String(data.user_id);
+      window.PIXORO_ID_TO_NAME[String(data.user_id)] = raw;
+      return {id: String(data.user_id), name: raw};
+    }
+  }catch(e){}
+  return {id:null, name: raw};
 }
-// FIXED - Itha Munnadi Plain Tamil Line Irundhuchu da - Ippo // Pottuten da
+// FIXED v114 - UUID ah anuppa venda da - Username ah anuppu da
 async function pixoroToggleFollow(target, btn){
   let raw = String(target||'').trim();
-  if(!raw) return false;
+  if(!raw || raw==='null' || raw==='undefined'){
+    let b = btn || document.activeElement;
+    raw = b?.dataset?.followUsername || b?.dataset?.followUser || '';
+  }
+  if(!raw || raw==='null' || raw==='undefined'){ alert('Username kedaikala da - Refresh pannu da'); return false; }
   let {id, name} = await pixoroResolveName(raw);
-  if(!id || id === String(window.ME_ID)){ return false; }
-  if(_pixoroFollowBusy[id]) return false;
-  _pixoroFollowBusy[id] = true;
-  let was = pixoroIsFollowing(id);
+  if(!name){ alert('User Not Found da - ' + raw); return false; }
+  if(id && id === String(window.ME_ID)) return false;
+  let busyKey = id || name;
+  if(_pixoroFollowBusy[busyKey]) return false;
+  _pixoroFollowBusy[busyKey] = true;
+  let was = id ? pixoroIsFollowing(id) : pixoroIsFollowing(name);
   let want = !was;
-  if(want){ window.PIXORO_FOLLOWING.add(id); window.PIXORO_FOLLOWING_NAMES.add(pixoroCleanName(name)); }
-  else { window.PIXORO_FOLLOWING.delete(id); window.PIXORO_FOLLOWING_NAMES.delete(pixoroCleanName(name)); }
+  if(id){ if(want){ window.PIXORO_FOLLOWING.add(id); window.PIXORO_FOLLOWING_NAMES.add(pixoroCleanName(name)); } else { window.PIXORO_FOLLOWING.delete(id); window.PIXORO_FOLLOWING_NAMES.delete(pixoroCleanName(name)); } }
+  else { if(want) window.PIXORO_FOLLOWING_NAMES.add(pixoroCleanName(name)); else window.PIXORO_FOLLOWING_NAMES.delete(pixoroCleanName(name)); }
   pixoroPaintAllFollowBtns();
   try{
-    let {data, error} = await window.supa.rpc('toggle_follow', {target_id: id});
-    if(error && String(error.message||'').includes('not found')){
-      let r2 = await window.supa.rpc('toggle_follow_by_name', {target_name: name});
-      data = r2.data; error = r2.error;
-    }
+    let {data, error} = await window.supa.rpc('toggle_follow_by_name', {target_name: name});
     if(error){
-      if(was){ window.PIXORO_FOLLOWING.add(id); window.PIXORO_FOLLOWING_NAMES.add(pixoroCleanName(name)); }
-      else { window.PIXORO_FOLLOWING.delete(id); window.PIXORO_FOLLOWING_NAMES.delete(pixoroCleanName(name)); }
+      if(was){ if(id) window.PIXORO_FOLLOWING.add(id); window.PIXORO_FOLLOWING_NAMES.add(pixoroCleanName(name)); }
+      else { if(id) window.PIXORO_FOLLOWING.delete(id); window.PIXORO_FOLLOWING_NAMES.delete(pixoroCleanName(name)); }
       pixoroPaintAllFollowBtns();
-      alert('Follow Fail da - Supabase la toggle_follow Function Podalaya da - ' + error.message);
-      _pixoroFollowBusy[id] = false;
+      alert('Follow Fail da - ' + error.message);
+      _pixoroFollowBusy[busyKey] = false;
       return false;
     }
-    if(data){ window.PIXORO_FOLLOWING.add(id); window.PIXORO_FOLLOWING_NAMES.add(pixoroCleanName(name)); }
-    else { window.PIXORO_FOLLOWING.delete(id); window.PIXORO_FOLLOWING_NAMES.delete(pixoroCleanName(name)); }
+    if(!id){ let r = await pixoroResolveName(name); id = r.id; }
+    if(id){
+      if(data){ window.PIXORO_FOLLOWING.add(id); window.PIXORO_FOLLOWING_NAMES.add(pixoroCleanName(name)); }
+      else { window.PIXORO_FOLLOWING.delete(id); window.PIXORO_FOLLOWING_NAMES.delete(pixoroCleanName(name)); }
+    } else {
+      if(data) window.PIXORO_FOLLOWING_NAMES.add(pixoroCleanName(name)); else window.PIXORO_FOLLOWING_NAMES.delete(pixoroCleanName(name));
+    }
     pixoroPaintAllFollowBtns();
     try{ localStorage.setItem('pixoro_follow_sync', JSON.stringify({targetId: id, targetName: name, following: data, t: Date.now()})); }catch(e){}
     pixoroLoadFollowCounts();
     setTimeout(()=>{ _pixoroLoadingFollow = false; pixoroLoadFollowing(); }, 500);
   }catch(e){ pixoroPaintAllFollowBtns(); }
-  setTimeout(()=>{ _pixoroFollowBusy[id] = false; }, 800);
+  setTimeout(()=>{ _pixoroFollowBusy[busyKey] = false; }, 800);
   return want;
 }
 function pixoroSyncFollowBtn(targetId, following){
