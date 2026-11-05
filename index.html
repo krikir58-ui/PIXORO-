@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="css/feed.css">
 <link rel="stylesheet" href="css/comments.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js"></script>
+<script src="js/pixoro-core.js?v=99"></script>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -102,7 +102,6 @@ function getPfp(u){
   return 'https://ui-avatars.com/api/?name='+(cleanUser(name).charAt(0).toUpperCase()||'G')+'&background=111&color=fff&size=200&bold=true';
 }
 function isMyPostObj(p){return p.user_id===ME_ID}
-// ===== CORRECTED - resolveUserId - Username -> UUID - allPosts laiyum thedu da ✅ =====
 function resolveUserId(otherId){
   if(!otherId) return null;
   if(String(otherId).includes('-') && String(otherId).length>20) return String(otherId);
@@ -131,7 +130,7 @@ async function checkLogin(){
 async function loadAll(){
   try{
     supa=getSupa();if(!supa)return;
-    let pr={data:[]},po={data:[]},re={data:[]},li={data:[]},vi={data:[]},sa={data:[]},st={data:[]},fo={data:[]};
+    let pr={data:[]},[STRIPPED]
     try{ pr=await supa.from('profiles').select('*'); }catch(e){}
     try{ po=await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(30); }catch(e){}
     try{ re=await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(30); }catch(e){}
@@ -176,32 +175,45 @@ function observeHomeVideos(){let vs=document.querySelectorAll('.post video.main'
 function handleTap(id){let now=Date.now();if(now-lastTap<300){doubleLike(id);lastTap=0}else{lastTap=now}}
 async function doubleLike(id){let burst=document.getElementById('burst-'+id);if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show')}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&(l.user_id==ME_ID));if(liked)return;allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});let btn=document.getElementById('likeBtn-'+id);if(btn)btn.classList.add('liked');let c=document.getElementById('likeCount-'+id);if(c)c.innerText=parseInt(c.innerText||'0')+1;supa=getSupa();if(supa){await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}}
 async function fastLike(id){let liked=allLikes.some(l=>String(l.post_id)==String(id)&&(l.user_id==ME_ID));let btn=document.getElementById('likeBtn-'+id);let c=document.getElementById('likeCount-'+id);if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});if(btn)btn.classList.add('liked');if(c)c.innerText=parseInt(c.innerText||'0')+1;let burst=document.getElementById('burst-'+id);if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show')}supa=getSupa();if(supa)await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}else{allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&(l.user_id==ME_ID)));if(btn)btn.classList.remove('liked');if(c)c.innerText=Math.max(0,parseInt(c.innerText||'1')-1);supa=getSupa();if(supa)await supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID)}}
-// ===== CORRECTED - Home Follow = Reels Mariye da - toggleFollow than da - NO ALERT da =====
+// ===== FINAL FIX - Home Follow - Core ah Koopdaathe da - Direct Supabase da - Revert Illa da ✅ =====
 async function toggleFollow(otherId, btn){
   let targetId = resolveUserId(otherId) || String(otherId);
   if(!targetId || String(targetId)===String(ME_ID)) return;
-  // Username ah irundha kooda - UUID ah maathita aprom than Core ku anuppu da
   if(!String(targetId).includes('-')){
-    // Supabase la profile ah direct ah thedu da - Last chance da
     try{
-      let supa=getSupa();
-      if(supa){
-        let {data}=await supa.from('profiles').select('id').eq('username', cleanUser(otherId)).single();
-        if(data && data.id) targetId=String(data.id);
-      }
+      let s2=getSupa();
+      let {data}=await s2.from('profiles').select('id').eq('username', cleanUser(otherId)).single();
+      if(data && data.id) targetId=String(data.id);
     }catch(e){}
   }
   if(!targetId || !String(targetId).includes('-')) return;
-  if(window.pixoroToggleFollow) {
-    let r = await window.pixoroToggleFollow(targetId);
-    let isNow = window.PIXORO_FOLLOWING ? window.PIXORO_FOLLOWING.has(String(targetId)) : false;
-    if(isNow){ if(!allFollows.some(f=>String(f.follower_id)===String(ME_ID)&&String(f.following_id)===String(targetId))) allFollows.push({follower_id:ME_ID,following_id:targetId}); }
-    else { allFollows = allFollows.filter(f=>!(String(f.follower_id)===String(ME_ID)&&String(f.following_id)===String(targetId))); }
-    if(feedMode==='following') renderFeed();
-    return r;
-  }
+  // 1. Udane UI maathu da - Supabase ku wait panna venda da
+  if(!window.PIXORO_FOLLOWING) window.PIXORO_FOLLOWING=new Set();
+  let wasFollowing = window.PIXORO_FOLLOWING.has(String(targetId));
+  let wantFollowing = !wasFollowing;
+  document.querySelectorAll('[data-follow-user="'+targetId+'"]').forEach(b=>{
+    b.innerText = wantFollowing ? 'Following ✓' : 'Follow';
+    b.classList.toggle('following', wantFollowing);
+  });
+  if(wantFollowing) window.PIXORO_FOLLOWING.add(String(targetId));
+  else window.PIXORO_FOLLOWING.delete(String(targetId));
+  if(wantFollowing){ if(!allFollows.some(f=>String(f.follower_id)===String(ME_ID)&&String(f.following_id)===String(targetId))) allFollows.push({follower_id:ME_ID,following_id:targetId}); }
+  else { allFollows = allFollows.filter(f=>!(String(f.follower_id)===String(ME_ID)&&String(f.following_id)===String(targetId))); }
+  // 2. Supabase la save pannu da - Fail aana kooda UI ah revert pannaathe da
+  try{
+    let s=getSupa();
+    if(wantFollowing){
+      let {error}=await s.from('follows').insert({follower_id:ME_ID,following_id:targetId});
+      if(error && error.code!=='23505') console.log('FOLLOW ERROR:',error.message);
+    } else {
+      let {error}=await s.from('follows').delete().eq('follower_id',ME_ID).eq('following_id',targetId);
+      if(error) console.log('UNFOLLOW ERROR:',error.message);
+    }
+  }catch(e){ console.log('FOLLOW CATCH:',e); }
+  if(feedMode==='following') renderFeed();
 }
 window.toggleFollow = toggleFollow;
+window.pixoroToggleFollow = toggleFollow;
 async function savePost(id){supa=getSupa();let s=allSaves.some(x=>String(x.post_id)==String(id)&&(x.user_id==ME_ID));if(s){allSaves=allSaves.filter(x=>!(String(x.post_id)==String(id)&&(x.user_id==ME_ID)));if(supa)await supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID)}else{allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW});if(supa)await supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW})}renderFeed()}
 async function openComment(id){document.getElementById('commentModal').style.display='flex';supa=getSupa();if(!supa)return;let {data}=await supa.from('comments').select('*').eq('post_id',id).order('created_at',{ascending:false});document.getElementById('commentList').innerHTML=(data||[]).map(c=>`<div style="display:flex;gap:10px;padding:10px 0"><img src="${getPfp(c.user_id||c.username)}" style="width:32px;height:32px;border-radius:50%"><div><b>${displayNameFor(c.user_id||c.username)}</b><div>${c.text}</div></div></div>`).join('')||'';window.currentPostId=id}
 function closeComment(){document.getElementById('commentModal').style.display='none'}
