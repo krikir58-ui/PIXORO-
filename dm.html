@@ -1,9 +1,8 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PIXORO - Chats</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=140"></script>
+<script src="js/pixoro-core.js?v=141"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-/* DM la No Image Background - No Theme - Plain PIXORO */
 body{background:#F6F6F8!important;color:#111;max-width:450px;margin:0 auto;padding-bottom:76px}
 .logo{font-size:23px;font-weight:900;letter-spacing:.5px;color:#111}
 .logo span{background:linear-gradient(90deg,#FF4D8D,#8A7CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -18,7 +17,6 @@ body{background:#F6F6F8!important;color:#111;max-width:450px;margin:0 auto;paddi
 .nRingInner{width:100%;height:100%;border-radius:50%;background:transparent;overflow:visible;display:grid;place-items:center;border:none}
 .noteBubble{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#fff;color:#111;font-size:9px;padding:3px 6px;border-radius:12px;white-space:nowrap;font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;border:1px solid #eee}
 .noteInput{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid #eee;padding:20px;border-radius:18px;z-index:999;display:none;width:85%;max-width:360px}.noteInput input{width:100%;padding:12px;border-radius:10px;border:0;background:#F1F1F5;color:#111;outline:none;margin:10px 0}
-/* Pakka Nitta Block - Chat Row White Block Card */
 .chatRow{display:flex;gap:10px;padding:10px 12px;align-items:center;cursor:pointer;width:calc(100% - 20px)!important;margin:0 10px 6px!important;background:#fff!important;border:none!important;border-radius:14px!important;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .chatRow:active{background:#EFEFF3!important}
 .avaWrap{width:44px;height:44px;flex:0 0 44px;position:relative;display:grid;place-items:center;background:transparent!important;border:none!important}
@@ -63,8 +61,10 @@ body{background:#F6F6F8!important;color:#111;max-width:450px;margin:0 auto;paddi
 <div class="bottom-nav"><a href="index.html"><span style="font-size:22px">⌂</span><span>Home</span></a><a href="search.html"><span style="font-size:21px">🔍</span><span>Search</span></a><a href="reels.html"><span style="font-size:21px">▶️</span><span>Reels</span></a><a href="dm.html" class="active"><span style="font-size:21px">💬</span><span>DM</span><span class="navBadge" id="navTotal" style="display:none">0</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
 <script>
 let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, CUR_TAB='all', ALL_CHATS=[], NOTES_MAP={}, SEARCH_Q='', UNREAD_MAP={}, SHEET_USER='', PINNED=[], MUTED=[], ARCHIVED=[];
-function saveDMSetting(k,v){ localStorage.setItem('pixoro_dm_'+k, v); showToast('Setting Saved da ✨'); }
-function loadDMSettings(){ let a=document.getElementById('setActive'); if(a) a.checked = localStorage.getItem('pixoro_dm_active')!=='false'; let ty=document.getElementById('setTyping'); if(ty) ty.checked = localStorage.getItem('pixoro_dm_typing')!=='false'; let s=document.getElementById('setSeen'); if(s) s.checked = localStorage.getItem('pixoro_dm_seen')!=='false'; let al=document.getElementById('setAllow'); if(al) al.value = localStorage.getItem('pixoro_dm_allow')||'everyone'; }
+// NO LOCAL STORAGE - In-Memory Mattum da
+let DM_ACTIVE=true, DM_TYPING=true, DM_SEEN=true, DM_ALLOW='everyone';
+function saveDMSetting(k,v){ if(k==='active') DM_ACTIVE=v; if(k==='typing') DM_TYPING=v; if(k==='seen') DM_SEEN=v; if(k==='allow') DM_ALLOW=v; showToast('Setting Saved da ✨'); }
+function loadDMSettings(){ let a=document.getElementById('setActive'); if(a) a.checked = DM_ACTIVE; let ty=document.getElementById('setTyping'); if(ty) ty.checked = DM_TYPING; let s=document.getElementById('setSeen'); if(s) s.checked = DM_SEEN; let al=document.getElementById('setAllow'); if(al) al.value = DM_ALLOW; }
 loadDMSettings();
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
 function letterFor(u){ let l=(cleanUser(u||'P').charAt(0).toUpperCase()||'P'); return /[A-Z]/.test(l)?l:'P'; }
@@ -72,7 +72,7 @@ function showToast(m){ let t=document.getElementById('toast'); t.innerText=m; t.
 function realPfp(u){ let p=profileMap[cleanUser(u)]||profileById[u]; let url=p?.avatar_url||p?.profile_pic||''; if(url && !url.includes('ui-avatars')) return url; return ''; }
 function avatarHtml(u, size){ let url=realPfp(u); let L=letterFor(u); let cls = size==='small' ? 'avaSmall' : 'ava'; let lcls = size==='small' ? 'avaLetterSmall' : 'avaLetter'; if(url) return `<span style="position:relative;width:44px;height:44px;display:grid;place-items:center"><img class="${cls}" src="${url}" onerror="this.style.display='none'"><span class="${lcls}" style="position:absolute;inset:0">${L}</span></span>`; return `<div class="${lcls}">${L}</div>`; }
 function fmtTime(t){ let d=new Date(t); let now=new Date(); if(d.toDateString()===now.toDateString()) return d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); let y=new Date(); y.setDate(now.getDate()-1); if(d.toDateString()===y.toDateString()) return 'Yesterday'; return d.toLocaleDateString([], {day:'numeric',month:'short'}); }
-async function updatePresence(o){ if(!ME_ID) return; if(localStorage.getItem('pixoro_dm_active')==='false'){ o=false; } await supa.from('profiles').update({is_online:o,last_seen:new Date().toISOString()}).eq('id',ME_ID); }
+async function updatePresence(o){ if(!ME_ID) return; if(!DM_ACTIVE){ o=false; } await supa.from('profiles').update({is_online:o,last_seen:new Date().toISOString()}).eq('id',ME_ID); }
 function isMineMsg(m){ return String(m.sender_id)===ME_ID || cleanUser(m.sender)===ME_RAW; }
 function otherIdOf(m){ if(isMineMsg(m) && m.receiver_id) return String(m.receiver_id); if(!isMineMsg(m) && m.sender_id) return String(m.sender_id); let name = isMineMsg(m) ? cleanUser(m.receiver) : cleanUser(m.sender); let p = profileMap[name]; return p ? String(p.id) : name; }
 function onSearch(v){ SEARCH_Q=v.toLowerCase().trim(); render(); }
@@ -97,7 +97,7 @@ function render(){
   if(!list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#999">No chats da<br><button onclick="location.href='search.html'" style="margin-top:12px;background:#FF4D8D;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`; return; }
   let totalUnread = Object.values(UNREAD_MAP).reduce((a,b)=>a+b,0);
   let nav=document.getElementById('navTotal'); if(totalUnread){ nav.style.display='grid'; nav.textContent=totalUnread>99?'99+':totalUnread; } else nav.style.display='none';
-  let seenOff = localStorage.getItem('pixoro_dm_seen')==='false';
+  let seenOff = !DM_SEEN;
   document.getElementById('list').innerHTML=list.map(c=>{
     let uname=profileById[c.other]?.username||c.other; let uc=UNREAD_MAP[c.other]||0; let badge=uc?`<span class="unreadBadge ${MUTED.includes(c.other)?'grey':''}">${uc>99?'99+':uc}</span>`:``; let isPin=PINNED.includes(c.other); let isMute=MUTED.includes(c.other);
     let isMine=isMineMsg(c.msg);
