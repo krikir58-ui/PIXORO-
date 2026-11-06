@@ -1,10 +1,9 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PIXORO - Chats</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=134"></script>
+<script src="js/pixoro-core.js?v=135"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{background:#F6F6F8!important;color:#111;max-width:450px;margin:0 auto;padding-bottom:76px}
-/* PHOTO THEME da - DM la Maathina - Chat layum Same Photo Varum da */
 body[data-photo="nature"]{background:url('https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800') center/cover fixed!important}
 body[data-photo="beach"]{background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800') center/cover fixed!important}
 body[data-photo="city"]{background:url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800') center/cover fixed!important}
@@ -16,31 +15,37 @@ body[data-photo="dark"]{background:#111!important;color:#fff!important}
 body[data-photo="pink"]{background:#FFF2F7!important}
 body[data-photo="lavender"]{background:#F3F0FF!important}
 body[data-photo="blue"]{background:#F0F5FF!important}
-.logo{font-size:23px;font-weight:900;letter-spacing:.5px;color:#111}
+/* FIX - Top White Block Remove da - Transparent da */
+.logo{font-size:23px;font-weight:900;letter-spacing:.5px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.7)}
 .logo span{background:linear-gradient(90deg,#FF4D8D,#8A7CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
-.top{background:rgba(255,255,255,.92);backdrop-filter:blur(10px);padding:12px 14px 8px;position:sticky;top:0;z-index:50}
+.top{background:transparent!important;backdrop-filter:none!important;padding:12px 14px 8px;position:sticky;top:0;z-index:50;box-shadow:none!important}
 .topRow{display:flex;justify-content:space-between;align-items:center}
-.topIco{font-size:20px;margin-left:14px;cursor:pointer;color:#666}
-.searchBar{margin:10px 12px;background:rgba(255,255,255,.9);border-radius:18px;padding:9px 12px;display:flex;gap:8px;align-items:center}
-.searchBar input{flex:1;background:transparent;border:0;color:#111;outline:none;font-size:14px}
+.topIco{font-size:20px;margin-left:14px;cursor:pointer;color:#fff;text-shadow:0 1px 4px #000}
+.searchBar{margin:10px 12px;background:rgba(255,255,255,.15)!important;border:1px solid rgba(255,255,255,.4)!important;border-radius:18px;padding:9px 12px;display:flex;gap:8px;align-items:center;backdrop-filter:blur(8px)}
+.searchBar input{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:14px}
+.searchBar input::placeholder{color:rgba(255,255,255,.8)!important}
 .notes{display:flex;gap:10px;overflow-x:auto;padding:8px 10px;scrollbar-width:none}.notes::-webkit-scrollbar{display:none}
 .nItem{flex:0 0 58px;text-align:center;cursor:pointer;position:relative}
-.nRing{width:52px;height:52px;border-radius:50%;padding:2px;background:#FFD6E8;position:relative}
-.nRingInner{width:100%;height:100%;border-radius:50%;background:#fff;padding:2px;overflow:hidden;display:grid;place-items:center}
-.noteBubble{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#fff;color:#111;font-size:9px;padding:3px 6px;border-radius:12px;white-space:nowrap;font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;border:1px solid #eee}
-.noteInput{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid #eee;padding:20px;border-radius:18px;z-index:999;display:none;width:85%;max-width:360px}.noteInput input{width:100%;padding:12px;border-radius:10px;border:0;background:#F1F1F5;color:#111;outline:none;margin:10px 0}
-/* FIX - Photo Frame Remove da - White Card Illa da - Transparent thaan da */
+/* FIX - Left Side Photo Frame Remove da - Notes Ring White Frame Thookiten da */
+.nRing{width:52px;height:52px;border-radius:50%;padding:0!important;background:transparent!important;border:none!important;box-shadow:none!important;position:relative}
+.nRingInner{width:100%;height:100%;border-radius:50%;background:transparent!important;padding:0!important;overflow:hidden;display:grid;place-items:center;border:none!important;box-shadow:none!important}
+.noteBubble{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.95);color:#111;font-size:9px;padding:3px 6px;border-radius:12px;white-space:nowrap;font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;border:1px solid #eee;display:flex;gap:4px;align-items:center}
+.noteBubble img{width:16px;height:16px;border-radius:50%;object-fit:cover}
+.noteSticker{width:26px;height:26px;border-radius:50%;object-fit:cover;position:absolute;top:-18px;right:-4px;border:none!important;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.noteInput{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(20,10,40,.92);backdrop-filter:blur(12px);border:none;padding:20px;border-radius:18px;z-index:999;display:none;width:85%;max-width:360px;color:#fff}.noteInput input{width:100%;padding:12px;border-radius:10px;border:0;background:rgba(255,255,255,.15);color:#fff;outline:none;margin:10px 0}
+.noteInput input::placeholder{color:rgba(255,255,255,.7)}
 .chatRow{display:flex;gap:10px;padding:12px 12px;align-items:center;cursor:pointer;width:100%!important;margin:0!important;background:transparent!important;border:none!important;border-radius:0!important;box-shadow:none!important;border-bottom:1px solid rgba(255,255,255,.15)}
 .chatRow:active{background:rgba(255,255,255,.15)!important}
 body[data-photo="light"] .chatRow{border-bottom:1px solid #eee}
 body[data-photo="light"] .chatName{color:#111!important;text-shadow:none!important}
 body[data-photo="light"] .chatPrev{color:#666!important;text-shadow:none!important}
 body[data-photo="light"] .chatTime{color:#999!important;text-shadow:none!important}
-.avaWrap{width:44px;height:44px;flex:0 0 44px;position:relative;display:grid;place-items:center;overflow:hidden}
-.ava{width:44px;height:44px;border-radius:50%;object-fit:cover;display:block;background:#EDEDF2}
-.avaLetter{width:44px;height:44px;border-radius:50%;background:#E8E0FF!important;color:#6C5CE7;display:grid;place-items:center;font-size:17px;font-weight:700;line-height:1}
-.avaSmall{width:44px;height:44px;border-radius:50%;object-fit:cover;display:block;background:#EDEDF2}
-.avaLetterSmall{width:44px;height:44px;border-radius:50%;background:#E8E0FF!important;color:#6C5CE7;display:grid;place-items:center;font-size:17px;font-weight:700;line-height:1}
+/* FIX - Left Side Photo Frame Remove da - Avatar White Frame / Border Thookiten da */
+.avaWrap{width:44px;height:44px;flex:0 0 44px;position:relative;display:grid;place-items:center;overflow:visible!important;background:transparent!important;border:none!important;box-shadow:none!important}
+.ava{width:44px;height:44px;border-radius:50%;object-fit:cover;display:block;background:transparent!important;border:none!important;box-shadow:none!important}
+.avaLetter{width:44px;height:44px;border-radius:50%;background:#E8E0FF!important;color:#6C5CE7;display:grid;place-items:center;font-size:17px;font-weight:700;line-height:1;border:none!important;box-shadow:none!important}
+.avaSmall{width:44px;height:44px;border-radius:50%;object-fit:cover;display:block;background:transparent!important;border:none!important}
+.avaLetterSmall{width:44px;height:44px;border-radius:50%;background:#E8E0FF!important;color:#6C5CE7;display:grid;place-items:center;font-size:17px;font-weight:700;line-height:1;border:none!important}
 .chatMain{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .chatTopRow{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%}
 .chatName{font-size:15px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left;letter-spacing:.2px;text-shadow:0 1px 4px rgba(0,0,0,.6)}
@@ -48,27 +53,26 @@ body[data-photo="light"] .chatTime{color:#999!important;text-shadow:none!importa
 .chatPrevRow{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%}
 .chatPrev{font-size:13px;color:rgba(255,255,255,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left;text-shadow:0 1px 4px rgba(0,0,0,.6)}
 .dot{display:none}
-/* DM Chat Nitta Iruka Num Pakka - Unread Badge da */
 .unreadBadge{background:#FF4D8D;color:#fff;font-size:11px;min-width:19px;height:19px;border-radius:10px;display:grid;place-items:center;padding:0 5px;font-weight:700;flex-shrink:0}
 .unreadBadge.grey{background:#BBB}
 .tick{letter-spacing:-1px}
 .tick.blue{color:#FF4D8D}
 .tick.grey{color:#999}
-.actionSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#fff;border-radius:20px 20px 0 0;padding:16px;z-index:1000;display:none;box-shadow:0 -2px 20px rgba(0,0,0,.1)}.actionSheet button{width:100%;padding:12px;border:0;background:#F1F1F5;color:#111;border-radius:12px;margin:4px 0;text-align:left}
-/* FIX - Bottom Nav - 1st Photo Mariye da - Black Nav da - Active White da */
+.actionSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:rgba(20,10,40,.92);backdrop-filter:blur(12px);color:#fff;border-radius:20px 20px 0 0;padding:16px;z-index:1000;display:none;box-shadow:0 -2px 20px rgba(0,0,0,.1)}.actionSheet button{width:100%;padding:12px;border:0;background:rgba(255,255,255,.12);color:#fff;border-radius:12px;margin:4px 0;text-align:left}
 .bottom-nav{position:fixed!important;bottom:0!important;left:0!important;right:0!important;max-width:450px!important;margin:0 auto!important;width:100%!important;height:64px!important;background:#000!important;border-top:1px solid #222!important;display:flex!important;justify-content:space-around!important;align-items:center!important;z-index:100!important}
 .bottom-nav a{display:flex!important;flex-direction:column!important;align-items:center!important;gap:2px!important;text-decoration:none!important;color:#888!important;position:relative!important}
 .bottom-nav a.active{color:#fff!important}
 .bottom-nav a.active span{color:#fff!important;font-weight:800!important}
 .bottom-nav span{font-size:11px!important;color:#888!important}
-.bottom-nav a img.navPfp{width:26px!important;height:26px!important;border-radius:50%!important;object-fit:cover!important;background:#EDEDF2;border:1.5px solid #fff!important}
+/* FIX - Nav Profile Photo Frame Remove da - White Border Thookiten da */
+.bottom-nav a img.navPfp{width:26px!important;height:26px!important;border-radius:50%!important;object-fit:cover!important;background:transparent!important;border:none!important;box-shadow:none!important}
 .navBadge{position:absolute;top:-4px;right:8px;background:#FF4D8D;color:#fff;font-size:10px;min-width:17px;height:17px;border-radius:9px;display:grid;place-items:center;padding:0 4px;font-weight:700}
 .fab{position:fixed;bottom:78px;right:14px;width:48px;height:48px;border-radius:50%;background:#FF4D8D;display:grid;place-items:center;font-size:20px;z-index:90;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.15);color:#fff}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;display:none;white-space:nowrap}
-#themeSheet,#dmSettingSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#fff;border-radius:20px 20px 0 0;padding:16px;z-index:1001;display:none;box-shadow:0 -2px 20px rgba(0,0,0,.15);max-height:85vh;overflow-y:auto}
+#themeSheet,#dmSettingSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:rgba(20,10,40,.92);backdrop-filter:blur(12px);color:#fff;border-radius:20px 20px 0 0;padding:16px;z-index:1001;display:none;box-shadow:0 -2px 20px rgba(0,0,0,.15);max-height:85vh;overflow-y:auto}
 .themePhoto{height:70px;border-radius:14px;border:2px solid transparent;cursor:pointer;color:#fff;font-weight:700;font-size:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-shadow:0 1px 4px rgba(0,0,0,.5)}
 .themePhoto.on{border-color:#FF4D8D!important}
-.setRow{display:flex;justify-content:space-between;align-items:center;padding:12px;background:#F6F6F8;border-radius:12px;margin-top:10px;font-size:14px;font-weight:600;color:#111}
+.setRow{display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(255,255,255,.12);border-radius:12px;margin-top:10px;font-size:14px;font-weight:600;color:#fff}
 .setRow input{width:22px;height:22px;accent-color:#FF4D8D}
 .setRow select{border:0;background:#fff;padding:6px 8px;border-radius:8px;font-weight:700}
 </style></head><body>
@@ -79,11 +83,10 @@ body[data-photo="light"] .chatTime{color:#999!important;text-shadow:none!importa
 <div id="list" style="text-align:center;color:#999;padding:10px">Loading...</div>
 <div class="fab" onclick="location.href='search.html'">✏️</div>
 <div class="toast" id="toast"></div>
-<div class="noteInput" id="notePop"><h3 style="color:#111">✏️ Add Note</h3><input id="noteText" placeholder="Yedhachum Yosichiya da...?" maxlength="60"><div style="display:flex;gap:10px"><button onclick="saveNote()" style="flex:1;background:#FF4D8D;color:#fff;border:0;padding:11px;border-radius:20px;font-weight:700">Share</button><button onclick="document.getElementById('notePop').style.display='none'" style="flex:1;background:#F1F1F5;color:#111;border:0;padding:11px;border-radius:20px">Cancel</button></div></div>
-<div class="actionSheet" id="sheet"><b id="sheetName" style="color:#111">Chat</b><button onclick="doPin()">📌 Pin / Unpin</button><button onclick="doMute()">🔕 Mute / Unmute</button><button onclick="doArchive()">🗄️ Archive</button><button onclick="doDelete()" style="color:#FF4D4D">🗑️ Delete Chat</button><button onclick="document.getElementById('sheet').style.display='none'" style="text-align:center;background:#EDEDF2">Cancel</button></div>
-<!-- FIX - ⋮ Kulla Setting da - Photo Theme + Active + Typing + Seen + Allow da -->
-<div id="dmSettingSheet"><b style="color:#111;font-size:17px">⚙️ DM Settings</b><p style="font-size:12px;color:#999;margin:6px 0 12px">DM Chat Nitta Iruka Num Pakka - Ellam Inga thaan da</p>
-<b style="color:#111">🖼️ Photo Theme - Active Now</b>
+<div class="noteInput" id="notePop"><h3>✏️ Add Note</h3><input id="noteText" placeholder="Yedhachum Yosichiya da...?" maxlength="60"><label style="display:block;padding:10px;background:rgba(255,255,255,.12);border-radius:10px;text-align:center;cursor:pointer;margin:10px 0">🖼️ Note la Image Sticker Vaikalam da<input type="file" id="noteImgInput" accept="image/*" hidden></label><div style="display:flex;gap:10px"><button onclick="saveNoteWithImage()" style="flex:1;background:#FF4D8D;color:#fff;border:0;padding:11px;border-radius:20px;font-weight:700">Share</button><button onclick="document.getElementById('notePop').style.display='none'" style="flex:1;background:rgba(255,255,255,.15);color:#fff;border:0;padding:11px;border-radius:20px">Cancel</button></div></div>
+<div class="actionSheet" id="sheet"><b id="sheetName">Chat</b><button onclick="doPin()">📌 Pin / Unpin</button><button onclick="doMute()">🔕 Mute / Unmute</button><button onclick="doArchive()">🗄️ Archive</button><button onclick="doDelete()" style="color:#FF4D4D">🗑️ Delete Chat</button><button onclick="document.getElementById('sheet').style.display='none'" style="text-align:center">Cancel</button></div>
+<div id="dmSettingSheet"><b style="font-size:17px">⚙️ DM Settings</b><p style="font-size:12px;color:rgba(255,255,255,.7);margin:6px 0 12px">DM Chat Nitta Iruka Num Pakka - Ellam Inga thaan da</p>
+<b>🖼️ Photo Theme - Active Now</b>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px">
 <div class="themePhoto" data-t="light" onclick="setPhotoTheme('light')" style="background:#F6F6F8;color:#111;text-shadow:none">🤍<span>Light</span></div>
 <div class="themePhoto" data-t="nature" onclick="setPhotoTheme('nature')" style="background:url('https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400') center/cover">🌿<span>Nature</span></div>
@@ -95,16 +98,16 @@ body[data-photo="light"] .chatTime{color:#999!important;text-shadow:none!importa
 <div class="themePhoto" data-t="love" onclick="setPhotoTheme('love')" style="background:url('https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400') center/cover">💗<span>Love</span></div>
 <div class="themePhoto" data-t="dark" onclick="setPhotoTheme('dark')" style="background:#111">🖤<span>Dark</span></div>
 </div>
-<label style="display:block;margin-top:12px;padding:12px;background:#F1F1F5;border-radius:12px;text-align:center;cursor:pointer;font-weight:700;color:#111">📷 Pudicha Photo Upload Pannu da<input type="file" accept="image/*" hidden onchange="setCustomTheme(this)"></label>
-<b style="color:#111;display:block;margin-top:16px">👀 Privacy</b>
+<label style="display:block;margin-top:12px;padding:12px;background:rgba(255,255,255,.12);border-radius:12px;text-align:center;cursor:pointer;font-weight:700">📷 Pudicha Photo Upload Pannu da<input type="file" accept="image/*" hidden onchange="setCustomTheme(this)"></label>
+<b style="display:block;margin-top:16px">👀 Privacy</b>
 <label class="setRow">🟢 Active Now - Online Kaatu <input type="checkbox" id="setActive" checked onchange="saveDMSetting('active',this.checked)"></label>
 <label class="setRow">✍️ Typing... - Type Panna Kaatu <input type="checkbox" id="setTyping" checked onchange="saveDMSetting('typing',this.checked)"></label>
 <label class="setRow">👁️ Seen - Paathen nu Kaatu <input type="checkbox" id="setSeen" checked onchange="saveDMSetting('seen',this.checked)"></label>
 <label class="setRow">✅ Allow Messages <select id="setAllow" onchange="saveDMSetting('allow',this.value)"><option value="everyone">Everyone - Allow</option><option value="following">Following Only</option><option value="none">No One - Not Allow</option></select></label>
-<button onclick="document.getElementById('dmSettingSheet').style.display='none'" style="width:100%;margin-top:14px;padding:12px;background:#F1F1F5;border:0;border-radius:12px;color:#111;font-weight:700">Close</button></div>
+<button onclick="document.getElementById('dmSettingSheet').style.display='none'" style="width:100%;margin-top:14px;padding:12px;background:rgba(255,255,255,.15);border:0;border-radius:12px;color:#fff;font-weight:700">Close</button></div>
 <div class="bottom-nav"><a href="index.html"><span style="font-size:22px">⌂</span><span>Home</span></a><a href="search.html"><span style="font-size:21px">🔍</span><span>Search</span></a><a href="reels.html"><span style="font-size:21px">▶️</span><span>Reels</span></a><a href="dm.html" class="active"><span style="font-size:21px">💬</span><span>DM</span><span class="navBadge" id="navTotal" style="display:none">0</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
 <script>
-let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, CUR_TAB='all', ALL_CHATS=[], NOTES_MAP={}, SEARCH_Q='', UNREAD_MAP={}, SHEET_USER='', PINNED=[], MUTED=[], ARCHIVED=[];
+let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, CUR_TAB='all', ALL_CHATS=[], NOTES_MAP={}, NOTES_IMG={}, SEARCH_Q='', UNREAD_MAP={}, SHEET_USER='', PINNED=[], MUTED=[], ARCHIVED=[];
 const PHOTO_THEMES={light:'',pink:'',lavender:'',blue:'',nature:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800',beach:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800',city:'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800',galaxy:'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800',flower:'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800',mountain:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800',love:'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800',dark:''};
 function setPhotoTheme(t){ localStorage.setItem('pixoro_photo_theme',t); localStorage.setItem('pixoro_theme',t); localStorage.removeItem('pixoro_custom_bg'); applyPhotoTheme(); document.getElementById('dmSettingSheet').style.display='none'; showToast('Photo Theme Changed da ✨'); }
 function setCustomTheme(input){ let f=input.files[0]; if(!f) return; let r=new FileReader(); r.onload=e=>{ localStorage.setItem('pixoro_custom_bg',e.target.result); localStorage.setItem('pixoro_photo_theme','custom'); applyPhotoTheme(); document.getElementById('dmSettingSheet').style.display='none'; showToast('Pudicha Photo Set Aayiduchu da ✨'); }; r.readAsDataURL(f); }
@@ -118,7 +121,6 @@ function applyPhotoTheme(){
   document.querySelectorAll('.themePhoto').forEach(b=>b.classList.toggle('on', b.dataset.t===t));
 }
 applyPhotoTheme();
-// DM Settings - Active / Typing / Seen / Allow da
 function saveDMSetting(k,v){ localStorage.setItem('pixoro_dm_'+k, v); showToast('Setting Saved da ✨'); }
 function loadDMSettings(){
   let a=document.getElementById('setActive'); if(a) a.checked = localStorage.getItem('pixoro_dm_active')!=='false';
@@ -154,18 +156,28 @@ function doPin(){ let i=PINNED.indexOf(SHEET_USER); if(i>=0) PINNED.splice(i,1);
 function doMute(){ let i=MUTED.indexOf(SHEET_USER); if(i>=0) MUTED.splice(i,1); else MUTED.push(SHEET_USER); document.getElementById('sheet').style.display='none'; render(); }
 function doArchive(){ if(!ARCHIVED.includes(SHEET_USER)) ARCHIVED.push(SHEET_USER); document.getElementById('sheet').style.display='none'; render(); }
 function doDelete(){ ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); document.getElementById('sheet').style.display='none'; showToast('Chat deleted'); render(); }
+// Note + Image Sticker da - DM Mela da
+function noteHtml(u){
+  let note = NOTES_MAP[u] || '';
+  let img = NOTES_IMG[u] || localStorage.getItem('pixoro_note_img_'+u) || '';
+  if(!note && !img) return '';
+  let imgTag = img ? `<img src="${img}">` : '';
+  let sticker = img ? `<img class="noteSticker" src="${img}">` : '';
+  return `<div class="noteBubble">${imgTag}${note}</div>${sticker}`;
+}
 async function loadNotes(){
   let {data}=await supa.from('notes').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false});
-  NOTES_MAP={}; (data||[]).forEach(n=>{ NOTES_MAP[cleanUser(n.username)]=n.text; });
+  NOTES_MAP={}; NOTES_IMG={}; (data||[]).forEach(n=>{ NOTES_MAP[cleanUser(n.username)]=n.text; if(n.image_url) NOTES_IMG[cleanUser(n.username)]=n.image_url; });
   let usersWithNote = Object.keys(NOTES_MAP).filter(u=>u!==ME_RAW);
   let myNote = NOTES_MAP[ME_RAW];
   let html='';
-  html+=`<div class="nItem" onclick="document.getElementById('notePop').style.display='block'"><div class="nRing"><div class="nRingInner">${avatarHtml(ME_RAW,'small')}${myNote?`<div class="noteBubble">${myNote}</div>`:''}</div></div><div style="font-size:10px;margin-top:4px;color:#111">Your note</div></div>`;
-  html+=usersWithNote.slice(0,10).map(u=>`<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(u)}'"><div class="nRing"><div class="nRingInner">${avatarHtml(u,'small')}<div class="noteBubble">${NOTES_MAP[u]}</div></div></div><div style="font-size:10px;margin-top:4px;color:#111">${u}</div></div>`).join('');
-  document.getElementById('notes').style.display = (myNote || usersWithNote.length) ? 'flex' : 'none';
+  html+=`<div class="nItem" onclick="document.getElementById('notePop').style.display='block'"><div class="nRing"><div class="nRingInner">${avatarHtml(ME_RAW,'small')}${noteHtml(ME_RAW)}</div></div><div style="font-size:10px;margin-top:4px;color:#fff;text-shadow:0 1px 4px #000">Your note</div></div>`;
+  html+=usersWithNote.slice(0,10).map(u=>`<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(u)}'"><div class="nRing"><div class="nRingInner">${avatarHtml(u,'small')}${noteHtml(u)}</div></div><div style="font-size:10px;margin-top:4px;color:#fff;text-shadow:0 1px 4px #000">${u}</div></div>`).join('');
+  document.getElementById('notes').style.display = (myNote || usersWithNote.length || true) ? 'flex' : 'none';
   document.getElementById('notes').innerHTML=html;
 }
 async function saveNote(){ let t=document.getElementById('noteText').value.trim(); if(!t) return; await supa.from('notes').delete().eq('username',ME_RAW); await supa.from('notes').insert({user_id:ME_ID,username:ME_RAW,text:t}); document.getElementById('notePop').style.display='none'; loadNotes(); }
+function saveNoteWithImage(){ let t=document.getElementById('noteText').value.trim(); let f=document.getElementById('noteImgInput')?.files[0]; if(f){ let r=new FileReader(); r.onload=e=>{ localStorage.setItem('pixoro_note_img_'+ME_RAW, e.target.result); NOTES_IMG[ME_RAW]=e.target.result; saveNote(); }; r.readAsDataURL(f); } else saveNote(); }
 function render(){
   let archived = ALL_CHATS.filter(c=>ARCHIVED.includes(c.other));
   let list=ALL_CHATS.filter(c=>!ARCHIVED.includes(c.other));
