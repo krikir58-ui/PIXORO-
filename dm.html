@@ -1,119 +1,87 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>DM - Pixoro</title>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PIXORO - Chats</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js?v=128"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-body{background:#000!important;color:#fff;max-width:1100px;margin:0 auto;padding-bottom:70px}
-@media(min-width:700px){ body{padding-bottom:0} }
-/* 3rd PHOTO HEADER DA */
-.top{padding:14px 14px 8px;display:flex;justify-content:space-between;align-items:center;background:#000;position:sticky;top:0;z-index:50;height:64px}
-.logo{font-size:32px;font-weight:900;letter-spacing:-1px}
-.logo span{color:#facc15}
-.topIcons{display:flex;gap:10px}
-.topIco{width:42px;height:42px;border-radius:50%;background:#1a1a1a;display:grid;place-items:center;font-size:20px;cursor:pointer}
-.topIco.purple{background:#7c3aed}
-.searchBar{margin:10px;background:#262626;border-radius:12px;padding:11px 12px;display:flex;gap:8px;align-items:center}
-.searchBar input{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:13px}
-.filterChip{padding:5px 10px;border-radius:14px;background:#333;color:#ccc;font-size:11px;cursor:pointer;white-space:nowrap}.filterChip.active{background:#a259ff;color:#fff;font-weight:700}
-.notes{display:flex;gap:12px;overflow-x:auto;padding:14px 10px 8px;scrollbar-width:none}.notes::-webkit-scrollbar{display:none}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{background:#0b141a!important;color:#e9edef;max-width:450px;margin:0 auto;padding-bottom:70px}
+/* WHATSAPP HEADER DA */
+.top{background:#202c33;padding:12px 14px 10px;position:sticky;top:0;z-index:50}
+.topRow{display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:24px;font-weight:700;color:#e9edef}
+.logo span{color:#00a884}
+.topIco{font-size:22px;margin-left:16px;cursor:pointer;color:#aebac1}
+.subTop{display:flex;gap:6px;margin-top:12px}
+.chip{padding:6px 12px;border-radius:16px;background:#2a3942;color:#8696a0;font-size:13px;cursor:pointer}
+.chip.on{background:#00a884;color:#0b141a;font-weight:700}
+.searchBar{margin:10px;background:#202c33;border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:center}
+.searchBar input{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:14px}
+.notes{display:flex;gap:12px;overflow-x:auto;padding:10px;scrollbar-width:none}.notes::-webkit-scrollbar{display:none}
 .nItem{flex:0 0 66px;text-align:center;cursor:pointer;position:relative}
-.nRing{width:60px;height:60px;border-radius:50%;padding:2.5px;background:linear-gradient(135deg,#ff5ea8,#ff7a00);position:relative}
-.nRingInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2px}.nRingInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.nRing{width:60px;height:60px;border-radius:50%;padding:2.5px;background:#00a884;position:relative}
+.nRingInner{width:100%;height:100%;border-radius:50%;background:#0b141a;padding:2px}.nRingInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .noteBubble{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#fff;color:#000;font-size:9px;padding:4px 7px;border-radius:12px;white-space:nowrap;font-weight:700;max-width:90px;overflow:hidden;text-overflow:ellipsis}
-.noteInput{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#1a1a1a;border:1px solid #333;padding:20px;border-radius:18px;z-index:999;display:none;width:85%;max-width:360px}.noteInput input{width:100%;padding:12px;border-radius:10px;border:0;background:#262626;color:#fff;outline:none;margin:10px 0}
-/* 3rd PHOTO TABS DA */
-.tabs{display:flex;gap:8px;padding:8px 10px;overflow-x:auto;scrollbar-width:none}
-.tab{flex:1;padding:11px;border-radius:22px;background:#161616;color:#aaa;font-size:14px;cursor:pointer;white-space:nowrap;text-align:center;border:1px solid #1f1f1f}
-.tab.active{background:#1a1a1a;color:#fff;box-shadow:0 3px 0 #7c3aed}
-.tab .cnt{background:#e11d48;color:#fff;font-size:12px;padding:2px 7px;border-radius:50%;margin-left:4px}
-.tab .cnt.grey{background:#2a2a2a;color:#aaa}
-/* SPLIT - 3rd PHOTO MARI DA */
-.wrap{display:flex;min-height:0}
-.listWrap{width:100%}
-.chatPane{display:none;width:100%;border-left:1px solid #1a1a1a;background:#000;flex-direction:column}
-.chatPane iframe{width:100%;flex:1;border:0;background:#000}
-@media(min-width:700px){ .listWrap{width:360px;flex-shrink:0} .chatPane{display:flex} .bottom-nav{display:none!important} body{padding-bottom:0} }
-.chatRow{display:flex;gap:12px;padding:10px 8px;align-items:center;cursor:pointer;background:#000!important;border:1px solid transparent!important;border-radius:16px;margin:2px 4px}
-.chatRow.sel{background:#171021!important;border:1px solid #7c3aed!important}
-.chatRow img{width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid #262626;flex-shrink:0}
-.chatRow.sel img{border-color:#a855f7}
-.dot{width:14px;height:14px;background:#22c55e;border-radius:50%;border:3px solid #000;position:absolute;bottom:2px;right:2px}
-.unreadBadge{background:#7c3aed;color:#fff;font-size:12px;min-width:22px;height:22px;border-radius:50%;display:grid;place-items:center;padding:0 5px;font-weight:700}
-.tick{color:#999;letter-spacing:-1px}
-.actionSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#1a1a1a;border-radius:20px 20px 0 0;padding:16px;z-index:1000;display:none}.actionSheet button{width:100%;padding:13px;border:0;background:#262626;color:#fff;border-radius:12px;margin:4px 0;text-align:left}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:60px;background:#000;border-top:1px solid #111;display:flex;justify-content:space-around;align-items:center;z-index:100}
-.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}.bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}.bottom-nav a.active{color:#ff5ea8}.bottom-nav a.active svg{stroke:#ff5ea8}.bottom-nav span{font-size:10px;color:#8e8e8e}.bottom-nav a.active span{color:#ff5ea8;font-weight:700}
-.bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #555;background:#111}
+.noteInput{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#233138;border:1px solid #333;padding:20px;border-radius:18px;z-index:999;display:none;width:85%;max-width:360px}.noteInput input{width:100%;padding:12px;border-radius:10px;border:0;background:#2a3942;color:#fff;outline:none;margin:10px 0}
+.chatRow{display:flex;gap:12px;padding:11px 12px;align-items:center;cursor:pointer}
+.chatRow:active{background:#202c33}
+.chatRow img{width:50px;height:50px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.dot{width:13px;height:13px;background:#00a884;border-radius:50%;border:2.5px solid #0b141a;position:absolute;bottom:2px;right:2px}
+.unreadBadge{background:#00a884;color:#0b141a;font-size:12px;min-width:22px;height:22px;border-radius:50%;display:grid;place-items:center;padding:0 6px;font-weight:700}
+.tick{letter-spacing:-1px}
+.tick.blue{color:#53bdeb}
+.tick.grey{color:#8696a0}
+.actionSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#233138;border-radius:20px 20px 0 0;padding:16px;z-index:1000;display:none}.actionSheet button{width:100%;padding:13px;border:0;background:#2a3942;color:#fff;border-radius:12px;margin:4px 0;text-align:left}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:62px;background:#202c33;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;z-index:100}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8696a0}.bottom-nav a.active{color:#00a884}.bottom-nav span{font-size:11px}.bottom-nav a.active span{color:#00a884;font-weight:700}
+.bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover}
+.fab{position:fixed;bottom:78px;right:16px;width:52px;height:52px;border-radius:50%;background:#00a884;display:grid;place-items:center;font-size:22px;z-index:90;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.4)}
 </style></head><body>
-<div class="top"><div class="logo">PIXOR<span>O</span></div><div class="topIcons"><div class="topIco" onclick="document.getElementById('searchInp').focus()">🔍</div><div class="topIco">📹</div><div class="topIco purple" onclick="location.href='search.html'">✎</div></div></div>
-<div style="padding:0 14px;font-size:19px;font-weight:700"><span id="topName">Loading...</span></div>
-<div class="searchBar">🔍 <input id="searchInp" placeholder="Search or ask Meta AI..." oninput="onSearch(this.value)"><span class="filterChip" id="chipUnread" onclick="toggleUnread()">Unread</span><span class="filterChip" id="chipOnline" onclick="toggleOnline()">🟢 Online</span></div>
+<div class="top"><div class="topRow"><div class="logo">PIXOR<span>O</span></div><div><span class="topIco">📷</span><span class="topIco">🔍</span><span class="topIco">⋮</span></div></div><div class="subTop"><div class="chip on" onclick="setTab('all',this)">All <span id="cAll"></span></div><div class="chip" onclick="setTab('requests',this)">Requests</div><div class="chip" onclick="setTab('hidden',this)">Hidden 🔒</div></div><div style="margin-top:8px;font-size:14px;color:#8696a0"><span id="topName">Loading...</span></div></div>
+<div class="searchBar">🔍 <input id="searchInp" placeholder="Search..." oninput="onSearch(this.value)"></div>
 <div class="notes" id="notes"></div>
-<div class="tabs"><div class="tab active" onclick="setTab('all',this)">Messages <span class="cnt" id="cAll"></span></div><div class="tab" onclick="setTab('requests',this)">Requests <span class="cnt grey">12</span></div><div class="tab" onclick="setTab('hidden',this)">Hidden Chats 🔒</div></div>
-<div class="wrap">
-<div class="listWrap"><div id="list" style="text-align:center;color:#555;padding:10px">Loading...</div></div>
-<div class="chatPane" id="chatPane"><div style="padding:14px;border-bottom:1px solid #1a1a1a;display:flex;gap:10px;align-items:center"><img id="panePfp" style="width:40px;height:40px;border-radius:50%;object-fit:cover"><div><b id="paneName">Select a chat</b><br><small id="paneStatus" style="color:#22c55e;font-size:12px">Active now</small></div><div style="flex:1"></div><span style="font-size:22px">📞</span><span style="font-size:22px">📹</span><span style="font-size:22px">⋮</span></div><iframe id="chatFrame" src=""></iframe></div>
-</div>
-<div class="noteInput" id="notePop"><h3>✏️ Add Note</h3><input id="noteText" placeholder="Yedhachum Yosichiya da...?" maxlength="60"><div style="display:flex;gap:10px"><button onclick="saveNote()" style="flex:1;background:#fff;color:#000;border:0;padding:11px;border-radius:20px;font-weight:700">Share</button><button onclick="document.getElementById('notePop').style.display='none'" style="flex:1;background:#262626;color:#fff;border:0;padding:11px;border-radius:20px">Cancel</button></div></div>
+<div id="list" style="text-align:center;color:#8696a0;padding:10px">Loading...</div>
+<div class="fab" onclick="location.href='search.html'">💬</div>
+<div class="noteInput" id="notePop"><h3>✏️ Add Note</h3><input id="noteText" placeholder="Yedhachum Yosichiya da...?" maxlength="60"><div style="display:flex;gap:10px"><button onclick="saveNote()" style="flex:1;background:#00a884;color:#000;border:0;padding:11px;border-radius:20px;font-weight:700">Share</button><button onclick="document.getElementById('notePop').style.display='none'" style="flex:1;background:#2a3942;color:#fff;border:0;padding:11px;border-radius:20px">Cancel</button></div></div>
 <div class="actionSheet" id="sheet"><b id="sheetName">Chat</b><button onclick="doPin()">📌 Pin / Unpin</button><button onclick="doMute()">🔕 Mute / Unmute</button><button onclick="doArchive()">🗄️ Archive</button><button onclick="doDelete()" style="color:#ff5555">🗑️ Delete Chat</button><button onclick="document.getElementById('sheet').style.display='none'" style="text-align:center;background:#333">Cancel</button></div>
-<div class="bottom-nav"><a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a><a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a><a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a><a href="dm.html" class="active"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
+<div class="bottom-nav"><a href="index.html"><span style="font-size:22px">⌂</span><span>Home</span></a><a href="search.html"><span style="font-size:22px">🔍</span><span>Search</span></a><a href="reels.html"><span style="font-size:22px">▶️</span><span>Reels</span></a><a href="dm.html" class="active"><span style="font-size:22px">💬</span><span>Chats</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
 <script>
-let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, CUR_TAB='all', ALL_CHATS=[], NOTES_MAP={}, SEARCH_Q='', FILTER_UNREAD=false, FILTER_ONLINE=false, UNREAD_MAP={}, SHEET_USER='', PINNED=[], MUTED=[], ARCHIVED=[], SEL_OTHER='';
+let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, CUR_TAB='all', ALL_CHATS=[], NOTES_MAP={}, SEARCH_Q='', UNREAD_MAP={}, SHEET_USER='', PINNED=[], MUTED=[], ARCHIVED=[], SEL_OTHER='';
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
 function letterFor(u){ let l=(cleanUser(u||'P').charAt(0).toUpperCase()||'P'); return /[A-Z]/.test(l)?l:'P'; }
-function getPfp(u){ let p=profileMap[cleanUser(u)]||profileById[u]; if(p?.avatar_url||p?.profile_pic) return p.avatar_url||p.profile_pic; return 'https://ui-avatars.com/api/?name='+letterFor(u||'P')+'&background=111&color=fff&size=200&bold=true' }
+function getPfp(u){ let p=profileMap[cleanUser(u)]||profileById[u]; if(p?.avatar_url||p?.profile_pic) return p.avatar_url||p.profile_pic; return 'https://ui-avatars.com/api/?name='+letterFor(u||'P')+'&background=00a884&color=fff&size=200&bold=true' }
 function fmtTime(t){ let d=new Date(t); let now=new Date(); if(d.toDateString()===now.toDateString()) return d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); return d.toLocaleDateString([], {day:'numeric',month:'short'}); }
 async function updatePresence(o){ if(!ME_ID) return; await supa.from('profiles').update({is_online:o,last_seen:new Date().toISOString()}).eq('id',ME_ID); }
-function getStatus(p){ if(!p) return 'Offline'; if(p.is_online) return 'Active now'; if(!p.last_seen) return 'Offline'; let d=(Date.now()-new Date(p.last_seen))/1000/60; if(d<1) return 'Active now'; if(d<60) return `Active ${Math.floor(d)}m ago`; if(d<1440) return `Active ${Math.floor(d/60)}h ago`; return `Active ${Math.floor(d/1440)}d ago`; }
+function getStatus(p){ if(!p) return 'Offline'; if(p.is_online) return 'online'; if(!p.last_seen) return 'Offline'; let d=(Date.now()-new Date(p.last_seen))/1000/60; if(d<1) return 'online'; if(d<60) return `last seen ${Math.floor(d)}m ago`; return 'Offline'; }
 function onSearch(v){ SEARCH_Q=v.toLowerCase().trim(); render(); }
-function toggleUnread(){ FILTER_UNREAD=!FILTER_UNREAD; document.getElementById('chipUnread').classList.toggle('active',FILTER_UNREAD); render(); }
-function toggleOnline(){ FILTER_ONLINE=!FILTER_ONLINE; document.getElementById('chipOnline').classList.toggle('active',FILTER_ONLINE); render(); }
 let pressTimer=null;
 function openSheet(user,uname){ SHEET_USER=user; document.getElementById('sheetName').innerText='@'+uname; document.getElementById('sheet').style.display='block'; }
 function doPin(){ let i=PINNED.indexOf(SHEET_USER); if(i>=0) PINNED.splice(i,1); else PINNED.unshift(SHEET_USER); document.getElementById('sheet').style.display='none'; render(); }
 function doMute(){ let i=MUTED.indexOf(SHEET_USER); if(i>=0) MUTED.splice(i,1); else MUTED.push(SHEET_USER); document.getElementById('sheet').style.display='none'; render(); }
 function doArchive(){ if(!ARCHIVED.includes(SHEET_USER)) ARCHIVED.push(SHEET_USER); document.getElementById('sheet').style.display='none'; render(); }
 function doDelete(){ if(confirm('Delete this chat da?')){ ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); document.getElementById('sheet').style.display='none'; render(); } }
-async function loadNotes(){ let {data}=await supa.from('notes').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false}); NOTES_MAP={}; (data||[]).forEach(n=>{ NOTES_MAP[cleanUser(n.username)]=n.text; }); let users=Object.keys(profileMap).slice(0,8); let myNote=NOTES_MAP[ME_RAW]||'Your note'; let html=`<div class="nItem" onclick="document.getElementById('notePop').style.display='block'"><div class="nRing" style="background:#333"><div class="nRingInner"><img src="${getPfp(ME_RAW)}"></div><div class="noteBubble">${myNote}</div></div><div style="font-size:10px;margin-top:4px">Your note</div></div>`; html+=users.filter(u=>u!==ME_RAW).map(u=>{ let txt=NOTES_MAP[u]||'Hi da ❤️'; return `<div class="nItem" onclick="openChatUser('${u}')"><div class="nRing"><div class="nRingInner"><img src="${getPfp(u)}"></div><div class="noteBubble">${txt}</div></div><div style="font-size:10px;margin-top:4px">${u}</div></div>`}).join(''); document.getElementById('notes').innerHTML=html; }
+async function loadNotes(){ let {data}=await supa.from('notes').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false}); NOTES_MAP={}; (data||[]).forEach(n=>{ NOTES_MAP[cleanUser(n.username)]=n.text; }); let users=Object.keys(profileMap).slice(0,8); let myNote=NOTES_MAP[ME_RAW]||'Your note'; let html=`<div class="nItem" onclick="document.getElementById('notePop').style.display='block'"><div class="nRing" style="background:#8696a0"><div class="nRingInner"><img src="${getPfp(ME_RAW)}"></div><div class="noteBubble">${myNote}</div></div><div style="font-size:10px;margin-top:4px">Your note</div></div>`; html+=users.filter(u=>u!==ME_RAW).map(u=>{ let txt=NOTES_MAP[u]||'Hi da ❤️'; return `<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(u)}'"><div class="nRing"><div class="nRingInner"><img src="${getPfp(u)}"></div><div class="noteBubble">${txt}</div></div><div style="font-size:10px;margin-top:4px">${u}</div></div>`}).join(''); document.getElementById('notes').innerHTML=html; }
 async function saveNote(){ let t=document.getElementById('noteText').value.trim(); if(!t) return; await supa.from('notes').delete().eq('username',ME_RAW); await supa.from('notes').insert({user_id:ME_ID,username:ME_RAW,text:t}); document.getElementById('notePop').style.display='none'; loadNotes(); }
-// FIX - 3rd photo tabs da - all / requests / hidden
-function setTab(t,el){ CUR_TAB=t; document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); render(); }
-function openChatUser(uname){
-  SEL_OTHER=uname;
-  // Desktop la - Right pane la chat.html open pannu da - Mobile la full page ku po da
-  if(window.innerWidth>=700){
-    let p=profileMap[cleanUser(uname)]; document.getElementById('paneName').innerText='@'+cleanUser(uname); document.getElementById('panePfp').src=getPfp(uname); document.getElementById('paneStatus').innerText=getStatus(p);
-    document.getElementById('chatFrame').src='chat.html?user='+encodeURIComponent(cleanUser(uname));
-    render();
-  } else {
-    location.href='chat.html?user='+encodeURIComponent(cleanUser(uname));
-  }
-}
+function setTab(t,el){ CUR_TAB=t; document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); el.classList.add('on'); render(); }
 function render(){
   let list=ALL_CHATS.filter(c=>!ARCHIVED.includes(c.other));
-  // Hidden tab na - Archive la irukkurathu mattum da
   if(CUR_TAB==='hidden') list=ALL_CHATS.filter(c=>ARCHIVED.includes(c.other));
   if(CUR_TAB==='requests') list=list.filter(c=>c.threadType==='requests');
-  if(CUR_TAB==='all') list=list.filter(c=>!ARCHIVED.includes(c.other));
-  if(FILTER_UNREAD) list=list.filter(c=>UNREAD_MAP[c.other]>0);
-  if(FILTER_ONLINE) list=list.filter(c=>profileById[c.other]?.is_online);
   if(SEARCH_Q) list=list.filter(c=>{ let n=(profileById[c.other]?.username||c.other||'').toLowerCase(); return n.includes(SEARCH_Q)||c.preview.toLowerCase().includes(SEARCH_Q); });
   list.sort((a,b)=>{ let pa=PINNED.includes(a.other)?1:0, pb=PINNED.includes(b.other)?1:0; return pb-pa; });
-  if(!list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#666">${SEARCH_Q?'No results da':'No chats da'}<br><button onclick="location.href='search.html'" style="margin-top:12px;background:#fff;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`; return; }
+  if(!list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#8696a0">No chats da<br><button onclick="location.href='search.html'" style="margin-top:12px;background:#00a884;color:#000;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`; return; }
   document.getElementById('list').innerHTML=list.map(c=>{
-    let uname=profileById[c.other]?.username||c.other; let prof=profileById[c.other]; let status=getStatus(prof); let dot=prof?.is_online?`<span class="dot"></span>`:``; let uc=UNREAD_MAP[c.other]||0; let badge=uc?`<span class="unreadBadge">${uc}</span>`:``; let isPin=PINNED.includes(c.other); let isMute=MUTED.includes(c.other); let isSel=cleanUser(uname)===cleanUser(SEL_OTHER);
-    // FIX - Tick grey mattum da - Seen word illa da - Blue illa da
-    let tick = c.msg.sender_id===ME_ID||c.msg.sender===ME_RAW ? `<span class="tick">${c.msg.seen?'✓✓':'✓'}</span> ` : '';
-    return `<div class="chatRow ${isSel?'sel':''}" onmousedown="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" onmouseup="clearTimeout(pressTimer)" ontouchstart="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" ontouchend="clearTimeout(pressTimer)"><div style="position:relative"><img src="${getPfp(c.other)}" onerror="this.src='https://ui-avatars.com/api/?name='+letterFor('${cleanUser(uname)}')+'&background=111&color=fff'" onclick="location.href='profile.html?user=${encodeURIComponent(uname)}'">${dot}</div><div style="flex:1;text-align:left;min-width:0" onclick="openChatUser('${cleanUser(uname)}')"><b style="font-size:14px">${isPin?'📌 ':''}${cleanUser(uname)} ${isMute?'🔕':''}</b><div style="font-size:12px;color:#ccc;font-weight:${uc?'700':'400'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${tick}${c.preview}</div><div style="font-size:11px;color:${prof?.is_online?'#00ff66':'#888'}">${status}</div></div><div style="text-align:right;font-size:10px;color:#888;flex-shrink:0">${fmtTime(c.msg.created_at)}<br>${badge}</div></div>`
+    let uname=profileById[c.other]?.username||c.other; let prof=profileById[c.other]; let status=getStatus(prof); let dot=prof?.is_online?`<span class="dot"></span>`:``; let uc=UNREAD_MAP[c.other]||0; let badge=uc?`<span class="unreadBadge">${uc}</span>`:``; let isPin=PINNED.includes(c.other); let isMute=MUTED.includes(c.other);
+    let isMine=c.msg.sender_id===ME_ID||c.msg.sender===ME_RAW;
+    let tick=isMine?`<span class="tick ${c.msg.seen?'blue':'grey'}">${c.msg.seen?'✓✓':'✓'}</span> `:'';
+    return `<div class="chatRow" onmousedown="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" onmouseup="clearTimeout(pressTimer)" ontouchstart="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" ontouchend="clearTimeout(pressTimer)"><div style="position:relative"><img src="${getPfp(c.other)}" onerror="this.src='https://ui-avatars.com/api/?name='+letterFor('${cleanUser(uname)}')+'&background=00a884&color=fff'">${dot}</div><div style="flex:1;min-width:0" onclick="location.href='chat.html?user=${encodeURIComponent(cleanUser(uname))}'"><div style="display:flex;justify-content:space-between"><b style="font-size:16px;font-weight:400">${isPin?'📌 ':''}${cleanUser(uname)} ${isMute?'🔕':''}</b><span style="font-size:12px;color:${uc?'#00a884':'#8696a0'}">${fmtTime(c.msg.created_at)}</span></div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px"><div style="font-size:14px;color:${uc?'#e9edef':'#8696a0'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${tick}${c.preview}</div>${badge}</div><div style="font-size:12px;color:#8696a0">${status}</div></div></div>`
   }).join('');
 }
 async function init(){
   if(!window.supa){setTimeout(init,300);return} supa=window.supa;
   let {data:{session}}=await supa.auth.getSession(); if(!session){location.href='login.html';return}
-  ME_ID=session.user.id; let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).single(); ME_RAW=cleanUser(my?.username||session.user.email.split('@')[0]); document.getElementById('topName').innerText=ME_RAW+' ▾'; let navPfp=document.getElementById('navPfp'); if(navPfp) navPfp.src=my?.avatar_url||getPfp(ME_RAW);
+  ME_ID=session.user.id; let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).single(); ME_RAW=cleanUser(my?.username||session.user.email.split('@')[0]); document.getElementById('topName').innerText=ME_RAW; let navPfp=document.getElementById('navPfp'); if(navPfp) navPfp.src=my?.avatar_url||getPfp(ME_RAW);
   let {data:profs}=await supa.from('profiles').select('*'); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p});
   let qp=new URLSearchParams(location.search); let qU=qp.get('u')||qp.get('user')||qp.get('id')||'';
-  if(qU){ let target=null; if(qU.includes('-')&&qU.length>20) target=profileById[qU]; if(!target) target=profileMap[cleanUser(qU)]; if(target){ openChatUser(cleanUser(target.username)); if(window.innerWidth<700){ location.href='chat.html?user='+encodeURIComponent(cleanUser(target.username)); return; } } }
+  if(qU){ let target=null; if(qU.includes('-')&&qU.length>20) target=profileById[qU]; if(!target) target=profileMap[cleanUser(qU)]; if(target){ location.href='chat.html?user='+encodeURIComponent(cleanUser(target.username)); return; } }
   updatePresence(true); setInterval(()=>updatePresence(true),30000); loadNotes(); load();
   supa.channel('dm-list').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},()=>load()).subscribe();
   supa.channel('presence-live').on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles'},()=>load()).subscribe();
@@ -126,14 +94,12 @@ async function load(){
   let map={}; data.forEach(m=>{ let s=m.sender_id||m.sender, r=m.receiver_id||m.receiver, o=(s===ME_ID||s===ME_RAW)?r:s; if(!o&&m.chat_id){let p=m.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0]} if(o&&(!map[o]||new Date(m.created_at)>new Date(map[o].created_at))) map[o]=m });
   ALL_CHATS=Object.values(map).map(c=>{
     let s=c.sender_id||c.sender, r=c.receiver_id||c.receiver, o=(s===ME_ID||s===ME_RAW)?r:s; if(!o&&c.chat_id){let p=c.chat_id.split('_'); o=p[0]===ME_RAW?p[1]:p[0]}
-    // FIX - 1st PHOTO BUG DA - E2E JSON ah preview la kaata koodathu da
     let preview='';
     if(c.type==='voice'||c.media_type==='voice') preview='🎙️ Voice';
     else if(c.type==='image'||c.media_type==='image'||c.media_path) preview='📷 Photo';
     else if(c.type==='video'||c.media_type==='video') preview='🎬 Video';
     else if((c.text||c.message||'').startsWith('{"e2e"')) preview='💬 Message';
     else preview=(c.text||c.message||c.content||'').slice(0,35) || '💬 Message';
-    // pixoro-core la iruntha athayum use pannu da
     if(window.pixoroPreviewText && !preview.startsWith('📷')){ let pp=pixoroPreviewText(c); if(pp) preview=pp; }
     let isFirstFromThem=(s!==ME_ID&&s!==ME_RAW); let threadType='primary'; if(isFirstFromThem && !c.seen) threadType='requests';
     return {other:o,msg:c,preview,threadType};
