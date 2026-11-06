@@ -17,12 +17,16 @@ body{background:#0b141a!important;color:#e9edef;max-width:450px;margin:0 auto;pa
 .notes{display:flex;gap:12px;overflow-x:auto;padding:10px;scrollbar-width:none}.notes::-webkit-scrollbar{display:none}
 .nItem{flex:0 0 66px;text-align:center;cursor:pointer;position:relative}
 .nRing{width:60px;height:60px;border-radius:50%;padding:2.5px;background:#00a884;position:relative}
-.nRingInner{width:100%;height:100%;border-radius:50%;background:#0b141a;padding:2px}.nRingInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.nRingInner{width:100%;height:100%;border-radius:50%;background:#0b141a;padding:2px;overflow:hidden}.nRingInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .noteBubble{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#fff;color:#000;font-size:9px;padding:4px 7px;border-radius:12px;white-space:nowrap;font-weight:700;max-width:90px;overflow:hidden;text-overflow:ellipsis}
 .noteInput{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#233138;border:1px solid #333;padding:20px;border-radius:18px;z-index:999;display:none;width:85%;max-width:360px}.noteInput input{width:100%;padding:12px;border-radius:10px;border:0;background:#2a3942;color:#fff;outline:none;margin:10px 0}
 .chatRow{display:flex;gap:12px;padding:11px 12px;align-items:center;cursor:pointer}
 .chatRow:active{background:#202c33}
-.chatRow img{width:50px;height:50px;border-radius:50%;object-fit:cover;flex-shrink:0}
+/* FIX - Avatar - Background Illa da - Letter Div da */
+.ava{width:50px;height:50px;border-radius:50%;object-fit:cover;flex-shrink:0;background:#000;display:block}
+.avaLetter{width:50px;height:50px;border-radius:50%;flex-shrink:0;background:#2a3942!important;color:#e9edef;display:grid;place-items:center;font-size:22px;font-weight:700}
+.avaSmall{width:60px;height:60px;border-radius:50%;object-fit:cover;background:#000}
+.avaLetterSmall{width:60px;height:60px;border-radius:50%;background:#2a3942!important;color:#e9edef;display:grid;place-items:center;font-size:24px;font-weight:700}
 .dot{width:13px;height:13px;background:#00a884;border-radius:50%;border:2.5px solid #0b141a;position:absolute;bottom:2px;right:2px}
 .unreadBadge{background:#00a884;color:#0b141a;font-size:12px;min-width:22px;height:22px;border-radius:50%;display:grid;place-items:center;padding:0 6px;font-weight:700}
 .tick{letter-spacing:-1px}
@@ -31,7 +35,7 @@ body{background:#0b141a!important;color:#e9edef;max-width:450px;margin:0 auto;pa
 .actionSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#233138;border-radius:20px 20px 0 0;padding:16px;z-index:1000;display:none}.actionSheet button{width:100%;padding:13px;border:0;background:#2a3942;color:#fff;border-radius:12px;margin:4px 0;text-align:left}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:62px;background:#202c33;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8696a0}.bottom-nav a.active{color:#00a884}.bottom-nav span{font-size:11px}.bottom-nav a.active span{color:#00a884;font-weight:700}
-.bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover}
+.bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover;background:#000}
 .fab{position:fixed;bottom:78px;right:16px;width:52px;height:52px;border-radius:50%;background:#00a884;display:grid;place-items:center;font-size:22px;z-index:90;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.4)}
 </style></head><body>
 <div class="top"><div class="topRow"><div class="logo">PIXOR<span>O</span></div><div><span class="topIco">📷</span><span class="topIco" onclick="document.getElementById('searchInp').focus()">🔍</span><span class="topIco">⋮</span></div></div><div class="subTop"><div class="chip on" onclick="setTab('all',this)">All <span id="cAll"></span></div><div class="chip" onclick="setTab('requests',this)">Requests</div><div class="chip" onclick="setTab('hidden',this)">Hidden 🔒</div></div></div>
@@ -46,15 +50,36 @@ body{background:#0b141a!important;color:#e9edef;max-width:450px;margin:0 auto;pa
 let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, CUR_TAB='all', ALL_CHATS=[], NOTES_MAP={}, SEARCH_Q='', UNREAD_MAP={}, SHEET_USER='', PINNED=[], MUTED=[], ARCHIVED=[];
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
 function letterFor(u){ let l=(cleanUser(u||'P').charAt(0).toUpperCase()||'P'); return /[A-Z]/.test(l)?l:'P'; }
-function getPfp(u){ let p=profileMap[cleanUser(u)]||profileById[u]; if(p?.avatar_url||p?.profile_pic) return p.avatar_url||p.profile_pic; return 'https://ui-avatars.com/api/?name='+letterFor(u||'P')+'&background=00a884&color=fff&size=200&bold=true' }
+// FIX - Real Photo Illana - Image ye Return Panna Koodathu da - Null Return Pannu da
+function realPfp(u){ let p=profileMap[cleanUser(u)]||profileById[u]; let url=p?.avatar_url||p?.profile_pic||''; if(url && !url.includes('ui-avatars')) return url; return ''; }
+// FIX - Avatar HTML - Real Photo Irundha Img, Illana Letter Div da - Background Image Illa da
+function avatarHtml(u, size){
+  let url=realPfp(u); let L=letterFor(u);
+  if(url) return `<img class="${size==='small'?'avaSmall':'ava'}" src="${url}" data-white="1" crossorigin="anonymous" onerror="this.outerHTML='<div class=\\'${size==='small'?'avaLetterSmall':'avaLetter'}\\">${L}</div>'">`;
+  return `<div class="${size==='small'?'avaLetterSmall':'avaLetter'}">${L}</div>`;
+}
+// FIX - White Background Remove - Reels Same da - 70% White Irundha mattum da
+async function removeWhiteBg(imgEl){
+  try{
+    if(!imgEl || imgEl.dataset.whiteDone) return; imgEl.dataset.whiteDone='1';
+    if(!imgEl.complete || !imgEl.naturalWidth) await new Promise(r=>{ imgEl.onload=r; imgEl.onerror=r; });
+    if(!imgEl.naturalWidth) return;
+    let c=document.createElement('canvas'); c.width=imgEl.naturalWidth; c.height=imgEl.naturalHeight;
+    let ctx=c.getContext('2d'); ctx.drawImage(imgEl,0,0);
+    let d=ctx.getImageData(0,0,c.width,c.height); let px=d.data; let white=0;
+    for(let i=0;i<px.length;i+=4){ if(px[i]>240 && px[i+1]>240 && px[i+2]>240) white++; }
+    if(white/(px.length/4) < 0.7) return;
+    for(let i=0;i<px.length;i+=4){ if(px[i]>235 && px[i+1]>235 && px[i+2]>235) px[i+3]=0; }
+    ctx.putImageData(d,0,0); imgEl.src=c.toDataURL('image/png');
+  }catch(e){}
+}
+function applyWhiteRemove(){ document.querySelectorAll('img[data-white="1"]').forEach(im=>removeWhiteBg(im)); }
 function fmtTime(t){ let d=new Date(t); let now=new Date(); if(d.toDateString()===now.toDateString()) return d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); let y=new Date(); y.setDate(now.getDate()-1); if(d.toDateString()===y.toDateString()) return 'Yesterday'; return d.toLocaleDateString([], {day:'numeric',month:'short'}); }
 async function updatePresence(o){ if(!ME_ID) return; await supa.from('profiles').update({is_online:o,last_seen:new Date().toISOString()}).eq('id',ME_ID); }
 function isMineMsg(m){ return String(m.sender_id)===ME_ID || cleanUser(m.sender)===ME_RAW; }
 function otherIdOf(m){
-  // FIX - UUID mattum return pannu da - username mix panna koodathu da
   if(isMineMsg(m) && m.receiver_id) return String(m.receiver_id);
   if(!isMineMsg(m) && m.sender_id) return String(m.sender_id);
-  // Old message ku sender / receiver name la iruntha - profile la thedu da
   let name = isMineMsg(m) ? cleanUser(m.receiver) : cleanUser(m.sender);
   let p = profileMap[name]; return p ? String(p.id) : name;
 }
@@ -68,15 +93,13 @@ function doDelete(){ if(confirm('Delete this chat da?')){ ALL_CHATS=ALL_CHATS.fi
 async function loadNotes(){
   let {data}=await supa.from('notes').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false});
   NOTES_MAP={}; (data||[]).forEach(n=>{ NOTES_MAP[cleanUser(n.username)]=n.text; });
-  // FIX - Fake note kaata koodathu da - Real note irukkuravanga mattum da
   let usersWithNote = Object.keys(NOTES_MAP).filter(u=>u!==ME_RAW);
   let myNote = NOTES_MAP[ME_RAW];
   let html='';
-  html+=`<div class="nItem" onclick="document.getElementById('notePop').style.display='block'"><div class="nRing" style="background:#8696a0"><div class="nRingInner"><img src="${getPfp(ME_RAW)}"></div>${myNote?`<div class="noteBubble">${myNote}</div>`:''}</div><div style="font-size:10px;margin-top:4px">Your note</div></div>`;
-  html+=usersWithNote.slice(0,10).map(u=>`<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(u)}'"><div class="nRing"><div class="nRingInner"><img src="${getPfp(u)}"></div><div class="noteBubble">${NOTES_MAP[u]}</div></div><div style="font-size:10px;margin-top:4px">${u}</div></div>`).join('');
-  // Note yaarum illana - Notes row ah maraichidu da - WhatsApp la apdithaan da
+  html+=`<div class="nItem" onclick="document.getElementById('notePop').style.display='block'"><div class="nRing" style="background:#8696a0"><div class="nRingInner">${avatarHtml(ME_RAW,'small')}${myNote?`<div class="noteBubble">${myNote}</div>`:''}</div></div><div style="font-size:10px;margin-top:4px">Your note</div></div>`;
+  html+=usersWithNote.slice(0,10).map(u=>`<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(u)}'"><div class="nRing"><div class="nRingInner">${avatarHtml(u,'small')}<div class="noteBubble">${NOTES_MAP[u]}</div></div></div><div style="font-size:10px;margin-top:4px">${u}</div></div>`).join('');
   document.getElementById('notes').style.display = (myNote || usersWithNote.length) ? 'flex' : 'none';
-  document.getElementById('notes').innerHTML=html;
+  document.getElementById('notes').innerHTML=html; applyWhiteRemove();
 }
 async function saveNote(){ let t=document.getElementById('noteText').value.trim(); if(!t) return; await supa.from('notes').delete().eq('username',ME_RAW); await supa.from('notes').insert({user_id:ME_ID,username:ME_RAW,text:t}); document.getElementById('notePop').style.display='none'; loadNotes(); }
 function setTab(t,el){ CUR_TAB=t; document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); el.classList.add('on'); render(); }
@@ -91,14 +114,13 @@ function render(){
     let uname=profileById[c.other]?.username||c.other; let prof=profileById[c.other]; let dot=prof?.is_online?`<span class="dot"></span>`:``; let uc=UNREAD_MAP[c.other]||0; let badge=uc?`<span class="unreadBadge">${uc}</span>`:``; let isPin=PINNED.includes(c.other); let isMute=MUTED.includes(c.other);
     let isMine=isMineMsg(c.msg);
     let tick=isMine?`<span class="tick ${c.msg.seen?'blue':'grey'}">${c.msg.seen?'✓✓':'✓'}</span> `:'';
-    // FIX - WhatsApp la Status line illa da - Name + Preview + Time mattum da
-    return `<div class="chatRow" onmousedown="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" onmouseup="clearTimeout(pressTimer)" ontouchstart="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" ontouchend="clearTimeout(pressTimer)"><div style="position:relative"><img src="${getPfp(c.other)}" onerror="this.src='https://ui-avatars.com/api/?name='+letterFor('${cleanUser(uname)}')+'&background=00a884&color=fff'">${dot}</div><div style="flex:1;min-width:0" onclick="location.href='chat.html?user=${encodeURIComponent(cleanUser(uname))}'"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:16px;font-weight:400">${isPin?'📌 ':''}${cleanUser(uname)} ${isMute?'🔕':''}</b><span style="font-size:12px;color:${uc?'#00a884':'#8696a0'};flex-shrink:0">${fmtTime(c.msg.created_at)}</span></div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px"><div style="font-size:14px;color:${uc?'#e9edef':'#8696a0'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${tick}${c.preview}</div>${badge}</div></div></div>`
-  }).join('');
+    return `<div class="chatRow" onmousedown="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" onmouseup="clearTimeout(pressTimer)" ontouchstart="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" ontouchend="clearTimeout(pressTimer)"><div style="position:relative">${avatarHtml(c.other)}${dot}</div><div style="flex:1;min-width:0" onclick="location.href='chat.html?user=${encodeURIComponent(cleanUser(uname))}'"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:16px;font-weight:400">${isPin?'📌 ':''}${cleanUser(uname)} ${isMute?'🔕':''}</b><span style="font-size:12px;color:${uc?'#00a884':'#8696a0'};flex-shrink:0">${fmtTime(c.msg.created_at)}</span></div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px"><div style="font-size:14px;color:${uc?'#e9edef':'#8696a0'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${tick}${c.preview}</div>${badge}</div></div></div>`
+  }).join(''); applyWhiteRemove();
 }
 async function init(){
   if(!window.supa){setTimeout(init,300);return} supa=window.supa;
   let {data:{session}}=await supa.auth.getSession(); if(!session){location.href='login.html';return}
-  ME_ID=session.user.id; let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).single(); ME_RAW=cleanUser(my?.username||session.user.email.split('@')[0]); let navPfp=document.getElementById('navPfp'); if(navPfp) navPfp.src=my?.avatar_url||getPfp(ME_RAW);
+  ME_ID=session.user.id; let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).single(); ME_RAW=cleanUser(my?.username||session.user.email.split('@')[0]); let navPfp=document.getElementById('navPfp'); if(navPfp && my?.avatar_url) navPfp.src=my.avatar_url; else if(navPfp) navPfp.style.display='none';
   let {data:profs}=await supa.from('profiles').select('*'); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p});
   let qp=new URLSearchParams(location.search); let qU=qp.get('u')||qp.get('user')||qp.get('id')||'';
   if(qU){ let target=null; if(qU.includes('-')&&qU.length>20) target=profileById[qU]; if(!target) target=profileMap[cleanUser(qU)]; if(target){ location.href='chat.html?user='+encodeURIComponent(cleanUser(target.username)); return; } }
@@ -109,7 +131,6 @@ async function init(){
 }
 async function load(){
   let {data}=await supa.from('messages').select('*').order('created_at',{ascending:false}).limit(300); if(!data) data=[];
-  // FIX - Unread - UUID la key pannu da
   UNREAD_MAP={}; data.forEach(m=>{ if(!isMineMsg(m) && !m.seen){ let oid=otherIdOf(m); UNREAD_MAP[oid]=(UNREAD_MAP[oid]||0)+1; } });
   let map={};
   data.forEach(m=>{
@@ -120,7 +141,6 @@ async function load(){
   });
   ALL_CHATS=Object.values(map).map(c=>{
     let oid=otherIdOf(c);
-    // FIX - Preview - Real text thaan da - pixoroPreviewText ah text ku use panna koodathu da
     let raw=(c.text||c.message||c.content||'');
     let preview='';
     if(c.type==='voice'||c.media_type==='voice') preview='🎙️ Voice';
