@@ -1,86 +1,75 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PIXORO - Chats</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=128"></script>
+<script src="js/pixoro-core.js?v=129"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{background:#fff!important;color:#000;max-width:450px;margin:0 auto;padding-bottom:70px}
-/* PIXORO - Style Layout da - Colour PIXORO thaan da */
-.top{background:#fff;padding:12px 14px 10px;position:sticky;top:0;z-index:50}
+body{background:#fff!important;color:#000;max-width:450px;margin:0 auto;padding-bottom:78px}
+/* TELEGRAM SYSTEM - PIXORO Name + Colour da */
+.top{background:#fff;padding:14px 14px 8px;position:sticky;top:0;z-index:50}
 .topRow{display:flex;justify-content:space-between;align-items:center}
-.logo{font-size:24px;font-weight:800;color:#000;letter-spacing:.5px}
-.logo span{color:#00a884}
-.topIco{font-size:22px;margin-left:16px;cursor:pointer;color:#666}
-.subTop{display:flex;gap:6px;margin-top:12px}
-.chip{padding:6px 12px;border-radius:16px;background:#f1f1f1;color:#666;font-size:13px;cursor:pointer}
-.chip.on{background:#00a884;color:#fff;font-weight:700}
-.searchBar{margin:10px;background:#f1f1f1;border-radius:20px;padding:10px 12px;display:flex;gap:8px;align-items:center}
-.searchBar input{flex:1;background:transparent;border:0;color:#000;outline:none;font-size:14px}
-.notes{display:flex;gap:12px;overflow-x:auto;padding:10px;scrollbar-width:none}.notes::-webkit-scrollbar{display:none}
+.logo{font-size:24px;font-weight:800;color:#00a884;letter-spacing:.3px}
+.logo span{color:#000}
+.topIco{font-size:22px;margin-left:16px;cursor:pointer;color:#333}
+.searchBar{margin:10px 12px;background:#f1f1f1;border-radius:20px;padding:10px 12px;display:flex;gap:8px;align-items:center}
+.searchBar input{flex:1;background:transparent;border:0;color:#000;outline:none;font-size:15px}
+.notes{display:flex;gap:12px;overflow-x:auto;padding:8px 10px;scrollbar-width:none}.notes::-webkit-scrollbar{display:none}
 .nItem{flex:0 0 66px;text-align:center;cursor:pointer;position:relative}
 .nRing{width:60px;height:60px;border-radius:50%;padding:2.5px;background:#00a884;position:relative}
 .nRingInner{width:100%;height:100%;border-radius:50%;background:#fff;padding:2px;overflow:hidden;display:grid;place-items:center}
 .noteBubble{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#fff;color:#000;font-size:9px;padding:4px 7px;border-radius:12px;white-space:nowrap;font-weight:700;max-width:90px;overflow:hidden;text-overflow:ellipsis;border:1px solid #ddd}
 .noteInput{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid #ddd;padding:20px;border-radius:18px;z-index:999;display:none;width:85%;max-width:360px}.noteInput input{width:100%;padding:12px;border-radius:10px;border:0;background:#f1f1f1;color:#000;outline:none;margin:10px 0}
-.chatRow{display:flex;gap:12px;padding:11px 12px;align-items:center;cursor:pointer;min-width:0}
+/* FIX - ChatRow - Telegram Mari 100% da - Name Nadula Varaathu da */
+.chatRow{display:flex;gap:12px;padding:12px 12px;align-items:center;cursor:pointer;width:100%}
 .chatRow:active{background:#f5f5f5}
-.avaWrap{width:50px;height:50px;flex:0 0 50px;position:relative;flex-shrink:0}
-.ava{width:50px;height:50px;border-radius:50%;object-fit:cover;display:block;background:#ddd}
-.avaLetter{width:50px;height:50px;border-radius:50%;flex-shrink:0;background:#00a884!important;color:#fff;display:grid;place-items:center;font-size:22px;font-weight:700}
+.avaWrap{width:56px;height:56px;flex:0 0 56px;position:relative;display:grid;place-items:center;overflow:hidden}
+.ava{width:56px;height:56px;border-radius:50%;object-fit:cover;display:block;background:#ddd}
+.avaLetter{width:56px;height:56px;border-radius:50%;background:#00a884!important;color:#fff;display:grid;place-items:center;font-size:22px;font-weight:700;line-height:1}
 .avaSmall{width:56px;height:56px;border-radius:50%;object-fit:cover;display:block;background:#ddd}
-.avaLetterSmall{width:56px;height:56px;border-radius:50%;background:#00a884!important;color:#fff;display:grid;place-items:center;font-size:22px;font-weight:700}
-.chatMain{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.chatTopRow{display:flex;justify-content:space-between;align-items:center;gap:8px;min-width:0}
-.chatName{font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;color:#000}
+.avaLetterSmall{width:56px;height:56px;border-radius:50%;background:#00a884!important;color:#fff;display:grid;place-items:center;font-size:22px;font-weight:700;line-height:1}
+.chatMain{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.chatTopRow{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%}
+.chatName{font-size:17px;font-weight:600;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left}
 .chatTime{font-size:12px;color:#999;flex-shrink:0}
-.chatPrevRow{display:flex;justify-content:space-between;align-items:center;gap:8px;min-width:0}
-.chatPrev{font-size:14px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.chatPrevRow{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%}
+.chatPrev{font-size:14px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left}
 .dot{width:13px;height:13px;background:#00a884;border-radius:50%;border:2.5px solid #fff;position:absolute;bottom:2px;right:2px}
-.unreadBadge{background:#00a884;color:#fff;font-size:12px;min-width:22px;height:22px;border-radius:50%;display:grid;place-items:center;padding:0 6px;font-weight:700;flex-shrink:0}
+.unreadBadge{background:#00a884;color:#fff;font-size:12px;min-width:24px;height:24px;border-radius:12px;display:grid;place-items:center;padding:0 7px;font-weight:700;flex-shrink:0}
+.unreadBadge.grey{background:#999}
 .tick{letter-spacing:-1px}
 .tick.blue{color:#00a884}
 .tick.grey{color:#999}
-.actionSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#fff;border-radius:20px 20px 0 0;padding:16px;z-index:1000;display:none;box-shadow:0 -2px 20px rgba(0,0,0,.1)}.actionSheet button{width:100%;padding:13px;border:0;background:#f1f1f1;color:#000;border-radius:12px;margin:4px 0;text-align:left}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:62px;background:#fff;border-top:1px solid #eee;display:flex;justify-content:space-around;align-items:center;z-index:100}
-.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#999}.bottom-nav a.active{color:#00a884}.bottom-nav span{font-size:11px}.bottom-nav a.active span{color:#00a884;font-weight:700}
+.actionSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#fff;border-radius:20px 20px 0 0;padding:16px;z-index:1000;display:none;box-shadow:0 -2px 20px rgba(0,0,0,.15)}.actionSheet button{width:100%;padding:13px;border:0;background:#f1f1f1;color:#000;border-radius:12px;margin:4px 0;text-align:left}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:68px;background:#fff;border-top:1px solid #eee;display:flex;justify-content:space-around;align-items:center;z-index:100}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#999;position:relative}.bottom-nav a.active{color:#00a884}.bottom-nav span{font-size:11px}.bottom-nav a.active span{color:#00a884;font-weight:700}
 .bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover;background:#ddd}
-.fab{position:fixed;bottom:78px;right:16px;width:52px;height:52px;border-radius:50%;background:#00a884;display:grid;place-items:center;font-size:22px;z-index:90;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2);color:#fff}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;display:none;white-space:nowrap}
+.navBadge{position:absolute;top:-4px;right:8px;background:#00a884;color:#fff;font-size:10px;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 4px;font-weight:700}
+.fab{position:fixed;bottom:82px;right:16px;width:56px;height:56px;border-radius:50%;background:#00a884;display:grid;place-items:center;font-size:24px;z-index:90;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25);color:#fff}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;display:none;white-space:nowrap}
 </style></head><body>
-<div class="top"><div class="topRow"><div class="logo">PIXOR<span>O</span></div><div><span class="topIco">📷</span><span class="topIco" onclick="document.getElementById('searchInp').focus()">🔍</span><span class="topIco">⋮</span></div></div><div class="subTop"><div class="chip on" onclick="setTab('all',this)">All <span id="cAll"></span></div><div class="chip" onclick="setTab('requests',this)">Requests</div><div class="chip" onclick="setTab('hidden',this)">Hidden 🔒</div></div></div>
+<div class="top"><div class="topRow"><div class="logo">PIXOR<span>O</span></div><div><span class="topIco" onclick="document.getElementById('searchInp').focus()">🔍</span><span class="topIco">⋮</span></div></div></div>
 <div class="searchBar">🔍 <input id="searchInp" placeholder="Search..." oninput="onSearch(this.value)"></div>
 <div class="notes" id="notes"></div>
+<div id="archivedRow" style="display:none"></div>
 <div id="list" style="text-align:center;color:#999;padding:10px">Loading...</div>
-<div class="fab" onclick="location.href='search.html'">💬</div>
+<div class="fab" onclick="location.href='search.html'">✏️</div>
 <div class="toast" id="toast"></div>
 <div class="noteInput" id="notePop"><h3 style="color:#000">✏️ Add Note</h3><input id="noteText" placeholder="Yedhachum Yosichiya da...?" maxlength="60"><div style="display:flex;gap:10px"><button onclick="saveNote()" style="flex:1;background:#00a884;color:#fff;border:0;padding:11px;border-radius:20px;font-weight:700">Share</button><button onclick="document.getElementById('notePop').style.display='none'" style="flex:1;background:#f1f1f1;color:#000;border:0;padding:11px;border-radius:20px">Cancel</button></div></div>
 <div class="actionSheet" id="sheet"><b id="sheetName" style="color:#000">Chat</b><button onclick="doPin()">📌 Pin / Unpin</button><button onclick="doMute()">🔕 Mute / Unmute</button><button onclick="doArchive()">🗄️ Archive</button><button onclick="doDelete()" style="color:#ff5555">🗑️ Delete Chat</button><button onclick="document.getElementById('sheet').style.display='none'" style="text-align:center;background:#ddd">Cancel</button></div>
-<div class="bottom-nav"><a href="index.html"><span style="font-size:22px">⌂</span><span>Home</span></a><a href="search.html"><span style="font-size:22px">🔍</span><span>Search</span></a><a href="reels.html"><span style="font-size:22px">▶️</span><span>Reels</span></a><a href="dm.html" class="active"><span style="font-size:22px">💬</span><span>Chats</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
+<div class="bottom-nav"><a href="dm.html" class="active"><span style="font-size:22px">💬</span><span>Chats</span><span class="navBadge" id="navTotal" style="display:none">0</span></a><a href="search.html"><span style="font-size:22px">👥</span><span>Contacts</span></a><a href="settings.html"><span style="font-size:22px">⚙️</span><span>Settings</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
 <script>
 let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, CUR_TAB='all', ALL_CHATS=[], NOTES_MAP={}, SEARCH_Q='', UNREAD_MAP={}, SHEET_USER='', PINNED=[], MUTED=[], ARCHIVED=[];
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
 function letterFor(u){ let l=(cleanUser(u||'P').charAt(0).toUpperCase()||'P'); return /[A-Z]/.test(l)?l:'P'; }
 function showToast(m){ let t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
 function realPfp(u){ let p=profileMap[cleanUser(u)]||profileById[u]; let url=p?.avatar_url||p?.profile_pic||''; if(url && !url.includes('ui-avatars')) return url; return ''; }
+// FIX - Avatar - onerror OuterHTML Illa da - P Keela Varaathu da - Wrapper la Fallback da
 function avatarHtml(u, size){
   let url=realPfp(u); let L=letterFor(u);
-  if(url) return `<img class="${size==='small'?'avaSmall':'ava'}" src="${url}" data-white="1" crossorigin="anonymous" onerror="this.outerHTML='<div class=\\'${size==='small'?'avaLetterSmall':'avaLetter'}\\">${L}</div>'">`;
-  return `<div class="${size==='small'?'avaLetterSmall':'avaLetter'}">${L}</div>`;
+  let cls = size==='small' ? 'avaSmall' : 'ava';
+  let lcls = size==='small' ? 'avaLetterSmall' : 'avaLetter';
+  if(url) return `<span style="position:relative;width:56px;height:56px;display:grid;place-items:center"><img class="${cls}" src="${url}" onerror="this.style.display='none'"><span class="${lcls}" style="position:absolute;inset:0">${L}</span></span>`;
+  return `<div class="${lcls}">${L}</div>`;
 }
-async function removeWhiteBg(imgEl){
-  try{
-    if(!imgEl || imgEl.dataset.whiteDone) return; imgEl.dataset.whiteDone='1';
-    if(!imgEl.complete || !imgEl.naturalWidth) await new Promise(r=>{ imgEl.onload=r; imgEl.onerror=r; });
-    if(!imgEl.naturalWidth) return;
-    let c=document.createElement('canvas'); c.width=imgEl.naturalWidth; c.height=imgEl.naturalHeight;
-    let ctx=c.getContext('2d'); ctx.drawImage(imgEl,0,0);
-    let d=ctx.getImageData(0,0,c.width,c.height); let px=d.data; let white=0;
-    for(let i=0;i<px.length;i+=4){ if(px[i]>240 && px[i+1]>240 && px[i+2]>240) white++; }
-    if(white/(px.length/4) < 0.7) return;
-    for(let i=0;i<px.length;i+=4){ if(px[i]>235 && px[i+1]>235 && px[i+2]>235) px[i+3]=0; }
-    ctx.putImageData(d,0,0); imgEl.src=c.toDataURL('image/png');
-  }catch(e){}
-}
-function applyWhiteRemove(){ document.querySelectorAll('img[data-white="1"]').forEach(im=>removeWhiteBg(im)); }
 function fmtTime(t){ let d=new Date(t); let now=new Date(); if(d.toDateString()===now.toDateString()) return d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); let y=new Date(); y.setDate(now.getDate()-1); if(d.toDateString()===y.toDateString()) return 'Yesterday'; return d.toLocaleDateString([], {day:'numeric',month:'short'}); }
 async function updatePresence(o){ if(!ME_ID) return; await supa.from('profiles').update({is_online:o,last_seen:new Date().toISOString()}).eq('id',ME_ID); }
 function isMineMsg(m){ return String(m.sender_id)===ME_ID || cleanUser(m.sender)===ME_RAW; }
@@ -106,23 +95,32 @@ async function loadNotes(){
   html+=`<div class="nItem" onclick="document.getElementById('notePop').style.display='block'"><div class="nRing"><div class="nRingInner">${avatarHtml(ME_RAW,'small')}${myNote?`<div class="noteBubble">${myNote}</div>`:''}</div></div><div style="font-size:10px;margin-top:4px;color:#000">Your note</div></div>`;
   html+=usersWithNote.slice(0,10).map(u=>`<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(u)}'"><div class="nRing"><div class="nRingInner">${avatarHtml(u,'small')}<div class="noteBubble">${NOTES_MAP[u]}</div></div></div><div style="font-size:10px;margin-top:4px;color:#000">${u}</div></div>`).join('');
   document.getElementById('notes').style.display = (myNote || usersWithNote.length) ? 'flex' : 'none';
-  document.getElementById('notes').innerHTML=html; applyWhiteRemove();
+  document.getElementById('notes').innerHTML=html;
 }
 async function saveNote(){ let t=document.getElementById('noteText').value.trim(); if(!t) return; await supa.from('notes').delete().eq('username',ME_RAW); await supa.from('notes').insert({user_id:ME_ID,username:ME_RAW,text:t}); document.getElementById('notePop').style.display='none'; loadNotes(); }
-function setTab(t,el){ CUR_TAB=t; document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); el.classList.add('on'); render(); }
 function render(){
+  let archived = ALL_CHATS.filter(c=>ARCHIVED.includes(c.other));
   let list=ALL_CHATS.filter(c=>!ARCHIVED.includes(c.other));
-  if(CUR_TAB==='hidden') list=ALL_CHATS.filter(c=>ARCHIVED.includes(c.other));
+  if(CUR_TAB==='hidden') list=archived;
   if(CUR_TAB==='requests') list=list.filter(c=>c.threadType==='requests');
   if(SEARCH_Q) list=list.filter(c=>{ let n=(profileById[c.other]?.username||c.other||'').toLowerCase(); return n.includes(SEARCH_Q)||c.preview.toLowerCase().includes(SEARCH_Q); });
   list.sort((a,b)=>{ let pa=PINNED.includes(a.other)?1:0, pb=PINNED.includes(b.other)?1:0; if(pa!==pb) return pb-pa; return new Date(b.msg.created_at)-new Date(a.msg.created_at); });
+  // Archived Row - Telegram Mari da
+  let archEl=document.getElementById('archivedRow');
+  if(archived.length && CUR_TAB==='all' && !SEARCH_Q){
+    archEl.style.display='block';
+    archEl.innerHTML=`<div class="chatRow" onclick="CUR_TAB='hidden';render()"><div class="avaWrap"><div class="avaLetter" style="background:#999!important">🗄️</div></div><div class="chatMain"><div class="chatTopRow"><span class="chatName">Archived Chats</span><span class="chatTime">${archived.length}</span></div><div class="chatPrevRow"><span class="chatPrev">${archived.map(c=>profileById[c.other]?.username||c.other).join(', ')}</span></div></div></div>`;
+  } else archEl.style.display='none';
+  if(CUR_TAB==='hidden' && !list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#999">No archived chats<br><button onclick="CUR_TAB='all';render()" style="margin-top:12px;background:#00a884;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:700">Back</button></div>`; return; }
   if(!list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#999">No chats da<br><button onclick="location.href='search.html'" style="margin-top:12px;background:#00a884;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`; return; }
+  let totalUnread = Object.values(UNREAD_MAP).reduce((a,b)=>a+b,0);
+  let nav=document.getElementById('navTotal'); if(totalUnread){ nav.style.display='grid'; nav.textContent=totalUnread>99?'99+':totalUnread; } else nav.style.display='none';
   document.getElementById('list').innerHTML=list.map(c=>{
-    let uname=profileById[c.other]?.username||c.other; let prof=profileById[c.other]; let dot=prof?.is_online?`<span class="dot"></span>`:``; let uc=UNREAD_MAP[c.other]||0; let badge=uc?`<span class="unreadBadge">${uc}</span>`:``; let isPin=PINNED.includes(c.other); let isMute=MUTED.includes(c.other);
+    let uname=profileById[c.other]?.username||c.other; let prof=profileById[c.other]; let dot=prof?.is_online?`<span class="dot"></span>`:``; let uc=UNREAD_MAP[c.other]||0; let badge=uc?`<span class="unreadBadge ${MUTED.includes(c.other)?'grey':''}">${uc>99?'99+':uc}</span>`:``; let isPin=PINNED.includes(c.other); let isMute=MUTED.includes(c.other);
     let isMine=isMineMsg(c.msg);
     let tick=isMine?`<span class="tick ${c.msg.seen?'blue':'grey'}">${c.msg.seen?'✓✓':'✓'}</span> `:'';
     return `<div class="chatRow" onmousedown="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" onmouseup="clearTimeout(pressTimer)" ontouchstart="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" ontouchend="clearTimeout(pressTimer)"><div class="avaWrap">${avatarHtml(c.other)}${dot}</div><div class="chatMain" onclick="location.href='chat.html?user=${encodeURIComponent(cleanUser(uname))}'"><div class="chatTopRow"><span class="chatName">${isPin?'📌 ':''}${cleanUser(uname)} ${isMute?'🔕':''}</span><span class="chatTime" style="color:${uc?'#00a884':'#999'}">${fmtTime(c.msg.created_at)}</span></div><div class="chatPrevRow"><span class="chatPrev" style="color:${uc?'#000':'#888'}">${tick}${c.preview}</span>${badge}</div></div></div>`
-  }).join(''); applyWhiteRemove();
+  }).join('');
 }
 async function init(){
   if(!window.supa){setTimeout(init,300);return} supa=window.supa;
@@ -159,7 +157,7 @@ async function load(){
     let isFirstFromThem=!isMineMsg(c); let threadType='primary'; if(isFirstFromThem && !c.seen) threadType='requests';
     return {other:oid,msg:c,preview,threadType};
   });
-  document.getElementById('cAll').innerText=ALL_CHATS.length||''; render();
+  render();
 }
 init();
 </script></body></html>
