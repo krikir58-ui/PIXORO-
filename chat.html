@@ -4,13 +4,31 @@
 <style>
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{margin:0;background:#F6F6F8;color:#111;max-width:450px;height:100dvh;margin:auto;display:flex;flex-direction:column;-webkit-touch-callout:none}
-/* LIGHT THEME da - Green Illa da - DM ku Match da */
+/* THEME SYSTEM da - DM la Maathina - Chat layum Same Varum da */
+body[data-theme="pink"]{background:#FFF2F7!important}
+body[data-theme="pink"] #box{background:#FFF2F7!important}
+body[data-theme="pink"] .me .bub{background:#FFD6E8!important}
+body[data-theme="lavender"]{background:#F3F0FF!important}
+body[data-theme="lavender"] #box{background:#F3F0FF!important}
+body[data-theme="lavender"] .me .bub{background:#E8E0FF!important}
+body[data-theme="blue"]{background:#F0F5FF!important}
+body[data-theme="blue"] #box{background:#F0F5FF!important}
+body[data-theme="blue"] .me .bub{background:#DCE8FF!important}
+body[data-theme="mint"]{background:#F0FFF6!important}
+body[data-theme="mint"] #box{background:#F0FFF6!important}
+body[data-theme="mint"] .me .bub{background:#D9F5E5!important}
+body[data-theme="peach"]{background:#FFF4EC!important}
+body[data-theme="peach"] #box{background:#FFF4EC!important}
+body[data-theme="peach"] .me .bub{background:#FFE8D6!important}
+body[data-theme="dark"]{background:#111!important;color:#fff!important}
+body[data-theme="dark"] #box{background:#111!important}
+body[data-theme="dark"] .top, body[data-theme="dark"] .inputWrap, body[data-theme="dark"] .other .bub{background:#1C1C1E!important;color:#fff!important}
+body[data-theme="dark"] .top b{color:#fff!important}
 .top{margin:8px 10px 0;height:52px;display:flex;align-items:center;gap:8px;padding:6px 8px;background:#fff;border-radius:26px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .backBtn{width:34px;height:34px;border-radius:50%;background:#F1F1F5;border:0;font-size:20px;cursor:pointer;flex-shrink:0;display:grid;place-items:center;color:#111}
 .top b{font-size:15px;font-weight:600;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;line-height:1.2}
 .top small{color:#999;font-size:11px;display:block;line-height:1.2}
 .small{font-size:19px;background:transparent;border:0;color:#666;width:34px;height:34px;cursor:pointer;flex-shrink:0}
-/* FIX - Photo Chinnatha Correct Size da - 40 Illa - 36 da */
 .hAva{width:36px;height:36px;border-radius:50%;background:#E8E0FF!important;color:#6C5CE7;display:grid;place-items:center;font-size:15px;font-weight:700;line-height:1}
 #pfpWrap{width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center}
 #pfpWrap img{width:36px;height:36px;border-radius:50%;object-fit:cover;display:block;background:#EDEDF2}
@@ -53,8 +71,11 @@ body{margin:0;background:#F6F6F8;color:#111;max-width:450px;height:100dvh;margin
 .enc{text-align:center;font-size:12px;color:#666;background:#EFEFF3;margin:8px 16px;padding:8px;border-radius:14px}
 #recBar{display:none;background:#fff;padding:10px 14px;align-items:center;gap:10px;margin:0 10px;border-radius:14px}
 #safeBanner{display:none;background:#FFF3CD;color:#856404;font-size:12px;text-align:center;padding:8px 12px;margin:8px 10px 0;border-radius:12px}
+#themeSheet{display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#fff;border-radius:20px 20px 0 0;padding:16px;z-index:1001;box-shadow:0 -2px 20px rgba(0,0,0,.15)}
+.themeBtn{padding:14px 8px;border-radius:14px;border:2px solid transparent;cursor:pointer;text-align:center;font-size:13px;font-weight:700}
+.themeBtn.on{border-color:#FF4D8D!important}
 </style></head><body>
-<header class="top"><button class="backBtn" onclick="location.href='dm.html'">←</button><span id="pfpWrap"></span><div style="flex:1;min-width:0"><b id="uname">Chat</b><small id="online">last seen recently</small></div><button class="small">📹</button><button class="small">📞</button><button class="small" onclick="openMenu()">⋮</button></header>
+<header class="top"><button class="backBtn" onclick="location.href='dm.html'">←</button><span id="pfpWrap"></span><div style="flex:1;min-width:0"><b id="uname">Chat</b><small id="online">last seen recently</small></div><button class="small">📹</button><button class="small">📞</button><button class="small" onclick="document.getElementById('themeSheet').style.display='block'">🎨</button><button class="small" onclick="openMenu()">⋮</button></header>
 <div id="safeBanner">🛡️ Full Safe - OTP / Password / Link DM la Anuppaatha da</div>
 <div id="status"></div>
 <div id="box"><div class="enc">🔒 Messages are end-to-end encrypted - PIXORO Full Safe</div></div>
@@ -63,10 +84,27 @@ body{margin:0;background:#F6F6F8;color:#111;max-width:450px;height:100dvh;margin
 <div id="recBar"><span style="color:#FF3B30">●</span><span style="flex:1">Recording... <span id="recTime">0:00</span></span><button onclick="stopVoice()" style="background:#FF3B30;color:#fff;border:0;padding:8px 14px;border-radius:16px">Stop</button></div>
 <div id="photoSheet"><div id="previewGrid"></div><div style="display:flex;gap:8px;margin-top:10px"><button onclick="confirmSendPhotos()" style="flex:1;background:#FF4D8D;color:#fff;border:0;padding:11px;border-radius:20px;font-weight:700;cursor:pointer">Send Photos ➤</button><button onclick="cancelPhotos()" style="flex:1;background:#F1F1F5;color:#111;border:0;padding:11px;border-radius:20px;cursor:pointer">Cancel</button></div><div id="upProgress" style="font-size:12px;color:#999;margin-top:6px"></div></div>
 <div id="inputBar"><div class="inputWrap"><span style="font-size:21px;cursor:pointer">😊</span><input id="inp" maxlength="3000" placeholder="Message" oninput="onInput()"><span class="action" onclick="document.getElementById('file').click()">📎</span><span class="action" onclick="document.getElementById('camFile').click()">📷</span></div><input type="file" id="file" hidden accept="image/jpeg,image/png,image/webp" multiple onchange="handlePhotos(this)"><input type="file" id="camFile" hidden accept="image/*" capture="environment" onchange="handlePhotos(this)"><input type="file" id="videoFile" hidden accept="video/*" onchange="sendMedia(this)"><button id="send" onclick="sendMessage()">➤</button><button id="micBtn" onclick="startVoice()">🎙️</button></div>
-<div id="menu"><button onclick="replySelected()">↩️ Reply</button><button onclick="reactSelected()">❤️ React</button><button id="menuUnsend" onclick="unsendSelected()">🗑️ Unsend</button><button onclick="reportSelected()">⚠️ Report</button><button onclick="blockSelected()">🚫 Block</button><button onclick="document.getElementById('menu').style.display='none'">Cancel</button></div>
+<div id="menu"><button onclick="replySelected()">↩️ Reply</button><button onclick="reactSelected()">❤️ React</button><button id="menuUnsend" onclick="unsendSelected()">🗑️ Unsend</button><button onclick="reportSelected()">⚠️ Report</button><button onclick="blockSelected()">🚫 Block</button><button onclick="document.getElementById('themeSheet').style.display='block';document.getElementById('menu').style.display='none'">🎨 Theme</button><button onclick="document.getElementById('menu').style.display='none'">Cancel</button></div>
+<div id="themeSheet"><b>🎨 Chat Theme - Pudicha Mari Maathu da</b><p style="font-size:12px;color:#999;margin:6px 0 12px">DM la Maathina - Ingayum Same Varum da</p><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+<button class="themeBtn" data-t="light" onclick="setTheme('light')" style="background:#F6F6F8;color:#111">🤍<br>Light</button>
+<button class="themeBtn" data-t="pink" onclick="setTheme('pink')" style="background:#FFF2F7;color:#111">💗<br>Pink</button>
+<button class="themeBtn" data-t="lavender" onclick="setTheme('lavender')" style="background:#F3F0FF;color:#111">💜<br>Lavender</button>
+<button class="themeBtn" data-t="blue" onclick="setTheme('blue')" style="background:#F0F5FF;color:#111">💙<br>Blue</button>
+<button class="themeBtn" data-t="mint" onclick="setTheme('mint')" style="background:#F0FFF6;color:#111">💚<br>Mint</button>
+<button class="themeBtn" data-t="peach" onclick="setTheme('peach')" style="background:#FFF4EC;color:#111">🧡<br>Peach</button>
+<button class="themeBtn" data-t="dark" onclick="setTheme('dark')" style="background:#111;color:#fff">🖤<br>Dark</button>
+</div><button onclick="document.getElementById('themeSheet').style.display='none'" style="width:100%;margin-top:14px;padding:12px;background:#F1F1F5;border:0;border-radius:12px">Close</button></div>
 <div id="zoomView" onclick="this.style.display='none'"><img id="zoomImg"></div>
 <script>
 'use strict'; const $=id=>document.getElementById(id); let supa=window.supa; let ME_ID='',OTHER_ID='',ME='',OTHER='',CHAT_ID='',OTHER_PFP=''; let channel=null,selectedMessage=null,replyText=''; let busy=false,recorder=null,recordChunks=[]; let pendingPhotos=[],SEL_PHOTO=null, recTimer=null, recSec=0;
+// THEME SYSTEM da - DM + Chat - Orey Theme da
+function setTheme(t){ localStorage.setItem('pixoro_theme',t); applyTheme(); document.getElementById('themeSheet').style.display='none'; }
+function applyTheme(){
+  let t=localStorage.getItem('pixoro_theme')||'light';
+  document.body.dataset.theme=t;
+  document.querySelectorAll('.themeBtn').forEach(b=>b.classList.toggle('on', b.dataset.t===t));
+}
+applyTheme();
 function cleanName(v){return String(v||'').trim().replace(/^@/,'').toLowerCase();}
 function status(t){$('status').textContent=t;}
 function scrollBottom(){$('box').scrollTop=$('box').scrollHeight;}
@@ -120,7 +158,6 @@ async function reactSelected(){ const {error}=await supa.from('messages').update
 async function unsendSelected(){ if(SEL_PHOTO?.media_path&&window.pixoroUnsendPhoto){ await pixoroUnsendPhoto(selectedMessage,SEL_PHOTO.media_path); } else { const {error}=await supa.from('messages').delete().eq('id',selectedMessage).eq('sender_id',ME_ID); if(error) status('Unsend failed: '+error.message); } $('menu').style.display='none'; await loadMessages(); }
 async function reportSelected(){ if(window.pixoroReportPhoto) await pixoroReportPhoto(OTHER_ID,selectedMessage,'Unsafe photo / message'); $('menu').style.display='none'; status('Reported'); }
 async function blockSelected(){ if(window.pixoroBlockUser) await pixoroBlockUser(OTHER); $('menu').style.display='none'; location.href='dm.html'; }
-// FIX - profiles.name Error - name Select la Illa da
 async function init(){
   try{
     if(!window.supa){ setTimeout(init,200); return; }
