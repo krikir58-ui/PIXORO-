@@ -1,4 +1,4 @@
-// ===== PIXORO MAIN - SERVER ONLY - v114 - NULL FIX DA =====
+// ===== PIXORO MAIN - SERVER ONLY - v115 - PHOTO DM SAFE DA =====
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 
@@ -81,12 +81,12 @@ async function pixoroMuteUser(userId){
   try{ await window.supa.from('muted_users').insert({user_id:window.ME_ID, muted_user_id:userId}); }catch(e){}
   location.reload();
 }
+// FIXED v115 - alert illa da - confirm mattum da
 async function pixoroBlockUser(target){
   let raw = String(target||'').trim(); if(!raw || raw==='null' || raw==='undefined') return;
   if(!confirm('Full ah Block Pannava da?')) return;
   let {data, error} = await window.supa.rpc('toggle_block_by_name', {target_name: raw});
-  if(error){ alert('Block Fail da - ' + error.message); return; }
-  alert(data ? (raw + ' Block Aayiduchu da') : (raw + ' Unblock Aayiduchu da'));
+  if(error){ return; }
   setTimeout(()=> location.reload(), 500);
 }
 async function pixoroGetHiddenIds(){
@@ -267,7 +267,6 @@ async function pixoroLoadFollowing(){
   }catch(e){}
   _pixoroLoadingFollow = false;
 }
-// FIXED v114 - null ah ID nu return panna koodathu da
 async function pixoroResolveName(raw){
   raw = pixoroCleanName(raw);
   if(!raw || raw==='null' || raw==='undefined' || raw==='nan') return {id:null, name:null};
@@ -291,16 +290,15 @@ async function pixoroResolveName(raw){
   }catch(e){}
   return {id:null, name: raw};
 }
-// FIXED v114 - UUID ah anuppa venda da - Username ah anuppu da
 async function pixoroToggleFollow(target, btn){
   let raw = String(target||'').trim();
   if(!raw || raw==='null' || raw==='undefined'){
     let b = btn || document.activeElement;
     raw = b?.dataset?.followUsername || b?.dataset?.followUser || '';
   }
-  if(!raw || raw==='null' || raw==='undefined'){ alert('Username kedaikala da - Refresh pannu da'); return false; }
+  if(!raw || raw==='null' || raw==='undefined'){ return false; }
   let {id, name} = await pixoroResolveName(raw);
-  if(!name){ alert('User Not Found da - ' + raw); return false; }
+  if(!name){ return false; }
   if(id && id === String(window.ME_ID)) return false;
   let busyKey = id || name;
   if(_pixoroFollowBusy[busyKey]) return false;
@@ -316,7 +314,6 @@ async function pixoroToggleFollow(target, btn){
       if(was){ if(id) window.PIXORO_FOLLOWING.add(id); window.PIXORO_FOLLOWING_NAMES.add(pixoroCleanName(name)); }
       else { if(id) window.PIXORO_FOLLOWING.delete(id); window.PIXORO_FOLLOWING_NAMES.delete(pixoroCleanName(name)); }
       pixoroPaintAllFollowBtns();
-      alert('Follow Fail da - ' + error.message);
       _pixoroFollowBusy[busyKey] = false;
       return false;
     }
@@ -357,3 +354,71 @@ window.addEventListener('storage', (e)=>{
 });
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
+
+// ===== PIXORO PHOTO DM v115 - SAFE - ADD PANNAPATTATHU DA =====
+const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
+async function pixoroCleanPhoto(file){
+  if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
+  if(file.size > PHOTO_CONFIG.maxSize) throw new Error('Photo 5MB ku mela irukka koodathu da');
+  const bmp = await createImageBitmap(file);
+  const canvas = document.createElement('canvas');
+  const maxW = 1080; let w=bmp.width, h=bmp.height;
+  if(w>maxW){ h=h*maxW/w; w=maxW; }
+  canvas.width=w; canvas.height=h;
+  canvas.getContext('2d').drawImage(bmp,0,0,w,h);
+  const blob = await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.85));
+  return new File([blob], 'photo_'+Date.now()+'.jpg', {type:'image/jpeg'});
+}
+async function pixoroUploadPhoto(file, chatId){
+  const clean = await pixoroCleanPhoto(file);
+  const path = `${window.ME_ID}/${chatId}/${Date.now()}_${clean.name}`;
+  const {error} = await window.supa.storage.from('dms').upload(path, clean, {upsert:false});
+  if(error) throw error;
+  return path;
+}
+async function pixoroGetPhotoUrl(path){
+  if(!path) return '';
+  if(path.startsWith('http')) return path;
+  const {data,error} = await window.supa.storage.from('dms').createSignedUrl(path, 3600);
+  if(error) return '';
+  return data.signedUrl;
+}
+async function pixoroCanSendPhotoTo(otherId){
+  try{
+    const {data} = await window.supa.from('blocked_users').select('*').or(`and(user_id.eq.${otherId},blocked_user_id.eq.${window.ME_ID}),and(user_id.eq.${window.ME_ID},blocked_user_id.eq.${otherId})`);
+    if(data && data.length) return {ok:false, msg:'Blocked user da'};
+  }catch(e){}
+  try{
+    const {data:priv} = await window.supa.from('privacy_settings').select('*').eq('user_id',otherId).maybeSingle();
+    if(priv && priv.photo_from==='nobody') return {ok:false, msg:'Avanga photo receive panna maataanga da'};
+    if(priv && priv.photo_from==='followers' && !pixoroIsFollowing(otherId)) return {ok:false, msg:'Followers mattum photo anuppa mudiyum da'};
+  }catch(e){}
+  return {ok:true};
+}
+async function pixoroUnsendPhoto(msgId, mediaPath){
+  if(mediaPath) await window.supa.storage.from('dms').remove([mediaPath]);
+  await window.supa.from('messages').delete().eq('id',msgId).eq('sender_id',window.ME_ID);
+}
+async function pixoroReportPhoto(otherId, msgId, reason){
+  await window.supa.from('reports').insert({reported_by: window.ME_ID, reported_id: otherId, message_id: msgId, reason: reason||'Unsafe photo'});
+}
+async function pixoroSavePhoto(mediaPath){
+  const url = await pixoroGetPhotoUrl(mediaPath);
+  if(!url) return;
+  const a=document.createElement('a'); a.href=url; a.download='pixoro_photo.jpg'; a.click();
+}
+function pixoroPreviewText(m){
+  if(!m) return '';
+  if(m.type==='image' || m.media_type==='image' || m.media_path) return '📷 Photo';
+  if(m.type==='video' || m.media_type==='video') return '🎬 Video';
+  if(m.type==='voice') return '🎙️ Voice';
+  return '💬 Message';
+}
+window.pixoroCleanPhoto = pixoroCleanPhoto;
+window.pixoroUploadPhoto = pixoroUploadPhoto;
+window.pixoroGetPhotoUrl = pixoroGetPhotoUrl;
+window.pixoroCanSendPhotoTo = pixoroCanSendPhotoTo;
+window.pixoroUnsendPhoto = pixoroUnsendPhoto;
+window.pixoroReportPhoto = pixoroReportPhoto;
+window.pixoroSavePhoto = pixoroSavePhoto;
+window.pixoroPreviewText = pixoroPreviewText;
