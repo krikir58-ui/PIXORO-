@@ -9,47 +9,58 @@
 <style>
 *{box-sizing:border-box;font-family:Arial,sans-serif}
 body{margin:0;background:#000;color:white;max-width:450px;height:100dvh;margin:auto;display:flex;flex-direction:column}
-.top{height:58px;display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #292929}
-.top img{width:38px;height:38px;border-radius:50%;object-fit:cover}
-.top b{font-size:14px}
-.small{font-size:20px;background:#191919;border:0;color:white;border-radius:50%;width:34px;height:34px;cursor:pointer}
-#box{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px}
-.bub{max-width:82%;padding:10px 13px;border-radius:18px;overflow-wrap:anywhere;white-space:pre-wrap;font-size:14px;line-height:1.4;position:relative}
-.me{align-self:flex-end;background:linear-gradient(135deg,#8b00ff,#ff1493,#ff7a00);border-bottom-right-radius:4px}
-.other{align-self:flex-start;background:#252525;border:1px solid #7040a0;border-bottom-left-radius:4px}
-.bub img,.bub video{max-width:100%;border-radius:12px;display:block;cursor:pointer}
-.bub audio{max-width:100%}
-.time{font-size:10px;text-align:right;opacity:.8;margin-top:5px}
-.reply{font-size:11px;border-left:3px solid #ff8bc8;padding:5px;margin-bottom:6px;background:#0003}
+/* 3rd PHOTO HEADER DA */
+.top{height:58px;display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #1a1a1a}
+.top img{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.top b{font-size:16px}
+.top small{color:#22c55e;font-size:12px}
+.small{font-size:22px;background:transparent;border:0;color:white;width:36px;height:36px;cursor:pointer}
+#box{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px}
+.dateSep{align-self:center;background:#1a1a1a;padding:5px 12px;border-radius:16px;font-size:12px;color:#999;margin:6px 0}
+/* 3rd PHOTO BUBBLE DA */
+.row{display:flex;gap:8px;align-items:flex-end;max-width:92%}
+.row.me{flex-direction:row-reverse;align-self:flex-end}
+.row.other{align-self:flex-start}
+.row img.ava2{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.bub{padding:10px 13px;border-radius:18px;overflow-wrap:anywhere;white-space:pre-wrap;font-size:14.5px;line-height:1.45;max-width:280px;position:relative}
+.me .bub{background:#7c3aed;color:#fff;border-bottom-right-radius:6px}
+.other .bub{background:#1e1e1e;color:#eee;border-bottom-left-radius:6px}
+.bub img,.bub video{max-width:100%;min-width:180px;max-height:320px;object-fit:cover;border-radius:12px;display:block;cursor:pointer}
+.bub audio{max-width:210px}
+.time{font-size:11px;text-align:right;opacity:.65;margin-top:3px}
+.tick{letter-spacing:-1px;font-size:12px}
+.reply{font-size:11px;border-left:3px solid #fff;padding:5px;margin-bottom:6px;background:rgba(0,0,0,.28);border-radius:6px}
 .react{position:absolute;bottom:-8px;right:8px;background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:2px 6px;font-size:12px}
-#typing{height:20px;font-size:12px;color:#aaa;padding-left:15px;font-style:italic}
-#inputBar{display:flex;align-items:center;gap:8px;padding:10px;border-top:1px solid #292929}
-#inp{flex:1;min-width:0;border:1px solid #7540b0;border-radius:25px;padding:12px;background:#222;color:white;outline:none}
-.action{border:0;background:transparent;color:white;font-size:22px;cursor:pointer}
-#send{background:linear-gradient(135deg,#ff5ea8,#ff7a00);border:0;border-radius:50%;width:42px;height:42px;color:white;font-size:20px;cursor:pointer}
-#status{font-size:12px;text-align:center;color:#aaa;padding:5px}
+#typing{height:20px;font-size:12px;color:#999;padding-left:15px;font-style:italic}
 #replyBar{display:none;padding:7px 12px;background:#171717;color:#ff9acb;font-size:12px}
-#menu{display:none;position:fixed;bottom:75px;left:50%;transform:translateX(-50%);width:min(94%,420px);background:#202020;padding:12px;border-radius:16px;z-index:20}
-#menu button{width:100%;padding:12px;background:#303030;color:white;border:0;border-radius:9px;margin:3px 0;text-align:left;cursor:pointer}
 #photoSheet{display:none;background:#111;padding:12px;border-top:1px solid #333}
 #previewGrid{display:flex;gap:8px;overflow-x:auto}
 #zoomView{display:none;position:fixed;inset:0;background:#000;z-index:9999;place-items:center}
 #zoomView img{max-width:100%;max-height:100%;object-fit:contain}
+/* 3rd PHOTO INPUT DA */
+#inputBar{display:flex;gap:8px;padding:10px 12px;background:#000;border-top:1px solid #1a1a1a;align-items:center}
+.inputWrap{flex:1;display:flex;gap:8px;align-items:center;background:#1a1a1a;border-radius:24px;padding:6px 8px 6px 6px}
+.camBtn{width:34px;height:34px;border-radius:50%;background:#7c3aed;display:grid;place-items:center;font-size:17px;cursor:pointer;flex-shrink:0}
+#inp{flex:1;min-width:0;background:transparent;border:0;color:#fff;outline:none;font-size:14px}
+#send{background:#7c3aed;border:0;border-radius:50%;width:42px;height:42px;color:white;font-size:18px;cursor:pointer;flex-shrink:0}
+.action{border:0;background:transparent;color:white;font-size:20px;cursor:pointer}
+#status{font-size:12px;text-align:center;color:#666;padding:4px}
+#menu{display:none;position:fixed;bottom:75px;left:50%;transform:translateX(-50%);width:min(94%,420px);background:#202020;padding:12px;border-radius:16px;z-index:20}
+#menu button{width:100%;padding:12px;background:#303030;color:white;border:0;border-radius:9px;margin:3px 0;text-align:left;cursor:pointer}
 </style>
 </head>
 <body>
 
 <header class="top">
-<button class="small" onclick="location.href='dm.html'">←</button>
+<button class="small" onclick="location.href='dm.html'">‹</button>
 <img id="pfp" alt="Profile">
-<div style="flex:1;min-width:0">
-<b id="uname">PIXORO User</b>
-<div id="online" style="font-size:11px;color:#aaa">PIXORO Chat</div>
-</div>
+<div style="flex:1;min-width:0"><b id="uname">PIXORO User</b><br><small id="online">Active now</small></div>
+<button class="small">📞</button>
+<button class="small">📹</button>
 <button class="small" onclick="openMenu()">⋮</button>
 </header>
 
-<div id="status">Connecting...</div>
+<div id="status"></div>
 <div id="box"></div>
 <div id="typing"></div>
 <div id="replyBar"></div>
@@ -61,14 +72,17 @@ body{margin:0;background:#000;color:white;max-width:450px;height:100dvh;margin:a
 </div>
 
 <div id="inputBar">
-<button class="action" onclick="document.getElementById('file').click()">🖼️</button>
-<button class="action" onclick="document.getElementById('camFile').click()">📷</button>
-<input type="file" id="file" hidden accept="image/jpeg,image/png,image/webp" multiple onchange="handlePhotos(this)">
-<input type="file" id="camFile" hidden accept="image/*" capture="environment" onchange="handlePhotos(this)">
-<input type="file" id="videoFile" hidden accept="video/*" onchange="sendMedia(this)">
-<input id="inp" maxlength="3000" placeholder="Message...">
-<button class="action" onclick="startVoice()">🎙️</button>
-<button id="send" onclick="sendMessage()">➤</button>
+  <div class="inputWrap">
+    <span class="camBtn" onclick="document.getElementById('file').click()">📷</span>
+    <input id="inp" maxlength="3000" placeholder="Type a message...">
+    <span style="font-size:20px;cursor:pointer" onclick="document.getElementById('camFile').click()">📸</span>
+    <span style="font-size:20px;cursor:pointer">😊</span>
+  </div>
+  <input type="file" id="file" hidden accept="image/jpeg,image/png,image/webp" multiple onchange="handlePhotos(this)">
+  <input type="file" id="camFile" hidden accept="image/*" capture="environment" onchange="handlePhotos(this)">
+  <input type="file" id="videoFile" hidden accept="video/*" onchange="sendMedia(this)">
+  <button class="action" onclick="startVoice()">🎙️</button>
+  <button id="send" onclick="sendMessage()">➤</button>
 </div>
 
 <div id="menu">
@@ -87,32 +101,27 @@ body{margin:0;background:#000;color:white;max-width:450px;height:100dvh;margin:a
 'use strict';
 const $=id=>document.getElementById(id);
 let supa=window.supa;
-let ME_ID='',OTHER_ID='',ME='',OTHER='',CHAT_ID='';
+let ME_ID='',OTHER_ID='',ME='',OTHER='',CHAT_ID='', OTHER_PFP='';
 let channel=null,selectedMessage=null,replyText='';
 let busy=false,recorder=null,recordChunks=[];
 let pendingPhotos=[], SEL_PHOTO=null;
-
 function cleanName(v){ return String(v||'').trim().replace(/^@/,'').toLowerCase(); }
 function status(t){$('status').textContent=t;}
 function scrollBottom(){ $('box').scrollTop=$('box').scrollHeight; }
-function addText(parent,tag,text,className){ const el=document.createElement(tag); if(className)el.className=className; el.textContent=text; parent.appendChild(el); return el; }
-function openMenu(){ 
-  // Photo va select panniruntha Save / Unsend correct ah kaatu da
+function openMenu(){
   let sel = document.querySelector('[data-id="'+CSS.escape(String(selectedMessage))+'"]');
   let isMine = sel && sel.classList.contains('me');
   $('menuSave').style.display = (SEL_PHOTO && !isMine) ? 'block' : 'none';
   $('menuUnsend').style.display = isMine ? 'block' : 'none';
   $('menu').style.display='block';
 }
-function selectMessage(id){ selectedMessage=id; 
+function selectMessage(id){ selectedMessage=id;
   let el=$('box').querySelector('[data-id="'+CSS.escape(String(id))+'"]');
   if(el && el.dataset.photo) SEL_PHOTO={id:id, media_path:el.dataset.photo};
   else SEL_PHOTO=null;
   openMenu();
 }
 function openZoom(url){ $('zoomImg').src=url; $('zoomView').style.display='grid'; }
-
-// ===== PHOTO - MULTIPLE + CAMERA + PREVIEW =====
 function handlePhotos(input){
   pendingPhotos=[...input.files].slice(0,5);
   if(!pendingPhotos.length) return;
@@ -132,68 +141,51 @@ function renderPreview(){
 function cancelPhotos(){ pendingPhotos=[]; $('photoSheet').style.display='none'; $('file').value=''; $('camFile').value=''; $('upProgress').textContent=''; }
 async function confirmSendPhotos(){
   if(!pendingPhotos.length) return;
-  // Privacy check - pixoro-core.js la irukku da
-  if(window.pixoroCanSendPhotoTo){
-    const check=await pixoroCanSendPhotoTo(OTHER_ID);
-    if(!check.ok){ status(check.msg); return; }
-  }
+  if(window.pixoroCanSendPhotoTo){ const check=await pixoroCanSendPhotoTo(OTHER_ID); if(!check.ok){ status(check.msg); return; } }
   for(let i=0;i<pendingPhotos.length;i++){
-    const f=pendingPhotos[i];
-    $('upProgress').textContent=`Uploading ${i+1}/${pendingPhotos.length}...`;
+    const f=pendingPhotos[i]; $('upProgress').textContent=`Uploading ${i+1}/${pendingPhotos.length}...`;
     let tempId='temp_'+Date.now()+i;
-    let tmp=document.createElement('div'); tmp.className='bub me'; tmp.id=tempId; tmp.innerHTML=`<img src="${URL.createObjectURL(f)}"><div class="time">Uploading... ⏳</div>`;
+    let tmp=document.createElement('div'); tmp.className='row me'; tmp.id=tempId; tmp.innerHTML=`<div><div class="bub"><img src="${URL.createObjectURL(f)}"></div><div class="time">Uploading... ⏳</div></div>`;
     $('box').appendChild(tmp); scrollBottom();
     try{
       const path = await pixoroUploadPhoto(f, CHAT_ID);
       const {error}=await supa.from('messages').insert({chat_id:CHAT_ID,sender_id:ME_ID,receiver_id:OTHER_ID,sender:ME,receiver:OTHER,text:'📷 Photo',message:'📷 Photo',media_path:path,media_type:'image',type:'image',seen:false,status:'sent',reply_to:replyText||null});
       if(error) throw error;
       document.getElementById(tempId)?.remove();
-    }catch(e){
-      let el=document.getElementById(tempId); if(el) el.innerHTML+='<div style="font-size:12px">Failed - <span onclick="retryFailedPhoto()" style="text-decoration:underline;cursor:pointer">Resend</span></div>';
-      status('Photo failed: '+e.message);
-    }
+    }catch(e){ let el=document.getElementById(tempId); if(el) el.innerHTML+='<div style="font-size:12px">Failed - Resend pannu da</div>'; status('Photo failed: '+e.message); }
   }
   cancelPhotos(); replyText=''; $('replyBar').style.display='none'; await loadMessages();
 }
-function retryFailedPhoto(){ confirmSendPhotos(); }
-
-// ===== RENDER - SIGNED URL MATTUM DA =====
+// 3rd PHOTO RENDER DA - Avatar + Purple / Grey Bubble da
 async function renderMessage(m){
   if(!m || !m.id) return;
   if($('box').querySelector('[data-id="'+CSS.escape(String(m.id))+'"]')) return;
   const mine=String(m.sender_id)===ME_ID;
-  const el=document.createElement('div');
-  el.className='bub '+(mine?'me':'other');
-  el.dataset.id=m.id;
-  if(m.media_path) el.dataset.photo=m.media_path;
-  if(m.reply_to) addText(el,'div',m.reply_to,'reply');
+  const row=document.createElement('div'); row.className='row '+(mine?'me':'other'); row.dataset.id=m.id;
+  if(m.media_path) row.dataset.photo=m.media_path;
+  const el=document.createElement('div'); el.className='bub '+(mine?'me':'other'); el.dataset.id=m.id; if(m.media_path) el.dataset.photo=m.media_path;
+  if(m.reply_to){ let r=document.createElement('div'); r.className='reply'; r.textContent=m.reply_to; el.appendChild(r); }
   let url='';
-  // Private bucket - Signed URL thaan da - Public URL illa da
   if(m.media_path && window.pixoroGetPhotoUrl) url = await pixoroGetPhotoUrl(m.media_path);
   else if(m.media_url) url=m.media_url;
   if(m.media_path || url){
-    if(m.media_type==='video'||m.type==='video'){
-      const v=document.createElement('video'); v.src=url; v.controls=true; v.playsInline=true; el.appendChild(v);
-    }else if(m.media_type==='voice'||m.type==='voice'){
-      const a=document.createElement('audio'); a.src=url; a.controls=true; el.appendChild(a);
-    }else{
-      const img=document.createElement('img'); img.src=url; img.alt='Shared photo'; img.loading='lazy';
-      img.onclick=()=>openZoom(url);
-      el.appendChild(img);
-    }
+    if(m.media_type==='video'||m.type==='video'){ const v=document.createElement('video'); v.src=url; v.controls=true; v.playsInline=true; el.appendChild(v); }
+    else if(m.media_type==='voice'||m.type==='voice'){ const a=document.createElement('audio'); a.src=url; a.controls=true; el.appendChild(a); }
+    else { const img=document.createElement('img'); img.src=url; img.alt='Shared photo'; img.loading='lazy'; img.onclick=()=>openZoom(url); el.appendChild(img); }
   }else{
-    addText(el,'div',m.text||m.message||'');
+    let txt=m.text||m.message||'';
+    if(txt.startsWith('{"e2e"')) txt='💬 Message';
+    let d=document.createElement('div'); d.textContent=txt; el.appendChild(d);
   }
-  if(m.reaction) addText(el,'div',m.reaction,'react');
-  addText(el,'div',(m.created_at?new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'')+(mine?(m.seen?'  ✓✓':'  ✓'):''),'time');
-  el.addEventListener('contextmenu',e=>{ e.preventDefault(); selectMessage(m.id); });
-  el.addEventListener('click',()=>{
-    if(window._lastTap && Date.now()-window._lastTap<350){ selectMessage(m.id); }
-    window._lastTap=Date.now();
-  });
-  $('box').appendChild(el);
+  if(m.reaction){ let rc=document.createElement('div'); rc.className='react'; rc.textContent=m.reaction; el.appendChild(rc); }
+  let wrap=document.createElement('div'); wrap.appendChild(el);
+  let tm=document.createElement('div'); tm.className='time'; tm.innerHTML=(m.created_at?new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'')+(mine?` <span class="tick">${m.seen?'✓✓':'✓'}</span>`:''); wrap.appendChild(tm);
+  if(!mine){ let av=document.createElement('img'); av.className='ava2'; av.src=OTHER_PFP||$('pfp').src; row.appendChild(av); }
+  row.appendChild(wrap);
+  row.addEventListener('contextmenu',e=>{ e.preventDefault(); selectMessage(m.id); });
+  row.addEventListener('click',()=>{ if(window._lastTap && Date.now()-window._lastTap<350){ selectMessage(m.id); } window._lastTap=Date.now(); });
+  $('box').appendChild(row);
 }
-
 async function loadMessages(){
   if(busy||!ME_ID||!OTHER_ID) return; busy=true;
   try{
@@ -201,18 +193,17 @@ async function loadMessages(){
     if(error) throw error;
     const box=$('box'); const wasBottom=box.scrollHeight-box.scrollTop-box.clientHeight<120;
     box.replaceChildren();
+    if(data && data.length){ let d=document.createElement('div'); d.className='dateSep'; d.textContent='Today '+new Date(data[0].created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); box.appendChild(d); }
     for(const m of (data||[])){ await renderMessage(m); }
     const unseen=(data||[]).filter(m=>String(m.receiver_id)===ME_ID&&!m.seen);
     for(const m of unseen){ await supa.from('messages').update({seen:true, seen_at:new Date().toISOString()}).eq('id',m.id).eq('receiver_id',ME_ID); }
     if(wasBottom||unseen.length) scrollBottom();
-    if(!data||!data.length) addText(box,'div','Say hello to @'+OTHER+' 👋');
+    if(!data||!data.length){ let e=document.createElement('div'); e.style.cssText='text-align:center;color:#777;padding:30px'; e.innerHTML='Say hello to @'+OTHER+' 👋'; box.appendChild(e); }
     status('');
   }catch(e){ console.error(e); status('Chat loading error: '+e.message); } finally{ busy=false; }
 }
-
 async function sendMessage(){
-  const input=$('inp'); const value=input.value.trim();
-  if(!value||!ME_ID||!OTHER_ID) return;
+  const input=$('inp'); const value=input.value.trim(); if(!value||!ME_ID||!OTHER_ID) return;
   $('send').disabled=true;
   try{
     const {error}=await supa.from('messages').insert({chat_id:CHAT_ID,sender_id:ME_ID,receiver_id:OTHER_ID,sender:ME,receiver:OTHER,text:value,message:value,type:'text',seen:false,reply_to:replyText||null,vanish:false,status:'sent'});
@@ -220,23 +211,18 @@ async function sendMessage(){
     input.value=''; replyText=''; $('replyBar').style.display='none'; await loadMessages();
   }catch(e){ status('Message send failed: '+e.message); } finally{ $('send').disabled=false; input.focus(); }
 }
-
-// Old single video / file ku - media_path la save pannu da
 async function sendMedia(input){
   const file=input.files?.[0]; if(!file) return;
-  if(!file.type.startsWith('video/')){ status('Video only - Photo ku 🖼️ button use pannu da'); return; }
+  if(!file.type.startsWith('video/')){ status('Video only'); return; }
   if(file.size>25*1024*1024){ status('Maximum 25 MB'); input.value=''; return; }
   status('Uploading...');
   try{
     const path=ME_ID+'/'+CHAT_ID+'/'+Date.now()+'_video.mp4';
-    const {error}=await supa.storage.from('dms').upload(path,file,{upsert:false,contentType:file.type});
-    if(error) throw error;
-    const {error:ie}=await supa.from('messages').insert({chat_id:CHAT_ID,sender_id:ME_ID,receiver_id:OTHER_ID,sender:ME,receiver:OTHER,text:'🎬 Video',message:'🎬 Video',media_path:path,media_type:'video',type:'video',seen:false,status:'sent'});
-    if(ie) throw ie;
+    const {error}=await supa.storage.from('dms').upload(path,file,{upsert:false,contentType:file.type}); if(error) throw error;
+    const {error:ie}=await supa.from('messages').insert({chat_id:CHAT_ID,sender_id:ME_ID,receiver_id:OTHER_ID,sender:ME,receiver:OTHER,text:'🎬 Video',message:'🎬 Video',media_path:path,media_type:'video',type:'video',seen:false,status:'sent'}); if(ie) throw ie;
     await loadMessages(); status('');
   }catch(e){ status('Upload failed: '+e.message); } finally{ input.value=''; }
 }
-
 async function startVoice(){
   if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){ status('Voice not supported'); return; }
   if(recorder && recorder.state==='recording'){ stopVoice(); return; }
@@ -249,8 +235,7 @@ async function startVoice(){
         const blob=new Blob(recordChunks,{type:recorder.mimeType||'audio/webm'});
         const path=ME_ID+'/'+CHAT_ID+'/'+Date.now()+'_voice.webm';
         const {error}=await supa.storage.from('dms').upload(path,blob); if(error) throw error;
-        const {error:e3}=await supa.from('messages').insert({chat_id:CHAT_ID,sender_id:ME_ID,receiver_id:OTHER_ID,sender:ME,receiver:OTHER,text:'Voice message',message:'Voice message',media_path:path,media_type:'voice',type:'voice',seen:false,status:'sent'});
-        if(e3) throw e3; await loadMessages();
+        const {error:e3}=await supa.from('messages').insert({chat_id:CHAT_ID,sender_id:ME_ID,receiver_id:OTHER_ID,sender:ME,receiver:OTHER,text:'Voice message',message:'Voice message',media_path:path,media_type:'voice',type:'voice',seen:false,status:'sent'}); if(e3) throw e3; await loadMessages();
       }catch(e){ status('Voice upload failed: '+e.message); }
       stream.getTracks().forEach(t=>t.stop());
     };
@@ -258,72 +243,43 @@ async function startVoice(){
   }catch(e){ status('Microphone permission unavailable'); }
 }
 function stopVoice(){ if(recorder&&recorder.state==='recording'){ recorder.stop(); $('voiceStop').style.display='none'; status('Sending voice...'); } }
-
 function replySelected(){
   const el=$('box').querySelector('[data-id="'+CSS.escape(String(selectedMessage))+'"]'); if(!el) return;
   replyText = el.dataset.photo ? '📷 Photo' : el.innerText.slice(0,150);
   $('replyBar').textContent='Replying to: '+replyText; $('replyBar').style.display='block'; $('inp').focus(); $('menu').style.display='none';
 }
 async function reactSelected(){
-  const emojis=['❤️','😂','🔥','👍','😮'];
-  const reaction=emojis[Math.floor(Math.random()*emojis.length)];
-  // Simple - ❤️ react pannu da - venumna prompt use pannu da
-  const {error}=await supa.from('messages').update({reaction:reaction}).eq('id',selectedMessage);
+  const {error}=await supa.from('messages').update({reaction:'❤️'}).eq('id',selectedMessage);
   if(error) status('Reaction failed: '+error.message);
   $('menu').style.display='none'; await loadMessages();
 }
-async function saveSelected(){
-  if(!SEL_PHOTO?.media_path) return;
-  if(window.pixoroSavePhoto) await pixoroSavePhoto(SEL_PHOTO.media_path);
-  $('menu').style.display='none';
-}
+async function saveSelected(){ if(!SEL_PHOTO?.media_path) return; if(window.pixoroSavePhoto) await pixoroSavePhoto(SEL_PHOTO.media_path); $('menu').style.display='none'; }
 async function unsendSelected(){
-  // Photo na Storage layum delete aagum da
   if(SEL_PHOTO?.media_path && window.pixoroUnsendPhoto){ await pixoroUnsendPhoto(selectedMessage, SEL_PHOTO.media_path); }
-  else{
-    const {error}=await supa.from('messages').delete().eq('id',selectedMessage).eq('sender_id',ME_ID);
-    if(error) status('Unsend failed: '+error.message);
-  }
+  else{ const {error}=await supa.from('messages').delete().eq('id',selectedMessage).eq('sender_id',ME_ID); if(error) status('Unsend failed: '+error.message); }
   $('menu').style.display='none'; await loadMessages();
 }
-async function reportSelected(){
-  if(window.pixoroReportPhoto) await pixoroReportPhoto(OTHER_ID, selectedMessage, 'Unsafe photo / message');
-  $('menu').style.display='none'; status('Reported');
-}
-async function blockSelected(){
-  if(window.pixoroBlockUser) await pixoroBlockUser(OTHER);
-  $('menu').style.display='none'; location.href='dm.html';
-}
-
+async function reportSelected(){ if(window.pixoroReportPhoto) await pixoroReportPhoto(OTHER_ID, selectedMessage, 'Unsafe photo / message'); $('menu').style.display='none'; status('Reported'); }
+async function blockSelected(){ if(window.pixoroBlockUser) await pixoroBlockUser(OTHER); $('menu').style.display='none'; location.href='dm.html'; }
 async function init(){
   try{
     if(!supa) throw new Error('PIXORO Supabase connection missing');
-    const {data:{session},error}=await supa.auth.getSession();
-    if(error) throw error; if(!session){ location.href='login.html'; return; }
+    const {data:{session},error}=await supa.auth.getSession(); if(error) throw error; if(!session){ location.href='login.html'; return; }
     ME_ID=session.user.id;
-    const target=cleanName(new URLSearchParams(location.search).get('user'));
-    if(!target){ location.href='dm.html'; return; }
+    const target=cleanName(new URLSearchParams(location.search).get('user')); if(!target){ location.href='dm.html'; return; }
     const {data:mine,error:e1}=await supa.from('profiles').select('id,username,name,avatar_url').eq('id',ME_ID).single(); if(e1) throw e1;
     const {data:other,error:e2}=await supa.from('profiles').select('id,username,name,avatar_url').ilike('username',target).maybeSingle(); if(e2) throw e2;
     if(!other) throw new Error('User not found'); if(other.id===ME_ID) throw new Error('Cannot chat with yourself');
-    ME_ID=mine.id; OTHER_ID=other.id; ME=cleanName(mine.username); OTHER=cleanName(other.username);
+    ME_ID=mine.id; OTHER_ID=other.id; ME=cleanName(mine.username); OTHER=cleanUser2(other.username); OTHER_PFP=other.avatar_url||'https://ui-avatars.com/api/?name=P&background=222&color=fff';
     CHAT_ID=[ME_ID,OTHER_ID].sort().join('_');
-    $('uname').textContent='@'+OTHER;
-    $('pfp').src=other.avatar_url||'https://ui-avatars.com/api/?name=P&background=222&color=fff';
-    $('online').textContent='Active now';
-    // Typing - pixoro-core la illa da - inga direct broadcast da
-    $('inp').addEventListener('input',()=>{
-      if(channel) channel.send({type:'broadcast',event:'typing',payload:{user:ME,typing:true}});
-      clearTimeout(window._tt); window._tt=setTimeout(()=>{ if(channel) channel.send({type:'broadcast',event:'typing',payload:{user:ME,typing:false}}); },1500);
-    });
+    $('uname').textContent='@'+OTHER; $('pfp').src=OTHER_PFP; $('online').textContent='Active now';
+    $('inp').addEventListener('input',()=>{ if(channel) channel.send({type:'broadcast',event:'typing',payload:{user:ME,typing:true}}); clearTimeout(window._tt); window._tt=setTimeout(()=>{ if(channel) channel.send({type:'broadcast',event:'typing',payload:{user:ME,typing:false}}); },1500); });
     await loadMessages();
-    channel=supa.channel('pixoro-chat-'+CHAT_ID)
-      .on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:'chat_id=eq.'+CHAT_ID},()=>loadMessages())
-      .on('broadcast',{event:'typing'},(p)=>{ if(p.payload && p.payload.user!==ME) $('typing').textContent = p.payload.typing ? '@'+p.payload.user+' is typing...' : ''; })
-      .subscribe();
+    channel=supa.channel('pixoro-chat-'+CHAT_ID).on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:'chat_id=eq.'+CHAT_ID},()=>loadMessages()).on('broadcast',{event:'typing'},(p)=>{ if(p.payload && p.payload.user!==ME) $('typing').textContent = p.payload.typing ? '@'+p.payload.user+' is typing...' : ''; }).subscribe();
     status('');
   }catch(e){ console.error(e); status(e.message); }
 }
+function cleanUser2(v){ return String(v||'').trim().replace(/^@/,'').toLowerCase(); }
 $('inp').addEventListener('keydown',e=>{ if(e.key==='Enter') sendMessage(); });
 const stopButton=document.createElement('button'); stopButton.id='voiceStop'; stopButton.textContent='⏹ Stop voice'; stopButton.style.cssText='display:none;position:fixed;bottom:75px;left:50%;transform:translateX(-50%);padding:12px 22px;background:#e22;color:white;border:0;border-radius:20px;z-index:30'; stopButton.onclick=stopVoice; document.body.appendChild(stopButton);
 init();
