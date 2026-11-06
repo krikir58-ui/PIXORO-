@@ -15,10 +15,9 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;displ
 .me{align-self:flex-end;background:linear-gradient(135deg,#8b00ff,#ff1493,#ff7a00);border-bottom-right-radius:4px}
 .other{align-self:flex-start;background:#262626;border-bottom-left-radius:4px;border:1px solid #a259ff}
 .bub img,.bub video{width:100%;border-radius:14px;margin:6px 0;display:block}.bub audio{width:200px;margin-top:6px}
-.time{font-size:9px;opacity:.7;margin-top:3px;text-align:right}
-.replyBox{font-size:11px;background:rgba(0,0,0,.3);padding:6px;border-radius:8px;margin-bottom:5px;border-left:2px solid #fff}
-.react{position:absolute;bottom:-10px;right:8px;background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:2px 6px;font-size:12px}
-.typing{font-size:12px;color:#00ff66;padding:2px 14px;height:18px}
+.time{font-size:10px;opacity:.75;margin-top:3px;text-align:right;display:flex;gap:4px;justify-content:flex-end;align-items:center}
+.tick{font-size:11px;letter-spacing:-1px;opacity:.9}
+.typing{font-size:12px;color:#999;padding:2px 14px;height:18px;font-style:italic}
 .vanishBar{background:#111;padding:8px;text-align:center;font-size:12px;color:#ff5ea8;border-bottom:1px solid #222;display:none}
 .input{display:flex;gap:8px;padding:12px;background:#000;border-top:1px solid #262626;align-items:center}
 .input input{flex:1;background:#262626;border:1px solid #a259ff;padding:12px 16px;border-radius:24px;color:#fff;outline:none;font-size:14px}
@@ -26,7 +25,6 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;displ
 .voiceBar{background:#111;padding:10px;display:none;align-items:center;gap:10px;border-top:1px solid #ff5ea8}
 .callBox{position:fixed;inset:0;background:#000;z-index:999;display:none;flex-direction:column}
 .callBox video{width:100%;height:100%;object-fit:cover}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:1000;display:none}
 .longSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#1a1a1a;border-radius:20px 20px 0 0;padding:16px;z-index:999;display:none}
 .longSheet button{width:100%;padding:12px;border:0;background:#262626;color:#fff;border-radius:10px;margin:4px 0;text-align:left}
 </style></head><body>
@@ -40,30 +38,26 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;displ
 <div class="longSheet" id="sheet"><div style="text-align:center;font-size:22px">❤️ 😂 😮 😢 🔥 👍</div><button onclick="doReact('❤️')">❤️ React</button><button onclick="doReply()">↩️ Reply</button><button onclick="doUnsend()">🗑️ Unsend</button><button onclick="document.getElementById('sheet').style.display='none'" style="text-align:center">Cancel</button></div>
 <div class="longSheet" id="setSheet"><b id="setName">Settings</b><button onclick="doBlock()">🚫 Block User</button><button onclick="doUnblock()">✅ Unblock User</button><button onclick="doReport()">⚠️ Report</button><button onclick="doMuteChat()">🔕 Mute Chat</button><button onclick="goProfile()">👤 View Profile</button><button onclick="doClear()">🗑️ Clear Chat</button><button onclick="document.getElementById('setSheet').style.display='none'" style="text-align:center">Cancel</button></div>
 <div class="callBox" id="callBox"><div style="position:relative;flex:1"><video id="remoteV" autoplay playsinline></video><video id="localV" autoplay muted playsinline style="width:110px;height:150px;position:absolute;bottom:20px;right:10px;border:2px solid #fff;border-radius:12px;object-fit:cover"></video><div style="position:absolute;top:20px;left:50%;transform:translateX(-50%);text-align:center"><b id="callName" style="font-size:18px"></b><p id="callStatus" style="font-size:12px;color:#00ff88">Calling...</p></div></div><div style="display:flex;gap:14px;justify-content:center;padding:20px"><button onclick="toggleMic()" id="micBtn" style="width:52px;height:52px;border-radius:50%;border:0;font-size:20px">🎙️</button><button onclick="toggleCam()" id="camBtn" style="width:52px;height:52px;border-radius:50%;border:0;font-size:20px">📸</button><button onclick="endCall()" style="width:52px;height:52px;border-radius:50%;border:0;background:#ff0000;font-size:20px">📵</button></div></div>
-<div id="toast" class="toast"></div>
 <script>
-function showToast(m){let t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
+// ALERT / TOAST ELLAM REMOVE DA - Onnum Varaathu da
+function showToast(m){}
 let supa = window.supa
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
 let ME='', ME_ID='', OTHER=cleanUser(new URLSearchParams(location.search).get('user')||''), OTHER_ID='', chatId='', mediaRec=null, vChunks=[], vTimer=null, vSec=0, peer=null, callObj=null, stream=null, micOn=true, camOn=true, VANISH=false, SEL_MSG=null, SEL_TXT='', REPLY_TXT='', BLOCKED=JSON.parse(localStorage.getItem('pixoro_blocked')||'[]');
 let MY_PRIV=null, SHARED_KEY=null, E2E_READY=false;
 let chatChannel=null, isMarkingSeen=false, isLoading=false;
 function goProfile(){ location.href='profile.html?user='+encodeURIComponent(OTHER); }
-function toggleVanish(){ VANISH=!VANISH; document.getElementById('vanishBar').style.display=VANISH?'block':'none'; showToast(VANISH?'Vanish ON da 👻':'Vanish OFF da') }
-function doBlock(){ if(!BLOCKED.includes(OTHER)) BLOCKED.push(OTHER); localStorage.setItem('pixoro_blocked',JSON.stringify(BLOCKED)); showToast('Blocked da 🚫'); document.getElementById('setSheet').style.display='none'; }
-function doUnblock(){ BLOCKED=BLOCKED.filter(x=>x!==OTHER); localStorage.setItem('pixoro_blocked',JSON.stringify(BLOCKED)); showToast('Unblocked da ✅'); document.getElementById('setSheet').style.display='none'; load(); }
-function doReport(){ showToast('Reported da ⚠️'); document.getElementById('setSheet').style.display='none'; }
-function doMuteChat(){ let m=JSON.parse(localStorage.getItem('pixoro_mute')||'[]'); if(!m.includes(OTHER)) m.push(OTHER); localStorage.setItem('pixoro_mute',JSON.stringify(m)); showToast('Muted da 🔕'); document.getElementById('setSheet').style.display='none'; }
-function doClear(){ document.getElementById('box').innerHTML=''; showToast('Cleared da 🗑️'); document.getElementById('setSheet').style.display='none'; }
-
-// ===== FIXED TYPING - Broadcast da - Table Illa da - Instant da =====
+function toggleVanish(){ VANISH=!VANISH; document.getElementById('vanishBar').style.display=VANISH?'block':'none'; }
+function doBlock(){ if(!BLOCKED.includes(OTHER)) BLOCKED.push(OTHER); localStorage.setItem('pixoro_blocked',JSON.stringify(BLOCKED)); document.getElementById('setSheet').style.display='none'; }
+function doUnblock(){ BLOCKED=BLOCKED.filter(x=>x!==OTHER); localStorage.setItem('pixoro_blocked',JSON.stringify(BLOCKED)); document.getElementById('setSheet').style.display='none'; load(); }
+function doReport(){ document.getElementById('setSheet').style.display='none'; }
+function doMuteChat(){ let m=JSON.parse(localStorage.getItem('pixoro_mute')||'[]'); if(!m.includes(OTHER)) m.push(OTHER); localStorage.setItem('pixoro_mute',JSON.stringify(m)); document.getElementById('setSheet').style.display='none'; }
+function doClear(){ document.getElementById('box').innerHTML=''; document.getElementById('setSheet').style.display='none'; }
 function onTyping(){
   if(!chatChannel) return;
   chatChannel.send({ type:'broadcast', event:'typing', payload:{ user:ME, typing:true } });
   clearTimeout(window._tt);
-  window._tt=setTimeout(()=>{
-    if(chatChannel) chatChannel.send({ type:'broadcast', event:'typing', payload:{ user:ME, typing:false } });
-  },1500);
+  window._tt=setTimeout(()=>{ if(chatChannel) chatChannel.send({ type:'broadcast', event:'typing', payload:{ user:ME, typing:false } }); },1500);
 }
 let pressT=null;
 function pressMsg(id,txt){ pressT=setTimeout(()=>{ SEL_MSG=id; SEL_TXT=txt; document.getElementById('sheet').style.display='block'; },600); }
@@ -71,7 +65,6 @@ document.addEventListener('mouseup',()=>clearTimeout(pressT)); document.addEvent
 async function doReact(e){ await supa.from('messages').update({reaction:e}).eq('id',SEL_MSG); document.getElementById('sheet').style.display='none'; }
 async function doReply(){ REPLY_TXT=SEL_TXT; document.getElementById('inp').placeholder='Replying: '+SEL_TXT.slice(0,20); document.getElementById('inp').focus(); document.getElementById('sheet').style.display='none'; }
 async function doUnsend(){ await supa.from('messages').delete().eq('id',SEL_MSG); document.getElementById('sheet').style.display='none'; }
-
 function bufToB64(b){ return btoa(String.fromCharCode(...new Uint8Array(b))); }
 function b64ToBuf(s){ try{ let bin=atob(s); let a=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return a.buffer; }catch(e){ return new ArrayBuffer(0); } }
 async function getOrCreateKeys(){
@@ -126,10 +119,10 @@ async function init(){
   ME_ID = session.user.id
   let { data: myProf } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
   ME = cleanUser(myProf?.username || session.user.email.split('@')[0])
-  if(OTHER===ME){ showToast('Unakku nee chat panna mudiyathu da 😅'); setTimeout(()=>location.href='dm.html',800); return }
+  if(OTHER===ME){ setTimeout(()=>location.href='dm.html',800); return }
   let { data: otherProf } = await supa.from('profiles').select('*').eq('username', OTHER).maybeSingle()
   if(!otherProf){ let {data:all}=await supa.from('profiles').select('*'); otherProf=(all||[]).find(p=>cleanUser(p.username)===OTHER) }
-  if(!otherProf){ showToast('Real user illa da ❌'); setTimeout(()=>location.href='dm.html',1000); return }
+  if(!otherProf){ setTimeout(()=>location.href='dm.html',1000); return }
   OTHER_ID = otherProf.id
   document.getElementById('uname').innerText = '@'+cleanUser(otherProf.username)
   document.getElementById('setName').innerText = '@'+cleanUser(otherProf.username)+' Settings'
@@ -146,7 +139,6 @@ async function init(){
       if(pr2?.public_key){ await makeSharedKey(pr2.public_key); load(); }
     },3000);
   }
-  // ===== FIXED REALTIME - ORE Channel la Message + Seen + Typing da =====
   if(chatChannel) supa.removeChannel(chatChannel);
   chatChannel = supa.channel('chat-'+chatId)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`chat_id=eq.${chatId}`},()=>{ load(); })
@@ -154,22 +146,20 @@ async function init(){
     .on('postgres_changes',{event:'DELETE',schema:'public',table:'messages',filter:`chat_id=eq.${chatId}`},()=>{ load(); })
     .on('broadcast',{event:'typing'},(p)=>{
       if(p.payload && p.payload.user!==ME){
-        document.getElementById('typing').innerText = p.payload.typing ? p.payload.user + ' is typing...' : '';
+        document.getElementById('typing').innerText = p.payload.typing ? '@' + p.payload.user + ' is typing...' : '';
       }
     })
-    .subscribe((s)=>{ console.log('Realtime:',s); });
+    .subscribe();
   load()
 }
 async function load(){
   if(isLoading) return; isLoading=true;
   try{
     let {data,error} = await supa.from('messages').select('*').eq('chat_id',chatId).order('created_at',{ascending:true})
-    if(error) console.log('Load Error',error);
     if(!data || !data.length){
       let {data:d2} = await supa.from('messages').select('*').or(`and(sender.eq.${ME},receiver.eq.${OTHER}),and(sender.eq.${OTHER},receiver.eq.${ME})`).order('created_at',{ascending:true})
       if(d2 && d2.length) data = d2
     }
-    // ===== FIXED SEEN - Mathavanga Anuppathukku Mattum da =====
     let unseen = (data||[]).filter(m=>!m.seen && m.sender!==ME && m.sender_id!==ME_ID);
     if(unseen.length){
       isMarkingSeen=true;
@@ -187,7 +177,8 @@ async function load(){
       else if(m.type==='video'||m.media_type==='video') media=`<video src="${url}" controls></video>`;
       else if(url) media=`<img src="${url}">`;
       else if(txt.startsWith('data:image')||(txt.startsWith('http')&&txt.includes('.jpg'))) media=`<img src="${txt}">`;
-      let tick=isMe? (m.seen?`<span style="color:#00bfff">✓✓ Seen</span>`:`<span style="color:#888">✓ Sent</span>`):'';
+      // TICK - Colour Illa da - Plain Grey Tick Mattum da - Pakka Nalla Theriyum da
+      let tick = isMe ? `<span class="tick">${m.seen ? '✓✓' : '✓'}</span>` : '';
       let reply=m.reply_to?`<div class="replyBox">${m.reply_to}</div>`:'';
       let react=m.reaction?`<span class="react">${m.reaction}</span>`:'';
       let safe=(txt||'').replace(/'/g,'').slice(0,30);
@@ -199,25 +190,24 @@ async function load(){
   } finally { isLoading=false; }
 }
 async function send(){
-  let i=document.getElementById('inp'); let t=i.value.trim(); if(!t) return; if(BLOCKED.includes(OTHER)){ showToast('Blocked da 🚫 Unblock Pannu da'); return; } i.value=''
-  document.getElementById('box').innerHTML+=`<div class="me bub">${t}<div class="time">now ✓</div></div>`; document.getElementById('box').scrollTop=document.getElementById('box').scrollHeight
+  let i=document.getElementById('inp'); let t=i.value.trim(); if(!t) return; if(BLOCKED.includes(OTHER)){ return; } i.value=''
+  document.getElementById('box').innerHTML+=`<div class="me bub">${t}<div class="time">now <span class="tick">✓</span></div></div>`; document.getElementById('box').scrollTop=document.getElementById('box').scrollHeight
   let encText = await encryptText(t);
   let {data,error} = await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:encText,message:encText,sender_id:ME_ID,receiver_id:OTHER_ID,seen:false,type:'text',reply_to:REPLY_TXT||null,vanish:VANISH}).select().single();
-  if(error){ console.log('Send Fail',error); showToast('Save Aagala da: '+error.message); }
   REPLY_TXT=''; document.getElementById('inp').placeholder='Message...';
   if(chatChannel) chatChannel.send({ type:'broadcast', event:'typing', payload:{ user:ME, typing:false } });
 }
 async function sendPhoto(input){
   if(!input.files[0]) return; let file=input.files[0]; let isVid=file.type.startsWith('video'); let fileName=Date.now()+'_'+ME+'_'+file.name.replace(/[^a-zA-Z0-9.]/g,'_'); let {error}=await supa.storage.from('dms').upload(fileName,file); let url=''; if(!error){ let {data}=supa.storage.from('dms').getPublicUrl(fileName); url=data.publicUrl; } else { let r=new FileReader(); r.onload=async e=>{ await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:e.target.result,message:'📷 Photo',sender_id:ME_ID,receiver_id:OTHER_ID,seen:false}); load(); }; r.readAsDataURL(file); return; }
-  await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:isVid?'🎬 Video':'📸 Photo',message:isVid?'🎬 Video':'📸 Photo',sender_id:ME_ID,receiver_id:OTHER_ID,seen:false,type:isVid?'video':'image',media_url:url,media_type:isVid?'video':'image'}); showToast(isVid?'Video Sent da 🎬':'Photo Sent da 🔥');
+  await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:isVid?'🎬 Video':'📸 Photo',message:isVid?'🎬 Video':'📸 Photo',sender_id:ME_ID,receiver_id:OTHER_ID,seen:false,type:isVid?'video':'image',media_url:url,media_type:isVid?'video':'image'});
 }
 async function startVoice(){
-  if(!window.isSecureContext){ showToast('HTTPS la mattum Voice da'); return; }
-  try{ let s=await navigator.mediaDevices.getUserMedia({audio:true}); mediaRec=new MediaRecorder(s); vChunks=[]; vSec=0; mediaRec.ondataavailable=e=>{if(e.data.size>0) vChunks.push(e.data)}; mediaRec.start(); document.getElementById('voiceBar').style.display='flex'; vTimer=setInterval(()=>{ vSec++; document.getElementById('recTime').innerText='🔴 '+vSec+'s' },1000); showToast('Recording da 🎙️'); }catch(e){ showToast(e.name==='NotAllowedError'?'Mic Block da! 🔒 Lock la Allow Pannu da':'Mic Error: '+e.message) }
+  if(!window.isSecureContext){ return; }
+  try{ let s=await navigator.mediaDevices.getUserMedia({audio:true}); mediaRec=new MediaRecorder(s); vChunks=[]; vSec=0; mediaRec.ondataavailable=e=>{if(e.data.size>0) vChunks.push(e.data)}; mediaRec.start(); document.getElementById('voiceBar').style.display='flex'; vTimer=setInterval(()=>{ vSec++; document.getElementById('recTime').innerText='🔴 '+vSec+'s' },1000); }catch(e){}
 }
 async function stopVoice(){
   clearInterval(vTimer); document.getElementById('voiceBar').style.display='none';
-  mediaRec.onstop=async()=>{ let blob=new Blob(vChunks,{type:'audio/webm'}); let fileName=Date.now()+'_'+ME+'_voice.webm'; await supa.storage.from('dms').upload(fileName,blob); let {data}=supa.storage.from('dms').getPublicUrl(fileName); await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:'🎙️ Voice',message:'🎙️ Voice',sender_id:ME_ID,receiver_id:OTHER_ID,seen:false,type:'voice',media_url:data.publicUrl,media_type:'voice'}); showToast('Voice Sent da 🎙️'); };
+  mediaRec.onstop=async()=>{ let blob=new Blob(vChunks,{type:'audio/webm'}); let fileName=Date.now()+'_'+ME+'_voice.webm'; await supa.storage.from('dms').upload(fileName,blob); let {data}=supa.storage.from('dms').getPublicUrl(fileName); await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:'🎙️ Voice',message:'🎙️ Voice',sender_id:ME_ID,receiver_id:OTHER_ID,seen:false,type:'voice',media_url:data.publicUrl,media_type:'voice'}); };
   mediaRec.stop();
 }
 async function startCall(isVideo){
