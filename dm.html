@@ -3,67 +3,70 @@
 <script src="js/pixoro-core.js?v=141"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{background:#F6F6F8!important;color:#111;max-width:450px;margin:0 auto;padding-bottom:76px}
-.logo{font-size:23px;font-weight:900;letter-spacing:.5px;color:#111}
+body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:76px}
+.logo{font-size:23px;font-weight:900;letter-spacing:.5px;color:#fff}
 .logo span{background:linear-gradient(90deg,#FF4D8D,#8A7CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
-.top{background:#fff;padding:12px 14px 8px;position:sticky;top:0;z-index:50;border-bottom:1px solid #eee}
+.top{background:#000;padding:12px 14px 8px;position:sticky;top:0;z-index:50;border-bottom:1px solid #1F1F1F}
 .topRow{display:flex;justify-content:space-between;align-items:center}
-.topIco{font-size:20px;margin-left:14px;cursor:pointer;color:#666}
-.searchBar{margin:10px 12px;background:#fff;border:1px solid #eee;border-radius:18px;padding:9px 12px;display:flex;gap:8px;align-items:center}
-.searchBar input{flex:1;background:transparent;border:0;color:#111;outline:none;font-size:14px}
+.topIco{font-size:20px;margin-left:14px;cursor:pointer;color:#aaa}
+.searchBar{margin:10px 12px;background:#1F1F1F;border:1px solid #222;border-radius:22px;padding:11px 12px;display:flex;gap:8px;align-items:center}
+.searchBar input{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:14px}
+.searchBar input::placeholder{color:#888}
 .notes{display:flex;gap:10px;overflow-x:auto;padding:8px 10px;scrollbar-width:none}.notes::-webkit-scrollbar{display:none}
 .nItem{flex:0 0 58px;text-align:center;cursor:pointer;position:relative}
 .nRing{width:52px;height:52px;border-radius:50%;background:transparent;border:none;position:relative}
 .nRingInner{width:100%;height:100%;border-radius:50%;background:transparent;overflow:visible;display:grid;place-items:center;border:none}
-.noteBubble{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#fff;color:#111;font-size:9px;padding:3px 6px;border-radius:12px;white-space:nowrap;font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;border:1px solid #eee}
-.noteInput{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid #eee;padding:20px;border-radius:18px;z-index:999;display:none;width:85%;max-width:360px}.noteInput input{width:100%;padding:12px;border-radius:10px;border:0;background:#F1F1F5;color:#111;outline:none;margin:10px 0}
-.chatRow{display:flex;gap:10px;padding:10px 12px;align-items:center;cursor:pointer;width:calc(100% - 20px)!important;margin:0 10px 6px!important;background:#fff!important;border:none!important;border-radius:14px!important;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.chatRow:active{background:#EFEFF3!important}
+.noteBubble{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#1F1F1F;color:#fff;font-size:9px;padding:3px 6px;border-radius:12px;white-space:nowrap;font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;border:1px solid #333}
+.noteInput{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#111;border:1px solid #222;padding:20px;border-radius:18px;z-index:999;display:none;width:85%;max-width:360px}.noteInput input{width:100%;padding:12px;border-radius:10px;border:0;background:#1F1F1F;color:#fff;outline:none;margin:10px 0}
+.chatRow{display:flex;gap:10px;padding:12px;align-items:center;cursor:pointer;width:calc(100% - 20px)!important;margin:0 10px 6px!important;background:#141414!important;border:none!important;border-radius:14px!important}
+.chatRow:active{background:#1F1F1F!important}
 .avaWrap{width:44px;height:44px;flex:0 0 44px;position:relative;display:grid;place-items:center;background:transparent!important;border:none!important}
-.ava{width:44px;height:44px;border-radius:50%;object-fit:cover;display:block;background:#EDEDF2;border:none!important}
-.avaLetter{width:44px;height:44px;border-radius:50%;background:#E8E0FF!important;color:#6C5CE7;display:grid;place-items:center;font-size:17px;font-weight:700;border:none!important}
-.avaSmall{width:44px;height:44px;border-radius:50%;object-fit:cover;display:block;background:#EDEDF2;border:none!important}
-.avaLetterSmall{width:44px;height:44px;border-radius:50%;background:#E8E0FF!important;color:#6C5CE7;display:grid;place-items:center;font-size:17px;font-weight:700;border:none!important}
+.ava{width:44px;height:44px;border-radius:50%;object-fit:cover;display:block;background:#222;border:none!important}
+.avaLetter{width:44px;height:44px;border-radius:50%;background:#2A1A2E!important;color:#FF4D8D;display:grid;place-items:center;font-size:17px;font-weight:700;border:none!important}
+.avaSmall{width:44px;height:44px;border-radius:50%;object-fit:cover;display:block;background:#222;border:none!important}
+.avaLetterSmall{width:44px;height:44px;border-radius:50%;background:#2A1A2E!important;color:#FF4D8D;display:grid;place-items:center;font-size:17px;font-weight:700;border:none!important}
 .chatMain{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .chatTopRow{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%}
-.chatName{font-size:15px;font-weight:800;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left}
-.chatTime{font-size:11px;color:#999;flex-shrink:0}
+.chatName{font-size:15px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left}
+.chatTime{font-size:11px;color:#888;flex-shrink:0}
 .chatPrevRow{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%}
-.chatPrev{font-size:13px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left}
+.chatPrev{font-size:13px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left}
 .unreadBadge{background:#FF4D8D;color:#fff;font-size:11px;min-width:19px;height:19px;border-radius:10px;display:grid;place-items:center;padding:0 5px;font-weight:700;flex-shrink:0}
-.unreadBadge.grey{background:#BBB}
-.tick{letter-spacing:-1px}.tick.blue{color:#FF4D8D}.tick.grey{color:#999}
-.actionSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#fff;border-radius:20px 20px 0 0;padding:16px;z-index:1000;display:none;box-shadow:0 -2px 20px rgba(0,0,0,.1)}.actionSheet button{width:100%;padding:12px;border:0;background:#F1F1F5;color:#111;border-radius:12px;margin:4px 0;text-align:left}
+.unreadBadge.grey{background:#444}
+.tick{letter-spacing:-1px}.tick.blue{color:#FF4D8D}.tick.grey{color:#888}
+.actionSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#111;border-radius:20px 20px 0 0;padding:16px;z-index:1000;display:none}.actionSheet button{width:100%;padding:12px;border:0;background:#1F1F1F;color:#fff;border-radius:12px;margin:4px 0;text-align:left}
 .bottom-nav{position:fixed!important;bottom:0!important;left:0!important;right:0!important;max-width:450px!important;margin:0 auto!important;width:100%!important;height:64px!important;background:#000!important;border-top:1px solid #222!important;display:flex!important;justify-content:space-around!important;align-items:center!important;z-index:100!important}
 .bottom-nav a{display:flex!important;flex-direction:column!important;align-items:center!important;gap:2px!important;text-decoration:none!important;color:#888!important;position:relative!important}
 .bottom-nav a.active{color:#fff!important}
 .bottom-nav a.active span{color:#fff!important;font-weight:800!important}
 .bottom-nav span{font-size:11px!important;color:#888!important}
-.bottom-nav a img.navPfp{width:26px!important;height:26px!important;border-radius:50%!important;object-fit:cover!important;background:#EDEDF2;border:1.5px solid #fff!important}
+.bottom-nav a img.navPfp{width:26px!important;height:26px!important;border-radius:50%!important;object-fit:cover!important;background:#222;border:1.5px solid #333!important}
 .navBadge{position:absolute;top:-4px;right:8px;background:#FF4D8D;color:#fff;font-size:10px;min-width:17px;height:17px;border-radius:9px;display:grid;place-items:center;padding:0 4px;font-weight:700}
 .fab{position:fixed;bottom:78px;right:14px;width:48px;height:48px;border-radius:50%;background:#FF4D8D;display:grid;place-items:center;font-size:20px;z-index:90;cursor:pointer;color:#fff}
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;display:none;white-space:nowrap}
-#dmSettingSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#fff;border-radius:20px 20px 0 0;padding:16px;z-index:1001;display:none;box-shadow:0 -2px 20px rgba(0,0,0,.15);max-height:85vh;overflow-y:auto;color:#111}
-.setRow{display:flex;justify-content:space-between;align-items:center;padding:12px;background:#F6F6F8;border-radius:12px;margin-top:10px;font-size:14px;font-weight:600;color:#111}
-.setRow input{width:22px;height:22px;accent-color:#FF4D8D}
-.setRow select{border:0;background:#fff;padding:6px 8px;border-radius:8px;font-weight:700}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1F1F1F;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;display:none;white-space:nowrap}
+#dmSettingSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#111;border-radius:20px 20px 0 0;padding:16px;z-index:1001;display:none;max-height:85vh;overflow-y:auto;color:#fff}
+.setRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;background:#1F1F1F;border-radius:12px;margin-top:10px;font-size:14px;font-weight:600;color:#fff}
+.setRow input[type="checkbox"]{appearance:none;-webkit-appearance:none;width:46px!important;height:26px!important;min-width:46px;border-radius:20px;background:#333!important;position:relative;cursor:pointer;flex-shrink:0;margin:0}
+.setRow input[type="checkbox"]:checked{background:#FF4D8D!important}
+.setRow input[type="checkbox"]::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.setRow input[type="checkbox"]:checked::after{left:23px}
+.setRow select{border:0;background:#222;padding:8px;border-radius:8px;font-weight:700;color:#fff}
 </style></head><body>
 <div class="top"><div class="topRow"><div class="logo">PIXOR<span>O</span></div><div><span class="topIco" onclick="document.getElementById('searchInp').focus()">🔍</span><span class="topIco" onclick="document.getElementById('dmSettingSheet').style.display='block'">⋮</span></div></div></div>
 <div class="searchBar">🔍 <input id="searchInp" placeholder="Search..." oninput="onSearch(this.value)"></div>
 <div class="notes" id="notes"></div>
 <div id="archivedRow" style="display:none"></div>
-<div id="list" style="text-align:center;color:#999;padding:10px">Loading...</div>
+<div id="list" style="text-align:center;color:#888;padding:10px">Loading...</div>
 <div class="fab" onclick="location.href='search.html'">✏️</div>
 <div class="toast" id="toast"></div>
-<div class="noteInput" id="notePop"><h3 style="color:#111">✏️ Add Note</h3><input id="noteText" placeholder="Yedhachum Yosichiya da...?" maxlength="60"><div style="display:flex;gap:10px"><button onclick="saveNote()" style="flex:1;background:#FF4D8D;color:#fff;border:0;padding:11px;border-radius:20px;font-weight:700">Share</button><button onclick="document.getElementById('notePop').style.display='none'" style="flex:1;background:#F1F1F5;color:#111;border:0;padding:11px;border-radius:20px">Cancel</button></div></div>
-<div class="actionSheet" id="sheet"><b id="sheetName" style="color:#111">Chat</b><button onclick="doPin()">📌 Pin / Unpin</button><button onclick="doMute()">🔕 Mute / Unmute</button><button onclick="doArchive()">🗄️ Archive</button><button onclick="doDelete()" style="color:#FF4D4D">🗑️ Delete Chat</button><button onclick="document.getElementById('sheet').style.display='none'" style="text-align:center">Cancel</button></div>
-<div id="dmSettingSheet"><b style="font-size:17px">⚙️ DM Settings</b><p style="font-size:12px;color:#999;margin:6px 0 12px">DM Chat Nitta Iruka Num Pakka - Ellam Inga thaan da</p><b>👀 Privacy</b><label class="setRow">🟢 Active Now - Online Kaatu <input type="checkbox" id="setActive" checked onchange="saveDMSetting('active',this.checked)"></label><label class="setRow">✍️ Typing... - Type Panna Kaatu <input type="checkbox" id="setTyping" checked onchange="saveDMSetting('typing',this.checked)"></label><label class="setRow">👁️ Seen - Paathen nu Kaatu <input type="checkbox" id="setSeen" checked onchange="saveDMSetting('seen',this.checked)"></label><label class="setRow">✅ Allow Messages <select id="setAllow" onchange="saveDMSetting('allow',this.value)"><option value="everyone">Everyone - Allow</option><option value="following">Following Only</option><option value="none">No One - Not Allow</option></select></label><p style="font-size:12px;color:#999;margin-top:12px">🖼️ Photo Theme - Chat ku Mattum da - Chat la Poi Maathalam da</p><button onclick="document.getElementById('dmSettingSheet').style.display='none'" style="width:100%;margin-top:14px;padding:12px;background:#F1F1F5;border:0;border-radius:12px;color:#111;font-weight:700">Close</button></div>
+<div class="noteInput" id="notePop"><h3 style="color:#fff">✏️ Add Note</h3><input id="noteText" placeholder="Yedhachum Yosichiya da...?" maxlength="60"><div style="display:flex;gap:10px"><button onclick="saveNote()" style="flex:1;background:#FF4D8D;color:#fff;border:0;padding:11px;border-radius:20px;font-weight:700">Share</button><button onclick="document.getElementById('notePop').style.display='none'" style="flex:1;background:#1F1F1F;color:#fff;border:0;padding:11px;border-radius:20px">Cancel</button></div></div>
+<div class="actionSheet" id="sheet"><b id="sheetName" style="color:#fff">Chat</b><button onclick="doPin()">📌 Pin / Unpin</button><button onclick="doMute()">🔕 Mute / Unmute</button><button onclick="doArchive()">🗄️ Archive</button><button onclick="doDelete()" style="color:#FF6B6B">🗑️ Delete Chat</button><button onclick="document.getElementById('sheet').style.display='none'" style="text-align:center">Cancel</button></div>
+<div id="dmSettingSheet"><b style="font-size:17px">DM Settings</b><p style="font-size:12px;color:#888;margin:6px 0 12px">DM Chat Nitta Iruka Num Pakka - Ellam Inga thaan da</p><b>Privacy</b><label class="setRow">Active Now - Online Kaatu <input type="checkbox" id="setActive" checked onchange="saveDMSetting('active',this.checked)"></label><label class="setRow">Typing... - Type Panna Kaatu <input type="checkbox" id="setTyping" checked onchange="saveDMSetting('typing',this.checked)"></label><label class="setRow">Seen - Paathen nu Kaatu <input type="checkbox" id="setSeen" checked onchange="saveDMSetting('seen',this.checked)"></label><label class="setRow">Allow Messages <select id="setAllow" onchange="saveDMSetting('allow',this.value)"><option value="everyone">Everyone - Allow</option><option value="following">Following Only</option><option value="none">No One - Not Allow</option></select></label><p style="font-size:12px;color:#888;margin-top:12px">Photo Theme - Chat ku Mattum da - Chat la Poi Maathalam da</p><button onclick="document.getElementById('dmSettingSheet').style.display='none'" style="width:100%;margin-top:14px;padding:12px;background:#1F1F1F;border:0;border-radius:12px;color:#fff;font-weight:700">Close</button></div>
 <div class="bottom-nav"><a href="index.html"><span style="font-size:22px">⌂</span><span>Home</span></a><a href="search.html"><span style="font-size:21px">🔍</span><span>Search</span></a><a href="reels.html"><span style="font-size:21px">▶️</span><span>Reels</span></a><a href="dm.html" class="active"><span style="font-size:21px">💬</span><span>DM</span><span class="navBadge" id="navTotal" style="display:none">0</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
 <script>
 let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, CUR_TAB='all', ALL_CHATS=[], NOTES_MAP={}, SEARCH_Q='', UNREAD_MAP={}, SHEET_USER='', PINNED=[], MUTED=[], ARCHIVED=[];
-// NO LOCAL STORAGE - In-Memory Mattum da
 let DM_ACTIVE=true, DM_TYPING=true, DM_SEEN=true, DM_ALLOW='everyone';
-function saveDMSetting(k,v){ if(k==='active') DM_ACTIVE=v; if(k==='typing') DM_TYPING=v; if(k==='seen') DM_SEEN=v; if(k==='allow') DM_ALLOW=v; showToast('Setting Saved da ✨'); }
+function saveDMSetting(k,v){ if(k==='active') DM_ACTIVE=v; if(k==='typing') DM_TYPING=v; if(k==='seen') DM_SEEN=v; if(k==='allow') DM_ALLOW=v; showToast('Setting Saved da ✨'); setTimeout(()=>{ document.getElementById('dmSettingSheet').style.display='none'; },400); }
 function loadDMSettings(){ let a=document.getElementById('setActive'); if(a) a.checked = DM_ACTIVE; let ty=document.getElementById('setTyping'); if(ty) ty.checked = DM_TYPING; let s=document.getElementById('setSeen'); if(s) s.checked = DM_SEEN; let al=document.getElementById('setAllow'); if(al) al.value = DM_ALLOW; }
 loadDMSettings();
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
@@ -81,8 +84,8 @@ function openSheet(user,uname){ SHEET_USER=user; document.getElementById('sheetN
 function doPin(){ let i=PINNED.indexOf(SHEET_USER); if(i>=0) PINNED.splice(i,1); else PINNED.unshift(SHEET_USER); document.getElementById('sheet').style.display='none'; render(); }
 function doMute(){ let i=MUTED.indexOf(SHEET_USER); if(i>=0) MUTED.splice(i,1); else MUTED.push(SHEET_USER); document.getElementById('sheet').style.display='none'; render(); }
 function doArchive(){ if(!ARCHIVED.includes(SHEET_USER)) ARCHIVED.push(SHEET_USER); document.getElementById('sheet').style.display='none'; render(); }
-function doDelete(){ ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); document.getElementById('sheet').style.display='none'; showToast('Chat deleted'); render(); }
-async function loadNotes(){ let {data}=await supa.from('notes').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false}); NOTES_MAP={}; (data||[]).forEach(n=>{ NOTES_MAP[cleanUser(n.username)]=n.text; }); let usersWithNote = Object.keys(NOTES_MAP).filter(u=>u!==ME_RAW); let myNote = NOTES_MAP[ME_RAW]; let html=''; html+=`<div class="nItem" onclick="document.getElementById('notePop').style.display='block'"><div class="nRing"><div class="nRingInner">${avatarHtml(ME_RAW,'small')}${myNote?`<div class="noteBubble">${myNote}</div>`:''}</div></div><div style="font-size:10px;margin-top:4px;color:#111">Your note</div></div>`; html+=usersWithNote.slice(0,10).map(u=>`<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(u)}'"><div class="nRing"><div class="nRingInner">${avatarHtml(u,'small')}<div class="noteBubble">${NOTES_MAP[u]}</div></div></div><div style="font-size:10px;margin-top:4px;color:#111">${u}</div></div>`).join(''); document.getElementById('notes').style.display = (myNote || usersWithNote.length) ? 'flex' : 'none'; document.getElementById('notes').innerHTML=html; }
+function doDelete(){ if(!confirm('Chat Delete Pannanuma?')) return; if(!confirm('Confirm ah? Ella Message Poidum da')) return; ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); document.getElementById('sheet').style.display='none'; showToast('Chat deleted'); render(); }
+async function loadNotes(){ let {data}=await supa.from('notes').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false}); NOTES_MAP={}; (data||[]).forEach(n=>{ NOTES_MAP[cleanUser(n.username)]=n.text; }); let usersWithNote = Object.keys(NOTES_MAP).filter(u=>u!==ME_RAW); let myNote = NOTES_MAP[ME_RAW]; let html=''; html+=`<div class="nItem" onclick="document.getElementById('notePop').style.display='block'"><div class="nRing"><div class="nRingInner">${avatarHtml(ME_RAW,'small')}${myNote?`<div class="noteBubble">${myNote}</div>`:''}</div></div><div style="font-size:10px;margin-top:4px;color:#aaa">Your note</div></div>`; html+=usersWithNote.slice(0,10).map(u=>`<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(u)}'"><div class="nRing"><div class="nRingInner">${avatarHtml(u,'small')}<div class="noteBubble">${NOTES_MAP[u]}</div></div></div><div style="font-size:10px;margin-top:4px;color:#aaa">${u}</div></div>`).join(''); document.getElementById('notes').style.display = (myNote || usersWithNote.length) ? 'flex' : 'none'; document.getElementById('notes').innerHTML=html; }
 async function saveNote(){ let t=document.getElementById('noteText').value.trim(); if(!t) return; await supa.from('notes').delete().eq('username',ME_RAW); await supa.from('notes').insert({user_id:ME_ID,username:ME_RAW,text:t}); document.getElementById('notePop').style.display='none'; loadNotes(); }
 function render(){
   let archived = ALL_CHATS.filter(c=>ARCHIVED.includes(c.other));
@@ -92,9 +95,9 @@ function render(){
   if(SEARCH_Q) list=list.filter(c=>{ let n=(profileById[c.other]?.username||c.other||'').toLowerCase(); return n.includes(SEARCH_Q)||c.preview.toLowerCase().includes(SEARCH_Q); });
   list.sort((a,b)=>{ let pa=PINNED.includes(a.other)?1:0, pb=PINNED.includes(b.other)?1:0; if(pa!==pb) return pb-pa; return new Date(b.msg.created_at)-new Date(a.msg.created_at); });
   let archEl=document.getElementById('archivedRow');
-  if(archived.length && CUR_TAB==='all' && !SEARCH_Q){ archEl.style.display='block'; archEl.innerHTML=`<div class="chatRow" onclick="CUR_TAB='hidden';render()"><div class="avaWrap"><div class="avaLetter" style="background:#EDEDF2!important;color:#666!important">🗄️</div></div><div class="chatMain"><div class="chatTopRow"><span class="chatName">Archived Chats</span><span class="chatTime">${archived.length}</span></div><div class="chatPrevRow"><span class="chatPrev">${archived.map(c=>profileById[c.other]?.username||c.other).join(', ')}</span></div></div></div>`; } else archEl.style.display='none';
-  if(CUR_TAB==='hidden' && !list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#999">No archived chats<br><button onclick="CUR_TAB='all';render()" style="margin-top:12px;background:#FF4D8D;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:700">Back</button></div>`; return; }
-  if(!list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#999">No chats da<br><button onclick="location.href='search.html'" style="margin-top:12px;background:#FF4D8D;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`; return; }
+  if(archived.length && CUR_TAB==='all' && !SEARCH_Q){ archEl.style.display='block'; archEl.innerHTML=`<div class="chatRow" onclick="CUR_TAB='hidden';render()"><div class="avaWrap"><div class="avaLetter" style="background:#1F1F1F!important;color:#aaa!important">🗄️</div></div><div class="chatMain"><div class="chatTopRow"><span class="chatName">Archived Chats</span><span class="chatTime">${archived.length}</span></div><div class="chatPrevRow"><span class="chatPrev">${archived.map(c=>profileById[c.other]?.username||c.other).join(', ')}</span></div></div></div>`; } else archEl.style.display='none';
+  if(CUR_TAB==='hidden' && !list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No archived chats<br><button onclick="CUR_TAB='all';render()" style="margin-top:12px;background:#FF4D8D;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:700">Back</button></div>`; return; }
+  if(!list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No chats da<br><button onclick="location.href='search.html'" style="margin-top:12px;background:#FF4D8D;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`; return; }
   let totalUnread = Object.values(UNREAD_MAP).reduce((a,b)=>a+b,0);
   let nav=document.getElementById('navTotal'); if(totalUnread){ nav.style.display='grid'; nav.textContent=totalUnread>99?'99+':totalUnread; } else nav.style.display='none';
   let seenOff = !DM_SEEN;
