@@ -9,6 +9,7 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;displ
 .top img{width:34px;height:34px;border-radius:50%;object-fit:cover;border:1px solid #333;cursor:pointer}
 .top b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;cursor:pointer}
 .smallBtn{font-size:16px;cursor:pointer;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:#1a1a1a;flex-shrink:0}
+.e2eBar{background:#0a2a12;color:#00ff66;text-align:center;font-size:11px;padding:5px;border-bottom:1px solid #123}
 .box{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
 .bub{max-width:78%;padding:10px 14px;border-radius:22px;font-size:14px;line-height:1.4;word-break:break-word;position:relative;cursor:pointer}
 .me{align-self:flex-end;background:linear-gradient(135deg,#8b00ff,#ff1493,#ff7a00);border-bottom-right-radius:4px}
@@ -30,6 +31,7 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;displ
 .longSheet button{width:100%;padding:12px;border:0;background:#262626;color:#fff;border-radius:10px;margin:4px 0;text-align:left}
 </style></head><body>
 <div class="top"><span onclick="location.href='dm.html'" style="font-size:22px;cursor:pointer">←</span><img id="pfp" onclick="goProfile()"><div style="flex:1" onclick="goProfile()"><b id="uname">...</b><div id="status" style="font-size:11px;color:#00ff66">Offline</div></div><span style="cursor:pointer;font-size:15px" onclick="toggleVanish()">👻</span><span class="smallBtn" onclick="startCall(false)">📞</span><span class="smallBtn" onclick="startCall(true)">🎥</span><span class="smallBtn" onclick="document.getElementById('setSheet').style.display='block'">⋮</span></div>
+<div class="e2eBar" id="e2eBar">🔒 End-to-End Encrypted • Server kooda paakka mudiyaathu da</div>
 <div class="vanishBar" id="vanishBar">👻 Vanish Mode ON</div>
 <div class="box" id="box"></div>
 <div class="typing" id="typing"></div>
@@ -44,6 +46,7 @@ function showToast(m){let t=document.getElementById('toast'); t.innerText=m; t.s
 let supa = window.supa
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
 let ME='', ME_ID='', OTHER=cleanUser(new URLSearchParams(location.search).get('user')||''), OTHER_ID='', chatId='', mediaRec=null, vChunks=[], vTimer=null, vSec=0, peer=null, callObj=null, stream=null, micOn=true, camOn=true, VANISH=false, SEL_MSG=null, SEL_TXT='', REPLY_TXT='', BLOCKED=JSON.parse(localStorage.getItem('pixoro_blocked')||'[]');
+let MY_PRIV=null, SHARED_KEY=null, E2E_READY=false;
 function goProfile(){ location.href='profile.html?user='+encodeURIComponent(OTHER); }
 function toggleVanish(){ VANISH=!VANISH; document.getElementById('vanishBar').style.display=VANISH?'block':'none'; showToast(VANISH?'Vanish ON da 👻':'Vanish OFF da') }
 function doBlock(){ if(!BLOCKED.includes(OTHER)) BLOCKED.push(OTHER); localStorage.setItem('pixoro_blocked',JSON.stringify(BLOCKED)); showToast('Blocked da 🚫'); document.getElementById('setSheet').style.display='none'; }
@@ -58,6 +61,48 @@ document.addEventListener('mouseup',()=>clearTimeout(pressT)); document.addEvent
 async function doReact(e){ await supa.from('messages').update({reaction:e}).eq('id',SEL_MSG); document.getElementById('sheet').style.display='none'; load(); }
 async function doReply(){ REPLY_TXT=SEL_TXT; document.getElementById('inp').placeholder='Replying: '+SEL_TXT.slice(0,20); document.getElementById('inp').focus(); document.getElementById('sheet').style.display='none'; }
 async function doUnsend(){ await supa.from('messages').delete().eq('id',SEL_MSG); document.getElementById('sheet').style.display='none'; load(); }
+
+// ===== E2E CORE - FREE WebCrypto da =====
+function bufToB64(b){ return btoa(String.fromCharCode(...new Uint8Array(b))); }
+function b64ToBuf(s){ try{ let bin=atob(s); let a=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return a.buffer; }catch(e){ return new ArrayBuffer(0); } }
+async function getOrCreateKeys(){
+  let stored = localStorage.getItem('pixoro_e2e_priv_'+ME_ID);
+  let pubStored = localStorage.getItem('pixoro_e2e_pub_'+ME_ID);
+  if(stored && pubStored){ try{ let jwk=JSON.parse(stored); MY_PRIV=await crypto.subtle.importKey('jwk',jwk,{name:'ECDH',namedCurve:'P-256'},true,['deriveKey']); return pubStored; }catch(e){} }
+  let kp = await crypto.subtle.generateKey({name:'ECDH',namedCurve:'P-256'},true,['deriveKey']);
+  let pubJwk = await crypto.subtle.exportKey('jwk',kp.publicKey);
+  let privJwk = await crypto.subtle.exportKey('jwk',kp.privateKey);
+  localStorage.setItem('pixoro_e2e_priv_'+ME_ID, JSON.stringify(privJwk));
+  let pubB64 = btoa(JSON.stringify(pubJwk));
+  localStorage.setItem('pixoro_e2e_pub_'+ME_ID, pubB64);
+  MY_PRIV=kp.privateKey;
+  await supa.from('profiles').update({public_key:pubB64}).eq('id',ME_ID);
+  return pubB64;
+}
+async function makeSharedKey(otherPubB64){
+  if(!otherPubB64 || !MY_PRIV) return null;
+  try{
+    let otherJwk=JSON.parse(atob(otherPubB64));
+    let otherPub=await crypto.subtle.importKey('jwk',otherJwk,{name:'ECDH',namedCurve:'P-256'},true,[]);
+    SHARED_KEY=await crypto.subtle.deriveKey({name:'ECDH',public:otherPub},MY_PRIV,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+    E2E_READY=true; document.getElementById('e2eBar').innerText='🔒 End-to-End Encrypted • Server kooda paakka mudiyaathu da';
+    return SHARED_KEY;
+  }catch(e){ E2E_READY=false; return null; }
+}
+async function encryptText(text){
+  if(!SHARED_KEY) return {content:text, iv:null, is_encrypted:false};
+  let iv=crypto.getRandomValues(new Uint8Array(12));
+  let enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},SHARED_KEY,new TextEncoder().encode(text));
+  return {content:bufToB64(enc), iv:bufToB64(iv), is_encrypted:true};
+}
+async function decryptText(m){
+  let raw=m.text||m.message||'';
+  if(!m.is_encrypted || !m.iv || !SHARED_KEY) return raw;
+  try{
+    let dec=await crypto.subtle.decrypt({name:'AES-GCM',iv:new Uint8Array(b64ToBuf(m.iv))},SHARED_KEY,b64ToBuf(m.content||raw));
+    return new TextDecoder().decode(dec);
+  }catch(e){ return '🔒 Encrypted Message'; }
+}
 async function init(){
   if(!window.supa){ setTimeout(init,300); return }
   supa = window.supa
@@ -75,9 +120,19 @@ async function init(){
   document.getElementById('uname').innerText = '@'+cleanUser(otherProf.username)
   document.getElementById('setName').innerText = '@'+cleanUser(otherProf.username)+' Settings'
   document.getElementById('pfp').src = otherProf.avatar_url || 'https://ui-avatars.com/api/?name='+OTHER.charAt(0).toUpperCase()+'&background=ff1493&color=fff&size=200&bold=true'
-  if(otherProf.is_online) document.getElementById('status').innerText='Active now'; else document.getElementById('status').innerText='Offline'
+  if(otherProf.is_online) document.getElementById('status').innerText='Active now • 🔒 E2E'; else document.getElementById('status').innerText='Offline • 🔒 E2E'
   chatId=[ME,cleanUser(otherProf.username)].sort().join('_')
   OTHER = cleanUser(otherProf.username)
+  // E2E SETUP da
+  await getOrCreateKeys();
+  if(otherProf.public_key){ await makeSharedKey(otherProf.public_key); }
+  else{
+    document.getElementById('e2eBar').innerText='⏳ Avanga Key ku Waiting... Avanga Chat Open Panna E2E ON Aagum da';
+    setTimeout(async()=>{
+      let {data:pr2}=await supa.from('profiles').select('*').eq('id',OTHER_ID).single();
+      if(pr2?.public_key){ await makeSharedKey(pr2.public_key); load(); }
+    },3000);
+  }
   try{ supa.channel('chat-'+chatId).on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:`chat_id=eq.${chatId}`},load).subscribe() }catch(e){}
   try{ supa.channel('typing-'+chatId).on('postgres_changes',{event:'*',schema:'public',table:'typing'},(p)=>{ let r=p.new; if(r&&r.username!==ME&&r.chat_id===chatId){ document.getElementById('typing').innerText=r.is_typing?'Typing...':''; } }).subscribe() }catch(e){}
   load()
@@ -90,14 +145,30 @@ async function load(){
   }
   await supa.from('messages').update({seen:true}).eq('chat_id',chatId).eq('seen',false).catch(()=>{});
   let b=document.getElementById('box')
-  if(!data||!data.length){ b.innerHTML=`<div style="text-align:center;color:#666;margin-top:80px"><b>Say hi to @${OTHER} 👋</b></div>`; return }
-  b.innerHTML=data.map(m=>{ let isMe = m.sender===ME || m.sender_id===ME_ID; let txt = m.text||m.message||''; let media=''; let url=m.media_url||m.image_url||''; if(m.type==='voice'||m.media_type==='voice') media=`<audio src="${url}" controls></audio>`; else if(m.type==='video'||m.media_type==='video') media=`<video src="${url}" controls></video>`; else if(url) media=`<img src="${url}">`; else if(txt.startsWith('data:image')||(txt.startsWith('http')&&txt.includes('.jpg'))) media=`<img src="${txt}">`; let tick=isMe? (m.seen?`<span style="color:#00bfff">✓✓ Seen</span>`:`<span style="color:#888">✓ Sent</span>`):''; let reply=m.reply_to?`<div class="replyBox">${m.reply_to}</div>`:''; let react=m.reaction?`<span class="react">${m.reaction}</span>`:''; let safe=(txt||'').replace(/'/g,'').slice(0,30); return `<div class="${isMe?'me':'other'} bub" onmousedown="pressMsg('${m.id}','${safe}')" ontouchstart="pressMsg('${m.id}','${safe}')">${reply}${media}${media?'':txt}${react}<div class="time">${new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} ${tick}</div></div>` }).join('')
-  b.scrollTop=b.scrollHeight
+  if(!data||!data.length){ b.innerHTML=`<div style="text-align:center;color:#666;margin-top:80px"><b>Say hi to @${OTHER} 👋</b><br><span style="font-size:11px;color:#00ff66">🔒 End-to-End Encrypted da</span></div>`; return }
+  let html='';
+  for(let m of data){
+    let isMe = m.sender===ME || m.sender_id===ME_ID;
+    let txt = await decryptText(m);
+    let media=''; let url=m.media_url||m.image_url||'';
+    if(m.type==='voice'||m.media_type==='voice') media=`<audio src="${url}" controls></audio>`;
+    else if(m.type==='video'||m.media_type==='video') media=`<video src="${url}" controls></video>`;
+    else if(url) media=`<img src="${url}">`;
+    else if(txt.startsWith('data:image')||(txt.startsWith('http')&&txt.includes('.jpg'))) media=`<img src="${txt}">`;
+    let tick=isMe? (m.seen?`<span style="color:#00bfff">✓✓ Seen</span>`:`<span style="color:#888">✓ Sent</span>`):'';
+    let reply=m.reply_to?`<div class="replyBox">${m.reply_to}</div>`:'';
+    let react=m.reaction?`<span class="react">${m.reaction}</span>`:'';
+    let safe=(txt||'').replace(/'/g,'').slice(0,30);
+    html+=`<div class="${isMe?'me':'other'} bub" onmousedown="pressMsg('${m.id}','${safe}')" ontouchstart="pressMsg('${m.id}','${safe}')">${reply}${media}${media?'':txt}${react}<div class="time">${new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} ${tick}</div></div>`;
+  }
+  b.innerHTML=html; b.scrollTop=b.scrollHeight
 }
 async function send(){
   let i=document.getElementById('inp'); let t=i.value.trim(); if(!t) return; if(BLOCKED.includes(OTHER)){ showToast('Blocked da 🚫 Unblock Pannu da'); return; } i.value=''
   document.getElementById('box').innerHTML+=`<div class="me bub">${t}<div class="time">now ✓</div></div>`; document.getElementById('box').scrollTop=document.getElementById('box').scrollHeight
-  let {error} = await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:t,message:t,sender_id:ME_ID,receiver_id:OTHER_ID,seen:false,type:'text',reply_to:REPLY_TXT||null,vanish:VANISH})
+  // E2E ENCRYPT da - Text mattum Lock Aagum da
+  let enc = await encryptText(t);
+  let {error} = await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:enc.content,message:enc.content,content:enc.content,iv:enc.iv,is_encrypted:enc.is_encrypted,sender_id:ME_ID,receiver_id:OTHER_ID,seen:false,type:'text',reply_to:REPLY_TXT||null,vanish:VANISH})
   if(error){ await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:t}); }
   REPLY_TXT=''; document.getElementById('inp').placeholder='Message...'; load()
 }
