@@ -1,228 +1,414 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pixoro Chat</title>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PIXORO Chat</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js"></script>
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-body{background:#000;color:#fff;max-width:450px;margin:0 auto;height:100vh;display:flex;flex-direction:column}
-.top{padding:10px 12px;display:flex;gap:8px;align-items:center;border-bottom:1px solid #262626;background:#000;position:sticky;top:0;z-index:50;height:56px}
-.top img{width:34px;height:34px;border-radius:50%;object-fit:cover;border:1px solid #333;cursor:pointer}
-.top b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;cursor:pointer}
-.smallBtn{font-size:16px;cursor:pointer;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:#1a1a1a;flex-shrink:0}
-.e2eBar{background:#0a2a12;color:#00ff66;text-align:center;font-size:11px;padding:5px;border-bottom:1px solid #123}
-.box{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
-.bub{max-width:78%;padding:10px 14px;border-radius:22px;font-size:14px;line-height:1.4;word-break:break-word;position:relative;cursor:pointer}
+*{box-sizing:border-box;font-family:Arial,sans-serif}
+body{margin:0;background:#000;color:white;max-width:450px;height:100dvh;margin:auto;display:flex;flex-direction:column}
+.top{height:58px;display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #292929}
+.top img{width:38px;height:38px;border-radius:50%;object-fit:cover}
+.top b{font-size:14px}
+.small{font-size:20px;background:#191919;border:0;color:white;border-radius:50%;width:34px;height:34px}
+#box{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px}
+.bub{max-width:82%;padding:10px 13px;border-radius:18px;overflow-wrap:anywhere;white-space:pre-wrap;font-size:14px;line-height:1.4}
 .me{align-self:flex-end;background:linear-gradient(135deg,#8b00ff,#ff1493,#ff7a00);border-bottom-right-radius:4px}
-.other{align-self:flex-start;background:#262626;border-bottom-left-radius:4px;border:1px solid #a259ff}
-.bub img,.bub video{width:100%;border-radius:14px;margin:6px 0;display:block}.bub audio{width:200px;margin-top:6px}
-.time{font-size:10px;opacity:.75;margin-top:3px;text-align:right;display:flex;gap:4px;justify-content:flex-end;align-items:center}
-.tick{font-size:11px;letter-spacing:-1px;opacity:.9}
-.typing{font-size:12px;color:#999;padding:2px 14px;height:18px;font-style:italic}
-.vanishBar{background:#111;padding:8px;text-align:center;font-size:12px;color:#ff5ea8;border-bottom:1px solid #222;display:none}
-.input{display:flex;gap:8px;padding:12px;background:#000;border-top:1px solid #262626;align-items:center}
-.input input{flex:1;background:#262626;border:1px solid #a259ff;padding:12px 16px;border-radius:24px;color:#fff;outline:none;font-size:14px}
-.sendBtn{background:linear-gradient(135deg,#ff5ea8,#ff7a00);width:42px;height:42px;border-radius:50%;display:grid;place-items:center;cursor:pointer;flex-shrink:0}
-.voiceBar{background:#111;padding:10px;display:none;align-items:center;gap:10px;border-top:1px solid #ff5ea8}
-.callBox{position:fixed;inset:0;background:#000;z-index:999;display:none;flex-direction:column}
-.callBox video{width:100%;height:100%;object-fit:cover}
-.longSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#1a1a1a;border-radius:20px 20px 0 0;padding:16px;z-index:999;display:none}
-.longSheet button{width:100%;padding:12px;border:0;background:#262626;color:#fff;border-radius:10px;margin:4px 0;text-align:left}
-</style></head><body>
-<div class="top"><span onclick="location.href='dm.html'" style="font-size:22px;cursor:pointer">←</span><img id="pfp" onclick="goProfile()"><div style="flex:1" onclick="goProfile()"><b id="uname">...</b><div id="status" style="font-size:11px;color:#00ff66">Offline</div></div><span style="cursor:pointer;font-size:15px" onclick="toggleVanish()">👻</span><span class="smallBtn" onclick="startCall(false)">📞</span><span class="smallBtn" onclick="startCall(true)">🎥</span><span class="smallBtn" onclick="document.getElementById('setSheet').style.display='block'">⋮</span></div>
-<div class="e2eBar" id="e2eBar">🔒 End-to-End Encrypted • Server kooda paakka mudiyaathu da</div>
-<div class="vanishBar" id="vanishBar">👻 Vanish Mode ON</div>
-<div class="box" id="box"></div>
-<div class="typing" id="typing"></div>
-<div class="voiceBar" id="voiceBar"><span id="recTime">🔴 0s</span><button onclick="stopVoice()" style="background:#ff0000;color:#fff;border:0;padding:8px 16px;border-radius:20px">⏹️ STOP & SEND</button></div>
-<div class="input"><span onclick="document.getElementById('fileUp').click()" style="font-size:22px;cursor:pointer">📸</span><input id="inp" placeholder="Message..." oninput="onTyping()" onkeydown="if(event.key==='Enter')send()"><input type="file" id="fileUp" hidden accept="image/*,video/*" onchange="sendPhoto(this)"><span onclick="startVoice()" style="font-size:22px;cursor:pointer">🎙️</span><span onclick="send()" class="sendBtn">➤</span></div>
-<div class="longSheet" id="sheet"><div style="text-align:center;font-size:22px">❤️ 😂 😮 😢 🔥 👍</div><button onclick="doReact('❤️')">❤️ React</button><button onclick="doReply()">↩️ Reply</button><button onclick="doUnsend()">🗑️ Unsend</button><button onclick="document.getElementById('sheet').style.display='none'" style="text-align:center">Cancel</button></div>
-<div class="longSheet" id="setSheet"><b id="setName">Settings</b><button onclick="doBlock()">🚫 Block User</button><button onclick="doUnblock()">✅ Unblock User</button><button onclick="doReport()">⚠️ Report</button><button onclick="doMuteChat()">🔕 Mute Chat</button><button onclick="goProfile()">👤 View Profile</button><button onclick="doClear()">🗑️ Clear Chat</button><button onclick="document.getElementById('setSheet').style.display='none'" style="text-align:center">Cancel</button></div>
-<div class="callBox" id="callBox"><div style="position:relative;flex:1"><video id="remoteV" autoplay playsinline></video><video id="localV" autoplay muted playsinline style="width:110px;height:150px;position:absolute;bottom:20px;right:10px;border:2px solid #fff;border-radius:12px;object-fit:cover"></video><div style="position:absolute;top:20px;left:50%;transform:translateX(-50%);text-align:center"><b id="callName" style="font-size:18px"></b><p id="callStatus" style="font-size:12px;color:#00ff88">Calling...</p></div></div><div style="display:flex;gap:14px;justify-content:center;padding:20px"><button onclick="toggleMic()" id="micBtn" style="width:52px;height:52px;border-radius:50%;border:0;font-size:20px">🎙️</button><button onclick="toggleCam()" id="camBtn" style="width:52px;height:52px;border-radius:50%;border:0;font-size:20px">📸</button><button onclick="endCall()" style="width:52px;height:52px;border-radius:50%;border:0;background:#ff0000;font-size:20px">📵</button></div></div>
+.other{align-self:flex-start;background:#252525;border:1px solid #7040a0;border-bottom-left-radius:4px}
+.bub img,.bub video{max-width:100%;border-radius:12px;display:block}
+.bub audio{max-width:100%}
+.time{font-size:10px;text-align:right;opacity:.8;margin-top:5px}
+.reply{font-size:11px;border-left:3px solid #ff8bc8;padding:5px;margin-bottom:6px;background:#0003}
+#typing{height:20px;font-size:12px;color:#aaa;padding-left:15px}
+#inputBar{display:flex;align-items:center;gap:8px;padding:10px;border-top:1px solid #292929}
+#inp{flex:1;min-width:0;border:1px solid #7540b0;border-radius:25px;padding:12px;background:#222;color:white;outline:none}
+.action{border:0;background:transparent;color:white;font-size:22px}
+#send{background:linear-gradient(135deg,#ff5ea8,#ff7a00);border:0;border-radius:50%;width:42px;height:42px;color:white;font-size:20px}
+#status{font-size:12px;text-align:center;color:#aaa;padding:5px}
+#replyBar{display:none;padding:7px 12px;background:#171717;color:#ff9acb;font-size:12px}
+#menu{display:none;position:fixed;bottom:75px;left:50%;transform:translateX(-50%);width:min(94%,420px);background:#202020;padding:12px;border-radius:16px;z-index:20}
+#menu button{width:100%;padding:12px;background:#303030;color:white;border:0;border-radius:9px;margin:3px 0;text-align:left}
+</style>
+</head>
+<body>
+
+<header class="top">
+<button class="small" onclick="location.href='dm.html'">←</button>
+<img id="pfp" alt="Profile">
+<div style="flex:1;min-width:0">
+<b id="uname">PIXORO User</b>
+<div id="online" style="font-size:11px;color:#aaa">PIXORO Chat</div>
+</div>
+<button class="small" onclick="openMenu()">⋮</button>
+</header>
+
+<div id="status">Connecting...</div>
+<div id="box"></div>
+<div id="typing"></div>
+<div id="replyBar"></div>
+
+<div id="inputBar">
+<button class="action" onclick="document.getElementById('file').click()">📎</button>
+<input type="file" id="file" hidden accept="image/*,video/*" onchange="sendMedia(this)">
+<input id="inp" maxlength="3000" placeholder="Message...">
+<button class="action" onclick="startVoice()">🎙️</button>
+<button id="send" onclick="sendMessage()">➤</button>
+</div>
+
+<div id="menu">
+<button onclick="replySelected()">↩️ Reply</button>
+<button onclick="reactSelected()">❤️ React</button>
+<button onclick="unsendSelected()">🗑️ Unsend my message</button>
+<button onclick="document.getElementById('menu').style.display='none'">Cancel</button>
+</div>
+
 <script>
-// ALERT / TOAST ELLAM REMOVE DA - Onnum Varaathu da
-function showToast(m){}
-let supa = window.supa
-function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
-let ME='', ME_ID='', OTHER=cleanUser(new URLSearchParams(location.search).get('user')||''), OTHER_ID='', chatId='', mediaRec=null, vChunks=[], vTimer=null, vSec=0, peer=null, callObj=null, stream=null, micOn=true, camOn=true, VANISH=false, SEL_MSG=null, SEL_TXT='', REPLY_TXT='', BLOCKED=JSON.parse(localStorage.getItem('pixoro_blocked')||'[]');
-let MY_PRIV=null, SHARED_KEY=null, E2E_READY=false;
-let chatChannel=null, isMarkingSeen=false, isLoading=false;
-function goProfile(){ location.href='profile.html?user='+encodeURIComponent(OTHER); }
-function toggleVanish(){ VANISH=!VANISH; document.getElementById('vanishBar').style.display=VANISH?'block':'none'; }
-function doBlock(){ if(!BLOCKED.includes(OTHER)) BLOCKED.push(OTHER); localStorage.setItem('pixoro_blocked',JSON.stringify(BLOCKED)); document.getElementById('setSheet').style.display='none'; }
-function doUnblock(){ BLOCKED=BLOCKED.filter(x=>x!==OTHER); localStorage.setItem('pixoro_blocked',JSON.stringify(BLOCKED)); document.getElementById('setSheet').style.display='none'; load(); }
-function doReport(){ document.getElementById('setSheet').style.display='none'; }
-function doMuteChat(){ let m=JSON.parse(localStorage.getItem('pixoro_mute')||'[]'); if(!m.includes(OTHER)) m.push(OTHER); localStorage.setItem('pixoro_mute',JSON.stringify(m)); document.getElementById('setSheet').style.display='none'; }
-function doClear(){ document.getElementById('box').innerHTML=''; document.getElementById('setSheet').style.display='none'; }
-function onTyping(){
-  if(!chatChannel) return;
-  chatChannel.send({ type:'broadcast', event:'typing', payload:{ user:ME, typing:true } });
-  clearTimeout(window._tt);
-  window._tt=setTimeout(()=>{ if(chatChannel) chatChannel.send({ type:'broadcast', event:'typing', payload:{ user:ME, typing:false } }); },1500);
+'use strict';
+
+const $=id=>document.getElementById(id);
+let supa=window.supa;
+let ME_ID='',OTHER_ID='',ME='',OTHER='',CHAT_ID='';
+let channel=null,selectedMessage=null,replyText='';
+let busy=false,recorder=null,recordChunks=[];
+
+function cleanName(v){
+ return String(v||'').trim().replace(/^@/,'').toLowerCase();
 }
-let pressT=null;
-function pressMsg(id,txt){ pressT=setTimeout(()=>{ SEL_MSG=id; SEL_TXT=txt; document.getElementById('sheet').style.display='block'; },600); }
-document.addEventListener('mouseup',()=>clearTimeout(pressT)); document.addEventListener('touchend',()=>clearTimeout(pressT));
-async function doReact(e){ await supa.from('messages').update({reaction:e}).eq('id',SEL_MSG); document.getElementById('sheet').style.display='none'; }
-async function doReply(){ REPLY_TXT=SEL_TXT; document.getElementById('inp').placeholder='Replying: '+SEL_TXT.slice(0,20); document.getElementById('inp').focus(); document.getElementById('sheet').style.display='none'; }
-async function doUnsend(){ await supa.from('messages').delete().eq('id',SEL_MSG); document.getElementById('sheet').style.display='none'; }
-function bufToB64(b){ return btoa(String.fromCharCode(...new Uint8Array(b))); }
-function b64ToBuf(s){ try{ let bin=atob(s); let a=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return a.buffer; }catch(e){ return new ArrayBuffer(0); } }
-async function getOrCreateKeys(){
-  let stored = localStorage.getItem('pixoro_e2e_priv_'+ME_ID);
-  let pubStored = localStorage.getItem('pixoro_e2e_pub_'+ME_ID);
-  if(stored && pubStored){ try{ let jwk=JSON.parse(stored); MY_PRIV=await crypto.subtle.importKey('jwk',jwk,{name:'ECDH',namedCurve:'P-256'},true,['deriveKey']); return pubStored; }catch(e){} }
-  let kp = await crypto.subtle.generateKey({name:'ECDH',namedCurve:'P-256'},true,['deriveKey']);
-  let pubJwk = await crypto.subtle.exportKey('jwk',kp.publicKey);
-  let privJwk = await crypto.subtle.exportKey('jwk',kp.privateKey);
-  localStorage.setItem('pixoro_e2e_priv_'+ME_ID, JSON.stringify(privJwk));
-  let pubB64 = btoa(JSON.stringify(pubJwk));
-  localStorage.setItem('pixoro_e2e_pub_'+ME_ID, pubB64);
-  MY_PRIV=kp.privateKey;
-  try{ await supa.from('profiles').update({public_key:pubB64}).eq('id',ME_ID); }catch(e){}
-  return pubB64;
+function status(t){$('status').textContent=t;}
+function scrollBottom(){
+ $('box').scrollTop=$('box').scrollHeight;
 }
-async function makeSharedKey(otherPubB64){
-  if(!otherPubB64 || !MY_PRIV) return null;
-  try{
-    let otherJwk=JSON.parse(atob(otherPubB64));
-    let otherPub=await crypto.subtle.importKey('jwk',otherJwk,{name:'ECDH',namedCurve:'P-256'},true,[]);
-    SHARED_KEY=await crypto.subtle.deriveKey({name:'ECDH',public:otherPub},MY_PRIV,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
-    E2E_READY=true; document.getElementById('e2eBar').innerText='🔒 End-to-End Encrypted • Server kooda paakka mudiyaathu da';
-    return SHARED_KEY;
-  }catch(e){ E2E_READY=false; return null; }
+
+function addText(parent,tag,text,className){
+ const el=document.createElement(tag);
+ if(className)el.className=className;
+ el.textContent=text;
+ parent.appendChild(el);
+ return el;
 }
-async function encryptText(text){
-  if(!SHARED_KEY) return text;
-  try{
-    let iv=crypto.getRandomValues(new Uint8Array(12));
-    let enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},SHARED_KEY,new TextEncoder().encode(text));
-    return JSON.stringify({e2e:1, iv:bufToB64(iv), data:bufToB64(enc)});
-  }catch(e){ return text; }
+
+function openMenu(){
+ $('menu').style.display='block';
 }
-async function decryptText(m){
-  let raw=m.text||m.message||'';
-  if(!raw) return '';
-  if(!raw.startsWith('{"e2e"')) return raw;
-  if(!SHARED_KEY) return '🔒 Encrypted - Key Waiting... Refresh Pannu da';
-  try{
-    let j=JSON.parse(raw);
-    let dec=await crypto.subtle.decrypt({name:'AES-GCM',iv:new Uint8Array(b64ToBuf(j.iv))},SHARED_KEY,b64ToBuf(j.data));
-    return new TextDecoder().decode(dec);
-  }catch(e){ return '🔒 Encrypted Message'; }
+function selectMessage(id){
+ selectedMessage=id;
+ openMenu();
 }
-async function init(){
-  if(!window.supa){ setTimeout(init,300); return }
-  supa = window.supa
-  if(!OTHER){ location.href='dm.html'; return }
-  let { data:{session} } = await supa.auth.getSession()
-  if(!session){ location.href='login.html'; return }
-  ME_ID = session.user.id
-  let { data: myProf } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
-  ME = cleanUser(myProf?.username || session.user.email.split('@')[0])
-  if(OTHER===ME){ setTimeout(()=>location.href='dm.html',800); return }
-  let { data: otherProf } = await supa.from('profiles').select('*').eq('username', OTHER).maybeSingle()
-  if(!otherProf){ let {data:all}=await supa.from('profiles').select('*'); otherProf=(all||[]).find(p=>cleanUser(p.username)===OTHER) }
-  if(!otherProf){ setTimeout(()=>location.href='dm.html',1000); return }
-  OTHER_ID = otherProf.id
-  document.getElementById('uname').innerText = '@'+cleanUser(otherProf.username)
-  document.getElementById('setName').innerText = '@'+cleanUser(otherProf.username)+' Settings'
-  document.getElementById('pfp').src = otherProf.avatar_url || 'https://ui-avatars.com/api/?name='+OTHER.charAt(0).toUpperCase()+'&background=ff1493&color=fff&size=200&bold=true'
-  if(otherProf.is_online) document.getElementById('status').innerText='Active now • 🔒 E2E'; else document.getElementById('status').innerText='Offline • 🔒 E2E'
-  chatId=[ME,cleanUser(otherProf.username)].sort().join('_')
-  OTHER = cleanUser(otherProf.username)
-  await getOrCreateKeys();
-  if(otherProf.public_key){ await makeSharedKey(otherProf.public_key); }
-  else{
-    document.getElementById('e2eBar').innerText='⏳ Avanga Key ku Waiting... Avanga Chat Open Panna E2E ON Aagum da';
-    setTimeout(async()=>{
-      let {data:pr2}=await supa.from('profiles').select('*').eq('id',OTHER_ID).single();
-      if(pr2?.public_key){ await makeSharedKey(pr2.public_key); load(); }
-    },3000);
+
+function renderMessage(m){
+ if(!m || !m.id)return;
+ if($('box').querySelector('[data-id="'+CSS.escape(String(m.id))+'"]'))return;
+
+ const mine=String(m.sender_id)===ME_ID;
+ const el=document.createElement('div');
+ el.className='bub '+(mine?'me':'other');
+ el.dataset.id=m.id;
+
+ if(m.reply_to){
+  addText(el,'div',m.reply_to,'reply');
+ }
+
+ const url=m.media_url||'';
+ if(url){
+  if(m.media_type==='video'||m.type==='video'){
+   const v=document.createElement('video');
+   v.src=url;v.controls=true;v.playsInline=true;
+   el.appendChild(v);
+  }else if(m.media_type==='voice'||m.type==='voice'){
+   const a=document.createElement('audio');
+   a.src=url;a.controls=true;
+   el.appendChild(a);
+  }else{
+   const img=document.createElement('img');
+   img.src=url;img.alt='Shared media';img.loading='lazy';
+   el.appendChild(img);
   }
-  if(chatChannel) supa.removeChannel(chatChannel);
-  chatChannel = supa.channel('chat-'+chatId)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`chat_id=eq.${chatId}`},()=>{ load(); })
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages',filter:`chat_id=eq.${chatId}`},()=>{ if(!isMarkingSeen) load(); })
-    .on('postgres_changes',{event:'DELETE',schema:'public',table:'messages',filter:`chat_id=eq.${chatId}`},()=>{ load(); })
-    .on('broadcast',{event:'typing'},(p)=>{
-      if(p.payload && p.payload.user!==ME){
-        document.getElementById('typing').innerText = p.payload.typing ? '@' + p.payload.user + ' is typing...' : '';
-      }
-    })
-    .subscribe();
-  load()
+ }else{
+  addText(el,'div',m.text||m.message||'');
+ }
+
+ if(m.reaction)addText(el,'div',m.reaction);
+ const time=addText(el,'div',
+  (m.created_at?new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'')+
+  (mine?(m.seen?'  ✓✓':'  ✓'):''),
+  'time'
+ );
+
+ el.addEventListener('contextmenu',e=>{
+  e.preventDefault();selectMessage(m.id);
+ });
+ el.addEventListener('click',()=>{
+  if(window._lastTap && Date.now()-window._lastTap<350){
+   selectMessage(m.id);
+  }
+  window._lastTap=Date.now();
+ });
+
+ $('box').appendChild(el);
 }
-async function load(){
-  if(isLoading) return; isLoading=true;
-  try{
-    let {data,error} = await supa.from('messages').select('*').eq('chat_id',chatId).order('created_at',{ascending:true})
-    if(!data || !data.length){
-      let {data:d2} = await supa.from('messages').select('*').or(`and(sender.eq.${ME},receiver.eq.${OTHER}),and(sender.eq.${OTHER},receiver.eq.${ME})`).order('created_at',{ascending:true})
-      if(d2 && d2.length) data = d2
-    }
-    let unseen = (data||[]).filter(m=>!m.seen && m.sender!==ME && m.sender_id!==ME_ID);
-    if(unseen.length){
-      isMarkingSeen=true;
-      await supa.from('messages').update({seen:true}).eq('chat_id',chatId).eq('seen',false).neq('sender',ME).neq('sender_id',ME_ID);
-      setTimeout(()=>{ isMarkingSeen=false; },500);
-    }
-    let b=document.getElementById('box')
-    if(!data||!data.length){ b.innerHTML=`<div style="text-align:center;color:#666;margin-top:80px"><b>Say hi to @${OTHER} 👋</b><br><span style="font-size:11px;color:#00ff66">🔒 End-to-End Encrypted da</span></div>`; return }
-    let html='';
-    for(let m of data){
-      let isMe = m.sender===ME || m.sender_id===ME_ID;
-      let txt = await decryptText(m);
-      let media=''; let url=m.media_url||m.image_url||'';
-      if(m.type==='voice'||m.media_type==='voice') media=`<audio src="${url}" controls></audio>`;
-      else if(m.type==='video'||m.media_type==='video') media=`<video src="${url}" controls></video>`;
-      else if(url) media=`<img src="${url}">`;
-      else if(txt.startsWith('data:image')||(txt.startsWith('http')&&txt.includes('.jpg'))) media=`<img src="${txt}">`;
-      // TICK - Colour Illa da - Plain Grey Tick Mattum da - Pakka Nalla Theriyum da
-      let tick = isMe ? `<span class="tick">${m.seen ? '✓✓' : '✓'}</span>` : '';
-      let reply=m.reply_to?`<div class="replyBox">${m.reply_to}</div>`:'';
-      let react=m.reaction?`<span class="react">${m.reaction}</span>`:'';
-      let safe=(txt||'').replace(/'/g,'').slice(0,30);
-      html+=`<div class="${isMe?'me':'other'} bub" onmousedown="pressMsg('${m.id}','${safe}')" ontouchstart="pressMsg('${m.id}','${safe}')">${reply}${media}${media?'':txt}${react}<div class="time">${new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} ${tick}</div></div>`;
-    }
-    let atBottom = (b.scrollHeight - b.scrollTop - b.clientHeight) < 150;
-    b.innerHTML=html;
-    if(atBottom || unseen.length) b.scrollTop=b.scrollHeight
-  } finally { isLoading=false; }
+
+async function loadMessages(){
+ if(busy||!ME_ID||!OTHER_ID)return;
+ busy=true;
+ try{
+  const {data,error}=await supa.from('messages')
+   .select('*')
+   .eq('chat_id',CHAT_ID)
+   .order('created_at',{ascending:true})
+   .limit(200);
+
+  if(error)throw error;
+
+  const box=$('box');
+  const wasBottom=box.scrollHeight-box.scrollTop-box.clientHeight<120;
+
+  box.replaceChildren();
+  (data||[]).forEach(renderMessage);
+
+  const unseen=(data||[]).filter(m=>
+   String(m.receiver_id)===ME_ID&&!m.seen
+  );
+
+  for(const m of unseen){
+   await supa.from('messages')
+    .update({seen:true})
+    .eq('id',m.id)
+    .eq('receiver_id',ME_ID);
+  }
+
+  if(wasBottom||unseen.length)scrollBottom();
+  if(!data||!data.length){
+   addText(box,'div','Say hello to @'+OTHER+' 👋');
+  }
+  status('');
+ }catch(e){
+  console.error(e);status('Chat loading error: '+e.message);
+ }finally{
+  busy=false;
+ }
 }
-async function send(){
-  let i=document.getElementById('inp'); let t=i.value.trim(); if(!t) return; if(BLOCKED.includes(OTHER)){ return; } i.value=''
-  document.getElementById('box').innerHTML+=`<div class="me bub">${t}<div class="time">now <span class="tick">✓</span></div></div>`; document.getElementById('box').scrollTop=document.getElementById('box').scrollHeight
-  let encText = await encryptText(t);
-  let {data,error} = await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:encText,message:encText,sender_id:ME_ID,receiver_id:OTHER_ID,seen:false,type:'text',reply_to:REPLY_TXT||null,vanish:VANISH}).select().single();
-  REPLY_TXT=''; document.getElementById('inp').placeholder='Message...';
-  if(chatChannel) chatChannel.send({ type:'broadcast', event:'typing', payload:{ user:ME, typing:false } });
-}
-async function sendPhoto(input){
-  if(!input.files[0]) return; let file=input.files[0]; let isVid=file.type.startsWith('video'); let fileName=Date.now()+'_'+ME+'_'+file.name.replace(/[^a-zA-Z0-9.]/g,'_'); let {error}=await supa.storage.from('dms').upload(fileName,file); let url=''; if(!error){ let {data}=supa.storage.from('dms').getPublicUrl(fileName); url=data.publicUrl; } else { let r=new FileReader(); r.onload=async e=>{ await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:e.target.result,message:'📷 Photo',sender_id:ME_ID,receiver_id:OTHER_ID,seen:false}); load(); }; r.readAsDataURL(file); return; }
-  await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:isVid?'🎬 Video':'📸 Photo',message:isVid?'🎬 Video':'📸 Photo',sender_id:ME_ID,receiver_id:OTHER_ID,seen:false,type:isVid?'video':'image',media_url:url,media_type:isVid?'video':'image'});
-}
-async function startVoice(){
-  if(!window.isSecureContext){ return; }
-  try{ let s=await navigator.mediaDevices.getUserMedia({audio:true}); mediaRec=new MediaRecorder(s); vChunks=[]; vSec=0; mediaRec.ondataavailable=e=>{if(e.data.size>0) vChunks.push(e.data)}; mediaRec.start(); document.getElementById('voiceBar').style.display='flex'; vTimer=setInterval(()=>{ vSec++; document.getElementById('recTime').innerText='🔴 '+vSec+'s' },1000); }catch(e){}
-}
-async function stopVoice(){
-  clearInterval(vTimer); document.getElementById('voiceBar').style.display='none';
-  mediaRec.onstop=async()=>{ let blob=new Blob(vChunks,{type:'audio/webm'}); let fileName=Date.now()+'_'+ME+'_voice.webm'; await supa.storage.from('dms').upload(fileName,blob); let {data}=supa.storage.from('dms').getPublicUrl(fileName); await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:'🎙️ Voice',message:'🎙️ Voice',sender_id:ME_ID,receiver_id:OTHER_ID,seen:false,type:'voice',media_url:data.publicUrl,media_type:'voice'}); };
-  mediaRec.stop();
-}
-async function startCall(isVideo){
-  document.getElementById('callBox').style.display='flex'; document.getElementById('callName').innerText='@'+OTHER; document.getElementById('callStatus').innerText=isVideo?'Video Calling...':'Audio Calling...';
-  peer=new Peer(ME);
-  peer.on('open', async()=>{
-    stream=await navigator.mediaDevices.getUserMedia({audio:true,video:isVideo});
-    document.getElementById('localV').srcObject=stream;
-    if(!isVideo) document.getElementById('localV').style.display='none'; else document.getElementById('localV').style.display='block';
-    callObj=peer.call(OTHER, stream); callObj.on('stream', s=>{ document.getElementById('remoteV').srcObject=s; document.getElementById('callStatus').innerText='Connected ✅'; });
+
+async function sendMessage(){
+ const input=$('inp');
+ const value=input.value.trim();
+ if(!value||!ME_ID||!OTHER_ID)return;
+
+ $('send').disabled=true;
+ try{
+  const {error}=await supa.from('messages').insert({
+   chat_id:CHAT_ID,
+   sender_id:ME_ID,
+   receiver_id:OTHER_ID,
+   sender:ME,
+   receiver:OTHER,
+   text:value,
+   message:value,
+   type:'text',
+   seen:false,
+   reply_to:replyText||null,
+   vanish:false
   });
-  peer.on('call', async c=>{ stream=await navigator.mediaDevices.getUserMedia({audio:true,video:isVideo}); document.getElementById('localV').srcObject=stream; c.answer(stream); c.on('stream', s=>{ document.getElementById('remoteV').srcObject=s; }); callObj=c; });
+  if(error)throw error;
+
+  input.value='';
+  replyText='';
+  $('replyBar').style.display='none';
+  $('box').scrollTop=$('box').scrollHeight;
+  await loadMessages();
+ }catch(e){
+  status('Message send failed: '+e.message);
+ }finally{
+  $('send').disabled=false;
+  input.focus();
+ }
 }
-function toggleMic(){ micOn=!micOn; stream.getAudioTracks()[0].enabled=micOn; document.getElementById('micBtn').innerText=micOn?'🎙️':'🔇'; }
-function toggleCam(){ camOn=!camOn; stream.getVideoTracks()[0].enabled=camOn; document.getElementById('camBtn').innerText=camOn?'📸':'📷'; }
-function endCall(){ if(callObj) callObj.close(); if(peer) peer.destroy(); if(stream) stream.getTracks().forEach(t=>t.stop()); document.getElementById('callBox').style.display='none'; }
-init()
-</script></body></html>
+
+async function sendMedia(input){
+ const file=input.files?.[0];
+ if(!file)return;
+ if(!file.type.startsWith('image/')&&!file.type.startsWith('video/')){
+  status('Image or video only');return;
+ }
+ if(file.size>25*1024*1024){
+  status('Maximum file size is 25 MB');input.value='';return;
+ }
+
+ status('Uploading...');
+ try{
+  const ext=file.name.split('.').pop().replace(/[^a-zA-Z0-9]/g,'');
+  const path=ME_ID+'/'+Date.now()+'.'+ext;
+  const {error}=await supa.storage.from('dms').upload(path,file,{
+   upsert:false,contentType:file.type
+  });
+  if(error)throw error;
+
+  // Private bucket: create a temporary signed URL.
+  const {data:link,error:linkError}=await supa.storage
+   .from('dms').createSignedUrl(path,3600);
+  if(linkError)throw linkError;
+
+  const kind=file.type.startsWith('video/')?'video':'image';
+  const {error:insertError}=await supa.from('messages').insert({
+   chat_id:CHAT_ID,sender_id:ME_ID,receiver_id:OTHER_ID,
+   sender:ME,receiver:OTHER,
+   text:kind==='video'?'Video':'Photo',
+   message:kind==='video'?'Video':'Photo',
+   media_url:link.signedUrl,media_type:kind,type:kind,seen:false
+  });
+  if(insertError)throw insertError;
+  await loadMessages();
+  status('');
+ }catch(e){
+  status('Upload failed: '+e.message);
+ }finally{
+  input.value='';
+ }
+}
+
+async function startVoice(){
+ if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){
+  status('Voice recording not supported');return;
+ }
+ try{
+  const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+  recorder=new MediaRecorder(stream);
+  recordChunks=[];
+  recorder.ondataavailable=e=>{
+   if(e.data.size)recordChunks.push(e.data);
+  };
+  recorder.onstop=async()=>{
+   try{
+    const blob=new Blob(recordChunks,{type:recorder.mimeType||'audio/webm'});
+    const path=ME_ID+'/'+Date.now()+'_voice.webm';
+    const {error}=await supa.storage.from('dms').upload(path,blob);
+    if(error)throw error;
+    const {data,error:e2}=await supa.storage.from('dms').createSignedUrl(path,3600);
+    if(e2)throw e2;
+    const {error:e3}=await supa.from('messages').insert({
+     chat_id:CHAT_ID,sender_id:ME_ID,receiver_id:OTHER_ID,
+     sender:ME,receiver:OTHER,text:'Voice message',
+     message:'Voice message',media_url:data.signedUrl,
+     media_type:'voice',type:'voice',seen:false
+    });
+    if(e3)throw e3;
+    await loadMessages();
+   }catch(e){status('Voice upload failed: '+e.message);}
+   stream.getTracks().forEach(t=>t.stop());
+  };
+  recorder.start();
+  status('Recording... Tap 🎙️ again to stop');
+  $('voiceStop').style.display='block';
+ }catch(e){status('Microphone permission unavailable');}
+}
+
+function stopVoice(){
+ if(recorder&&recorder.state==='recording'){
+  recorder.stop();$('voiceStop').style.display='none';
+  status('Sending voice...');
+ }
+}
+
+function replySelected(){
+ const el=$('box').querySelector('[data-id="'+CSS.escape(String(selectedMessage))+'"]');
+ if(!el)return;
+ replyText=el.innerText.slice(0,150);
+ $('replyBar').textContent='Replying to: '+replyText;
+ $('replyBar').style.display='block';
+ $('inp').focus();
+ $('menu').style.display='none';
+}
+
+async function reactSelected(){
+ const reaction=prompt('Enter a reaction: ❤️ 😂 👍');
+ if(!reaction)return;
+ const {error}=await supa.from('messages')
+  .update({reaction:reaction})
+  .eq('id',selectedMessage)
+  .eq('receiver_id',ME_ID);
+ if(error)status('Reaction failed: '+error.message);
+ $('menu').style.display='none';
+ await loadMessages();
+}
+
+async function unsendSelected(){
+ const {error}=await supa.from('messages')
+  .delete()
+  .eq('id',selectedMessage)
+  .eq('sender_id',ME_ID);
+ if(error)status('Unsend failed: '+error.message);
+ $('menu').style.display='none';
+ await loadMessages();
+}
+
+async function init(){
+ try{
+  if(!supa)throw new Error('PIXORO Supabase connection missing');
+
+  const {data:{session},error}=await supa.auth.getSession();
+  if(error)throw error;
+  if(!session){location.href='login.html';return;}
+  ME_ID=session.user.id;
+
+  const target=cleanName(new URLSearchParams(location.search).get('user'));
+  if(!target){location.href='dm.html';return;}
+
+  const {data:mine,error:e1}=await supa.from('profiles')
+   .select('id,username,name,avatar_url')
+   .eq('id',ME_ID).single();
+  if(e1)throw e1;
+
+  const {data:other,error:e2}=await supa.from('profiles')
+   .select('id,username,name,avatar_url')
+   .ilike('username',target).maybeSingle();
+  if(e2)throw e2;
+  if(!other)throw new Error('User not found');
+  if(other.id===ME_ID)throw new Error('Cannot chat with yourself');
+
+  ME_ID=mine.id;
+  OTHER_ID=other.id;
+  ME=cleanName(mine.username);
+  OTHER=cleanName(other.username);
+  CHAT_ID=[ME_ID,OTHER_ID].sort().join('_');
+
+  $('uname').textContent='@'+OTHER;
+  $('pfp').src=other.avatar_url||
+   'https://ui-avatars.com/api/?name=P&background=222&color=fff';
+
+  await loadMessages();
+
+  channel=supa.channel('pixoro-chat-'+CHAT_ID)
+   .on('postgres_changes',{
+    event:'*',schema:'public',table:'messages',
+    filter:'chat_id=eq.'+CHAT_ID
+   },()=>loadMessages())
+   .subscribe();
+
+  status('PIXORO Chat connected');
+ }catch(e){
+  console.error(e);status(e.message);
+ }
+}
+
+$('inp').addEventListener('keydown',e=>{
+ if(e.key==='Enter')sendMessage();
+});
+
+const stopButton=document.createElement('button');
+stopButton.id='voiceStop';
+stopButton.textContent='⏹ Stop voice';
+stopButton.style.cssText='display:none;position:fixed;bottom:75px;left:50%;transform:translateX(-50%);padding:12px 22px;background:#e22;color:white;border:0;border-radius:20px;z-index:30';
+stopButton.onclick=stopVoice;
+document.body.appendChild(stopButton);
+
+init();
+
+window.addEventListener('beforeunload',()=>{
+ if(channel&&supa)supa.removeChannel(channel);
+ if(recorder&&recorder.state==='recording')recorder.stop();
+});
+</script>
+</body>
+</html>
