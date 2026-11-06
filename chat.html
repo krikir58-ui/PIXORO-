@@ -3,54 +3,57 @@
 <script src="js/pixoro-core.js"></script>
 <style>
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{margin:0;background:#fff;color:#000;max-width:450px;height:100dvh;margin:auto;display:flex;flex-direction:column;-webkit-touch-callout:none}
-.top{height:60px;display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fff;border-bottom:1px solid #eee}
-.top b{font-size:16px;font-weight:600;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.top small{color:#999;font-size:12px}
-.small{font-size:22px;background:transparent;border:0;color:#666;width:36px;height:36px;cursor:pointer;flex-shrink:0}
-.hAva{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:#00a884!important;color:#fff;display:grid;place-items:center;font-size:18px;font-weight:700}
-#pfpWrap{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center}
-#pfpWrap img{width:38px;height:38px;border-radius:50%;object-fit:cover;display:block;background:#ddd}
-#box{flex:1;overflow-y:auto;padding:14px 10px;display:flex;flex-direction:column;gap:6px;background:#fff}
-.dateSep{align-self:center;background:#e8e8e8;padding:6px 12px;border-radius:14px;font-size:12px;color:#666;margin:8px 0}
+body{margin:0;background:#a8d5a2;color:#000;max-width:450px;height:100dvh;margin:auto;display:flex;flex-direction:column;-webkit-touch-callout:none}
+/* TELEGRAM SYSTEM - PIXORO Name + Colour da */
+.top{margin:10px 10px 0;height:56px;display:flex;align-items:center;gap:8px;padding:6px 8px;background:#fff;border-radius:30px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.backBtn{width:38px;height:38px;border-radius:50%;background:#f1f1f1;border:0;font-size:22px;cursor:pointer;flex-shrink:0;display:grid;place-items:center}
+.top b{font-size:17px;font-weight:600;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;line-height:1.2}
+.top small{color:#999;font-size:12px;display:block;line-height:1.2}
+.small{font-size:20px;background:transparent;border:0;color:#333;width:36px;height:36px;cursor:pointer;flex-shrink:0}
+.hAva{width:40px;height:40px;border-radius:50%;background:#00a884!important;color:#fff;display:grid;place-items:center;font-size:18px;font-weight:700;line-height:1}
+#pfpWrap{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center}
+#pfpWrap img{width:40px;height:40px;border-radius:50%;object-fit:cover;display:block;background:#ddd}
+#box{flex:1;overflow-y:auto;padding:14px 10px;display:flex;flex-direction:column;gap:6px;background:#a8d5a2}
+.dateSep{align-self:center;background:#4e9a4e;color:#fff;padding:6px 14px;border-radius:14px;font-size:13px;font-weight:600}
+.joinSep{align-self:center;background:#4e9a4e;color:#fff;padding:6px 14px;border-radius:14px;font-size:13px;font-weight:600}
 .row{display:flex;max-width:88%}
 .row.me{align-self:flex-end;flex-direction:row-reverse}
 .row.other{align-self:flex-start}
-.bub{padding:7px 8px 6px 9px;border-radius:14px;font-size:14.5px;line-height:1.4;word-break:break-word;max-width:300px;position:relative;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.bub{padding:8px 10px 7px;border-radius:14px;font-size:15px;line-height:1.4;word-break:break-word;max-width:300px;position:relative;box-shadow:0 1px 2px rgba(0,0,0,.15)}
 .me .bub{background:#e1ffc7;color:#000;border-top-right-radius:4px}
-.other .bub{background:#f1f1f1;color:#000;border-top-left-radius:4px}
-.bub img,.bub video{max-width:100%;min-width:180px;max-height:320px;object-fit:cover;border-radius:10px;display:block;cursor:pointer;background:#ddd;-webkit-user-drag:none;user-select:none;pointer-events:auto}
+.other .bub{background:#fff;color:#000;border-top-left-radius:4px}
+.bub img,.bub video{max-width:100%;min-width:180px;max-height:320px;object-fit:cover;border-radius:10px;display:block;cursor:pointer;background:#ddd;-webkit-user-drag:none;user-select:none}
 .bub audio{max-width:210px}
-.time{font-size:11px;color:#999;text-align:right;margin-top:2px;float:right;margin-left:8px}
+.time{font-size:11px;color:#999;text-align:right;margin-top:3px;float:right;margin-left:8px}
 .tick{letter-spacing:-2px}
 .tick.blue{color:#00a884}
 .tick.grey{color:#999}
 .reply{font-size:12px;border-left:3px solid #00a884;padding:5px 6px;margin-bottom:6px;background:rgba(0,0,0,.05);border-radius:4px;color:#000}
 .react{position:absolute;bottom:-8px;right:8px;background:#fff;border:1px solid #ddd;border-radius:12px;padding:2px 6px;font-size:12px}
-#typing{padding:4px 10px;background:transparent;min-height:0}
-.typingBub{display:inline-flex;gap:4px;background:#f1f1f1;padding:10px 12px;border-radius:12px;border-top-left-radius:4px;align-items:center}
+#typing{padding:4px 10px;min-height:0}
+.typingBub{display:inline-flex;gap:4px;background:#fff;padding:10px 12px;border-radius:12px;border-top-left-radius:4px;align-items:center}
 .typingBub i{width:6px;height:6px;background:#999;border-radius:50%;display:block;animation:tb 1s infinite}
 .typingBub i:nth-child(2){animation-delay:.15s}.typingBub i:nth-child(3){animation-delay:.3s}
 @keyframes tb{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
-#replyBar{display:none;padding:7px 12px;background:#f5f5f5;color:#00a884;font-size:12px;align-items:center;justify-content:space-between}
+#replyBar{display:none;padding:7px 12px;background:#fff;color:#00a884;font-size:12px;align-items:center;justify-content:space-between;margin:0 10px;border-radius:12px}
 #photoSheet{display:none;background:#fff;padding:12px;border-top:1px solid #eee}
 #previewGrid{display:flex;gap:8px;overflow-x:auto}
 #zoomView{display:none;position:fixed;inset:0;background:#000;z-index:9999;place-items:center}
 #zoomView img{max-width:100%;max-height:100%;object-fit:contain;background:#000}
-#inputBar{display:flex;gap:8px;padding:8px 10px;background:#fff;align-items:flex-end;border-top:1px solid #eee}
-.inputWrap{flex:1;display:flex;gap:6px;align-items:center;background:#f1f1f1;border-radius:24px;padding:6px 10px}
+#inputBar{display:flex;gap:8px;padding:8px 10px;background:transparent;align-items:flex-end}
+.inputWrap{flex:1;display:flex;gap:6px;align-items:center;background:#fff;border-radius:28px;padding:6px 10px;box-shadow:0 1px 4px rgba(0,0,0,.1)}
 #inp{flex:1;background:transparent;border:0;color:#000;outline:none;font-size:15px;padding:8px 0}
 #send{background:#00a884;border:0;border-radius:50%;width:48px;height:48px;color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;display:none}
 #micBtn{background:#00a884;border:0;border-radius:50%;width:48px;height:48px;color:#fff;font-size:22px;cursor:pointer;flex-shrink:0}
 .action{border:0;background:transparent;color:#999;font-size:22px;cursor:pointer}
-#status{font-size:12px;text-align:center;color:#999;padding:4px;background:#fff}
-#menu{display:none;position:fixed;bottom:75px;left:50%;transform:translateX(-50%);width:min(94%,420px);background:#fff;padding:12px;border-radius:16px;z-index:20;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+#status{font-size:12px;text-align:center;color:#fff;padding:4px;text-shadow:0 1px 2px rgba(0,0,0,.2)}
+#menu{display:none;position:fixed;bottom:75px;left:50%;transform:translateX(-50%);width:min(94%,420px);background:#fff;padding:12px;border-radius:16px;z-index:20;box-shadow:0 4px 20px rgba(0,0,0,.2)}
 #menu button{width:100%;padding:12px;background:#f1f1f1;color:#000;border:0;border-radius:9px;margin:3px 0;text-align:left;cursor:pointer}
-.enc{text-align:center;font-size:12px;color:#666;background:#f5f5f5;margin:8px 16px;padding:8px;border-radius:14px}
-#recBar{display:none;background:#f1f1f1;padding:10px 14px;align-items:center;gap:10px}
-#safeBanner{display:none;background:#fff3cd;color:#856404;font-size:12px;text-align:center;padding:8px 12px;border-bottom:1px solid #ffe69c}
+.enc{text-align:center;font-size:12px;color:#555;background:#e8e8e8;margin:8px 16px;padding:8px;border-radius:14px}
+#recBar{display:none;background:#fff;padding:10px 14px;align-items:center;gap:10px;margin:0 10px;border-radius:14px}
+#safeBanner{display:none;background:#fff3cd;color:#856404;font-size:12px;text-align:center;padding:8px 12px;margin:8px 10px 0;border-radius:12px}
 </style></head><body>
-<header class="top"><button class="small" onclick="location.href='dm.html'">‹</button><span id="pfpWrap"></span><div style="flex:1;min-width:0"><b id="uname">Loading...</b><br><small id="online">online</small></div><button class="small">📹</button><button class="small">📞</button><button class="small" onclick="openMenu()">⋮</button></header>
+<header class="top"><button class="backBtn" onclick="location.href='dm.html'">←</button><span id="pfpWrap"></span><div style="flex:1;min-width:0"><b id="uname">Chat</b><small id="online">last seen recently</small></div><button class="small">📹</button><button class="small">📞</button><button class="small" onclick="openMenu()">⋮</button></header>
 <div id="safeBanner">🛡️ Full Safe - OTP / Password / Link DM la Anuppaatha da</div>
 <div id="status"></div>
 <div id="box"><div class="enc">🔒 Messages are end-to-end encrypted - PIXORO Full Safe</div></div>
@@ -67,10 +70,8 @@ function cleanName(v){return String(v||'').trim().replace(/^@/,'').toLowerCase()
 function status(t){$('status').textContent=t;}
 function scrollBottom(){$('box').scrollTop=$('box').scrollHeight;}
 function isMineMsg(m){ return String(m.sender_id)===ME_ID || cleanName(m.sender)===ME; }
-// FULL SAFE - Photo Save / Right Click Block da
 document.addEventListener('contextmenu',e=>{ if(e.target.tagName==='IMG'||e.target.tagName==='VIDEO') e.preventDefault(); });
 document.addEventListener('dragstart',e=>{ if(e.target.tagName==='IMG') e.preventDefault(); });
-// FULL SAFE - OTP / Password / Link Check da
 function isUnsafeText(v){
   let low=v.toLowerCase();
   if(low.includes('otp')||low.includes('password')||low.includes('pin')||low.includes('cvv')) return 'OTP / Password DM la Anuppaatha da - Full Safe illa da';
@@ -108,7 +109,7 @@ function renderPreview(){ $('previewGrid').innerHTML=''; pendingPhotos.forEach((
 function cancelPhotos(){ pendingPhotos=[]; $('photoSheet').style.display='none'; $('file').value=''; $('camFile').value=''; $('upProgress').textContent=''; }
 async function confirmSendPhotos(){ if(!pendingPhotos.length) return; if(window.pixoroCanSendPhotoTo){ const check=await pixoroCanSendPhotoTo(OTHER_ID); if(!check.ok){ status(check.msg); return; } } for(let i=0;i<pendingPhotos.length;i++){ const f=pendingPhotos[i]; $('upProgress').textContent=`Uploading ${i+1}/${pendingPhotos.length}...`; let tempId='temp_'+Date.now()+i; let tmp=document.createElement('div'); tmp.className='row me'; tmp.id=tempId; tmp.innerHTML=`<div class="bub"><img src="${URL.createObjectURL(f)}" style="background:#ddd"><div class="time">Uploading... ⏳</div></div>`; $('box').appendChild(tmp); scrollBottom(); try{ const path=await pixoroUploadPhoto(f,CHAT_ID); const {error}=await supa.from('messages').insert({chat_id:CHAT_ID,sender_id:ME_ID,receiver_id:OTHER_ID,sender:ME,receiver:OTHER,text:'📷 Photo',message:'📷 Photo',media_path:path,media_type:'image',type:'image',seen:false,status:'sent',reply_to:replyText||null}); if(error) throw error; document.getElementById(tempId)?.remove(); }catch(e){ let el=document.getElementById(tempId); if(el) el.innerHTML+='<div style="font-size:12px">Failed - Resend</div>'; status('Photo failed: '+e.message); } } cancelPhotos(); replyText=''; $('replyBar').style.display='none'; await loadMessages(); }
 async function renderMessage(m){ if(!m||!m.id) return; if($('box').querySelector('[data-id="'+CSS.escape(String(m.id))+'"]')) return; const mine=isMineMsg(m); const row=document.createElement('div'); row.className='row '+(mine?'me':'other'); row.dataset.id=m.id; if(m.media_path) row.dataset.photo=m.media_path; const el=document.createElement('div'); el.className='bub '+(mine?'me':'other'); el.dataset.id=m.id; if(m.media_path) el.dataset.photo=m.media_path; if(m.reply_to){ let r=document.createElement('div'); r.className='reply'; r.textContent=m.reply_to; el.appendChild(r); } let url=''; if(m.media_path&&window.pixoroGetPhotoUrl) url=await pixoroGetPhotoUrl(m.media_path); else if(m.media_url) url=m.media_url; if(m.media_path||url){ if(m.media_type==='video'||m.type==='video'){ const v=document.createElement('video'); v.src=url; v.controls=true; v.playsInline=true; v.setAttribute('controlsList','nodownload'); el.appendChild(v); } else if(m.media_type==='voice'||m.type==='voice'){ const a=document.createElement('audio'); a.src=url; a.controls=true; el.appendChild(a); } else { const img=document.createElement('img'); img.src=url; img.loading='lazy'; img.setAttribute('crossorigin','anonymous'); img.oncontextmenu=e=>e.preventDefault(); img.onclick=()=>openZoom(url); el.appendChild(img); removeWhiteBg(img); } } else { let txt=m.text||m.message||''; if(txt.startsWith('{"e2e"')) txt='💬 Message'; let d=document.createElement('div'); d.textContent=txt; el.appendChild(d); } if(m.reaction){ let rc=document.createElement('div'); rc.className='react'; rc.textContent=m.reaction; el.appendChild(rc); } let tm=document.createElement('div'); tm.className='time'; tm.innerHTML=(m.created_at?new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'')+(mine?` <span class="tick ${m.seen?'blue':'grey'}">${m.seen?'✓✓':'✓'}</span>`:''); el.appendChild(tm); row.appendChild(el); row.addEventListener('contextmenu',e=>{e.preventDefault();selectMessage(m.id);}); row.addEventListener('click',()=>{ if(window._lastTap&&Date.now()-window._lastTap<350){selectMessage(m.id);} window._lastTap=Date.now(); }); $('box').appendChild(row); }
-async function loadMessages(){ if(busy||!ME_ID||!OTHER_ID) return; busy=true; try{ const {data,error}=await supa.from('messages').select('*').eq('chat_id',CHAT_ID).order('created_at',{ascending:true}).limit(200); if(error) throw error; const box=$('box'); const wasBottom=box.scrollHeight-box.scrollTop-box.clientHeight<120; box.innerHTML='<div class="enc">🔒 Messages are end-to-end encrypted - PIXORO Full Safe</div>'; let lastDate=''; for(const m of (data||[])){ let dl=dateLabel(m.created_at); if(dl!==lastDate){ lastDate=dl; let d=document.createElement('div'); d.className='dateSep'; d.textContent=dl; box.appendChild(d); } await renderMessage(m); } const unseen=(data||[]).filter(m=>!isMineMsg(m)&&!m.seen); for(const m of unseen){ await supa.from('messages').update({seen:true,seen_at:new Date().toISOString()}).eq('id',m.id).eq('receiver_id',ME_ID); } if(wasBottom||unseen.length) scrollBottom(); if(!data||!data.length){ let e=document.createElement('div'); e.style.cssText='text-align:center;color:#999;padding:30px'; e.innerHTML='Say hello to @'+OTHER+' 👋'; box.appendChild(e); } status(''); }catch(e){ console.error(e); status('Chat loading error: '+e.message); } finally{ busy=false; } }
+async function loadMessages(){ if(busy||!ME_ID||!OTHER_ID) return; busy=true; try{ const {data,error}=await supa.from('messages').select('*').eq('chat_id',CHAT_ID).order('created_at',{ascending:true}).limit(200); if(error) throw error; const box=$('box'); const wasBottom=box.scrollHeight-box.scrollTop-box.clientHeight<120; box.innerHTML='<div class="enc">🔒 Messages are end-to-end encrypted - PIXORO Full Safe</div>'; let lastDate=''; for(const m of (data||[])){ let dl=dateLabel(m.created_at); if(dl!==lastDate){ lastDate=dl; let d=document.createElement('div'); d.className='dateSep'; d.textContent=dl; box.appendChild(d); if(!data||data.length===0){} } await renderMessage(m); } const unseen=(data||[]).filter(m=>!isMineMsg(m)&&!m.seen); for(const m of unseen){ await supa.from('messages').update({seen:true,seen_at:new Date().toISOString()}).eq('id',m.id).eq('receiver_id',ME_ID); } if(wasBottom||unseen.length) scrollBottom(); if(!data||!data.length){ let j=document.createElement('div'); j.className='joinSep'; j.textContent=OTHER+' joined PIXORO!'; box.appendChild(j); let e=document.createElement('div'); e.style.cssText='text-align:center;color:#fff;padding:30px;text-shadow:0 1px 2px rgba(0,0,0,.3)'; e.innerHTML='Say hello to @'+OTHER+' 👋'; box.appendChild(e); } status(''); }catch(e){ console.error(e); status('Chat loading error: '+e.message); } finally{ busy=false; } }
 async function sendMessage(){ const input=$('inp'); const value=input.value.trim(); if(!value||!ME_ID||!OTHER_ID) return; let unsafe=isUnsafeText(value); if(unsafe){ showSafeBanner(unsafe); return; } try{ const {error}=await supa.from('messages').insert({chat_id:CHAT_ID,sender_id:ME_ID,receiver_id:OTHER_ID,sender:ME,receiver:OTHER,text:value,message:value,type:'text',seen:false,reply_to:replyText||null,vanish:false,status:'sent'}); if(error) throw error; input.value=''; onInput(); replyText=''; $('replyBar').style.display='none'; await loadMessages(); }catch(e){ status('Message send failed: '+e.message); } }
 async function sendMedia(input){ const file=input.files?.[0]; if(!file) return; if(!file.type.startsWith('video/')){ status('Video only'); return; } if(file.size>25*1024*1024){ status('Maximum 25 MB'); input.value=''; return; } status('Uploading...'); try{ const path=ME_ID+'/'+CHAT_ID+'/'+Date.now()+'_video.mp4'; const {error}=await supa.storage.from('dms').upload(path,file,{upsert:false,contentType:file.type}); if(error) throw error; const {error:ie}=await supa.from('messages').insert({chat_id:CHAT_ID,sender_id:ME_ID,receiver_id:OTHER_ID,sender:ME,receiver:OTHER,text:'🎬 Video',message:'🎬 Video',media_path:path,media_type:'video',type:'video',seen:false,status:'sent'}); if(ie) throw ie; await loadMessages(); status(''); }catch(e){ status('Upload failed: '+e.message); } finally{ input.value=''; } }
 async function startVoice(){ if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){ status('Voice not supported'); return; } if(recorder&&recorder.state==='recording'){ stopVoice(); return; } try{ const stream=await navigator.mediaDevices.getUserMedia({audio:true}); recorder=new MediaRecorder(stream); recordChunks=[]; recorder.ondataavailable=e=>{ if(e.data.size) recordChunks.push(e.data); }; recorder.onstop=async()=>{ clearInterval(recTimer); $('recBar').style.display='none'; try{ const blob=new Blob(recordChunks,{type:recorder.mimeType||'audio/webm'}); const path=ME_ID+'/'+CHAT_ID+'/'+Date.now()+'_voice.webm'; const {error}=await supa.storage.from('dms').upload(path,blob); if(error) throw error; const {error:e3}=await supa.from('messages').insert({chat_id:CHAT_ID,sender_id:ME_ID,receiver_id:OTHER_ID,sender:ME,receiver:OTHER,text:'Voice message',message:'Voice message',media_path:path,media_type:'voice',type:'voice',seen:false,status:'sent'}); if(e3) throw e3; await loadMessages(); }catch(e){ status('Voice upload failed: '+e.message); } stream.getTracks().forEach(t=>t.stop()); }; recorder.start(); recSec=0; $('recBar').style.display='flex'; recTimer=setInterval(()=>{ recSec++; $('recTime').textContent=Math.floor(recSec/60)+':'+String(recSec%60).padStart(2,'0'); },1000); }catch(e){ status('Microphone permission unavailable'); } }
@@ -118,9 +119,33 @@ async function reactSelected(){ const {error}=await supa.from('messages').update
 async function unsendSelected(){ if(SEL_PHOTO?.media_path&&window.pixoroUnsendPhoto){ await pixoroUnsendPhoto(selectedMessage,SEL_PHOTO.media_path); } else { const {error}=await supa.from('messages').delete().eq('id',selectedMessage).eq('sender_id',ME_ID); if(error) status('Unsend failed: '+error.message); } $('menu').style.display='none'; await loadMessages(); }
 async function reportSelected(){ if(window.pixoroReportPhoto) await pixoroReportPhoto(OTHER_ID,selectedMessage,'Unsafe photo / message'); $('menu').style.display='none'; status('Reported'); }
 async function blockSelected(){ if(window.pixoroBlockUser) await pixoroBlockUser(OTHER); $('menu').style.display='none'; location.href='dm.html'; }
-async function init(){ try{ if(!supa) throw new Error('PIXORO Supabase connection missing'); const {data:{session},[STRIPPED] supa.auth.getSession(); if(error) throw error; if(!session){ location.href='login.html'; return; } ME_ID=session.user.id; const target=cleanName(new URLSearchParams(location.search).get('user')); if(!target){ location.href='dm.html'; return; }
-  $('uname').textContent=target; setHeaderAvatar('', target);
-  const {data:mine,[STRIPPED] supa.from('profiles').select('id,username,name,avatar_url').eq('id',ME_ID).single(); if(e1) throw e1; const {data:other,[STRIPPED] supa.from('profiles').select('id,username,name,avatar_url').ilike('username',target).maybeSingle(); if(e2) throw e2; if(!other) throw new Error('User not found'); if(other.id===ME_ID) throw new Error('Cannot chat with yourself'); ME_ID=mine.id; OTHER_ID=other.id; ME=cleanName(mine.username); OTHER=cleanName(other.username); OTHER_PFP=other.avatar_url||''; CHAT_ID=[ME_ID,OTHER_ID].sort().join('_'); $('uname').textContent=OTHER; setHeaderAvatar(OTHER_PFP, OTHER); $('online').textContent= other.is_online ? 'online' : (other.last_seen ? 'last seen '+new Date(other.last_seen).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : 'online'); await loadMessages(); channel=supa.channel('pixoro-chat-'+CHAT_ID).on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:'chat_id=eq.'+CHAT_ID},()=>loadMessages()).on('broadcast',{event:'typing'},(p)=>{ if(p.payload&&p.payload.user!==ME) $('typing').innerHTML=p.payload.typing?'<div class="typingBub"><i></i><i></i><i></i></div>':''; }).subscribe(); status(''); }catch(e){ console.error(e); status(e.message); } }
+// FIX - init - [STRIPPED] Broken Code Thookiten da - Full Correct da
+async function init(){
+  try{
+    if(!window.supa){ setTimeout(init,200); return; }
+    supa=window.supa;
+    const targetRaw = new URLSearchParams(location.search).get('user') || '';
+    const target = cleanName(targetRaw);
+    if(!target){ location.href='dm.html'; return; }
+    $('uname').textContent=target; $('online').textContent='last seen recently'; setHeaderAvatar('', target);
+    const {data:{session}, error:seErr} = await supa.auth.getSession();
+    if(seErr) throw seErr;
+    if(!session){ location.href='login.html'; return; }
+    ME_ID=session.user.id;
+    const {data:mine, error:e1} = await supa.from('profiles').select('id,username,name,avatar_url').eq('id',ME_ID).single();
+    if(e1) throw e1;
+    const {data:other, error:e2} = await supa.from('profiles').select('id,username,name,avatar_url,is_online,last_seen').ilike('username',target).maybeSingle();
+    if(e2) throw e2;
+    if(!other) throw new Error('User not found: '+target);
+    if(other.id===ME_ID) throw new Error('Cannot chat with yourself');
+    ME=cleanName(mine.username); OTHER=cleanName(other.username); OTHER_ID=other.id; OTHER_PFP=other.avatar_url||''; CHAT_ID=[ME_ID,OTHER_ID].sort().join('_');
+    $('uname').textContent=OTHER; setHeaderAvatar(OTHER_PFP, OTHER);
+    $('online').textContent= other.is_online ? 'online' : (other.last_seen ? 'last seen '+new Date(other.last_seen).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : 'last seen recently');
+    await loadMessages();
+    channel=supa.channel('pixoro-chat-'+CHAT_ID).on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:'chat_id=eq.'+CHAT_ID},()=>loadMessages()).on('broadcast',{event:'typing'},(p)=>{ if(p.payload&&p.payload.user!==ME) $('typing').innerHTML=p.payload.typing?'<div class="typingBub"><i></i><i></i><i></i></div>':''; }).subscribe();
+    status('');
+  }catch(e){ console.error(e); status(e.message); }
+}
 $('inp').addEventListener('keydown',e=>{ if(e.key==='Enter') sendMessage(); });
 init();
 window.addEventListener('beforeunload',()=>{ if(channel&&supa) supa.removeChannel(channel); if(recorder&&recorder.state==='recording') recorder.stop(); });
