@@ -5,13 +5,15 @@
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{margin:0;background:#0b141a;color:#e9edef;max-width:450px;height:100dvh;margin:auto;display:flex;flex-direction:column}
 .top{height:60px;display:flex;align-items:center;gap:8px;padding:8px 10px;background:#202c33}
-.top img{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#000}
-.top b{font-size:16px;font-weight:400}
+.top b{font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .top small{color:#8696a0;font-size:12px}
-.small{font-size:22px;background:transparent;border:0;color:#aebac1;width:36px;height:36px;cursor:pointer}
-/* FIX - Header Avatar Letter - Background Image Illa da */
-.hAva{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:#2a3942!important;color:#e9edef;display:grid;place-items:center;font-size:18px;font-weight:700}
-#box{flex:1;overflow-y:auto;padding:14px 10px;display:flex;flex-direction:column;gap:6px;background-color:#0b141a;background-image:radial-gradient(#1a2a33 1px, transparent 1px);background-size:22px 22px}
+.small{font-size:22px;background:transparent;border:0;color:#aebac1;width:36px;height:36px;cursor:pointer;flex-shrink:0}
+/* FIX - Header Avatar - Background Image Illa da - Letter Div Clean da */
+.hAva{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:#2a3942!important;color:#fff;display:grid;place-items:center;font-size:18px;font-weight:700}
+#pfpWrap{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center}
+#pfpWrap img{width:38px;height:38px;border-radius:50%;object-fit:cover;display:block;background:#000}
+/* FIX - Background Remove da - Dots Illa da - Plain Black da */
+#box{flex:1;overflow-y:auto;padding:14px 10px;display:flex;flex-direction:column;gap:6px;background:#0b141a}
 .dateSep{align-self:center;background:#182229;padding:6px 12px;border-radius:8px;font-size:12px;color:#8696a0;margin:8px 0;box-shadow:0 1px 2px rgba(0,0,0,.4)}
 .row{display:flex;max-width:88%}
 .row.me{align-self:flex-end;flex-direction:row-reverse}
@@ -40,8 +42,8 @@ body{margin:0;background:#0b141a;color:#e9edef;max-width:450px;height:100dvh;mar
 #inputBar{display:flex;gap:8px;padding:8px 10px;background:#0b141a;align-items:flex-end}
 .inputWrap{flex:1;display:flex;gap:6px;align-items:center;background:#202c33;border-radius:24px;padding:6px 10px}
 #inp{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:15px;padding:8px 0}
-#send{background:#00a884;border:0;border-radius:50%;width:48px;height:48px;color:#0b141a;font-size:20px;cursor:pointer;flex-shrink:0;display:none}
-#micBtn{background:#00a884;border:0;border-radius:50%;width:48px;height:48px;color:#0b141a;font-size:22px;cursor:pointer;flex-shrink:0}
+#send{background:#00a884;border:0;border-radius:50%;width:48px;height:48px;color:#000;font-size:20px;cursor:pointer;flex-shrink:0;display:none}
+#micBtn{background:#00a884;border:0;border-radius:50%;width:48px;height:48px;color:#000;font-size:22px;cursor:pointer;flex-shrink:0}
 .action{border:0;background:transparent;color:#8696a0;font-size:22px;cursor:pointer}
 #status{font-size:12px;text-align:center;color:#8696a0;padding:4px;background:#0b141a}
 #menu{display:none;position:fixed;bottom:75px;left:50%;transform:translateX(-50%);width:min(94%,420px);background:#233138;padding:12px;border-radius:16px;z-index:20}
@@ -49,7 +51,7 @@ body{margin:0;background:#0b141a;color:#e9edef;max-width:450px;height:100dvh;mar
 .enc{text-align:center;font-size:12px;color:#ffd279;background:#182229;margin:8px 16px;padding:8px;border-radius:8px}
 #recBar{display:none;background:#202c33;padding:10px 14px;align-items:center;gap:10px}
 </style></head><body>
-<header class="top"><button class="small" onclick="location.href='dm.html'">‹</button><span id="pfpWrap"></span><div style="flex:1;min-width:0"><b id="uname">...</b><br><small id="online">online</small></div><button class="small">📹</button><button class="small">📞</button><button class="small" onclick="openMenu()">⋮</button></header>
+<header class="top"><button class="small" onclick="location.href='dm.html'">‹</button><span id="pfpWrap"></span><div style="flex:1;min-width:0"><b id="uname">Loading...</b><br><small id="online">online</small></div><button class="small">📹</button><button class="small">📞</button><button class="small" onclick="openMenu()">⋮</button></header>
 <div id="status"></div>
 <div id="box"><div class="enc">🔒 Messages are end-to-end encrypted</div></div>
 <div id="typing"></div>
@@ -65,7 +67,7 @@ function cleanName(v){return String(v||'').trim().replace(/^@/,'').toLowerCase()
 function status(t){$('status').textContent=t;}
 function scrollBottom(){$('box').scrollTop=$('box').scrollHeight;}
 function isMineMsg(m){ return String(m.sender_id)===ME_ID || cleanName(m.sender)===ME; }
-// FIX - White Background Remove - Reels / DM Same da
+// FIX - White Background Remove - Reels / DM Same da - 70% White Irundha mattum da
 async function removeWhiteBg(imgEl){
   try{
     if(!imgEl || imgEl.dataset.whiteDone) return; imgEl.dataset.whiteDone='1';
@@ -80,10 +82,10 @@ async function removeWhiteBg(imgEl){
     ctx.putImageData(d,0,0); imgEl.src=c.toDataURL('image/png');
   }catch(e){}
 }
-// FIX - Header Avatar - Real Photo Illana Letter Div da
+// FIX - Header Avatar - Real Photo Illana Letter Div da - Name ah Avatar la Poda Koodathu da
 function setHeaderAvatar(url, uname){
   let wrap=$('pfpWrap'); let L=(cleanName(uname||'P').charAt(0).toUpperCase()||'P');
-  if(url && !url.includes('ui-avatars')){ wrap.innerHTML=`<img id="pfp" src="${url}" data-white="1" crossorigin="anonymous" style="width:38px;height:38px;border-radius:50%;object-fit:cover;background:#000">`; let im=wrap.querySelector('img'); if(im) removeWhiteBg(im); }
+  if(url && !url.includes('ui-avatars')){ wrap.innerHTML=`<img src="${url}" data-white="1" crossorigin="anonymous">`; let im=wrap.querySelector('img'); if(im) removeWhiteBg(im); }
   else { wrap.innerHTML=`<div class="hAva">${L}</div>`; }
 }
 function dateLabel(d){ let dt=new Date(d); let now=new Date(); let y=new Date(); y.setDate(now.getDate()-1); if(dt.toDateString()===now.toDateString()) return 'Today'; if(dt.toDateString()===y.toDateString()) return 'Yesterday'; return dt.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'}); }
@@ -107,7 +109,10 @@ async function saveSelected(){ if(!SEL_PHOTO?.media_path) return; if(window.pixo
 async function unsendSelected(){ if(SEL_PHOTO?.media_path&&window.pixoroUnsendPhoto){ await pixoroUnsendPhoto(selectedMessage,SEL_PHOTO.media_path); } else { const {error}=await supa.from('messages').delete().eq('id',selectedMessage).eq('sender_id',ME_ID); if(error) status('Unsend failed: '+error.message); } $('menu').style.display='none'; await loadMessages(); }
 async function reportSelected(){ if(window.pixoroReportPhoto) await pixoroReportPhoto(OTHER_ID,selectedMessage,'Unsafe photo / message'); $('menu').style.display='none'; status('Reported'); }
 async function blockSelected(){ if(window.pixoroBlockUser) await pixoroBlockUser(OTHER); $('menu').style.display='none'; location.href='dm.html'; }
-async function init(){ try{ if(!supa) throw new Error('PIXORO Supabase connection missing'); const {data:{session},[STRIPPED] supa.auth.getSession(); if(error) throw error; if(!session){ location.href='login.html'; return; } ME_ID=session.user.id; const target=cleanName(new URLSearchParams(location.search).get('user')); if(!target){ location.href='dm.html'; return; } const {data:mine,[STRIPPED] supa.from('profiles').select('id,username,name,avatar_url').eq('id',ME_ID).single(); if(e1) throw e1; const {data:other,[STRIPPED] supa.from('profiles').select('id,username,name,avatar_url').ilike('username',target).maybeSingle(); if(e2) throw e2; if(!other) throw new Error('User not found'); if(other.id===ME_ID) throw new Error('Cannot chat with yourself'); ME_ID=mine.id; OTHER_ID=other.id; ME=cleanName(mine.username); OTHER=cleanName(other.username); OTHER_PFP=other.avatar_url||''; CHAT_ID=[ME_ID,OTHER_ID].sort().join('_'); $('uname').textContent=OTHER; setHeaderAvatar(OTHER_PFP, OTHER); $('online').textContent= other.is_online ? 'online' : (other.last_seen ? 'last seen '+new Date(other.last_seen).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : 'online'); await loadMessages(); channel=supa.channel('pixoro-chat-'+CHAT_ID).on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:'chat_id=eq.'+CHAT_ID},()=>loadMessages()).on('broadcast',{event:'typing'},(p)=>{ if(p.payload&&p.payload.user!==ME) $('typing').innerHTML=p.payload.typing?'<div class="typingBub"><i></i><i></i><i></i></div>':''; }).subscribe(); status(''); }catch(e){ console.error(e); status(e.message); } }
+async function init(){ try{ if(!supa) throw new Error('PIXORO Supabase connection missing'); const {data:{session},[STRIPPED] supa.auth.getSession(); if(error) throw error; if(!session){ location.href='login.html'; return; } ME_ID=session.user.id; const target=cleanName(new URLSearchParams(location.search).get('user')); if(!target){ location.href='dm.html'; return; }
+  // FIX - Name ... Vara Koodathu da - URL la irundhe Odane Kaatu da
+  $('uname').textContent=target; setHeaderAvatar('', target);
+  const {data:mine,[STRIPPED] supa.from('profiles').select('id,username,name,avatar_url').eq('id',ME_ID).single(); if(e1) throw e1; const {data:other,[STRIPPED] supa.from('profiles').select('id,username,name,avatar_url').ilike('username',target).maybeSingle(); if(e2) throw e2; if(!other) throw new Error('User not found'); if(other.id===ME_ID) throw new Error('Cannot chat with yourself'); ME_ID=mine.id; OTHER_ID=other.id; ME=cleanName(mine.username); OTHER=cleanName(other.username); OTHER_PFP=other.avatar_url||''; CHAT_ID=[ME_ID,OTHER_ID].sort().join('_'); $('uname').textContent=OTHER; setHeaderAvatar(OTHER_PFP, OTHER); $('online').textContent= other.is_online ? 'online' : (other.last_seen ? 'last seen '+new Date(other.last_seen).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : 'online'); await loadMessages(); channel=supa.channel('pixoro-chat-'+CHAT_ID).on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:'chat_id=eq.'+CHAT_ID},()=>loadMessages()).on('broadcast',{event:'typing'},(p)=>{ if(p.payload&&p.payload.user!==ME) $('typing').innerHTML=p.payload.typing?'<div class="typingBub"><i></i><i></i><i></i></div>':''; }).subscribe(); status(''); }catch(e){ console.error(e); status(e.message); } }
 $('inp').addEventListener('keydown',e=>{ if(e.key==='Enter') sendMessage(); });
 init();
 window.addEventListener('beforeunload',()=>{ if(channel&&supa) supa.removeChannel(channel); if(recorder&&recorder.state==='recording') recorder.stop(); });
