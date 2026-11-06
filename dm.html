@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PIXORO - Chats</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=143"></script>
+<script src="js/pixoro-core.js?v=full143"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:76px}
@@ -12,6 +12,16 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 .searchBar{margin:10px 12px;background:#1F1F1F;border:1px solid #2A2A2A;border-radius:24px;padding:12px 14px;display:flex;gap:8px;align-items:center}
 .searchBar input{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:15px}
 .searchBar input::placeholder{color:#888}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:6px 12px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:8px 14px;border-radius:20px;background:#1F1F1F;color:#aaa;font-size:13px;font-weight:700;border:0;cursor:pointer}
+.tab.on{background:#FF4D8D;color:#fff}
+.tab small{background:#fff;color:#FF4D8D;border-radius:10px;padding:0 5px;margin-left:4px;font-size:11px}
+.onlineRow{display:flex;gap:12px;overflow-x:auto;padding:10px 12px;scrollbar-width:none}.onlineRow::-webkit-scrollbar{display:none}
+.onItem{flex:0 0 58px;text-align:center;cursor:pointer}
+.onAva{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#FF4D8D,#8A7CFF);padding:2.5px;position:relative;margin:0 auto}
+.onAvaIn{width:100%;height:100%;border-radius:50%;background:#000;display:grid;place-items:center;border:2px solid #000;overflow:hidden}
+.onAvaIn img{width:100%;height:100%;object-fit:cover}
+.onDot{position:absolute;bottom:1px;right:1px;width:13px;height:13px;background:#22C55E;border:2.5px solid #000;border-radius:50%}
 .notes{display:flex;gap:12px;overflow-x:auto;padding:10px 12px;scrollbar-width:none}.notes::-webkit-scrollbar{display:none}
 .nItem{flex:0 0 62px;text-align:center;cursor:pointer;position:relative}
 .nRing{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#FF4D8D,#8A7CFF,#FF8A00);padding:2.5px;position:relative}
@@ -52,21 +62,24 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 .setRow input[type="checkbox"]::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
 .setRow input[type="checkbox"]:checked::after{left:23px}
 .setRow select{border:0;background:#222;padding:8px;border-radius:8px;font-weight:700;color:#fff}
+.blockRow{display:flex;gap:12px;padding:12px;align-items:center;width:calc(100% - 20px);margin:0 10px 8px;background:#141414;border:1px solid #222;border-radius:18px}
 </style></head><body>
 <div class="top"><div class="topRow"><div class="logo">PIXOR<span>O</span></div><div><span class="topIco" onclick="document.getElementById('searchInp').focus()">🔍</span><span class="topIco" onclick="document.getElementById('dmSettingSheet').style.display='block'">⋮</span></div></div></div>
-<div class="searchBar">🔍 <input id="searchInp" placeholder="Search..." oninput="onSearch(this.value)"></div>
+<div class="searchBar">🔍 <input id="searchInp" placeholder="Search name / message..." oninput="onSearch(this.value)"></div>
+<div class="tabs" id="tabs"><button class="tab on" onclick="setTab('all',this)">All</button><button class="tab" onclick="setTab('unread',this)">Unread</button><button class="tab" onclick="setTab('requests',this)">Requests <small id="reqCount" style="display:none">0</small></button><button class="tab" onclick="setTab('archived',this)">Archived</button><button class="tab" onclick="setTab('blocked',this)">Blocked <small id="blkCount" style="display:none">0</small></button></div>
+<div id="onlineBox"><div style="padding:4px 12px;font-size:13px;font-weight:800;color:#22C55E">● Online Now</div><div class="onlineRow" id="onlineRow"></div></div>
 <div class="notes" id="notes"></div>
-<div id="archivedRow" style="display:none"></div>
 <div id="list" style="text-align:center;color:#888;padding:10px">Loading...</div>
 <div class="fab" onclick="location.href='search.html'">✏️</div>
 <div class="toast" id="toast"></div>
 <div class="noteInput" id="notePop"><h3 style="color:#fff">✏️ Add Note</h3><input id="noteText" placeholder="Yedhachum Yosichiya da...?" maxlength="60"><div style="display:flex;gap:10px"><button onclick="saveNote()" style="flex:1;background:#FF4D8D;color:#fff;border:0;padding:11px;border-radius:20px;font-weight:700">Share</button><button onclick="document.getElementById('notePop').style.display='none'" style="flex:1;background:#1F1F1F;color:#fff;border:0;padding:11px;border-radius:20px">Cancel</button></div></div>
-<div class="actionSheet" id="sheet"><b id="sheetName" style="color:#fff;font-size:17px">Chat</b><button onclick="doPin()">📌 Pin / Unpin</button><button onclick="doMute()">🔕 Mute / Unmute</button><button onclick="doArchive()">🗄️ Archive</button><button onclick="doDelete()" style="color:#FF6B6B;background:#2A1215">🗑️ Delete Chat</button><button onclick="document.getElementById('sheet').style.display='none'" style="text-align:center">Cancel</button></div>
+<div class="actionSheet" id="sheet"><b id="sheetName" style="color:#fff;font-size:17px">Chat</b><button onclick="doPin()">📌 Pin / Unpin</button><button onclick="doMute()">🔕 Mute / Unmute</button><button onclick="doArchive()">🗄️ Archive</button><button onclick="doBlockFromSheet()" style="color:#FF6B6B;background:#2A1215">🚫 Block User</button><button onclick="doDeleteChatOnly()">🗑️ Delete Chat Mattum - List la Poidum</button><button onclick="doDeleteAll()" style="color:#FF6B6B;background:#2A1215">🗑️ Delete Ella Message um</button><button onclick="document.getElementById('sheet').style.display='none'" style="text-align:center">Cancel</button></div>
 <div id="dmSettingSheet"><b style="font-size:17px">DM Settings - MASS</b><p style="font-size:12px;color:#888;margin:6px 0 12px">DM Chat Nitta Iruka Num Pakka - Ellam Inga thaan da</p><b>Privacy</b><label class="setRow">Active Now - Online Kaatu <input type="checkbox" id="setActive" checked onchange="saveDMSetting('active',this.checked)"></label><label class="setRow">Typing... - Type Panna Kaatu <input type="checkbox" id="setTyping" checked onchange="saveDMSetting('typing',this.checked)"></label><label class="setRow">Seen - Paathen nu Kaatu <input type="checkbox" id="setSeen" checked onchange="saveDMSetting('seen',this.checked)"></label><label class="setRow">Allow Messages <select id="setAllow" onchange="saveDMSetting('allow',this.value)"><option value="everyone">Everyone - Allow</option><option value="following">Following Only</option><option value="none">No One - Not Allow</option></select></label><button onclick="document.getElementById('dmSettingSheet').style.display='none'" style="width:100%;margin-top:14px;padding:12px;background:#FF4D8D;border:0;border-radius:14px;color:#fff;font-weight:800">Close</button></div>
 <div class="bottom-nav"><a href="index.html"><span style="font-size:22px">⌂</span><span>Home</span></a><a href="search.html"><span style="font-size:21px">🔍</span><span>Search</span></a><a href="reels.html"><span style="font-size:21px">▶️</span><span>Reels</span></a><a href="dm.html" class="active"><span style="font-size:21px">💬</span><span>DM</span><span class="navBadge" id="navTotal" style="display:none">0</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
 <script>
-let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, CUR_TAB='all', ALL_CHATS=[], NOTES_MAP={}, SEARCH_Q='', UNREAD_MAP={}, SHEET_USER='', PINNED=[], MUTED=[], ARCHIVED=[];
+let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, CUR_TAB='all', ALL_CHATS=[], NOTES_MAP={}, SEARCH_Q='', UNREAD_MAP={}, SHEET_USER='', SHEET_UNAME='', PINNED=[], MUTED=[], ARCHIVED=[], BLOCKED=[];
 let DM_ACTIVE=true, DM_TYPING=true, DM_SEEN=true, DM_ALLOW='everyone';
+function setTab(t,btn){ CUR_TAB=t; document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on')); if(btn) btn.classList.add('on'); render(); }
 function saveDMSetting(k,v){ if(k==='active') DM_ACTIVE=v; if(k==='typing') DM_TYPING=v; if(k==='seen') DM_SEEN=v; if(k==='allow') DM_ALLOW=v; showToast('Setting Saved da ✨'); setTimeout(()=>{ document.getElementById('dmSettingSheet').style.display='none'; },400); }
 function loadDMSettings(){ let a=document.getElementById('setActive'); if(a) a.checked = DM_ACTIVE; let ty=document.getElementById('setTyping'); if(ty) ty.checked = DM_TYPING; let s=document.getElementById('setSeen'); if(s) s.checked = DM_SEEN; let al=document.getElementById('setAllow'); if(al) al.value = DM_ALLOW; }
 loadDMSettings();
@@ -81,23 +94,34 @@ function isMineMsg(m){ return String(m.sender_id)===ME_ID || cleanUser(m.sender)
 function otherIdOf(m){ if(isMineMsg(m) && m.receiver_id) return String(m.receiver_id); if(!isMineMsg(m) && m.sender_id) return String(m.sender_id); let name = isMineMsg(m) ? cleanUser(m.receiver) : cleanUser(m.sender); let p = profileMap[name]; return p ? String(p.id) : name; }
 function onSearch(v){ SEARCH_Q=v.toLowerCase().trim(); render(); }
 let pressTimer=null;
-function openSheet(user,uname){ SHEET_USER=user; document.getElementById('sheetName').innerText='@'+uname; document.getElementById('sheet').style.display='block'; }
+function openSheet(user,uname){ SHEET_USER=user; SHEET_UNAME=uname; document.getElementById('sheetName').innerText='@'+uname; document.getElementById('sheet').style.display='block'; }
 function doPin(){ let i=PINNED.indexOf(SHEET_USER); if(i>=0) PINNED.splice(i,1); else PINNED.unshift(SHEET_USER); document.getElementById('sheet').style.display='none'; render(); }
 function doMute(){ let i=MUTED.indexOf(SHEET_USER); if(i>=0) MUTED.splice(i,1); else MUTED.push(SHEET_USER); document.getElementById('sheet').style.display='none'; render(); }
 function doArchive(){ if(!ARCHIVED.includes(SHEET_USER)) ARCHIVED.push(SHEET_USER); document.getElementById('sheet').style.display='none'; render(); }
-function doDelete(){ if(!confirm('Chat Delete Pannanuma?')) return; if(!confirm('Confirm ah? Ella Message Poidum da')) return; ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); document.getElementById('sheet').style.display='none'; showToast('Chat deleted'); render(); }
+function doBlockFromSheet(){ if(!confirm(SHEET_UNAME+' ah Block Pannanuma?')) return; if(!confirm('Confirm ah? Inime Message Varaathu da')) return; if(!BLOCKED.includes(SHEET_USER)) BLOCKED.push(SHEET_USER); if(window.pixoroBlockUser) pixoroBlockUser(SHEET_UNAME); ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); document.getElementById('sheet').style.display='none'; showToast('Blocked da'); render(); }
+function doUnblock(id,uname){ if(!confirm(uname+' ah Unblock Pannanuma?')) return; BLOCKED=BLOCKED.filter(x=>x!==id); if(window.pixoroUnblockUser) pixoroUnblockUser(uname); showToast('Unblocked da'); render(); }
+function doDeleteChatOnly(){ ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); document.getElementById('sheet').style.display='none'; showToast('Chat List la irunthu Delete Panniten - Message Safe da'); render(); }
+async function doDeleteAll(){ if(!confirm('Ella Message um Delete Pannanuma?')) return; if(!confirm('Confirm ah? Thirumba Varaathu da')) return; ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); document.getElementById('sheet').style.display='none'; showToast('Ella Message Delete Panniten'); render(); }
 async function loadNotes(){ let {data}=await supa.from('notes').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false}); NOTES_MAP={}; (data||[]).forEach(n=>{ NOTES_MAP[cleanUser(n.username)]=n.text; }); let usersWithNote = Object.keys(NOTES_MAP).filter(u=>u!==ME_RAW); let myNote = NOTES_MAP[ME_RAW]; let html=''; html+=`<div class="nItem" onclick="document.getElementById('notePop').style.display='block'"><div class="nRing"><div class="nRingInner">${avatarHtml(ME_RAW,'small')}${myNote?`<div class="noteBubble">${myNote}</div>`:''}</div></div><div style="font-size:10px;margin-top:4px;color:#aaa">Your note</div></div>`; html+=usersWithNote.slice(0,10).map(u=>`<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(u)}'"><div class="nRing"><div class="nRingInner">${avatarHtml(u,'small')}<div class="noteBubble">${NOTES_MAP[u]}</div></div></div><div style="font-size:10px;margin-top:4px;color:#aaa">${u}</div></div>`).join(''); document.getElementById('notes').style.display = (myNote || usersWithNote.length) ? 'flex' : 'none'; document.getElementById('notes').innerHTML=html; }
 async function saveNote(){ let t=document.getElementById('noteText').value.trim(); if(!t) return; await supa.from('notes').delete().eq('username',ME_RAW); await supa.from('notes').insert({user_id:ME_ID,username:ME_RAW,text:t}); document.getElementById('notePop').style.display='none'; loadNotes(); }
+function renderOnline(){ let online = Object.values(profileMap).filter(p=>p.is_online && cleanUser(p.username)!==ME_RAW).slice(0,12); let box=document.getElementById('onlineBox'); if(!online.length){ box.style.display='none'; return; } box.style.display='block'; document.getElementById('onlineRow').innerHTML=online.map(p=>{ let u=cleanUser(p.username); return `<div class="onItem" onclick="location.href='chat.html?user=${encodeURIComponent(u)}'"><div class="onAva"><div class="onAvaIn">${avatarHtml(u,'small')}</div><span class="onDot"></span></div><div style="font-size:11px;margin-top:4px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u}</div></div>` }).join(''); }
 function render(){
-  let archived = ALL_CHATS.filter(c=>ARCHIVED.includes(c.other));
-  let list=ALL_CHATS.filter(c=>!ARCHIVED.includes(c.other));
-  if(CUR_TAB==='hidden') list=archived;
-  if(CUR_TAB==='requests') list=list.filter(c=>c.threadType==='requests');
+  renderOnline();
+  let reqs = ALL_CHATS.filter(c=>c.threadType==='requests' && !BLOCKED.includes(c.other));
+  let rc=document.getElementById('reqCount'); if(reqs.length){ rc.style.display='inline'; rc.textContent=reqs.length; } else rc.style.display='none';
+  let bc=document.getElementById('blkCount'); if(BLOCKED.length){ bc.style.display='inline'; bc.textContent=BLOCKED.length; } else bc.style.display='none';
+  if(CUR_TAB==='blocked'){
+    if(!BLOCKED.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No Blocked Users da<br>Yaarayum Block Pannala da ✨</div>`; return; }
+    document.getElementById('list').innerHTML=BLOCKED.map(id=>{ let uname=profileById[id]?.username||id; let cu=cleanUser(uname); return `<div class="blockRow"><div class="avaWrap">${avatarHtml(cu)}</div><div style="flex:1"><b style="color:#fff">${cu}</b><div style="font-size:12px;color:#888">Blocked - Message Varaathu</div></div><button onclick="doUnblock('${id}','${cu}')" style="background:#FF4D8D;color:#fff;border:0;padding:8px 16px;border-radius:20px;font-weight:700">Unblock</button></div>` }).join(''); return;
+  }
+  let list=ALL_CHATS.filter(c=>!ARCHIVED.includes(c.other) && !BLOCKED.includes(c.other));
+  if(CUR_TAB==='unread') list=list.filter(c=>(UNREAD_MAP[c.other]||0)>0);
+  if(CUR_TAB==='requests') list=reqs;
+  if(CUR_TAB==='archived') list=ALL_CHATS.filter(c=>ARCHIVED.includes(c.other));
   if(SEARCH_Q) list=list.filter(c=>{ let n=(profileById[c.other]?.username||c.other||'').toLowerCase(); return n.includes(SEARCH_Q)||c.preview.toLowerCase().includes(SEARCH_Q); });
   list.sort((a,b)=>{ let pa=PINNED.includes(a.other)?1:0, pb=PINNED.includes(b.other)?1:0; if(pa!==pb) return pb-pa; return new Date(b.msg.created_at)-new Date(a.msg.created_at); });
-  let archEl=document.getElementById('archivedRow');
-  if(archived.length && CUR_TAB==='all' && !SEARCH_Q){ archEl.style.display='block'; archEl.innerHTML=`<div class="chatRow" onclick="CUR_TAB='hidden';render()"><div class="avaWrap"><div class="avaLetter" style="background:#1F1F1F!important;color:#aaa!important">🗄️</div></div><div class="chatMain"><div class="chatTopRow"><span class="chatName">Archived Chats</span><span class="chatTime">${archived.length}</span></div><div class="chatPrevRow"><span class="chatPrev">${archived.map(c=>profileById[c.other]?.username||c.other).join(', ')}</span></div></div></div>`; } else archEl.style.display='none';
-  if(CUR_TAB==='hidden' && !list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No archived chats<br><button onclick="CUR_TAB='all';render()" style="margin-top:12px;background:#FF4D8D;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:700">Back</button></div>`; return; }
+  if(CUR_TAB==='requests' && !list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No Requests da ✨<br>Puthu Yarum Message Pannala da</div>`; return; }
+  if(CUR_TAB==='archived' && !list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No Archived Chats da</div>`; return; }
   if(!list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No chats da<br><button onclick="location.href='search.html'" style="margin-top:12px;background:#FF4D8D;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`; return; }
   let totalUnread = Object.values(UNREAD_MAP).reduce((a,b)=>a+b,0);
   let nav=document.getElementById('navTotal'); if(totalUnread){ nav.style.display='grid'; nav.textContent=totalUnread>99?'99+':totalUnread; } else nav.style.display='none';
@@ -106,9 +130,11 @@ function render(){
     let uname=profileById[c.other]?.username||c.other; let uc=UNREAD_MAP[c.other]||0; let badge=uc?`<span class="unreadBadge ${MUTED.includes(c.other)?'grey':''}">${uc>99?'99+':uc}</span>`:``; let isPin=PINNED.includes(c.other); let isMute=MUTED.includes(c.other);
     let isMine=isMineMsg(c.msg);
     let tick = seenOff ? '' : (isMine?`<span class="tick ${c.msg.seen?'blue':'grey'}">${c.msg.seen?'✓✓':'✓'}</span> `:'');
-    return `<div class="chatRow" onmousedown="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" onmouseup="clearTimeout(pressTimer)" ontouchstart="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" ontouchend="clearTimeout(pressTimer)"><div class="avaWrap">${avatarHtml(cleanUser(uname))}<span class="onlineDot"></span></div><div class="chatMain" onclick="location.href='chat.html?user=${encodeURIComponent(cleanUser(uname))}'"><div class="chatTopRow"><span class="chatName">${isPin?'📌 ':''}${cleanUser(uname)} ${isMute?'🔕':''}</span><span class="chatTime">${fmtTime(c.msg.created_at)}</span></div><div class="chatPrevRow"><span class="chatPrev">${tick}${c.preview}</span>${badge}</div></div></div>`
+    let reqBtn = CUR_TAB==='requests' ? `<div style="display:flex;gap:8px;margin-top:6px"><button onclick="event.stopPropagation();location.href='chat.html?user=${encodeURIComponent(cleanUser(uname))}'" style="flex:1;background:#FF4D8D;color:#fff;border:0;padding:7px;border-radius:16px;font-weight:700">Accept</button><button onclick="event.stopPropagation();doBlockFromSheet2('${c.other}','${cleanUser(uname)}')" style="flex:1;background:#1F1F1F;color:#fff;border:0;padding:7px;border-radius:16px">Decline</button></div>` : '';
+    return `<div class="chatRow" onmousedown="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" onmouseup="clearTimeout(pressTimer)" ontouchstart="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" ontouchend="clearTimeout(pressTimer)"><div class="avaWrap">${avatarHtml(cleanUser(uname))}<span class="onlineDot"></span></div><div class="chatMain" onclick="location.href='chat.html?user=${encodeURIComponent(cleanUser(uname))}'"><div class="chatTopRow"><span class="chatName">${isPin?'📌 ':''}${cleanUser(uname)} ${isMute?'🔕':''}</span><span class="chatTime">${fmtTime(c.msg.created_at)}</span></div><div class="chatPrevRow"><span class="chatPrev">${tick}${c.preview}</span>${badge}</div>${reqBtn}</div></div>`
   }).join('');
 }
+function doBlockFromSheet2(id,uname){ if(!BLOCKED.includes(id)) BLOCKED.push(id); ALL_CHATS=ALL_CHATS.filter(c=>c.other!==id); showToast('Declined + Blocked'); render(); }
 async function init(){
   if(!window.supa){setTimeout(init,300);return} supa=window.supa;
   let {data:{session}}=await supa.auth.getSession(); if(!session){location.href='login.html';return}
