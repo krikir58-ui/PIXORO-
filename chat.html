@@ -54,7 +54,7 @@ function doUnblock(){ BLOCKED=BLOCKED.filter(x=>x!==OTHER); localStorage.setItem
 function doReport(){ showToast('Reported da ⚠️'); document.getElementById('setSheet').style.display='none'; }
 function doMuteChat(){ let m=JSON.parse(localStorage.getItem('pixoro_mute')||'[]'); if(!m.includes(OTHER)) m.push(OTHER); localStorage.setItem('pixoro_mute',JSON.stringify(m)); showToast('Muted da 🔕'); document.getElementById('setSheet').style.display='none'; }
 function doClear(){ document.getElementById('box').innerHTML=''; showToast('Cleared da 🗑️'); document.getElementById('setSheet').style.display='none'; }
-async function onTyping(){ await supa.from('typing').upsert({chat_id:chatId,username:ME,is_typing:true},{onConflict:'chat_id,username'}); clearTimeout(window._tt); window._tt=setTimeout(async()=>{ await supa.from('typing').upsert({chat_id:chatId,username:ME,is_typing:false},{onConflict:'chat_id,username'}); },2000); }
+async function onTyping(){ try{ await supa.from('typing').upsert({chat_id:chatId,username:ME,is_typing:true},{onConflict:'chat_id,username'}); }catch(e){} clearTimeout(window._tt); window._tt=setTimeout(async()=>{ try{ await supa.from('typing').upsert({chat_id:chatId,username:ME,is_typing:false},{onConflict:'chat_id,username'}); }catch(e){} },2000); }
 let pressT=null;
 function pressMsg(id,txt){ pressT=setTimeout(()=>{ SEL_MSG=id; SEL_TXT=txt; document.getElementById('sheet').style.display='block'; },600); }
 document.addEventListener('mouseup',()=>clearTimeout(pressT)); document.addEventListener('touchend',()=>clearTimeout(pressT));
@@ -62,7 +62,7 @@ async function doReact(e){ await supa.from('messages').update({reaction:e}).eq('
 async function doReply(){ REPLY_TXT=SEL_TXT; document.getElementById('inp').placeholder='Replying: '+SEL_TXT.slice(0,20); document.getElementById('inp').focus(); document.getElementById('sheet').style.display='none'; }
 async function doUnsend(){ await supa.from('messages').delete().eq('id',SEL_MSG); document.getElementById('sheet').style.display='none'; load(); }
 
-// ===== E2E CORE - FREE WebCrypto da =====
+// ===== E2E FIXED - text Column la ye Lock + IV Serthu Vaipom da - Extra Column Theva Illa da =====
 function bufToB64(b){ return btoa(String.fromCharCode(...new Uint8Array(b))); }
 function b64ToBuf(s){ try{ let bin=atob(s); let a=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return a.buffer; }catch(e){ return new ArrayBuffer(0); } }
 async function getOrCreateKeys(){
@@ -76,7 +76,7 @@ async function getOrCreateKeys(){
   let pubB64 = btoa(JSON.stringify(pubJwk));
   localStorage.setItem('pixoro_e2e_pub_'+ME_ID, pubB64);
   MY_PRIV=kp.privateKey;
-  await supa.from('profiles').update({public_key:pubB64}).eq('id',ME_ID);
+  try{ await supa.from('profiles').update({public_key:pubB64}).eq('id',ME_ID); }catch(e){}
   return pubB64;
 }
 async function makeSharedKey(otherPubB64){
@@ -90,16 +90,24 @@ async function makeSharedKey(otherPubB64){
   }catch(e){ E2E_READY=false; return null; }
 }
 async function encryptText(text){
-  if(!SHARED_KEY) return {content:text, iv:null, is_encrypted:false};
-  let iv=crypto.getRandomValues(new Uint8Array(12));
-  let enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},SHARED_KEY,new TextEncoder().encode(text));
-  return {content:bufToB64(enc), iv:bufToB64(iv), is_encrypted:true};
+  // SHARED_KEY Illana - Plain ah Anuppu da - Message Poga Koodaathu da
+  if(!SHARED_KEY) return text;
+  try{
+    let iv=crypto.getRandomValues(new Uint8Array(12));
+    let enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},SHARED_KEY,new TextEncoder().encode(text));
+    // FIX da - text la ye JSON ah Vaipom da - {e2e:1, iv, data} - Extra Column Theva Illa da
+    return JSON.stringify({e2e:1, iv:bufToB64(iv), data:bufToB64(enc)});
+  }catch(e){ return text; }
 }
 async function decryptText(m){
   let raw=m.text||m.message||'';
-  if(!m.is_encrypted || !m.iv || !SHARED_KEY) return raw;
+  if(!raw) return '';
+  // E2E Message ah nu Check Pannu da - {e2e:1} nu Irundha Mattum Decrypt Pannu da
+  if(!raw.startsWith('{"e2e"')) return raw;
+  if(!SHARED_KEY) return '🔒 Encrypted - Key Waiting... Refresh Pannu da';
   try{
-    let dec=await crypto.subtle.decrypt({name:'AES-GCM',iv:new Uint8Array(b64ToBuf(m.iv))},SHARED_KEY,b64ToBuf(m.content||raw));
+    let j=JSON.parse(raw);
+    let dec=await crypto.subtle.decrypt({name:'AES-GCM',iv:new Uint8Array(b64ToBuf(j.iv))},SHARED_KEY,b64ToBuf(j.data));
     return new TextDecoder().decode(dec);
   }catch(e){ return '🔒 Encrypted Message'; }
 }
@@ -123,7 +131,6 @@ async function init(){
   if(otherProf.is_online) document.getElementById('status').innerText='Active now • 🔒 E2E'; else document.getElementById('status').innerText='Offline • 🔒 E2E'
   chatId=[ME,cleanUser(otherProf.username)].sort().join('_')
   OTHER = cleanUser(otherProf.username)
-  // E2E SETUP da
   await getOrCreateKeys();
   if(otherProf.public_key){ await makeSharedKey(otherProf.public_key); }
   else{
@@ -138,12 +145,13 @@ async function init(){
   load()
 }
 async function load(){
-  let {data} = await supa.from('messages').select('*').eq('chat_id',chatId).order('created_at',{ascending:true})
+  let {data,error} = await supa.from('messages').select('*').eq('chat_id',chatId).order('created_at',{ascending:true})
+  if(error) console.log('Load Error',error);
   if(!data || !data.length){
     let {data:d2} = await supa.from('messages').select('*').or(`and(sender.eq.${ME},receiver.eq.${OTHER}),and(sender.eq.${OTHER},receiver.eq.${ME})`).order('created_at',{ascending:true})
     if(d2 && d2.length) data = d2
   }
-  await supa.from('messages').update({seen:true}).eq('chat_id',chatId).eq('seen',false).catch(()=>{});
+  try{ await supa.from('messages').update({seen:true}).eq('chat_id',chatId).eq('seen',false); }catch(e){}
   let b=document.getElementById('box')
   if(!data||!data.length){ b.innerHTML=`<div style="text-align:center;color:#666;margin-top:80px"><b>Say hi to @${OTHER} 👋</b><br><span style="font-size:11px;color:#00ff66">🔒 End-to-End Encrypted da</span></div>`; return }
   let html='';
@@ -166,10 +174,11 @@ async function load(){
 async function send(){
   let i=document.getElementById('inp'); let t=i.value.trim(); if(!t) return; if(BLOCKED.includes(OTHER)){ showToast('Blocked da 🚫 Unblock Pannu da'); return; } i.value=''
   document.getElementById('box').innerHTML+=`<div class="me bub">${t}<div class="time">now ✓</div></div>`; document.getElementById('box').scrollTop=document.getElementById('box').scrollHeight
-  // E2E ENCRYPT da - Text mattum Lock Aagum da
-  let enc = await encryptText(t);
-  let {error} = await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:enc.content,message:enc.content,content:enc.content,iv:enc.iv,is_encrypted:enc.is_encrypted,sender_id:ME_ID,receiver_id:OTHER_ID,seen:false,type:'text',reply_to:REPLY_TXT||null,vanish:VANISH})
-  if(error){ await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:t}); }
+  let encText = await encryptText(t);
+  // FIX da - Old Columns Mattum Use Pannu da - content / iv / is_encrypted Podala da - Insert Fail Aagaathu da
+  let {data,error} = await supa.from('messages').insert({chat_id:chatId,sender:ME,receiver:OTHER,text:encText,message:encText,sender_id:ME_ID,receiver_id:OTHER_ID,seen:false,type:'text',reply_to:REPLY_TXT||null,vanish:VANISH}).select().single();
+  if(error){ console.log('Send Fail',error); showToast('Save Aagala da: '+error.message); }
+  else{ console.log('Save Aachu da',data.id); }
   REPLY_TXT=''; document.getElementById('inp').placeholder='Message...'; load()
 }
 async function sendPhoto(input){
