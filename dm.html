@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PIXORO - Chats</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=greenfix"></script>
+<script src="js/pixoro-core.js?v=msgrequest_final2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:76px}
@@ -13,7 +13,7 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 .searchBar input{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:15px}
 .searchBar input::placeholder{color:#888}
 .tabs{display:flex;gap:8px;overflow-x:auto;padding:6px 12px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
-.tab{flex-shrink:0;padding:8px 14px;border-radius:20px;background:#1F1F1F;color:#aaa;font-size:13px;font-weight:700;border:0;cursor:pointer}
+.tab{flex:0 0 auto;padding:8px 14px;border-radius:20px;background:#1F1F1F;color:#aaa;font-size:13px;font-weight:700;border:0;cursor:pointer}
 .tab.on{background:#FF4D8D;color:#fff}
 .tab small{background:#fff;color:#FF4D8D;border-radius:10px;padding:0 5px;margin-left:4px;font-size:11px}
 .onlineRow{display:flex;gap:12px;overflow-x:auto;padding:10px 12px;scrollbar-width:none}.onlineRow::-webkit-scrollbar{display:none}
@@ -59,16 +59,17 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 .navBadge{position:absolute;top:-4px;right:8px;background:#FF4D8D;color:#fff;font-size:10px;min-width:17px;height:17px;border-radius:9px;display:grid;place-items:center;padding:0 4px;font-weight:700}
 .fab{position:fixed;bottom:78px;right:14px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#FF4D8D,#FF2E63);display:grid;place-items:center;font-size:22px;z-index:90;cursor:pointer;color:#fff;box-shadow:0 6px 18px rgba(255,77,141,.5)}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#FF4D8D;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;display:none;white-space:nowrap}
-#dmSettingSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#111;border:1px solid #FF4D8D;border-radius:22px 22px 0 0;padding:18px;z-index:1001;display:none;max-height:85vh;overflow-y:auto;color:#fff}
-.setRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px;background:#1F1F1F;border-radius:14px;margin-top:10px;font-size:14px;font-weight:600;color:#fff}
-.setRow input[type="checkbox"]{appearance:none;-webkit-appearance:none;width:48px!important;height:28px!important;min-width:48px;border-radius:20px;background:#333!important;position:relative;cursor:pointer;flex-shrink:0;margin:0}
-.setRow input[type="checkbox"]:checked{background:linear-gradient(90deg,#FF4D8D,#8A7CFF)!important}
-.setRow input[type="checkbox"]::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
-.setRow input[type="checkbox"]:checked::after{left:23px}
-.setRow select{border:0;background:#222;padding:8px;border-radius:8px;font-weight:700;color:#fff}
+#dmSettingSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#000!important;border-top:2px solid #FF4D8D;border-radius:24px 24px 0 0;padding:18px;z-index:1001;display:none;max-height:88vh;overflow-y:auto;color:#fff}
+.massRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px;background:linear-gradient(135deg,#1F1F1F,#151515)!important;border:1px solid #2A2A2A;border-radius:16px;margin-top:10px}
+.massRow b{font-size:14px}.massRow small{display:block;font-size:11px;color:#888;font-weight:400;margin-top:2px}
+.allowBox{display:flex;background:#000;border:1px solid #333;border-radius:20px;padding:3px;flex-shrink:0}
+.allowBox button{border:0;padding:7px 10px;border-radius:16px;font-size:11px;font-weight:800;cursor:pointer;background:transparent;color:#888}
+.allowBox button.onAllow{background:#22C55E!important;color:#fff!important;box-shadow:0 0 12px #22C55E}
+.allowBox button.onDeny{background:#FF3B30!important;color:#fff!important;box-shadow:0 0 12px #FF3B30}
+.massTitle{font-size:13px;color:#FF4D8D;font-weight:900;margin-top:18px;display:block;letter-spacing:1px}
 .blockRow{display:flex;gap:12px;padding:12px;align-items:center;width:calc(100% - 20px);margin:0 10px 8px;background:#141414;border:1px solid #222;border-radius:18px}
 </style></head><body>
-<div class="top"><div class="topRow"><div class="logo">PIXOR<span>O</span></div><div><span class="topIco" onclick="document.getElementById('searchInp').focus()">🔍</span><span class="topIco" onclick="document.getElementById('dmSettingSheet').style.display='block'">⋮</span></div></div></div>
+<div class="top"><div class="topRow"><div class="logo">PIXOR<span>O</span></div><div><span class="topIco" onclick="document.getElementById('searchInp').focus()">🔍</span><span class="topIco" onclick="openDMSettings()">⋮</span></div></div></div>
 <div class="searchBar">🔍 <input id="searchInp" placeholder="Search name / message..." oninput="onSearch(this.value)"></div>
 <div class="tabs" id="tabs"><button class="tab on" onclick="setTab('all',this)">All</button><button class="tab" onclick="setTab('unread',this)">Unread</button><button class="tab" onclick="setTab('requests',this)">Requests <small id="reqCount" style="display:none">0</small></button><button class="tab" onclick="setTab('archived',this)">Archived</button><button class="tab" onclick="setTab('blocked',this)">Blocked <small id="blkCount" style="display:none">0</small></button></div>
 <div id="onlineBox"><div style="padding:4px 12px;font-size:13px;font-weight:800;color:#22C55E">● Online Now</div><div class="onlineRow" id="onlineRow"></div></div>
@@ -78,15 +79,52 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 <div class="toast" id="toast"></div>
 <div class="noteInput" id="notePop"><h3 style="color:#fff">✏️ Add Note</h3><input id="noteText" placeholder="Yedhachum Yosichiya da...?" maxlength="60"><div style="display:flex;gap:10px"><button onclick="saveNote()" style="flex:1;background:#FF4D8D;color:#fff;border:0;padding:11px;border-radius:20px;font-weight:700">Share</button><button onclick="document.getElementById('notePop').style.display='none'" style="flex:1;background:#1F1F1F;color:#fff;border:0;padding:11px;border-radius:20px">Cancel</button></div></div>
 <div class="actionSheet" id="sheet"><b id="sheetName" style="color:#fff;font-size:17px">Chat</b><div id="sheetStatus" style="font-size:12px;color:#22C55E;margin:4px 0 8px"></div><button onclick="doPin()">📌 Pin / Unpin</button><button onclick="doMute()">🔕 Mute / Unmute</button><button onclick="doArchive()">🗄️ Archive</button><button onclick="doBlockFromSheet()" style="color:#FF6B6B;background:#2A1215">🚫 Block User</button><button onclick="doDeleteChatOnly()">🗑️ Delete Chat Mattum - List la Poidum</button><button onclick="doDeleteAll()" style="color:#FF6B6B;background:#2A1215">🗑️ Delete Ella Message um</button><button onclick="document.getElementById('sheet').style.display='none'" style="text-align:center">Cancel</button></div>
-<div id="dmSettingSheet"><b style="font-size:17px">DM Settings - MASS</b><p style="font-size:12px;color:#888;margin:6px 0 12px">DM Chat Nitta Iruka Num Pakka - Ellam Inga thaan da</p><b>Privacy</b><label class="setRow">Active Now - Online Kaatu - Online na Mattum 🟢 <input type="checkbox" id="setActive" checked onchange="saveDMSetting('active',this.checked)"></label><label class="setRow">Typing... - Type Panna Kaatu <input type="checkbox" id="setTyping" checked onchange="saveDMSetting('typing',this.checked)"></label><label class="setRow">Seen - Paathen nu Kaatu - ✓✓ <input type="checkbox" id="setSeen" checked onchange="saveDMSetting('seen',this.checked)"></label><label class="setRow">Show Last Seen <input type="checkbox" id="setShowLastSeen" checked onchange="saveDMSetting('showLastSeen',this.checked)"></label><label class="setRow">Allow Messages <select id="setAllow" onchange="saveDMSetting('allow',this.value)"><option value="everyone">Everyone - Allow</option><option value="following">Following Only</option><option value="none">No One - Not Allow</option></select></label><button onclick="document.getElementById('dmSettingSheet').style.display='none'" style="width:100%;margin-top:14px;padding:12px;background:#FF4D8D;border:0;border-radius:14px;color:#fff;font-weight:800">Close</button></div>
+<div id="dmSettingSheet">
+  <div style="width:50px;height:5px;background:#FF4D8D;border-radius:10px;margin:0 auto 12px;box-shadow:0 0 12px #FF4D8D"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:19px">⚡ PIXORO <span style="color:#FF4D8D">MASS</span> SETTINGS</b><span onclick="document.getElementById('dmSettingSheet').style.display='none'" style="background:#1F1F1F;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;cursor:pointer">✕</span></div>
+  <p style="font-size:12px;color:#888;margin:6px 0 12px">Server la Save Aagum da - Phone la Illa da</p>
+  <b class="massTitle">📩 0. MESSAGE REQUEST - FIRST SETTING</b>
+  <p style="font-size:11px;color:#888;margin:4px 0">Yaar Unakku Message Anuppa Mudiyum nu Nee Sollu da</p>
+  <div class="massRow" style="border-color:#FF4D8D!important"><span><b>Message Request</b><small id="msgReqTxt">Ippo: Everyone - Yar Venaalum Anuppa Mudiyum</small></span>
+    <select id="setMsgRequest" onchange="setMsgRequest(this.value)" style="background:#000;border:1px solid #FF4D8D;color:#fff;padding:8px;border-radius:10px;font-weight:800;max-width:135px">
+      <option value="everyone">Everyone</option>
+      <option value="followers">Followers Only</option>
+      <option value="none">No One</option>
+    </select>
+  </div>
+  <div class="massRow"><span><b>Request la Photo Allow?</b><small>Accept Panna Munnadi Photo Vara Koodatha?</small></span><div class="allowBox" data-key="reqPhoto"><button onclick="setMassReq('reqPhoto',true,this)">ALLOW</button><button class="onDeny" onclick="setMassReq('reqPhoto',false,this)">NOT ALLOW</button></div></div>
+  <div class="massRow"><span><b>Request la Voice Allow?</b><small>Accept Panna Munnadi Voice Vara Koodatha?</small></span><div class="allowBox" data-key="reqVoice"><button onclick="setMassReq('reqVoice',true,this)">ALLOW</button><button class="onDeny" onclick="setMassReq('reqVoice',false,this)">NOT ALLOW</button></div></div>
+  <div class="massRow"><span><b>Request Preview</b><small>Stranger Message ah Paakka Mudiyuma?</small></span><div class="allowBox" data-key="reqPreview"><button class="onAllow" onclick="setMassReq('reqPreview',true,this)">ALLOW</button><button onclick="setMassReq('reqPreview',false,this)">NOT ALLOW</button></div></div>
+  <b class="massTitle">👁️ 1. PRIVACY - MASS</b>
+  <div class="massRow"><span><b>Active Now 🟢</b><small>Online nu Kaatu</small></span><div class="allowBox" data-key="active"><button class="onAllow" onclick="setMassReq('active',true,this)">ALLOW</button><button onclick="setMassReq('active',false,this)">NOT ALLOW</button></div></div>
+  <div class="massRow"><span><b>Typing...</b><small>Type Panna Kaatu</small></span><div class="allowBox" data-key="typing"><button class="onAllow" onclick="setMassReq('typing',true,this)">ALLOW</button><button onclick="setMassReq('typing',false,this)">NOT ALLOW</button></div></div>
+  <div class="massRow"><span><b>Seen - Blue Tick ✓✓</b><small>Paathen nu Kaatu</small></span><div class="allowBox" data-key="seen"><button class="onAllow" onclick="setMassReq('seen',true,this)">ALLOW</button><button onclick="setMassReq('seen',false,this)">NOT ALLOW</button></div></div>
+  <div class="massRow"><span><b>Show Last Seen</b><small>Today / Yesterday Kaatu</small></span><div class="allowBox" data-key="showLastSeen"><button class="onAllow" onclick="setMassReq('showLastSeen',true,this)">ALLOW</button><button onclick="setMassReq('showLastSeen',false,this)">NOT ALLOW</button></div></div>
+  <div class="massRow"><span><b>Allow Messages</b><small>Chat la Yar Message Anuppa Mudiyum?</small></span><div class="allowBox" data-key="allow"><button class="onAllow" onclick="setMassAllow('everyone',this)">EVERYONE</button><button onclick="setMassAllow('none',this)">NO ONE</button></div></div>
+  <button onclick="document.getElementById('dmSettingSheet').style.display='none'" style="width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,#FF4D8D,#FF7AB8);border:0;border-radius:14px;color:#fff;font-weight:900;box-shadow:0 0 20px rgba(255,77,141,.5)">DONE - MASS 🔥</button>
+</div>
 <div class="bottom-nav"><a href="index.html"><span style="font-size:22px">⌂</span><span>Home</span></a><a href="search.html"><span style="font-size:21px">🔍</span><span>Search</span></a><a href="reels.html"><span style="font-size:21px">▶️</span><span>Reels</span></a><a href="dm.html" class="active"><span style="font-size:21px">💬</span><span>DM</span><span class="navBadge" id="navTotal" style="display:none">0</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
 <script>
 let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, CUR_TAB='all', ALL_CHATS=[], NOTES_MAP={}, SEARCH_Q='', UNREAD_MAP={}, SHEET_USER='', SHEET_UNAME='', PINNED=[], MUTED=[], ARCHIVED=[], BLOCKED=[];
 let DM_ACTIVE=true, DM_TYPING=true, DM_SEEN=true, DM_ALLOW='everyone', SHOW_LASTSEEN=true;
+let MSG_REQUEST='everyone', REQ_PHOTO=false, REQ_VOICE=false, REQ_PREVIEW=true;
 function setTab(t,btn){ CUR_TAB=t; document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on')); if(btn) btn.classList.add('on'); render(); }
-function saveDMSetting(k,v){ if(k==='active') DM_ACTIVE=v; if(k==='typing') DM_TYPING=v; if(k==='seen') DM_SEEN=v; if(k==='allow') DM_ALLOW=v; if(k==='showLastSeen') SHOW_LASTSEEN=v; showToast('Setting Saved da ✨'); setTimeout(()=>{ document.getElementById('dmSettingSheet').style.display='none'; },400); render(); }
-function loadDMSettings(){ let a=document.getElementById('setActive'); if(a) a.checked = DM_ACTIVE; let ty=document.getElementById('setTyping'); if(ty) ty.checked = DM_TYPING; let s=document.getElementById('setSeen'); if(s) s.checked = DM_SEEN; let al=document.getElementById('setAllow'); if(al) al.value = DM_ALLOW; let ls=document.getElementById('setShowLastSeen'); if(ls) ls.checked=SHOW_LASTSEEN; }
-loadDMSettings();
+function openDMSettings(){ syncMassUI(); document.getElementById('dmSettingSheet').style.display='block'; }
+function syncMassUI(){
+  let sel=document.getElementById('setMsgRequest'); if(sel) sel.value=MSG_REQUEST;
+  let txt=document.getElementById('msgReqTxt'); if(txt) txt.textContent='Ippo: '+(MSG_REQUEST==='everyone'?'Everyone - Yar Venaalum Anuppa Mudiyum':MSG_REQUEST==='followers'?'Followers Only - Follow Panna Mattum Thaan':'No One - Yarume Anuppa Mudiyaathu');
+  let map={reqPhoto:REQ_PHOTO,reqVoice:REQ_VOICE,reqPreview:REQ_PREVIEW,active:DM_ACTIVE,typing:DM_TYPING,seen:DM_SEEN,showLastSeen:SHOW_LASTSEEN};
+  document.querySelectorAll('.allowBox').forEach(box=>{
+    let k=box.dataset.key; if(!(k in map)) return;
+    let btns=box.querySelectorAll('button'); btns.forEach(b=>b.classList.remove('onAllow','onDeny'));
+    if(map[k]) btns[0]?.classList.add('onAllow'); else btns[1]?.classList.add('onDeny');
+  });
+}
+async function saveUserSettings(){ if(!ME_ID||!supa) return; try{ await supa.from('user_settings').upsert({user_id:ME_ID,msg_request:MSG_REQUEST,req_photo:REQ_PHOTO,req_voice:REQ_VOICE,req_preview:REQ_PREVIEW,dm_active:DM_ACTIVE,dm_typing:DM_TYPING,dm_seen:DM_SEEN,dm_allow:DM_ALLOW,show_lastseen:SHOW_LASTSEEN,updated_at:new Date().toISOString()},{onConflict:'user_id'}); }catch(e){} }
+async function loadUserSettings(){ if(!ME_ID||!supa) return; try{ let {data}=await supa.from('user_settings').select('*').eq('user_id',ME_ID).maybeSingle(); if(data){ MSG_REQUEST=data.msg_request||'everyone'; REQ_PHOTO=data.req_photo||false; REQ_VOICE=data.req_voice||false; REQ_PREVIEW=data.req_preview??true; DM_ACTIVE=data.dm_active??true; DM_TYPING=data.dm_typing??true; DM_SEEN=data.dm_seen??true; DM_ALLOW=data.dm_allow||'everyone'; SHOW_LASTSEEN=data.show_lastseen??true; } }catch(e){} syncMassUI(); }
+function setMsgRequest(v){ MSG_REQUEST=v; syncMassUI(); saveUserSettings(); showToast('Message Request - '+v+' - Server la Save Aachu da'); render(); }
+function setMassReq(k,v,btn){ if(k==='reqPhoto') REQ_PHOTO=v; if(k==='reqVoice') REQ_VOICE=v; if(k==='reqPreview') REQ_PREVIEW=v; if(k==='active') DM_ACTIVE=v; if(k==='typing') DM_TYPING=v; if(k==='seen') DM_SEEN=v; if(k==='showLastSeen') SHOW_LASTSEEN=v; let box=btn.parentElement; box.querySelectorAll('button').forEach(b=>b.classList.remove('onAllow','onDeny')); if(v) btn.classList.add('onAllow'); else btn.classList.add('onDeny'); saveUserSettings(); showToast('Server la Save Aachu da'); render(); }
+function setMassAllow(v,btn){ DM_ALLOW=v; let box=btn.parentElement; box.querySelectorAll('button').forEach(b=>b.classList.remove('onAllow','onDeny')); if(v==='everyone') btn.classList.add('onAllow'); else btn.classList.add('onDeny'); saveUserSettings(); showToast('Allow Messages - '+v+' da'); render(); }
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
 function letterFor(u){ let l=(cleanUser(u||'P').charAt(0).toUpperCase()||'P'); return /[A-Z]/.test(l)?l:'P'; }
 function showToast(m){ let t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
@@ -103,16 +141,17 @@ function openSheet(user,uname){ SHEET_USER=user; SHEET_UNAME=uname; document.get
 function doPin(){ let i=PINNED.indexOf(SHEET_USER); if(i>=0) PINNED.splice(i,1); else PINNED.unshift(SHEET_USER); document.getElementById('sheet').style.display='none'; render(); }
 function doMute(){ let i=MUTED.indexOf(SHEET_USER); if(i>=0) MUTED.splice(i,1); else MUTED.push(SHEET_USER); document.getElementById('sheet').style.display='none'; render(); }
 function doArchive(){ if(!ARCHIVED.includes(SHEET_USER)) ARCHIVED.push(SHEET_USER); document.getElementById('sheet').style.display='none'; render(); }
-function doBlockFromSheet(){ if(!confirm(SHEET_UNAME+' ah Block Pannanuma?')) return; if(!confirm('Confirm ah? Inime Message Varaathu da')) return; if(!BLOCKED.includes(SHEET_USER)) BLOCKED.push(SHEET_USER); if(window.pixoroBlockUser) pixoroBlockUser(SHEET_UNAME); ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); document.getElementById('sheet').style.display='none'; showToast('Blocked da'); render(); }
-function doUnblock(id,uname){ if(!confirm(uname+' ah Unblock Pannanuma?')) return; BLOCKED=BLOCKED.filter(x=>x!==id); if(window.pixoroUnblockUser) pixoroUnblockUser(uname); showToast('Unblocked da'); render(); }
+function doBlockFromSheet(){ if(!BLOCKED.includes(SHEET_USER)) BLOCKED.push(SHEET_USER); if(window.pixoroBlockUser) pixoroBlockUser(SHEET_UNAME); ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); document.getElementById('sheet').style.display='none'; showToast('Blocked da'); render(); }
+function doUnblock(id,uname){ BLOCKED=BLOCKED.filter(x=>x!==id); if(window.pixoroUnblockUser) pixoroUnblockUser(uname); showToast('Unblocked da'); render(); }
 function doDeleteChatOnly(){ ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); document.getElementById('sheet').style.display='none'; showToast('Chat List la irunthu Delete Panniten - Message Safe da'); render(); }
-async function doDeleteAll(){ if(!confirm('Ella Message um Delete Pannanuma?')) return; if(!confirm('Confirm ah? Thirumba Varaathu da')) return; ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); document.getElementById('sheet').style.display='none'; showToast('Ella Message Delete Panniten'); render(); }
+async function doDeleteAll(){ ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); document.getElementById('sheet').style.display='none'; showToast('Ella Message Delete Panniten'); render(); }
 async function loadNotes(){ let {data}=await supa.from('notes').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false}); NOTES_MAP={}; (data||[]).forEach(n=>{ NOTES_MAP[cleanUser(n.username)]=n.text; }); let usersWithNote = Object.keys(NOTES_MAP).filter(u=>u!==ME_RAW); let myNote = NOTES_MAP[ME_RAW]; let html=''; html+=`<div class="nItem" onclick="document.getElementById('notePop').style.display='block'"><div class="nRing"><div class="nRingInner">${avatarHtml(ME_RAW,'small',true)}${myNote?`<div class="noteBubble">${myNote}</div>`:''}</div></div><div style="font-size:10px;margin-top:4px;color:#aaa">Your note</div></div>`; html+=usersWithNote.slice(0,10).map(u=>`<div class="nItem" onclick="location.href='chat.html?user=${encodeURIComponent(u)}'"><div class="nRing"><div class="nRingInner">${avatarHtml(u,'small',true)}<div class="noteBubble">${NOTES_MAP[u]}</div></div></div><div style="font-size:10px;margin-top:4px;color:#aaa">${u}</div></div>`).join(''); document.getElementById('notes').style.display = (myNote || usersWithNote.length) ? 'flex' : 'none'; document.getElementById('notes').innerHTML=html; }
 async function saveNote(){ let t=document.getElementById('noteText').value.trim(); if(!t) return; let exp=new Date(); exp.setHours(exp.getHours()+24); await supa.from('notes').delete().eq('username',ME_RAW); await supa.from('notes').insert({user_id:ME_ID,username:ME_RAW,text:t,expires_at:exp.toISOString()}); document.getElementById('notePop').style.display='none'; loadNotes(); }
 function renderOnline(){ let online = Object.values(profileMap).filter(p=>p.is_online && cleanUser(p.username)!==ME_RAW).slice(0,12); let box=document.getElementById('onlineBox'); if(!online.length){ box.style.display='none'; return; } box.style.display='block'; document.getElementById('onlineRow').innerHTML=online.map(p=>{ let u=cleanUser(p.username); return `<div class="onItem" onclick="location.href='chat.html?user=${encodeURIComponent(u)}'"><div class="onAva"><div class="onAvaIn">${avatarHtml(u,'small',true)}</div><span class="onDot"></span></div><div style="font-size:11px;margin-top:4px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u}</div><div style="font-size:10px;color:#22C55E;font-weight:700">Online</div></div>` }).join(''); }
 function render(){
   renderOnline();
   let reqs = ALL_CHATS.filter(c=>c.threadType==='requests' && !BLOCKED.includes(c.other));
+  if(MSG_REQUEST==='none') reqs=[];
   let rc=document.getElementById('reqCount'); if(reqs.length){ rc.style.display='inline'; rc.textContent=reqs.length; } else rc.style.display='none';
   let bc=document.getElementById('blkCount'); if(BLOCKED.length){ bc.style.display='inline'; bc.textContent=BLOCKED.length; } else bc.style.display='none';
   if(CUR_TAB==='blocked'){
@@ -125,7 +164,7 @@ function render(){
   if(CUR_TAB==='archived') list=ALL_CHATS.filter(c=>ARCHIVED.includes(c.other));
   if(SEARCH_Q) list=list.filter(c=>{ let n=(profileById[c.other]?.username||c.other||'').toLowerCase(); return n.includes(SEARCH_Q)||c.preview.toLowerCase().includes(SEARCH_Q); });
   list.sort((a,b)=>{ let pa=PINNED.includes(a.other)?1:0, pb=PINNED.includes(b.other)?1:0; if(pa!==pb) return pb-pa; return new Date(b.msg.created_at)-new Date(a.msg.created_at); });
-  if(CUR_TAB==='requests' && !list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No Requests da ✨<br>Puthu Yarum Message Pannala da</div>`; return; }
+  if(CUR_TAB==='requests' && !list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No Requests da ✨<br>${MSG_REQUEST==='none'?'Message Request OFF la Irukku da - Setting la Maathu da':'Puthu Yarum Message Pannala da'}</div>`; return; }
   if(CUR_TAB==='archived' && !list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No Archived Chats da</div>`; return; }
   if(!list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No chats da<br><button onclick="location.href='search.html'" style="margin-top:12px;background:#FF4D8D;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`; return; }
   let totalUnread = Object.values(UNREAD_MAP).reduce((a,b)=>a+b,0);
@@ -137,8 +176,11 @@ function render(){
     let tick = seenOff ? '' : (isMine?`<span class="tick ${c.msg.seen?'blue':'grey'}">${c.msg.seen?'✓✓':'✓'}</span> `:'');
     let p=profileById[c.other]; let isOn=!!p?.is_online;
     let statusTxt = isOn ? `<span style="color:#22C55E;font-size:11px">● Online</span>` : ``;
-    let reqBtn = CUR_TAB==='requests' ? `<div style="display:flex;gap:8px;margin-top:6px"><button onclick="event.stopPropagation();location.href='chat.html?user=${encodeURIComponent(cleanUser(uname))}'" style="flex:1;background:#FF4D8D;color:#fff;border:0;padding:7px;border-radius:16px;font-weight:700">Accept</button><button onclick="event.stopPropagation();doBlockFromSheet2('${c.other}','${cleanUser(uname)}')" style="flex:1;background:#1F1F1F;color:#fff;border:0;padding:7px;border-radius:16px">Decline</button></div>` : '';
-    return `<div class="chatRow" onmousedown="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" onmouseup="clearTimeout(pressTimer)" ontouchstart="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" ontouchend="clearTimeout(pressTimer)"><div class="avaWrap ${isOn?'':'off'}">${avatarHtml(cleanUser(uname),'',isOn)}${isOn?`<span class="onlineDot"></span>`:``}</div><div class="chatMain" onclick="location.href='chat.html?user=${encodeURIComponent(cleanUser(uname))}'"><div class="chatTopRow"><span class="chatName">${isPin?'📌 ':''}${cleanUser(uname)} ${isMute?'🔕':''}</span><span class="chatTime">${fmtTime(c.msg.created_at)}</span></div><div class="chatPrevRow"><span class="chatPrev">${tick}${c.preview}</span>${badge}</div>${statusTxt}${reqBtn}</div></div>`
+    let previewTxt = (CUR_TAB==='requests' && !REQ_PREVIEW) ? '📩 Message Request - Preview NOT ALLOW' : c.preview;
+    if(CUR_TAB==='requests' && !REQ_PHOTO && (c.msg.media_path || c.msg.media_type==='image')) previewTxt='📩 Photo Request - Accept Panna Thaan Paakkalam';
+    if(CUR_TAB==='requests' && !REQ_VOICE && c.msg.media_type==='voice') previewTxt='📩 Voice Request - Accept Panna Thaan Kekkalam';
+    let reqBtn = CUR_TAB==='requests' ? `<div style="display:flex;gap:8px;margin-top:6px"><button onclick="event.stopPropagation();location.href='chat.html?user=${encodeURIComponent(cleanUser(uname))}'" style="flex:1;background:#22C55E;color:#fff;border:0;padding:7px;border-radius:16px;font-weight:700">✅ Accept</button><button onclick="event.stopPropagation();doBlockFromSheet2('${c.other}','${cleanUser(uname)}')" style="flex:1;background:#1F1F1F;color:#fff;border:0;padding:7px;border-radius:16px">Decline</button></div>` : '';
+    return `<div class="chatRow" onmousedown="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" onmouseup="clearTimeout(pressTimer)" ontouchstart="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" ontouchend="clearTimeout(pressTimer)"><div class="avaWrap ${isOn?'':'off'}">${avatarHtml(cleanUser(uname),'',isOn)}${isOn?`<span class="onlineDot"></span>`:``}</div><div class="chatMain" onclick="location.href='chat.html?user=${encodeURIComponent(cleanUser(uname))}'"><div class="chatTopRow"><span class="chatName">${isPin?'📌 ':''}${cleanUser(uname)} ${isMute?'🔕':''}</span><span class="chatTime">${fmtTime(c.msg.created_at)}</span></div><div class="chatPrevRow"><span class="chatPrev">${tick}${previewTxt}</span>${badge}</div>${statusTxt}${reqBtn}</div></div>`
   }).join('');
 }
 function doBlockFromSheet2(id,uname){ if(!BLOCKED.includes(id)) BLOCKED.push(id); ALL_CHATS=ALL_CHATS.filter(c=>c.other!==id); showToast('Declined + Blocked'); render(); }
@@ -147,6 +189,7 @@ async function init(){
   let {data:{session}}=await supa.auth.getSession(); if(!session){location.href='login.html';return}
   ME_ID=session.user.id; let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).single(); ME_RAW=cleanUser(my?.username||session.user.email.split('@')[0]); let navPfp=document.getElementById('navPfp'); if(navPfp && my?.avatar_url) navPfp.src=my.avatar_url; else if(navPfp) navPfp.style.display='none';
   let {data:profs}=await supa.from('profiles').select('*'); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p});
+  await loadUserSettings();
   updatePresence(true); setInterval(()=>updatePresence(true),30000); loadNotes(); load();
   supa.channel('dm-list').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},()=>load()).subscribe();
   supa.channel('presence-live').on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles'},()=>{ load(); }).subscribe();
