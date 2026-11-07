@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PIXORO Chat</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=safe_nested_intha_file"></script>
+<script src="js/pixoro-core.js?v=insta_3level_chat"></script>
 <style>
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{margin:0;background:#000!important;color:#fff;max-width:450px;height:100dvh;height:100svh;margin:auto;display:flex;flex-direction:column;-webkit-touch-callout:none;overflow:hidden}
@@ -59,16 +59,22 @@ body{margin:0;background:#000!important;color:#fff;max-width:450px;height:100dvh
 #recBar{display:none;background:#111;padding:10px 14px;align-items:center;gap:10px;margin:0 10px;border-radius:14px;color:#fff}
 #warnBar{display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);width:min(92%,400px);background:#FF4D8D;color:#fff;font-size:13px;font-weight:700;text-align:center;padding:12px 14px;border-radius:14px;z-index:9999;box-shadow:0 8px 30px rgba(0,0,0,.5)}
 #smallSafe{display:none;background:#141414;color:#888;font-size:11px;text-align:center;padding:7px 10px;margin:8px 10px 0;border-radius:10px}
-#sheetBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none}
-#dmSettingSheet{display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#000!important;color:#fff;border-radius:24px 24px 0 0;padding:16px;z-index:1001;max-height:92vh;overflow-y:auto;border-top:2px solid #FF4D8D}
+#sheetBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none;opacity:0;transition:opacity .35s ease}
+#sheetBackdrop.open{display:block;opacity:1}
+#dmSettingSheet{display:block;position:fixed;bottom:0;left:50%;transform:translate(-50%,100%);width:100%;max-width:450px;background:#000!important;color:#fff;border-radius:24px 24px 0 0;padding:16px;z-index:1001;max-height:82vh;overflow-y:auto;border-top:2px solid #FF4D8D;visibility:hidden;transition:transform .35s ease}
+#dmSettingSheet.open{transform:translate(-50%,0);visibility:visible}
 .typeRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:15px;background:#1A1A1A!important;border-radius:14px;margin-top:8px;cursor:pointer}
 .typeRow b{font-size:15px}
 .typeRow .st{font-size:12px;font-weight:800;padding:5px 10px;border-radius:20px}
 .st.on{background:#22C55E;color:#fff}.st.off{background:#333;color:#888}
-.detailBox{display:none;background:#141414;border-radius:18px;padding:16px;margin-top:8px}
-.detailBox .bigBtn{flex:1;padding:14px;border:0;border-radius:14px;font-weight:800;font-size:14px;cursor:pointer;color:#888;background:#222}
-.detailBox .bigBtn.selAllow{background:#22C55E!important;color:#fff!important}
-.detailBox .bigBtn.selDeny{background:#FF3B30!important;color:#fff!important}
+.detailBox{display:none;background:transparent!important;border-radius:0;padding:0;margin-top:8px}
+.detailBox .bigBtn{flex:1;padding:14px;border:1.5px solid #333;border-radius:14px;font-weight:800;font-size:14px;cursor:pointer;color:#888;background:transparent!important}
+.detailBox .bigBtn.selAllow{background:#22C55E!important;color:#fff!important;border-color:#22C55E}
+.detailBox .bigBtn.selDeny{background:#FF3B30!important;color:#fff!important;border-color:#FF3B30}
+.secTitle{font-size:12px;color:#888;margin:16px 0 4px}
+.slideIn{animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.backBtn2{background:#222;border:0;color:#fff;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer}
 .massTitle{font-size:12px;color:#FF4D8D;font-weight:800;margin-top:16px;display:block;letter-spacing:1px}
 #callView{display:none;position:fixed;inset:0;background:#000;z-index:9999;flex-direction:column}
 #remoteVideo{flex:1;width:100%;object-fit:cover;background:#000}
@@ -121,15 +127,12 @@ body{margin:0;background:#000!important;color:#fff;max-width:450px;height:100dvh
 <div id="chatControlsPage" style="display:none;position:fixed;inset:0;background:#000;z-index:2002;max-width:450px;margin:auto;padding:14px"><div style="display:flex;gap:12px;align-items:center"><button onclick="document.getElementById('chatControlsPage').style.display='none'" style="background:none;border:0;color:#fff;font-size:22px">←</button><b style="font-size:18px">Chat controls</b></div><div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center"><span>Move to general</span><button onclick="moveToGeneral()" style="background:#333;color:#fff;border:0;padding:8px 18px;border-radius:18px">Move</button></div></div>
 <div id="privacyPage" style="display:none;position:fixed;inset:0;background:#000;z-index:2002;max-width:450px;margin:auto;padding:14px;overflow-y:auto"><div style="display:flex;gap:12px;align-items:center"><button onclick="document.getElementById('privacyPage').style.display='none'" style="background:none;border:0;color:#fff;font-size:22px">←</button><b style="font-size:18px">Privacy</b></div><div id="privacyList"></div><div id="privacyDetail" class="detailBox"><div style="display:flex;align-items:center;gap:10px"><button onclick="closePrivacyDetail()" style="background:#222;border:0;color:#fff;width:32px;height:32px;border-radius:50%;font-size:16px">←</button><b id="privacyDetailTitle" style="font-size:16px">Seen</b></div><div style="display:flex;gap:10px;margin-top:16px"><button id="privacyAllowBtn" class="bigBtn" onclick="setPrivacyDetail(true)">ALLOW</button><button id="privacyDenyBtn" class="bigBtn" onclick="setPrivacyDetail(false)">NOT ALLOW</button></div><button onclick="closePrivacyDetail()" style="width:100%;margin-top:12px;padding:13px;background:linear-gradient(135deg,#FF4D8D,#FF7AB8);border:0;border-radius:14px;color:#fff;font-weight:900">DONE</button></div><div class="pRow" onclick="doRestrict()"><div style="flex:1"><b>Restrict</b></div></div><div class="pRow" onclick="blockSelected()"><div style="flex:1"><b>Block</b></div></div><div class="pRow" onclick="reportSelected()"><div style="flex:1"><b style="color:#FF6B6B">Report</b></div></div></div>
 <div id="dmSettingSheet">
-  <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:18px">Settings</b><span onclick="closeAllSheets()" style="background:#1F1F1F;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;cursor:pointer">✕</span></div>
+  <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:18px" id="dmSettingsTitle">Settings</b><span onclick="closeDMSettingsSlow()" style="background:#1F1F1F;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;cursor:pointer">✕</span></div>
   <div style="background:#1A1A1A;border-radius:12px;padding:10px;font-size:12px;margin-top:10px;color:#888">Chat: <b id="massChatName" style="color:#fff">-</b></div>
-  <b class="massTitle">SETTINGS</b>
-  <div id="dmTypeList"></div>
-  <div id="dmTypeDetail" class="detailBox"><div style="display:flex;align-items:center;gap:10px"><button onclick="closeDmTypeDetail()" style="background:#222;border:0;color:#fff;width:32px;height:32px;border-radius:50%;font-size:16px">←</button><b id="dmTypeTitle" style="font-size:16px">Settings</b></div><div id="dmTypeBody" style="margin-top:14px"></div><button onclick="closeDmTypeDetail()" style="width:100%;margin-top:12px;padding:13px;background:linear-gradient(135deg,#FF4D8D,#FF7AB8);border:0;border-radius:14px;color:#fff;font-weight:900">DONE</button></div>
+  <div id="dmStack"><div id="dmPage1"></div><div id="dmPage2" style="display:none"></div><div id="dmPage3" style="display:none"></div></div>
   <button onclick="clearChat()" style="width:100%;padding:14px;background:#1F1F1F;color:#fff;border:0;border-radius:14px;margin-top:14px;font-weight:700;text-align:left">Clear Chat</button>
   <button onclick="reportSelected()" style="width:100%;padding:14px;background:#1F1F1F;color:#FF6B6B;border:0;border-radius:14px;margin-top:8px;font-weight:700;text-align:left">Report</button>
   <button onclick="blockSelected()" style="width:100%;padding:14px;background:#1F1F1F;color:#FF6B6B;border:0;border-radius:14px;margin-top:8px;font-weight:700;text-align:left">Block</button>
-  <button onclick="closeAllSheets()" style="width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,#FF4D8D,#FF7AB8);border:0;border-radius:14px;color:#fff;font-weight:900">DONE</button>
 </div>
 <div id="zoomView" onclick="this.style.display='none'"><img id="zoomImg"></div>
 <div id="callView"><video id="remoteVideo" autoplay playsinline></video><video id="localVideo" autoplay playsinline muted></video><div id="callName">Chat</div><div id="callStatus">Connecting...</div><div id="callControls"><button class="callBtn" style="background:#333" onclick="toggleMute()" id="muteBtn">🎤</button><button class="callBtn" style="background:#333" onclick="toggleCamera()" id="camBtn">📷</button><button class="callBtn" style="background:#FF3B30" onclick="endCall()">📞</button></div></div>
@@ -144,13 +147,26 @@ let MY_MSG_REQUEST='everyone', MY_REQ_PHOTO=false, MY_REQ_VOICE=false, MY_REQ_PR
 let OTHER_MSG_REQUEST='everyone', OTHER_REQ_PHOTO=false, OTHER_REQ_VOICE=false, OTHER_REQ_PREVIEW=true, IS_REQUEST_PENDING=false, MY_MSG_COUNT=0;
 let lastMsgText='',lastMsgTime=0,spamCount=0;
 let pc=null,localStream=null,CALL_TYPE='audio',PENDING_OFFER=null,CALL_ACTIVE=false,MIC_MUTED=false,CAM_OFF=false;
-let SAFE_CUR=null, PRIV_CUR=null, DM_CUR=null;
+let SAFE_CUR=null, PRIV_CUR=null, DM_CUR=null, DM_STACK=[], DM_LAST_GROUP=null;
 const SAFE_TYPES=[{k:'photo',t:'Photo'},{k:'view',t:'View Photo'},{k:'call',t:'Call'},{k:'voice',t:'Voice'},{k:'stranger',t:'Stranger'},{k:'imgblock',t:'Image Block'}];
 const PRIV_TYPES=[{k:'seen',t:'Seen'},{k:'typing',t:'Typing'},{k:'active',t:'Active'},{k:'showLastSeen',t:'Last Seen'},{k:'otpblock',t:'OTP Block'},{k:'linkwarn',t:'Link Warning'}];
-const DM_TYPES=[{k:'msgRequest',t:'Message Request'},{k:'reqPhoto',t:'Request Photo'},{k:'reqVoice',t:'Request Voice'},{k:'reqPreview',t:'Request Preview'},{k:'audiocall',t:'Audio Call'},{k:'videocall',t:'Video Call'},{k:'camera',t:'Camera'},{k:'antispam',t:'Anti-Spam'},{k:'mute',t:'Mute'},{k:'vanish',t:'Vanish'},{k:'disappear',t:'Disappear 24H'}];
+const DM_GROUPS=[
+  {title:'What you see', items:[{k:'msgRequest',t:'Message Request'},{k:'privacy',t:'Privacy'}]},
+  {title:'Your app and media', items:[{k:'media',t:'Media & Calls'},{k:'safety',t:'Safety'}]},
+  {title:'For families', items:[{k:'girl',t:'Girl Safety'},{k:'kids',t:'Kids Help'}]},
+];
+const DM_SUB={
+  privacy:[{k:'seen',t:'Seen'},{k:'typing',t:'Typing'},{k:'active',t:'Active'},{k:'showLastSeen',t:'Last Seen'},{k:'otpblock',t:'OTP Block'},{k:'linkwarn',t:'Link Warning'}],
+  media:[{k:'audiocall',t:'Audio Call'},{k:'videocall',t:'Video Call'},{k:'camera',t:'Camera'}],
+  safety:[{k:'antispam',t:'Anti-Spam'},{k:'mute',t:'Mute'},{k:'vanish',t:'Vanish'},{k:'disappear',t:'Disappear 24H'}],
+  girl:[{k:'girl_photo',t:'Photo'},{k:'girl_view',t:'View Photo'},{k:'girl_call',t:'Call'},{k:'girl_voice',t:'Voice'},{k:'girl_stranger',t:'Stranger'},{k:'girl_imgblock',t:'Image Block'}],
+  kids:[{k:'kids_mode',t:'Kids Mode'},{k:'kids_help',t:'Help Button'}],
+  reqGroup:[{k:'reqPhoto',t:'Request Photo'},{k:'reqVoice',t:'Request Voice'},{k:'reqPreview',t:'Request Preview'}],
+};
+const DM_TITLES={privacy:'Privacy',media:'Media & Calls',safety:'Safety',girl:'Girl Safety',kids:'Kids Help',reqGroup:'Request Settings',msgRequest:'Message Request'};
 function getSafeVal(k){ return GIRL_SAFETY[k]; }
 function getPrivVal(k){ let m={seen:DM_SEEN,typing:DM_TYPING,active:DM_ACTIVE,showLastSeen:SHOW_LASTSEEN,otpblock:DM_OTP_BLOCK,linkwarn:DM_LINK_WARN}; return m[k]; }
-function getDmVal(k){ if(k==='msgRequest') return MY_MSG_REQUEST; if(k==='reqPhoto') return MY_REQ_PHOTO; if(k==='reqVoice') return MY_REQ_VOICE; if(k==='reqPreview') return MY_REQ_PREVIEW; if(k==='audiocall') return ALLOW_AUDIO; if(k==='videocall') return ALLOW_VIDEO; if(k==='camera') return ALLOW_CAMERA; if(k==='antispam') return DM_ANTISPAM; if(k==='mute') return DM_MUTE; if(k==='vanish') return DM_VANISH; if(k==='disappear') return DM_DISAPPEAR==='24h'; return true; }
+function getDmVal(k){ if(k==='msgRequest') return MY_MSG_REQUEST; if(k==='reqPhoto') return MY_REQ_PHOTO; if(k==='reqVoice') return MY_REQ_VOICE; if(k==='reqPreview') return MY_REQ_PREVIEW; if(k==='audiocall') return ALLOW_AUDIO; if(k==='videocall') return ALLOW_VIDEO; if(k==='camera') return ALLOW_CAMERA; if(k==='antispam') return DM_ANTISPAM; if(k==='mute') return DM_MUTE; if(k==='vanish') return DM_VANISH; if(k==='disappear') return DM_DISAPPEAR==='24h'; if(k==='seen') return DM_SEEN; if(k==='typing') return DM_TYPING; if(k==='active') return DM_ACTIVE; if(k==='showLastSeen') return SHOW_LASTSEEN; if(k==='otpblock') return DM_OTP_BLOCK; if(k==='linkwarn') return DM_LINK_WARN; if(k==='girl_photo') return GIRL_SAFETY.photo; if(k==='girl_view') return GIRL_SAFETY.view; if(k==='girl_call') return GIRL_SAFETY.call; if(k==='girl_voice') return GIRL_SAFETY.voice; if(k==='girl_stranger') return GIRL_SAFETY.stranger; if(k==='girl_imgblock') return GIRL_SAFETY.imgblock; if(k==='kids_mode') return false; if(k==='kids_help') return true; return true; }
 function renderSafeList(){ let el=$('safeList'); if(!el) return; el.innerHTML=SAFE_TYPES.map(o=>{ let v=getSafeVal(o.k); return `<div class="typeRow" onclick="openSafeDetail('${o.k}')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center"><span class="st ${v?'on':'off'}">${v?'ON':'OFF'}</span><span>›</span></span></div>` }).join(''); }
 function openSafeDetail(k){ SAFE_CUR=k; let o=SAFE_TYPES.find(x=>x.k===k); $('safeDetailTitle').textContent=o?o.t:k; $('safeList').style.display='none'; $('safeDetail').style.display='block'; let v=getSafeVal(k); $('safeAllowBtn').className='bigBtn '+(v?'selAllow':''); $('safeDenyBtn').className='bigBtn '+(!v?'selDeny':''); }
 function closeSafeDetail(){ SAFE_CUR=null; $('safeDetail').style.display='none'; $('safeList').style.display='block'; renderSafeList(); }
@@ -159,15 +175,74 @@ function renderPrivacyList(){ let el=$('privacyList'); if(!el) return; el.innerH
 function openPrivacyDetail(k){ PRIV_CUR=k; let o=PRIV_TYPES.find(x=>x.k===k); $('privacyDetailTitle').textContent=o?o.t:k; $('privacyList').style.display='none'; $('privacyDetail').style.display='block'; let v=getPrivVal(k); $('privacyAllowBtn').className='bigBtn '+(v?'selAllow':''); $('privacyDenyBtn').className='bigBtn '+(!v?'selDeny':''); }
 function closePrivacyDetail(){ PRIV_CUR=null; $('privacyDetail').style.display='none'; $('privacyList').style.display='block'; renderPrivacyList(); }
 function setPrivacyDetail(v){ if(!PRIV_CUR) return; saveDMSetting(PRIV_CUR,v); $('privacyAllowBtn').className='bigBtn '+(v?'selAllow':''); $('privacyDenyBtn').className='bigBtn '+(!v?'selDeny':''); }
-function renderDmTypeList(){ let el=$('dmTypeList'); if(!el) return; el.innerHTML=DM_TYPES.map(o=>{ let v=getDmVal(o.k); let label=o.k==='msgRequest'?MY_MSG_REQUEST:(v?'ON':'OFF'); let cls=o.k==='msgRequest'?(MY_MSG_REQUEST==='none'?'off':'on'):(v?'on':'off'); return `<div class="typeRow" onclick="openDmTypeDetail('${o.k}')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center"><span class="st ${cls}">${label}</span><span>›</span></span></div>` }).join(''); }
-function openDmTypeDetail(k){ DM_CUR=k; let o=DM_TYPES.find(x=>x.k===k); $('dmTypeTitle').textContent=o?o.t:k; $('dmTypeList').style.display='none'; $('dmTypeDetail').style.display='block'; let body=$('dmTypeBody'); if(k==='msgRequest'){ body.innerHTML=`<div style="display:flex;gap:10px"><button class="bigBtn ${MY_MSG_REQUEST==='everyone'?'selAllow':''}" onclick="setDmMsgRequest('everyone')">Everyone</button><button class="bigBtn ${MY_MSG_REQUEST==='followers'?'selAllow':''}" onclick="setDmMsgRequest('followers')">Followers</button><button class="bigBtn ${MY_MSG_REQUEST==='none'?'selDeny':''}" onclick="setDmMsgRequest('none')">No One</button></div>`; } else { let v=getDmVal(k); body.innerHTML=`<div style="display:flex;gap:10px"><button class="bigBtn ${v?'selAllow':''}" onclick="setDmDetailBool('${k}',true)">ALLOW</button><button class="bigBtn ${!v?'selDeny':''}" onclick="setDmDetailBool('${k}',false)">NOT ALLOW</button></div>`; } }
-function closeDmTypeDetail(){ DM_CUR=null; $('dmTypeDetail').style.display='none'; $('dmTypeList').style.display='block'; renderDmTypeList(); }
-function setDmMsgRequest(v){ MY_MSG_REQUEST=v; saveMyMsgRequest(); openDmTypeDetail('msgRequest'); renderDmTypeList(); }
-function setDmDetailBool(k,v){ if(k==='reqPhoto') MY_REQ_PHOTO=v; else if(k==='reqVoice') MY_REQ_VOICE=v; else if(k==='reqPreview') MY_REQ_PREVIEW=v; else if(k==='audiocall') ALLOW_AUDIO=v; else if(k==='videocall') ALLOW_VIDEO=v; else if(k==='camera') ALLOW_CAMERA=v; else if(k==='antispam') DM_ANTISPAM=v; else if(k==='mute') DM_MUTE=v; else if(k==='vanish') DM_VANISH=v; else if(k==='disappear') DM_DISAPPEAR=v?'24h':'off'; if(['reqPhoto','reqVoice','reqPreview'].includes(k)) saveMyMsgRequest(); else saveDMSetting(k,v); openDmTypeDetail(k); renderDmTypeList(); }
+// === INSTA 3-LEVEL - dmSettingSheet ===
+function renderDmLevel1(){
+  $('dmSettingsTitle').textContent='Settings';
+  let h='';
+  DM_GROUPS.forEach(g=>{
+    h+=`<div class="secTitle">${g.title}</div>`;
+    g.items.forEach(o=>{
+      let isGroup=!!DM_SUB[o.k];
+      let label=isGroup?'':`<span class="st ${getDmVal(o.k)==='none'||getDmVal(o.k)===false?'off':'on'}">${getDmVal(o.k)}</span>`;
+      h+=`<div class="typeRow" onclick="openDmGroup('${o.k}')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center">${label}<span>›</span></span></div>`;
+    });
+  });
+  h+=`<div class="secTitle">Message Request</div><div class="typeRow" onclick="openDmGroup('reqGroup')"><b>Request Settings</b><span>›</span></div>`;
+  let p1=$('dmPage1'); p1.innerHTML=h; p1.style.display='block'; p1.classList.add('slideIn');
+  $('dmPage2').style.display='none'; $('dmPage3').style.display='none'; DM_STACK=['level1'];
+}
+function openDmGroup(k){
+  if(k==='msgRequest'){ openDmDetail('msgRequest','level1'); return; }
+  let items=DM_SUB[k]; if(!items) return; DM_LAST_GROUP=k; showDmPage2(DM_TITLES[k]||k, items);
+}
+function showDmPage2(title, items){
+  $('dmSettingsTitle').textContent=title;
+  let h=`<button class="backBtn2" onclick="renderDmLevel1()">←</button>`;
+  h+=items.map(o=>{ let v=getDmVal(o.k); return `<div class="typeRow" onclick="openDmDetail('${o.k}','level2')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center"><span class="st ${v?'on':'off'}">${v?'ON':'OFF'}</span><span>›</span></span></div>`; }).join('');
+  let p2=$('dmPage2'); p2.innerHTML=h; p2.style.display='block'; p2.classList.add('slideIn');
+  $('dmPage1').style.display='none'; $('dmPage3').style.display='none'; DM_STACK=['level1','level2'];
+}
+function openDmDetail(k, from){
+  DM_CUR=k;
+  let all=[...Object.values(DM_SUB).flat(), {k:'msgRequest',t:'Message Request'}];
+  let o=all.find(x=>x.k===k)||{t:k};
+  $('dmSettingsTitle').textContent=o.t;
+  let body='';
+  if(k==='msgRequest'){
+    body=`<div style="display:flex;gap:10px"><button class="bigBtn ${MY_MSG_REQUEST==='everyone'?'selAllow':''}" onclick="setDmMsgRequest('everyone')">Everyone</button><button class="bigBtn ${MY_MSG_REQUEST==='followers'?'selAllow':''}" onclick="setDmMsgRequest('followers')">Followers</button><button class="bigBtn ${MY_MSG_REQUEST==='none'?'selDeny':''}" onclick="setDmMsgRequest('none')">No One</button></div>`;
+  } else {
+    let v=getDmVal(k);
+    body=`<div style="display:flex;gap:10px"><button class="bigBtn ${v?'selAllow':''}" onclick="setDmDetailBool('${k}',true)">ALLOW</button><button class="bigBtn ${!v?'selDeny':''}" onclick="setDmDetailBool('${k}',false)">NOT ALLOW</button></div>`;
+  }
+  let h=`<button class="backBtn2" onclick="goBackDm()">←</button><div style="margin-top:14px">${body}</div><button onclick="goBackDm()" style="width:100%;margin-top:12px;padding:13px;background:linear-gradient(135deg,#FF4D8D,#FF7AB8);border:0;border-radius:14px;color:#fff;font-weight:900">DONE</button>`;
+  let p3=$('dmPage3'); p3.innerHTML=h; p3.style.display='block'; p3.classList.add('slideIn');
+  $('dmPage1').style.display='none'; $('dmPage2').style.display='none'; DM_STACK=['level1','level2','level3'];
+}
+function goBackDm(){
+  if(DM_STACK.length>=3 && DM_LAST_GROUP && DM_SUB[DM_LAST_GROUP]){ showDmPage2(DM_TITLES[DM_LAST_GROUP], DM_SUB[DM_LAST_GROUP]); }
+  else { renderDmLevel1(); }
+}
+// Old names - compatibility
+function renderDmTypeList(){ renderDmLevel1(); }
+function closeDmTypeDetail(){ goBackDm(); }
+function setDmMsgRequest(v){ MY_MSG_REQUEST=v; saveMyMsgRequest(); openDmDetail('msgRequest','level1'); renderDmLevel1(); }
+function setDmDetailBool(k,v){
+  if(k==='reqPhoto') MY_REQ_PHOTO=v; else if(k==='reqVoice') MY_REQ_VOICE=v; else if(k==='reqPreview') MY_REQ_PREVIEW=v;
+  else if(k==='audiocall') ALLOW_AUDIO=v; else if(k==='videocall') ALLOW_VIDEO=v; else if(k==='camera') ALLOW_CAMERA=v;
+  else if(k==='antispam') DM_ANTISPAM=v; else if(k==='mute') DM_MUTE=v; else if(k==='vanish') DM_VANISH=v; else if(k==='disappear') DM_DISAPPEAR=v?'24h':'off';
+  else if(k==='seen') DM_SEEN=v; else if(k==='typing') DM_TYPING=v; else if(k==='active') DM_ACTIVE=v; else if(k==='showLastSeen') SHOW_LASTSEEN=v;
+  else if(k==='otpblock') DM_OTP_BLOCK=v; else if(k==='linkwarn') DM_LINK_WARN=v;
+  else if(k==='girl_photo') GIRL_SAFETY.photo=v; else if(k==='girl_view') GIRL_SAFETY.view=v; else if(k==='girl_call') GIRL_SAFETY.call=v; else if(k==='girl_voice') GIRL_SAFETY.voice=v; else if(k==='girl_stranger') GIRL_SAFETY.stranger=v; else if(k==='girl_imgblock') GIRL_SAFETY.imgblock=v;
+  if(['reqPhoto','reqVoice','reqPreview'].includes(k)) saveMyMsgRequest();
+  else if(k.startsWith('girl_')) saveGirlSafety(k.replace('girl_',''),v);
+  else saveDMSetting(k,v);
+  openDmDetail(k,'level2');
+}
 function showWarning(msg){ let w=$('warnBar'); if(!w) return; w.textContent=msg; w.style.display='block'; clearTimeout(window._warnT); window._warnT=setTimeout(()=>w.style.display='none',1500); }
-function closeAllSheets(){ ['dmSettingSheet','menu','optMenu'].forEach(id=>{ let e=$(id); if(e) e.style.display='none'; }); let bd=$('sheetBackdrop'); if(bd) bd.style.display='none'; }
-function openDMSettings(){ closeProfile(); closeAllSheets(); renderDmTypeList(); closeDmTypeDetail(); $('dmSettingSheet').style.display='block'; $('sheetBackdrop').style.display='block'; syncAllMassUI(); }
-function goBackFix(){ let ps=$('profileSheet'); if(ps && ps.style.display==='block'){ if($('privacyPage').style.display==='block'){ if($('privacyDetail').style.display==='block'){ closePrivacyDetail(); return; } $('privacyPage').style.display='none'; return; } if($('chatControlsPage').style.display==='block'){ $('chatControlsPage').style.display='none'; return; } if($('optMenu').style.display==='block'){ $('optMenu').style.display='none'; return; } if($('safeDetail').style.display==='block'){ closeSafeDetail(); return; } closeProfile(); return; } let s=$('dmSettingSheet'); if(s && s.style.display==='block'){ if($('dmTypeDetail').style.display==='block'){ closeDmTypeDetail(); return; } closeAllSheets(); return; } let m=$('menu'); if(m && m.style.display==='block'){ closeAllSheets(); return; } let z=$('zoomView'); if(z && z.style.display==='grid'){ z.style.display='none'; return; } if(CALL_ACTIVE) endCall(); location.href='dm.html'; }
+function closeDMSettingsSlow(){ let s=$('dmSettingSheet'); let bd=$('sheetBackdrop'); s.classList.remove('open'); bd.classList.remove('open'); setTimeout(()=>{ bd.style.display='none'; },350); }
+function closeAllSheets(){ closeDMSettingsSlow(); ['menu','optMenu'].forEach(id=>{ let e=$(id); if(e) e.style.display='none'; }); }
+function openDMSettings(){ closeProfile(); closeAllSheets(); renderDmLevel1(); let s=$('dmSettingSheet'); let bd=$('sheetBackdrop'); s.classList.add('open'); bd.classList.add('open'); bd.style.display='block'; syncAllMassUI(); }
+function goBackFix(){ let ps=$('profileSheet'); if(ps && ps.style.display==='block'){ if($('privacyPage').style.display==='block'){ if($('privacyDetail').style.display==='block'){ closePrivacyDetail(); return; } $('privacyPage').style.display='none'; return; } if($('chatControlsPage').style.display==='block'){ $('chatControlsPage').style.display='none'; return; } if($('optMenu').style.display==='block'){ $('optMenu').style.display='none'; return; } if($('safeDetail').style.display==='block'){ closeSafeDetail(); return; } closeProfile(); return; } let s=$('dmSettingSheet'); if(s && s.classList.contains('open')){ if($('dmPage3').style.display==='block'){ goBackDm(); return; } if($('dmPage2').style.display==='block'){ renderDmLevel1(); return; } closeAllSheets(); return; } let m=$('menu'); if(m && m.style.display==='block'){ closeAllSheets(); return; } let z=$('zoomView'); if(z && z.style.display==='grid'){ z.style.display='none'; return; } if(CALL_ACTIVE) endCall(); location.href='dm.html'; }
 function getDMState(){ return {active:DM_ACTIVE,typing:DM_TYPING,seen:DM_SEEN,allow:DM_ALLOW,showLastSeen:SHOW_LASTSEEN,otpblock:DM_OTP_BLOCK,linkwarn:DM_LINK_WARN,vanish:DM_VANISH,disappear:DM_DISAPPEAR,shotalert:DM_SHOT_ALERT,antispam:DM_ANTISPAM,mute:DM_MUTE,audiocall:ALLOW_AUDIO,videocall:ALLOW_VIDEO,camera:ALLOW_CAMERA}; }
 function getGirlState(){ return GIRL_SAFETY; }
 function applyDMState(d){ if(!d) return; DM_ACTIVE=d.active??true; DM_TYPING=d.typing??true; DM_SEEN=d.seen??true; DM_ALLOW=d.allow||'everyone'; SHOW_LASTSEEN=d.showLastSeen??true; DM_OTP_BLOCK=d.otpblock??true; DM_LINK_WARN=d.linkwarn??true; DM_VANISH=d.vanish||false; DM_DISAPPEAR=d.disappear||'off'; DM_SHOT_ALERT=d.shotalert??true; DM_ANTISPAM=d.antispam??true; DM_MUTE=d.mute||false; ALLOW_AUDIO=d.audiocall??true; ALLOW_VIDEO=d.videocall??true; ALLOW_CAMERA=d.camera??true; }
@@ -177,7 +252,7 @@ async function loadPerChat(){ if(!CHAT_ID||!ME_ID||!supa) return; try{ let {data
 async function saveMyMsgRequest(){ if(!ME_ID||!supa) return; try{ await supa.from('user_settings').upsert({user_id:ME_ID,msg_request:MY_MSG_REQUEST,req_photo:MY_REQ_PHOTO,req_voice:MY_REQ_VOICE,req_preview:MY_REQ_PREVIEW,dm_active:DM_ACTIVE,dm_typing:DM_TYPING,dm_seen:DM_SEEN,dm_allow:DM_ALLOW,show_lastseen:SHOW_LASTSEEN,updated_at:new Date().toISOString()},{onConflict:'user_id'}); }catch(e){} }
 async function loadMyMsgRequest(){ if(!ME_ID||!supa) return; try{ let {data}=await supa.from('user_settings').select('*').eq('user_id',ME_ID).maybeSingle(); if(data){ MY_MSG_REQUEST=data.msg_request||'everyone'; MY_REQ_PHOTO=data.req_photo||false; MY_REQ_VOICE=data.req_voice||false; MY_REQ_PREVIEW=data.req_preview??true; } }catch(e){} syncReqUI(); }
 async function loadOtherMsgRequest(){ if(!OTHER_ID||!supa) return; try{ let {data}=await supa.from('user_settings').select('*').eq('user_id',OTHER_ID).maybeSingle(); if(data){ OTHER_MSG_REQUEST=data.msg_request||'everyone'; OTHER_REQ_PHOTO=data.req_photo||false; OTHER_REQ_VOICE=data.req_voice||false; OTHER_REQ_PREVIEW=data.req_preview??true; } }catch(e){} try{ let {data:msgs}=await supa.from('messages').select('id,sender_id').eq('chat_id',CHAT_ID).limit(200); let mine=(msgs||[]).filter(m=>String(m.sender_id)===ME_ID).length; MY_MSG_COUNT=mine; IS_REQUEST_PENDING=(mine===0); }catch(e){} syncReqUI(); showRequestBanner(); }
-function syncReqUI(){ renderSafeList(); renderPrivacyList(); renderDmTypeList(); }
+function syncReqUI(){ renderSafeList(); renderPrivacyList(); renderDmLevel1(); }
 function setMyMsgRequest(v){ MY_MSG_REQUEST=v; syncReqUI(); saveMyMsgRequest(); showWarning('Saved'); }
 function setMyReq(k,v,btn){ if(k==='reqPhoto') MY_REQ_PHOTO=v; if(k==='reqVoice') MY_REQ_VOICE=v; if(k==='reqPreview') MY_REQ_PREVIEW=v; saveMyMsgRequest(); }
 function showRequestBanner(){ let box=$('box'); if(!box) return; let old=document.getElementById('reqBanner'); if(old) old.remove(); if(OTHER_MSG_REQUEST==='none'){ let d=document.createElement('div'); d.id='reqBanner'; d.style.cssText='background:#FF3B30;color:#fff;text-align:center;padding:10px;font-size:13px;font-weight:700;margin:8px;border-radius:12px'; d.textContent='Blocked'; box.prepend(d); return; } if(IS_REQUEST_PENDING && (MY_MSG_REQUEST==='followers' || OTHER_MSG_REQUEST==='followers')){ let d=document.createElement('div'); d.id='reqBanner'; d.style.cssText='background:#1F1F1F;border:1px solid #FF4D8D;border-radius:14px;padding:12px;margin:8px;text-align:center'; d.innerHTML='<b>Message Request</b><div style="display:flex;gap:8px;margin-top:10px"><button onclick="acceptRequest()" style="flex:1;background:#22C55E;border:0;color:#fff;padding:10px;border-radius:12px;font-weight:800">Accept</button><button onclick="declineRequest()" style="flex:1;background:#333;border:0;color:#fff;padding:10px;border-radius:12px;font-weight:800">Decline</button><button onclick="blockSelected()" style="flex:1;background:#FF3B30;border:0;color:#fff;padding:10px;border-radius:12px;font-weight:800">Block</button></div>'; box.prepend(d); } }
