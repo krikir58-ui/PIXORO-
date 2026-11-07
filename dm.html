@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PIXORO - Chats</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=dm_nested_final"></script>
+<script src="js/pixoro-core.js?v=insta_3level_final"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:76px}
@@ -59,16 +59,22 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 .navBadge{position:absolute;top:-4px;right:8px;background:#FF4D8D;color:#fff;font-size:10px;min-width:17px;height:17px;border-radius:9px;display:grid;place-items:center;padding:0 4px;font-weight:700}
 .fab{position:fixed;bottom:78px;right:14px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#FF4D8D,#FF2E63);display:grid;place-items:center;font-size:22px;z-index:90;cursor:pointer;color:#fff}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#FF4D8D;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;display:none;white-space:nowrap}
-#sheetBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;display:none}
-#dmSettingSheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#000!important;border-top:2px solid #FF4D8D;border-radius:24px 24px 0 0;padding:18px;z-index:1001;display:none;max-height:88vh;overflow-y:auto;color:#fff}
+#sheetBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;display:none;opacity:0;transition:opacity .35s ease}
+#sheetBackdrop.open{display:block;opacity:1}
+#dmSettingSheet{position:fixed;bottom:0;left:50%;transform:translate(-50%,100%);width:100%;max-width:450px;background:#000!important;border-top:2px solid #FF4D8D;border-radius:24px 24px 0 0;padding:18px;z-index:1001;display:block;max-height:82vh;overflow-y:auto;color:#fff;transition:transform .35s ease;visibility:hidden}
+#dmSettingSheet.open{transform:translate(-50%,0);visibility:visible}
+.secTitle{font-size:12px;color:#888;margin:16px 0 4px}
 .typeRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:15px;background:#1A1A1A!important;border-radius:14px;margin-top:8px;cursor:pointer}
-.typeRow b{font-size:15px}
+.typeRow b{font-size:15px;font-weight:600}
 .typeRow .st{font-size:12px;font-weight:800;padding:5px 10px;border-radius:20px}
 .st.on{background:#22C55E;color:#fff}.st.off{background:#333;color:#888}
-.detailBox{display:none;background:#141414;border-radius:18px;padding:16px;margin-top:8px}
-.detailBox .bigBtn{flex:1;padding:14px;border:0;border-radius:14px;font-weight:800;font-size:14px;cursor:pointer;color:#888;background:#222}
-.detailBox .bigBtn.selAllow{background:#22C55E!important;color:#fff!important}
-.detailBox .bigBtn.selDeny{background:#FF3B30!important;color:#fff!important}
+.detailBox{background:transparent!important;border-radius:0;padding:0;margin-top:8px}
+.bigBtn{flex:1;padding:14px;border:1.5px solid #333;border-radius:14px;font-weight:800;font-size:14px;cursor:pointer;color:#888;background:transparent!important}
+.bigBtn.selAllow{background:#22C55E!important;color:#fff!important;border-color:#22C55E}
+.bigBtn.selDeny{background:#FF3B30!important;color:#fff!important;border-color:#FF3B30}
+.slideIn{animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.backBtn2{background:#222;border:0;color:#fff;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer}
 .blockRow{display:flex;gap:12px;padding:12px;align-items:center;width:calc(100% - 20px);margin:0 10px 8px;background:#141414;border:1px solid #222;border-radius:18px}
 </style></head><body>
 <div class="top"><div class="topRow"><div class="logo">PIXOR<span>O</span></div><div><span class="topIco" onclick="document.getElementById('searchInp').focus()">🔍</span><span class="topIco" onclick="openDMSettings()">⋮</span></div></div></div>
@@ -83,31 +89,112 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 <div class="noteInput" id="notePop"><h3 style="color:#fff">Add Note</h3><input id="noteText" placeholder="..." maxlength="60"><div style="display:flex;gap:10px"><button onclick="saveNote()" style="flex:1;background:#FF4D8D;color:#fff;border:0;padding:11px;border-radius:20px;font-weight:700">Share</button><button onclick="document.getElementById('notePop').style.display='none'" style="flex:1;background:#1F1F1F;color:#fff;border:0;padding:11px;border-radius:20px">Cancel</button></div></div>
 <div class="actionSheet" id="sheet"><b id="sheetName" style="color:#fff;font-size:17px">Chat</b><div id="sheetStatus" style="font-size:12px;color:#22C55E;margin:4px 0 8px"></div><button onclick="doPin()">Pin / Unpin</button><button onclick="doMute()">Mute / Unmute</button><button onclick="doArchive()">Archive</button><button onclick="doBlockFromSheet()" style="color:#FF6B6B;background:#2A1215">Block</button><button onclick="doDeleteChatOnly()">Delete Chat</button><button onclick="doDeleteAll()" style="color:#FF6B6B;background:#2A1215">Delete All Messages</button><button onclick="closeAllSheets()" style="text-align:center">Cancel</button></div>
 <div id="dmSettingSheet">
-  <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:18px">Settings</b><span onclick="closeAllSheets()" style="background:#1F1F1F;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;cursor:pointer">✕</span></div>
-  <div id="dmTypeList"></div>
-  <div id="dmTypeDetail" class="detailBox"><div style="display:flex;align-items:center;gap:10px"><button onclick="closeDmTypeDetail()" style="background:#222;border:0;color:#fff;width:32px;height:32px;border-radius:50%;font-size:16px">←</button><b id="dmTypeTitle" style="font-size:16px">Settings</b></div><div id="dmTypeBody" style="margin-top:14px"></div><button onclick="closeDmTypeDetail()" style="width:100%;margin-top:12px;padding:13px;background:linear-gradient(135deg,#FF4D8D,#FF7AB8);border:0;border-radius:14px;color:#fff;font-weight:900">DONE</button></div>
-  <button onclick="closeAllSheets()" style="width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,#FF4D8D,#FF7AB8);border:0;border-radius:14px;color:#fff;font-weight:900">DONE</button>
+  <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:18px" id="dmSettingsTitle">Settings</b><span onclick="closeDMSettingsSlow()" style="background:#1F1F1F;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;cursor:pointer">✕</span></div>
+  <div id="dmStack"><div id="dmPage1"></div><div id="dmPage2" style="display:none"></div><div id="dmPage3" style="display:none"></div></div>
 </div>
 <div class="bottom-nav"><a href="index.html"><span style="font-size:22px">⌂</span><span>Home</span></a><a href="search.html"><span style="font-size:21px">🔍</span><span>Search</span></a><a href="reels.html"><span style="font-size:21px">▶️</span><span>Reels</span></a><a href="dm.html" class="active"><span style="font-size:21px">💬</span><span>DM</span><span class="navBadge" id="navTotal" style="display:none">0</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
 <script>
 let supa=window.supa, ME_RAW='', ME_ID='', profileMap={}, profileById={}, CUR_TAB='all', ALL_CHATS=[], NOTES_MAP={}, SEARCH_Q='', UNREAD_MAP={}, SHEET_USER='', SHEET_UNAME='', PINNED=[], MUTED=[], ARCHIVED=[], BLOCKED=[];
 let DM_ACTIVE=true, DM_TYPING=true, DM_SEEN=true, DM_ALLOW='everyone', SHOW_LASTSEEN=true;
 let MSG_REQUEST='everyone', REQ_PHOTO=false, REQ_VOICE=false, REQ_PREVIEW=true;
-let DM_CUR=null;
-const DM_TYPES=[{k:'msgRequest',t:'Message Request'},{k:'reqPhoto',t:'Request Photo'},{k:'reqVoice',t:'Request Voice'},{k:'reqPreview',t:'Request Preview'},{k:'active',t:'Active'},{k:'typing',t:'Typing'},{k:'seen',t:'Seen'},{k:'showLastSeen',t:'Last Seen'},{k:'allow',t:'Allow Messages'}];
-function getDmVal(k){ if(k==='msgRequest') return MSG_REQUEST; if(k==='reqPhoto') return REQ_PHOTO; if(k==='reqVoice') return REQ_VOICE; if(k==='reqPreview') return REQ_PREVIEW; if(k==='active') return DM_ACTIVE; if(k==='typing') return DM_TYPING; if(k==='seen') return DM_SEEN; if(k==='showLastSeen') return SHOW_LASTSEEN; if(k==='allow') return DM_ALLOW; return true; }
-function renderDmTypeList(){ let el=document.getElementById('dmTypeList'); if(!el) return; el.innerHTML=DM_TYPES.map(o=>{ let v=getDmVal(o.k); let label=(o.k==='msgRequest'||o.k==='allow')?v:(v?'ON':'OFF'); let cls=(o.k==='msgRequest'&&v==='none')||(o.k==='allow'&&v==='none')||(v===false)?'off':'on'; return `<div class="typeRow" onclick="openDmTypeDetail('${o.k}')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center"><span class="st ${cls}">${label}</span><span>›</span></span></div>` }).join(''); }
-function openDmTypeDetail(k){ DM_CUR=k; let o=DM_TYPES.find(x=>x.k===k); document.getElementById('dmTypeTitle').textContent=o?o.t:k; document.getElementById('dmTypeList').style.display='none'; document.getElementById('dmTypeDetail').style.display='block'; let body=document.getElementById('dmTypeBody'); if(k==='msgRequest'){ body.innerHTML=`<div style="display:flex;gap:10px"><button class="bigBtn ${MSG_REQUEST==='everyone'?'selAllow':''}" onclick="setDmMsgRequest('everyone')">Everyone</button><button class="bigBtn ${MSG_REQUEST==='followers'?'selAllow':''}" onclick="setDmMsgRequest('followers')">Followers</button><button class="bigBtn ${MSG_REQUEST==='none'?'selDeny':''}" onclick="setDmMsgRequest('none')">No One</button></div>`; } else if(k==='allow'){ body.innerHTML=`<div style="display:flex;gap:10px"><button class="bigBtn ${DM_ALLOW==='everyone'?'selAllow':''}" onclick="setDmAllowDetail('everyone')">Everyone</button><button class="bigBtn ${DM_ALLOW==='none'?'selDeny':''}" onclick="setDmAllowDetail('none')">No One</button></div>`; } else { let v=getDmVal(k); body.innerHTML=`<div style="display:flex;gap:10px"><button class="bigBtn ${v?'selAllow':''}" onclick="setDmDetailBool('${k}',true)">ALLOW</button><button class="bigBtn ${!v?'selDeny':''}" onclick="setDmDetailBool('${k}',false)">NOT ALLOW</button></div>`; } }
-function closeDmTypeDetail(){ DM_CUR=null; document.getElementById('dmTypeDetail').style.display='none'; document.getElementById('dmTypeList').style.display='block'; renderDmTypeList(); }
-function setDmMsgRequest(v){ MSG_REQUEST=v; saveUserSettings(); openDmTypeDetail('msgRequest'); renderDmTypeList(); }
-function setDmAllowDetail(v){ DM_ALLOW=v; saveUserSettings(); openDmTypeDetail('allow'); renderDmTypeList(); }
-function setDmDetailBool(k,v){ if(k==='reqPhoto') REQ_PHOTO=v; if(k==='reqVoice') REQ_VOICE=v; if(k==='reqPreview') REQ_PREVIEW=v; if(k==='active') DM_ACTIVE=v; if(k==='typing') DM_TYPING=v; if(k==='seen') DM_SEEN=v; if(k==='showLastSeen') SHOW_LASTSEEN=v; saveUserSettings(); openDmTypeDetail(k); renderDmTypeList(); render(); }
+let DM_OTP_BLOCK=true, DM_LINK_WARN=true, DM_ANTISPAM=true, ALLOW_AUDIO=true, ALLOW_VIDEO=true, ALLOW_CAMERA=true;
+let GIRL_SAFETY={photo:true,call:true,voice:true};
+let KIDS_MODE=false, KIDS_HELP=true;
+let DM_CUR=null, DM_STACK=[], DM_LAST_GROUP=null;
+const DM_GROUPS=[
+  {title:'What you see', items:[{k:'msgRequest',t:'Message Request'},{k:'privacy',t:'Privacy'}]},
+  {title:'Your app and media', items:[{k:'media',t:'Media & Calls'},{k:'safety',t:'Safety'}]},
+  {title:'For families', items:[{k:'girl',t:'Girl Safety'},{k:'kids',t:'Kids Help'}]},
+];
+const DM_SUB={
+  privacy:[{k:'active',t:'Active'},{k:'typing',t:'Typing'},{k:'seen',t:'Seen'},{k:'showLastSeen',t:'Last Seen'}],
+  media:[{k:'audiocall',t:'Audio Call'},{k:'videocall',t:'Video Call'},{k:'camera',t:'Camera'}],
+  safety:[{k:'otpblock',t:'OTP Block'},{k:'linkwarn',t:'Link Warning'},{k:'antispam',t:'Anti-Spam'}],
+  girl:[{k:'girl_photo',t:'Photo'},{k:'girl_call',t:'Call'},{k:'girl_voice',t:'Voice'}],
+  kids:[{k:'kids_mode',t:'Kids Mode'},{k:'kids_help',t:'Help Button'}],
+  reqGroup:[{k:'reqPhoto',t:'Request Photo'},{k:'reqVoice',t:'Request Voice'},{k:'reqPreview',t:'Request Preview'}],
+};
+const DM_TITLES={privacy:'Privacy',media:'Media & Calls',safety:'Safety',girl:'Girl Safety',kids:'Kids Help',reqGroup:'Request Settings',msgRequest:'Message Request'};
+function getDmVal(k){ if(k==='msgRequest') return MSG_REQUEST; if(k==='reqPhoto') return REQ_PHOTO; if(k==='reqVoice') return REQ_VOICE; if(k==='reqPreview') return REQ_PREVIEW; if(k==='active') return DM_ACTIVE; if(k==='typing') return DM_TYPING; if(k==='seen') return DM_SEEN; if(k==='showLastSeen') return SHOW_LASTSEEN; if(k==='allow') return DM_ALLOW; if(k==='audiocall') return ALLOW_AUDIO; if(k==='videocall') return ALLOW_VIDEO; if(k==='camera') return ALLOW_CAMERA; if(k==='otpblock') return DM_OTP_BLOCK; if(k==='linkwarn') return DM_LINK_WARN; if(k==='antispam') return DM_ANTISPAM; if(k==='girl_photo') return GIRL_SAFETY.photo; if(k==='girl_call') return GIRL_SAFETY.call; if(k==='girl_voice') return GIRL_SAFETY.voice; if(k==='kids_mode') return KIDS_MODE; if(k==='kids_help') return KIDS_HELP; return true; }
+function renderDmLevel1(){
+  document.getElementById('dmSettingsTitle').textContent='Settings';
+  let h='';
+  DM_GROUPS.forEach(g=>{
+    h+=`<div class="secTitle">${g.title}</div>`;
+    g.items.forEach(o=>{
+      let isGroup=!!DM_SUB[o.k];
+      let label=isGroup?'':`<span class="st ${getDmVal(o.k)==='none'||getDmVal(o.k)===false?'off':'on'}">${getDmVal(o.k)}</span>`;
+      h+=`<div class="typeRow" onclick="openDmGroup('${o.k}')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center">${label}<span>›</span></span></div>`;
+    });
+  });
+  h+=`<div class="secTitle">Message Request</div><div class="typeRow" onclick="openDmGroup('reqGroup')"><b>Request Settings</b><span>›</span></div>`;
+  let p1=document.getElementById('dmPage1'); p1.innerHTML=h; p1.style.display='block'; p1.classList.add('slideIn');
+  document.getElementById('dmPage2').style.display='none'; document.getElementById('dmPage3').style.display='none';
+  DM_STACK=['level1'];
+}
+function openDmGroup(k){
+  if(k==='msgRequest'){ openDmDetail('msgRequest','level1'); return; }
+  let items=DM_SUB[k]; if(!items) return;
+  DM_LAST_GROUP=k;
+  showDmPage2(DM_TITLES[k]||k, items);
+}
+function showDmPage2(title, items){
+  document.getElementById('dmSettingsTitle').textContent=title;
+  let h=`<button class="backBtn2" onclick="renderDmLevel1()">←</button>`;
+  h+=items.map(o=>{ let v=getDmVal(o.k); return `<div class="typeRow" onclick="openDmDetail('${o.k}','level2')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center"><span class="st ${v?'on':'off'}">${v?'ON':'OFF'}</span><span>›</span></span></div>`; }).join('');
+  let p2=document.getElementById('dmPage2'); p2.innerHTML=h; p2.style.display='block'; p2.classList.add('slideIn');
+  document.getElementById('dmPage1').style.display='none'; document.getElementById('dmPage3').style.display='none';
+  DM_STACK=['level1','level2'];
+}
+function openDmDetail(k, from){
+  DM_CUR=k;
+  let all=[...Object.values(DM_SUB).flat(), {k:'msgRequest',t:'Message Request'}, {k:'allow',t:'Allow Messages'}];
+  let o=all.find(x=>x.k===k)||{t:k};
+  document.getElementById('dmSettingsTitle').textContent=o.t;
+  let body='';
+  if(k==='msgRequest'){
+    body=`<div style="display:flex;gap:10px"><button class="bigBtn ${MSG_REQUEST==='everyone'?'selAllow':''}" onclick="setDmMsgRequest('everyone')">Everyone</button><button class="bigBtn ${MSG_REQUEST==='followers'?'selAllow':''}" onclick="setDmMsgRequest('followers')">Followers</button><button class="bigBtn ${MSG_REQUEST==='none'?'selDeny':''}" onclick="setDmMsgRequest('none')">No One</button></div>`;
+  } else if(k==='allow'){
+    body=`<div style="display:flex;gap:10px"><button class="bigBtn ${DM_ALLOW==='everyone'?'selAllow':''}" onclick="setDmAllowDetail('everyone')">Everyone</button><button class="bigBtn ${DM_ALLOW==='none'?'selDeny':''}" onclick="setDmAllowDetail('none')">No One</button></div>`;
+  } else {
+    let v=getDmVal(k);
+    body=`<div style="display:flex;gap:10px"><button class="bigBtn ${v?'selAllow':''}" onclick="setDmDetailBool('${k}',true)">ALLOW</button><button class="bigBtn ${!v?'selDeny':''}" onclick="setDmDetailBool('${k}',false)">NOT ALLOW</button></div>`;
+  }
+  let backFn = (from==='level2' && DM_LAST_GROUP) ? `showDmPage2('${DM_TITLES[DM_LAST_GROUP]}', DM_SUB['${DM_LAST_GROUP}'])` : `renderDmLevel1()`;
+  // Back ku simple: Level2 iruntha Level2 ku, illa Level1 ku
+  let h=`<button class="backBtn2" onclick="goBackDm()">←</button><div style="margin-top:14px">${body}</div><button onclick="goBackDm()" style="width:100%;margin-top:12px;padding:13px;background:linear-gradient(135deg,#FF4D8D,#FF7AB8);border:0;border-radius:14px;color:#fff;font-weight:900">DONE</button>`;
+  let p3=document.getElementById('dmPage3'); p3.innerHTML=h; p3.style.display='block'; p3.classList.add('slideIn');
+  document.getElementById('dmPage1').style.display='none'; document.getElementById('dmPage2').style.display='none';
+  DM_STACK=['level1','level2','level3'];
+}
+function goBackDm(){
+  if(DM_STACK.length>=3 && DM_LAST_GROUP && DM_SUB[DM_LAST_GROUP]){
+    showDmPage2(DM_TITLES[DM_LAST_GROUP], DM_SUB[DM_LAST_GROUP]);
+  } else {
+    renderDmLevel1();
+  }
+}
+function setDmMsgRequest(v){ MSG_REQUEST=v; saveUserSettings(); openDmDetail('msgRequest','level1'); }
+function setDmAllowDetail(v){ DM_ALLOW=v; saveUserSettings(); openDmDetail('allow','level2'); }
+function setDmDetailBool(k,v){
+  if(k==='reqPhoto') REQ_PHOTO=v; if(k==='reqVoice') REQ_VOICE=v; if(k==='reqPreview') REQ_PREVIEW=v;
+  if(k==='active') DM_ACTIVE=v; if(k==='typing') DM_TYPING=v; if(k==='seen') DM_SEEN=v; if(k==='showLastSeen') SHOW_LASTSEEN=v;
+  if(k==='audiocall') ALLOW_AUDIO=v; if(k==='videocall') ALLOW_VIDEO=v; if(k==='camera') ALLOW_CAMERA=v;
+  if(k==='otpblock') DM_OTP_BLOCK=v; if(k==='linkwarn') DM_LINK_WARN=v; if(k==='antispam') DM_ANTISPAM=v;
+  if(k==='girl_photo') GIRL_SAFETY.photo=v; if(k==='girl_call') GIRL_SAFETY.call=v; if(k==='girl_voice') GIRL_SAFETY.voice=v;
+  if(k==='kids_mode') KIDS_MODE=v; if(k==='kids_help') KIDS_HELP=v;
+  saveUserSettings(); openDmDetail(k,'level2'); render();
+}
+// Old functions - compatibility ku vechirukken da
+function renderDmTypeList(){ renderDmLevel1(); }
+function closeDmTypeDetail(){ goBackDm(); }
 function setTab(t,btn){ CUR_TAB=t; document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on')); if(btn) btn.classList.add('on'); render(); }
-function closeAllSheets(){ let s=document.getElementById('dmSettingSheet'); if(s) s.style.display='none'; let sh=document.getElementById('sheet'); if(sh) sh.style.display='none'; let bd=document.getElementById('sheetBackdrop'); if(bd) bd.style.display='none'; let np=document.getElementById('notePop'); if(np) np.style.display='none'; }
-function openDMSettings(){ closeAllSheets(); renderDmTypeList(); closeDmTypeDetail(); document.getElementById('dmSettingSheet').style.display='block'; document.getElementById('sheetBackdrop').style.display='block'; }
+function closeDMSettingsSlow(){ let s=document.getElementById('dmSettingSheet'); let bd=document.getElementById('sheetBackdrop'); s.classList.remove('open'); bd.classList.remove('open'); setTimeout(()=>{ bd.style.display='none'; },350); }
+function closeAllSheets(){ closeDMSettingsSlow(); let sh=document.getElementById('sheet'); if(sh) sh.style.display='none'; let np=document.getElementById('notePop'); if(np) np.style.display='none'; }
+function openDMSettings(){ closeAllSheets(); renderDmLevel1(); let s=document.getElementById('dmSettingSheet'); let bd=document.getElementById('sheetBackdrop'); s.classList.add('open'); bd.classList.add('open'); bd.style.display='block'; }
 function openChatUser(u){ closeAllSheets(); location.href='chat.html?user='+encodeURIComponent(u); }
 function goSearch(){ closeAllSheets(); location.href='search.html'; }
-function syncMassUI(){ renderDmTypeList(); }
+function syncMassUI(){ renderDmLevel1(); }
 async function saveUserSettings(){ if(!ME_ID||!supa) return; try{ await supa.from('user_settings').upsert({user_id:ME_ID,msg_request:MSG_REQUEST,req_photo:REQ_PHOTO,req_voice:REQ_VOICE,req_preview:REQ_PREVIEW,dm_active:DM_ACTIVE,dm_typing:DM_TYPING,dm_seen:DM_SEEN,dm_allow:DM_ALLOW,show_lastseen:SHOW_LASTSEEN,updated_at:new Date().toISOString()},{onConflict:'user_id'}); }catch(e){} }
 async function loadUserSettings(){ if(!ME_ID||!supa) return; try{ let {data}=await supa.from('user_settings').select('*').eq('user_id',ME_ID).maybeSingle(); if(data){ MSG_REQUEST=data.msg_request||'everyone'; REQ_PHOTO=data.req_photo||false; REQ_VOICE=data.req_voice||false; REQ_PREVIEW=data.req_preview??true; DM_ACTIVE=data.dm_active??true; DM_TYPING=data.dm_typing??true; DM_SEEN=data.dm_seen??true; DM_ALLOW=data.dm_allow||'everyone'; SHOW_LASTSEEN=data.show_lastseen??true; } }catch(e){} syncMassUI(); }
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
