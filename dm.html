@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PIXORO - Chats</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=dm_save_fix_final"></script>
+<script src="js/pixoro-core.js?v=server_only_final"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:76px}
@@ -194,56 +194,20 @@ function openDMSettings(){ closeAllSheets(); renderDmLevel1(); let s=document.ge
 function openChatUser(u){ closeAllSheets(); location.href='chat.html?user='+encodeURIComponent(u); }
 function goSearch(){ closeAllSheets(); location.href='search.html'; }
 function syncMassUI(){ renderDmLevel1(); }
-// === FIXED SAVE - Ella Settings um Server + Phone la Save da ===
+// SERVER MATTUM - 100% Supabase
 async function saveUserSettings(){
-  if(!ME_ID) return;
+  if(!ME_ID||!supa) return;
   let all = collectAllSettings();
-  // 1. Phone la Save - Refresh Panna Kooda Pogaathu da
-  try{ localStorage.setItem('pixoro_dm_'+ME_ID, JSON.stringify(all)); }catch(e){}
-  if(!supa) return;
-  // 2. Server la Save - Core columns mattum first - Fail Aanaalum Phone la Irukkum da
-  try{
-    let core = {user_id:ME_ID,msg_request:MSG_REQUEST,req_photo:REQ_PHOTO,req_voice:REQ_VOICE,req_preview:REQ_PREVIEW,dm_active:DM_ACTIVE,dm_typing:DM_TYPING,dm_seen:DM_SEEN,dm_allow:DM_ALLOW,show_lastseen:SHOW_LASTSEEN,updated_at:new Date().toISOString()};
-    let {error} = await supa.from('user_settings').upsert(core,{onConflict:'user_id'});
-    if(error) console.log('DM SAVE FAIL core:', error.message);
-    else console.log('DM SAVE OK core');
-  }catch(e){ console.log('DM SAVE FAIL core:', e.message); }
-  // 3. Extra Settings - dm_settings jsonb la Save - Column Illana Fail Aagum, Parava Illa da - Phone la Irukku da
-  try{
-    let {error} = await supa.from('user_settings').upsert({user_id:ME_ID, dm_settings: all, updated_at:new Date().toISOString()},{onConflict:'user_id'});
-    if(error) console.log('DM SAVE extra fail (phone la irukku):', error.message);
-    else console.log('DM SAVE OK extra - Server full save');
-  }catch(e){}
+  let {error} = await supa.from('user_settings').upsert({user_id:ME_ID,msg_request:MSG_REQUEST,req_photo:REQ_PHOTO,req_voice:REQ_VOICE,req_preview:REQ_PREVIEW,dm_active:DM_ACTIVE,dm_typing:DM_TYPING,dm_seen:DM_SEEN,dm_allow:DM_ALLOW,show_lastseen:SHOW_LASTSEEN,dm_settings:all,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+  if(error) console.log('SERVER SAVE FAIL:',error.message); else console.log('SERVER SAVE OK');
 }
-// === FIXED LOAD - Server la Illana Phone la irunthu Edukkum da ===
 async function loadUserSettings(){
-  if(!ME_ID) return;
-  let loaded = false;
-  if(supa){
-    try{
-      let {data, error} = await supa.from('user_settings').select('*').eq('user_id',ME_ID).maybeSingle();
-      if(error) console.log('DM LOAD FAIL:', error.message);
-      if(data){
-        // Extra full settings irundha atha Edu da
-        if(data.dm_settings && typeof data.dm_settings==='object' && Object.keys(data.dm_settings).length>2){
-          applyAllSettings(data.dm_settings);
-          loaded = true;
-        } else {
-          // Old core mattum irundha - Core ah Edu da
-          MSG_REQUEST=data.msg_request||'everyone'; REQ_PHOTO=data.req_photo??false; REQ_VOICE=data.req_voice??false; REQ_PREVIEW=data.req_preview??true; DM_ACTIVE=data.dm_active??true; DM_TYPING=data.dm_typing??true; DM_SEEN=data.dm_seen??true; DM_ALLOW=data.dm_allow||'everyone'; SHOW_LASTSEEN=data.show_lastseen??true;
-          loaded = true;
-        }
-        console.log('DM LOAD OK - Server la irunthu');
-      }
-    }catch(e){ console.log('DM LOAD FAIL:', e.message); }
-  }
-  // Server la Illana / Fail Aana - Phone la irunthu Edu da - Refresh Panna Kooda Pogaathu da
-  if(!loaded){
-    try{
-      let raw = localStorage.getItem('pixoro_dm_'+ME_ID);
-      if(raw){ applyAllSettings(JSON.parse(raw)); console.log('DM LOAD OK - Phone la irunthu'); }
-    }catch(e){}
-  }
+  if(!ME_ID||!supa) return;
+  let {data,error} = await supa.from('user_settings').select('*').eq('user_id',ME_ID).maybeSingle();
+  if(error){ console.log('SERVER LOAD FAIL:',error.message); return; }
+  if(!data) return;
+  if(data.dm_settings && typeof data.dm_settings==='object' && Object.keys(data.dm_settings).length>2){ applyAllSettings(data.dm_settings); }
+  else { MSG_REQUEST=data.msg_request||'everyone'; REQ_PHOTO=data.req_photo??false; REQ_VOICE=data.req_voice??false; REQ_PREVIEW=data.req_preview??true; DM_ACTIVE=data.dm_active??true; DM_TYPING=data.dm_typing??true; DM_SEEN=data.dm_seen??true; DM_ALLOW=data.dm_allow||'everyone'; SHOW_LASTSEEN=data.show_lastseen??true; }
   syncMassUI();
 }
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
