@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PIXORO Chat</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=insta_3level_chat"></script>
+<script src="js/pixoro-core.js?v=server_only_final"></script>
 <style>
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{margin:0;background:#000!important;color:#fff;max-width:450px;height:100dvh;height:100svh;margin:auto;display:flex;flex-direction:column;-webkit-touch-callout:none;overflow:hidden}
@@ -143,6 +143,7 @@ let DM_ACTIVE=true,DM_TYPING=true,DM_SEEN=true,DM_ALLOW='everyone',SHOW_LASTSEEN
 let DM_OTP_BLOCK=true,DM_LINK_WARN=true,DM_VANISH=false,DM_DISAPPEAR='off',DM_SHOT_ALERT=true,DM_ANTISPAM=true,DM_MUTE=false;
 let ALLOW_AUDIO=true,ALLOW_VIDEO=true,ALLOW_CAMERA=true;
 let GIRL_SAFETY={photo:true,view:true,call:true,voice:true,stranger:true,imgblock:true};
+let KIDS_MODE=false, KIDS_HELP=true;
 let MY_MSG_REQUEST='everyone', MY_REQ_PHOTO=false, MY_REQ_VOICE=false, MY_REQ_PREVIEW=true;
 let OTHER_MSG_REQUEST='everyone', OTHER_REQ_PHOTO=false, OTHER_REQ_VOICE=false, OTHER_REQ_PREVIEW=true, IS_REQUEST_PENDING=false, MY_MSG_COUNT=0;
 let lastMsgText='',lastMsgTime=0,spamCount=0;
@@ -166,7 +167,7 @@ const DM_SUB={
 const DM_TITLES={privacy:'Privacy',media:'Media & Calls',safety:'Safety',girl:'Girl Safety',kids:'Kids Help',reqGroup:'Request Settings',msgRequest:'Message Request'};
 function getSafeVal(k){ return GIRL_SAFETY[k]; }
 function getPrivVal(k){ let m={seen:DM_SEEN,typing:DM_TYPING,active:DM_ACTIVE,showLastSeen:SHOW_LASTSEEN,otpblock:DM_OTP_BLOCK,linkwarn:DM_LINK_WARN}; return m[k]; }
-function getDmVal(k){ if(k==='msgRequest') return MY_MSG_REQUEST; if(k==='reqPhoto') return MY_REQ_PHOTO; if(k==='reqVoice') return MY_REQ_VOICE; if(k==='reqPreview') return MY_REQ_PREVIEW; if(k==='audiocall') return ALLOW_AUDIO; if(k==='videocall') return ALLOW_VIDEO; if(k==='camera') return ALLOW_CAMERA; if(k==='antispam') return DM_ANTISPAM; if(k==='mute') return DM_MUTE; if(k==='vanish') return DM_VANISH; if(k==='disappear') return DM_DISAPPEAR==='24h'; if(k==='seen') return DM_SEEN; if(k==='typing') return DM_TYPING; if(k==='active') return DM_ACTIVE; if(k==='showLastSeen') return SHOW_LASTSEEN; if(k==='otpblock') return DM_OTP_BLOCK; if(k==='linkwarn') return DM_LINK_WARN; if(k==='girl_photo') return GIRL_SAFETY.photo; if(k==='girl_view') return GIRL_SAFETY.view; if(k==='girl_call') return GIRL_SAFETY.call; if(k==='girl_voice') return GIRL_SAFETY.voice; if(k==='girl_stranger') return GIRL_SAFETY.stranger; if(k==='girl_imgblock') return GIRL_SAFETY.imgblock; if(k==='kids_mode') return false; if(k==='kids_help') return true; return true; }
+function getDmVal(k){ if(k==='msgRequest') return MY_MSG_REQUEST; if(k==='reqPhoto') return MY_REQ_PHOTO; if(k==='reqVoice') return MY_REQ_VOICE; if(k==='reqPreview') return MY_REQ_PREVIEW; if(k==='audiocall') return ALLOW_AUDIO; if(k==='videocall') return ALLOW_VIDEO; if(k==='camera') return ALLOW_CAMERA; if(k==='antispam') return DM_ANTISPAM; if(k==='mute') return DM_MUTE; if(k==='vanish') return DM_VANISH; if(k==='disappear') return DM_DISAPPEAR==='24h'; if(k==='seen') return DM_SEEN; if(k==='typing') return DM_TYPING; if(k==='active') return DM_ACTIVE; if(k==='showLastSeen') return SHOW_LASTSEEN; if(k==='otpblock') return DM_OTP_BLOCK; if(k==='linkwarn') return DM_LINK_WARN; if(k==='girl_photo') return GIRL_SAFETY.photo; if(k==='girl_view') return GIRL_SAFETY.view; if(k==='girl_call') return GIRL_SAFETY.call; if(k==='girl_voice') return GIRL_SAFETY.voice; if(k==='girl_stranger') return GIRL_SAFETY.stranger; if(k==='girl_imgblock') return GIRL_SAFETY.imgblock; if(k==='kids_mode') return KIDS_MODE; if(k==='kids_help') return KIDS_HELP; return true; }
 function renderSafeList(){ let el=$('safeList'); if(!el) return; el.innerHTML=SAFE_TYPES.map(o=>{ let v=getSafeVal(o.k); return `<div class="typeRow" onclick="openSafeDetail('${o.k}')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center"><span class="st ${v?'on':'off'}">${v?'ON':'OFF'}</span><span>›</span></span></div>` }).join(''); }
 function openSafeDetail(k){ SAFE_CUR=k; let o=SAFE_TYPES.find(x=>x.k===k); $('safeDetailTitle').textContent=o?o.t:k; $('safeList').style.display='none'; $('safeDetail').style.display='block'; let v=getSafeVal(k); $('safeAllowBtn').className='bigBtn '+(v?'selAllow':''); $('safeDenyBtn').className='bigBtn '+(!v?'selDeny':''); }
 function closeSafeDetail(){ SAFE_CUR=null; $('safeDetail').style.display='none'; $('safeList').style.display='block'; renderSafeList(); }
@@ -175,7 +176,6 @@ function renderPrivacyList(){ let el=$('privacyList'); if(!el) return; el.innerH
 function openPrivacyDetail(k){ PRIV_CUR=k; let o=PRIV_TYPES.find(x=>x.k===k); $('privacyDetailTitle').textContent=o?o.t:k; $('privacyList').style.display='none'; $('privacyDetail').style.display='block'; let v=getPrivVal(k); $('privacyAllowBtn').className='bigBtn '+(v?'selAllow':''); $('privacyDenyBtn').className='bigBtn '+(!v?'selDeny':''); }
 function closePrivacyDetail(){ PRIV_CUR=null; $('privacyDetail').style.display='none'; $('privacyList').style.display='block'; renderPrivacyList(); }
 function setPrivacyDetail(v){ if(!PRIV_CUR) return; saveDMSetting(PRIV_CUR,v); $('privacyAllowBtn').className='bigBtn '+(v?'selAllow':''); $('privacyDenyBtn').className='bigBtn '+(!v?'selDeny':''); }
-// === INSTA 3-LEVEL - dmSettingSheet ===
 function renderDmLevel1(){
   $('dmSettingsTitle').textContent='Settings';
   let h='';
@@ -222,7 +222,6 @@ function goBackDm(){
   if(DM_STACK.length>=3 && DM_LAST_GROUP && DM_SUB[DM_LAST_GROUP]){ showDmPage2(DM_TITLES[DM_LAST_GROUP], DM_SUB[DM_LAST_GROUP]); }
   else { renderDmLevel1(); }
 }
-// Old names - compatibility
 function renderDmTypeList(){ renderDmLevel1(); }
 function closeDmTypeDetail(){ goBackDm(); }
 function setDmMsgRequest(v){ MY_MSG_REQUEST=v; saveMyMsgRequest(); openDmDetail('msgRequest','level1'); renderDmLevel1(); }
@@ -233,8 +232,10 @@ function setDmDetailBool(k,v){
   else if(k==='seen') DM_SEEN=v; else if(k==='typing') DM_TYPING=v; else if(k==='active') DM_ACTIVE=v; else if(k==='showLastSeen') SHOW_LASTSEEN=v;
   else if(k==='otpblock') DM_OTP_BLOCK=v; else if(k==='linkwarn') DM_LINK_WARN=v;
   else if(k==='girl_photo') GIRL_SAFETY.photo=v; else if(k==='girl_view') GIRL_SAFETY.view=v; else if(k==='girl_call') GIRL_SAFETY.call=v; else if(k==='girl_voice') GIRL_SAFETY.voice=v; else if(k==='girl_stranger') GIRL_SAFETY.stranger=v; else if(k==='girl_imgblock') GIRL_SAFETY.imgblock=v;
+  else if(k==='kids_mode') KIDS_MODE=v; else if(k==='kids_help') KIDS_HELP=v;
   if(['reqPhoto','reqVoice','reqPreview'].includes(k)) saveMyMsgRequest();
   else if(k.startsWith('girl_')) saveGirlSafety(k.replace('girl_',''),v);
+  else if(k==='kids_mode'||k==='kids_help') savePerChat();
   else saveDMSetting(k,v);
   openDmDetail(k,'level2');
 }
@@ -243,14 +244,34 @@ function closeDMSettingsSlow(){ let s=$('dmSettingSheet'); let bd=$('sheetBackdr
 function closeAllSheets(){ closeDMSettingsSlow(); ['menu','optMenu'].forEach(id=>{ let e=$(id); if(e) e.style.display='none'; }); }
 function openDMSettings(){ closeProfile(); closeAllSheets(); renderDmLevel1(); let s=$('dmSettingSheet'); let bd=$('sheetBackdrop'); s.classList.add('open'); bd.classList.add('open'); bd.style.display='block'; syncAllMassUI(); }
 function goBackFix(){ let ps=$('profileSheet'); if(ps && ps.style.display==='block'){ if($('privacyPage').style.display==='block'){ if($('privacyDetail').style.display==='block'){ closePrivacyDetail(); return; } $('privacyPage').style.display='none'; return; } if($('chatControlsPage').style.display==='block'){ $('chatControlsPage').style.display='none'; return; } if($('optMenu').style.display==='block'){ $('optMenu').style.display='none'; return; } if($('safeDetail').style.display==='block'){ closeSafeDetail(); return; } closeProfile(); return; } let s=$('dmSettingSheet'); if(s && s.classList.contains('open')){ if($('dmPage3').style.display==='block'){ goBackDm(); return; } if($('dmPage2').style.display==='block'){ renderDmLevel1(); return; } closeAllSheets(); return; } let m=$('menu'); if(m && m.style.display==='block'){ closeAllSheets(); return; } let z=$('zoomView'); if(z && z.style.display==='grid'){ z.style.display='none'; return; } if(CALL_ACTIVE) endCall(); location.href='dm.html'; }
-function getDMState(){ return {active:DM_ACTIVE,typing:DM_TYPING,seen:DM_SEEN,allow:DM_ALLOW,showLastSeen:SHOW_LASTSEEN,otpblock:DM_OTP_BLOCK,linkwarn:DM_LINK_WARN,vanish:DM_VANISH,disappear:DM_DISAPPEAR,shotalert:DM_SHOT_ALERT,antispam:DM_ANTISPAM,mute:DM_MUTE,audiocall:ALLOW_AUDIO,videocall:ALLOW_VIDEO,camera:ALLOW_CAMERA}; }
+function getDMState(){ return {active:DM_ACTIVE,typing:DM_TYPING,seen:DM_SEEN,allow:DM_ALLOW,showLastSeen:SHOW_LASTSEEN,otpblock:DM_OTP_BLOCK,linkwarn:DM_LINK_WARN,vanish:DM_VANISH,disappear:DM_DISAPPEAR,shotalert:DM_SHOT_ALERT,antispam:DM_ANTISPAM,mute:DM_MUTE,audiocall:ALLOW_AUDIO,videocall:ALLOW_VIDEO,camera:ALLOW_CAMERA,kids_mode:KIDS_MODE,kids_help:KIDS_HELP}; }
 function getGirlState(){ return GIRL_SAFETY; }
-function applyDMState(d){ if(!d) return; DM_ACTIVE=d.active??true; DM_TYPING=d.typing??true; DM_SEEN=d.seen??true; DM_ALLOW=d.allow||'everyone'; SHOW_LASTSEEN=d.showLastSeen??true; DM_OTP_BLOCK=d.otpblock??true; DM_LINK_WARN=d.linkwarn??true; DM_VANISH=d.vanish||false; DM_DISAPPEAR=d.disappear||'off'; DM_SHOT_ALERT=d.shotalert??true; DM_ANTISPAM=d.antispam??true; DM_MUTE=d.mute||false; ALLOW_AUDIO=d.audiocall??true; ALLOW_VIDEO=d.videocall??true; ALLOW_CAMERA=d.camera??true; }
+function applyDMState(d){ if(!d) return; DM_ACTIVE=d.active??true; DM_TYPING=d.typing??true; DM_SEEN=d.seen??true; DM_ALLOW=d.allow||'everyone'; SHOW_LASTSEEN=d.showLastSeen??true; DM_OTP_BLOCK=d.otpblock??true; DM_LINK_WARN=d.linkwarn??true; DM_VANISH=d.vanish||false; DM_DISAPPEAR=d.disappear||'off'; DM_SHOT_ALERT=d.shotalert??true; DM_ANTISPAM=d.antispam??true; DM_MUTE=d.mute||false; ALLOW_AUDIO=d.audiocall??true; ALLOW_VIDEO=d.videocall??true; ALLOW_CAMERA=d.camera??true; KIDS_MODE=d.kids_mode??false; KIDS_HELP=d.kids_help??true; }
 function applyGirlState(g){ if(!g) return; GIRL_SAFETY={photo:g.photo??true,view:g.view??true,call:g.call??true,voice:g.voice??true,stranger:g.stranger??true,imgblock:g.imgblock??true}; }
-async function savePerChat(){ if(!CHAT_ID||!ME_ID||!OTHER_ID||!supa) return; try{ await supa.from('chat_settings').upsert({user_id:ME_ID,chat_id:CHAT_ID,other_id:OTHER_ID,dm_settings:getDMState(),girl_settings:getGirlState(),updated_at:new Date().toISOString()},{onConflict:'user_id,chat_id'}); }catch(e){} }
-async function loadPerChat(){ if(!CHAT_ID||!ME_ID||!supa) return; try{ let {data}=await supa.from('chat_settings').select('dm_settings,girl_settings').eq('user_id',ME_ID).eq('chat_id',CHAT_ID).maybeSingle(); if(data){ applyDMState(data.dm_settings); applyGirlState(data.girl_settings); } }catch(e){} syncAllMassUI(); }
-async function saveMyMsgRequest(){ if(!ME_ID||!supa) return; try{ await supa.from('user_settings').upsert({user_id:ME_ID,msg_request:MY_MSG_REQUEST,req_photo:MY_REQ_PHOTO,req_voice:MY_REQ_VOICE,req_preview:MY_REQ_PREVIEW,dm_active:DM_ACTIVE,dm_typing:DM_TYPING,dm_seen:DM_SEEN,dm_allow:DM_ALLOW,show_lastseen:SHOW_LASTSEEN,updated_at:new Date().toISOString()},{onConflict:'user_id'}); }catch(e){} }
-async function loadMyMsgRequest(){ if(!ME_ID||!supa) return; try{ let {data}=await supa.from('user_settings').select('*').eq('user_id',ME_ID).maybeSingle(); if(data){ MY_MSG_REQUEST=data.msg_request||'everyone'; MY_REQ_PHOTO=data.req_photo||false; MY_REQ_VOICE=data.req_voice||false; MY_REQ_PREVIEW=data.req_preview??true; } }catch(e){} syncReqUI(); }
+// SERVER MATTUM - 100% Supabase
+async function savePerChat(){
+  if(!CHAT_ID||!ME_ID||!OTHER_ID||!supa) return;
+  let {error}=await supa.from('chat_settings').upsert({user_id:ME_ID,chat_id:CHAT_ID,other_id:OTHER_ID,dm_settings:getDMState(),girl_settings:getGirlState(),updated_at:new Date().toISOString()},{onConflict:'user_id,chat_id'});
+  if(error) console.log('SERVER SAVE FAIL:',error.message); else console.log('SERVER SAVE OK');
+}
+async function loadPerChat(){
+  if(!CHAT_ID||!ME_ID||!supa) return;
+  let {data,error}=await supa.from('chat_settings').select('dm_settings,girl_settings').eq('user_id',ME_ID).eq('chat_id',CHAT_ID).maybeSingle();
+  if(error){ console.log('SERVER LOAD FAIL:',error.message); return; }
+  if(data){ applyDMState(data.dm_settings); applyGirlState(data.girl_settings); }
+  syncAllMassUI();
+}
+async function saveMyMsgRequest(){
+  if(!ME_ID||!supa) return;
+  let {error}=await supa.from('user_settings').upsert({user_id:ME_ID,msg_request:MY_MSG_REQUEST,req_photo:MY_REQ_PHOTO,req_voice:MY_REQ_VOICE,req_preview:MY_REQ_PREVIEW,dm_active:DM_ACTIVE,dm_typing:DM_TYPING,dm_seen:DM_SEEN,dm_allow:DM_ALLOW,show_lastseen:SHOW_LASTSEEN,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+  if(error) console.log('SERVER SAVE FAIL:',error.message); else console.log('SERVER SAVE OK');
+}
+async function loadMyMsgRequest(){
+  if(!ME_ID||!supa) return;
+  let {data}=await supa.from('user_settings').select('*').eq('user_id',ME_ID).maybeSingle();
+  if(data){ MY_MSG_REQUEST=data.msg_request||'everyone'; MY_REQ_PHOTO=data.req_photo??false; MY_REQ_VOICE=data.req_voice??false; MY_REQ_PREVIEW=data.req_preview??true; if(data.dm_settings) applyDMState(data.dm_settings); }
+  syncReqUI();
+}
 async function loadOtherMsgRequest(){ if(!OTHER_ID||!supa) return; try{ let {data}=await supa.from('user_settings').select('*').eq('user_id',OTHER_ID).maybeSingle(); if(data){ OTHER_MSG_REQUEST=data.msg_request||'everyone'; OTHER_REQ_PHOTO=data.req_photo||false; OTHER_REQ_VOICE=data.req_voice||false; OTHER_REQ_PREVIEW=data.req_preview??true; } }catch(e){} try{ let {data:msgs}=await supa.from('messages').select('id,sender_id').eq('chat_id',CHAT_ID).limit(200); let mine=(msgs||[]).filter(m=>String(m.sender_id)===ME_ID).length; MY_MSG_COUNT=mine; IS_REQUEST_PENDING=(mine===0); }catch(e){} syncReqUI(); showRequestBanner(); }
 function syncReqUI(){ renderSafeList(); renderPrivacyList(); renderDmLevel1(); }
 function setMyMsgRequest(v){ MY_MSG_REQUEST=v; syncReqUI(); saveMyMsgRequest(); showWarning('Saved'); }
