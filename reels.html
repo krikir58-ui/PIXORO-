@@ -28,10 +28,9 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 .reel-pfp-wrap img{width:100%!important;height:100%!important;object-fit:cover}
 .reel-username{font-size:15px!important;font-weight:700!important;margin-left:8px!important;cursor:pointer}
 .reel-caption{margin-top:6px!important;font-size:13px!important;color:#ddd!important;line-height:1.4;display:block!important;max-height:42px!important;overflow:hidden!important}
-.followBtnPerusa{background:#000!important;background-color:#000!important;color:#fff!important;border:1.5px solid #fff!important;padding:0 14px!important;border-radius:20px!important;font-weight:600!important;font-size:14px!important;line-height:1!important;margin-left:10px!important;height:30px!important;min-width:80px!important;white-space:nowrap!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;box-shadow:none!important}
-.followBtnPerusa.following{background:#000!important;background-color:#000!important;color:#fff!important;border:1.5px solid rgba(255,255,255,.6)!important}
-[data-follow-user]{background:#000!important;background-color:#000!important;color:#fff!important;border:1.5px solid #fff!important;padding:0 14px!important;border-radius:20px!important;font-weight:600!important;font-size:14px!important;line-height:1!important;height:30px!important;min-width:80px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;box-shadow:none!important}
-[data-follow-user].following{background:#000!important;background-color:#000!important;color:#fff!important;border:1.5px solid rgba(255,255,255,.6)!important}
+/* FIX - FOLLOW BACKGROUND REMOVE DA - TRANSPARENT DA - BOX ILLA, BORDER ILLA, BLACK ILLA DA */
+.followBtnPerusa,.followBtnPerusa.following,[data-follow-user],[data-follow-user].following{ background:transparent!important; background-color:transparent!important; border:none!important; box-shadow:none!important; outline:none!important; color:#fff!important; padding:0!important; border-radius:0!important; font-weight:700!important; font-size:15px!important; line-height:1!important; margin-left:10px!important; height:auto!important; min-width:0!important; white-space:nowrap!important; display:inline-flex!important; align-items:center!important; justify-content:center!important; text-shadow:0 1px 6px #000,0 1px 6px #000!important; }
+.followBtnPerusa.following,[data-follow-user].following{ opacity:.75!important; }
 .reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:56px;padding:0 16px;background:linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);pointer-events:none}
 .reelsTop b{color:#fff!important;font-size:24px!important;font-weight:800!important}
 .reelsTop b span{color:#FF4D8D!important}
@@ -112,7 +111,6 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 <div class="sheet" id="commentSheet" onclick="if(event.target==this)closeSheet('commentSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Comments</b></div><div id="commentList" style="overflow-y:auto;flex:1;max-height:45vh;padding:0 20px"></div><div style="display:flex;gap:10px;align-items:center;padding:10px 20px;border-top:1px solid #eee;margin-top:10px"><input id="commentInput" style="flex:1;background:#F1F1F5;border:0;border-radius:20px;padding:12px 14px;color:#111;outline:none" placeholder="Add kind comment..."><button onclick="postComment()" style="background:#FF4D8D;color:#fff;border:0;border-radius:20px;padding:10px 18px;font-weight:800">Post</button></div></div></div>
 <div class="sheet" id="shareSheet" onclick="if(event.target==this)closeSheet('shareSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Share</b></div><div class="safeCard"><div class="safeItem" onclick="copyLinkSafe()"><div class="txt"><div class="title">📋 Copy Link</div></div></div><div class="safeItem" onclick="shareWA()"><div class="txt"><div class="title">💚 WhatsApp</div></div></div></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js" defer></script>
-<script src="js/pixoro-core.js?v=124" defer></script>
 <script>
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
@@ -120,9 +118,8 @@ function showToast(m){let t=document.getElementById('toast');if(!t)return;t.inne
 function fmtViews(n){if(n>=1000000)return (n/1000000).toFixed(1).replace('.0','')+'M';if(n>=1000)return (n/1000).toFixed(1).replace('.0','')+'K';return String(n)}
 let ME_RAW='',ME_ID='',profileMap={},profileByIdMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=[],mutedUsers=[],blockedUsers=[],hiddenMeta={},lastAction=null,savingIds=new Set(),_INIT_DONE=false
 async function waitSupa(){for(let i=0;i<30;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
-// FIX 2 - removeWhiteBg THOOKITEN DA - Photo ah Canvas la Maatha Koodathu da - Athaan Flicker + Slow da
 function applyWhiteRemove(){ return; }
-async function init(){if(_INIT_DONE) return; _INIT_DONE=true; supa=await waitSupa();if(!supa){_INIT_DONE=false;return;}let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;window.ME_ID=ME_ID;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;if(window.pixoroLoadFollowing) await window.pixoroLoadFollowing();let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileByIdMap[String(p.id)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);load()}
+async function init(){if(_INIT_DONE) return; _INIT_DONE=true; supa=await waitSupa();if(!supa){_INIT_DONE=false;return;}let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;window.ME_ID=ME_ID;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileByIdMap[String(p.id)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);load()}
 function displayNameFor(u){
   if(!u) return ME_RAW||'user';
   let p=profileByIdMap[String(u)]||profileMap[cleanUser(u)];
@@ -186,14 +183,12 @@ all.forEach(p=>{
   else if(p.username) p.username=cleanUser(p.username);
 });
 allPosts=all;allLikes=likes.data||[];allSaves=saves.data||[];allFollows=follows.data||[];allComments=comments.data||[];allViews=views.data||[];
-if(window.PIXORO_FOLLOWING){
-  window.PIXORO_FOLLOWING=new Set((allFollows||[]).filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));
-  window.PIXORO_ID_TO_NAME=window.PIXORO_ID_TO_NAME||{};
-  window.PIXORO_NAME_TO_ID=window.PIXORO_NAME_TO_ID||{};
-  (Object.values(profileMap)||[]).forEach(pp=>{ window.PIXORO_ID_TO_NAME[String(pp.id)]=cleanUser(pp.username); window.PIXORO_NAME_TO_ID[cleanUser(pp.username)]=String(pp.id); });
-  window.PIXORO_FOLLOWING_NAMES=new Set([...window.PIXORO_FOLLOWING].map(id=>cleanUser(window.PIXORO_ID_TO_NAME[id]||'')));
-}
-render();if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();}catch(err){console.log(err)}}
+window.PIXORO_FOLLOWING=new Set((allFollows||[]).filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));
+window.PIXORO_ID_TO_NAME=window.PIXORO_ID_TO_NAME||{};
+window.PIXORO_NAME_TO_ID=window.PIXORO_NAME_TO_ID||{};
+(Object.values(profileMap)||[]).forEach(pp=>{ window.PIXORO_ID_TO_NAME[String(pp.id)]=cleanUser(pp.username); window.PIXORO_NAME_TO_ID[cleanUser(pp.username)]=String(pp.id); });
+window.PIXORO_FOLLOWING_NAMES=new Set([...window.PIXORO_FOLLOWING].map(id=>cleanUser(window.PIXORO_ID_TO_NAME[id]||'')));
+render();}catch(err){console.log(err)}}
 async function addRealView(postId){
   postId=String(postId);
   if(viewedPosts.has(postId)) return;
@@ -256,7 +251,7 @@ return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div c
 </div>
 <div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap" onclick="event.stopPropagation();location.href='profile.html?u=${p.user_id}'"><img src="${getPfp(p.user_id||p.username)}" onerror="pfpErr(this,'${followName}')" loading="lazy"></div><b class="reel-username" onclick="event.stopPropagation();location.href='profile.html?u=${p.user_id}'">${followName}</b>${followBtn}</div>${captionHtml}<div style="font-size:12px;color:#ddd;margin-top:6px;font-weight:700">▶ <span data-viewcount="${p.id}">${fmtViews(vCount)}</span> views</div></div>
 </div>`
-}).join('');observe(); applyWhiteRemove(); if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();}
+}).join('');observe(); applyWhiteRemove();}
 let _reelIO=null;
 function observe(){let reels=document.querySelectorAll('video.reel-main');if(_reelIO) _reelIO.disconnect();_reelIO=new IntersectionObserver(entries=>{entries.forEach(e=>{let v=e.target;if(v.tagName!='VIDEO')return;let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;if(e.isIntersecting){if(!v.src && v.dataset.src){ v.src=v.dataset.src; v.load(); }document.querySelectorAll('video.reel-main').forEach(o=>{if(o!==v)o.pause()});v.muted=globalMuted;currentVideo=v;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})});if(prog){v.ontimeupdate=()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'}}addRealView(reel.dataset.id);}else{v.pause()}})}, {threshold:0.5, rootMargin:'200px 0px'}); reels.forEach(v=>_reelIO.observe(v))}
 function handleReelTap(el){let now=Date.now();if(now-lastTap<300){clearTimeout(tapTimer);lastTap=0;dblLike(el.dataset.id);return}lastTap=now;tapTimer=setTimeout(()=>{let v=el.querySelector('video.reel-main');if(v){if(!v.src && v.dataset.src){v.src=v.dataset.src;v.load();}if(v.paused){v.muted=false;globalMuted=false;currentVideo=v;v.play();showCenter(el,false)}else{v.pause();showCenter(el,true)}}lastTap=0},300)}
@@ -322,7 +317,7 @@ window.toggleFollow = async function(target, btn){
     if(!name || name==='null' || name==='user'){ return false; }
     if(name === cleanUser(ME_RAW)) return false;
     let b = btn;
-    let wasFollowing = b ? b.innerText.includes('Following') : false;
+    let wasFollowing = b ? b.innerText.replace(/✓|✅/g,'').trim()==='Following' : false;
     if(b){ b.innerText = wasFollowing ? 'Follow' : 'Following'; b.classList.toggle('following', !wasFollowing); }
     if(window.PIXORO_FOLLOWING_NAMES){ if(!wasFollowing) window.PIXORO_FOLLOWING_NAMES.add(name); else window.PIXORO_FOLLOWING_NAMES.delete(name); }
     let s = window.supa;
@@ -347,6 +342,6 @@ window.toggleFollow = async function(target, btn){
 };
 window.pixoroToggleFollow = window.toggleFollow;
 window.toggleF = window.toggleFollow;
-// FIX 1 - setInterval THOOKITEN DA - ITHU THAAN 0.5 SEC KU ORU THADAVA BUTTON AH MAATHI FLICKER PANNUTHU DA - Ippo CSS mattum pothum da, JS la thirumba thirumba maatha vendaam da
+window.pixoroPaintAllFollowBtns = function(){ return; };
 init()
 </script></body></html>
