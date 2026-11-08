@@ -1,6 +1,7 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PIXORO - Chats</title>
+<!-- CORE CONNECT - ELLA PAGE KUM ORE LINE DA - v=200 - defer ILLA DA -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=117"></script>
+<script src="js/pixoro-core.js?v=200"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:76px}
@@ -192,7 +193,6 @@ function closeDMSettingsSlow(){ let s=document.getElementById('dmSettingSheet');
 function closeAllSheets(){ closeDMSettingsSlow(); let sh=document.getElementById('sheet'); if(sh) sh.style.display='none'; let np=document.getElementById('notePop'); if(np) np.style.display='none'; }
 function openDMSettings(){ closeAllSheets(); renderDmLevel1(); let s=document.getElementById('dmSettingSheet'); let bd=document.getElementById('sheetBackdrop'); s.classList.add('open'); bd.classList.add('open'); bd.style.display='block'; }
 function openChatUser(u){ closeAllSheets(); location.href='chat.html?user='+encodeURIComponent(u); }
-// FIX LINK - Photo / Name ah Thotta Profile ku poganum da - Chat ku illa da - ID vachu poganum da
 function openProfileUser(u){
   closeAllSheets();
   let p = profileMap[cleanUser(u)] || profileById[u];
@@ -220,7 +220,6 @@ async function loadUserSettings(){
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
 function letterFor(u){ let l=(cleanUser(u||'P').charAt(0).toUpperCase()||'P'); return /[A-Z]/.test(l)?l:'P'; }
 function showToast(m){ let t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',1500); }
-// FIX PHOTO - Core Cache vum paaru da - Ella page kum photo maaranum da
 function realPfp(u){ let p=profileMap[cleanUser(u)]||profileById[u]; let url=p?.avatar_url||p?.profile_pic||''; if(url && !url.includes('ui-avatars')) return url; if(window._PIXORO_PFP_CACHE){ let cached = window._PIXORO_PFP_CACHE[cleanUser(u)] || window._PIXORO_PFP_CACHE[String(u)]; if(cached) return cached; } return ''; }
 function avatarHtml(u, size, isOnline){ let url=realPfp(u); let L=letterFor(u); let cls = size==='small' ? 'avaSmall' : 'ava'; let lcls = size==='small' ? 'avaLetterSmall' : 'avaLetter'; if(isOnline===false) lcls+=' off'; if(url) return `<img class="${cls}" src="${url}" onerror="this.outerHTML='<div class=&quot;${lcls}&quot;>${L}</div>'">`; return `<div class="${lcls}">${L}</div>`; }
 function fmtTime(t){ let d=new Date(t); let now=new Date(); if(d.toDateString()===now.toDateString()) return d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); let y=new Date(); y.setDate(now.getDate()-1); if(d.toDateString()===y.toDateString()) return 'Yesterday'; return d.toLocaleDateString([], {day:'numeric',month:'short'}); }
@@ -280,7 +279,7 @@ function doBlockFromSheet2(id,uname){ if(!BLOCKED.includes(id)) BLOCKED.push(id)
 async function init(){
   if(!window.supa){setTimeout(init,300);return} supa=window.supa;
   let {data:{session}}=await supa.auth.getSession(); if(!session){location.href='login.html';return}
-  ME_ID=session.user.id; let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).single(); ME_RAW=cleanUser(my?.username||session.user.email.split('@')[0]); let navPfp=document.getElementById('navPfp'); if(navPfp && my?.avatar_url) navPfp.src=my.avatar_url; else if(navPfp) navPfp.style.display='none';
+  ME_ID=session.user.id; window.ME_ID=ME_ID; let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).single(); ME_RAW=cleanUser(my?.username||session.user.email.split('@')[0]); window.ME_RAW=ME_RAW; let navPfp=document.getElementById('navPfp'); if(navPfp && my?.avatar_url) navPfp.src=my.avatar_url; else if(navPfp) navPfp.style.display='none';
   let {data:profs}=await supa.from('profiles').select('*'); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p});
   await loadUserSettings();
   updatePresence(true); setInterval(()=>updatePresence(true),30000); loadNotes(); load();
