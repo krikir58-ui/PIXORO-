@@ -1,6 +1,6 @@
-// ===== PIXORO MAIN - SERVER ONLY - v202 - NO LOCALSTORAGE - FOLLOW COLOUR FIX DA =====
+// ===== PIXORO MAIN - SERVER ONLY - v203 - NOTIFY ADDED - NO LOCALSTORAGE DA =====
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
-const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
+const SUPA_KEY = 'UN_OLD_KEY_AH_INGA_VEIKO_DA_MAATHAATHA';
 if(!window.supa && window.supabase && window.supabase.createClient){
   window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
   console.log("✅ Pixoro Supa Connected da!");
@@ -162,7 +162,35 @@ function pixoroReelSetup(videoEl, postId, userId){
     lastTap = now;
   });
 }
-async function pixoroLike(postId, userId){ await window.supa.from('likes').insert({post_id:postId, user_id:window.ME_ID}); }
+// ===== PIXORO NOTIFY - SERVER ONLY - NO LOCALSTORAGE DA =====
+async function pixoroSendNotification(toUserId, type, postId, message){
+  try{
+    if(!window.supa) return;
+    if(!window.ME_ID){
+      let {data:{session}} = await window.supa.auth.getSession();
+      if(session?.user?.id) window.ME_ID = session.user.id;
+      else return;
+    }
+    if(!toUserId) return;
+    if(String(toUserId) === String(window.ME_ID)) return;
+    let {error} = await window.supa.from('notifications').insert({
+      to_user_id: toUserId,
+      from_user_id: window.ME_ID,
+      type: type,
+      post_id: postId || null,
+      message: message || '',
+      is_read: false
+    });
+    if(error) console.log('NOTIFY SAVE FAIL da', error.message);
+    else console.log('NOTIFY SAVE OK da', type);
+  }catch(e){}
+}
+window.pixoroSendNotification = pixoroSendNotification;
+async function pixoroLike(postId, userId){
+  let {error} = await window.supa.from('likes').insert({post_id:postId, user_id:window.ME_ID});
+  if(error) return;
+  if(userId){ await pixoroSendNotification(userId, 'like', postId, 'liked your post'); }
+}
 async function pixoroSave(postId, userId){ await window.supa.from('saves').insert({post_id:postId, user_id:window.ME_ID}); }
 function pixoroOnDMSent(toUserId){ console.log("Pixoro DM Sent to:", toUserId); }
 async function getPixoroExplore(myId, myFollows){
@@ -344,6 +372,7 @@ function pixoroToggleFollow(target, btn){
       if(id){
         if(data) window.PIXORO_FOLLOWING.add(id); else window.PIXORO_FOLLOWING.delete(id);
         if(data) window.PIXORO_FOLLOWING_NAMES.add(name); else window.PIXORO_FOLLOWING_NAMES.delete(name);
+        if(data === true){ await pixoroSendNotification(id, 'follow', null, 'started following you'); }
       }
       pixoroLoadFollowing();
       if(window.pixoroLoadFollowCounts) window.pixoroLoadFollowCounts();
@@ -368,7 +397,7 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
-console.log('PIXORO CORE v202 SERVER ONLY LOADED');
+console.log('PIXORO CORE v203 SERVER ONLY LOADED');
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
