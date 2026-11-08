@@ -1,9 +1,17 @@
-// Supabase Connection - Pixoro 🔵 - FINAL CORRECTED
+// Supabase Connection - Pixoro 🔵 - FINAL CORRECTED - LOGIN LOOP FIX
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 
 if(!window.supa && window.supabase && window.supabase.createClient){
-  window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY, {
+    auth: {
+      persistSession: true, // <-- Ithu thaan Main Fix da - Session ah Save pannum da
+      autoRefreshToken: true, // Token Expire aana - Thanaave Puthusu Edukkum da
+      detectSessionInUrl: true, // OTP Link la Vanthaalum - Session ah Pudikkum da
+      storage: window.localStorage, // Phone la Save pannum da
+      storageKey: 'pixoro-auth-token' // Ella Page layum - Orey Key da - Athaan Loop Varathu da
+    }
+  });
 }
 
 // GOLD TICK - ID ONLY - 47f16fa1... ku Mattum da 👑
