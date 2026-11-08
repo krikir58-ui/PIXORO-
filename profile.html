@@ -60,21 +60,24 @@ input[type=range]{width:100%;accent-color:#fff}
 <script>
 function getSupa(){return window.supa} window.getTick=()=>'';
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase();return u||''}
-let ME_RAW='',ME_ID='',VIEW_USER='',VIEW_PROFILE=null,myPosts=[],savedPosts=[],allViews=[],allFollows=[],allProfiles=[],currentTab='all',allHighlights=[],editingHL=null,editingCover='',blockedUsers=[],savedTouchTimer=null,savedLongPressed=false
+let ME_RAW='',ME_ID='',VIEW_USER='',VIEW_PROFILE=null,myPosts=[],savedPosts=[],allViews=[],allFollows=[],allProfiles=[],currentTab='all',allHighlights=[],editingHL=null,editingCover='',blockedUsers=[],savedTouchTimer=null,savedLongPressed=false,_INIT_DONE=false;
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 function isReelPost(p){ if(p._from==='reels') return true; if(p.media_type==='reel'||p.media_type==='video'||p.media_type==='reels') return true; let m=(p.media_url||p.video_url||'').toLowerCase().split('?')[0]; return m.endsWith('.mp4')||m.endsWith('.mov')||m.endsWith('.webm')||m.endsWith('.m4v'); }
 function getBestMedia(p){ if(p._from==='reels') return {url:p.video_url||p.media_url||'',isVid:true}; let m=(p.media_url||p.video_url||'').toLowerCase().split('?')[0]; if(m.endsWith('.mp4')||m.endsWith('.mov')||m.endsWith('.webm')||m.endsWith('.m4v')) return {url:p.media_url||p.video_url,isVid:true}; return {url:p.media_url||p.video_url||p.image_url||p.image||'',isVid:false}; }
 function isRealPhoto(url){ if(!url) return false; if(url.includes('ui-avatars')||url.includes('placeholder')||url.includes('undefined')) return false; return true; }
 function letterFor(uname){ let l=(cleanUser(uname||'P').charAt(0).toUpperCase()||'P'); if(!/[A-Z]/.test(l)) l='P'; return l; }
 function getPfpFrom(p){ if(p&&(p.avatar_url||p.profile_pic||p.photo_url)) return p.avatar_url||p.profile_pic||p.photo_url; return 'https://ui-avatars.com/api/?name='+letterFor(p?.username||'P')+'&background=111&color=fff&size=200&bold=true'; }
-function pfpErr(el,uname){ el.onerror=null; el.src='https://ui-avatars.com/api/?name='+letterFor(uname||VIEW_USER||ME_RAW||'P')+'&background=111&color=fff&size=200&bold=true'; }
+// FIX 2 - P FLICKER: onerror 1 thadava mattum, photo iruntha P ku maatha koodathu da - ui-avatars na thaan maathu da
+function pfpErr(el,uname){ if(el.dataset.errDone) return; el.dataset.errDone='1'; el.onerror=null; let cur=el.src||''; if(cur.includes('ui-avatars')) return; el.src='https://ui-avatars.com/api/?name='+letterFor(uname||VIEW_USER||ME_RAW||'P')+'&background=111&color=fff&size=200&bold=true'; }
 window.pfpErr=pfpErr;
 function displayNameFor(u){ if(!u) return ME_RAW||'user'; let p=allProfiles.find(x=>String(x.id)===String(u))||allProfiles.find(x=>cleanUser(x.username)===cleanUser(u)); if(p&&p.username) return cleanUser(p.username); if(String(u)===String(ME_ID)) return ME_RAW||'user'; let cu=cleanUser(u); if(cu.length>20) return ME_RAW||'user'; return cu||ME_RAW||'user'; }
 function updateFollowMsg(){ return; }
 function openMessageFriend(){ if(!VIEW_PROFILE) return; location.href='dm.html?u='+VIEW_PROFILE.id+'&user='+VIEW_USER; }
 window.openMessageFriend=openMessageFriend;
 async function init(){
-  let supa=getSupa(); if(!supa){setTimeout(init,200);return}
+  // FIX 3 - INIT 2 THADAVA ODATHU DA - GUARD POTTEN DA
+  if(_INIT_DONE) return; _INIT_DONE=true;
+  let supa=getSupa(); if(!supa){_INIT_DONE=false;setTimeout(init,200);return}
   let {data:{session}}=await supa.auth.getSession(); if(!session){location.href='login.html';return}
   let {data:myProfile}=await supa.from('profiles').select('*').eq('id',session.user.id).single(); if(!myProfile){location.href='setup-username.html';return}
   ME_RAW=cleanUser(myProfile.username||session.user.email.split('@')[0]); ME_ID=session.user.id; window.ME_ID=ME_ID; window.ME_RAW=ME_RAW;
@@ -89,9 +92,9 @@ async function init(){
   let t=document.getElementById('tabSaved'); if(t) t.style.display='block';
   document.getElementById('topUsername').innerHTML=cleanUser(VIEW_PROFILE.username);
   document.getElementById('bioText').innerText=VIEW_PROFILE.bio||''; document.getElementById('linkText').innerText=VIEW_PROFILE.link||VIEW_PROFILE.website||'';
-  let pfpEl=document.getElementById('pfpImg'); pfpEl.src=getPfpFrom(VIEW_PROFILE); pfpEl.onerror=()=>pfpErr(pfpEl,VIEW_USER);
+  let pfpEl=document.getElementById('pfpImg'); pfpEl.dataset.errDone=''; pfpEl.src=getPfpFrom(VIEW_PROFILE); pfpEl.onerror=()=>pfpErr(pfpEl,VIEW_USER);
   document.getElementById('editPfpPreview').src=getPfpFrom(VIEW_PROFILE);
-  let navEl=document.getElementById('navPfp'); navEl.src=getPfpFrom(myProfile); navEl.onerror=()=>pfpErr(navEl,ME_RAW);
+  let navEl=document.getElementById('navPfp'); navEl.dataset.errDone=''; navEl.src=getPfpFrom(myProfile); navEl.onerror=()=>pfpErr(navEl,ME_RAW);
   let [followsRes,allP2Res,blRes,postsRes,reelsRes,viewsRes] = await Promise.all([
     supa.from('follows').select('*').then(r=>r).catch(()=>({data:[]})),
     supa.from('profiles').select('*').then(r=>r).catch(()=>({data:[]})),
@@ -214,6 +217,6 @@ function applyCrop(){let canvas=document.createElement('canvas');canvas.width=40
 document.getElementById('pfpInput').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{openCrop(ev.target.result)};r.readAsDataURL(f)})
 document.getElementById('hlCoverInput').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{editingCover=ev.target.result};r.readAsDataURL(f)})
 window.addEventListener('pixoroFollowChanged', ()=>{ updateFollowMsg(); });
-setInterval(()=>{ document.querySelectorAll('button,[data-follow-user]').forEach(b=>{ if(b.innerText && b.innerText.includes('✓')){ b.innerText=b.innerText.replace(/✓/g,'').trim(); if(b.innerText.includes('Following')) b.innerText='Following'; } }); },1000);
+// FIX 1 - setInterval THOOKITEN DA - ITHU THAAN FOLLOW BUTTON AH 1 SEC KU ORU THADAVA MAATHI FLICKER PANNUTHU DA
 init()
 </script></body></html>
