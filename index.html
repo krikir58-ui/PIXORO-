@@ -1,7 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Pixoro - Final Mass Killa</title>
-<link rel="preload" href="style.css" as="style"><link rel="preload" href="css/feed.css" as="style">
 <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="css/feed.css"><link rel="stylesheet" href="css/comments.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
@@ -65,14 +64,9 @@ html{background:#000}body{background:#000!important;color:#fff;max-width:450px;m
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
 <div id="choice" class="choiceSheet" onclick="if(event.target==this)hideChoice()"><div style="background:#1a1a1a;border-radius:28px 28px 0 0;padding:20px 0 30px;width:100%;max-width:450px"><div style="width:50px;height:5px;background:#333;border-radius:10px;margin:0 auto 16px"></div><div style="text-align:center;font-size:22px;font-weight:900;margin-bottom:10px">Create</div><div class="createRow" onclick="location.href='post-create.html'"><div class="createIco">+</div><div style="flex:1"><b>Post</b><div style="font-size:12px;color:#888">Share a photo</div></div><span>></span></div><div class="createRow" onclick="location.href='reel-create.html'"><div class="createIco">></div><div style="flex:1"><b>Reels</b><div style="font-size:12px;color:#888">Create a short reel</div></div><span>></span></div><div class="createRow" onclick="location.href='story-upload.html'"><div class="createIco">O</div><div style="flex:1"><b>Story</b><div style="font-size:12px;color:#888">Share 24h story</div></div><span>></span></div><div onclick="hideChoice()" style="text-align:center;padding:14px;color:#777">Cancel</div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js"></script>
-<script src="js/pixoro-core.js?v=211"></script>
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<!-- CORE MATTUM DA - supabase.js DELETE PANNITEN DA - DOUBLE CLIENT = FLICKER DA -->
+<script src="js/pixoro-core.js?v=212"></script>
 <script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    try{ await OneSignal.init({ appId: "UN_OLD_ONESIGNAL_APP_ID_INGA_VEIKO_DA", notifyButton: { enable: false } }); }catch(e){}
-  });
   function enableNotif(){ location.href='notifications.html'; }
 </script>
 <script>
@@ -169,19 +163,25 @@ async function pixoroCheckBell(){
 }
 window.pixoroCheckBell = pixoroCheckBell;
 setInterval(pixoroCheckBell, 15000);
-// FIXED checkLogin - REDIRECT LOOP ILLA DA - Session Illana Ingaye Login Kaamikkum da - Page Maathathu da
+// ===== CHECK LOGIN - CORRECTED - FLICKER FIX DA =====
+let AUTH_DONE = false;
 async function checkLogin(){
   for(let i=0;i<50;i++){ if(window.supa) break; await new Promise(r=>setTimeout(r,200)); }
   supa = window.supa;
   if(!supa){ return; }
+  if(AUTH_DONE) return;
+  AUTH_DONE = true;
   let {data:{session}} = await supa.auth.getSession();
   if(!session){
-    // Login ku Thalla Maatom da - Ingaye Login Button ah Kaamikkum da - Flicker Stop da
+    await new Promise(r=>setTimeout(r,800));
+    let s2 = await supa.auth.getSession();
+    session = s2.data.session;
+  }
+  if(!session){
     let f=document.getElementById('feed');
     if(f) f.innerHTML='<div style="text-align:center;padding:30px 16px"><p style="font-size:18px;font-weight:900;margin-bottom:8px">Welcome to Pixoro 👋</p><p style="color:#888;font-size:13px;margin-bottom:16px">Login pannu da - Feed Paakalam da</p><button onclick="location.href=\'login.html\'" style="background:#FFD700;color:#000;border:0;padding:13px 28px;border-radius:12px;font-weight:900;font-size:15px">Login / Sign Up ➡️</button></div>';
     return;
   }
-  // Profile Illana Kuda - Feed ah Kaamikkum da - Login ku Thalla Maatom da - Ithu thaan Main Fix da
   let {data:profile} = await supa.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
   if(profile && profile.username){
     ME_RAW=cleanUser(profile.username);ME_PFP=profile.avatar_url||'';
@@ -192,7 +192,7 @@ async function checkLogin(){
   try{ if(window.pixoroLoadFollowing) await window.pixoroLoadFollowing(); }catch(e){ console.log('Follow load fail - Feed continue da'); }
   loadAll();
 }
-// FIXED loadAll - [STRIPPED] Syntax Error ah Delete panniten da
+// ===== LOAD ALL - CORRECTED - SYNTAX ERROR FIX DA =====
 async function loadAll(){
   try{
     supa=getSupa();if(!supa)return;
@@ -217,6 +217,10 @@ async function loadAll(){
     var merged=[];(po.data||[]).forEach(p=>merged.push({...p,_from:'posts'}));(re.data||[]).forEach(p=>merged.push({...p,_from:'reels'}));
     var seenUrl=new Set(),deduped=[];
     for(let p of merged){
+      if(!p.user_id && p.username){
+        let pr2 = allProfiles.find(x=>cleanUser(x.username)===cleanUser(p.username));
+        if(pr2) p.user_id = pr2.id;
+      }
       let prof=profileById(p.user_id);p.username=prof?prof.username:(p.username||'');p.username=cleanUser(p.username);
       p.media_url=p.media_url||p.image||p.image_url||p.video_url||'';
       let raw=(p.media_url||p.video_url||'').trim();if(!raw) continue;if(p.is_archived) continue;
