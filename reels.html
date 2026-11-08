@@ -24,7 +24,7 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 .audioWrap{display:flex!important;flex-direction:column!important;align-items:center!important}
 @keyframes spin{to{transform:rotate(360deg)}}
 .btm{position:absolute!important;left:12px!important;right:82px!important;bottom:65px!important;z-index:10!important;text-shadow:0 2px 8px rgba(0,0,0,0.9)!important;background:none!important;background-image:none!important;padding:20px 0 0 0}
-.reel-pfp-wrap{width:38px!important;height:38px!important;min-width:38px!important;border-radius:50%!important;overflow:hidden!important;border:1.8px solid #fff!important}
+.reel-pfp-wrap{width:38px!important;height:38px!important;min-width:38px!important;border-radius:50%!important;overflow:hidden!important;border:1.8px solid #fff!important;cursor:pointer}
 .reel-pfp-wrap img{width:100%!important;height:100%!important;object-fit:cover}
 .reel-username{font-size:15px!important;font-weight:700!important;margin-left:8px!important;cursor:pointer}
 .reel-caption{margin-top:6px!important;font-size:13px!important;color:#ddd!important;line-height:1.4;display:block!important;max-height:42px!important;overflow:hidden!important}
@@ -93,7 +93,7 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 <div class="safeItem" onclick="editReel()"><div class="icon">✏️</div><div class="txt"><div class="title">Edit caption</div><div class="sub">Words maathu - safe</div></div></div>
 <div class="safeItem" onclick="shareQR()"><div class="icon">🔗</div><div class="txt"><div class="title">Share link</div><div class="sub">Friends ku share - enjoy</div></div></div>
 </div>
-<div class="safeCard"><div class="safeItem" onclick="deleteSafe()"><div class="icon">🗑️</div><div class="txt"><div class="title" style="color:#ff3b30">Delete - Safe</div><div class="sub">30 days archive la irukkum</div></div></div></div>
+<div class="safeCard"><div class="safeItem" onclick="deleteSafe()"><div class="icon">🗑️</div><div class="txt"><div class="title" style="color:#ff3b30">Delete - Safe</div><div class="sub">30 days archive la irukkum</div></div></div>
 </div></div>
 <div class="sheet" id="viewerSheet" onclick="if(event.target==this)closeSheet('viewerSheet')"><div class="sheetBox">
 <div class="sheetHandle"></div><div class="pixHead"><b>Pixoro Safe 🌿</b><p>Safe enjoy - No alert da</p></div>
@@ -111,6 +111,7 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 <div class="sheet" id="commentSheet" onclick="if(event.target==this)closeSheet('commentSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Comments</b></div><div id="commentList" style="overflow-y:auto;flex:1;max-height:45vh;padding:0 20px"></div><div style="display:flex;gap:10px;align-items:center;padding:10px 20px;border-top:1px solid #eee;margin-top:10px"><input id="commentInput" style="flex:1;background:#F1F1F5;border:0;border-radius:20px;padding:12px 14px;color:#111;outline:none" placeholder="Add kind comment..."><button onclick="postComment()" style="background:#FF4D8D;color:#fff;border:0;border-radius:20px;padding:10px 18px;font-weight:800">Post</button></div></div></div>
 <div class="sheet" id="shareSheet" onclick="if(event.target==this)closeSheet('shareSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Share</b></div><div class="safeCard"><div class="safeItem" onclick="copyLinkSafe()"><div class="txt"><div class="title">📋 Copy Link</div></div></div><div class="safeItem" onclick="shareWA()"><div class="txt"><div class="title">💚 WhatsApp</div></div></div></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js" defer></script>
+<script src="js/pixoro-core.js?v=117" defer></script>
 <script>
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
@@ -118,8 +119,17 @@ function showToast(m){let t=document.getElementById('toast');if(!t)return;t.inne
 function fmtViews(n){if(n>=1000000)return (n/1000000).toFixed(1).replace('.0','')+'M';if(n>=1000)return (n/1000).toFixed(1).replace('.0','')+'K';return String(n)}
 let ME_RAW='',ME_ID='',profileMap={},profileByIdMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=[],mutedUsers=[],blockedUsers=[],hiddenMeta={},lastAction=null,savingIds=new Set(),_INIT_DONE=false
 async function waitSupa(){for(let i=0;i<30;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
-function applyWhiteRemove(){ return; }
-async function init(){if(_INIT_DONE) return; _INIT_DONE=true; supa=await waitSupa();if(!supa){_INIT_DONE=false;return;}let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;window.ME_ID=ME_ID;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileByIdMap[String(p.id)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);load()}
+// FIX FOLLOW - Core Tick ah Thooku da - Flicker Stop da - Transparent Mattum da
+function cleanFollowBtnsReels(){
+  document.querySelectorAll('[data-follow-user],.followBtnPerusa').forEach(b=>{
+    let t=(b.innerText||'').replace(/✓|✅|✔/g,'').trim();
+    if(t.includes('Following')) t='Following'; else if(t.includes('Follow')) t='Follow';
+    if(t && b.innerText!==t) b.innerText=t;
+    b.style.background='transparent'; b.style.backgroundColor='transparent'; b.style.border='none'; b.style.boxShadow='none';
+  });
+}
+window.pixoroPaintAllFollowBtns = cleanFollowBtnsReels;
+async function init(){if(_INIT_DONE) return; _INIT_DONE=true; supa=await waitSupa();if(!supa){_INIT_DONE=false;return;}let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;window.ME_ID=ME_ID;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileByIdMap[String(p.id)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);if(window.pixoroRefreshPhotos) await window.pixoroRefreshPhotos();load()}
 function displayNameFor(u){
   if(!u) return ME_RAW||'user';
   let p=profileByIdMap[String(u)]||profileMap[cleanUser(u)];
@@ -131,10 +141,15 @@ function displayNameFor(u){
   if(cu.length>20) return ME_RAW||'user';
   return cu||ME_RAW||'user';
 }
+// FIX PHOTO - Core Cache vum paaru da - Ella page kum photo maaranum da
 function getPfp(u){
   if(!u) return 'https://ui-avatars.com/api/?name=P&background=FF4D8D&color=fff&size=200&bold=true';
   let p=profileByIdMap[String(u)]||profileMap[cleanUser(u)];
   if(p&&(p.avatar_url||p.profile_pic||p.photo_url)) return p.avatar_url||p.profile_pic||p.photo_url;
+  if(window._PIXORO_PFP_CACHE){
+    let cached = window._PIXORO_PFP_CACHE[cleanUser(displayNameFor(u))] || window._PIXORO_PFP_CACHE[String(u)];
+    if(cached) return cached;
+  }
   let uname = p ? cleanUser(p.username) : '';
   if(!uname){
     let pp=allPosts.find(x=>String(x.user_id)===String(u));
@@ -251,7 +266,7 @@ return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div c
 </div>
 <div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap" onclick="event.stopPropagation();location.href='profile.html?u=${p.user_id}'"><img src="${getPfp(p.user_id||p.username)}" onerror="pfpErr(this,'${followName}')" loading="lazy"></div><b class="reel-username" onclick="event.stopPropagation();location.href='profile.html?u=${p.user_id}'">${followName}</b>${followBtn}</div>${captionHtml}<div style="font-size:12px;color:#ddd;margin-top:6px;font-weight:700">▶ <span data-viewcount="${p.id}">${fmtViews(vCount)}</span> views</div></div>
 </div>`
-}).join('');observe(); applyWhiteRemove();}
+}).join('');observe(); cleanFollowBtnsReels();}
 let _reelIO=null;
 function observe(){let reels=document.querySelectorAll('video.reel-main');if(_reelIO) _reelIO.disconnect();_reelIO=new IntersectionObserver(entries=>{entries.forEach(e=>{let v=e.target;if(v.tagName!='VIDEO')return;let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;if(e.isIntersecting){if(!v.src && v.dataset.src){ v.src=v.dataset.src; v.load(); }document.querySelectorAll('video.reel-main').forEach(o=>{if(o!==v)o.pause()});v.muted=globalMuted;currentVideo=v;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})});if(prog){v.ontimeupdate=()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'}}addRealView(reel.dataset.id);}else{v.pause()}})}, {threshold:0.5, rootMargin:'200px 0px'}); reels.forEach(v=>_reelIO.observe(v))}
 function handleReelTap(el){let now=Date.now();if(now-lastTap<300){clearTimeout(tapTimer);lastTap=0;dblLike(el.dataset.id);return}lastTap=now;tapTimer=setTimeout(()=>{let v=el.querySelector('video.reel-main');if(v){if(!v.src && v.dataset.src){v.src=v.dataset.src;v.load();}if(v.paused){v.muted=false;globalMuted=false;currentVideo=v;v.play();showCenter(el,false)}else{v.pause();showCenter(el,true)}}lastTap=0},300)}
@@ -342,6 +357,5 @@ window.toggleFollow = async function(target, btn){
 };
 window.pixoroToggleFollow = window.toggleFollow;
 window.toggleF = window.toggleFollow;
-window.pixoroPaintAllFollowBtns = function(){ return; };
 init()
 </script></body></html>
