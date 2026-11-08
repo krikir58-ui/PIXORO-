@@ -65,6 +65,8 @@ html{background:#000}body{background:#000!important;color:#fff;max-width:450px;m
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
 <div id="choice" class="choiceSheet" onclick="if(event.target==this)hideChoice()"><div style="background:#1a1a1a;border-radius:28px 28px 0 0;padding:20px 0 30px;width:100%;max-width:450px"><div style="width:50px;height:5px;background:#333;border-radius:10px;margin:0 auto 16px"></div><div style="text-align:center;font-size:22px;font-weight:900;margin-bottom:10px">Create</div><div class="createRow" onclick="location.href='post-create.html'"><div class="createIco">+</div><div style="flex:1"><b>Post</b><div style="font-size:12px;color:#888">Share a photo</div></div><span>></span></div><div class="createRow" onclick="location.href='reel-create.html'"><div class="createIco">></div><div style="flex:1"><b>Reels</b><div style="font-size:12px;color:#888">Create a short reel</div></div><span>></span></div><div class="createRow" onclick="location.href='story-upload.html'"><div class="createIco">O</div><div style="flex:1"><b>Story</b><div style="font-size:12px;color:#888">Share 24h story</div></div><span>></span></div><div onclick="hideChoice()" style="text-align:center;padding:14px;color:#777">Cancel</div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<!-- FIX 1 - ITHU THAAN MAIN FIX DA - js/supabase.js ILLANA - window.supa = undefined - Flicker Varum da -->
+<script src="js/supabase.js"></script>
 <script src="js/pixoro-core.js?v=211"></script>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
@@ -169,10 +171,15 @@ async function pixoroCheckBell(){
 }
 window.pixoroCheckBell = pixoroCheckBell;
 setInterval(pixoroCheckBell, 15000);
+// FIX 2 - checkLogin - supa Load aaga Wait pannu da - Illana Flicker Varum da
 async function checkLogin(){
-  supa=getSupa();if(!supa){setTimeout(checkLogin,200);return}
-  let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}
-  let {data:profile}=await supa.from('profiles').select('*').eq('id',session.user.id).single();if(!profile||!profile.username){location.href='login.html';return}
+  for(let i=0;i<50;i++){ if(window.supa) break; await new Promise(r=>setTimeout(r,200)); }
+  supa = window.supa;
+  if(!supa){ console.log('Supa Illa da'); return; }
+  let {data:{session}} = await supa.auth.getSession();
+  if(!session){ location.replace('login.html'); return; }
+  let {data:profile} = await supa.from('profiles').select('*').eq('id',session.user.id).single();
+  if(!profile || !profile.username){ location.replace('login.html'); return; }
   ME_RAW=cleanUser(profile.username);ME=ME_RAW;ME_ID=session.user.id;ME_PFP=profile.avatar_url||'';window.ME=ME_RAW;window.ME_ID=ME_ID;window.ME_RAW=ME_RAW;
   try{ if(window.pixoroLoadFollowing) await window.pixoroLoadFollowing(); }catch(e){ console.log('Follow load fail - Feed continue da'); }
   loadAll();
@@ -181,7 +188,7 @@ async function checkLogin(){
 async function loadAll(){
   try{
     supa=getSupa();if(!supa)return;
-    let pr={data:[]},po={data:[]},re={data:[]},li={data:[]},vi={data:[]},sa={data:[]},st={data:[]},fo={data:[]};
+    let pr={data:[]},[STRIPPED]
     try{ pr = await supa.from('profiles').select('*'); }catch(e){}
     try{ po = await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(12); }catch(e){}
     try{ re = await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(12); }catch(e){}
