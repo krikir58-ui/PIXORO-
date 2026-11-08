@@ -1,4 +1,4 @@
-// ===== PIXORO MAIN - SERVER ONLY - v115 - PHOTO DM SAFE DA =====
+// ===== PIXORO MAIN - SERVER ONLY - v117 - PHOTO + LINK + FOLLOW FIX DA =====
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 
@@ -21,8 +21,9 @@ window.getTick = goldTickHTML;
   .reelsTop b, .topTitle{ font-family:'Segoe UI',system-ui,sans-serif!important;font-size:20px!important;font-weight:600!important;color:#fff!important; }
   .reel-pfp-wrap{width:38px!important;height:38px!important;min-width:38px!important;border:2px solid #fff!important}
   .audioDisc{width:28px!important;height:28px!important;border:2px solid #fff!important}
-  .reel-username{font-size:17px!important;font-weight:700!important}
-  .followBtnRBig{background:transparent!important;color:#fff!important;border:1.2px solid #fff!important;font-size:14px!important;height:28px!important}
+  .reel-username{font-size:17px!important;font-weight:700!important;cursor:pointer!important}
+  [data-follow-user], .followBtnPerusa, .followBtnRBig{ background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.2px solid #fff!important;font-size:14px!important;height:28px!important;box-shadow:none!important }
+  [data-follow-user].following, .followBtnPerusa.following{ background:transparent!important;background-color:transparent!important;border:1.2px solid rgba(255,255,255,.6)!important }
   .msgBtn, .messageBtn{ background:transparent!important;color:#fff!important;border:1.2px solid #fff!important; }
   .createIco{ background:transparent!important;border:1.2px solid #fff!important;color:#fff!important; }
   .reel-main{ background:#000!important; }
@@ -32,15 +33,41 @@ window.getTick = goldTickHTML;
   if(location.pathname.includes('index') || location.pathname.endsWith('/')) document.body.classList.add('isHome');
 })();
 
+window._PIXORO_PFP_CACHE = window._PIXORO_PFP_CACHE || {};
 window.getPfp = function(p){
-  if(typeof p === 'string'){
-    let name = p.replace('@','').trim() || 'G';
+  if(p && typeof p === 'object'){
+    let url = p?.avatar_url || p?.avatar || p?.profile_pic || p?.pfp || p?.photo_url;
+    if(url && String(url).startsWith('http') && !String(url).includes('undefined')) return url;
+    let name = (p?.username || p?.name || 'G').toString().replace('@','').trim() || 'G';
+    let cached = window._PIXORO_PFP_CACHE[name.toLowerCase()];
+    if(cached) return cached;
     return 'https://ui-avatars.com/api/?name=' + name.charAt(0).toUpperCase() + '&background=111&color=fff&size=300&bold=true';
   }
-  let url = p?.avatar_url || p?.avatar || p?.profile_pic || p?.pfp;
-  if(url && String(url).startsWith('http') && !String(url).includes('undefined')) return url;
-  let name = (p?.username || p?.name || 'G').toString().replace('@','').trim() || 'G';
-  return `https://ui-avatars.com/api/?name=${name.charAt(0).toUpperCase()}&background=111&color=fff&size=300&bold=true`;
+  if(typeof p === 'string'){
+    let name = p.replace('@','').trim() || 'G';
+    let cached = window._PIXORO_PFP_CACHE[name.toLowerCase()];
+    if(cached) return cached;
+    return 'https://ui-avatars.com/api/?name=' + name.charAt(0).toUpperCase() + '&background=111&color=fff&size=300&bold=true';
+  }
+  return 'https://ui-avatars.com/api/?name=G&background=111&color=fff&size=300&bold=true';
+};
+window.pixoroRefreshPhotos = async function(){
+  try{
+    if(!window.supa) return;
+    let {data:profs} = await window.supa.from('profiles').select('id,username,avatar_url,profile_pic');
+    (profs||[]).forEach(pr=>{
+      let url = pr.avatar_url || pr.profile_pic;
+      if(!url) return;
+      let uname = String(pr.username||'').toLowerCase().replace('@','');
+      window._PIXORO_PFP_CACHE[uname] = url;
+      window._PIXORO_PFP_CACHE[String(pr.id)] = url;
+    });
+    document.querySelectorAll('img[data-pfp-for], img[data-user-id], .reel-pfp-wrap img, .post-pfp img').forEach(img=>{
+      let key = String(img.dataset.pfpFor || img.dataset.userId || img.alt || '').toLowerCase().replace('@','');
+      let cached = window._PIXORO_PFP_CACHE[key];
+      if(cached && img.src !== cached && !img.src.includes(cached.split('?')[0])) img.src = cached;
+    });
+  }catch(e){}
 };
 
 window.ME_ID = window.ME_ID || null;
@@ -81,7 +108,6 @@ async function pixoroMuteUser(userId){
   try{ await window.supa.from('muted_users').insert({user_id:window.ME_ID, muted_user_id:userId}); }catch(e){}
   location.reload();
 }
-// FIXED v115 - alert illa da - confirm mattum da
 async function pixoroBlockUser(target){
   let raw = String(target||'').trim(); if(!raw || raw==='null' || raw==='undefined') return;
   if(!confirm('Full ah Block Pannava da?')) return;
@@ -184,8 +210,8 @@ async function pixoroOpenFollowList(type){
     let pid = type==='following' ? f.following_id : f.follower_id;
     let pr = (profs||[]).find(p=> String(p.id)===String(pid));
     let uname = pr?.username || f.following_name || f.follower_name || 'user';
-    let pfp = pr?.avatar_url || 'https://ui-avatars.com/api/?name='+uname[0]+'&background=fff&color=000';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><img src="${pfp}" style="width:36px;height:36px;border-radius:50%;object-fit:cover"><b style="flex:1;color:#fff">${uname}</b><button onclick="location.href='profile.html?user=${uname}'" style="background:#fff;color:#000;border:0;padding:6px 14px;border-radius:20px;font-weight:700">View</button></div>`;
+    let pfp = pr?.avatar_url || pr?.profile_pic || 'https://ui-avatars.com/api/?name='+uname[0]+'&background=fff&color=000';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><img src="${pfp}" onclick="location.href='profile.html?u=${pid}'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer"><b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='profile.html?u=${pid}'">${uname}</b><button onclick="location.href='profile.html?u=${pid}'" style="background:#fff;color:#000;border:0;padding:6px 14px;border-radius:20px;font-weight:700">View</button></div>`;
   }).join('') || `<div style="color:#888;text-align:center;padding:20px">No ${type} yet</div>`;
   let old = document.getElementById('followModal'); if(old) old.remove();
   let m = document.createElement('div'); m.id = 'followModal';
@@ -244,8 +270,10 @@ function pixoroPaintAllFollowBtns(){
     let raw = String(btn.dataset.followUser || btn.dataset.followUsername || '');
     if(!raw || raw==='null' || raw==='undefined') return;
     let isFollowing = pixoroIsFollowing(raw);
-    let wantText = isFollowing ? 'Following ✓' : 'Follow';
-    if(btn.innerText !== wantText) btn.innerText = wantText;
+    let wantText = isFollowing ? 'Following' : 'Follow';
+    let cur = String(btn.innerText||'').replace(/✓|✅|✔/g,'').trim();
+    if(cur.includes('Following')) cur='Following'; else if(cur.includes('Follow')) cur='Follow';
+    if(cur !== wantText) btn.innerText = wantText;
     if(btn.classList.contains('following') !== isFollowing) btn.classList.toggle('following', isFollowing);
     btn.dataset.followState = isFollowing ? 'following' : 'follow';
   });
@@ -264,6 +292,7 @@ async function pixoroLoadFollowing(){
     window.PIXORO_FOLLOWING = new Set((data||[]).map(x=>String(x.following_id)));
     window.PIXORO_FOLLOWING_NAMES = new Set([...window.PIXORO_FOLLOWING].map(id=>pixoroCleanName(window.PIXORO_ID_TO_NAME[id]||'')));
     pixoroPaintAllFollowBtns();
+    pixoroRefreshPhotos();
   }catch(e){}
   _pixoroLoadingFollow = false;
 }
@@ -325,9 +354,7 @@ async function pixoroToggleFollow(target, btn){
       if(data) window.PIXORO_FOLLOWING_NAMES.add(pixoroCleanName(name)); else window.PIXORO_FOLLOWING_NAMES.delete(pixoroCleanName(name));
     }
     pixoroPaintAllFollowBtns();
-    try{ localStorage.setItem('pixoro_follow_sync', JSON.stringify({targetId: id, targetName: name, following: data, t: Date.now()})); }catch(e){}
     pixoroLoadFollowCounts();
-    setTimeout(()=>{ _pixoroLoadingFollow = false; pixoroLoadFollowing(); }, 500);
   }catch(e){ pixoroPaintAllFollowBtns(); }
   setTimeout(()=>{ _pixoroFollowBusy[busyKey] = false; }, 800);
   return want;
@@ -347,15 +374,10 @@ window.pixoroPaintAllFollowBtns = pixoroPaintAllFollowBtns;
 window.pixoroSyncFollowBtn = pixoroSyncFollowBtn;
 window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
-window.addEventListener('storage', (e)=>{
-  if(e.key === 'pixoro_follow_sync' && e.newValue){
-    try{ let d = JSON.parse(e.newValue); pixoroSyncFollowBtn(d.targetId, d.following); }catch(err){}
-  }
-});
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
 
-// ===== PIXORO PHOTO DM v115 - SAFE - ADD PANNAPATTATHU DA =====
+// ===== PIXORO PHOTO DM v117 - SAFE DA =====
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
