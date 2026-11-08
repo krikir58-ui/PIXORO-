@@ -16,15 +16,14 @@ input::placeholder{color:#777}
 .avaL{width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);display:grid;place-items:center;font-weight:900;font-size:18px;color:#fff}
 .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}
 .gridItem{aspect-ratio:1/1;overflow:hidden;background:#111;cursor:pointer;position:relative}
-.gridItem img,.gridItem video{width:100%;height:100%;object-fit:cover;display:block}
-.gridItem .play{position:absolute;top:6px;right:6px;font-size:14px;text-shadow:0 1px 4px #000}
-.secTitle{padding:12px 12px 8px;font-size:13px;font-weight:900}
+.gridItem img,.gridItem video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.gridItem .play{position:absolute;top:6px;right:6px;font-size:14px;text-shadow:0 1px 4px #000;pointer-events:none}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:60px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}.bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}.bottom-nav a.active{color:#fff}.bottom-nav a.active svg{stroke:#fff}.bottom-nav span{font-size:10px;color:#8e8e8e}.bottom-nav a.active span{color:#fff;font-weight:700}.bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #fff}
 </style></head><body>
 <div class="top"><b>Pixoro</b><div class="searchWrap"><span>🔍</span><input id="searchInput" placeholder="Search name or ID... @name" oninput="doSearch()" autocomplete="off"></div></div>
 <div id="results"></div>
-<div id="trendingWrap"><div class="secTitle">Trending • Posts & Reels</div><div class="grid" id="grid"></div></div>
+<div id="trendingWrap"><div class="grid" id="grid"></div></div>
 <div class="bottom-nav"><a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a><a href="search.html" class="active"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a><a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a><a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
 <script>
 let supa=window.supa;
@@ -35,6 +34,7 @@ function letterFor(u){let n=cleanUser(u||'');let l=n.replace(/[^a-zA-Z]/g,'').ch
 function avatarHtml(u){let url=getRealPfp(u);let L=letterFor(u);if(url) return `<img src="${url}" onerror="this.outerHTML='<div class=&quot;avaL&quot;>${L}</div>'">`;return `<div class="avaL">${L}</div>`;}
 function getPfp(u){let r=getRealPfp(u);if(r) return r;return 'https://ui-avatars.com/api/?name='+letterFor(u)+'&background=ff5ea8&color=fff&size=200&bold=true';}
 function getBestMedia(p){if(p._from==='reels') return {url:p.video_url||p.media_url||'',isVid:true};let m=(p.media_url||p.video_url||'').toLowerCase().split('?')[0];if(m.endsWith('.mp4')||m.endsWith('.mov')||m.endsWith('.webm')||m.endsWith('.m4v')) return {url:p.media_url||p.video_url,isVid:true};return {url:p.media_url||p.video_url||p.image_url||'',isVid:false};}
+function goToPost(p){let best=getBestMedia(p);if(best.isVid){location.href='reels.html?id='+p.id;}else{location.href='index.html?id='+p.id;}}
 async function init(){if(!window.supa){setTimeout(init,300);return}supa=window.supa;let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);let {data:profs}=await supa.from('profiles').select('*').limit(500);allProfilesCache=profs||[];(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p});let el=document.getElementById('navPfp');if(el) el.src=getPfp(ME_RAW);loadTrending();}
 async function loadTrending(){
   let all=[];
@@ -43,7 +43,7 @@ async function loadTrending(){
   let seenUrl=new Set(),seenId=new Set(),deduped=[];
   for(let p of all){let raw=(p.media_url||p.video_url||'').trim();if(!raw) continue;if(p.is_archived) continue;let u=raw.split('?')[0].toLowerCase();if(seenUrl.has(u)) continue;if(seenId.has(String(p.id))) continue;seenUrl.add(u);seenId.add(String(p.id));deduped.push(p);}
   allPosts=deduped;
-  document.getElementById('grid').innerHTML=deduped.map(p=>{let best=getBestMedia(p);if(!best.url) return '';let link=best.isVid?`reels.html?id=${p.id}`:`index.html?id=${p.id}`;if(best.isVid) return `<div class="gridItem" onclick="location.href='${link}'"><video src="${best.url}" muted playsinline preload="metadata"></video><span class="play">▶</span></div>`;return `<div class="gridItem" onclick="location.href='${link}'"><img src="${best.url}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`;}).join('');
+  document.getElementById('grid').innerHTML=deduped.map((p,idx)=>{let best=getBestMedia(p);if(!best.url) return '';if(best.isVid) return `<div class="gridItem" onclick="goToPost(allPosts[${idx}])"><video src="${best.url}" muted playsinline preload="metadata"></video><span class="play">▶</span></div>`;return `<div class="gridItem" onclick="goToPost(allPosts[${idx}])"><img src="${best.url}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`;}).join('');
   if(!deduped.length) document.getElementById('grid').innerHTML='<p style="padding:30px;color:#777;text-align:center">No posts yet da</p>';
 }
 async function doSearch(){
@@ -57,5 +57,6 @@ async function doSearch(){
   if(!list.length){box.innerHTML=`<p style="padding:30px 20px;color:#777;text-align:center">No users found da<br>Try: <b style="color:#fff">sanjay</b></p>`;return;}
   box.innerHTML=list.slice(0,30).map(p=>{let u=cleanUser(p.username);return `<div class="userRow" onclick="location.href='profile.html?u=${p.id}'"><div class="uAva">${avatarHtml(u)}</div><div style="flex:1;min-width:0"><b>@${u}</b><div style="font-size:12px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.bio||'Pixoro User'}</div></div><span style="color:#666;font-size:20px">›</span></div>`;}).join('');
 }
+window.goToPost=goToPost;
 init()
 </script></body></html>
