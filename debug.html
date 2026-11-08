@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pixoro Debug</title></head>
+<body style="background:#000;color:#fff;font-family:sans-serif;padding:20px">
+<h2>Pixoro Debug 🛠️</h2><div id="out">Loading...</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/pixoro-core.js?v=212"></script>
+<script>
+async function run(){
+  let o=document.getElementById('out');
+  let html='';
+  html+='supa irukka? '+(window.supa?'YES ✅':'NO ❌')+'<br><br>';
+  if(!window.supa){ o.innerHTML=html+'Core load aagala da - v=212 check pannu da'; return; }
+  html+='URL: '+ (window.supa.supabaseUrl||'theriyala') +'<br><br>';
+  // Key check - full key kaamikka maaten da - first 10 char mattum da
+  let {data:{session},error} = await window.supa.auth.getSession();
+  html+='Session Error: '+(error?error.message:'illa ✅')+'<br>';
+  html+='Session: '+(session?'OK ✅ - '+session.user.email:'NULL ❌ - LOGGED OUT DA')+'<br><br>';
+  if(session){
+    let {data,error:err2} = await window.supa.from('profiles').select('username').eq('id',session.user.id).maybeSingle();
+    html+='Profile: '+(err2?err2.message:(data?.username||'PROFILE ILLA ❌'))+'<br><br>';
+    let {data:posts} = await window.supa.from('posts').select('id').limit(1);
+    html+='Posts Table: '+(posts?'OK ✅ - '+(posts.length)+' row':'FAIL ❌')+'<br>';
+  } else {
+    html+='<b>Mudivu: Neenga Logged Out la Irukkinga da</b><br>Login Button ah Click panni - OTP pottu - Login pannunga da<br><br>';
+    html+='<a href="login.html" style="color:#FFD700">👉 Login Page ku Po da</a>';
+  }
+  o.innerHTML=html;
+}
+setTimeout(run,1000);
+</script></body></html>
