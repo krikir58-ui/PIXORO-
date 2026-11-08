@@ -1,6 +1,6 @@
 // ===== PIXORO MAIN - SERVER ONLY - v212 - CORRECTED DA =====
 const SUPA_URL ='https://yecpltndhlzfjplzhcpm.supabase.co';
-const SUPA_KEY = 'appId: "f69281e7-d3a7-450f-bd95-55002fd1613b"'; // <-- Giri, ithula un REAL anon public key ah podu da
+const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_"'; // <-- Giri, ithula un REAL anon public key ah podu da
 if(!window.supa && window.supabase && window.supabase.createClient){
   window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
   console.log("✅ Pixoro Supa Connected da!");
