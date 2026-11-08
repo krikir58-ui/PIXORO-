@@ -8,7 +8,7 @@
 html{background:#000}body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px;overflow-x:hidden}
 .top{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;background:#000;position:sticky;top:0;z-index:50;border-bottom:1px solid #111;height:56px}
 .topPlus{width:auto!important;height:auto!important;background:transparent!important;color:#fff!important;font-size:28px!important;cursor:pointer;padding:0 6px!important;border:none!important}
-.bellWhite{display:flex!important;width:auto!important;height:auto!important;background:transparent!important;color:#fff!important;font-size:22px!important;cursor:pointer;border:none!important;padding:0 8px!important;align-items:center;justify-content:center}.bellWhite svg{width:22px!important;height:22px!important;fill:none!important;stroke:#fff!important}
+.bellWhite{display:flex!important;width:auto!important;height:auto!important;background:transparent!important;color:#fff!important;font-size:22px!important;cursor:pointer;border:none!important;padding:0 8px!important;align-items:center;justify-content:center;position:relative}.bellWhite svg{width:22px!important;height:22px!important;fill:none!important;stroke:#fff!important}
 .post{background:#000;border:1px solid #151515;border-radius:20px;margin:10px 8px 14px;overflow:hidden;padding-bottom:10px;box-shadow:0 4px 20px rgba(0,0,0,0.4);contain:content}
 .postTop{padding:10px 12px;display:flex;align-items:center;justify-content:space-between}
 .postTop b{font-size:15px!important;font-weight:700!important;cursor:pointer}
@@ -47,7 +47,7 @@ html{background:#000}body{background:#000!important;color:#fff;max-width:450px;m
 .skel{height:340px;background:#111;border-radius:20px;margin:10px 8px;animation:sk 1s infinite alternate}
 @keyframes sk{from{opacity:.6}to{opacity:1}}
 </style></head><body>
-<div class="top"><b style="font-size:26px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="enableNotif()"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div></div></div>
+<div class="top"><b style="font-size:26px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="location.href='notifications.html'"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span id="pixoroBellDot" style="display:none;position:absolute;top:-2px;right:2px;width:10px;height:10px;background:#FF0A33;border-radius:50%;border:2px solid #000"></span></div></div></div>
 <div id="singleBanner" class="singleBanner" style="display:none">Single Post View - <span onclick="location.href='index.html'" style="text-decoration:underline;cursor:pointer">Back to Feed</span></div>
 <div class="storyBar" id="storyBar"></div>
 <div class="feedTabs"><div class="feedTab active" id="tabForYou" onclick="setFeedMode('foryou')">For You</div><div class="feedTab" id="tabFollowing" onclick="setFeedMode('following')">Following</div><div class="feedTab" id="tabLatest" onclick="setFeedMode('latest')">Latest</div></div>
@@ -64,26 +64,19 @@ html{background:#000}body{background:#000!important;color:#fff;max-width:450px;m
 <div id="commentModal" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #333"><b>Comments</b><span onclick="closeComment()" style="font-size:22px">X</span></div><div id="commentList" style="flex:1;overflow-y:auto;padding:12px"></div><div style="padding:10px;border-top:1px solid #333;display:flex;gap:10px"><div id="myCommentPfpWrap" style="width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#222"></div><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#000;border:1px solid #333;padding:12px 14px;border-radius:20px;color:#fff"><button onclick="addComment()" style="background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:0;color:#fff;font-weight:900;padding:10px 16px;border-radius:20px">Post</button></div></div></div>
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
 <div id="choice" class="choiceSheet" onclick="if(event.target==this)hideChoice()"><div style="background:#1a1a1a;border-radius:28px 28px 0 0;padding:20px 0 30px;width:100%;max-width:450px"><div style="width:50px;height:5px;background:#333;border-radius:10px;margin:0 auto 16px"></div><div style="text-align:center;font-size:22px;font-weight:900;margin-bottom:10px">Create</div><div class="createRow" onclick="location.href='post-create.html'"><div class="createIco">+</div><div style="flex:1"><b>Post</b><div style="font-size:12px;color:#888">Share a photo</div></div><span>></span></div><div class="createRow" onclick="location.href='reel-create.html'"><div class="createIco">></div><div style="flex:1"><b>Reels</b><div style="font-size:12px;color:#888">Create a short reel</div></div><span>></span></div><div class="createRow" onclick="location.href='story-upload.html'"><div class="createIco">O</div><div style="flex:1"><b>Story</b><div style="font-size:12px;color:#888">Share 24h story</div></div><span>></span></div><div onclick="hideChoice()" style="text-align:center;padding:14px;color:#777">Cancel</div></div></div>
-<!-- CORE CONNECT - ELLA PAGE KUM ORE LINE DA - v=200 - defer ILLA DA -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js?v=211"></script>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
-    try{ await OneSignal.init({ appId: "f69281e7-d3a7-450f-bd95-55002fd1613b", notifyButton: { enable: false } }); }catch(e){}
+    try{ await OneSignal.init({ appId: "UN_OLD_ONESIGNAL_APP_ID_INGA_VEIKO_DA", notifyButton: { enable: false } }); }catch(e){}
   });
-  function enableNotif(){
-    OneSignalDeferred.push(async function(OneSignal) {
-      if(OneSignal.Notifications.permission){ location.href='notifications.html'; return; }
-      await OneSignal.Notifications.requestPermission();
-    });
-  }
+  function enableNotif(){ location.href='notifications.html'; }
 </script>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 window.showToast=showToast; function showChoice(){document.getElementById('choice').classList.add('show')} function hideChoice(){document.getElementById('choice').classList.remove('show')}
-// CORE OVERRIDE ILLA DA - Core la Irukura pixoroPaintAllFollowBtns / toggleFollow Thaan Velai Seiyum da - Page la Thirumba Ezutha Koodathu da
 let supa=window.supa;function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase();return u||''}
 let ME_RAW='',ME='',ME_ID='',ME_PFP='',allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=[],allViews=[],viewedStories=[],lastTap=0,feedMode='foryou',curMenuPost=null;
 function getSupa(){return window.supa||supa} window.getSupa=getSupa;
@@ -165,6 +158,17 @@ function getBestMedia(p){
   if(m.endsWith('.mp4')||m.endsWith('.mov')||m.endsWith('.webm')||m.endsWith('.m4v')){ return {url: p.media_url||p.video_url, isVid:true}; }
   return {url: p.media_url||p.video_url||'', isVid:false};
 }
+// ===== PIXORO BELL DOT - SERVER ONLY DA =====
+async function pixoroCheckBell(){
+  try{
+    if(!window.supa || !window.ME_ID) return;
+    let {data} = await window.supa.from('notifications').select('id').eq('to_user_id', window.ME_ID).eq('is_read', false).limit(1);
+    let dot = document.getElementById('pixoroBellDot');
+    if(dot) dot.style.display = (data && data.length) ? 'block' : 'none';
+  }catch(e){}
+}
+window.pixoroCheckBell = pixoroCheckBell;
+setInterval(pixoroCheckBell, 15000);
 async function checkLogin(){
   supa=getSupa();if(!supa){setTimeout(checkLogin,200);return}
   let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}
@@ -215,6 +219,7 @@ async function loadAll(){
       if(ME_PFP && ME_PFP.includes('http')) el.src=ME_PFP; else el.src=getPfp(ME_ID);
     }
     let cp=document.getElementById('myCommentPfpWrap'); if(cp) cp.innerHTML = avatarHtmlSmall(ME_ID, ME_RAW);
+    pixoroCheckBell();
   }catch(e){
     console.log('Load Error',e);
     let feed=document.getElementById('feed');
@@ -257,7 +262,12 @@ async function doubleLike(id){
   let c=document.getElementById('likeCount-'+id);if(c)c.innerText=parseInt(c.innerText||'0')+1;
   supa=getSupa();if(!supa) return;
   let {error}=await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});
-  if(error) console.log('SERVER SAVE FAIL:',error.message); else console.log('SERVER SAVE OK - like');
+  if(error) console.log('SERVER SAVE FAIL:',error.message);
+  else {
+    console.log('SERVER SAVE OK - like');
+    let p = allPosts.find(x=> String(x.id)===String(id));
+    if(p && window.pixoroSendNotification){ await window.pixoroSendNotification(p.user_id, 'like', id, 'liked your post'); }
+  }
 }
 async function fastLike(id){
   let liked=allLikes.some(l=>String(l.post_id)==String(id)&&(l.user_id==ME_ID));
@@ -266,13 +276,18 @@ async function fastLike(id){
   if(!liked){
     allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});if(btn)btn.classList.add('liked');if(c)c.innerText=parseInt(c.innerText||'0')+1;
     let burst=document.getElementById('burst-'+id);if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show')}
-    if(supa){ let {error}=await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW}); if(error) console.log('SERVER SAVE FAIL:',error.message); }
+    if(supa){
+      let {error}=await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});
+      if(!error){
+        let p = allPosts.find(x=> String(x.id)===String(id));
+        if(p && window.pixoroSendNotification){ await window.pixoroSendNotification(p.user_id, 'like', id, 'liked your post'); }
+      }
+    }
   } else {
     allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&(l.user_id==ME_ID)));if(btn)btn.classList.remove('liked');if(c)c.innerText=Math.max(0,parseInt(c.innerText||'1')-1);
     if(supa){ let {error}=await supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID); if(error) console.log('SERVER SAVE FAIL:',error.message); }
   }
 }
-// toggleFollow - Core la Irukku da - Page la Ezutha Koodathu da - Core Function ah Thaan Use Pannu da
 window.toggleFollow = window.pixoroToggleFollow;
 window.toggleF = window.pixoroToggleFollow;
 async function savePost(id,btn){
@@ -291,7 +306,12 @@ function closeComment(){document.getElementById('commentModal').style.display='n
 async function addComment(){
   supa=getSupa();let t=document.getElementById('commentInput').value.trim();if(!t||!window.currentPostId||!supa)return;
   let {error}=await supa.from('comments').insert({post_id:window.currentPostId,user_id:ME_ID,username:ME_RAW,text:t});
-  if(error) console.log('SERVER SAVE FAIL:',error.message); else console.log('SERVER SAVE OK - comment');
+  if(error) console.log('SERVER SAVE FAIL:',error.message);
+  else {
+    console.log('SERVER SAVE OK - comment');
+    let p = allPosts.find(x=> String(x.id)===String(window.currentPostId));
+    if(p && window.pixoroSendNotification){ await window.pixoroSendNotification(p.user_id, 'comment', window.currentPostId, 'commented: "'+t+'"'); }
+  }
   document.getElementById('commentInput').value='';openComment(window.currentPostId)
 }
 checkLogin()
