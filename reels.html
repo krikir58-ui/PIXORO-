@@ -28,7 +28,7 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 .reel-pfp-wrap img{width:100%!important;height:100%!important;object-fit:cover}
 .reel-username{font-size:15px!important;font-weight:700!important;cursor:pointer;max-width:120px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
 .reel-caption{margin-top:6px!important;font-size:13px!important;color:#ddd!important;line-height:1.4;display:block!important;max-height:42px!important;overflow:hidden!important}
-/* ===== FOLLOW - NO BACKGROUND - BATTERY SAVE - RAINBOW LIGHT DA ===== */
+/* ===== FOLLOW - NO BACKGROUND - BATTERY SAVE - LIGHT 4 SEC DA ===== */
 .followBtnPerusa,[data-follow-user]{
   height:32px!important; min-width:86px!important; padding:0 16px!important; margin-left:10px!important;
   display:inline-flex!important; align-items:center!important; justify-content:center!important; flex-shrink:0!important;
@@ -45,14 +45,14 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 .followBtnPerusa.following,[data-follow-user].following{
   color:#fff!important; border:1.2px solid rgba(255,255,255,.9)!important; opacity:1!important;
 }
-/* FOLLOWING VARUM POTHU - ALL COLOUR RAINBOW LIGHT VANTHU POKUM DA */
+/* HEART ILLA DA - LIGHT MATTUM DA - BOX KULLA 4 SEC POITEY IRUKKUM DA */
 .followBtnPerusa.flash::after,[data-follow-user].flash::after{
   content:''!important; position:absolute!important; top:0!important; bottom:0!important; width:60%!important; left:-60%!important; z-index:1!important; pointer-events:none!important;
   background:linear-gradient(90deg, transparent, #FF004C, #FF8A00, #FFEE00, #00E676, #00B0FF, #7A00FF, transparent)!important;
-  animation:rainbowLight .8s ease forwards!important;
+  animation:rainbowLight .7s linear infinite!important;
 }
-@keyframes rainbowLight{ 0%{ left:-60%; opacity:0; } 15%{ opacity:1; } 100%{ left:110%; opacity:0; } }
-.followBtnPerusa:active,[data-follow-user]:active{ transform:scale(.96)!important; box-shadow:none!important; }
+@keyframes rainbowLight{ 0%{ left:-60%; opacity:0; } 20%{ opacity:1; } 100%{ left:110%; opacity:0; } }
+.followBtnPerusa:active,[data-follow-user]:active{ transform:scale(.96)!important; box-shadow:none!important; background:transparent!important; }
 .reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:56px;padding:0 16px;background:#000!important;background-image:none!important;pointer-events:none}
 .reelsTop b{color:#fff!important;font-size:24px!important;font-weight:800!important}
 .reelsTop b span{color:#FF4D8D!important}
@@ -137,7 +137,7 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 <div class="sheet" id="commentSheet" onclick="if(event.target==this)closeSheet('commentSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Comments</b></div><div id="commentList" style="overflow-y:auto;flex:1;max-height:45vh;padding:0 20px"></div><div style="display:flex;gap:10px;align-items:center;padding:10px 20px;border-top:1px solid #eee;margin-top:10px"><input id="commentInput" style="flex:1;background:#F1F1F5;border:0;border-radius:20px;padding:12px 14px;color:#111;outline:none" placeholder="Add kind comment..."><button onclick="postComment()" style="background:#FF4D8D;color:#fff;border:0;border-radius:20px;padding:10px 18px;font-weight:800">Post</button></div></div></div>
 <div class="sheet" id="shareSheet" onclick="if(event.target==this)closeSheet('shareSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Share</b></div><div class="safeCard"><div class="safeItem" onclick="copyLinkSafe()"><div class="txt"><div class="title">📋 Copy Link</div></div></div><div class="safeItem" onclick="shareWA()"><div class="txt"><div class="title">💚 WhatsApp</div></div></div></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=204"></script>
+<script src="js/pixoro-core.js?v=208"></script>
 <script>
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
@@ -147,14 +147,15 @@ let ME_RAW='',ME_ID='',profileMap={},profileByIdMap={},allPosts=[],allLikes=[],a
 async function waitSupa(){for(let i=0;i<30;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
 window.toggleFollow = window.pixoroToggleFollow;
 window.toggleF = window.pixoroToggleFollow;
-// ===== RAINBOW LIGHT - Following Aana Mattum All Colour Vanthu Pokum da =====
+// ===== LIGHT MATTUM - HEART ILLA - BOX KULLA 4 SEC POITEY IRUKKUM DA =====
 document.addEventListener('click', (e)=>{
   let b = e.target.closest('[data-follow-user], .followBtnPerusa');
   if(!b) return;
   let willBeFollowing = !b.classList.contains('following');
   if(!willBeFollowing) return;
+  let oldHeart = b.querySelector('.followHeart'); if(oldHeart) oldHeart.remove();
   b.classList.remove('flash'); void b.offsetWidth; b.classList.add('flash');
-  setTimeout(()=> b.classList.remove('flash'), 850);
+  setTimeout(()=> b.classList.remove('flash'), 4000);
 });
 async function init(){if(_INIT_DONE) return; _INIT_DONE=true; supa=await waitSupa();if(!supa){_INIT_DONE=false;return;}let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;window.ME_ID=ME_ID;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileByIdMap[String(p.id)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);if(window.pixoroRefreshPhotos) await window.pixoroRefreshPhotos();load()}
 function displayNameFor(u){
