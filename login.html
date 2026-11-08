@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pixoro Login</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js"></script>
+<!-- CORE MATTUM DA - supabase.js DELETE PANNITEN DA - DOUBLE CLIENT = LOOP DA -->
+<script src="js/pixoro-core.js?v=212"></script>
 <style>
 body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif!important;display:flex;justify-content:center;padding:20px}
 .box{width:360px;text-align:center}.card{border:1px solid #262626;padding:20px;border-radius:12px;margin-bottom:10px;background:#0a0a0a}
@@ -89,7 +90,7 @@ button:disabled{opacity:0.6}
 </div>
 </div>
 <script>
-let supa=window.supa, curEmail='', forgotEmailVal='', timerInt
+let supa=window.supa, curEmail='', forgotEmailVal='', timerInt, LOGIN_CHECK_DONE=false;
 function go(id){['s1','sOTP','s2','s3','sOld','sForgot'].forEach(x=>document.getElementById(x).classList.add('hide'));document.getElementById(id).classList.remove('hide')}
 function showOld(){go('sOld')}
 function showErr(id,m){document.getElementById(id).innerText=m}
@@ -101,22 +102,21 @@ function checkAuto(){if(getOTP().length===6) verifyOTP()}
 function startTimer(){let s=60;document.getElementById('resendBtn').classList.add('hide');clearInterval(timerInt);timerInt=setInterval(()=>{s--;document.getElementById('timer').innerText='Resend in '+s+'s';if(s<=0){clearInterval(timerInt);document.getElementById('timer').innerText='OTP Varala ya?';document.getElementById('resendBtn').classList.remove('hide')}},1000)}
 function showPfpWarn(msg){let w=document.getElementById('pfpWarn'); w.innerText='⚠️ '+msg; w.style.display='block'; document.getElementById('pfpFile').value=''}
 async function waitSupa(){for(let i=0;i<50;i++){if(window.supa) return window.supa; await new Promise(r=>setTimeout(r,200))} return window.supa}
-
-// FIX 1 - Page Open aana Odane - Session iruntha - Direct ah Ulla Poidum da - Login kekathu da
+// ===== CHECK LOGIN - CORRECTED - ORE CLIENT DA - LOOP ILLA DA =====
 async function checkAlreadyLoggedIn(){
+  if(LOGIN_CHECK_DONE) return; LOGIN_CHECK_DONE=true;
   supa = await waitSupa();
   if(!supa) return;
+  // Logout la vandha - check panna venaam da
+  if(new URLSearchParams(location.search).get('logout')==='1') return;
   let {data:{session}} = await supa.auth.getSession();
   if(!session || !session.user) return;
-  // Session irukku - Profile irukka nu paaru
   let {data:prof} = await supa.from('profiles').select('username').eq('id',session.user.id).maybeSingle();
   if(prof && prof.username){ location.href='index.html'; return; }
-  // Profile illa na - Create Profile ku po - Login ku illa da
   curEmail = session.user.email || '';
   go('s2');
 }
 checkAlreadyLoggedIn();
-
 async function sendOTP(isResend){
   supa = await waitSupa();
   if(!supa) return showErr('msg1','Supabase Load Aagala da - Refresh Pannu da 🔄');
@@ -137,8 +137,6 @@ async function sendOTP(isResend){
   document.getElementById('otpInfo').innerText='OTP sent to '+curEmail+' - Spam / Promotions la Paaru da 📩';
   go('sOTP'); startTimer(); setTimeout(()=>document.getElementById('o1').focus(),100);
 }
-
-// FIX 2 - Verify aana Apram - Session Save aaga 500ms Wait panni - Apram Check pannu da - Ithu thaan Main Fix da
 async function verifyOTP(){
   let code=getOTP()
   if(code.length<6) return showErr('msgOTP','6 Digit OTP Podu da')
@@ -170,8 +168,12 @@ async function saveProfile(){
   if(upErr) return showErr('msg2',upErr.message);
   let {data:{user}}=await supa.auth.getUser()
   if(!user) return showErr('msg2','Session Illa da - OTP Thirumba Podu da');
-  let {error:profErr} = await supa.from('profiles').upsert({id:user.id, username:u, email:curEmail, avatar_url:'https://ui-avatars.com/api/?name='+u.charAt(0).toUpperCase()+'&background=111&color=fff'})
-  if(profErr) return showErr('msg2','Profile Save Aagala da: '+profErr.message);
+  // email column illa na fail aagum da - athaan try/catch da
+  let {error:profErr} = await supa.from('profiles').upsert({id:user.id, username:u, avatar_url:'https://ui-avatars.com/api/?name='+u.charAt(0).toUpperCase()+'&background=111&color=fff'})
+  if(profErr){
+    let {error:profErr2} = await supa.from('profiles').upsert({id:user.id, username:u, email:curEmail, avatar_url:'https://ui-avatars.com/api/?name='+u.charAt(0).toUpperCase()+'&background=111&color=fff'})
+    if(profErr2) return showErr('msg2','Profile Save Aagala da: '+profErr2.message);
+  }
   go('s3')
 }
 function previewPfp(inp){
@@ -188,6 +190,7 @@ async function savePhoto(){
   let {data:{user}}=await supa.auth.getUser(); let {error}=await supa.storage.from('avatars').upload(user.id+'.jpg', f, {upsert:true}); if(error) return showPfpWarn('Upload Fail da - Skip pannu da'); let {data}=supa.storage.from('avatars').getPublicUrl(user.id+'.jpg'); await supa.from('profiles').update({avatar_url:data.publicUrl}).eq('id',user.id); location.href='index.html'
 }
 async function loginOld(){
+  supa = await waitSupa();
   let val=document.getElementById('oldUser').value.trim(), pass=document.getElementById('oldPass').value
   if(!val||!pass) return showErr('msgOld','Username & Password Podu da')
   let email=val
@@ -198,6 +201,7 @@ async function loginOld(){
   location.href='index.html'
 }
 async function sendForgotOTP(){
+  supa = await waitSupa();
   forgotEmailVal=document.getElementById('forgotEmail').value.trim().toLowerCase()
   if(!forgotEmailVal.includes('@')) return showErr('msgForgot','Valid Gmail Podu da')
   let {error}=await supa.auth.signInWithOtp({email:forgotEmailVal, options:{shouldCreateUser:false, emailRedirectTo: location.origin + '/index.html'}})
@@ -206,6 +210,7 @@ async function sendForgotOTP(){
   showErr('msgForgot','OTP Gmail ku pochu da! Spam la Paaru da!')
 }
 async function resetPasswordNow(){
+  supa = await waitSupa();
   let code=getForgotOTP(), p1=document.getElementById('forgotNew').value, p2=document.getElementById('forgotNew2').value
   if(code.length<6) return showErr('msgForgot','6 Digit OTP Podu da')
   if(p1.length<6) return showErr('msgForgot','Password 6+ Letters Podu da')
