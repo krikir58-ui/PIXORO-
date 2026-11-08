@@ -1,4 +1,4 @@
-// ===== PIXORO MAIN - SERVER ONLY - v117 - PHOTO + LINK + FOLLOW FIX DA =====
+// ===== PIXORO MAIN - SERVER ONLY - v200 - PHOTO + LINK + FOLLOW FIX DA - ELLA PAGE KUM ORE CORE DA =====
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 
@@ -54,9 +54,9 @@ window.getPfp = function(p){
 window.pixoroRefreshPhotos = async function(){
   try{
     if(!window.supa) return;
-    let {data:profs} = await window.supa.from('profiles').select('id,username,avatar_url,profile_pic');
+    let {data:profs} = await window.supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url');
     (profs||[]).forEach(pr=>{
-      let url = pr.avatar_url || pr.profile_pic;
+      let url = pr.avatar_url || pr.profile_pic || pr.photo_url;
       if(!url) return;
       let uname = String(pr.username||'').toLowerCase().replace('@','');
       window._PIXORO_PFP_CACHE[uname] = url;
@@ -266,9 +266,14 @@ function pixoroIsFollowing(check){
   return false;
 }
 function pixoroPaintAllFollowBtns(){
-  document.querySelectorAll('[data-follow-user]').forEach(btn=>{
-    let raw = String(btn.dataset.followUser || btn.dataset.followUsername || '');
+  document.querySelectorAll('[data-follow-user], .followBtnPost, .followBtnSearch, .followBtnPerusa, .whiteBtn').forEach(btn=>{
+    let raw = String(btn.dataset.followUser || btn.dataset.followUsername || btn.innerText || '');
     if(!raw || raw==='null' || raw==='undefined') return;
+    // whiteBtn la Vera Text Irukkum - Follow Button Mattum Thaan Maathu da
+    if(btn.classList.contains('whiteBtn') && !btn.dataset.followUser && !btn.dataset.followUsername) return;
+    let clean = pixoroCleanName(raw);
+    if(clean==='follow' || clean==='following') return;
+    if(!btn.dataset.followUser && !btn.dataset.followUsername) return;
     let isFollowing = pixoroIsFollowing(raw);
     let wantText = isFollowing ? 'Following' : 'Follow';
     let cur = String(btn.innerText||'').replace(/✓|✅|✔/g,'').trim();
@@ -276,17 +281,25 @@ function pixoroPaintAllFollowBtns(){
     if(cur !== wantText) btn.innerText = wantText;
     if(btn.classList.contains('following') !== isFollowing) btn.classList.toggle('following', isFollowing);
     btn.dataset.followState = isFollowing ? 'following' : 'follow';
+    btn.style.background = 'transparent'; btn.style.backgroundColor = 'transparent';
   });
 }
 async function pixoroLoadFollowing(){
-  if(!window.supa || !window.ME_ID) return;
+  if(!window.supa) return;
+  // FIX v200 - ME_ID Illana Session la irundhu Edukkum da - Page ME_ID Set Aaga Munnadi Core Run Aanaalum Velai Seiyum da
+  if(!window.ME_ID){
+    try{ let {data:{session}} = await window.supa.auth.getSession(); if(session?.user?.id){ window.ME_ID = session.user.id; let {data:pr} = await window.supa.from('profiles').select('username').eq('id', window.ME_ID).single(); if(pr) window.ME_RAW = pr.username; } }catch(e){}
+  }
+  if(!window.ME_ID) return;
   if(_pixoroLoadingFollow) return;
   _pixoroLoadingFollow = true;
   try{
-    let {data:profs} = await window.supa.from('profiles').select('id,username');
+    let {data:profs} = await window.supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url');
     (profs||[]).forEach(p=>{
       window.PIXORO_ID_TO_NAME[String(p.id)] = pixoroCleanName(p.username);
       window.PIXORO_NAME_TO_ID[pixoroCleanName(p.username)] = String(p.id);
+      let url = p.avatar_url || p.profile_pic || p.photo_url;
+      if(url && String(url).includes('http')){ window._PIXORO_PFP_CACHE[pixoroCleanName(p.username)] = url; window._PIXORO_PFP_CACHE[String(p.id)] = url; }
     });
     let {data} = await window.supa.from('follows').select('following_id').eq('follower_id', window.ME_ID);
     window.PIXORO_FOLLOWING = new Set((data||[]).map(x=>String(x.following_id)));
@@ -355,6 +368,7 @@ async function pixoroToggleFollow(target, btn){
     }
     pixoroPaintAllFollowBtns();
     pixoroLoadFollowCounts();
+    window.dispatchEvent(new Event('pixoroFollowChanged'));
   }catch(e){ pixoroPaintAllFollowBtns(); }
   setTimeout(()=>{ _pixoroFollowBusy[busyKey] = false; }, 800);
   return want;
@@ -376,8 +390,9 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
+console.log('PIXORO CORE v200 LOADED');
 
-// ===== PIXORO PHOTO DM v117 - SAFE DA =====
+// ===== PIXORO PHOTO DM v200 - SAFE DA =====
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
