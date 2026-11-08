@@ -12,10 +12,10 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 .reel .reel-main + .reel-main{display:none!important}
 .progress{position:absolute;top:0;left:0;height:2px;background:#FF4D8D;width:0%;z-index:20}
 .vBar{position:absolute!important;right:10px!important;bottom:110px!important;display:flex!important;flex-direction:column!important;gap:20px!important;align-items:center!important;z-index:15!important}
-.vBtn{display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;width:48px!important;cursor:pointer!important}
+.vBtn{display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;width:48px!important;cursor:pointer!important;-webkit-tap-highlight-color:transparent!important}
 .vBtn span{font-size:11px!important;font-weight:700!important;color:#fff!important;text-shadow:0 1px 4px rgba(0,0,0,0.9)!important}
 .vBtn svg{width:28px!important;height:28px!important;stroke:#fff!important;fill:none!important;stroke-width:1.8!important;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8))!important}
-.vBtn:active{transform:scale(0.85)}
+.vBtn:active{transform:scale(0.85);background:transparent!important;box-shadow:none!important}
 .vBtn.liked svg{fill:#ff3040!important;stroke:#ff3040!important}
 .vBtn.saved svg{fill:#fff!important;stroke:#fff!important}
 .vBtn.tildeBtn{background:transparent!important;border:none!important;width:36px!important;height:36px!important;display:flex!important;align-items:center!important;justify-content:center!important}
@@ -24,12 +24,28 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 .audioWrap{display:flex!important;flex-direction:column!important;align-items:center!important}
 @keyframes spin{to{transform:rotate(360deg)}}
 .btm{position:absolute!important;left:12px!important;right:82px!important;bottom:65px!important;z-index:10!important;text-shadow:0 2px 8px rgba(0,0,0,0.9)!important;background:none!important;background-image:none!important;padding:20px 0 0 0}
-.reel-pfp-wrap{width:38px!important;height:38px!important;min-width:38px!important;border-radius:50%!important;overflow:hidden!important;border:1.8px solid #fff!important;cursor:pointer}
+.reel-pfp-wrap{width:40px!important;height:40px!important;min-width:40px!important;border-radius:50%!important;overflow:hidden!important;border:2px solid #fff!important;cursor:pointer;flex-shrink:0}
 .reel-pfp-wrap img{width:100%!important;height:100%!important;object-fit:cover}
-.reel-username{font-size:15px!important;font-weight:700!important;margin-left:8px!important;cursor:pointer}
+.reel-username{font-size:15px!important;font-weight:700!important;cursor:pointer;max-width:120px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
 .reel-caption{margin-top:6px!important;font-size:13px!important;color:#ddd!important;line-height:1.4;display:block!important;max-height:42px!important;overflow:hidden!important}
-.followBtnPerusa,.followBtnPerusa.following,[data-follow-user],[data-follow-user].following{ background:transparent!important; background-color:transparent!important; border:none!important; box-shadow:none!important; outline:none!important; color:#fff!important; padding:0!important; border-radius:0!important; font-weight:700!important; font-size:15px!important; line-height:1!important; margin-left:10px!important; height:auto!important; min-width:0!important; white-space:nowrap!important; display:inline-flex!important; align-items:center!important; justify-content:center!important; text-shadow:0 1px 6px #000,0 1px 6px #000!important; }
-.followBtnPerusa.following,[data-follow-user].following{ opacity:.75!important; }
+/* ===== FOLLOW BOX CORRECT DA - Chinna Tha Illa da - Colour Fill Aagum da ===== */
+.followBtnPerusa,[data-follow-user]{
+  height:32px!important; min-width:86px!important; padding:0 16px!important; margin-left:10px!important;
+  display:inline-flex!important; align-items:center!important; justify-content:center!important; flex-shrink:0!important;
+  border-radius:8px!important; font-size:14px!important; font-weight:800!important; line-height:1!important; white-space:nowrap!important;
+  -webkit-tap-highlight-color:transparent!important; outline:none!important; transition:all .15s ease!important; text-shadow:none!important;
+}
+/* FOLLOW - Pink Colour Ulla Vanthidum da */
+.followBtnPerusa:not(.following),[data-follow-user]:not(.following){
+  background:linear-gradient(135deg,#FF4D8D,#FF2E63)!important; background-color:#FF4D8D!important;
+  color:#fff!important; border:1.2px solid #FF4D8D!important; box-shadow:0 2px 10px rgba(255,77,141,.4)!important;
+}
+/* FOLLOWING - White Box / Black Text da - Colour Maari Poidum da */
+.followBtnPerusa.following,[data-follow-user].following{
+  background:#fff!important; background-color:#fff!important; background-image:none!important;
+  color:#000!important; border:1.2px solid #fff!important; box-shadow:none!important; opacity:1!important;
+}
+.followBtnPerusa:active,[data-follow-user]:active{ transform:scale(.96)!important; box-shadow:none!important; }
 .reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:56px;padding:0 16px;background:linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);pointer-events:none}
 .reelsTop b{color:#fff!important;font-size:24px!important;font-weight:800!important}
 .reelsTop b span{color:#FF4D8D!important}
@@ -109,7 +125,6 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 </div></div>
 <div class="sheet" id="commentSheet" onclick="if(event.target==this)closeSheet('commentSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Comments</b></div><div id="commentList" style="overflow-y:auto;flex:1;max-height:45vh;padding:0 20px"></div><div style="display:flex;gap:10px;align-items:center;padding:10px 20px;border-top:1px solid #eee;margin-top:10px"><input id="commentInput" style="flex:1;background:#F1F1F5;border:0;border-radius:20px;padding:12px 14px;color:#111;outline:none" placeholder="Add kind comment..."><button onclick="postComment()" style="background:#FF4D8D;color:#fff;border:0;border-radius:20px;padding:10px 18px;font-weight:800">Post</button></div></div></div>
 <div class="sheet" id="shareSheet" onclick="if(event.target==this)closeSheet('shareSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Share</b></div><div class="safeCard"><div class="safeItem" onclick="copyLinkSafe()"><div class="txt"><div class="title">📋 Copy Link</div></div></div><div class="safeItem" onclick="shareWA()"><div class="txt"><div class="title">💚 WhatsApp</div></div></div></div></div></div>
-<!-- CORE CONNECT - ELLA PAGE KUM ORE LINE DA - v=200 - defer ILLA DA -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js?v=201"></script>
 <script>
@@ -119,7 +134,6 @@ function showToast(m){let t=document.getElementById('toast');if(!t)return;t.inne
 function fmtViews(n){if(n>=1000000)return (n/1000000).toFixed(1).replace('.0','')+'M';if(n>=1000)return (n/1000).toFixed(1).replace('.0','')+'K';return String(n)}
 let ME_RAW='',ME_ID='',profileMap={},profileByIdMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=[],mutedUsers=[],blockedUsers=[],hiddenMeta={},lastAction=null,savingIds=new Set(),_INIT_DONE=false
 async function waitSupa(){for(let i=0;i<30;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
-// CORE OVERRIDE ILLA DA - Core la Irukura pixoroPaintAllFollowBtns / pixoroToggleFollow Thaan Velai Seiyum da
 window.toggleFollow = window.pixoroToggleFollow;
 window.toggleF = window.pixoroToggleFollow;
 async function init(){if(_INIT_DONE) return; _INIT_DONE=true; supa=await waitSupa();if(!supa){_INIT_DONE=false;return;}let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;window.ME_ID=ME_ID;let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileByIdMap[String(p.id)]=p});let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);if(window.pixoroRefreshPhotos) await window.pixoroRefreshPhotos();load()}
@@ -256,11 +270,18 @@ return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div c
 <div class="vBtn tildeBtn" onclick="event.stopPropagation();openPixoroSheet('${p.id}','${p.user_id}','${followName}')"><span>~</span></div>
 <div class="audioWrap" onclick="event.stopPropagation();toggleMuteAll()"><div class="audioDiscInBar">🎵</div></div>
 </div>
-<div class="btm"><div style="display:flex;align-items:center;gap:8px"><div class="reel-pfp-wrap" onclick="event.stopPropagation();location.href='profile.html?u=${p.user_id}'"><img src="${getPfp(p.user_id||p.username)}" onerror="pfpErr(this,'${followName}')" loading="lazy"></div><b class="reel-username" onclick="event.stopPropagation();location.href='profile.html?u=${p.user_id}'">${followName}</b>${followBtn}</div>${captionHtml}<div style="font-size:12px;color:#ddd;margin-top:6px;font-weight:700">▶ <span data-viewcount="${p.id}">${fmtViews(vCount)}</span> views</div></div>
+<div class="btm"><div style="display:flex;align-items:center;gap:10px"><div class="reel-pfp-wrap" onclick="event.stopPropagation();location.href='profile.html?u=${p.user_id}'"><img src="${getPfp(p.user_id||p.username)}" onerror="pfpErr(this,'${followName}')" loading="lazy"></div><b class="reel-username" onclick="event.stopPropagation();location.href='profile.html?u=${p.user_id}'">${followName}</b>${followBtn}</div>${captionHtml}<div style="font-size:12px;color:#ddd;margin-top:6px;font-weight:700">▶ <span data-viewcount="${p.id}">${fmtViews(vCount)}</span> views</div></div>
 </div>`
 }).join('');observe(); if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();}
 let _reelIO=null;
-function observe(){let reels=document.querySelectorAll('video.reel-main');if(_reelIO) _reelIO.disconnect();_reelIO=new IntersectionObserver(entries=>{entries.forEach(e=>{let v=e.target;if(v.tagName!='VIDEO')return;let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;if(e.isIntersecting){if(!v.src && v.dataset.src){ v.src=v.dataset.src; v.load(); }document.querySelectorAll('video.reel-main').forEach(o=>{if(o!==v)o.pause()});v.muted=globalMuted;currentVideo=v;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})});if(prog){v.ontimeupdate=()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'}}addRealView(reel.dataset.id);}else{v.pause()}})}, {threshold:0.5, rootMargin:'200px 0px'}); reels.forEach(v=>_reelIO.observe(v))}
+function observe(){
+  let reels=document.querySelectorAll('video.reel-main');
+  if(_reelIO) _reelIO.disconnect();
+  // BATTERY SAVE - rootMargin 0 da - 1 Video Mattum Oodum da - 200px Illa da
+  _reelIO=new IntersectionObserver(entries=>{entries.forEach(e=>{let v=e.target;if(v.tagName!='VIDEO')return;let reel=v.closest('.reel');let prog=reel?reel.querySelector('.progress'):null;if(e.isIntersecting){if(!v.src && v.dataset.src){ v.src=v.dataset.src; v.load(); }document.querySelectorAll('video.reel-main').forEach(o=>{if(o!==v){o.pause(); o.removeAttribute('src'); o.load();}});v.muted=globalMuted;currentVideo=v;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})});if(prog){v.ontimeupdate=()=>{if(v.duration)prog.style.width=(v.currentTime/v.duration*100)+'%'}}addRealView(reel.dataset.id);}else{v.pause()}})}, {threshold:0.6, rootMargin:'0px 0px'});
+  reels.forEach(v=>_reelIO.observe(v));
+  document.addEventListener('visibilitychange',()=>{ if(document.hidden) document.querySelectorAll('video').forEach(v=>v.pause()); },{once:true});
+}
 function handleReelTap(el){let now=Date.now();if(now-lastTap<300){clearTimeout(tapTimer);lastTap=0;dblLike(el.dataset.id);return}lastTap=now;tapTimer=setTimeout(()=>{let v=el.querySelector('video.reel-main');if(v){if(!v.src && v.dataset.src){v.src=v.dataset.src;v.load();}if(v.paused){v.muted=false;globalMuted=false;currentVideo=v;v.play();showCenter(el,false)}else{v.pause();showCenter(el,true)}}lastTap=0},300)}
 async function dblLike(id){let reel=document.querySelector(`.reel[data-id="${id}"]`);let b=reel?reel.querySelector('.heartBurst'):null;if(b){b.classList.remove('show');void b.offsetWidth;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),900)}let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).then(()=>{}).catch(()=>{});}}
 async function toggleLike(id){let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));if(!liked){allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).then(()=>{}).catch(()=>{});}else{allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID)));updateLikeUI(id,false);supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}).catch(()=>{});}}
