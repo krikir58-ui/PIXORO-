@@ -2,65 +2,96 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <style>
-*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto}
-.top{padding:14px;display:flex;justify-content:space-between}
-.prev{margin:12px;height:360px;background:#000;border:1px solid #222;border-radius:16px;overflow:hidden;position:relative}
-.prev video{width:100%;height:100%;object-fit:cover}
-#txtOverlay{position:absolute;top:18%;left:0;right:0;text-align:center;font-weight:900;font-size:22px;text-shadow:0 2px 8px #000;pointer-events:none}
-.trim{margin:12px;padding:14px;border:1px solid #222;border-radius:14px}
-input[type=range]{width:100%;accent-color:#fff;margin:10px 0}
-/* CAPCUT MARI TIMELINE - PIXORO STYLE */
-.track{display:flex;gap:2px;overflow-x:auto;height:48px;margin-top:8px}
-.frame{flex:0 0 42px;height:48px;background:#222;border-radius:6px;overflow:hidden}
-.frame video{width:100%;height:100%;object-fit:cover}
-.tools{display:flex;gap:8px;padding:10px 12px;overflow-x:auto}
-.tool{flex:0 0 auto;padding:10px 14px;border:1.2px solid #fff;border-radius:20px;font-size:12px;font-weight:700;background:transparent;color:#fff}
-.tool.active{background:#fff;color:#000}
-.panel{margin:0 12px 12px;padding:12px;border:1px solid #222;border-radius:14px}
-.btn{margin:12px;background:#fff;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900;color:#000}
-.btn2{background:transparent;border:1.2px solid #fff;color:#fff}
+*{margin:0;box-sizing:border-box}body{background:#050008;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;min-height:100vh;background:radial-gradient(circle at 0% 0%,#7b2fff66,transparent 45%),radial-gradient(circle at 100% 30%,#a259ff88,transparent 40%),#050008;padding-bottom:20px}
+.top{padding:14px;display:flex;justify-content:space-between;align-items:center}.top b{font-size:20px}.top b span{color:#a259ff}
+.prev{margin:12px;height:360px;background:#111;border:2px solid #a259ff55;border-radius:16px;overflow:hidden;position:relative}.prev video{width:100%;height:100%;object-fit:cover;transition:.3s}
+#txtOverlay{position:absolute;top:18%;left:0;right:0;text-align:center;font-weight:900;font-size:22px;text-shadow:0 2px 8px #000;pointer-events:none;z-index:5}
+#stickerOverlay{position:absolute;bottom:20%;left:0;right:0;text-align:center;font-size:36px;pointer-events:none;z-index:5}
+.trim{margin:12px;padding:14px;border:1px solid #a259ff55;border-radius:14px;background:#140a24}
+input[type=range]{width:100%;accent-color:#a259ff;margin:10px 0}
+.track{display:flex;gap:2px;overflow-x:auto;height:48px;margin-top:8px}.frame{flex:0 0 42px;height:48px;background:#222;border-radius:6px;overflow:hidden;border:1px solid #a259ff55}.frame video{width:100%;height:100%;object-fit:cover}
+.tools{display:flex;gap:8px;padding:10px 12px;overflow-x:auto}.tool{flex:0 0 auto;padding:10px 14px;border:1.2px solid #a259ff;border-radius:20px;font-size:12px;font-weight:700;background:#140a24;color:#fff}.tool.active{background:#a259ff;color:#fff}
+.panel{margin:0 12px 12px;padding:12px;border:1px solid #a259ff55;border-radius:14px;background:#140a24}
+.btn{margin:12px;background:linear-gradient(90deg,#7b2fff,#c44dff);border:0;width:calc(100% - 24px);padding:14px;border-radius:25px;font-weight:900;color:#fff;font-size:16px}
+.btn2{background:transparent;border:1.2px solid #a259ff;color:#fff}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;display:none;z-index:999;white-space:nowrap}
+#bgBar{position:fixed;top:0;left:0;right:0;max-width:450px;margin:auto;background:#140a24;padding:10px;display:none;z-index:1000}#bgBar .bar{height:6px;background:#333;border-radius:20px;overflow:hidden;margin-top:6px}#bgBar .bar div{height:100%;width:0%;background:linear-gradient(90deg,#7b2fff,#ff2dcc);transition:.3s}
 </style></head><body>
-<div class="top"><span onclick="history.back()">✕</span><b>Pixoro Edit</b><span onclick="uploadTrim()" style="font-weight:900">Share</span></div>
-<div class="prev"><video id="v" controls playsinline></video><div id="txtOverlay"></div></div>
+<div class="top"><span onclick="location.href='reel-create.html'" style="font-size:26px;cursor:pointer">✕</span><b>Pix<span>o</span>ro Edit</b><span onclick="uploadTrim()" style="font-weight:900;color:#a259ff;cursor:pointer">Share</span></div>
+<div class="prev"><video id="v" controls playsinline></video><div id="txtOverlay"></div><div id="stickerOverlay"></div></div>
 
-<!-- UN TRIM SAME DA -->
 <div class="trim">
-<div style="display:flex;justify-content:space-between;font-weight:800"><span id="tInfo">0.0s - 30.0s</span><span style="color:#888;font-size:12px">PIXORO TRIM</span></div>
-<label style="font-size:12px;color:#888">START - Theva Yana Idam</label><input type="range" id="sR" min="0" max="60" step="0.1" value="0">
-<label style="font-size:12px;color:#888">END - Mudiya Vendum Idam</label><input type="range" id="eR" min="0" max="60" step="0.1" value="30">
-<div style="display:flex;gap:8px;margin-top:10px"><button onclick="previewTrim()" style="flex:1;background:#fff;border:0;padding:10px;border-radius:20px;font-weight:800">Preview Trim</button><button onclick="resetTrim()" style="flex:1;background:transparent;border:1.2px solid #fff;color:#fff;padding:10px;border-radius:20px">Reset</button></div>
+<div style="display:flex;justify-content:space-between;font-weight:800"><span id="tInfo">0.0s - 30.0s</span><span style="color:#a259ff;font-size:12px">PIXORO TRIM</span></div>
+<label style="font-size:12px;color:#aaa">START - Theva Yana Idam</label><input type="range" id="sR" min="0" max="60" step="0.1" value="0">
+<label style="font-size:12px;color:#aaa">END - Mudiya Vendum Idam</label><input type="range" id="eR" min="0" max="60" step="0.1" value="30">
+<div style="display:flex;gap:8px;margin-top:10px"><button onclick="previewTrim()" style="flex:1;background:#fff;border:0;padding:10px;border-radius:20px;font-weight:800">Preview Trim</button><button onclick="resetTrim()" style="flex:1;background:transparent;border:1.2px solid #a259ff;color:#fff;padding:10px;border-radius:20px">Reset</button></div>
 <div class="track" id="track"></div>
 </div>
 
-<!-- CAPCUT MARI TOOLS DA -->
 <div class="tools">
-<button class="tool active" onclick="setTool(this,'trim')">Trim</button>
-<button class="tool" onclick="setTool(this,'text')">Text</button>
-<button class="tool" onclick="setTool(this,'audio')">Audio</button>
-<button class="tool" onclick="setTool(this,'speed')">Speed</button>
-<button class="tool" onclick="setTool(this,'filter')">Filter</button>
-<button class="tool" onclick="setTool(this,'sticker')">Sticker</button>
+<button class="tool active" onclick="setTool(this,'trim')">✂️ Trim</button>
+<button class="tool" onclick="setTool(this,'text')">📝 Text</button>
+<button class="tool" onclick="setTool(this,'audio')">🎵 Audio</button>
+<button class="tool" onclick="setTool(this,'speed')">⏱️ Speed</button>
+<button class="tool" onclick="setTool(this,'filter')">✨ Filter</button>
+<button class="tool" onclick="setTool(this,'sticker')">😍 Sticker</button>
 <button class="tool" onclick="splitVideo()">Split ✂️</button>
 </div>
-<div class="panel" id="panelText" style="display:none"><input id="txtInput" placeholder="Text Type Pannu da..." style="width:100%;background:#111;border:1px solid #333;padding:10px;border-radius:10px;color:#fff" oninput="document.getElementById('txtOverlay').innerText=this.value"></div>
-<div class="panel" id="panelAudio" style="display:none"><input type="file" id="aud" accept="audio/*" onchange="let a=new Audio(URL.createObjectURL(this.files[0]));a.play()"><div style="font-size:12px;color:#888;margin-top:6px">Music Add Pannu da</div></div>
-<div class="panel" id="panelSpeed" style="display:none"><div style="display:flex;gap:8px"><button class="tool" onclick="v.playbackRate=0.5">0.5x</button><button class="tool active" onclick="v.playbackRate=1">1x</button><button class="tool" onclick="v.playbackRate=1.5">1.5x</button><button class="tool" onclick="v.playbackRate=2">2x</button></div></div>
-<div class="panel" id="panelFilter" style="display:none"><div style="display:flex;gap:8px"><button class="tool" onclick="v.style.filter='none'">Normal</button><button class="tool" onclick="v.style.filter='grayscale(1)'">B&W</button><button class="tool" onclick="v.style.filter='contrast(1.3) saturate(1.5)'">Pixoro</button><button class="tool" onclick="v.style.filter='sepia(0.6)'">Warm</button></div></div>
-<div class="panel" id="panelSticker" style="display:none"><div style="font-size:22px;display:flex;gap:12px"><span onclick="document.getElementById('txtOverlay').innerText+=' 🔥'">🔥</span><span onclick="document.getElementById('txtOverlay').innerText+=' ❤️'">❤️</span><span onclick="document.getElementById('txtOverlay').innerText+=' ⭐'">⭐</span><span onclick="document.getElementById('txtOverlay').innerText+=' 😎'">😎</span></div></div>
+<div class="panel" id="panelText" style="display:none"><input id="txtInput" placeholder="Text Type Pannu da..." style="width:100%;background:#111;border:1px solid #a259ff;padding:10px;border-radius:10px;color:#fff" oninput="edit.text=this.value;document.getElementById('txtOverlay').innerText=this.value"></div>
+<div class="panel" id="panelAudio" style="display:none"><input type="file" id="aud" accept="audio/*" onchange="setAudio(this)"><div style="font-size:12px;color:#aaa;margin-top:6px">Music Add Pannu da - Real ah Video Kooda Play Aagum da</div><audio id="audPlay" loop></audio></div>
+<div class="panel" id="panelSpeed" style="display:none"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="tool" onclick="setSpeed(0.5,this)">0.5x</button><button class="tool active" onclick="setSpeed(1,this)">1x</button><button class="tool" onclick="setSpeed(1.5,this)">1.5x</button><button class="tool" onclick="setSpeed(2,this)">2x</button></div></div>
+<div class="panel" id="panelFilter" style="display:none"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="tool" onclick="setFilter('none',this)">Normal</button><button class="tool" onclick="setFilter('grayscale(1)',this)">B&W</button><button class="tool" onclick="setFilter('contrast(1.3) saturate(1.5)',this)">Pixoro 💜</button><button class="tool" onclick="setFilter('sepia(0.6)',this)">Warm</button><button class="tool" onclick="setFilter('hue-rotate(280deg) saturate(2)',this)">Neon</button></div></div>
+<div class="panel" id="panelSticker" style="display:none"><div style="font-size:28px;display:flex;gap:14px"><span onclick="addSticker('🔥')">🔥</span><span onclick="addSticker('❤️')">❤️</span><span onclick="addSticker('⭐')">⭐</span><span onclick="addSticker('😎')">😎</span><span onclick="addSticker('👑')">👑</span><span onclick="addSticker('💜')">💜</span></div></div>
 
-<input id="cap" placeholder="Caption..." style="width:calc(100% - 24px);margin:0 12px;background:#111;border:1px solid #333;padding:12px;border-radius:12px;color:#fff;outline:none">
-<button class="btn" onclick="uploadTrim()">Share Reel</button>
+<button class="btn" onclick="goNext()">Next → Upload Page 🚀</button>
+<button class="btn btn2" onclick="uploadTrim()">Share Reel - Direct Server Save 🔥</button>
+<div style="text-align:center;font-size:11px;color:#888">NO LocalStorage da - Ellaamey URL la Thaan da ✅</div>
+<div id="bgBar"><div style="font-weight:700">Uploading... <span id="bgPct">0%</span></div><div class="bar"><div id="bgFill"></div></div></div>
+<div id="toast" class="toast"></div>
 <script>
-let supa=window.supa,ME_RAW='',ME_ID='',start=0,end=30,dur=0,vidUrl='';
+// NO LOCALSTORAGE DA - NO SESSIONSTORAGE DA - ELLAAMEY URL PARAMS LA THAAN DA
+let supa=window.supa, ME_RAW='', ME_ID='', start=0, end=30, dur=0, vidUrl='';
 let v=document.getElementById('v');
-async function init(){let {data:{session}}=await supa.auth.getSession();ME_ID=session.user.id;let {data:p}=await supa.from('profiles').select('*').eq('id',ME_ID).single();ME_RAW=(p?.username||'user').toLowerCase();vidUrl=sessionStorage.getItem('pixoro_edit_video');v.src=vidUrl;v.onloadedmetadata=()=>{dur=v.duration;document.getElementById('sR').max=dur;document.getElementById('eR').max=dur;end=Math.min(30,dur);document.getElementById('eR').value=end;update();makeTrack();}}
+let edit={text:'',speed:1,filter:'none',stickers:'',audio:'',splitAt:0};
+function showToast(m){let t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
+async function init(){
+ let {data:{session}}=await supa.auth.getSession(); if(!session){location.href='login.html';return}
+ ME_ID=session.user.id; let {data:p}=await supa.from('profiles').select('*').eq('id',ME_ID).single(); ME_RAW=(p?.username||session.user.email.split('@')[0]).toLowerCase();
+ // URL LA THAAN DA - ?media=https://... - CREATE PAGE LA IRUNTHU VARUM DA
+ let pr=new URLSearchParams(location.search); vidUrl=pr.get('media')||'';
+ if(!vidUrl){showToast('Video illa da - Choose pannu da');return}
+ // BLOB URL NA - WORK AAGATHU DA - CREATE PAGE LA SUPABASE URL AH ANUPPANUM DA
+ if(vidUrl.startsWith('blob:')){showToast('Blob URL Work Aagathu da - Create Page la Upload Panni Varum da');return}
+ v.src=vidUrl; v.onloadedmetadata=()=>{dur=v.duration;document.getElementById('sR').max=dur;document.getElementById('eR').max=dur;end=Math.min(30,dur);document.getElementById('eR').value=end;update();makeTrack();};
+ // URL LA IRUNTHU OLD EDIT AH - RESTORE PANNROM DA - LOCALSTORAGE ILLA DA
+ let oldText=pr.get('text'); if(oldText){edit.text=oldText;document.getElementById('txtOverlay').innerText=oldText;document.getElementById('txtInput').value=oldText;}
+ let oldStk=pr.get('stickers'); if(oldStk){edit.stickers=oldStk;document.getElementById('stickerOverlay').innerText=oldStk;}
+}
 init();
-function makeTrack(){let t=document.getElementById('track');t.innerHTML='';for(let i=0;i<12;i++)t.innerHTML+=`<div class="frame"><video src="${vidUrl}" muted></video></div>`}
-function setTool(el,n){document.querySelectorAll('.tool').forEach(b=>b.classList.remove('active'));el.classList.add('active');['Text','Audio','Speed','Filter','Sticker'].forEach(x=>document.getElementById('panel'+x).style.display='none');if(n!='trim')document.getElementById('panel'+n.charAt(0).toUpperCase()+n.slice(1)).style.display='block';}
-function splitVideo(){let mid=(start+end)/2;document.getElementById('sR').value=mid;update();alert('Split Panniten da - '+mid.toFixed(1)+'s la irunthu');}
+function makeTrack(){let t=document.getElementById('track');t.innerHTML='';for(let i=0;i<12;i++)t.innerHTML+=`<div class="frame"><video src="${vidUrl}#t=${i}" muted preload="metadata"></video></div>`}
+function setTool(el,n){document.querySelectorAll('.tools .tool').forEach(b=>b.classList.remove('active'));el.classList.add('active');['Text','Audio','Speed','Filter','Sticker'].forEach(x=>document.getElementById('panel'+x).style.display='none');if(n!='trim')document.getElementById('panel'+n.charAt(0).toUpperCase()+n.slice(1)).style.display='block';}
+function setSpeed(s,el){edit.speed=s;v.playbackRate=s;document.getElementById('audPlay').playbackRate=s;document.querySelectorAll('#panelSpeed .tool').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');showToast('Speed: '+s+'x da');}
+function setFilter(f,el){edit.filter=f;v.style.filter=f;document.querySelectorAll('#panelFilter .tool').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');showToast('Filter Applied da ✨');}
+function addSticker(em){edit.stickers+=em+' ';document.getElementById('stickerOverlay').innerText=edit.stickers;showToast('Sticker Added da '+em);}
+function setAudio(inp){let f=inp.files[0];if(!f)return;edit.audio=f.name;let a=document.getElementById('audPlay');a.src=URL.createObjectURL(f);a.play();v.muted=true;showToast('Audio Added da 🎵 - '+f.name);}
+function splitVideo(){let mid=(start+end)/2;edit.splitAt=mid;document.getElementById('sR').value=mid;update();showToast('Split Panniten da - '+mid.toFixed(1)+'s la da ✂️');}
 function update(){start=parseFloat(document.getElementById('sR').value);end=parseFloat(document.getElementById('eR').value);if(end<=start)end=start+1;if(end-start>30)end=start+30;document.getElementById('eR').value=end;document.getElementById('tInfo').innerText=start.toFixed(1)+'s - '+end.toFixed(1)+'s • '+(end-start).toFixed(1)+'s';v.currentTime=start;}
 document.getElementById('sR').oninput=update;document.getElementById('eR').oninput=update;
 function previewTrim(){v.currentTime=start;v.play();setTimeout(()=>v.pause(),(end-start)*1000);}
-function resetTrim(){document.getElementById('sR').value=0;document.getElementById('eR').value=Math.min(30,dur);update();}
-async function uploadTrim(){let res=await fetch(vidUrl);let blob=await res.blob();let file=new File([blob],'reel.mp4');let fileName=Date.now()+'_'+ME_RAW+'.mp4';let {error}=await supa.storage.from('reels').upload(fileName,file);if(error){alert(error.message);return}let {data}=supa.storage.from('reels').getPublicUrl(fileName);await supa.from('posts').insert({user_id:ME_ID,username:ME_RAW,media_url:data.publicUrl,media_type:'reel',caption:document.getElementById('cap').value,video_url:data.publicUrl});location.href='reels.html';}
+function resetTrim(){document.getElementById('sR').value=0;document.getElementById('eR').value=Math.min(30,dur);edit={text:'',speed:1,filter:'none',stickers:'',audio:'',splitAt:0};v.style.filter='none';v.playbackRate=1;document.getElementById('txtOverlay').innerText='';document.getElementById('stickerOverlay').innerText='';update();}
+function goNext(){
+ // NO LOCALSTORAGE DA - ELLAAMEY URL LA THAAN DA - UPLOAD PAGE KU URL LA ANUPPOM DA
+ let q=new URLSearchParams({media:vidUrl,type:'video',trim_start:String(start),trim_end:String(end),filter:edit.filter,speed:String(edit.speed),text:edit.text,stickers:edit.stickers,audio:edit.audio,split_at:String(edit.splitAt)});
+ location.href='reels-upload.html?'+q.toString();
+}
+// REAL SERVER SAVE DA - MEDIA ALREADY SUPABASE URL DA - DIRECT AH POSTS LA SAVE DA - LOCALSTORAGE ILLA DA
+async function uploadTrim(){
+ if(!vidUrl||vidUrl.startsWith('blob:')){showToast('Media Supabase URL illa da - Create la Upload Pannu da');return}
+ document.getElementById('bgBar').style.display='block';document.getElementById('bgFill').style.width='70%';document.getElementById('bgPct').innerText='70%';
+ try{
+  let {error}=await supa.from('posts').insert({user_id:ME_ID,username:ME_RAW,media_url:vidUrl,media_type:'reel',caption:edit.text||'PIXORO Reel 🔥',video_url:vidUrl,trim_start:start,trim_end:end,filter_name:edit.filter,speed:edit.speed,stickers:edit.stickers,audio_name:edit.audio,split_at:edit.splitAt});
+  if(error){ let {error:e2}=await supa.from('posts').insert({user_id:ME_ID,username:ME_RAW,media_url:vidUrl,media_type:'reel',caption:edit.text||'PIXORO Reel 🔥',video_url:vidUrl}); if(e2) throw e2; }
+  document.getElementById('bgFill').style.width='100%';document.getElementById('bgPct').innerText='100%';showToast('Server la Saved da 🔥');setTimeout(()=>location.href='reels.html',800);
+ }catch(e){showToast('Fail da: '+e.message);}
+}
 </script></body></html>
