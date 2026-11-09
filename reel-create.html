@@ -7,7 +7,6 @@
 .pill{display:flex;gap:6px;margin:0 12px}.pill button{flex:1;background:#1a1a1a;border:1px solid #222;padding:9px;border-radius:20px;color:#fff;font-size:12px;font-weight:700;cursor:pointer}.pill button.on{background:linear-gradient(90deg,#7B2FFF,#FF2DCC);border:0}
 .sec{display:flex;justify-content:space-between;padding:12px 12px 6px;font-size:14px;font-weight:800}.sec span{font-size:12px;background:#1a1a1a;padding:5px 10px;border-radius:12px;cursor:pointer}
 .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;padding:0 2px}.cell{aspect-ratio:3/4;background:#111;position:relative;overflow:hidden;border-radius:6px;cursor:pointer}.cell video{width:100%;height:100%;object-fit:cover}.cell .dur{position:absolute;right:5px;bottom:5px;font-size:11px;background:rgba(0,0,0,.7);padding:2px 6px;border-radius:10px}.cell.cam{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:12px;color:#aaa}
-.tabs{display:flex;justify-content:center;gap:18px;padding:14px;border-top:1px solid #222;position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:auto;background:#000;z-index:10}.tabs b{font-size:12px;letter-spacing:1px;color:#888;cursor:pointer}.tabs b.on{color:#fff;border-bottom:2px solid #FF2DCC;padding-bottom:4px}
 .preview{height:58vh;background:#000;position:relative}.preview video{width:100%;height:100%;object-fit:contain}
 .bar{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:#aaa;cursor:pointer}
 .tools{display:flex;gap:8px;justify-content:flex-start;padding:8px 10px;overflow-x:auto}.tool{background:#1a1a1a;border:1px solid #222;padding:10px 12px;border-radius:12px;text-align:center;font-size:11px;min-width:62px;cursor:pointer;flex-shrink:0;color:#fff}.tool span{font-size:18px;display:block}
@@ -19,7 +18,7 @@
 .empty{grid-column:1/-1;text-align:center;color:#888;font-size:13px;padding:30px 10px;line-height:1.6}
 </style></head><body>
 
-<!-- STEP 1 - REAL GALLERY MATTUM DA -->
+<!-- STEP 1 - REAL GALLERY MATTUM DA - KEELA TABS ILLA DA -->
 <div id="p1">
 <div class="top"><span onclick="location.href='index.html'" style="font-size:24px;cursor:pointer">✕</span><b>PIX<span>O</span>RO - New reel</b><span style="margin-left:auto;font-size:22px" onclick="document.getElementById('f').click()">📷</span></div>
 <div class="pill"><button class="on" onclick="showTab(this,'edits')">✨ Edits</button><button onclick="showTab(this,'drafts')">📝 Drafts</button><button onclick="showTab(this,'templates')">🎬 Templates</button></div>
@@ -28,8 +27,7 @@
 <div class="cell cam" onclick="document.getElementById('f').click()"><span style="font-size:28px">📷</span>Camera</div>
 </div>
 <div id="emptyMsg" class="empty">Un Gallery la irunthu Video select pannu da 📷<br>Select / Camera Click pannu da</div>
-<div style="height:70px"></div>
-<div class="tabs"><b onclick="location.href='story-create.html'">STORY</b><b onclick="location.href='post-create.html'">POST</b><b class="on">REEL</b><b onclick="location.href='live.html'">LIVE</b></div>
+<!-- KEELA STORY / POST / REEL / LIVE DELETE DA - THEVA ILLA DA -->
 </div>
 
 <!-- STEP 2 - PREVIEW + EDIT -->
@@ -58,13 +56,11 @@
 let supa=window.supa, selFile=null, selUrl='', publicUrl='', dur=0, start=0, end=30, ME_RAW='', ME_ID='';
 let v=document.getElementById('v');
 let edit={text:'',filter:'none',speed:1,stickers:'',audio:''};
-let myVideos=[]; // REAL GALLERY - NEE SELECT PANNA VIDEO MATTUM DA
+let myVideos=[];
 function showToast(m){let t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 async function init(){let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;let {data:p}=await supa.from('profiles').select('*').eq('id',ME_ID).single();ME_RAW=(p?.username||session.user.email.split('@')[0]).toLowerCase();}
 init();
 function showTab(el,n){document.querySelectorAll('.pill button').forEach(b=>b.classList.remove('on'));el.classList.add('on');showToast(n+' - Coming soon da 🔥');}
-
-// REAL GALLERY DA - FILE PICKER LA SELECT PANNA VIDEO THAAN GRID LA VARUM DA - FAKE ILLA DA
 function h(e){
  let files=[...e.target.files]; if(!files.length) return;
  files.forEach(f=>{
@@ -75,11 +71,9 @@ function h(e){
    div.innerHTML=`<video src="${url}" muted preload="metadata"></video><span class="dur">▶</span>`;
    div.onclick=()=>{ selFile=f; selUrl=url; showPreview(url); showToast('Video Selected da 🔥'); };
    grid.appendChild(div);
-   // Duration kaamikka
    let vid=div.querySelector('video'); vid.onloadedmetadata=()=>{ div.querySelector('.dur').innerText='0:'+Math.floor(vid.duration).toString().padStart(2,'0'); };
  });
  document.getElementById('emptyMsg').style.display='none';
- // First video va auto preview ku edukka venda - Nee click panna thaan preview varum da - Instagram mari da
  showToast(myVideos.length+' video selected da 🔥 - Oru video va click pannu da');
  e.target.value='';
 }
