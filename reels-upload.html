@@ -14,7 +14,7 @@
 .inp{width:calc(100% - 24px);margin:8px 12px;background:#140a24;border:1px solid #a259ff55;padding:12px;border-radius:12px;color:#fff;outline:none}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;z-index:1000;align-items:flex-end}.modal.open{display:flex}.sheet{background:#140a24;width:100%;max-width:450px;margin:auto;border-radius:20px 20px 0 0;padding:16px;max-height:70vh;overflow:auto}.sheet button{width:100%;padding:12px;margin:6px 0;border-radius:12px;border:1px solid #a259ff55;background:#1a0b2e;color:#fff;text-align:left;cursor:pointer}.sheet button b{display:block}
 .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;display:none;z-index:9999;white-space:nowrap}
-/* INSTAGRAM MARI KUTTY BOX DA - KEELA MELLA UPLOAD AAGUM DA */
+/* PIXORO KUTTY BOX DA - KEELA MELLA UPLOAD AAGUM DA */
 #miniBox{position:fixed;bottom:12px;left:12px;right:12px;max-width:426px;margin:auto;background:#1a0b2e;border:1px solid #a259ff;border-radius:14px;padding:10px;display:none;z-index:2000;align-items:center;gap:10px}#miniBox img{width:44px;height:60px;object-fit:cover;border-radius:8px}#miniBox .bar{height:6px;background:#333;border-radius:20px;overflow:hidden;margin-top:6px}#miniBox .bar div{height:100%;width:0%;background:linear-gradient(90deg,#7b2fff,#ff2dcc);transition:.3s}
 </style></head><body>
 <div id="uploadPage">
@@ -42,12 +42,12 @@
 <div class="modal" id="mEffect"><div class="sheet"><h3>✨ Add Effect</h3><button onclick="setEffect('none','Original')">Original</button><button onclick="setEffect('brightness(1.3) saturate(1.4)','Pixoro 💜')">Pixoro 💜</button><button onclick="setEffect('grayscale(1)','B&W')">B&W</button><button onclick="setEffect('sepia(0.6)','Warm')">Warm</button><button onclick="setEffect('hue-rotate(280deg) saturate(2)','Neon')">Neon</button><button onclick="closeAll()">Done</button></div></div>
 <div class="modal" id="mAud"><div class="sheet"><h3>Audience</h3><button onclick="setAud('public','🌍 Everyone')">🌍 <b>Everyone</b> Ellaarum Paakalam</button><button onclick="setAud('followers','👥 Followers')">👥 <b>Followers Only</b></button><button onclick="closeAll()">Cancel</button></div></div>
 
-<!-- INSTAGRAM MARI KUTTY BOX -->
+<!-- PIXORO KUTTY BOX -->
 <div id="miniBox"><img id="miniImg"><div style="flex:1"><div style="font-weight:700;font-size:13px">Uploading Reel... <span id="miniPct">0%</span></div><div style="font-size:11px;color:#aaa" id="miniTxt">Mella Upload Aaguthu da - Vera Page Paakalam da</div><div class="bar"><div id="miniFill"></div></div></div><span onclick="document.getElementById('miniBox').style.display='none'" style="cursor:pointer">✕</span></div>
 <div id="toast" class="toast"></div>
 <audio id="musicAud" loop></audio>
 <script>
-// NO LOCALSTORAGE DA - ELLAAMEY URL + SERVER LA THAAN DA
+// NO LOCALSTORAGE DA - ELLAAMEY URL + SERVER LA THAAN DA - PIXORO THAAN DA
 let supa=window.supa, ME='', ME_ID='', pr=new URLSearchParams(location.search);
 let media=pr.get('media')||'', trimStart=pr.get('trim_start')||'0', trimEnd=pr.get('trim_end')||'30', filterFromEdit=pr.get('filter')||'none', speedFromEdit=pr.get('speed')||'1';
 let tagPeople='', loc='', music='', effect='none', privacy='public', remix=true, shareReels=true, audioUrl='';
@@ -82,35 +82,31 @@ async function saveDraft(){
  let cap=document.getElementById('cap').value.trim()||'Draft Reel';
  let {error}=await supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,tags:document.getElementById('tags').value.trim(),privacy:privacy,location:loc,tagged_people:tagPeople,image_url:media,media_url:media,video_url:media,media_type:'reel',status:'draft',trim_start:trimStart,trim_end:trimEnd,filter_name:effect,audio_name:music,allow_remix:remix});
  if(error){let {error:e2}=await supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,image_url:media,media_url:media,media_type:'reel'});if(e2){showToast(e2.message);return}}
- showToast('Draft Saved da 🗂️'); 
+ showToast('Draft Saved da 🗂️');
 }
-// INSTAGRAM MARI DA - SHARE THOTTA - PAGE CLOSE AAGUM DA - KUTTY BOX LA UPLOAD AAGUM DA - VERA PAGE PAAKALAM DA
+// PIXORO MARI DA - SHARE THOTTA - PAGE CLOSE AAGUM DA - KUTTY BOX LA UPLOAD AAGUM DA - VERA PAGE PAAKALAM DA
 async function share(){
  if(!media){showToast('Media illa da');return}
- let btn=document.getElementById('shareBtn');btn.disabled=true;btn.innerText='Starting Upload...';
+ let btn=document.getElementById('shareBtn');btn.disabled=true;btn.innerText='Uploading...';
  let cap=document.getElementById('cap').value.trim()||'PIXORO Reel 🔥';
  let tags=document.getElementById('tags').value.trim();
- // 1 - KUTTY BOX KAATU DA - UPLOAD PAGE AH MOODU DA - FEED KU PO DA - UPLOAD BACKGROUND LA POGUM DA
- let mini=document.getElementById('miniBox');mini.style.display='flex';document.getElementById('miniFill').style.width='10%';document.getElementById('miniPct').innerText='10%';
- showToast('Uploading in Background da 🔥 - Feed Paakalam da');
- // 2 - URL LA UPLOAD ID AH VECHU - FEED PAGE KU PO DA - FEED PAGE LA KUTTY BOX THODARUM DA - NO LOCALSTORAGE DA
  let uploadId=Date.now()+'_'+ME;
- // 3 - SERVER LA SAVE - BACKGROUND LA DA - AWAIT PANNA MAATOM - PAGE CLOSE AAGUM DA
- let p=supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,tags:tags,privacy:privacy,location:loc,tagged_people:tagPeople,image_url:media,media_url:media,video_url:media,media_type:'reel',trim_start:trimStart,trim_end:trimEnd,filter_name:effect,speed:speedFromEdit,audio_name:music,allow_remix:remix,share_to_reels:shareReels});
- // 4 - PROGRESS FAKE ILLA DA - REAL INSERT AH WAIT PANNI - 100% KAATUROM DA - AANA PAGE AH MOODITOM DA
- setTimeout(()=>{document.getElementById('miniFill').style.width='60%';document.getElementById('miniPct').innerText='60%';},600);
- p.then(({error})=>{
-   if(error){ // FALLBACK - COLUMN ILLANA - CAPTION MATTUM VECHU SAVE DA
-     supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,image_url:media,media_url:media,media_type:'reel'}).then(()=>{
-       document.getElementById('miniFill').style.width='100%';document.getElementById('miniPct').innerText='100%';document.getElementById('miniTxt').innerText='Done da 🔥 - Reel Feed la Irukku da';
-       setTimeout(()=>{mini.style.display='none';},2000);
-     });
-     return;
-   }
-   document.getElementById('miniFill').style.width='100%';document.getElementById('miniPct').innerText='100%';document.getElementById('miniTxt').innerText='Done da 🔥 - Reel Feed la Irukku da';
-   setTimeout(()=>{mini.style.display='none';},2000);
- });
- // 5 - INSTAGRAM MARI - UPLOAD PAGE CLOSE - FEED KU PO DA - KUTTY BOX AH URL LA KONDU POGUM DA
- setTimeout(()=>{location.href='reels.html?uploading='+encodeURIComponent(uploadId)+'&media='+encodeURIComponent(media)+'&caption='+encodeURIComponent(cap);},1200);
+ // 1 - KUTTY BOX KAATU DA - 10% la irunthu
+ let mini=document.getElementById('miniBox');mini.style.display='flex';
+ document.getElementById('miniFill').style.width='10%';document.getElementById('miniPct').innerText='10%';
+ document.getElementById('miniTxt').innerText='Mella Upload Aaguthu da - Vera Page Paakalam da';
+ showToast('Uploading da 🔥 - Feed Paakalam da');
+ // 2 - REAL SAVE DA - AWAIT PANNU DA - PAGE CLOSE AANA INSERT CANCEL AAYIDUM DA - ATHAAN AWAIT DA
+ document.getElementById('miniFill').style.width='50%';document.getElementById('miniPct').innerText='50%';
+ let {error}=await supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,tags:tags,privacy:privacy,location:loc,tagged_people:tagPeople,image_url:media,media_url:media,video_url:media,media_type:'reel',trim_start:trimStart,trim_end:trimEnd,filter_name:effect,speed:speedFromEdit,audio_name:music,allow_remix:remix,share_to_reels:shareReels});
+ if(error){
+   // FALLBACK DA - COLUMN ILLANA - CAPTION MATTUM VECHU SAVE DA
+   let {error:e2}=await supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,image_url:media,media_url:media,media_type:'reel'});
+   if(e2){showToast('Fail da: '+e2.message);btn.disabled=false;btn.innerText='⬆️ Share Reel';mini.style.display='none';return;}
+ }
+ // 3 - 100% - DONE DA - PAGE CLOSE - REELS PAGE KU PO DA - KUTTY BOX AH URL LA KONDU POGUM DA
+ document.getElementById('miniFill').style.width='100%';document.getElementById('miniPct').innerText='100%';
+ document.getElementById('miniTxt').innerText='Done da 🔥 - Reel Feed la Irukku da';
+ setTimeout(()=>{location.href='reels.html?uploading='+encodeURIComponent(uploadId)+'&media='+encodeURIComponent(media)+'&caption='+encodeURIComponent(cap);},600);
 }
 </script></body></html>
