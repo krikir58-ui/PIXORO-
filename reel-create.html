@@ -2,64 +2,88 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <style>
-*{margin:0;box-sizing:border-box}body{background:#fff;color:#111;font-family:sans-serif;max-width:450px;margin:auto;min-height:100vh;padding-bottom:20px}
-.top{padding:16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee}.top b{font-size:20px;font-weight:900}
-.logo{text-align:center;padding:20px 10px 0}.logo h1{font-size:44px;line-height:1;font-weight:900}.logo h1 span{color:#FF4D8D}.logo p{font-size:14px;color:#888;margin-top:6px}
-.prev{margin:16px 12px;height:360px;background:#f8f8f8;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#999;font-size:14px}.prev video{width:100%;height:100%;object-fit:cover}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px}.cell{padding:18px;background:#f8f8f8;border-radius:14px;text-align:center;cursor:pointer;font-weight:800;font-size:14px}.cell span{display:block;font-size:12px;font-weight:400;color:#888;margin-top:4px}
-.btn{margin:12px;background:#111;border:0;width:calc(100% - 24px);padding:15px;border-radius:14px;font-weight:900;color:#fff;font-size:16px;cursor:pointer}
-.btn2{margin:0 12px 12px;background:#fff;border:1px solid #eee;color:#111;width:calc(100% - 24px);padding:14px;border-radius:14px;font-weight:900;cursor:pointer}
-.btn:disabled{opacity:.5}
-.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
-.info{margin:0 12px;padding:10px;font-size:12px;color:#888;text-align:center}
-.trimBox{margin:12px;padding:16px;border-radius:16px;background:#f8f8f8}
-input[type=range]{width:100%;accent-color:#FF4D8D;margin:8px 0}
-#bar{height:6px;background:#eee;border-radius:20px;overflow:hidden;margin:12px;display:none}#bar div{height:100%;width:0%;background:#FF4D8D;transition:.3s}
+*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;min-height:100vh}
+.top{display:flex;align-items:center;gap:10px;padding:12px}.top b{font-size:17px}.top b span{color:#FF2DCC}
+.pill{display:flex;gap:6px;margin:0 12px}.pill button{flex:1;background:#1a1a1a;border:1px solid #222;padding:9px;border-radius:20px;color:#fff;font-size:12px;font-weight:700;cursor:pointer}.pill button.on{background:linear-gradient(90deg,#7B2FFF,#FF2DCC);border:0}
+.sec{display:flex;justify-content:space-between;padding:12px 12px 6px;font-size:14px;font-weight:800}.sec span{font-size:12px;background:#1a1a1a;padding:5px 10px;border-radius:12px;cursor:pointer}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;padding:0 2px}.cell{aspect-ratio:3/4;background:#111;position:relative;overflow:hidden;border-radius:6px;cursor:pointer}.cell video{width:100%;height:100%;object-fit:cover}.cell .dur{position:absolute;right:5px;bottom:5px;font-size:11px;background:rgba(0,0,0,.7);padding:2px 6px;border-radius:10px}.cell.cam{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:12px;color:#aaa}
+.tabs{display:flex;justify-content:center;gap:18px;padding:14px;border-top:1px solid #222;position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:auto;background:#000;z-index:10}.tabs b{font-size:12px;letter-spacing:1px;color:#888;cursor:pointer}.tabs b.on{color:#fff;border-bottom:2px solid #FF2DCC;padding-bottom:4px}
+.preview{height:58vh;background:#000;position:relative}.preview video{width:100%;height:100%;object-fit:contain}
+.bar{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:#aaa;cursor:pointer}
+.tools{display:flex;gap:8px;justify-content:flex-start;padding:8px 10px;overflow-x:auto}.tool{background:#1a1a1a;border:1px solid #222;padding:10px 12px;border-radius:12px;text-align:center;font-size:11px;min-width:62px;cursor:pointer;flex-shrink:0}.tool span{font-size:18px;display:block}
+.bot{display:flex;justify-content:space-between;padding:12px;gap:10px}.bot button{flex:1;padding:13px;border-radius:20px;border:0;font-weight:800;cursor:pointer}.bot .nxt{background:linear-gradient(90deg,#7B2FFF,#FF2DCC);color:#fff}
+.timeline{display:none;padding:10px;background:#0a0a0a}.timeline .track{display:flex;gap:2px;overflow-x:auto;height:48px}.timeline .frame{flex:0 0 42px;height:48px;background:#222;border-radius:6px;overflow:hidden}.timeline .frame video{width:100%;height:100%;object-fit:cover}
+.trimBox{padding:12px;background:#0a0a0a}input[type=range]{width:100%;accent-color:#FF2DCC;margin:8px 0}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:800;display:none;z-index:999;white-space:nowrap}
+#bar{height:6px;background:#222;border-radius:20px;overflow:hidden;margin:12px;display:none}#bar div{height:100%;width:0%;background:linear-gradient(90deg,#7B2FFF,#FF2DCC);transition:.3s}
 </style></head><body>
-<div class="top"><b id="pageTitle">New Reel</b><span onclick="location.href='index.html'" style="font-size:24px;cursor:pointer">✕</span></div>
 
-<div id="step1">
-<div class="logo"><h1>Pix<span>o</span>ro</h1><p>Create • Share • Grow</p></div>
-<div style="text-align:center;padding:12px"><div style="font-size:44px">🎬</div><div style="font-size:17px;margin-top:6px;color:#333">Select a video to create<br>your Reel</div></div>
-<div class="prev" id="prev">Select Video</div>
-<div class="info">Max: 30 Sec • Trim inside</div>
-<div class="grid" style="margin-top:10px"><div class="cell" onclick="document.getElementById('f').click()">Gallery<span>Video Select</span></div><div class="cell" onclick="document.getElementById('f').click()">Add Video<span>From Phone</span></div></div>
-<button class="btn" onclick="goEdit()">Next → Edit Video</button>
+<!-- STEP 1 - NEW REEL - VIDEO LA 1st PAGE MARI DA -->
+<div id="p1">
+<div class="top"><span onclick="location.href='index.html'" style="font-size:24px;cursor:pointer">✕</span><b>PIX<span>O</span>RO - New reel</b><span style="margin-left:auto;font-size:22px" onclick="document.getElementById('f').click()">📷</span></div>
+<div class="pill"><button class="on" onclick="showTab(this,'edits')">✨ Edits</button><button onclick="showTab(this,'drafts')">📝 Drafts</button><button onclick="showTab(this,'templates')">🎬 Templates</button></div>
+<div class="sec"><span>Recents ∨</span><span onclick="document.getElementById('f').click()">☑ Select</span></div>
+<div class="grid" id="grid">
+<div class="cell cam" onclick="document.getElementById('f').click()"><span style="font-size:28px">📷</span>Camera</div>
+<div class="cell" onclick="pickDemo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4')"><video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" muted preload="metadata"></video><span class="dur">0:22</span></div>
+<div class="cell" onclick="pickDemo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4')"><video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" muted preload="metadata"></video><span class="dur">0:12</span></div>
+<div class="cell" onclick="pickDemo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4')"><video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" muted preload="metadata"></video><span class="dur">0:04</span></div>
+<div class="cell" onclick="pickDemo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4')"><video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" muted preload="metadata"></video><span class="dur">0:06</span></div>
+<div class="cell" onclick="pickDemo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4')"><video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4" muted preload="metadata"></video><span class="dur">0:04</span></div>
+</div>
+<div style="height:70px"></div>
+<div class="tabs"><b onclick="location.href='story-create.html'">STORY</b><b onclick="location.href='post-create.html'">POST</b><b class="on">REEL</b><b onclick="location.href='live.html'">LIVE</b></div>
 </div>
 
-<div id="step2" style="display:none">
-<div class="prev"><video id="editV" controls playsinline></video></div>
+<!-- STEP 2 - PREVIEW + EDIT - VIDEO LA 2nd PAGE MARI DA -->
+<div id="p2" style="display:none">
+<div class="top"><span onclick="backToSelect()" style="font-size:24px;cursor:pointer">✕</span><b>PIXORO Reel</b><span style="margin-left:auto">Try Edits ✨</span></div>
+<div class="preview"><video id="v" playsinline controls></video><div class="bar" onclick="showTimeline()">Swipe up to edit ↑</div></div>
+<div class="timeline" id="tl">
+<div style="display:flex;justify-content:space-between;font-size:12px"><span id="tInfo">0.0s - 30.0s</span><span>↩ ↪</span></div>
+<div class="track" id="track"></div>
+<div style="padding:10px 0;font-size:13px;color:#aaa;line-height:1.9">+ Add audio<br>+ Add text</div>
 <div class="trimBox">
-<div style="display:flex;justify-content:space-between;font-weight:800"><span id="tInfo">0.0s - 30.0s</span><span style="color:#FF4D8D;font-size:12px">TRIM</span></div>
 <label style="font-size:12px;color:#888">START</label><input type="range" id="sR" min="0" max="60" step="0.1" value="0">
 <label style="font-size:12px;color:#888">END</label><input type="range" id="eR" min="0" max="60" step="0.1" value="30">
-<button onclick="previewTrim()" style="width:100%;background:#fff;border:1px solid #eee;padding:11px;border-radius:12px;font-weight:800;margin-top:8px;cursor:pointer">Preview Trim</button>
+<button onclick="previewTrim()" style="width:100%;background:#1a1a1a;border:1px solid #222;color:#fff;padding:11px;border-radius:12px;font-weight:800;margin-top:8px;cursor:pointer">Preview Trim</button>
 </div>
+</div>
+<div class="tools"><div class="tool" onclick="addAudio()"><span>🎵</span>Audio</div><div class="tool" onclick="addText()"><span>Aa</span>Text</div><div class="tool" onclick="addVoice()"><span>🎙️</span>Voice</div><div class="tool" onclick="addCap()"><span>CC</span>Captions</div><div class="tool" onclick="addSticker()"><span>😍</span>Sticker</div><div class="tool" onclick="addFilter()"><span>✨</span>Filters</div></div>
 <div id="bar"><div id="fill"></div></div>
 <div id="status" style="text-align:center;font-size:12px;color:#888"></div>
-<button class="btn" id="nextBtn" onclick="goEditPage()">Next → Edit Page</button>
-<button class="btn2" onclick="backSelect()">Back</button>
+<div class="bot"><button onclick="showTimeline()" style="background:#1a1a1a;color:#fff">Edit video</button><button class="nxt" id="nextBtn" onclick="goEditPage()">Next →</button></div>
 </div>
 
 <div id="toast" class="toast"></div>
 <input type="file" id="f" hidden accept="video/*" onchange="h(event)">
 <script>
 let supa=window.supa, selFile=null, selUrl='', publicUrl='', dur=0, start=0, end=30, ME_RAW='', ME_ID='';
+let v=document.getElementById('v');
+let edit={text:'',filter:'none',speed:1,stickers:'',audio:''};
 function showToast(m){let t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 async function init(){let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;let {data:p}=await supa.from('profiles').select('*').eq('id',ME_ID).single();ME_RAW=(p?.username||session.user.email.split('@')[0]).toLowerCase();}
 init();
-function h(e){let f=e.target.files[0];if(!f)return;selFile=f;publicUrl='';selUrl=URL.createObjectURL(f);document.getElementById('prev').innerHTML=`<video src="${selUrl}" autoplay loop muted playsinline></video>`;showToast('Video Selected');}
-function goEdit(){
-  if(!selUrl){showToast('Select a video');return}
-  document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='block';document.getElementById('pageTitle').innerText='Edit Video';
-  let v=document.getElementById('editV');v.src=selUrl;v.onloadedmetadata=()=>{dur=v.duration;document.getElementById('sR').max=dur;document.getElementById('eR').max=dur;end=Math.min(30,dur);document.getElementById('eR').value=end;update();};
-}
-function backSelect(){document.getElementById('step2').style.display='none';document.getElementById('step1').style.display='block';document.getElementById('pageTitle').innerText='New Reel';}
-function update(){start=parseFloat(document.getElementById('sR').value);end=parseFloat(document.getElementById('eR').value);if(end<=start)end=start+1;if(end-start>30)end=start+30;document.getElementById('eR').value=end;document.getElementById('tInfo').innerText=start.toFixed(1)+'s - '+end.toFixed(1)+'s';document.getElementById('editV').currentTime=start;}
+function showTab(el,n){document.querySelectorAll('.pill button').forEach(b=>b.classList.remove('on'));el.classList.add('on');showToast(n+' - Coming soon da 🔥');}
+function h(e){let f=e.target.files[0];if(!f)return;selFile=f;publicUrl='';selUrl=URL.createObjectURL(f);showPreview(selUrl);showToast('Video Selected da 🔥');}
+function pickDemo(url){selFile=null;selUrl=url;showPreview(url);showToast('Demo video selected da - Real video select panna Supabase la upload aagum da');}
+function showPreview(url){document.getElementById('p1').style.display='none';document.getElementById('p2').style.display='block';v.src=url;v.play();v.onloadedmetadata=()=>{dur=v.duration;document.getElementById('sR').max=dur;document.getElementById('eR').max=dur;end=Math.min(30,dur);document.getElementById('eR').value=end;update();makeTrack(url);}}
+function backToSelect(){document.getElementById('p2').style.display='none';document.getElementById('p1').style.display='block';v.pause();}
+function makeTrack(url){let t=document.getElementById('track');t.innerHTML='';for(let i=0;i<10;i++)t.innerHTML+=`<div class="frame"><video src="${url}#t=${i}" muted preload="metadata"></video></div>`}
+function showTimeline(){let tl=document.getElementById('tl');tl.style.display=tl.style.display==='block'?'none':'block';}
+function update(){start=parseFloat(document.getElementById('sR').value);end=parseFloat(document.getElementById('eR').value);if(end<=start)end=start+1;if(end-start>30)end=start+30;document.getElementById('eR').value=end;document.getElementById('tInfo').innerText=start.toFixed(1)+'s - '+end.toFixed(1)+'s';v.currentTime=start;}
 document.getElementById('sR').oninput=update;document.getElementById('eR').oninput=update;
-function previewTrim(){let v=document.getElementById('editV');v.currentTime=start;v.play();setTimeout(()=>v.pause(),(end-start)*1000);}
+function previewTrim(){v.currentTime=start;v.play();setTimeout(()=>v.pause(),(end-start)*1000);}
+function addAudio(){showToast('Audio add pannu da 🎵');}
+function addText(){let txt=prompt('Text type pannu da');if(txt){edit.text=txt;showToast('Text added: '+txt);}}
+function addVoice(){showToast('Voice - Mic la pesu da 🎙️');}
+function addCap(){showToast('Captions auto add aagum da');}
+function addSticker(){edit.stickers+='🔥 ';showToast('Sticker added 🔥');}
+function addFilter(){edit.filter=edit.filter==='none'?'contrast(1.3) saturate(1.5)':'none';v.style.filter=edit.filter;showToast('Filter applied ✨');}
 async function goEditPage(){
-  if(!selFile){showToast('No video');return}
+  // DEMO VIDEO NA - DIRECT AH EDIT PAGE KU DA - UPLOAD VENDA DA
+  if(!selFile && selUrl){let q=new URLSearchParams({media:selUrl,type:'video',trim_start:String(start),trim_end:String(end),filter:edit.filter,speed:String(edit.speed),text:edit.text,stickers:edit.stickers,audio:edit.audio});location.href='reel-edit.html?'+q.toString();return;}
+  if(!selFile){showToast('Select a video da');return}
   let btn=document.getElementById('nextBtn');btn.disabled=true;btn.innerText='Uploading...';
   document.getElementById('bar').style.display='block';document.getElementById('fill').style.width='40%';document.getElementById('status').innerText='Uploading... 40%';
   try{
@@ -69,8 +93,8 @@ async function goEditPage(){
     document.getElementById('fill').style.width='80%';document.getElementById('status').innerText='Done... 80%';
     let {data}=supa.storage.from('reels').getPublicUrl(fileName);
     publicUrl=data.publicUrl;
-    let q=new URLSearchParams({media:publicUrl,type:'video',trim_start:String(start),trim_end:String(end)});
+    let q=new URLSearchParams({media:publicUrl,type:'video',trim_start:String(start),trim_end:String(end),filter:edit.filter,speed:String(edit.speed),text:edit.text,stickers:edit.stickers,audio:edit.audio});
     location.href='reel-edit.html?'+q.toString();
-  }catch(e){showToast('Try again');btn.disabled=false;btn.innerText='Next → Edit Page';}
+  }catch(e){showToast('Try again da');btn.disabled=false;btn.innerText='Next →';}
 }
 </script></body></html>
