@@ -3,34 +3,39 @@
 <script src="js/supabase.js"></script>
 <style>
 *{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;min-height:100vh;padding-bottom:20px}
-.top{padding:14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222}.top b{font-size:20px}
-.pill{border:1px solid #333;background:#111;padding:8px 14px;border-radius:20px;font-size:13px;cursor:pointer}
-.capBox{display:flex;gap:12px;margin:14px 12px}.thumb{width:90px;height:120px;border-radius:12px;overflow:hidden;background:#111;flex-shrink:0}.thumb video{width:100%;height:100%;object-fit:cover}
-.cap{flex:1;background:#111;border:1px solid #222;border-radius:12px;padding:10px}.cap textarea{width:100%;background:transparent;border:0;color:#fff;outline:none;resize:none;height:80px;font-size:15px}
+.top{padding:14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222}.top b{font-size:17px}.top b span{color:#FF2DCC}
+.pill{border:1px solid #222;background:#111;padding:8px 14px;border-radius:20px;font-size:13px;cursor:pointer;font-weight:700}
+.capBox{display:flex;gap:12px;margin:14px 12px}.thumb{width:90px;height:120px;border-radius:12px;overflow:hidden;background:#111;flex-shrink:0;position:relative}.thumb video{width:100%;height:100%;object-fit:cover}.thumb .cover{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.7);font-size:11px;text-align:center;padding:5px}
+.cap{flex:1;background:#111;border:1px solid #222;border-radius:12px;padding:10px}.cap textarea{width:100%;background:transparent;border:0;color:#fff;outline:none;resize:none;height:58px;font-size:15px}
+.inp{width:calc(100% - 24px);margin:0 12px 8px;background:#111;border:1px solid #222;padding:12px;border-radius:10px;color:#fff;outline:none}
 .row{display:flex;gap:12px;align-items:center;border-bottom:1px solid #1a1a1a;padding:16px 12px;cursor:pointer}.row small{color:#888;display:block;margin-top:2px}.row .arr{margin-left:auto;font-size:20px;color:#888}.row .val{margin-left:auto;font-size:13px;color:#aaa;max-width:110px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.toggle{width:46px;height:28px;background:#FF4D8D;border-radius:20px;position:relative;flex-shrink:0;cursor:pointer}.toggle:after{content:'';position:absolute;right:3px;top:3px;width:22px;height:22px;background:#fff;border-radius:50%}.toggle.off{background:#333}.toggle.off:after{left:3px;right:auto}
-.btnShare{margin:16px 12px;background:#fff;border:0;width:calc(100% - 24px);padding:15px;border-radius:12px;font-weight:900;color:#000;font-size:16px;cursor:pointer}
+.toggle{width:46px;height:28px;background:linear-gradient(90deg,#7B2FFF,#FF2DCC);border-radius:20px;position:relative;flex-shrink:0;cursor:pointer}.toggle:after{content:'';position:absolute;right:3px;top:3px;width:22px;height:22px;background:#fff;border-radius:50%}.toggle.off{background:#333}.toggle.off:after{left:3px;right:auto}
+.btnShare{margin:16px 12px;background:linear-gradient(90deg,#7B2FFF,#FF2DCC);border:0;width:calc(100% - 24px);padding:15px;border-radius:16px;font-weight:900;color:#fff;font-size:16px;cursor:pointer}
 .btnShare:disabled{opacity:.6}
-.inp{width:calc(100% - 24px);margin:8px 12px;background:#111;border:1px solid #222;padding:12px;border-radius:10px;color:#fff;outline:none}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;z-index:1000;align-items:flex-end}.modal.open{display:flex}.sheet{background:#111;width:100%;max-width:450px;margin:auto;border-radius:20px 20px 0 0;padding:16px;max-height:70vh;overflow:auto}.sheet button{width:100%;padding:13px;margin:6px 0;border-radius:10px;border:1px solid #222;background:#000;color:#fff;text-align:left;cursor:pointer}
-.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;display:none;z-index:9999;white-space:nowrap}
-#miniBox{position:fixed;bottom:12px;left:12px;right:12px;max-width:426px;margin:auto;background:#111;border:1px solid #333;border-radius:12px;padding:10px;display:none;z-index:2000;align-items:center;gap:10px}#miniBox video{width:44px;height:60px;object-fit:cover;border-radius:8px;background:#000}#miniBox .bar{height:5px;background:#222;border-radius:20px;overflow:hidden;margin-top:6px}#miniBox .bar div{height:100%;width:0%;background:#FF4D8D;transition:.3s}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:800;display:none;z-index:9999;white-space:nowrap}
+#miniBox{position:fixed;bottom:12px;left:12px;right:12px;max-width:426px;margin:auto;background:#111;border:1px solid #333;border-radius:12px;padding:10px;display:none;z-index:2000;align-items:center;gap:10px}#miniBox video{width:44px;height:60px;object-fit:cover;border-radius:8px;background:#000}#miniBox .bar{height:5px;background:#222;border-radius:20px;overflow:hidden;margin-top:6px}#miniBox .bar div{height:100%;width:0%;background:linear-gradient(90deg,#7B2FFF,#FF2DCC);transition:.3s}
 </style></head><body>
-<div class="top"><span onclick="location.href='reel-edit.html?media='+encodeURIComponent(media)" style="font-size:28px;cursor:pointer">‹</span><b>Upload Reel</b><span class="pill" onclick="saveDraft()">Draft</span></div>
-<div class="capBox"><div class="thumb"><video id="thumbVid" muted playsinline></video></div><div class="cap"><textarea id="cap" placeholder="Write a caption..."></textarea><div style="text-align:right" onclick="addEmoji()">😊</div></div></div>
-<input id="tags" class="inp" placeholder="Add hashtags...">
-<div class="row" onclick="openTag()"><span>🏷️</span><div><b>Tag People</b><small id="tagSmall">Mention friends</small></div><span class="val" id="tagVal"></span><span class="arr">›</span></div>
-<div class="row" onclick="openLoc()"><span>📍</span><div><b>Add Location</b><small id="locSmall">Share where this was taken</small></div><span class="val" id="locVal"></span><span class="arr">›</span></div>
-<div class="row" onclick="openMusic()"><span>🎵</span><div><b>Add Music</b><small id="musicSmall">Choose a song</small></div><span class="val" id="musicVal">Trending</span><span class="arr">›</span></div>
-<div class="row" onclick="openEffect()"><span>✨</span><div><b>Add Effect</b><small id="effectSmall">Make it more creative</small></div><span class="arr">›</span></div>
+<!-- VIDEO LA MARI - NEW REEL TOP DA -->
+<div class="top"><span onclick="location.href='reel-edit.html?media='+encodeURIComponent(media)" style="font-size:28px;cursor:pointer">‹</span><b>PIX<span>O</span>RO - New Reel</b><span class="pill" onclick="saveDraft()">Save draft</span></div>
+<div class="capBox"><div class="thumb"><video id="thumbVid" muted playsinline></video><div class="cover" onclick="editCover()">Edit cover</div></div><div class="cap"><textarea id="cap" placeholder="Write a caption..."></textarea><div style="text-align:right" onclick="addEmoji()">😊</div></div></div>
+<input id="tags" class="inp" placeholder="Add hashtags... #Chennai #Pixoro">
+
+<!-- VIDEO LA MARI ROWS DA - NEAT AH NITTA DA -->
+<div class="row" onclick="openTag()"><span>🏷️</span><div><b>Tag people</b><small id="tagSmall">Mention friends</small></div><span class="val" id="tagVal"></span><span class="arr">›</span></div>
+<div class="row" onclick="openLoc()"><span>📍</span><div><b>Add location</b><small id="locSmall">Share where this was taken</small></div><span class="val" id="locVal"></span><span class="arr">›</span></div>
+<div class="row" onclick="openMusic()"><span>🎵</span><div><b>Rename audio</b><small id="musicSmall">Original audio - Rename it</small></div><span class="val" id="musicVal">Trending</span><span class="arr">›</span></div>
+<div class="row" onclick="openMusic()"><span>🎵</span><div><b>Add music</b><small>Choose a song</small></div><span class="arr">›</span></div>
+<div class="row" onclick="openEffect()"><span>✨</span><div><b>Add effect</b><small id="effectSmall">Make it more creative</small></div><span class="arr">›</span></div>
 <div class="row" onclick="openAudience()"><span>🌍</span><div><b>Audience</b></div><span class="val" id="audVal">Everyone</span><span class="arr">›</span></div>
-<div class="row"><span>🔁</span><div><b>Allow Remix</b><small>Let others remix</small></div><div class="toggle" onclick="toggle(this,'remix')"></div></div>
-<div class="row"><span>📊</span><div><b>Share to Reels</b></div><div class="toggle" onclick="toggle(this,'shareReels')"></div></div>
-<button class="btnShare" id="shareBtn" onclick="share()">Share Reel</button>
-<div class="modal" id="mTag"><div class="sheet"><h3>Tag People</h3><input id="tagSearch" class="inp" style="width:100%;margin:10px 0" placeholder="Search @username..." oninput="searchUsers(this.value)"><div id="tagList"></div><button onclick="closeAll()">Done</button></div></div>
-<div class="modal" id="mLoc"><div class="sheet"><h3>Add Location</h3><button onclick="setLoc('Chennai, Tamil Nadu')">📍 Chennai</button><button onclick="setLoc('Vellore, Tamil Nadu')">📍 Vellore</button><button onclick="setLoc('Madurai, Tamil Nadu')">📍 Madurai</button><button onclick="closeAll()">Cancel</button></div></div>
-<div class="modal" id="mMusic"><div class="sheet"><h3>Add Music</h3><div id="musicList"></div><button onclick="closeAll()">Done</button></div></div>
-<div class="modal" id="mEffect"><div class="sheet"><h3>Add Effect</h3><button onclick="setEffect('none','Original')">Original</button><button onclick="setEffect('brightness(1.2) saturate(1.3)','Pixoro')">Pixoro</button><button onclick="setEffect('grayscale(1)','B&W')">B&W</button><button onclick="setEffect('sepia(0.6)','Warm')">Warm</button><button onclick="closeAll()">Done</button></div></div>
+<div class="row"><span>🔁</span><div><b>Allow remix</b><small>Let others remix</small></div><div class="toggle" onclick="toggle(this,'remix')"></div></div>
+<div class="row"><span>📊</span><div><b>Also share to Feed</b><small>Share to Reels + Feed</small></div><div class="toggle" onclick="toggle(this,'shareReels')"></div></div>
+<button class="btnShare" id="shareBtn" onclick="share()">Share Reel →</button>
+
+<div class="modal" id="mTag"><div class="sheet"><h3>Tag people</h3><input id="tagSearch" class="inp" style="width:100%;margin:10px 0" placeholder="Search @username..." oninput="searchUsers(this.value)"><div id="tagList"></div><button onclick="closeAll()">Done</button></div></div>
+<div class="modal" id="mLoc"><div class="sheet"><h3>Add location</h3><button onclick="setLoc('Chennai, Tamil Nadu')">📍 Chennai</button><button onclick="setLoc('Vellore, Tamil Nadu')">📍 Vellore</button><button onclick="setLoc('Madurai, Tamil Nadu')">📍 Madurai</button><button onclick="closeAll()">Cancel</button></div></div>
+<div class="modal" id="mMusic"><div class="sheet"><h3>Add music / Rename audio</h3><div id="musicList"></div><button onclick="closeAll()">Done</button></div></div>
+<div class="modal" id="mEffect"><div class="sheet"><h3>Add effect</h3><button onclick="setEffect('none','Original')">Original</button><button onclick="setEffect('brightness(1.2) saturate(1.3)','Pixoro')">Pixoro 💜</button><button onclick="setEffect('grayscale(1)','B&W')">B&W</button><button onclick="setEffect('sepia(0.6)','Warm')">Warm</button><button onclick="closeAll()">Done</button></div></div>
 <div class="modal" id="mAud"><div class="sheet"><h3>Audience</h3><button onclick="setAud('public','Everyone')">🌍 Everyone</button><button onclick="setAud('followers','Followers')">👥 Followers Only</button><button onclick="closeAll()">Cancel</button></div></div>
 <div id="miniBox"><video id="miniVid" muted></video><div style="flex:1"><div style="font-weight:700;font-size:13px">Uploading... <span id="miniPct">0%</span></div><div style="font-size:11px;color:#aaa" id="miniTxt">Please wait</div><div class="bar"><div id="miniFill"></div></div></div><span onclick="document.getElementById('miniBox').style.display='none'" style="cursor:pointer">✕</span></div>
 <div id="toast" class="toast"></div>
@@ -47,6 +52,7 @@ async function init(){
  if(filterFromEdit && filterFromEdit!=='none'){effect=filterFromEdit;document.getElementById('thumbVid').style.filter=filterFromEdit;}
 }
 init();
+function editCover(){showToast('Edit cover - Thumbnail select pannu da 📸');}
 function closeAll(){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('open'));}
 function openTag(){document.getElementById('mTag').classList.add('open');searchUsers('');}
 async function searchUsers(q){
@@ -67,7 +73,7 @@ function addEmoji(){document.getElementById('cap').value+=' 💜';}
 async function saveDraft(){
  let cap=document.getElementById('cap').value.trim()||'Draft Reel';
  let {error}=await supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,tags:document.getElementById('tags').value.trim(),privacy:privacy,location:loc,tagged_people:tagPeople,image_url:media,media_url:media,video_url:media,media_type:'reel',status:'draft'});
- if(error){showToast('Try again');return} showToast('Draft Saved');
+ if(error){showToast('Try again');return} showToast('Draft Saved da 💜');
 }
 async function share(){
  if(!media){showToast('No media');return}
@@ -78,7 +84,7 @@ async function share(){
  let mini=document.getElementById('miniBox');mini.style.display='flex';
  document.getElementById('miniFill').style.width='50%';document.getElementById('miniPct').innerText='50%';
  let {error}=await supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,tags:tags,privacy:privacy,location:loc,tagged_people:tagPeople,image_url:media,media_url:media,video_url:media,media_type:'reel',trim_start:trimStart,trim_end:trimEnd,filter_name:effect,speed:speedFromEdit,audio_name:music,allow_remix:remix,share_to_reels:shareReels});
- if(error){let {error:e2}=await supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,image_url:media,media_url:media,media_type:'reel'});if(e2){showToast('Try again');btn.disabled=false;btn.innerText='Share Reel';mini.style.display='none';return;}}
+ if(error){let {error:e2}=await supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,image_url:media,media_url:media,media_type:'reel'});if(e2){showToast('Try again');btn.disabled=false;btn.innerText='Share Reel →';mini.style.display='none';return;}}
  document.getElementById('miniFill').style.width='100%';document.getElementById('miniPct').innerText='100%';document.getElementById('miniTxt').innerText='Done';
  setTimeout(()=>{location.href='reels.html?uploading='+encodeURIComponent(uploadId)+'&media='+encodeURIComponent(media);},600);
 }
