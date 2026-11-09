@@ -9,8 +9,8 @@
 #stickerOverlay{position:absolute;bottom:20%;left:0;right:0;text-align:center;font-size:36px;pointer-events:none;z-index:5}
 .timeline{margin:12px;padding:12px;background:#0a0a0a;border-radius:14px}.tinfo{display:flex;justify-content:space-between;font-size:12px;color:#aaa}.track{display:flex;gap:2px;overflow-x:auto;height:48px;margin-top:8px}.frame{flex:0 0 42px;height:48px;background:#222;border-radius:6px;overflow:hidden}.frame video{width:100%;height:100%;object-fit:cover}
 .trim{margin:0 12px 12px;padding:14px;border-radius:14px;background:#111}input[type=range]{width:100%;accent-color:#FF2DCC;margin:8px 0}
-.tools{display:flex;gap:8px;padding:10px 12px;overflow-x:auto}.tool{flex:0 0 auto;background:#1a1a1a;border:1px solid #222;padding:10px 12px;border-radius:12px;text-align:center;font-size:11px;min-width:62px;cursor:pointer}.tool span{font-size:18px;display:block}.tool.active{background:linear-gradient(90deg,#7B2FFF,#FF2DCC);border:0}
-.panel{margin:0 12px 12px;padding:14px;border-radius:14px;background:#111}
+.tools{display:flex;gap:8px;padding:10px 12px;overflow-x:auto}.tool{flex:0 0 auto;background:#1a1a1a;border:1px solid #222;padding:10px 12px;border-radius:12px;text-align:center;font-size:11px;min-width:62px;cursor:pointer;color:#fff}.tool span{font-size:18px;display:block}.tool.active{background:linear-gradient(90deg,#7B2FFF,#FF2DCC);border:0}
+.panel{margin:0 12px 12px;padding:14px;border-radius:14px;background:#111;display:none}
 .btn{margin:12px;background:linear-gradient(90deg,#7B2FFF,#FF2DCC);border:0;width:calc(100% - 24px);padding:15px;border-radius:16px;font-weight:900;color:#fff;font-size:16px;cursor:pointer}
 .btn2{margin:0 12px 12px;background:#1a1a1a;border:1px solid #222;color:#fff;width:calc(100% - 24px);padding:14px;border-radius:16px;font-weight:900;cursor:pointer}
 .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:800;display:none;z-index:999;white-space:nowrap}
@@ -19,7 +19,6 @@
 <div class="top"><span onclick="location.href='reel-create.html'" style="font-size:26px;cursor:pointer">✕</span><b>PIX<span>O</span>RO Edit</b><span class="try">✨ Try Edits</span><span onclick="goNext()" style="margin-left:auto;font-size:22px;cursor:pointer">→</span></div>
 <div class="prev"><video id="v" controls playsinline></video><div id="txtOverlay"></div><div id="stickerOverlay"></div></div>
 
-<!-- VIDEO LA MARI TIMELINE DA -->
 <div class="timeline">
 <div class="tinfo"><span>⏸ <span id="tInfo">0.0s - 30.0s</span></span><span>↩ ↪</span></div>
 <div class="track" id="track"></div>
@@ -33,7 +32,6 @@
 <div style="display:flex;gap:8px;margin-top:10px"><button onclick="previewTrim()" style="flex:1;background:#fff;border:0;padding:11px;border-radius:12px;font-weight:800;cursor:pointer">Preview Trim</button><button onclick="resetTrim()" style="flex:1;background:#1a1a1a;border:1px solid #222;color:#fff;padding:11px;border-radius:12px;cursor:pointer">Reset</button></div>
 </div>
 
-<!-- VIDEO LA MARI TOOLS DA - KEELA NEAT AH DA -->
 <div class="tools">
 <button class="tool active" onclick="setTool(this,'trim')"><span>✂️</span>Trim</button>
 <button class="tool" onclick="setTool(this,'text')"><span>Aa</span>Text</button>
@@ -47,11 +45,11 @@
 <button class="tool" onclick="uploadTrim()"><span>⬇️</span>Save</button>
 </div>
 
-<div class="panel" id="panelText" style="display:none"><input id="txtInput" placeholder="Type text..." style="width:100%;background:#000;border:1px solid #222;padding:12px;border-radius:10px;color:#fff;outline:none" oninput="edit.text=this.value;document.getElementById('txtOverlay').innerText=this.value"></div>
-<div class="panel" id="panelAudio" style="display:none"><input type="file" id="aud" accept="audio/*" onchange="setAudio(this)"><div style="font-size:12px;color:#888;margin-top:6px">Add music - Video kooda play aagum</div><audio id="audPlay" loop></audio></div>
-<div class="panel" id="panelSpeed" style="display:none"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="tool" onclick="setSpeed(0.5,this)">0.5x</button><button class="tool active" onclick="setSpeed(1,this)">1x</button><button class="tool" onclick="setSpeed(1.5,this)">1.5x</button><button class="tool" onclick="setSpeed(2,this)">2x</button></div></div>
-<div class="panel" id="panelFilter" style="display:none"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="tool" onclick="setFilter('none',this)">Normal</button><button class="tool" onclick="setFilter('grayscale(1)',this)">B&W</button><button class="tool" onclick="setFilter('contrast(1.3) saturate(1.5)',this)">Pixoro 💜</button><button class="tool" onclick="setFilter('sepia(0.6)',this)">Warm</button><button class="tool" onclick="setFilter('hue-rotate(280deg) saturate(2)',this)">Neon</button></div></div>
-<div class="panel" id="panelSticker" style="display:none"><div style="font-size:28px;display:flex;gap:14px"><span onclick="addSticker('🔥')">🔥</span><span onclick="addSticker('❤️')">❤️</span><span onclick="addSticker('⭐')">⭐</span><span onclick="addSticker('😎')">😎</span><span onclick="addSticker('👑')">👑</span><span onclick="addSticker('💜')">💜</span></div></div>
+<div class="panel" id="panelText"><input id="txtInput" placeholder="Type text..." style="width:100%;background:#000;border:1px solid #222;padding:12px;border-radius:10px;color:#fff;outline:none" oninput="edit.text=this.value;document.getElementById('txtOverlay').innerText=this.value"></div>
+<div class="panel" id="panelAudio"><input type="file" id="aud" accept="audio/*" onchange="setAudio(this)"><div style="font-size:12px;color:#888;margin-top:6px">Add music - Video kooda play aagum</div><audio id="audPlay" loop></audio></div>
+<div class="panel" id="panelSpeed"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="tool" onclick="setSpeed(0.5,this)">0.5x</button><button class="tool active" onclick="setSpeed(1,this)">1x</button><button class="tool" onclick="setSpeed(1.5,this)">1.5x</button><button class="tool" onclick="setSpeed(2,this)">2x</button></div></div>
+<div class="panel" id="panelFilter"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="tool" onclick="setFilter('none',this)">Normal</button><button class="tool" onclick="setFilter('grayscale(1)',this)">B&W</button><button class="tool" onclick="setFilter('contrast(1.3) saturate(1.5)',this)">Pixoro 💜</button><button class="tool" onclick="setFilter('sepia(0.6)',this)">Warm</button><button class="tool" onclick="setFilter('hue-rotate(280deg) saturate(2)',this)">Neon</button></div></div>
+<div class="panel" id="panelSticker"><div style="font-size:28px;display:flex;gap:14px"><span onclick="addSticker('🔥')">🔥</span><span onclick="addSticker('❤️')">❤️</span><span onclick="addSticker('⭐')">⭐</span><span onclick="addSticker('😎')">😎</span><span onclick="addSticker('👑')">👑</span><span onclick="addSticker('💜')">💜</span></div></div>
 
 <button class="btn" onclick="goNext()">Next → Upload Page</button>
 <button class="btn btn2" onclick="uploadTrim()">Share Reel - Direct Save</button>
@@ -74,7 +72,11 @@ async function init(){
 }
 init();
 function makeTrack(){let t=document.getElementById('track');t.innerHTML='';for(let i=0;i<12;i++)t.innerHTML+=`<div class="frame"><video src="${vidUrl}#t=${i}" muted preload="metadata"></video></div>`}
-function setTool(el,n){document.querySelectorAll('.tools .tool').forEach(b=>b.classList.remove('active'));el.classList.add('active');['Text','Audio','Speed','Filter','Sticker'].forEach(x=>document.getElementById('panel'+x).style.display='none');if(n!='trim')document.getElementById('panel'+n.charAt(0).toUpperCase()+n.slice(1)).style.display='block';}
+function setTool(el,n){
+ document.querySelectorAll('.tools .tool').forEach(b=>b.classList.remove('active'));el.classList.add('active');
+ ['Text','Audio','Speed','Filter','Sticker'].forEach(x=>document.getElementById('panel'+x).style.display='none');
+ if(n!='trim')document.getElementById('panel'+n.charAt(0).toUpperCase()+n.slice(1)).style.display='block';
+}
 function setSpeed(s,el){edit.speed=s;v.playbackRate=s;document.getElementById('audPlay').playbackRate=s;document.querySelectorAll('#panelSpeed .tool').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');showToast('Speed: '+s+'x');}
 function setFilter(f,el){edit.filter=f;v.style.filter=f;document.querySelectorAll('#panelFilter .tool').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');showToast('Filter Applied');}
 function addSticker(em){edit.stickers+=em+' ';document.getElementById('stickerOverlay').innerText=edit.stickers;showToast('Sticker Added '+em);}
