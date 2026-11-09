@@ -16,12 +16,10 @@
 .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:800;display:none;z-index:9999;white-space:nowrap}
 #miniBox{position:fixed;bottom:12px;left:12px;right:12px;max-width:426px;margin:auto;background:#111;border:1px solid #333;border-radius:12px;padding:10px;display:none;z-index:2000;align-items:center;gap:10px}#miniBox video{width:44px;height:60px;object-fit:cover;border-radius:8px;background:#000}#miniBox .bar{height:5px;background:#222;border-radius:20px;overflow:hidden;margin-top:6px}#miniBox .bar div{height:100%;width:0%;background:linear-gradient(90deg,#7B2FFF,#FF2DCC);transition:.3s}
 </style></head><body>
-<!-- VIDEO LA MARI - NEW REEL TOP DA -->
 <div class="top"><span onclick="location.href='reel-edit.html?media='+encodeURIComponent(media)" style="font-size:28px;cursor:pointer">‹</span><b>PIX<span>O</span>RO - New Reel</b><span class="pill" onclick="saveDraft()">Save draft</span></div>
 <div class="capBox"><div class="thumb"><video id="thumbVid" muted playsinline></video><div class="cover" onclick="editCover()">Edit cover</div></div><div class="cap"><textarea id="cap" placeholder="Write a caption..."></textarea><div style="text-align:right" onclick="addEmoji()">😊</div></div></div>
 <input id="tags" class="inp" placeholder="Add hashtags... #Chennai #Pixoro">
 
-<!-- VIDEO LA MARI ROWS DA - NEAT AH NITTA DA -->
 <div class="row" onclick="openTag()"><span>🏷️</span><div><b>Tag people</b><small id="tagSmall">Mention friends</small></div><span class="val" id="tagVal"></span><span class="arr">›</span></div>
 <div class="row" onclick="openLoc()"><span>📍</span><div><b>Add location</b><small id="locSmall">Share where this was taken</small></div><span class="val" id="locVal"></span><span class="arr">›</span></div>
 <div class="row" onclick="openMusic()"><span>🎵</span><div><b>Rename audio</b><small id="musicSmall">Original audio - Rename it</small></div><span class="val" id="musicVal">Trending</span><span class="arr">›</span></div>
@@ -70,9 +68,24 @@ function openAudience(){document.getElementById('mAud').classList.add('open');}
 function setAud(p,label){privacy=p;document.getElementById('audVal').innerText=label;closeAll();}
 function toggle(el,name){el.classList.toggle('off');let on=!el.classList.contains('off');if(name==='remix')remix=on;if(name==='shareReels')shareReels=on;}
 function addEmoji(){document.getElementById('cap').value+=' 💜';}
+
+// REAL VIDEO DA - BLOB NA SUPABASE KU UPLOAD PANNI PUBLIC URL EDUTHU DA - BLOB AH DB LA PODA KUDATHU DA
+async function getRealUrl(){
+ if(!media) return '';
+ if(!media.startsWith('blob:')) return media;
+ try{
+   let res=await fetch(media); let blob=await res.blob();
+   let fileName=Date.now()+'_'+ME+'.mp4';
+   let {error}=await supa.storage.from('reels').upload(fileName, blob);
+   if(error) throw error;
+   let {data}=supa.storage.from('reels').getPublicUrl(fileName);
+   media=data.publicUrl; return media;
+ }catch(e){ return media; }
+}
 async function saveDraft(){
  let cap=document.getElementById('cap').value.trim()||'Draft Reel';
- let {error}=await supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,tags:document.getElementById('tags').value.trim(),privacy:privacy,location:loc,tagged_people:tagPeople,image_url:media,media_url:media,video_url:media,media_type:'reel',status:'draft'});
+ let realUrl=await getRealUrl();
+ let {error}=await supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,tags:document.getElementById('tags').value.trim(),privacy:privacy,location:loc,tagged_people:tagPeople,image_url:realUrl,media_url:realUrl,video_url:realUrl,media_type:'reel',status:'draft'});
  if(error){showToast('Try again');return} showToast('Draft Saved da 💜');
 }
 async function share(){
@@ -83,9 +96,10 @@ async function share(){
  let uploadId=Date.now()+'_'+ME;
  let mini=document.getElementById('miniBox');mini.style.display='flex';
  document.getElementById('miniFill').style.width='50%';document.getElementById('miniPct').innerText='50%';
- let {error}=await supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,tags:tags,privacy:privacy,location:loc,tagged_people:tagPeople,image_url:media,media_url:media,video_url:media,media_type:'reel',trim_start:trimStart,trim_end:trimEnd,filter_name:effect,speed:speedFromEdit,audio_name:music,allow_remix:remix,share_to_reels:shareReels});
- if(error){let {error:e2}=await supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,image_url:media,media_url:media,media_type:'reel'});if(e2){showToast('Try again');btn.disabled=false;btn.innerText='Share Reel →';mini.style.display='none';return;}}
+ let realUrl=await getRealUrl(); // BLOB NA INGA UPLOAD AAGIDUM DA
+ let {error}=await supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,tags:tags,privacy:privacy,location:loc,tagged_people:tagPeople,image_url:realUrl,media_url:realUrl,video_url:realUrl,media_type:'reel',trim_start:trimStart,trim_end:trimEnd,filter_name:effect,speed:speedFromEdit,audio_name:music,allow_remix:remix,share_to_reels:shareReels});
+ if(error){let {error:e2}=await supa.from('posts').insert({user_id:ME_ID,username:ME,caption:cap,image_url:realUrl,media_url:realUrl,media_type:'reel'});if(e2){showToast('Try again');btn.disabled=false;btn.innerText='Share Reel →';mini.style.display='none';return;}}
  document.getElementById('miniFill').style.width='100%';document.getElementById('miniPct').innerText='100%';document.getElementById('miniTxt').innerText='Done';
- setTimeout(()=>{location.href='reels.html?uploading='+encodeURIComponent(uploadId)+'&media='+encodeURIComponent(media);},600);
+ setTimeout(()=>{location.href='reels.html?uploading='+encodeURIComponent(uploadId)+'&media='+encodeURIComponent(realUrl);},600);
 }
 </script></body></html>
