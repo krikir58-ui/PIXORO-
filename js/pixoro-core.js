@@ -1,6 +1,6 @@
 // ===== PIXORO MAIN - SERVER ONLY - v212 - CORRECTED DA =====
 const SUPA_URL ='https://yecpltndhlzfjplzhcpm.supabase.co';
-const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllY3BsdG5kaGx6ZmpwbHpoY3BtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NTkzODksImV4cCI6MjEwNTIzNTM4OX0.I5icBkP7A-Lpt-EJhrOrBDZYG-G9fW8qKbbaQbnQHSM';
 if(!window.supa && window.supabase && window.supabase.createClient){
   window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
   console.log("✅ Pixoro Supa Connected da!");
