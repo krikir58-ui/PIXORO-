@@ -1,4 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
 <style>
 *{margin:0;box-sizing:border-box}body{background:#050008;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;min-height:100vh;background:radial-gradient(circle at 0% 0%,#7b2fff66,transparent 45%),radial-gradient(circle at 100% 20%,#a259ff88,transparent 40%),#050008;padding-bottom:80px}
 .top{padding:14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222}.top b{font-size:20px;font-weight:900}
@@ -8,24 +10,26 @@
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px}.cell{padding:18px;background:#140a24;border:1px solid #a259ff55;border-radius:14px;text-align:center;cursor:pointer;font-weight:800;font-size:14px}.cell span{display:block;font-size:12px;font-weight:400;color:#aaa;margin-top:4px}
 .btn{margin:12px;background:linear-gradient(90deg,#7b2fff,#c44dff);border:0;width:calc(100% - 24px);padding:14px;border-radius:25px;font-weight:900;color:#fff;font-size:16px}
 .btn2{margin:12px;background:transparent;border:1.2px solid #a259ff;color:#fff;width:calc(100% - 24px);padding:14px;border-radius:25px;font-weight:900}
+.btn:disabled{opacity:.5}
 .toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
 .info{margin:0 12px;padding:8px;border:1px solid #a259ff55;border-radius:10px;font-size:12px;color:#aaa;text-align:center}
 .trimBox{margin:12px;padding:14px;border:1px solid #a259ff55;border-radius:14px;background:#140a24}
 input[type=range]{width:100%;accent-color:#a259ff;margin:8px 0}
+#bar{height:8px;background:#222;border-radius:20px;overflow:hidden;margin:12px;display:none}#bar div{height:100%;width:0%;background:#a259ff;transition:.3s}
 </style></head><body>
 <div class="top"><b id="pageTitle">New Reel</b><span onclick="location.href='index.html'" style="font-size:24px;cursor:pointer">✕</span></div>
 
-<!-- STEP 1 - SELECT MATTUM DA - THANi PAGE DA -->
+<!-- STEP 1 - SELECT MATTUM DA - THANI PAGE DA -->
 <div id="step1">
 <div class="logo"><h1>Pix<span>o</span>ro</h1><p>Create • Share • Grow</p><div class="line"></div></div>
 <div style="text-align:center;padding:14px"><div style="font-size:50px">🎬</div><div style="font-style:italic;font-size:20px;margin-top:6px">Select a media to create<br>your Reel 💜</div></div>
 <div class="prev" id="prev">Video Select Pannu</div>
-<div class="info" id="info">Max: 30 Sec • Pixoro Trim Inside da</div>
+<div class="info" id="info">Max: 30 Sec • Pixoro Trim Inside da • NO LocalStorage da ✅</div>
 <div class="grid" style="margin-top:10px"><div class="cell" onclick="document.getElementById('f').click()">Gallery<span>Video Select</span></div><div class="cell" onclick="document.getElementById('f').click()">Add Video<span>From Phone</span></div></div>
 <button class="btn" onclick="goEdit()">Next → Edit Video</button>
 </div>
 
-<!-- STEP 2 - TRIM MATTUM DA - UPLOAD ILLA DA - THANi PAGE KU POGUM DA -->
+<!-- STEP 2 - TRIM MATTUM DA - UPLOAD ILLA DA - EDIT PAGE KU POGUM DA -->
 <div id="step2" style="display:none">
 <div class="prev"><video id="editV" controls playsinline></video></div>
 <div class="trimBox">
@@ -34,17 +38,22 @@ input[type=range]{width:100%;accent-color:#a259ff;margin:8px 0}
 <label style="font-size:12px;color:#aaa">END - Mudiya Vendum Idam</label><input type="range" id="eR" min="0" max="60" step="0.1" value="30">
 <button onclick="previewTrim()" style="width:100%;background:#fff;border:0;padding:10px;border-radius:20px;font-weight:800;margin-top:8px">Preview Trim</button>
 </div>
-<button class="btn" onclick="goUpload()">Next → Upload Page 🚀</button>
+<div id="bar"><div id="fill"></div></div>
+<div id="status" style="text-align:center;font-size:12px;color:#999"></div>
+<button class="btn" id="nextBtn" onclick="goEditPage()">Next → Edit Page 🚀</button>
 <button class="btn2" onclick="backSelect()">Back</button>
-<div style="text-align:center;font-size:11px;color:#888">Caption / #Tag / Privacy - Ellaame - Adutha Page la da</div>
+<div style="text-align:center;font-size:11px;color:#888">Caption / #Tag / Privacy - Ellaame - Upload Page la da<br>Edit - Adutha Page la da</div>
 </div>
 
 <div id="toast" class="toast"></div>
 <input type="file" id="f" hidden accept="video/*" onchange="h(event)">
 <script>
-let selFile=null, selUrl='', dur=0, start=0, end=30;
+// NO LOCALSTORAGE DA - NO SESSIONSTORAGE DA - ELLAAMEY URL + SERVER LA THAAN DA
+let supa=window.supa, selFile=null, selUrl='', publicUrl='', dur=0, start=0, end=30, ME_RAW='', ME_ID='';
 function showToast(m){let t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2200)}
-function h(e){let f=e.target.files[0];if(!f)return;selFile=f;selUrl=URL.createObjectURL(f);document.getElementById('prev').innerHTML=`<video src="${selUrl}" autoplay loop muted playsinline></video>`;showToast('Video Selected da - Next ku po da');}
+async function init(){let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;let {data:p}=await supa.from('profiles').select('*').eq('id',ME_ID).single();ME_RAW=(p?.username||session.user.email.split('@')[0]).toLowerCase();}
+init();
+function h(e){let f=e.target.files[0];if(!f)return;selFile=f;publicUrl='';selUrl=URL.createObjectURL(f);document.getElementById('prev').innerHTML=`<video src="${selUrl}" autoplay loop muted playsinline></video>`;showToast('Video Selected da - Next ku po da');}
 function goEdit(){
   if(!selUrl){showToast('Video select pannu da');return}
   document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='block';document.getElementById('pageTitle').innerText='Edit Video';
@@ -54,10 +63,21 @@ function backSelect(){document.getElementById('step2').style.display='none';docu
 function update(){start=parseFloat(document.getElementById('sR').value);end=parseFloat(document.getElementById('eR').value);if(end<=start)end=start+1;if(end-start>30)end=start+30;document.getElementById('eR').value=end;document.getElementById('tInfo').innerText=start.toFixed(1)+'s - '+end.toFixed(1)+'s • '+(end-start).toFixed(1)+'s';document.getElementById('editV').currentTime=start;}
 document.getElementById('sR').oninput=update;document.getElementById('eR').oninput=update;
 function previewTrim(){let v=document.getElementById('editV');v.currentTime=start;v.play();setTimeout(()=>v.pause(),(end-start)*1000);}
-// THANi PAGE DA - TRIM AH - UPLOAD PAGE KU ANUPPOM DA - INGA UPLOAD ILLA DA
-function goUpload(){
-  if(!selUrl){showToast('Video illa da');return}
-  localStorage.setItem('pixoro_trim', JSON.stringify({start:start,end:end}));
-  location.href='reels-upload.html?media='+encodeURIComponent(selUrl)+'&type=video&trim_start='+start+'&trim_end='+end;
+// THANI PAGE DA - BLOB URL AH ANUPPA MUDIYATHU DA - SERVER LA UPLOAD PANNI - PUBLIC URL AH - URL LA ANUPPOM DA - LOCALSTORAGE ILLA DA
+async function goEditPage(){
+  if(!selFile){showToast('Video illa da');return}
+  let btn=document.getElementById('nextBtn');btn.disabled=true;btn.innerText='Uploading to Server...';
+  document.getElementById('bar').style.display='block';document.getElementById('fill').style.width='40%';document.getElementById('status').innerText='Server la Upload Aaguthu da... 40%';
+  try{
+    let fileName=Date.now()+'_'+ME_RAW+'.mp4';
+    let {error}=await supa.storage.from('reels').upload(fileName, selFile);
+    if(error) throw error;
+    document.getElementById('fill').style.width='80%';document.getElementById('status').innerText='Done da... 80%';
+    let {data}=supa.storage.from('reels').getPublicUrl(fileName);
+    publicUrl=data.publicUrl;
+    // NO LOCALSTORAGE DA - ELLAAMEY URL LA THAAN DA - EDIT PAGE KU URL LA POGUM DA
+    let q=new URLSearchParams({media:publicUrl,type:'video',trim_start:String(start),trim_end:String(end)});
+    location.href='reel-edit.html?'+q.toString();
+  }catch(e){showToast('Fail da: '+e.message);btn.disabled=false;btn.innerText='Next → Edit Page 🚀';}
 }
 </script></body></html>
