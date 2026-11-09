@@ -65,7 +65,7 @@ async function init(){
  ME_ID=session.user.id; let {data:p}=await supa.from('profiles').select('*').eq('id',ME_ID).single(); ME_RAW=(p?.username||session.user.email.split('@')[0]).toLowerCase();
  let pr=new URLSearchParams(location.search); vidUrl=pr.get('media')||'';
  if(!vidUrl){showToast('No video - Choose again');return}
- if(vidUrl.startsWith('blob:')){showToast('Blob URL not working - Upload again');return}
+ // REAL GALLERY DA - blob: URL um REAL VIDEO THAAN DA - BLOCK PANNA KUDATHU DA
  v.src=vidUrl; v.onloadedmetadata=()=>{dur=v.duration;document.getElementById('sR').max=dur;document.getElementById('eR').max=dur;end=Math.min(30,dur);document.getElementById('eR').value=end;update();makeTrack();};
  let oldText=pr.get('text'); if(oldText){edit.text=oldText;document.getElementById('txtOverlay').innerText=oldText;document.getElementById('txtInput').value=oldText;}
  let oldStk=pr.get('stickers'); if(oldStk){edit.stickers=oldStk;document.getElementById('stickerOverlay').innerText=oldStk;}
@@ -91,9 +91,11 @@ function goNext(){
  location.href='reels-upload.html?'+q.toString();
 }
 async function uploadTrim(){
- if(!vidUrl||vidUrl.startsWith('blob:')){showToast('No media - Upload again');return}
+ if(!vidUrl){showToast('No media - Upload again');return}
  document.getElementById('bgBar').style.display='block';document.getElementById('bgFill').style.width='70%';document.getElementById('bgPct').innerText='70%';
  try{
+  // BLOB NA - DIRECT SAVE Panna Mudiyadhu da - Upload Page ku Poo da - Athula Supabase Upload Aagum da
+  if(vidUrl.startsWith('blob:')){showToast('Next ku poo da - Upload anga aagum');setTimeout(()=>goNext(),800);return;}
   let {error}=await supa.from('posts').insert({user_id:ME_ID,username:ME_RAW,media_url:vidUrl,media_type:'reel',caption:edit.text||'Pixoro Reel',video_url:vidUrl,trim_start:start,trim_end:end,filter_name:edit.filter,speed:edit.speed,stickers:edit.stickers,audio_name:edit.audio,split_at:edit.splitAt});
   if(error){ let {error:e2}=await supa.from('posts').insert({user_id:ME_ID,username:ME_RAW,media_url:vidUrl,media_type:'reel',caption:edit.text||'Pixoro Reel',video_url:vidUrl}); if(e2) throw e2; }
   document.getElementById('bgFill').style.width='100%';document.getElementById('bgPct').innerText='100%';showToast('Saved');setTimeout(()=>location.href='reels.html',800);
