@@ -14,6 +14,10 @@
 .info{margin:0 12px;padding:8px;background:transparent;border:1px solid #222;border-radius:10px;font-size:12px;color:#aaa;text-align:center}
 .trimBox{margin:12px;padding:14px;border:1px solid #222;border-radius:14px;display:none}
 input[type=range]{width:100%;accent-color:#fff;margin:8px 0}
+.inp{width:calc(100% - 24px);margin:8px 12px 0;background:#111;border:1px solid #333;padding:12px;border-radius:12px;color:#fff;outline:none}
+select.inp{appearance:none}
+#bar{height:8px;background:#222;border-radius:20px;overflow:hidden;margin:12px;display:none}
+#bar div{height:100%;width:0%;background:#fff;transition:.3s}
 </style></head><body>
 <div class="top"><b id="pageTitle">New Reel</b><span onclick="location.href='index.html'">✕</span></div>
 
@@ -25,7 +29,7 @@ input[type=range]{width:100%;accent-color:#fff;margin:8px 0}
 <button class="btn" onclick="goEdit()">Next → Edit Video</button>
 </div>
 
-<!-- STEP 2 - EDIT VIDEO DA - INGA THAAN CUT AGUM DA -->
+<!-- STEP 2 - EDIT VIDEO DA -->
 <div id="step2" style="display:none">
 <div class="prev"><video id="editV" controls playsinline></video></div>
 <div class="trimBox" id="trimBox" style="display:block">
@@ -34,8 +38,15 @@ input[type=range]{width:100%;accent-color:#fff;margin:8px 0}
 <label style="font-size:12px;color:#888">END - Mudiya Vendum Idam</label><input type="range" id="eR" min="0" max="60" step="0.1" value="30">
 <button onclick="previewTrim()" style="width:100%;background:#fff;border:0;padding:10px;border-radius:20px;font-weight:800;margin-top:8px">Preview Trim</button>
 </div>
-<input id="cap" placeholder="Caption..." style="width:calc(100% - 24px);margin:0 12px;background:#111;border:1px solid #333;padding:12px;border-radius:12px;color:#fff;outline:none">
-<button class="btn" onclick="shareTrim()">Share Reel</button>
+
+<input id="cap" placeholder="Caption..." class="inp">
+<!-- #TAG OPTIONAL DA - THEVA NA MATTUM PODU DA - AUTO ILLA DA - ATOMIC ILLA DA -->
+<input id="tags" placeholder="#Tag - Theva na mattum Podu da - Illana Vidru da" class="inp">
+<select id="privacy" class="inp"><option value="public">🌍 Public - Ellaarum Paakalam</option><option value="followers">👥 Followers Only</option></select>
+
+<div id="bar"><div id="fill"></div></div>
+<div id="status" style="text-align:center;font-size:12px;color:#999"></div>
+<button class="btn" id="shareBtn" onclick="shareTrim()">Share Reel</button>
 <button class="btn" style="background:transparent!important;border:1.2px solid #fff;color:#fff" onclick="backSelect()">Back</button>
 </div>
 
@@ -43,13 +54,12 @@ input[type=range]{width:100%;accent-color:#fff;margin:8px 0}
 <input type="file" id="f" hidden accept="video/*" onchange="h(event)">
 <script>
 let supa=window.supa, ME_RAW='', selFile=null, selUrl='', dur=0, start=0, end=30;
-function showToast(m){let t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
+function showToast(m){let t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2200)}
 async function checkAuth(){let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}let {data:p}=await supa.from('profiles').select('*').eq('id',session.user.id).single();ME_RAW=(p?.username||session.user.email.split('@')[0]).toLowerCase()}
 checkAuth();
 function h(e){let f=e.target.files[0];if(!f)return;selFile=f;selUrl=URL.createObjectURL(f);document.getElementById('prev').innerHTML=`<video src="${selUrl}" autoplay loop muted playsinline></video>`;showToast('Video Selected da - Next ku po da');}
 function goEdit(){
   if(!selUrl){showToast('Video select pannu da');return}
-  // INGA UPLOAD ILLA DA - EDIT KU POTHU DA
   document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='block';document.getElementById('pageTitle').innerText='Edit Video';
   let v=document.getElementById('editV');v.src=selUrl;v.onloadedmetadata=()=>{dur=v.duration;document.getElementById('sR').max=dur;document.getElementById('eR').max=dur;end=Math.min(30,dur);document.getElementById('eR').value=end;update();};
 }
@@ -58,11 +68,28 @@ function update(){start=parseFloat(document.getElementById('sR').value);end=pars
 document.getElementById('sR').oninput=update;document.getElementById('eR').oninput=update;
 function previewTrim(){let v=document.getElementById('editV');v.currentTime=start;v.play();setTimeout(()=>v.pause(),(end-start)*1000);}
 async function shareTrim(){
-  showToast('Uploading Trim...');let fileName=Date.now()+'_'+ME_RAW+'.mp4';
+  let btn=document.getElementById('shareBtn'); btn.disabled=true; btn.innerText='Uploading...';
+  document.getElementById('bar').style.display='block'; document.getElementById('fill').style.width='30%';
+  document.getElementById('status').innerText='Uploading to Server... 30%';
+  let fileName=Date.now()+'_'+ME_RAW+'.mp4';
   let {error}=await supa.storage.from('reels').upload(fileName,selFile);
-  if(error){showToast(error.message);return}
+  if(error){showToast(error.message);btn.disabled=false;btn.innerText='Share Reel';return}
+  document.getElementById('fill').style.width='70%'; document.getElementById('status').innerText='Saving to Server... 70%';
   let {data}=supa.storage.from('reels').getPublicUrl(fileName);
-  await supa.from('posts').insert({user_id:(await supa.auth.getSession()).data.session.user.id,username:ME_RAW,media_url:data.publicUrl,media_type:'reel',caption:document.getElementById('cap').value,video_url:data.publicUrl});
-  location.href='reels.html';
+  let caption=document.getElementById('cap').value.trim();
+  // #TAG REAL MATTUM DA - USER TYPE PANNA MATTUM DA - EMPTY NA "" DA - AUTO VARATHU DA
+  let tags=document.getElementById('tags').value.trim();
+  let privacy=document.getElementById('privacy').value;
+  let session=(await supa.auth.getSession()).data.session;
+  // REAL SERVER SAVE DA - POSTS TABLE LA
+  let {error:err2}=await supa.from('posts').insert({user_id:session.user.id,username:ME_RAW,media_url:data.publicUrl,media_type:'reel',caption:caption,tags:tags,privacy:privacy,video_url:data.publicUrl,trim_start:start,trim_end:end});
+  if(err2){
+    // tags / privacy column illana - caption mattum vechu save pannu da - app break aagathu da
+    let {error:err3}=await supa.from('posts').insert({user_id:session.user.id,username:ME_RAW,media_url:data.publicUrl,media_type:'reel',caption:caption,video_url:data.publicUrl});
+    if(err3){showToast(err3.message);btn.disabled=false;btn.innerText='Share Reel';return}
+  }
+  document.getElementById('fill').style.width='100%'; document.getElementById('status').innerText='Done da 🔥';
+  showToast('Reel Upload Aayiduchu da 🔥');
+  setTimeout(()=>location.href='reels.html',800);
 }
 </script></body></html>
