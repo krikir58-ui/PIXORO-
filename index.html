@@ -53,6 +53,12 @@ html{background:#000}body{background:#000!important;color:#fff;max-width:450px;m
 <div id="trendBar" class="trendBar" style="display:none"></div>
 <div id="feed"><div class="skel"></div><div class="skel"></div></div>
 <div id="toast" class="toast"></div>
+<!-- PIXORO KUTTY BOX DA - UPLOAD BACKGROUND LA DA - CORRECT ADD PANNITEN DA -->
+<div id="miniBox" style="position:fixed;bottom:64px;left:12px;right:12px;max-width:426px;margin:auto;background:#1a0b2e;border:1px solid #a259ff;border-radius:14px;padding:10px;display:none;z-index:2000;align-items:center;gap:10px">
+<img id="miniImg" style="width:44px;height:60px;object-fit:cover;border-radius:8px">
+<div style="flex:1"><div style="font-weight:700;font-size:13px">Uploading Reel... <span id="miniPct">0%</span></div><div style="font-size:11px;color:#aaa" id="miniTxt">Mella Upload Aaguthu da - Feed Paakalam da</div><div style="height:6px;background:#333;border-radius:20px;overflow:hidden;margin-top:6px"><div id="miniFill" style="height:100%;width:0%;background:linear-gradient(90deg,#7b2fff,#ff2dcc);transition:.3s"></div></div></div>
+<span onclick="document.getElementById('miniBox').style.display='none'" style="cursor:pointer">✕</span>
+</div>
 <div class="bottom-nav">
 <a class="active" href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
 <a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
@@ -64,7 +70,6 @@ html{background:#000}body{background:#000!important;color:#fff;max-width:450px;m
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
 <div id="choice" class="choiceSheet" onclick="if(event.target==this)hideChoice()"><div style="background:#1a1a1a;border-radius:28px 28px 0 0;padding:20px 0 30px;width:100%;max-width:450px"><div style="width:50px;height:5px;background:#333;border-radius:10px;margin:0 auto 16px"></div><div style="text-align:center;font-size:22px;font-weight:900;margin-bottom:10px">Create</div><div class="createRow" onclick="location.href='post-create.html'"><div class="createIco">+</div><div style="flex:1"><b>Post</b><div style="font-size:12px;color:#888">Share a photo</div></div><span>></span></div><div class="createRow" onclick="location.href='reel-create.html'"><div class="createIco">></div><div style="flex:1"><b>Reels</b><div style="font-size:12px;color:#888">Create a short reel</div></div><span>></span></div><div class="createRow" onclick="location.href='story-upload.html'"><div class="createIco">O</div><div style="flex:1"><b>Story</b><div style="font-size:12px;color:#888">Share 24h story</div></div><span>></span></div><div onclick="hideChoice()" style="text-align:center;padding:14px;color:#777">Cancel</div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<!-- CORE MATTUM DA - supabase.js DELETE PANNITEN DA - DOUBLE CLIENT = FLICKER DA -->
 <script src="js/pixoro-core.js?v=213"></script>
 <script>
   function enableNotif(){ location.href='notifications.html'; }
@@ -163,7 +168,6 @@ async function pixoroCheckBell(){
 }
 window.pixoroCheckBell = pixoroCheckBell;
 setInterval(pixoroCheckBell, 15000);
-// ===== CHECK LOGIN - CORRECTED - FLICKER FIX DA =====
 let AUTH_DONE = false;
 async function checkLogin(){
   for(let i=0;i<50;i++){ if(window.supa) break; await new Promise(r=>setTimeout(r,200)); }
@@ -192,7 +196,6 @@ async function checkLogin(){
   try{ if(window.pixoroLoadFollowing) await window.pixoroLoadFollowing(); }catch(e){ console.log('Follow load fail - Feed continue da'); }
   loadAll();
 }
-// ===== LOAD ALL - CORRECTED - SYNTAX ERROR FIX DA =====
 async function loadAll(){
   try{
     supa=getSupa();if(!supa)return;
@@ -333,5 +336,50 @@ async function addComment(){
   }
   document.getElementById('commentInput').value='';openComment(window.currentPostId)
 }
+// PIXORO KUTTY BOX DA - CORRECT ADD PANNITEN DA - NO LOCALSTORAGE DA - URL LA THAAN DA
+function checkMiniUpload(){
+  let up=new URLSearchParams(location.search);
+  let uploading=up.get('uploading');
+  let media=up.get('media');
+  if(!uploading || !media) return;
+  let box=document.getElementById('miniBox');
+  if(!box) return;
+  box.style.display='flex';
+  document.getElementById('miniImg').src=media;
+  document.getElementById('miniPct').innerText='10%';
+  document.getElementById('miniFill').style.width='10%';
+  document.getElementById('miniTxt').innerText='Mella Upload Aaguthu da - Feed Paakalam da';
+  let tries=0;
+  let iv=setInterval(async ()=>{
+    tries++;
+    let pct=Math.min(90, 10 + tries*15);
+    document.getElementById('miniFill').style.width=pct+'%';
+    document.getElementById('miniPct').innerText=pct+'%';
+    try{
+      let s=getSupa();
+      if(s){
+        let {data}=await s.from('posts').select('id').eq('media_url',media).limit(1);
+        if(data && data.length){
+          clearInterval(iv);
+          document.getElementById('miniFill').style.width='100%';
+          document.getElementById('miniPct').innerText='100%';
+          document.getElementById('miniTxt').innerText='Done da 🔥 - Reel Feed la Irukku da';
+          showToast('Reel Upload Done da 🔥');
+          setTimeout(()=>{box.style.display='none';},2500);
+          if(typeof loadAll==='function') loadAll();
+          return;
+        }
+      }
+    }catch(e){}
+    if(tries>10){
+      clearInterval(iv);
+      document.getElementById('miniFill').style.width='100%';
+      document.getElementById('miniPct').innerText='100%';
+      document.getElementById('miniTxt').innerText='Done da 🔥';
+      setTimeout(()=>{box.style.display='none';},2000);
+    }
+  },1200);
+}
+checkMiniUpload();
 checkLogin()
 </script></body></html>
