@@ -83,6 +83,12 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 </div></div>
 <div class="reelWrap" id="reelWrap"></div>
 <div id="toast" class="toast"></div>
+<!-- PIXORO KUTTY BOX DA - UPLOAD BACKGROUND LA DA - CORRECT ADD PANNITEN DA -->
+<div id="miniBox" style="position:fixed;bottom:76px;left:12px;right:12px;max-width:426px;margin:auto;background:#1a0b2e;border:1px solid #a259ff;border-radius:14px;padding:10px;display:none;z-index:2000;align-items:center;gap:10px">
+<img id="miniImg" style="width:44px;height:60px;object-fit:cover;border-radius:8px">
+<div style="flex:1"><div style="font-weight:700;font-size:13px;color:#fff">Uploading Reel... <span id="miniPct">0%</span></div><div style="font-size:11px;color:#aaa" id="miniTxt">Mella Upload Aaguthu da - Reels Paakalam da</div><div style="height:6px;background:#333;border-radius:20px;overflow:hidden;margin-top:6px"><div id="miniFill" style="height:100%;width:0%;background:linear-gradient(90deg,#7b2fff,#ff2dcc);transition:.3s"></div></div></div>
+<span onclick="document.getElementById('miniBox').style.display='none'" style="cursor:pointer;color:#fff">✕</span>
+</div>
 <div class="bottom-nav">
 <a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
 <a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
@@ -133,7 +139,6 @@ async function pixoroCheckBell(){
   }catch(e){}
 }
 setInterval(pixoroCheckBell, 15000);
-// ===== INIT - CORRECTED - FLICKER FIX DA =====
 async function init(){
   if(_INIT_DONE) return; _INIT_DONE=true;
   supa=await waitSupa();if(!supa){_INIT_DONE=false;return;}
@@ -329,14 +334,12 @@ function openFriendProfile(){ if(curSheetUser) location.href='profile.html?u='+c
 window.openFriendProfile=openFriendProfile;
 function editReel(){ if(curSheetId) location.href='edit.html?id='+curSheetId; }
 function shareQR(){ let link=location.origin+'/reels.html?id='+curSheetId; navigator.clipboard.writeText(link); closeSheet('ownerSheet'); }
-// ===== DELETE / HIDE - CORRECTED DA - GLOBAL ARCHIVE ILLA DA =====
 async function deleteSafe(){
   if(!curSheetId) return;
   let p = allPosts.find(x=>String(x.id)===String(curSheetId));
   if(p && !isMyPostObj(p)){ showToast('Un reel mattum delete panna mudiyum da'); closeSheet('ownerSheet'); return; }
   if(hiddenPosts.includes(String(curSheetId))) return;
   hiddenPosts.push(String(curSheetId));
-  // Owner mattum - posts la archive pannu da - reels la is_archived illa da
   if(p && p._from==='posts') supa.from('posts').update({is_archived:true}).eq('id',curSheetId).then(()=>{});
   if(p && p._from==='reels') supa.from('posts').update({is_archived:true}).eq('id',curSheetId).then(()=>{});
   setTimeout(()=>render(),200); closeSheet('ownerSheet'); showToast('Deleted da');
@@ -345,13 +348,11 @@ async function saveReel(){ await saveR(curSheetId); closeSheet('viewerSheet'); }
 function copyLinkSafe(){ let link=location.origin+'/reels.html?id='+curSheetId; navigator.clipboard.writeText(link); closeSheet('viewerSheet'); closeSheet('shareSheet'); }
 function shareWA(){ let link=location.origin+'/reels.html?id='+curShareId; window.open('https://wa.me/?text='+encodeURIComponent(link),'_blank'); }
 async function notInterestedSafe(){
-  // LOCAL MATTUM DA - DB ah THODAATHA DA - Ellaarukum maraiyathu da
   if(hiddenPosts.includes(String(curSheetId))){closeSheet('viewerSheet');return;}
   hiddenPosts.push(String(curSheetId));
   setTimeout(()=>render(),200); closeSheet('viewerSheet'); showToast('Show less da - OK da');
 }
 async function hideReelSafe(){
-  // LOCAL MATTUM DA - DB ah THODAATHA DA
   if(hiddenPosts.includes(String(curSheetId))){closeSheet('viewerSheet');return;}
   hiddenPosts.push(String(curSheetId));
   setTimeout(()=>render(),200); closeSheet('viewerSheet'); showToast('Hidden for you da');
@@ -391,5 +392,50 @@ async function saveR(id){
     }
   } finally { savingIds.delete(id); }
 }
+// PIXORO KUTTY BOX DA - CORRECT ADD PANNITEN DA - NO LOCALSTORAGE DA - URL LA THAAN DA
+function checkMiniUpload(){
+  let up=new URLSearchParams(location.search);
+  let uploading=up.get('uploading');
+  let media=up.get('media');
+  if(!uploading || !media) return;
+  let box=document.getElementById('miniBox');
+  if(!box) return;
+  box.style.display='flex';
+  document.getElementById('miniImg').src=media;
+  document.getElementById('miniPct').innerText='10%';
+  document.getElementById('miniFill').style.width='10%';
+  document.getElementById('miniTxt').innerText='Mella Upload Aaguthu da - Reels Paakalam da';
+  let tries=0;
+  let iv=setInterval(async ()=>{
+    tries++;
+    let pct=Math.min(90, 10 + tries*15);
+    document.getElementById('miniFill').style.width=pct+'%';
+    document.getElementById('miniPct').innerText=pct+'%';
+    try{
+      let s=window.supa;
+      if(s){
+        let {data}=await s.from('posts').select('id').eq('media_url',media).limit(1);
+        if(data && data.length){
+          clearInterval(iv);
+          document.getElementById('miniFill').style.width='100%';
+          document.getElementById('miniPct').innerText='100%';
+          document.getElementById('miniTxt').innerText='Done da 🔥 - Reel Reels la Irukku da';
+          showToast('Reel Upload Done da 🔥');
+          setTimeout(()=>{box.style.display='none';},2500);
+          if(typeof load==='function') load();
+          return;
+        }
+      }
+    }catch(e){}
+    if(tries>10){
+      clearInterval(iv);
+      document.getElementById('miniFill').style.width='100%';
+      document.getElementById('miniPct').innerText='100%';
+      document.getElementById('miniTxt').innerText='Done da 🔥';
+      setTimeout(()=>{box.style.display='none';},2000);
+    }
+  },1200);
+}
+checkMiniUpload();
 init()
 </script></body></html>
