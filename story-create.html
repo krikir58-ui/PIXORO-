@@ -3,16 +3,18 @@
 <script src="js/pixoro-core.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/index.umd.js"></script>
 <style>
-*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;background:radial-gradient(circle at 20% 0%,#ff149333,transparent 50%),radial-gradient(circle at 80% 80%,#ff7a0033,transparent 50%),#000}
-.top{padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #262626;align-items:center}.top b{font-size:18px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.prev{margin:12px;height:400px;background:#111;border:2px dashed #ff5ea8;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden}.prev img,.prev video{width:100%;height:100%;object-fit:cover}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 12px}.cell{aspect-ratio:1;background:#111;border:1px solid #262626;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;font-weight:700}
+*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;padding-bottom:80px;background:radial-gradient(circle at 20% 0%,#ff149333,transparent 50%),radial-gradient(circle at 80% 80%,#ff7a0033,transparent 50%),#000}
+.top{padding:14px;display:flex;justify-content:space-between;align-items:center}.top b{font-size:22px;font-weight:900}.top b i{color:#FF2DCC;font-style:normal}
+.pills{display:flex;gap:8px;padding:6px 12px}.pills b{flex:1;text-align:center;padding:12px;border-radius:999px;background:#1a1a1a;font-size:13px;color:#ccc}.pills b.on{background:linear-gradient(90deg,#7b2fff,#FF2DCC);color:#fff}
+.row{display:flex;justify-content:space-between;padding:12px}.row b{background:#1a1a1a;padding:8px 12px;border-radius:999px;font-size:13px}
+.prev{margin:0 12px;height:360px;background:#111;border:2px dashed #ff5ea8;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden}.prev img,.prev video{width:100%;height:100%;object-fit:cover}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px}.cell{aspect-ratio:1;background:#111;border:1px solid #262626;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-weight:700;font-size:13px}
+.empty{text-align:center;color:#888;padding:10px 20px;font-size:13px}
 .btn{margin:12px;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);border:0;width:calc(100% - 24px);padding:14px;border-radius:25px;font-weight:900;color:#fff;font-size:16px}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;display:none;white-space:nowrap}
 .progress{margin:0 12px;background:#111;border:1px solid #a259ff;border-radius:12px;padding:10px;display:none}.bar{height:6px;background:#333;border-radius:10px;overflow:hidden;margin-top:6px}.barFill{height:100%;background:linear-gradient(90deg,#ff5ea8,#ff7a00);width:0%}
 .pollBox{margin:0 12px;background:#111;border:1px solid #333;border-radius:16px;padding:12px}.pollBox input{width:100%;background:#222;border:1px solid #ff5ea8;color:#fff;padding:10px;border-radius:10px;margin-top:8px;outline:none}.pollOpt{display:flex;gap:8px;margin-top:8px}.pollOpt input{flex:1}
 .bgBox{margin:12px;background:#111;border:1px solid #00d4ff;border-radius:16px;padding:12px}.bgBox button{flex:1;padding:12px;border-radius:25px;font-weight:800;cursor:pointer;color:#fff}
-/* INSTAGRAM MARI - BACKGROUND UPLOAD DA */
 #bgBar{position:fixed;top:0;left:0;right:0;max-width:450px;margin:auto;background:#111;border-bottom:1px solid #262626;padding:10px 12px;display:none;z-index:1000}
 #bgBar .row{display:flex;gap:10px;align-items:center}
 #bgBar img{width:44px;height:60px;object-fit:cover;border-radius:8px;background:#222}
@@ -22,26 +24,23 @@
 .feedCard{margin:12px;border:1px solid #262626;border-radius:16px;overflow:hidden}
 .feedCard img,.feedCard video{width:100%;max-height:500px;object-fit:cover;background:#111}
 .feedCard .meta{padding:10px;font-size:13px}
-.bottomNav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:auto;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;padding:12px;z-index:1000}
-.bottomNav span{font-size:22px;cursor:pointer}
+.tabs{display:flex;justify-content:center;gap:18px;padding:14px;border-top:1px solid #222;position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:auto;background:#000;z-index:10}.tabs b{font-size:12px;letter-spacing:1px;color:#888;cursor:pointer}.tabs b.on{color:#fff;border-bottom:2px solid #FF2DCC;padding-bottom:4px}
 </style></head><body>
-<!-- STORY CREATE PAGE -->
 <div id="createPage">
-<div class="top"><b>PIXORO New Story ⭐</b><span onclick="location.href='index.html'" style="font-size:20px;cursor:pointer;background:#222;width:32px;height:32px;border-radius:50%;display:grid;place-items:center">✕</span></div>
+<div class="top"><b>✕ PIX<i>O</i>RO - New story</b><span>📷</span></div>
+<div class="pills"><b class="on">✨ Edits</b><b>📝 Drafts</b><b>🎬 Templates</b></div>
+<div class="row"><b>Recents ∨</b><b onclick="document.getElementById('f').click()">☑ Select</b></div>
 <div class="prev" id="prev">⭐ Photo / Video Select Pannu</div>
-<div class="grid"><div class="cell" onclick="location.href='camera.html?type=story'">📷 Camera</div><div class="cell" onclick="document.getElementById('f').click()">🖼️ Gallery</div><div class="cell" onclick="document.getElementById('f').click()">➕ Add</div></div>
+<div class="grid"><div class="cell" onclick="location.replace('camera.html?type=story')">📷<br>Camera</div><div class="cell" onclick="document.getElementById('f').click()">🖼️<br>Gallery</div><div class="cell" onclick="document.getElementById('f').click()">➕<br>Add</div></div>
+<div class="empty" id="emptyMsg">Un Gallery la irunthu Photo select pannu da 📷<br>Effect Next Page la Irukku da - Inga Illa da ✅</div>
 <div class="bgBox"><b>✂️ Background Remove Block</b><div style="display:flex;gap:8px;margin-top:10px"><button id="rmBgBtn" onclick="removeBG()" style="background:linear-gradient(90deg,#00d4ff,#a259ff);border:0">✂️ Remove BG</button><button onclick="resetBG()" style="background:#222;border:1px solid #333">↩️ Original</button></div><div style="font-size:11px;color:#888;margin-top:6px">Image ku mattum da - Video ku aagathu da</div></div>
 <div class="pollBox"><b>📊 Poll Add Pannu da</b><input id="pollQ" placeholder="Question - Ex: Pudichirukka?"><div class="pollOpt"><input id="pollO1" placeholder="🔥 Yes" value="Yes"><input id="pollO2" placeholder="😴 No" value="No"></div><div style="font-size:11px;color:#888;margin-top:6px">Poll venda na empty ah vidu da</div></div>
 <div class="progress" id="prog"><div style="display:flex;justify-content:space-between;font-size:11px;color:#aaa"><span id="progText">Compressing... 💾</span><span id="progSize"></span></div><div class="bar"><div class="barFill" id="progFill"></div></div></div>
 <button class="btn" onclick="go()">Next → 🔥</button>
 </div>
-
-<!-- INSTAGRAM MARI - BACKGROUND BAR -->
-<div id="bgBar"><div class="row"><img id="bgThumb"><div style="flex:1"><div style="font-size:13px;font-weight:700">Uploading Story... <span id="bgPct">0%</span></div><div style="font-size:11px;color:#999" id="bgTxt">Mella Upload Aaguthu da - Neenga Feed Paakalam da</div><div class="bar"><div id="bgFill"></div></div></div><span onclick="location.href='index.html'" style="font-size:20px">✕</span></div></div>
-
-<!-- HOME FEED - CREATE CLOSE AANA ODANE - INGA VARUM DA -->
-<div id="feed"><div class="top"><b>PIXORO ⭐</b><span onclick="location.href='index.html'">🏠</span></div><div id="feedList"></div><div class="bottomNav"><span onclick="location.href='index.html'">🏠</span><span onclick="location.href='reels.html'">🎬</span><span onclick="location.href='story-create.html'">➕</span><span onclick="location.href='profile.html'">👤</span></div></div>
-
+<div id="bgBar"><div class="row"><img id="bgThumb"><div style="flex:1"><div style="font-size:13px;font-weight:700">Uploading Story... <span id="bgPct">0%</span></div><div style="font-size:11px;color:#999" id="bgTxt">Mella Upload Aaguthu da - Neenga Feed Paakalam da</div><div class="bar"><div id="bgFill"></div></div></div><span onclick="location.replace('index.html')" style="font-size:20px">✕</span></div></div>
+<div id="feed"><div class="top"><b>PIXORO ⭐</b><span onclick="location.replace('index.html')">🏠</span></div><div id="feedList"></div></div>
+<div class="tabs"><b class="on">STORY</b><b onclick="location.replace('post-create.html')">POST</b><b onclick="location.replace('reel-create.html')">REEL</b><b onclick="location.replace('live.html')">LIVE</b></div>
 <div id="toast" class="toast"></div>
 <input type="file" id="f" hidden accept="image/*,video/*" onchange="h(event)">
 <script>
@@ -53,39 +52,36 @@ let ME_RAW='', ME_ID=null, originalM='', noBgM=''
 async function checkAuth(){
   if(!window.supa){ setTimeout(checkAuth,300); return }
   supa=window.supa;
-  let {data:{session}}=await supa.auth.getSession(); if(!session){ location.href='login.html'; return }
+  let {data:{session}}=await supa.auth.getSession(); if(!session){ location.replace('login.html'); return }
   ME_ID=session.user.id;
   let {data:profile}=await supa.from('profiles').select('*').eq('id',ME_ID).single();
   ME_RAW=cleanUser(profile?.username||session.user.email.split('@')[0]);
 }
 checkAuth()
 let urlP=new URLSearchParams(location.search); let m=urlP.get('media')||''; let mType=urlP.get('type')||'image';
-if(m){ document.getElementById('prev').innerHTML=mType==='video'?`<video src="${decodeURIComponent(m)}" autoplay loop controls></video>`:`<img src="${decodeURIComponent(m)}">`; m=decodeURIComponent(m); originalM=m; }
+if(m){ document.getElementById('prev').innerHTML=mType==='video'?`<video src="${decodeURIComponent(m)}" autoplay loop controls></video>`:`<img src="${decodeURIComponent(m)}">`; m=decodeURIComponent(m); originalM=m; document.getElementById('emptyMsg').style.display='none'; }
 async function compressImage(file){ return new Promise(res=>{ let img=new Image(); let url=URL.createObjectURL(file); img.onload=()=>{ let w=img.width,h=img.height; let maxW=720; if(w>maxW){ h=h*maxW/w; w=maxW; } let c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); c.toBlob(b=>{ res(new File([b],file.name.replace(/\.[^.]+$/,'')+'.jpg',{type:'image/jpeg'})); },'image/jpeg',0.72); URL.revokeObjectURL(url); }; img.onerror=()=>res(file); img.src=url; }); }
 async function removeBG(){ if(!m){ showToast('Photo select pannu da!'); return } if(mType==='video'){ showToast('Video ku BG remove aagathu da!'); return } let btn=document.getElementById('rmBgBtn'); btn.innerText='⏳ Removing...'; try{ originalM=m; let blob=await ImglyBackgroundRemoval.removeBackground(m); let url=URL.createObjectURL(blob); noBgM=url; document.getElementById('prev').innerHTML=`<img src="${url}" style="background:repeating-conic-gradient(#333 0% 25%,#111 0% 50%) 50% / 20px 20px">`; let file=new File([blob],'pixoro-nobg-'+Date.now()+'.png',{type:'image/png'}); let fileName=Date.now()+'_'+ME_RAW+'_nobg.png'; let {error}=await supa.storage.from('stories').upload(fileName,file); if(!error){ let {data}=supa.storage.from('stories').getPublicUrl(fileName); m=data.publicUrl; mType='image'; showToast('Background Removed da! 🔥'); } else showToast('Preview Ready da - Upload Fail: '+error.message); }catch(e){ showToast('BG Remove Fail da - Vera photo try pannu'); } btn.innerText='✂️ Remove BG'; }
 function resetBG(){ if(!originalM){ showToast('Original illa da!'); return } m=originalM; noBgM=''; document.getElementById('prev').innerHTML=`<img src="${m}">`; showToast('Original Restore da ↩️'); }
 async function h(e){
-let f=e.target.files[0]; if(!f) return; document.getElementById('prog').style.display='block'; document.getElementById('progText').innerText='Compressing... 💾'; document.getElementById('progSize').innerText='Original: '+formatSize(f.size); document.getElementById('progFill').style.width='30%';
+let f=e.target.files[0]; if(!f) return; document.getElementById('emptyMsg').style.display='none'; document.getElementById('prog').style.display='block'; document.getElementById('progText').innerText='Compressing... 💾'; document.getElementById('progSize').innerText='Original: '+formatSize(f.size); document.getElementById('progFill').style.width='30%';
 if(f.type.startsWith('video/')){ if(f.size>10*1024*1024){ showToast('Story Video perusu da! 10MB kulla eduthuko'); document.getElementById('prog').style.display='none'; e.target.value=''; return } let u=URL.createObjectURL(f); let vid=document.createElement('video'); vid.preload='metadata'; vid.onloadedmetadata=async()=>{ if(vid.duration>20){ showToast('Story 15 sec kulla irukanum da!'); e.target.value=''; return } document.getElementById('prev').innerHTML=`<video src="${u}" autoplay loop controls></video>`; document.getElementById('progFill').style.width='70%'; let fileName=Date.now()+'_'+ME_RAW+'_'+f.name.replace(/[^a-zA-Z0-9.]/g,'_'); let {error}=await supa.storage.from('stories').upload(fileName,f); if(error){ showToast('Upload Fail: '+error.message); return } let {data}=supa.storage.from('stories').getPublicUrl(fileName); m=data.publicUrl; mType='video'; originalM=m; document.getElementById('progFill').style.width='100%'; document.getElementById('progText').innerText='Story Ready ✅ - 24h la Delete aagidum'; showToast('Story Ready da! ⭐ Next ku po'); }; vid.src=u; }
 else{ let uploadFile=await compressImage(f); let url=URL.createObjectURL(uploadFile); document.getElementById('prev').innerHTML=`<img src="${url}">`; document.getElementById('progFill').style.width='70%'; let fileName=Date.now()+'_'+ME_RAW+'_'+uploadFile.name.replace(/[^a-zA-Z0-9.]/g,'_'); let {error}=await supa.storage.from('stories').upload(fileName,uploadFile); if(error){ showToast('Upload Fail: '+error.message); return } let {data}=supa.storage.from('stories').getPublicUrl(fileName); m=data.publicUrl; mType='image'; originalM=m; document.getElementById('progFill').style.width='100%'; document.getElementById('progText').innerText='Compressed ✅ '+formatSize(f.size)+' → '+formatSize(uploadFile.size); showToast('Story Compressed da! ⭐'); }
 }
-// *** MAIN FIX DA - NEXT THOTTA - PAGE CLOSE - FEED OPEN - BACKGROUND LA POGUM DA ***
 function go(){
   if(!m){ showToast('Story select pannu da!'); return }
   let poll={q:document.getElementById('pollQ').value.trim(), o1:document.getElementById('pollO1').value.trim()||'Yes', o2:document.getElementById('pollO2').value.trim()||'No'};
   if(poll.q) localStorage.setItem('pixoro_poll',JSON.stringify(poll)); else localStorage.removeItem('pixoro_poll');
-  // 1. CREATE PAGE AH - FULL CLOSE DA - INSTAGRAM MARI
   document.getElementById('createPage').style.display='none';
   document.getElementById('feed').style.display='block';
   document.getElementById('bgBar').style.display='block';
   document.getElementById('bgThumb').src=m;
   loadFeed();
   showToast('Uploading in Background da ⭐ - Feed Paakalam da');
-  // 2. BACKGROUND BAR - MELLA POGUM DA
   let p=0; let iv=setInterval(()=>{
     p+=20; if(p>100) p=100;
     document.getElementById('bgFill').style.width=p+'%'; document.getElementById('bgPct').innerText=p+'%';
-    if(p>=100){ clearInterval(iv); document.getElementById('bgTxt').innerText='Done da ⭐ - Story Ready da'; showToast('Story Done da ⭐'); setTimeout(()=>{ location.href='story-add.html?media='+encodeURIComponent(m)+'&type='+mType; },1200); }
+    if(p>=100){ clearInterval(iv); document.getElementById('bgTxt').innerText='Done da ⭐ - Story Ready da'; showToast('Story Done da ⭐'); setTimeout(()=>{ location.replace('story-add.html?media='+encodeURIComponent(m)+'&type='+mType); },1200); }
   },400);
 }
 async function loadFeed(){
