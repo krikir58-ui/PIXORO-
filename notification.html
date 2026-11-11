@@ -14,7 +14,6 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 .logoTxt{font-size:17px;font-weight:800;background:linear-gradient(90deg,#ff8ac2,#c39bff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer;white-space:nowrap}
 .top b{font-size:17px}
 .mark{margin-left:auto;font-size:12px;color:#ff5ea8;cursor:pointer;white-space:nowrap}
-/* ✅ BLOCK MASS LOOK DA */
 .block{display:flex;gap:10px;padding:12px;margin:0 12px 10px;background:#151515;border:1px solid #222;border-radius:14px;align-items:center;cursor:pointer}
 .block.unread{background:#1a1a1a;border-color:#2a2a2a}
 .block img{width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0}
@@ -35,10 +34,16 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 .bottom-nav span{font-size:10px;color:#8e8e8e}
 .bottom-nav a.active span{color:#ff5ea8;font-weight:700}
 .bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #555;background:#111}
+.liveToast{position:fixed;top:70px;left:12px;right:12px;max-width:426px;margin:auto;background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;padding:12px 14px;border-radius:14px;font-weight:700;font-size:14px;z-index:9999;display:none;align-items:center;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.liveToast img{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.liveDot{display:inline-block;width:8px;height:8px;background:#00ff66;border-radius:50%;margin-right:6px;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 </style>
 </head>
 <body>
 <div class="top"><div class="logoBox" onclick="location.href='./index.html'">P</div><div class="logoTxt" onclick="location.href='./index.html'">Pixoro</div><b>Notifications</b><span class="mark" onclick="markAllRead()">Mark all read</span></div>
+<div style="padding:0 14px 6px;font-size:11px;color:#00ff66;font-weight:700"><span class="liveDot"></span><span id="liveStatus">Connecting Live...</span></div>
+<div id="liveToast" class="liveToast" onclick="this.style.display='none'"><img id="liveToastImg" src=""><div id="liveToastTxt"></div></div>
 <div class="tabBar"><div class="active" onclick="filterNot('all',this)">All</div><div onclick="filterNot('like',this)">Likes</div><div onclick="filterNot('follow',this)">Follows</div><div onclick="filterNot('comment',this)">Comments</div></div>
 <div id="notList"><p style="text-align:center;padding:60px;color:#666">Loading...</p></div>
 <div class="bottom-nav">
@@ -49,11 +54,11 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 <a href="./profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a>
 </div>
 <script>
-// ===== CORRECTED v216 - SAME v215 LOGIC - STYLE MATTUM BLOCK MASS DA =====
 let supa = window.supa;
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase() || ''; }
 let ME='', ME_ID='', allNots=[], profileMap={}, profileById={};
 let curFilter = 'all';
+let _liveStarted = false;
 function getPfpById(id, uname){
   let p = profileById[String(id)] || profileMap[cleanUser(uname)];
   if(p && (p.avatar_url || p.profile_pic)) return p.avatar_url || p.profile_pic;
@@ -61,6 +66,24 @@ function getPfpById(id, uname){
   return 'https://ui-avatars.com/api/?name='+encodeURIComponent(c.charAt(0).toUpperCase())+'&background=ff5ea8&color=fff&size=200&bold=true';
 }
 function isToday(t){ if(!t) return false; let d=new Date(t), n=new Date(); return d.getDate()===n.getDate() && d.getMonth()===n.getMonth() && d.getFullYear()===n.getFullYear(); }
+// ✅ LIVE FIX DA - Dedup ah Function ah maathiten da - Pudhu Noti Mela Varum da
+function dedupNots(list){
+  let seen = new Set();
+  let out = [];
+  // list already newest first da - pudhusa vandha athu mela irukkum da
+  for(let n of (list||[])){
+    if(String(n.from_user_id)===String(ME_ID)) continue;
+    if(!['like','follow','comment'].includes(n.type)) continue;
+    let key = n.type + '_' + String(n.from_user_id) + '_' + (n.post_id||'');
+    if(n.type==='follow') key = 'follow_' + String(n.from_user_id);
+    if(seen.has(key)) continue;
+    seen.add(key);
+    let fromProf = profileById[String(n.from_user_id)] || {};
+    let uname = n.from_username || fromProf.username || 'pixoro';
+    out.push({ ...n, from_username: uname, message: n.message || (n.type==='follow' ? 'started following you' : n.type==='like' ? 'liked your post' : n.type==='comment' ? 'commented on your post' : 'sent you a notification') });
+  }
+  return out;
+}
 async function loadNots(){
   try{
     let tries = 0;
@@ -78,27 +101,64 @@ async function loadNots(){
     (profs||[]).forEach(p=>{ profileMap[cleanUser(p.username)] = p; profileById[String(p.id)] = p; });
     let {data:nots, error} = await supa.from('notifications').select('*').eq('to_user_id', ME_ID).order('created_at',{ascending:false}).limit(100);
     if(error) throw new Error(error.message);
-    let seen = new Set();
-    allNots = (nots||[]).filter(n=>{
-      if(String(n.from_user_id)===String(ME_ID)) return false;
-      if(!['like','follow','comment'].includes(n.type)) return false;
-      let key = n.type + '_' + String(n.from_user_id) + '_' + (n.post_id||'');
-      if(n.type==='follow') key = 'follow_' + String(n.from_user_id);
-      if(seen.has(key)) return false;
-      seen.add(key); return true;
-    }).map(n=>{
-      let fromProf = profileById[String(n.from_user_id)] || {};
-      let uname = n.from_username || fromProf.username || 'pixoro';
-      return { ...n, from_username: uname, message: n.message || (n.type==='follow' ? 'started following you' : n.type==='like' ? 'liked your post' : n.type==='comment' ? 'commented on your post' : 'sent you a notification') };
-    });
+    allNots = dedupNots(nots||[]);
     if(!allNots.length){
       document.getElementById('notList').innerHTML = `<div style="text-align:center;padding:60px"><div style="font-size:50px">🔔</div><p style="color:#666;margin-top:10px">No notifications yet da<br><span style="font-size:12px">Like, comment, follow panna inga varum da!</span></p></div>`;
-      return;
+    } else {
+      renderNots('all');
     }
-    renderNots('all');
+    startLive(); // ✅ LIVE START DA
   }catch(e){
     document.getElementById('notList').innerHTML = `<p style="text-align:center;padding:40px;color:#ff5ea8">Error: ${e.message}</p><p style="text-align:center;color:#666;font-size:12px">Supabase la notifications table irukka nu paaru da</p>`;
   }
+}
+// ✅ REAL LIVE - REFRESH PANNAAMA VARUM DA
+function startLive(){
+  if(_liveStarted) return; _liveStarted = true;
+  try{
+    let s = window.supa || supa; if(!s || !ME_ID) { _liveStarted=false; return; }
+    s.channel('pixoro-live-noti-'+ME_ID)
+      .on('postgres_changes', {event:'INSERT', schema:'public', table:'notifications', filter:'to_user_id=eq.'+ME_ID}, (payload)=>{
+        console.log('LIVE NOTI VANDHUCHU DA 🔥', payload.new);
+        let n = payload.new;
+        if(String(n.from_user_id)===String(ME_ID)) return;
+        // Profile theriyaama irundha - fetch pannu da
+        if(!profileById[String(n.from_user_id)]){
+          s.from('profiles').select('*').eq('id', n.from_user_id).maybeSingle().then(({data})=>{ if(data){ profileById[String(data.id)]=data; profileMap[cleanUser(data.username)]=data; renderNots(curFilter); } });
+        }
+        // List la mela add pannu da - Refresh venaam da - Dedup ah thandi pudhusa kaatu da
+        let fromProf = profileById[String(n.from_user_id)] || {};
+        let uname = n.from_username || fromProf.username || 'pixoro';
+        let formatted = { ...n, from_username: uname, message: n.message || (n.type==='follow' ? 'started following you' : n.type==='like' ? 'liked your post' : 'commented on your post') };
+        // Same key irundha - Pazhaya tha thookidu - Pudhusaa mela podu da
+        let key = formatted.type + '_' + String(formatted.from_user_id) + '_' + (formatted.post_id||'');
+        if(formatted.type==='follow') key = 'follow_' + String(formatted.from_user_id);
+        allNots = allNots.filter(x=>{
+          let k2 = x.type + '_' + String(x.from_user_id) + '_' + (x.post_id||'');
+          if(x.type==='follow') k2 = 'follow_' + String(x.from_user_id);
+          return k2 !== key;
+        });
+        allNots.unshift(formatted);
+        renderNots(curFilter);
+        showLiveToast(formatted);
+        try{ navigator.vibrate && navigator.vibrate(200); }catch(e){}
+      })
+      .subscribe((status)=>{
+        console.log('LIVE STATUS:', status);
+        let el=document.getElementById('liveStatus');
+        if(el){
+          if(status==='SUBSCRIBED') el.innerText='Live Connected 🟢 - Refresh Panna Venaam da';
+          else el.innerText='Live Connecting... '+status;
+        }
+      });
+  }catch(e){ console.log('LIVE START FAIL', e); }
+}
+function showLiveToast(n){
+  let pfp = getPfpById(n.from_user_id, n.from_username);
+  document.getElementById('liveToastImg').src=pfp;
+  document.getElementById('liveToastTxt').innerText='@'+cleanUser(n.from_username||'user')+' '+n.message;
+  let t=document.getElementById('liveToast'); t.style.display='flex';
+  setTimeout(()=>t.style.display='none', 4000);
 }
 function oneBlock(n){
   let uname = cleanUser(n.from_username);
