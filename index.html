@@ -46,7 +46,7 @@ html{background:#000}body{background:#000!important;color:#fff;max-width:450px;m
 .skel{height:340px;background:#111;border-radius:20px;margin:10px 8px;animation:sk 1s infinite alternate}
 @keyframes sk{from{opacity:.6}to{opacity:1}}
 </style></head><body>
-<div class="top"><b style="font-size:26px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="location.href='./notifications.html'"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span id="pixoroBellDot" style="display:none;position:absolute;top:-2px;right:2px;width:10px;height:10px;background:#FF0A33;border-radius:50%;border:2px solid #000"></span></div></div></div>
+<div class="top"><b style="font-size:26px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="location.href='./notification.html'"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span id="pixoroBellDot" style="display:none;position:absolute;top:-2px;right:2px;width:10px;height:10px;background:#FF0A33;border-radius:50%;border:2px solid #000"></span></div></div></div>
 <div id="singleBanner" class="singleBanner" style="display:none">Single Post View - <span onclick="location.href='./index.html'" style="text-decoration:underline;cursor:pointer">Back to Feed</span></div>
 <div class="storyBar" id="storyBar"></div>
 <div class="feedTabs"><div class="feedTab active" id="tabForYou" onclick="setFeedMode('foryou')">For You</div><div class="feedTab" id="tabFollowing" onclick="setFeedMode('following')">Following</div><div class="feedTab" id="tabLatest" onclick="setFeedMode('latest')">Latest</div></div>
@@ -70,7 +70,7 @@ html{background:#000}body{background:#000!important;color:#fff;max-width:450px;m
 <div id="choice" class="createBar" onclick="if(event.target==this)hideChoice()"><div class="createPill"><b onclick="location.href='./post-create.html'">POST</b><b onclick="location.href='./reel-create.html'" class="on">REELS</b><b onclick="location.href='./story-upload.html'">STORY</b><b onclick="location.href='./live.html'">LIVE</b></div><div class="createClose" onclick="hideChoice()">Cancel ✕</div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js?v=213"></script>
-<script>function enableNotif(){ location.href='./notifications.html'; }</script>
+<script>function enableNotif(){ location.href='./notification.html'; }</script>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 window.showToast=showToast;
@@ -217,7 +217,7 @@ async function checkLogin(){
 async function loadAll(){
   try{
     supa=getSupa();if(!supa)return;
-    let pr={data:[]},po={data:[]},re={data:[]},li={data:[]},vi={data:[]},sa={data:[]},st={data:[]},fo={data:[]};
+    let pr={data:[]}, po={data:[]}, re={data:[]}, li={data:[]}, vi={data:[]}, sa={data:[]}, st={data:[]}, fo={data:[]};
     try{ pr = await supa.from('profiles').select('*'); }catch(e){}
     try{ po = await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(12); }catch(e){}
     try{ re = await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(12); }catch(e){}
