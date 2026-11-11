@@ -76,9 +76,9 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 .cRow .del{color:#ff3b30;font-size:12px;font-weight:700;cursor:pointer}
 .toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:800;z-index:9999;display:none;white-space:nowrap;max-width:90vw}
 </style></head><body>
+<!-- CORRECTED: BELL REMOVED DA - SEARCH + VOLUME MATTUM DA -->
 <div class="reelsTop"><b>Pixor<span>o</span></b><div class="topRight">
 <div class="searchTopBtn" onclick="location.href='search.html'"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg></div>
-<div class="volBtn" onclick="location.href='notifications.html'"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span id="pixoroBellDot" style="display:none;position:absolute;top:-2px;right:-2px;width:10px;height:10px;background:#FF0A33;border-radius:50%;border:2px solid #000"></span></div>
 <div class="volBtn" id="volIcon" onclick="toggleMuteAll()"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></div>
 </div></div>
 <div class="reelWrap" id="reelWrap"></div>
@@ -129,15 +129,30 @@ let ME_RAW='',ME_ID='',profileMap={},profileByIdMap={},allPosts=[],allLikes=[],a
 async function waitSupa(){for(let i=0;i<30;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
 window.toggleFollow = window.pixoroToggleFollow;
 window.toggleF = window.pixoroToggleFollow;
-async function pixoroCheckBell(){
+
+// ===== SERVER ONLY NOTIF - NO LOCALSTORAGE - NO BELL CHECK IN REELS DA =====
+async function pixoroSendNotification(toUserId, type, postId, msg){
   try{
-    if(!window.supa || !window.ME_ID) return;
-    let {data} = await window.supa.from('notifications').select('id').eq('to_user_id', window.ME_ID).eq('is_read', false).limit(1);
-    let dot = document.getElementById('pixoroBellDot');
-    if(dot) dot.style.display = (data && data.length) ? 'block' : 'none';
-  }catch(e){}
+    if(!toUserId || !ME_ID) return;
+    let targetId = String(toUserId);
+    if(!(targetId.includes('-') && targetId.length>20)){
+      let pr = profileByIdMap[targetId] || profileMap[cleanUser(targetId)];
+      if(pr) targetId = String(pr.id);
+      else { let pp = allPosts.find(p=>cleanUser(p.username)===cleanUser(targetId)); if(pp) targetId = String(pp.user_id); else return; }
+    }
+    if(targetId === String(ME_ID)) return;
+    let s = window.supa || supa; if(!s) return;
+    if(type==='like' && postId){
+      let {data:ex} = await s.from('notifications').select('id').eq('to_user_id',targetId).eq('from_user_id',ME_ID).eq('type','like').eq('post_id',postId).limit(1);
+      if(ex && ex.length) return;
+    }
+    let {error} = await s.from('notifications').insert({ to_user_id: targetId, from_user_id: ME_ID, from_username: ME_RAW, type: type, post_id: postId || null, message: msg, is_read: false });
+    if(error) console.log('Notif Fail:',error.message);
+    else console.log('Notif Sent SERVER:',type);
+  }catch(e){ console.log('Notif Error',e); }
 }
-setInterval(pixoroCheckBell, 15000);
+window.pixoroSendNotification = pixoroSendNotification;
+
 async function init(){
   if(_INIT_DONE) return; _INIT_DONE=true;
   supa=await waitSupa();if(!supa){_INIT_DONE=false;return;}
@@ -225,7 +240,6 @@ window.PIXORO_ID_TO_NAME=window.PIXORO_ID_TO_NAME||{};
 window.PIXORO_NAME_TO_ID=window.PIXORO_NAME_TO_ID||{};
 (Object.values(profileMap)||[]).forEach(pp=>{ window.PIXORO_ID_TO_NAME[String(pp.id)]=cleanUser(pp.username); window.PIXORO_NAME_TO_ID[cleanUser(pp.username)]=String(pp.id); });
 window.PIXORO_FOLLOWING_NAMES=new Set([...window.PIXORO_FOLLOWING].map(id=>cleanUser(window.PIXORO_ID_TO_NAME[id]||'')));
-pixoroCheckBell();
 render();}catch(err){console.log(err)}}
 async function addRealView(postId){
   postId=String(postId);
@@ -309,7 +323,7 @@ async function dblLike(id){
     let {error} = await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});
     if(!error){
       let p = allPosts.find(x=> String(x.id)===String(id));
-      if(p && window.pixoroSendNotification){ await window.pixoroSendNotification(p.user_id, 'like', id, 'liked your post'); }
+      if(p){ await pixoroSendNotification(p.user_id, 'like', id, 'liked your post'); }
     }
   }
 }
@@ -320,7 +334,7 @@ async function toggleLike(id){
     let {error} = await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});
     if(!error){
       let p = allPosts.find(x=> String(x.id)===String(id));
-      if(p && window.pixoroSendNotification){ await window.pixoroSendNotification(p.user_id, 'like', id, 'liked your post'); }
+      if(p){ await pixoroSendNotification(p.user_id, 'like', id, 'liked your post'); }
     }
   } else {
     allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID)));updateLikeUI(id,false);
@@ -366,7 +380,7 @@ async function postComment(){
   let {error} = await supa.from('comments').insert({post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t});
   if(!error){
     let p = allPosts.find(x=> String(x.id)===String(curCommentPost));
-    if(p && window.pixoroSendNotification){ await window.pixoroSendNotification(p.user_id, 'comment', curCommentPost, 'commented: "'+t+'"'); }
+    if(p){ await pixoroSendNotification(p.user_id, 'comment', curCommentPost, 'commented: "'+t+'"'); }
   }
 }
 async function deleteComment(cid,pid){allComments=allComments.filter(c=>String(c.id)!=String(cid));openCommentSheet(pid);supa.from('comments').delete().eq('id',cid).then(()=>{}).catch(()=>{});}
