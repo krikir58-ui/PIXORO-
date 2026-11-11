@@ -1,10 +1,17 @@
-// ===== PIXORO MAIN - SERVER ONLY - v212 - CORRECTED DA =====
-const SUPA_URL ='https://yecpltndhlzfjplzhcpm.supabase.co';
+// ===== PIXORO MAIN - SERVER ONLY - v213 - CORRECTED DA =====
+const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllY3BsdG5kaGx6ZmpwbHpoY3BtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NTkzODksImV4cCI6MjEwNTIzNTM4OX0.I5icBkP7A-Lpt-EJhrOrBDZYG-G9fW8qKbbaQbnQHSM';
 if(!window.supa && window.supabase && window.supabase.createClient){
   window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
   console.log("✅ Pixoro Supa Connected da!");
 }
+
+// ===== GITHUB BASE FIX - ITHU THAAN 404 FIX DA 🔥 =====
+function pixoroGetBase(){
+  return location.href.split('?')[0].split('#')[0].replace(/\/[^\/]*$/,'/') + '';
+}
+window.pixoroGetBase = pixoroGetBase;
+window.getBase = pixoroGetBase;
 
 // ===== GOLD TICK - CORRECTED DA =====
 function isGoldUser(p){
@@ -89,7 +96,7 @@ async function pixoroFixMe(){
     let {data:{session}} = await window.supa.auth.getSession();
     if(session?.user?.id){
       window.ME_ID = session.user.id;
-      let {data:pr} = await window.supa.from('profiles').select('username').eq('id', window.ME_ID).single();
+      let {data:pr} = await window.supa.from('profiles').select('username').eq('id', window.ME_ID).maybeSingle();
       if(pr) window.ME_RAW = pr.username;
       pixoroLoadFollowing();
     }
@@ -99,7 +106,6 @@ async function getAllPixoroPosts(){
   let all = [];
   try{ let r1 = await window.supa.from('posts').select('*').order('created_at',{ascending:false}); if(r1.data) all = all.concat(r1.data.map(p=>({...p,_from:'posts'}))); }catch(e){ console.log('posts fetch fail', e.message); }
   try{ let r2 = await window.supa.from('reels').select('*').order('created_at',{ascending:false}); if(r2.data) all = all.concat(r2.data.map(p=>({...p,_from:'reels'}))); }catch(e){}
-  // DEDUPE DA - posts + reels la same video irundha 2 vaati varum da
   let seen = new Set(), out = [];
   for(let p of all){
     let url = String(p.media_url||p.video_url||'').split('?')[0].toLowerCase();
@@ -110,7 +116,6 @@ async function getAllPixoroPosts(){
   return out;
 }
 function pixoroIsRealPhoto(url){ return true; }
-// ===== ARCHIVE - CORRECTED DA - reels la is_archived illa da =====
 async function pixoroRemoveFromGrid(postId){
   await window.supa.from('posts').update({is_archived:true}).eq('id',postId);
   location.reload();
@@ -182,7 +187,7 @@ function pixoroReelSetup(videoEl, postId, userId){
     lastTap = now;
   });
 }
-// ===== PIXORO NOTIFY - SERVER ONLY - NO LOCALSTORAGE DA =====
+// ===== PIXORO NOTIFY - SERVER ONLY - CORRECTED v213 DA =====
 async function pixoroSendNotification(toUserId, type, postId, message){
   try{
     if(!window.supa) return;
@@ -193,9 +198,19 @@ async function pixoroSendNotification(toUserId, type, postId, message){
     }
     if(!toUserId) return;
     if(String(toUserId) === String(window.ME_ID)) return;
+    // Duplicate check da
+    if(type==='like' && postId){
+      let {data:ex} = await window.supa.from('notifications').select('id').eq('to_user_id',toUserId).eq('from_user_id',window.ME_ID).eq('type','like').eq('post_id',postId).limit(1);
+      if(ex && ex.length) return;
+    }
+    if(type==='follow'){
+      let {data:ex2} = await window.supa.from('notifications').select('id').eq('to_user_id',toUserId).eq('from_user_id',window.ME_ID).eq('type','follow').limit(1);
+      if(ex2 && ex2.length) return;
+    }
     let {error} = await window.supa.from('notifications').insert({
       to_user_id: toUserId,
       from_user_id: window.ME_ID,
+      from_username: window.ME_RAW || 'giri_ceo',
       type: type,
       post_id: postId || null,
       message: message || '',
@@ -207,6 +222,9 @@ async function pixoroSendNotification(toUserId, type, postId, message){
 }
 window.pixoroSendNotification = pixoroSendNotification;
 async function pixoroLike(postId, userId){
+  // Duplicate like check da
+  let {data:ex} = await window.supa.from('likes').select('id').eq('post_id',postId).eq('user_id',window.ME_ID).limit(1);
+  if(ex && ex.length) return;
   let {error} = await window.supa.from('likes').insert({post_id:postId, user_id:window.ME_ID});
   if(error) return;
   if(userId){ await pixoroSendNotification(userId, 'like', postId, 'liked your post'); }
@@ -217,7 +235,7 @@ async function getPixoroExplore(myId, myFollows){
   let all = await getAllPixoroPosts();
   return (all||[]).filter(p=> String(p.user_id)!==String(myId) && !myFollows.includes(String(p.user_id)));
 }
-// ===== SAVE POST - CORRECTED DA - reels ku thani columns da =====
+// ===== SAVE POST - CORRECTED DA =====
 async function pixoroSavePost(fileUrl, isReel, caption){
   let {data:{session}} = await window.supa.auth.getSession();
   if(!session) return;
@@ -225,10 +243,9 @@ async function pixoroSavePost(fileUrl, isReel, caption){
   let {error} = await window.supa.from('posts').insert(row);
   if(error){ console.log('POST SAVE FAIL', error.message); return; }
   if(isReel){
-    // reels table la 6 column mattum da: id, username, video_url, caption, likes, created_at
     await window.supa.from('reels').insert({ username: window.ME_RAW, video_url: fileUrl, caption: caption || 'Just Pixoro', likes: 0 });
   }
-  location.href = 'reels.html';
+  location.href = './reels.html';
 }
 async function loadProfileRealCount(){
   await pixoroFixMe();
@@ -259,7 +276,7 @@ async function pixoroOpenFollowList(type){
     let pr = (profs||[]).find(p=> String(p.id)===String(pid));
     let uname = pr?.username || f.following_name || f.follower_name || 'user';
     let pfp = pr?.avatar_url || pr?.profile_pic || 'https://ui-avatars.com/api/?name='+uname[0]+'&background=fff&color=000';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><img src="${pfp}" onclick="location.href='profile.html?u=${pid}'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer"><b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='profile.html?u=${pid}'">${uname}</b><button onclick="location.href='profile.html?u=${pid}'" style="background:#fff;color:#000;border:0;padding:6px 14px;border-radius:20px;font-weight:700">View</button></div>`;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><img src="${pfp}" onclick="location.href='./profile.html?u=${pid}'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer"><b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='./profile.html?u=${pid}'">${uname}</b><button onclick="location.href='./profile.html?u=${pid}'" style="background:#fff;color:#000;border:0;padding:6px 14px;border-radius:20px;font-weight:700">View</button></div>`;
   }).join('') || `<div style="color:#888;text-align:center;padding:20px">No ${type} yet</div>`;
   let old = document.getElementById('followModal'); if(old) old.remove();
   let m = document.createElement('div'); m.id = 'followModal';
@@ -352,7 +369,7 @@ async function pixoroResolveName(raw){
   if(window.PIXORO_NAME_TO_ID[raw]) return {id: window.PIXORO_NAME_TO_ID[raw], name: raw};
   if(pixoroIsUuid(raw) && window.PIXORO_ID_TO_NAME[raw]) return {id: raw, name: pixoroCleanName(window.PIXORO_ID_TO_NAME[raw])};
   try{
-    let {data} = await window.supa.from('profiles').select('id,username').ilike('username', raw).single();
+    let {data} = await window.supa.from('profiles').select('id,username').ilike('username', raw).maybeSingle();
     if(data && data.id){
       window.PIXORO_ID_TO_NAME[String(data.id)] = pixoroCleanName(data.username);
       window.PIXORO_NAME_TO_ID[pixoroCleanName(data.username)] = String(data.id);
@@ -360,7 +377,7 @@ async function pixoroResolveName(raw){
     }
   }catch(e){}
   try{
-    let {data} = await window.supa.from('posts').select('user_id,username').ilike('username', raw).limit(1).single();
+    let {data} = await window.supa.from('posts').select('user_id,username').ilike('username', raw).limit(1).maybeSingle();
     if(data && data.user_id && pixoroIsUuid(data.user_id)){
       window.PIXORO_NAME_TO_ID[raw] = String(data.user_id);
       window.PIXORO_ID_TO_NAME[String(data.user_id)] = raw;
@@ -422,7 +439,7 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
-console.log('PIXORO CORE v212 SERVER ONLY LOADED');
+console.log('PIXORO CORE v213 SERVER ONLY LOADED');
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
