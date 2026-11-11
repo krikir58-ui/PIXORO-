@@ -10,6 +10,7 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
 body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{padding:12px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #111;position:sticky;top:0;background:#000;z-index:50;height:56px}
+.logo{font-size:22px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer;white-space:nowrap}
 .notItem{display:flex;gap:12px;padding:14px;border-bottom:1px solid #111;align-items:center;cursor:pointer}
 .notItem.unread{background:#111}
 .notItem img{width:44px;height:44px;border-radius:50%;object-fit:cover}
@@ -29,7 +30,7 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 </style>
 </head>
 <body>
-<div class="top"><span onclick="location.href='./index.html'" style="font-size:22px;cursor:pointer">←</span><b style="font-size:19px">Notifications</b><span onclick="markAllRead()" style="margin-left:auto;font-size:12px;color:#ff5ea8;cursor:pointer">Mark all read</span></div>
+<div class="top"><span onclick="location.href='./index.html'" class="logo">← Pixoro</span><b style="font-size:19px">Notifications</b><span onclick="markAllRead()" style="margin-left:auto;font-size:12px;color:#ff5ea8;cursor:pointer">Mark all read</span></div>
 <div class="tabBar"><div class="active" onclick="filterNot('all',this)">All</div><div onclick="filterNot('like',this)">Likes</div><div onclick="filterNot('follow',this)">Follows</div><div onclick="filterNot('comment',this)">Comments</div></div>
 <div id="notList"><p style="text-align:center;padding:60px;color:#666">Loading...</p></div>
 <div class="bottom-nav">
@@ -40,7 +41,7 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 <a href="./profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a>
 </div>
 <script>
-// ===== CORRECTED v214 - SERVER ONLY - NO LOCALSTORAGE DA =====
+// ===== CORRECTED v215 - PIXORO NAME + DEDUP + SELF FILTER DA =====
 let supa = window.supa;
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase() || ''; }
 let ME='', ME_ID='', allNots=[], profileMap={}, profileById={};
@@ -68,7 +69,20 @@ async function loadNots(){
     (profs||[]).forEach(p=>{ profileMap[cleanUser(p.username)] = p; profileById[String(p.id)] = p; });
     let {data:nots, error} = await supa.from('notifications').select('*').eq('to_user_id', ME_ID).order('created_at',{ascending:false}).limit(100);
     if(error) throw new Error(error.message);
-    allNots = (nots||[]).map(n=>{
+    // ✅ ENNA VARUM / VARAATHU - FILTER DA
+    let seen = new Set();
+    allNots = (nots||[]).filter(n=>{
+      // ❌ 1. THANAKKUTHANE - Nee Unakku Panna Like/Follow/Comment - Vara Koodathu da
+      if(String(n.from_user_id)===String(ME_ID)) return false;
+      // ❌ 2. TYPE ILLANA - Vara Koodathu da
+      if(!['like','follow','comment'].includes(n.type)) return false;
+      // ❌ 3. DUPLICATE - Same Aalu + Same Type + Same Post - Thirumba Vara Koodathu da
+      let key = n.type + '_' + String(n.from_user_id) + '_' + (n.post_id||'');
+      // Follow ku Post Illa - Aalu Mattum Podhum da
+      if(n.type==='follow') key = 'follow_' + String(n.from_user_id);
+      if(seen.has(key)) return false;
+      seen.add(key); return true;
+    }).map(n=>{
       let fromProf = profileById[String(n.from_user_id)] || {};
       let uname = n.from_username || fromProf.username || 'pixoro';
       return { ...n, from_username: uname, message: n.message || (n.type==='follow' ? 'started following you' : n.type==='like' ? 'liked your post' : n.type==='comment' ? 'commented on your post' : 'sent you a notification') };
