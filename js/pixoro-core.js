@@ -1,19 +1,15 @@
-// ===== PIXORO MAIN - SERVER ONLY - v213 - CORRECTED DA =====
+// ===== PIXORO MAIN - SERVER ONLY - v214 - CORRECTED DA - DUPLICATE BLOCK REMOVE DA =====
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllY3BsdG5kaGx6ZmpwbHpoY3BtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NTkzODksImV4cCI6MjEwNTIzNTM4OX0.I5icBkP7A-Lpt-EJhrOrBDZYG-G9fW8qKbbaQbnQHSM';
 if(!window.supa && window.supabase && window.supabase.createClient){
   window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
   console.log("✅ Pixoro Supa Connected da!");
 }
-
-// ===== GITHUB BASE FIX - ITHU THAAN 404 FIX DA 🔥 =====
 function pixoroGetBase(){
   return location.href.split('?')[0].split('#')[0].replace(/\/[^\/]*$/,'/') + '';
 }
 window.pixoroGetBase = pixoroGetBase;
 window.getBase = pixoroGetBase;
-
-// ===== GOLD TICK - CORRECTED DA =====
 function isGoldUser(p){
   if(!p) return false;
   if(p.is_gold === true) return true;
@@ -29,7 +25,6 @@ function goldTickHTML(p){
 window.isGoldUser = isGoldUser;
 window.goldTickHTML = goldTickHTML;
 window.getTick = goldTickHTML;
-
 (function(){
   if(document.getElementById('pixoro-speed-css')) return;
   let css = `
@@ -187,7 +182,7 @@ function pixoroReelSetup(videoEl, postId, userId){
     lastTap = now;
   });
 }
-// ===== PIXORO NOTIFY - SERVER ONLY - CORRECTED v213 DA =====
+// ===== PIXORO NOTIFY - v214 FIXED DA - DUPLICATE BLOCK REMOVE + REFRESH LOGIC DA =====
 async function pixoroSendNotification(toUserId, type, postId, message){
   try{
     if(!window.supa) return;
@@ -198,15 +193,17 @@ async function pixoroSendNotification(toUserId, type, postId, message){
     }
     if(!toUserId) return;
     if(String(toUserId) === String(window.ME_ID)) return;
-    // Duplicate check da
-    if(type==='like' && postId){
-      let {data:ex} = await window.supa.from('notifications').select('id').eq('to_user_id',toUserId).eq('from_user_id',window.ME_ID).eq('type','like').eq('post_id',postId).limit(1);
-      if(ex && ex.length) return;
-    }
-    if(type==='follow'){
-      let {data:ex2} = await window.supa.from('notifications').select('id').eq('to_user_id',toUserId).eq('from_user_id',window.ME_ID).eq('type','follow').limit(1);
-      if(ex2 && ex2.length) return;
-    }
+    // ✅ FIX DA - Pazhaya Notification ah Delete Panni - Pudhusaa Podu da - Appo Today la Varum da - Double um Varaathu da
+    // Munnadi - if(exists) return; nu irundhuchu da - Athaan 2d ago la ye Ninnuchu da
+    try{
+      if(type==='like' && postId){
+        await window.supa.from('notifications').delete().eq('to_user_id',toUserId).eq('from_user_id',window.ME_ID).eq('type','like').eq('post_id',postId);
+      }
+      if(type==='follow'){
+        await window.supa.from('notifications').delete().eq('to_user_id',toUserId).eq('from_user_id',window.ME_ID).eq('type','follow');
+      }
+      // Comment ku delete venaam da - Pala comment varalaam da
+    }catch(e){}
     let {error} = await window.supa.from('notifications').insert({
       to_user_id: toUserId,
       from_user_id: window.ME_ID,
@@ -217,12 +214,11 @@ async function pixoroSendNotification(toUserId, type, postId, message){
       is_read: false
     });
     if(error) console.log('NOTIFY SAVE FAIL da', error.message);
-    else console.log('NOTIFY SAVE OK da', type);
-  }catch(e){}
+    else console.log('NOTIFY SAVE OK da 🔥', type);
+  }catch(e){ console.log('NOTIFY ERROR', e); }
 }
 window.pixoroSendNotification = pixoroSendNotification;
 async function pixoroLike(postId, userId){
-  // Duplicate like check da
   let {data:ex} = await window.supa.from('likes').select('id').eq('post_id',postId).eq('user_id',window.ME_ID).limit(1);
   if(ex && ex.length) return;
   let {error} = await window.supa.from('likes').insert({post_id:postId, user_id:window.ME_ID});
@@ -235,7 +231,6 @@ async function getPixoroExplore(myId, myFollows){
   let all = await getAllPixoroPosts();
   return (all||[]).filter(p=> String(p.user_id)!==String(myId) && !myFollows.includes(String(p.user_id)));
 }
-// ===== SAVE POST - CORRECTED DA =====
 async function pixoroSavePost(fileUrl, isReel, caption){
   let {data:{session}} = await window.supa.auth.getSession();
   if(!session) return;
@@ -439,7 +434,7 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
-console.log('PIXORO CORE v213 SERVER ONLY LOADED');
+console.log('PIXORO CORE v214 SERVER ONLY LOADED - DUPLICATE FIX DA');
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
