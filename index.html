@@ -70,9 +70,7 @@ html{background:#000}body{background:#000!important;color:#fff;max-width:450px;m
 <div id="choice" class="createBar" onclick="if(event.target==this)hideChoice()"><div class="createPill"><b onclick="location.href='post-create.html'">POST</b><b onclick="location.href='reel-create.html'" class="on">REELS</b><b onclick="location.href='story-upload.html'">STORY</b><b onclick="location.href='live.html'">LIVE</b></div><div class="createClose" onclick="hideChoice()">Cancel ✕</div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js?v=213"></script>
-<script>
-  function enableNotif(){ location.href='notifications.html'; }
-</script>
+<script>function enableNotif(){ location.href='notifications.html'; }</script>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 window.showToast=showToast;
@@ -80,6 +78,40 @@ function showChoice(){document.getElementById('choice').classList.add('show')} f
 let supa=window.supa;function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase();return u||''}
 let ME_RAW='',ME='',ME_ID='',ME_PFP='',allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=[],allViews=[],viewedStories=[],lastTap=0,feedMode='foryou',curMenuPost=null;
 function getSupa(){return window.supa||supa} window.getSupa=getSupa;
+
+// ===== SERVER ONLY NOTIFICATION - NO LOCALSTORAGE DA =====
+async function pixoroSendNotification(toUserId, type, postId, msg){
+  try{
+    if(!toUserId || !ME_ID) return;
+    let targetId = String(toUserId);
+    // username vantha - ID ah maathu da
+    if(!(targetId.includes('-') && targetId.length>20)){
+      let pr = allProfiles.find(x=>cleanUser(x.username)===cleanUser(targetId));
+      if(pr) targetId = String(pr.id);
+      else { let pp = allPosts.find(p=>cleanUser(p.username)===cleanUser(targetId)); if(pp) targetId = String(pp.user_id); else return; }
+    }
+    if(targetId === String(ME_ID)) return; // thanakkuthane venaam da
+    let s = getSupa(); if(!s) return;
+    // DUPLICATE CHECK - SERVER LA PAARU DA - already like notification iruntha thirumba poda venaam da
+    if(type==='like' && postId){
+      let {data:ex} = await s.from('notifications').select('id').eq('to_user_id',targetId).eq('from_user_id',ME_ID).eq('type','like').eq('post_id',postId).limit(1);
+      if(ex && ex.length) return;
+    }
+    let {error} = await s.from('notifications').insert({
+      to_user_id: targetId,
+      from_user_id: ME_ID,
+      from_username: ME_RAW,
+      type: type,
+      post_id: postId || null,
+      message: msg,
+      is_read: false
+    });
+    if(error) console.log('Notif Fail:',error.message);
+    else console.log('Notif Sent SERVER:',type);
+  }catch(e){ console.log('Notif Error',e); }
+}
+window.pixoroSendNotification = pixoroSendNotification;
+
 function profileById(id){return allProfiles.find(x=>String(x.id)===String(id))||null}
 function profileByName(n){return allProfiles.find(x=>cleanUser(x.username)===cleanUser(n))||null}
 function displayNameFor(u){
@@ -158,10 +190,11 @@ function getBestMedia(p){
   if(m.endsWith('.mp4')||m.endsWith('.mov')||m.endsWith('.webm')||m.endsWith('.m4v')){ return {url: p.media_url||p.video_url, isVid:true}; }
   return {url: p.media_url||p.video_url||'', isVid:false};
 }
+// ===== BELL DOT - SERVER ONLY DA =====
 async function pixoroCheckBell(){
   try{
-    if(!window.supa || !window.ME_ID) return;
-    let {data} = await window.supa.from('notifications').select('id').eq('to_user_id', window.ME_ID).eq('is_read', false).limit(1);
+    if(!getSupa() || !ME_ID) return;
+    let {data} = await getSupa().from('notifications').select('id').eq('to_user_id', ME_ID).eq('is_read', false).limit(1);
     let dot = document.getElementById('pixoroBellDot');
     if(dot) dot.style.display = (data && data.length) ? 'block' : 'none';
   }catch(e){}
@@ -286,9 +319,8 @@ async function doubleLike(id){
   let {error}=await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});
   if(error) console.log('SERVER SAVE FAIL:',error.message);
   else {
-    console.log('SERVER SAVE OK - like');
     let p = allPosts.find(x=> String(x.id)===String(id));
-    if(p && window.pixoroSendNotification){ await window.pixoroSendNotification(p.user_id, 'like', id, 'liked your post'); }
+    if(p){ await pixoroSendNotification(p.user_id, 'like', id, 'liked your post'); }
   }
 }
 async function fastLike(id){
@@ -302,7 +334,7 @@ async function fastLike(id){
       let {error}=await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});
       if(!error){
         let p = allPosts.find(x=> String(x.id)===String(id));
-        if(p && window.pixoroSendNotification){ await window.pixoroSendNotification(p.user_id, 'like', id, 'liked your post'); }
+        if(p){ await pixoroSendNotification(p.user_id, 'like', id, 'liked your post'); }
       }
     }
   } else {
@@ -310,8 +342,32 @@ async function fastLike(id){
     if(supa){ let {error}=await supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID); if(error) console.log('SERVER SAVE FAIL:',error.message); }
   }
 }
-window.toggleFollow = window.pixoroToggleFollow;
-window.toggleF = window.pixoroToggleFollow;
+// ===== FOLLOW WRAPPER - SERVER ONLY - FOLLOW NOTIF DA =====
+(function(){
+  let _tries = 0;
+  let _iv = setInterval(()=>{
+    _tries++;
+    if(window.pixoroToggleFollow && !window.pixoroToggleFollow._wrapped){
+      let _old = window.pixoroToggleFollow;
+      let _wrapped = async function(name, btn){
+        let wasFollowing = btn && btn.classList.contains('following');
+        // core la following check - NAME la irunthu
+        if(!wasFollowing && window.PIXORO_FOLLOWING_NAMES && window.PIXORO_FOLLOWING_NAMES.has(cleanUser(name))) wasFollowing = true;
+        await _old(name, btn);
+        if(!wasFollowing){
+          let pr = profileByName(name);
+          if(pr){ await pixoroSendNotification(pr.id, 'follow', null, 'started following you'); }
+        }
+      };
+      _wrapped._wrapped = true;
+      window.pixoroToggleFollow = _wrapped;
+      window.toggleFollow = _wrapped;
+      window.toggleF = _wrapped;
+      clearInterval(_iv);
+    }
+    if(_tries>20) clearInterval(_iv);
+  },500);
+})();
 async function savePost(id,btn){
   supa=getSupa(); let s=allSaves.some(x=>String(x.post_id)==String(id)&&(x.user_id==ME_ID));
   if(s){
@@ -330,9 +386,8 @@ async function addComment(){
   let {error}=await supa.from('comments').insert({post_id:window.currentPostId,user_id:ME_ID,username:ME_RAW,text:t});
   if(error) console.log('SERVER SAVE FAIL:',error.message);
   else {
-    console.log('SERVER SAVE OK - comment');
     let p = allPosts.find(x=> String(x.id)===String(window.currentPostId));
-    if(p && window.pixoroSendNotification){ await window.pixoroSendNotification(p.user_id, 'comment', window.currentPostId, 'commented: "'+t+'"'); }
+    if(p){ await pixoroSendNotification(p.user_id, 'comment', window.currentPostId, 'commented: "'+t+'"'); }
   }
   document.getElementById('commentInput').value='';openComment(window.currentPostId)
 }
