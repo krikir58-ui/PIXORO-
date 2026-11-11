@@ -78,24 +78,26 @@ function showChoice(){document.getElementById('choice').classList.add('show')} f
 let supa=window.supa;function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase();return u||''}
 let ME_RAW='',ME='',ME_ID='',ME_PFP='',allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=[],allViews=[],viewedStories=[],lastTap=0,feedMode='foryou',curMenuPost=null;
 function getSupa(){return window.supa||supa} window.getSupa=getSupa;
+// ✅ CORRECTED v217 - NOTI FIX DA - DEDUP BLOCK REMOVE + DEBUG DA
 async function pixoroSendNotification(toUserId, type, postId, msg){
   try{
-    if(!toUserId || !ME_ID) return;
+    if(!toUserId || !ME_ID){ console.log('NOTI SKIP - No ID da'); return; }
     let targetId = String(toUserId);
     if(!(targetId.includes('-') && targetId.length>20)){
       let pr = allProfiles.find(x=>cleanUser(x.username)===cleanUser(targetId));
       if(pr) targetId = String(pr.id);
-      else { let pp = allPosts.find(p=>cleanUser(p.username)===cleanUser(targetId)); if(pp) targetId = String(pp.user_id); else return; }
+      else { let pp = allPosts.find(p=>cleanUser(p.username)===cleanUser(targetId)); if(pp && pp.user_id) targetId = String(pp.user_id); else { console.log('NOTI SKIP - User ID Kedaikala da', toUserId); return; } }
     }
-    if(targetId === String(ME_ID)) return;
+    if(targetId === String(ME_ID)){ console.log('NOTI SKIP - Thanakku Thane da'); return; }
     let s = getSupa(); if(!s) return;
-    if(type==='like' && postId){
-      let {data:ex} = await s.from('notifications').select('id').eq('to_user_id',targetId).eq('from_user_id',ME_ID).eq('type','like').eq('post_id',postId).limit(1);
-      if(ex && ex.length) return;
-    }
-    let {error} = await s.from('notifications').insert({ to_user_id: targetId, from_user_id: ME_ID, from_username: ME_RAW, type: type, post_id: postId || null, message: msg, is_read: false });
-    if(error) console.log('Notif Fail:',error.message);
-  }catch(e){ console.log('Notif Error',e); }
+    // ✅ post_id UUID Illa na - null ah anuppu da - Illa na RLS / UUID Error Varum da
+    let safePostId = null;
+    if(postId && String(postId).includes('-') && String(postId).length>20) safePostId = String(postId);
+    console.log('NOTI SEND TRY da ->', type, 'to:', targetId, 'post:', safePostId);
+    let {data, error} = await s.from('notifications').insert({ to_user_id: targetId, from_user_id: ME_ID, from_username: ME_RAW, type: type, post_id: safePostId, message: msg, is_read: false }).select();
+    if(error) console.log('NOTI FAIL da ❌:', error.message, error);
+    else console.log('NOTI SENT da ✅:', data);
+  }catch(e){ console.log('NOTI ERROR da', e); }
 }
 window.pixoroSendNotification = pixoroSendNotification;
 function profileById(id){return allProfiles.find(x=>String(x.id)===String(id))||null}
@@ -288,7 +290,6 @@ function openPostMenu(postId, ownerId){
   document.getElementById('postMenu').classList.add('show');
 }
 function closePostMenu(){document.getElementById('postMenu').classList.remove('show')}
-// ✅ CORRECTED - COPY LINK FIX DA - /PIXORO-/ POGAATHU DA
 function copyPostLink(id){
   let base = location.href.substring(0, location.href.lastIndexOf('/')+1);
   navigator.clipboard.writeText(base + 'index.html?id=' + id);
@@ -332,6 +333,7 @@ async function fastLike(id){
     if(supa){ let {error}=await supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID); if(error) console.log('SERVER SAVE FAIL:',error.message); }
   }
 }
+// ✅ CORRECTED - FOLLOW NOTI - 2 WAY FIX DA - WRAP + CLICK - ETHUVUM MISS AAGAATHU DA
 (function(){
   let _tries = 0;
   let _iv = setInterval(()=>{
@@ -343,8 +345,10 @@ async function fastLike(id){
         if(!wasFollowing && window.PIXORO_FOLLOWING_NAMES && window.PIXORO_FOLLOWING_NAMES.has(cleanUser(name))) wasFollowing = true;
         await _old(name, btn);
         if(!wasFollowing){
-          let pr = profileByName(name);
-          if(pr){ await pixoroSendNotification(pr.id, 'follow', null, 'started following you'); }
+          setTimeout(async ()=>{
+            let pr = profileByName(name);
+            if(pr){ await pixoroSendNotification(pr.id, 'follow', null, 'started following you'); }
+          }, 600);
         }
       };
       _wrapped._wrapped = true;
@@ -353,8 +357,22 @@ async function fastLike(id){
       window.toggleF = _wrapped;
       clearInterval(_iv);
     }
-    if(_tries>20) clearInterval(_iv);
+    if(_tries>40) clearInterval(_iv);
   },500);
+  // Backup - Follow Button Click na - Kooda Notification Pogum da
+  document.addEventListener('click', async (e)=>{
+    let btn = e.target.closest('[data-follow-user]');
+    if(!btn) return;
+    let name = btn.getAttribute('data-follow-user');
+    if(!name) return;
+    setTimeout(async ()=>{
+      let nowFollowing = btn.classList.contains('following') || btn.innerText.includes('Following');
+      if(nowFollowing){
+        let pr = profileByName(name);
+        if(pr){ await pixoroSendNotification(pr.id, 'follow', null, 'started following you'); }
+      }
+    }, 1000);
+  });
 })();
 async function savePost(id,btn){
   supa=getSupa(); let s=allSaves.some(x=>String(x.post_id)==String(id)&&(x.user_id==ME_ID));
