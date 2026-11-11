@@ -76,7 +76,6 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 .cRow .del{color:#ff3b30;font-size:12px;font-weight:700;cursor:pointer}
 .toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:800;z-index:9999;display:none;white-space:nowrap;max-width:90vw}
 </style></head><body>
-<!-- CORRECTED: BELL REMOVED DA - SEARCH + VOLUME MATTUM DA -->
 <div class="reelsTop"><b>Pixor<span>o</span></b><div class="topRight">
 <div class="searchTopBtn" onclick="location.href='search.html'"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg></div>
 <div class="volBtn" id="volIcon" onclick="toggleMuteAll()"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></div>
@@ -129,30 +128,65 @@ let ME_RAW='',ME_ID='',profileMap={},profileByIdMap={},allPosts=[],allLikes=[],a
 async function waitSupa(){for(let i=0;i<30;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
 window.toggleFollow = window.pixoroToggleFollow;
 window.toggleF = window.pixoroToggleFollow;
-
-// ===== SERVER ONLY NOTIF - NO LOCALSTORAGE - NO BELL CHECK IN REELS DA =====
+// ✅ CORRECTED v217 - REELS NOTI FIX DA - DEDUP REMOVE + UUID FIX + DEBUG DA
 async function pixoroSendNotification(toUserId, type, postId, msg){
   try{
-    if(!toUserId || !ME_ID) return;
+    if(!toUserId || !ME_ID){ console.log('NOTI SKIP - No ID da'); return; }
     let targetId = String(toUserId);
     if(!(targetId.includes('-') && targetId.length>20)){
       let pr = profileByIdMap[targetId] || profileMap[cleanUser(targetId)];
       if(pr) targetId = String(pr.id);
-      else { let pp = allPosts.find(p=>cleanUser(p.username)===cleanUser(targetId)); if(pp) targetId = String(pp.user_id); else return; }
+      else { let pp = allPosts.find(p=>cleanUser(p.username)===cleanUser(targetId)); if(pp && pp.user_id) targetId = String(pp.user_id); else { console.log('NOTI SKIP - User ID Kedaikala da', toUserId); return; } }
     }
-    if(targetId === String(ME_ID)) return;
+    if(targetId === String(ME_ID)){ console.log('NOTI SKIP - Thanakku Thane da'); return; }
     let s = window.supa || supa; if(!s) return;
-    if(type==='like' && postId){
-      let {data:ex} = await s.from('notifications').select('id').eq('to_user_id',targetId).eq('from_user_id',ME_ID).eq('type','like').eq('post_id',postId).limit(1);
-      if(ex && ex.length) return;
-    }
-    let {error} = await s.from('notifications').insert({ to_user_id: targetId, from_user_id: ME_ID, from_username: ME_RAW, type: type, post_id: postId || null, message: msg, is_read: false });
-    if(error) console.log('Notif Fail:',error.message);
-    else console.log('Notif Sent SERVER:',type);
-  }catch(e){ console.log('Notif Error',e); }
+    let safePostId = null;
+    if(postId && String(postId).includes('-') && String(postId).length>20) safePostId = String(postId);
+    console.log('NOTI SEND TRY da ->', type, 'to:', targetId, 'post:', safePostId);
+    let {data, error} = await s.from('notifications').insert({ to_user_id: targetId, from_user_id: ME_ID, from_username: ME_RAW, type: type, post_id: safePostId, message: msg, is_read: false }).select();
+    if(error) console.log('NOTI FAIL da ❌:', error.message, error);
+    else console.log('NOTI SENT da ✅:', data);
+  }catch(e){ console.log('NOTI ERROR da', e); }
 }
 window.pixoroSendNotification = pixoroSendNotification;
-
+// ✅ FOLLOW - 2 WAY FIX DA - WRAP + CLICK BACKUP DA
+(function(){
+  let _tries=0;
+  let _iv=setInterval(()=>{
+    _tries++;
+    if(window.pixoroToggleFollow && !window.pixoroToggleFollow._wrapped){
+      let _old=window.pixoroToggleFollow;
+      let _wrapped=async function(name, btn){
+        let wasFollowing = btn && btn.classList.contains('following');
+        if(!wasFollowing && window.PIXORO_FOLLOWING_NAMES && window.PIXORO_FOLLOWING_NAMES.has(cleanUser(name))) wasFollowing=true;
+        await _old(name, btn);
+        if(!wasFollowing){
+          setTimeout(async ()=>{
+            let pr = profileMap[cleanUser(name)];
+            if(pr) await pixoroSendNotification(pr.id, 'follow', null, 'started following you');
+          }, 600);
+        }
+      };
+      _wrapped._wrapped=true;
+      window.pixoroToggleFollow=_wrapped; window.toggleFollow=_wrapped; window.toggleF=_wrapped;
+      clearInterval(_iv);
+    }
+    if(_tries>40) clearInterval(_iv);
+  },500);
+  document.addEventListener('click', async (e)=>{
+    let btn=e.target.closest('[data-follow-user]');
+    if(!btn) return;
+    let name=btn.getAttribute('data-follow-user');
+    if(!name) return;
+    setTimeout(async ()=>{
+      let nowFollowing = btn.classList.contains('following') || btn.innerText.includes('Following');
+      if(nowFollowing){
+        let pr=profileMap[cleanUser(name)];
+        if(pr) await pixoroSendNotification(pr.id, 'follow', null, 'started following you');
+      }
+    }, 1000);
+  });
+})();
 async function init(){
   if(_INIT_DONE) return; _INIT_DONE=true;
   supa=await waitSupa();if(!supa){_INIT_DONE=false;return;}
