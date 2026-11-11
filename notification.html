@@ -9,16 +9,24 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
 body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
-.top{padding:12px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #111;position:sticky;top:0;background:#000;z-index:50;height:56px}
-.logo{font-size:22px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer;white-space:nowrap}
-.notItem{display:flex;gap:12px;padding:14px;border-bottom:1px solid #111;align-items:center;cursor:pointer}
-.notItem.unread{background:#111}
-.notItem img{width:44px;height:44px;border-radius:50%;object-fit:cover}
-.notText{flex:1;font-size:14px;line-height:1.4}
-.notTime{font-size:11px;color:#888;margin-top:2px}
-.tabBar{display:flex;border-bottom:1px solid #222}
-.tabBar div{flex:1;text-align:center;padding:12px;font-size:13px;font-weight:700;color:#666;border-bottom:2px solid transparent;cursor:pointer}
-.tabBar div.active{color:#fff;border-bottom:2px solid #fff}
+.top{padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;background:#000;z-index:50}
+.logoBox{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#ff5ea8,#a259ff,#ff7a00);display:grid;place-items:center;font-weight:900;font-size:18px;cursor:pointer;flex-shrink:0}
+.logoTxt{font-size:17px;font-weight:800;background:linear-gradient(90deg,#ff8ac2,#c39bff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer;white-space:nowrap}
+.top b{font-size:17px}
+.mark{margin-left:auto;font-size:12px;color:#ff5ea8;cursor:pointer;white-space:nowrap}
+/* ✅ BLOCK MASS LOOK DA */
+.block{display:flex;gap:10px;padding:12px;margin:0 12px 10px;background:#151515;border:1px solid #222;border-radius:14px;align-items:center;cursor:pointer}
+.block.unread{background:#1a1a1a;border-color:#2a2a2a}
+.block img{width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.block .txt{flex:1;font-size:13px;line-height:1.35;min-width:0}
+.block .txt b{font-weight:800}
+.block .sub{font-size:11.5px;color:#999;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.followBtn{border:1px solid #ff5ea8;color:#ff8ac2;background:transparent;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;flex-shrink:0;cursor:pointer}
+.iconBadge{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#a259ff);display:grid;place-items:center;font-size:15px;flex-shrink:0}
+.sec{padding:14px 14px 6px;font-size:12px;color:#888;font-weight:700}
+.tabBar{display:flex;gap:8px;padding:0 14px 10px}
+.tabBar div{padding:7px 13px;font-size:12px;font-weight:700;color:#888;background:#151515;border-radius:20px;cursor:pointer;border:1px solid #222}
+.tabBar div.active{color:#fff;background:#ff5ea8;border-color:#ff5ea8}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:60px;background:#000;border-top:1px solid #111;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}
 .bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}
@@ -30,7 +38,7 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 </style>
 </head>
 <body>
-<div class="top"><span onclick="location.href='./index.html'" class="logo">← Pixoro</span><b style="font-size:19px">Notifications</b><span onclick="markAllRead()" style="margin-left:auto;font-size:12px;color:#ff5ea8;cursor:pointer">Mark all read</span></div>
+<div class="top"><div class="logoBox" onclick="location.href='./index.html'">P</div><div class="logoTxt" onclick="location.href='./index.html'">Pixoro</div><b>Notifications</b><span class="mark" onclick="markAllRead()">Mark all read</span></div>
 <div class="tabBar"><div class="active" onclick="filterNot('all',this)">All</div><div onclick="filterNot('like',this)">Likes</div><div onclick="filterNot('follow',this)">Follows</div><div onclick="filterNot('comment',this)">Comments</div></div>
 <div id="notList"><p style="text-align:center;padding:60px;color:#666">Loading...</p></div>
 <div class="bottom-nav">
@@ -41,7 +49,7 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 <a href="./profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a>
 </div>
 <script>
-// ===== CORRECTED v215 - PIXORO NAME + DEDUP + SELF FILTER DA =====
+// ===== CORRECTED v216 - SAME v215 LOGIC - STYLE MATTUM BLOCK MASS DA =====
 let supa = window.supa;
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase() || ''; }
 let ME='', ME_ID='', allNots=[], profileMap={}, profileById={};
@@ -52,6 +60,7 @@ function getPfpById(id, uname){
   let c = cleanUser(uname) || 'P';
   return 'https://ui-avatars.com/api/?name='+encodeURIComponent(c.charAt(0).toUpperCase())+'&background=ff5ea8&color=fff&size=200&bold=true';
 }
+function isToday(t){ if(!t) return false; let d=new Date(t), n=new Date(); return d.getDate()===n.getDate() && d.getMonth()===n.getMonth() && d.getFullYear()===n.getFullYear(); }
 async function loadNots(){
   try{
     let tries = 0;
@@ -69,16 +78,11 @@ async function loadNots(){
     (profs||[]).forEach(p=>{ profileMap[cleanUser(p.username)] = p; profileById[String(p.id)] = p; });
     let {data:nots, error} = await supa.from('notifications').select('*').eq('to_user_id', ME_ID).order('created_at',{ascending:false}).limit(100);
     if(error) throw new Error(error.message);
-    // ✅ ENNA VARUM / VARAATHU - FILTER DA
     let seen = new Set();
     allNots = (nots||[]).filter(n=>{
-      // ❌ 1. THANAKKUTHANE - Nee Unakku Panna Like/Follow/Comment - Vara Koodathu da
       if(String(n.from_user_id)===String(ME_ID)) return false;
-      // ❌ 2. TYPE ILLANA - Vara Koodathu da
       if(!['like','follow','comment'].includes(n.type)) return false;
-      // ❌ 3. DUPLICATE - Same Aalu + Same Type + Same Post - Thirumba Vara Koodathu da
       let key = n.type + '_' + String(n.from_user_id) + '_' + (n.post_id||'');
-      // Follow ku Post Illa - Aalu Mattum Podhum da
       if(n.type==='follow') key = 'follow_' + String(n.from_user_id);
       if(seen.has(key)) return false;
       seen.add(key); return true;
@@ -96,19 +100,27 @@ async function loadNots(){
     document.getElementById('notList').innerHTML = `<p style="text-align:center;padding:40px;color:#ff5ea8">Error: ${e.message}</p><p style="text-align:center;color:#666;font-size:12px">Supabase la notifications table irukka nu paaru da</p>`;
   }
 }
+function oneBlock(n){
+  let uname = cleanUser(n.from_username);
+  let pfp = getPfpById(n.from_user_id, uname);
+  let icon = n.type=='like' ? '❤️' : n.type=='follow' ? '👤' : n.type=='comment' ? '💬' : '🔔';
+  let sub = n.type==='follow' ? 'Follow back • '+timeAgo(n.created_at) : (n.message||'')+' • '+timeAgo(n.created_at);
+  let right = n.type==='follow' ? `<button class="followBtn" onclick="event.stopPropagation();openNot('','${encodeURIComponent(uname)}','${n.from_user_id||''}','${n.id||''}','follow')">Follow</button>` : `<div class="iconBadge">${icon}</div>`;
+  return `<div class="block ${!n.is_read?'unread':''}" onclick="openNot('${n.post_id||''}','${encodeURIComponent(uname)}','${n.from_user_id||''}','${n.id||''}','${n.type||''}')"><img src="${pfp}" onerror="this.src='https://ui-avatars.com/api/?name=P&background=333&color=fff'"><div class="txt"><b>@${uname}</b> ${n.message||''}<div class="sub">${sub}</div></div>${right}</div>`;
+}
 function renderNots(filter){
   curFilter = filter;
   let list = document.getElementById('notList');
   let filtered = filter=='all' ? allNots : allNots.filter(n=> n.type==filter);
   if(!filtered.length){ list.innerHTML = `<p style="text-align:center;padding:40px;color:#666">No ${filter} notifications da</p>`; return; }
-  list.innerHTML = filtered.map(n=>{
-    let uname = cleanUser(n.from_username);
-    let pfp = getPfpById(n.from_user_id, uname);
-    let icon = n.type=='like' ? '❤️' : n.type=='follow' ? '👤' : n.type=='comment' ? '💬' : '🔔';
-    return `<div class="notItem ${!n.is_read?'unread':''}" onclick="openNot('${n.post_id||''}','${encodeURIComponent(uname)}','${n.from_user_id||''}','${n.id||''}','${n.type||''}')"><img src="${pfp}" onerror="this.src='https://ui-avatars.com/api/?name=P&background=333&color=fff'"><div class="notText"><b>@${uname}</b> ${n.message||''}<div class="notTime">${timeAgo(n.created_at)}</div></div><div style="font-size:20px">${icon}</div></div>`;
-  }).join('');
+  let today = filtered.filter(n=>isToday(n.created_at));
+  let earlier = filtered.filter(n=>!isToday(n.created_at));
+  let html='';
+  if(today.length) html+=`<div class="sec">Today</div>`+today.map(oneBlock).join('');
+  if(earlier.length) html+=`<div class="sec">Earlier</div>`+earlier.map(oneBlock).join('');
+  if(!today.length && !earlier.length) html=filtered.map(oneBlock).join('');
+  list.innerHTML=html;
 }
-// ===== CLICK FIX v214 - ./ THAAN DA - ITHU THAAN 404 FIX DA =====
 async function openNot(pid, unameEnc, fromId, notId, type){
   let uname = decodeURIComponent(unameEnc || '');
   try{ if(notId && supa) await supa.from('notifications').update({is_read:true}).eq('id', notId); }catch(e){}
