@@ -78,26 +78,10 @@ function showChoice(){document.getElementById('choice').classList.add('show')} f
 let supa=window.supa;function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase();return u||''}
 let ME_RAW='',ME='',ME_ID='',ME_PFP='',allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=[],allViews=[],viewedStories=[],lastTap=0,feedMode='foryou',curMenuPost=null;
 function getSupa(){return window.supa||supa} window.getSupa=getSupa;
-// ✅ CORRECTED v217 - NOTI FIX DA - DEDUP BLOCK REMOVE + DEBUG DA
+// ✅ FINAL v218 - TRIGGER MATTUM NOTI PANNUM DA - FRONTEND OFF DA - DOUBLE ILLA DA
 async function pixoroSendNotification(toUserId, type, postId, msg){
-  try{
-    if(!toUserId || !ME_ID){ console.log('NOTI SKIP - No ID da'); return; }
-    let targetId = String(toUserId);
-    if(!(targetId.includes('-') && targetId.length>20)){
-      let pr = allProfiles.find(x=>cleanUser(x.username)===cleanUser(targetId));
-      if(pr) targetId = String(pr.id);
-      else { let pp = allPosts.find(p=>cleanUser(p.username)===cleanUser(targetId)); if(pp && pp.user_id) targetId = String(pp.user_id); else { console.log('NOTI SKIP - User ID Kedaikala da', toUserId); return; } }
-    }
-    if(targetId === String(ME_ID)){ console.log('NOTI SKIP - Thanakku Thane da'); return; }
-    let s = getSupa(); if(!s) return;
-    // ✅ post_id UUID Illa na - null ah anuppu da - Illa na RLS / UUID Error Varum da
-    let safePostId = null;
-    if(postId && String(postId).includes('-') && String(postId).length>20) safePostId = String(postId);
-    console.log('NOTI SEND TRY da ->', type, 'to:', targetId, 'post:', safePostId);
-    let {data, error} = await s.from('notifications').insert({ to_user_id: targetId, from_user_id: ME_ID, from_username: ME_RAW, type: type, post_id: safePostId, message: msg, is_read: false }).select();
-    if(error) console.log('NOTI FAIL da ❌:', error.message, error);
-    else console.log('NOTI SENT da ✅:', data);
-  }catch(e){ console.log('NOTI ERROR da', e); }
+  // Trigger thaan pannum da - Frontend onnum panna venaam da - Double aayidum da
+  return;
 }
 window.pixoroSendNotification = pixoroSendNotification;
 function profileById(id){return allProfiles.find(x=>String(x.id)===String(id))||null}
@@ -309,10 +293,7 @@ async function doubleLike(id){
   supa=getSupa();if(!supa) return;
   let {error}=await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});
   if(error) console.log('SERVER SAVE FAIL:',error.message);
-  else {
-    let p = allPosts.find(x=> String(x.id)===String(id));
-    if(p){ await pixoroSendNotification(p.user_id, 'like', id, 'liked your post'); }
-  }
+  // Trigger thaan Notification pannum da - Frontend onnum panna venaam da
 }
 async function fastLike(id){
   let liked=allLikes.some(l=>String(l.post_id)==String(id)&&(l.user_id==ME_ID));
@@ -323,57 +304,15 @@ async function fastLike(id){
     let burst=document.getElementById('burst-'+id);if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show')}
     if(supa){
       let {error}=await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});
-      if(!error){
-        let p = allPosts.find(x=> String(x.id)===String(id));
-        if(p){ await pixoroSendNotification(p.user_id, 'like', id, 'liked your post'); }
-      }
+      if(error) console.log('SERVER SAVE FAIL:',error.message);
+      // Trigger thaan Notification pannum da
     }
   } else {
     allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&(l.user_id==ME_ID)));if(btn)btn.classList.remove('liked');if(c)c.innerText=Math.max(0,parseInt(c.innerText||'1')-1);
     if(supa){ let {error}=await supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID); if(error) console.log('SERVER SAVE FAIL:',error.message); }
   }
 }
-// ✅ CORRECTED - FOLLOW NOTI - 2 WAY FIX DA - WRAP + CLICK - ETHUVUM MISS AAGAATHU DA
-(function(){
-  let _tries = 0;
-  let _iv = setInterval(()=>{
-    _tries++;
-    if(window.pixoroToggleFollow && !window.pixoroToggleFollow._wrapped){
-      let _old = window.pixoroToggleFollow;
-      let _wrapped = async function(name, btn){
-        let wasFollowing = btn && btn.classList.contains('following');
-        if(!wasFollowing && window.PIXORO_FOLLOWING_NAMES && window.PIXORO_FOLLOWING_NAMES.has(cleanUser(name))) wasFollowing = true;
-        await _old(name, btn);
-        if(!wasFollowing){
-          setTimeout(async ()=>{
-            let pr = profileByName(name);
-            if(pr){ await pixoroSendNotification(pr.id, 'follow', null, 'started following you'); }
-          }, 600);
-        }
-      };
-      _wrapped._wrapped = true;
-      window.pixoroToggleFollow = _wrapped;
-      window.toggleFollow = _wrapped;
-      window.toggleF = _wrapped;
-      clearInterval(_iv);
-    }
-    if(_tries>40) clearInterval(_iv);
-  },500);
-  // Backup - Follow Button Click na - Kooda Notification Pogum da
-  document.addEventListener('click', async (e)=>{
-    let btn = e.target.closest('[data-follow-user]');
-    if(!btn) return;
-    let name = btn.getAttribute('data-follow-user');
-    if(!name) return;
-    setTimeout(async ()=>{
-      let nowFollowing = btn.classList.contains('following') || btn.innerText.includes('Following');
-      if(nowFollowing){
-        let pr = profileByName(name);
-        if(pr){ await pixoroSendNotification(pr.id, 'follow', null, 'started following you'); }
-      }
-    }, 1000);
-  });
-})();
+// ✅ FOLLOW - Trigger thaan pannum da - Frontend Double Fix Remove Pannen da
 async function savePost(id,btn){
   supa=getSupa(); let s=allSaves.some(x=>String(x.post_id)==String(id)&&(x.user_id==ME_ID));
   if(s){
@@ -391,10 +330,7 @@ async function addComment(){
   supa=getSupa();let t=document.getElementById('commentInput').value.trim();if(!t||!window.currentPostId||!supa)return;
   let {error}=await supa.from('comments').insert({post_id:window.currentPostId,user_id:ME_ID,username:ME_RAW,text:t});
   if(error) console.log('SERVER SAVE FAIL:',error.message);
-  else {
-    let p = allPosts.find(x=> String(x.id)===String(window.currentPostId));
-    if(p){ await pixoroSendNotification(p.user_id, 'comment', window.currentPostId, 'commented: "'+t+'"'); }
-  }
+  // Trigger thaan Notification pannum da
   document.getElementById('commentInput').value='';openComment(window.currentPostId)
 }
 function checkMiniUpload(){
