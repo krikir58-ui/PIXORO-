@@ -20,6 +20,14 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
+
+// FIX 1: SW ah correct path la register pannu da
+let swReg = null;
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('firebase-messaging-sw.js')
+    .then(reg => { swReg = reg; console.log('SW OK da'); })
+    .catch(e => console.log('SW Fail', e));
+}
 </script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
@@ -65,7 +73,7 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 </head>
 <body>
 <div class="top"><div class="logoBox" onclick="location.href='./index.html'">P</div><div class="logoTxt" onclick="location.href='./index.html'">Pixoro</div><b>Notifications</b><button class="bellBtn" onclick="markAllRead()"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot" id="bellDot"></span></button></div>
-<div class="safeBar"><b>Pixoro Safety ON</b> • Follow Request - Nee Accept Panna Thaan Follow Aagum • Stranger Comment - Hidden • Block - 1 Click la</div>
+<div class="safeBar"><b>Pixoro Safety ON</b> • Follow Request - Nee Accept Panna Thaan Follow Aagum • Stranger Comment - Hidden • Block - 1 Click la<br><span id="pushStatus" style="color:#ff9a00">Push: Checking...</span></div>
 <div class="tabBar"><div class="active" onclick="filterNot('all',this)">All</div><div onclick="filterNot('like',this)">Likes</div><div onclick="filterNot('follow',this)">Requests</div><div onclick="filterNot('comment',this)">Comments</div></div>
 <div id="liveToast" class="liveToast" onclick="hideLiveToast()"><div style="flex:1"><div id="liveToastTxt"></div><small>Pixoro • Just now</small></div><span style="color:#888;font-size:14px">✕</span></div>
 <div id="notList"><p style="text-align:center;padding:60px;color:#888">Loading...</p></div>
@@ -83,17 +91,25 @@ let ME='', ME_ID='', allNots=[], profileMap={}, profileById={}, followerIds=new 
 let curFilter='all', _liveStarted=false, _toastTimer=null;
 function isToday(t){ if(!t) return false; let d=new Date(t), n=new Date(); return d.getDate()===n.getDate()&&d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear(); }
 function timeAgo(t){ if(!t) return ''; let d=Math.floor((new Date()-new Date(t))/1000); if(d<60) return 'now'; if(d<3600) return Math.floor(d/60)+'m'; if(d<86400) return Math.floor(d/3600)+'h'; return Math.floor(d/86400)+'d'; }
+function setPushStatus(t){ let el=document.getElementById('pushStatus'); if(el) el.innerText='Push: '+t; }
 async function savePushToken(){
   try{
+    setPushStatus('Permission kekuren da...');
     const permission = await Notification.requestPermission();
-    if(permission !== 'granted') return;
-    const token = await messaging.getToken({ vapidKey: "BNiep_ITMRi7e9gX4mRukcyoIHhATY6RvfLW5uWG1FZeFzpoxO57xSTz5YOLkrczx11xVD1UO9wixj1Ca1G6uQ4" });
+    if(permission !== 'granted'){ setPushStatus('Permission DENIED da - Allow kudunga da'); return; }
+    setPushStatus('Token edukkuren da...');
+    let tries=0; while(!swReg && tries<20){ await new Promise(r=>setTimeout(r,300)); tries++; }
+    const token = await messaging.getToken({ vapidKey: "BNiep_ITMRi7e9gX4mRukcyoIHhATY6RvfLW5uWG1FZeFzpoxO57xSTz5YOLkrczx11xVD1UO9wixj1Ca1G6uQ4", serviceWorkerRegistration: swReg });
     if(token){
       localStorage.setItem('pixoro_fcm_token', token);
-      if(ME_ID) await supa.from('profiles').update({ fcm_token: token }).eq('id', ME_ID);
-      console.log('FCM Token Saved da');
-    }
-  }catch(e){ console.log('Push Error', e); }
+      setPushStatus('Token kedaichiduchu da ✅ - Saving...');
+      if(ME_ID){
+        const {error} = await supa.from('profiles').update({ fcm_token: token }).eq('id', ME_ID);
+        if(error){ setPushStatus('Supabase Error: '+error.message); console.log('Supabase Error', error); }
+        else { setPushStatus('Push ON ✅ - Token Saved da 🎉'); console.log('FCM Token Saved da'); }
+      }
+    } else { setPushStatus('Token kedaikala da'); }
+  }catch(e){ setPushStatus('Push Error: '+e.message); console.log('Push Error', e); }
 }
 async function loadNots(){
   try{
