@@ -20,8 +20,6 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
-
-// FIX 1: SW ah correct path la register pannu da
 let swReg = null;
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('firebase-messaging-sw.js')
@@ -101,12 +99,11 @@ async function savePushToken(){
     let tries=0; while(!swReg && tries<20){ await new Promise(r=>setTimeout(r,300)); tries++; }
     const token = await messaging.getToken({ vapidKey: "BNiep_ITMRi7e9gX4mRukcyoIHhATY6RvfLW5uWG1FZeFzpoxO57xSTz5YOLkrczx11xVD1UO9wixj1Ca1G6uQ4", serviceWorkerRegistration: swReg });
     if(token){
-      localStorage.setItem('pixoro_fcm_token', token);
-      setPushStatus('Token kedaichiduchu da ✅ - Saving...');
+      setPushStatus('Token kedaichiduchu da ✅ - Server la Saving...');
       if(ME_ID){
         const {error} = await supa.from('profiles').update({ fcm_token: token }).eq('id', ME_ID);
         if(error){ setPushStatus('Supabase Error: '+error.message); console.log('Supabase Error', error); }
-        else { setPushStatus('Push ON ✅ - Token Saved da 🎉'); console.log('FCM Token Saved da'); }
+        else { setPushStatus('Push ON ✅ - Server la Saved da 🎉'); console.log('FCM Token Saved da'); }
       }
     } else { setPushStatus('Token kedaikala da'); }
   }catch(e){ setPushStatus('Push Error: '+e.message); console.log('Push Error', e); }
@@ -123,7 +120,7 @@ async function loadNots(){
     let {data:profs} = await supa.from('profiles').select('*'); (profs||[]).forEach(p=>{ profileMap[cleanUser(p.username)]=p; profileById[String(p.id)]=p; });
     try{ let {data:fl}=await supa.from('follows').select('follower_id').eq('following_id',ME_ID); (fl||[]).forEach(r=>followerIds.add(String(r.follower_id))); }catch(e){}
     try{ let {data:fl2}=await supa.from('followers').select('follower_id').eq('following_id',ME_ID); (fl2||[]).forEach(r=>followerIds.add(String(r.follower_id))); }catch(e){}
-    try{ blockedIds = new Set(JSON.parse(localStorage.getItem('pixoro_blocked')||'[]')); }catch(e){}
+    try{ let {data:bl}=await supa.from('blocked_users').select('blocked_id').eq('blocker_id',ME_ID); (bl||[]).forEach(r=>blockedIds.add(String(r.blocked_id))); }catch(e){}
     let {data:nots} = await supa.from('notifications').select('*').eq('to_user_id',ME_ID).order('created_at',{ascending:false}).limit(100);
     allNots=(nots||[]).filter(n=>String(n.from_user_id)!==String(ME_ID)&&['like','follow','comment'].includes(n.type)).filter(n=>!blockedIds.has(String(n.from_user_id))).map(n=>{
       let pr=profileById[String(n.from_user_id)]||{}; let uname=n.from_username||pr.username||'pixoro';
@@ -207,7 +204,6 @@ async function rejectFollow(userId, key){
 async function blockUser(userId, key){
   if(!confirm('Block panna vaa? Inime ivanga notification varaathu da')) return;
   blockedIds.add(String(userId));
-  localStorage.setItem('pixoro_blocked', JSON.stringify([...blockedIds]));
   allNots = allNots.filter(n=>String(n.from_user_id)!==String(userId));
   try{ await supa.from('blocked_users').insert([{blocker_id:ME_ID, blocked_id:userId}]); }catch(e){}
   try{ await supa.from('notifications').delete().eq('from_user_id',userId).eq('to_user_id',ME_ID); }catch(e){}
