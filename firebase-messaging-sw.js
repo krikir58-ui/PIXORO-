@@ -2,7 +2,7 @@ importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js'
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
 firebase.initializeApp({
-  apiKey: "AIzaSyCw0Xsjqp20oT2PoxSyHojk5r5r58vQ1o",
+  apiKey: "AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",
   authDomain: "pixoro-75927.firebaseapp.com",
   projectId: "pixoro-75927",
   storageBucket: "pixoro-75927.firebasestorage.app",
