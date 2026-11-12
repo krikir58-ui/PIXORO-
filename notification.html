@@ -16,6 +16,8 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 .top .bellBtn{background:none;border:0;cursor:pointer;position:relative;padding:4px}
 .top .bellBtn svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:1.8}
 .top .bellBtn .dot{position:absolute;top:2px;right:2px;width:8px;height:8px;background:#FF3040;border-radius:50%;border:2px solid #000;display:none}
+.safeBar{margin:6px 12px 10px;padding:10px 12px;background:#111;border:1px solid #222;border-radius:12px;font-size:12px;line-height:1.4;color:#aaa}
+.safeBar b{color:#fff}
 .tabBar{display:flex;gap:8px;padding:4px 12px 10px;overflow-x:auto;background:#000}
 .tabBar::-webkit-scrollbar{display:none}
 .tabBar div{padding:7px 12px;font-size:13px;font-weight:700;color:#888;background:transparent;border:1px solid #222;border-radius:20px;cursor:pointer;white-space:nowrap;flex-shrink:0}
@@ -27,8 +29,12 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 .row .txt b{font-weight:800}
 .row .txt span{color:#aaa;font-weight:400}
 .row .txt small{display:block;color:#888;font-size:11px;margin-top:2px;font-weight:400}
+.row .txt .warn{color:#ff9a00;font-size:11px}
 .tagMini{font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;border:1px solid #333;color:#ff8ac2;flex-shrink:0;letter-spacing:.5px}
-.followBtn{background:transparent;color:#ff5ea8;border:1px solid #ff5ea8;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;flex-shrink:0;cursor:pointer}
+.btnRow{display:flex;gap:6px;flex-shrink:0;align-items:center}
+.acceptBtn{background:#00c853;color:#fff;border:0;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
+.rejectBtn{background:transparent;color:#ff5a5a;border:1px solid #333;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
+.blockBtn{background:transparent;color:#888;border:1px solid #333;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:60px;background:#000;border-top:1px solid #111;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}
 .bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}
@@ -44,7 +50,8 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 </head>
 <body>
 <div class="top"><div class="logoBox" onclick="location.href='./index.html'">P</div><div class="logoTxt" onclick="location.href='./index.html'">Pixoro</div><b>Notifications</b><button class="bellBtn" onclick="markAllRead()"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot" id="bellDot"></span></button></div>
-<div class="tabBar"><div class="active" onclick="filterNot('all',this)">All</div><div onclick="filterNot('like',this)">Likes</div><div onclick="filterNot('follow',this)">Follows</div><div onclick="filterNot('comment',this)">Comments</div></div>
+<div class="safeBar"><b>Pixoro Safety ON</b> • Follow Request - Nee Accept Panna Thaan Follow Aagum • Stranger Comment - Hidden • Block - 1 Click la</div>
+<div class="tabBar"><div class="active" onclick="filterNot('all',this)">All</div><div onclick="filterNot('like',this)">Likes</div><div onclick="filterNot('follow',this)">Requests</div><div onclick="filterNot('comment',this)">Comments</div></div>
 <div id="liveToast" class="liveToast" onclick="hideLiveToast()"><div style="flex:1"><div id="liveToastTxt"></div><small>Pixoro • Just now</small></div><span style="color:#888;font-size:14px">✕</span></div>
 <div id="notList"><p style="text-align:center;padding:60px;color:#888">Loading...</p></div>
 <div class="bottom-nav">
@@ -57,7 +64,7 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 <script>
 let supa = window.supa;
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase() || ''; }
-let ME='', ME_ID='', allNots=[], profileMap={}, profileById={};
+let ME='', ME_ID='', allNots=[], profileMap={}, profileById={}, followerIds=new Set(), blockedIds=new Set(), acceptedIds=new Set();
 let curFilter='all', _liveStarted=false, _toastTimer=null;
 function isToday(t){ if(!t) return false; let d=new Date(t), n=new Date(); return d.getDate()===n.getDate()&&d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear(); }
 function timeAgo(t){ if(!t) return ''; let d=Math.floor((new Date()-new Date(t))/1000); if(d<60) return 'now'; if(d<3600) return Math.floor(d/60)+'m'; if(d<86400) return Math.floor(d/3600)+'h'; return Math.floor(d/86400)+'d'; }
@@ -71,10 +78,13 @@ async function loadNots(){
     ME=cleanUser(myProf?.username||session.user.email.split('@')[0]);
     let nav=document.getElementById('navPfp'); if(nav && myProf?.avatar_url) nav.src=myProf.avatar_url;
     let {data:profs} = await supa.from('profiles').select('*'); (profs||[]).forEach(p=>{ profileMap[cleanUser(p.username)]=p; profileById[String(p.id)]=p; });
+    try{ let {data:fl}=await supa.from('follows').select('follower_id').eq('following_id',ME_ID); (fl||[]).forEach(r=>followerIds.add(String(r.follower_id))); }catch(e){}
+    try{ let {data:fl2}=await supa.from('followers').select('follower_id').eq('following_id',ME_ID); (fl2||[]).forEach(r=>followerIds.add(String(r.follower_id))); }catch(e){}
+    try{ blockedIds = new Set(JSON.parse(localStorage.getItem('pixoro_blocked')||'[]')); }catch(e){}
     let {data:nots} = await supa.from('notifications').select('*').eq('to_user_id',ME_ID).order('created_at',{ascending:false}).limit(100);
-    allNots=(nots||[]).filter(n=>String(n.from_user_id)!==String(ME_ID)&&['like','follow','comment'].includes(n.type)).map(n=>{
+    allNots=(nots||[]).filter(n=>String(n.from_user_id)!==String(ME_ID)&&['like','follow','comment'].includes(n.type)).filter(n=>!blockedIds.has(String(n.from_user_id))).map(n=>{
       let pr=profileById[String(n.from_user_id)]||{}; let uname=n.from_username||pr.username||'pixoro';
-      return {...n, from_username:uname, message:n.message||(n.type==='follow'?'started following you':n.type==='like'?'liked your post':'commented on your post')};
+      return {...n, from_username:uname, message:n.message||(n.type==='follow'?'sent you a follow request':n.type==='like'?'liked your post':'commented on your post')};
     });
     renderNots(curFilter); startLive();
   }catch(e){ document.getElementById('notList').innerHTML='<p style="text-align:center;padding:40px;color:#ff5ea8">Error: '+e.message+'</p>'; }
@@ -100,16 +110,22 @@ function oneGroupRow(g){
   let names = '<b>'+cleanUser(first.username)+'</b>';
   if(second) names += ', <b>'+cleanUser(second.username)+'</b>';
   if(others>0) names += ' and others';
-  let action = g.type==='like' ? ' liked your post.' : g.type==='comment' ? ' commented on your post.' : ' started following you.';
-  let extra='';
+  let isFollower = followerIds.has(String(first.id)) || acceptedIds.has(String(first.id));
+  let action = g.type==='like' ? ' liked your post.' : g.type==='comment' ? ' commented on your post.' : ' sent you a follow request.';
+  let extra=''; let warn='';
   if(g.type==='comment'){
-    let c = allNots.find(n=>String(n.post_id)===String(g.post_id)&&n.type==='comment');
-    if(c && c.message) extra = ' <span>"'+c.message.replace('commented: ','').replace(/^"|"$/g,'')+'"</span>';
+    if(!isFollower){ extra = ' <span>Stranger comment hidden - Followers mattum paakka mudiyum</span>'; warn = '<div class="warn">Hidden • Follow Accept Panna Thaan Theriyum</div>'; }
+    else { let c = allNots.find(n=>String(n.post_id)===String(g.post_id)&&n.type==='comment'); if(c && c.message) extra = ' <span>"'+c.message.replace('commented: ','').replace(/^"|"$/g,'')+'"</span>'; }
   }
-  let tag = g.type==='like' ? 'LIKE' : g.type==='follow' ? 'FOLLOW' : 'COMMENT';
-  let right = g.type==='follow' ? `<button class="followBtn" onclick="event.stopPropagation();location.href='./profile.html?u=${first.id}'">Follow</button>` : `<span class="tagMini">${tag}</span>`;
+  let tag = g.type==='like' ? 'LIKE' : g.type==='follow' ? 'REQUEST' : 'COMMENT';
+  let right='';
+  if(g.type==='follow' && !acceptedIds.has(String(first.id))){
+    right = `<div class="btnRow"><button class="acceptBtn" onclick="event.stopPropagation();acceptFollow('${first.id}','${g.key}')">Accept</button><button class="rejectBtn" onclick="event.stopPropagation();rejectFollow('${first.id}','${g.key}')">Reject</button><button class="blockBtn" onclick="event.stopPropagation();blockUser('${first.id}','${g.key}')">Block</button></div>`;
+  } else {
+    right = `<div class="btnRow">${g.type!=='follow' ? `<span class="tagMini">${tag}</span>` : `<span class="tagMini">ACCEPTED</span>`}<button class="blockBtn" onclick="event.stopPropagation();blockUser('${first.id}','${g.key}')">Block</button></div>`;
+  }
   let click = g.type==='follow' ? `./profile.html?u=${first.id}` : g.post_id ? `./index.html?id=${g.post_id}` : `./profile.html?u=${first.id}`;
-  return `<div class="row" onclick="openGroup('${g.key}','${click}')"><div class="txt">${names}<span>${action}${extra}</span><small>${timeAgo(g.latest)}</small></div>${right}</div>`;
+  return `<div class="row" onclick="openGroup('${g.key}','${click}')"><div class="txt">${names}<span>${action}${extra}</span>${warn}<small>${timeAgo(g.latest)}</small></div>${right}</div>`;
 }
 function renderNots(filter){
   curFilter=filter;
@@ -131,6 +147,30 @@ async function openGroup(key, url){
   if(g && g.ids.length){ try{ await supa.from('notifications').update({is_read:true}).in('id', g.ids); }catch(e){} g.ids.forEach(id=>{ let n=allNots.find(x=>String(x.id)===String(id)); if(n) n.is_read=true; }); }
   location.href=url;
 }
+async function acceptFollow(userId, key){
+  acceptedIds.add(String(userId)); followerIds.add(String(userId));
+  try{ await supa.from('follows').insert([{follower_id:userId, following_id:ME_ID, status:'accepted'}]); }catch(e){}
+  try{ await supa.from('follows').update({status:'accepted'}).eq('follower_id',userId).eq('following_id',ME_ID); }catch(e){}
+  try{ await supa.from('notifications').update({is_read:true}).eq('from_user_id',userId).eq('to_user_id',ME_ID).eq('type','follow'); }catch(e){}
+  renderNots(curFilter);
+  showLiveToast({from_username:'Pixoro', message:'Follow request accepted da'});
+}
+async function rejectFollow(userId, key){
+  allNots = allNots.filter(n=>!(n.type==='follow' && String(n.from_user_id)===String(userId)));
+  try{ await supa.from('notifications').delete().eq('from_user_id',userId).eq('to_user_id',ME_ID).eq('type','follow'); }catch(e){}
+  try{ await supa.from('follows').delete().eq('follower_id',userId).eq('following_id',ME_ID); }catch(e){}
+  renderNots(curFilter);
+}
+async function blockUser(userId, key){
+  if(!confirm('Block panna vaa? Inime ivanga notification varaathu da')) return;
+  blockedIds.add(String(userId));
+  localStorage.setItem('pixoro_blocked', JSON.stringify([...blockedIds]));
+  allNots = allNots.filter(n=>String(n.from_user_id)!==String(userId));
+  try{ await supa.from('blocked_users').insert([{blocker_id:ME_ID, blocked_id:userId}]); }catch(e){}
+  try{ await supa.from('notifications').delete().eq('from_user_id',userId).eq('to_user_id',ME_ID); }catch(e){}
+  renderNots(curFilter);
+  showLiveToast({from_username:'Pixoro', message:'Blocked da - Safe ah iru da'});
+}
 function startLive(){
   if(_liveStarted) return; _liveStarted=true;
   try{
@@ -138,11 +178,12 @@ function startLive(){
     s.channel('pixoro-live-noti-'+ME_ID)
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:'to_user_id=eq.'+ME_ID},(payload)=>{
         let n=payload.new; if(String(n.from_user_id)===String(ME_ID)) return;
+        if(blockedIds.has(String(n.from_user_id))) return;
         if(!profileById[String(n.from_user_id)]){
           s.from('profiles').select('*').eq('id',n.from_user_id).maybeSingle().then(({data})=>{ if(data){ profileById[String(data.id)]=data; profileMap[cleanUser(data.username)]=data; renderNots(curFilter); } });
         }
         let pr=profileById[String(n.from_user_id)]||{}; let uname=n.from_username||pr.username||'pixoro';
-        let formatted={...n, from_username:uname, message:n.message||(n.type==='follow'?'started following you':n.type==='like'?'liked your post':'commented on your post')};
+        let formatted={...n, from_username:uname, message:n.message||(n.type==='follow'?'sent you a follow request':n.type==='like'?'liked your post':'commented on your post')};
         allNots.unshift(formatted); renderNots(curFilter); showLiveToast(formatted);
         try{ navigator.vibrate && navigator.vibrate(60); }catch(e){}
       }).subscribe();
