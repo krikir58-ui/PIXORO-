@@ -8,32 +8,27 @@
 <script src="js/pixoro-core.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-body{background:#1c1c1e!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
-.top{padding:12px 14px;display:flex;align-items:center;gap:14px;position:sticky;top:0;background:#1c1c1e;z-index:50}
-.top .back{font-size:28px;cursor:pointer;line-height:1}
-.top b{font-size:24px;font-weight:800;flex:1}
-.top .bell{font-size:22px;position:relative;cursor:pointer}
-.top .bell .dot{position:absolute;top:0;right:0;width:9px;height:9px;background:#FF3040;border-radius:50%;border:2px solid #1c1c1e;display:none}
-.tabBar{display:flex;gap:8px;padding:4px 14px 12px;overflow-x:auto;background:#1c1c1e}
+body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
+.top{padding:12px 14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;background:#000;z-index:50}
+.top .back{font-size:24px;cursor:pointer;line-height:1;color:#fff}
+.top b{font-size:20px;font-weight:800;flex:1}
+.top .bellBtn{background:none;border:0;cursor:pointer;position:relative;padding:4px}
+.top .bellBtn svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:1.8}
+.top .bellBtn .dot{position:absolute;top:2px;right:2px;width:8px;height:8px;background:#FF3040;border-radius:50%;border:2px solid #000;display:none}
+.tabBar{display:flex;gap:8px;padding:4px 12px 10px;overflow-x:auto;background:#000}
 .tabBar::-webkit-scrollbar{display:none}
-.tabBar div{padding:9px 14px;font-size:15px;font-weight:600;color:#fff;background:#333;border-radius:10px;cursor:pointer;white-space:nowrap;flex-shrink:0}
-.tabBar div.active{color:#000;background:#fff}
-.sec{padding:16px 14px 10px;font-size:20px;font-weight:700;background:#1c1c1e}
-.row{display:flex;gap:12px;padding:12px 14px;align-items:center;cursor:pointer;background:#1c1c1e;border-bottom:1px solid #2a2a2a}
-.row:active{background:#2a2a2a}
-.row .leftAv{position:relative;width:52px;height:52px;flex-shrink:0}
-.row .leftAv img{width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid #1c1c1e;background:#333;position:absolute}
-.row .leftAv img.a1{left:0;top:0;z-index:2}
-.row .leftAv img.a2{right:0;bottom:0;z-index:1;width:36px;height:36px}
-.row .leftAv .singleAv{width:52px;height:52px;border-radius:50%;object-fit:cover;position:static;border:0}
-.row .adsIcon{width:52px;height:52px;border-radius:50%;border:1.5px solid #fff;display:grid;place-items:center;font-size:20px;flex-shrink:0}
-.row .txt{flex:1;font-size:16px;line-height:1.35;min-width:0}
-.row .txt b{font-weight:700}
+.tabBar div{padding:7px 12px;font-size:13px;font-weight:700;color:#888;background:transparent;border:1px solid #222;border-radius:20px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.tabBar div.active{color:#fff;background:transparent;border-color:#ff5ea8}
+.sec{padding:14px 12px 6px;font-size:13px;color:#888;font-weight:700;background:#000}
+.row{display:flex;gap:10px;padding:11px 12px;align-items:center;cursor:pointer;background:#000;border-bottom:1px solid #111}
+.row:active{background:#111}
+.row .txt{flex:1;font-size:13.5px;line-height:1.35;min-width:0}
+.row .txt b{font-weight:800}
 .row .txt span{color:#aaa;font-weight:400}
-.row .txt small{display:block;color:#888;font-size:14px;margin-top:4px;font-weight:600}
-.row .thumb{width:52px;height:68px;border-radius:8px;object-fit:cover;flex-shrink:0;background:#333}
-.followBtn{background:#0095F6;color:#fff;border:0;padding:8px 18px;border-radius:10px;font-size:14px;font-weight:700;flex-shrink:0;cursor:pointer}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:60px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;z-index:100}
+.row .txt small{display:block;color:#888;font-size:11px;margin-top:2px;font-weight:400}
+.iconMini{width:28px;height:28px;border-radius:50%;background:#111;border:1px solid #222;display:grid;place-items:center;font-size:13px;flex-shrink:0}
+.followBtn{background:transparent;color:#ff5ea8;border:1px solid #ff5ea8;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;flex-shrink:0;cursor:pointer}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:60px;background:#000;border-top:1px solid #111;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}
 .bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}
 .bottom-nav a.active{color:#ff5ea8}
@@ -41,16 +36,16 @@ body{background:#1c1c1e!important;color:#fff;max-width:450px;margin:0 auto;paddi
 .bottom-nav span{font-size:10px;color:#8e8e8e}
 .bottom-nav a.active span{color:#ff5ea8;font-weight:700}
 .bottom-nav a img.navPfp{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #555;background:#111}
-.liveToast{position:fixed;top:-90px;left:12px;right:12px;max-width:426px;margin:auto;background:#000;border:1px solid #333;color:#fff;padding:14px 16px;border-radius:14px;font-size:14px;font-weight:600;z-index:9999;display:none;align-items:center;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.8);transition:top .7s ease,opacity .7s ease;opacity:0}
+.liveToast{position:fixed;top:-90px;left:12px;right:12px;max-width:426px;margin:auto;background:#000;border:1px solid #333;color:#fff;padding:12px 14px;border-radius:14px;font-size:13px;font-weight:600;z-index:9999;display:none;align-items:center;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.8);transition:top .7s ease,opacity .7s ease;opacity:0}
 .liveToast.show{top:14px;opacity:1}
-.liveToast .liveIcon{width:32px;height:32px;border-radius:50%;background:#111;border:1px solid #333;display:grid;place-items:center;font-size:16px;flex-shrink:0}
+.liveToast .liveIcon{width:28px;height:28px;border-radius:50%;background:#111;border:1px solid #333;display:grid;place-items:center;font-size:14px;flex-shrink:0}
 .liveToast small{display:block;font-size:11px;color:#999;font-weight:400;margin-top:2px}
 </style>
 </head>
 <body>
-<div class="top"><span class="back" onclick="location.href='./index.html'">←</span><b>Notifications</b><span class="bell" onclick="markAllRead()">🔔<span class="dot" id="bellDot"></span></span></div>
+<div class="top"><span class="back" onclick="location.href='./index.html'">←</span><b>Notifications</b><button class="bellBtn" onclick="markAllRead()"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot" id="bellDot"></span></button></div>
 <div class="tabBar"><div class="active" onclick="filterNot('all',this)">All</div><div onclick="filterNot('follow',this)">People you follow</div><div onclick="filterNot('comment',this)">Comments</div><div onclick="filterNot('like',this)">Likes</div><div onclick="filterNot('follow2',this)">Professional</div></div>
-<div id="liveToast" class="liveToast" onclick="hideLiveToast()"><div class="liveIcon" id="liveToastIcon">❤️</div><div style="flex:1"><div id="liveToastTxt"></div><small>Pixoro • Just now</small></div><span style="color:#888;font-size:16px">✕</span></div>
+<div id="liveToast" class="liveToast" onclick="hideLiveToast()"><div class="liveIcon" id="liveToastIcon">❤️</div><div style="flex:1"><div id="liveToastTxt"></div><small>Pixoro • Just now</small></div><span style="color:#888;font-size:14px">✕</span></div>
 <div id="notList"><p style="text-align:center;padding:60px;color:#888">Loading...</p></div>
 <div class="bottom-nav">
 <a href="./index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
@@ -62,15 +57,8 @@ body{background:#1c1c1e!important;color:#fff;max-width:450px;margin:0 auto;paddi
 <script>
 let supa = window.supa;
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase() || ''; }
-let ME='', ME_ID='', allNots=[], profileMap={}, profileById={}, postMap={};
+let ME='', ME_ID='', allNots=[], profileMap={}, profileById={};
 let curFilter='all', _liveStarted=false, _toastTimer=null;
-function getPfp(id, uname){
-  let p = profileById[String(id)] || profileMap[cleanUser(uname)];
-  if(p && (p.avatar_url||p.profile_pic)) return p.avatar_url||p.profile_pic;
-  let c = cleanUser(uname)||'P';
-  return 'https://ui-avatars.com/api/?name='+encodeURIComponent(c.charAt(0).toUpperCase())+'&background=333&color=fff&size=200&bold=true';
-}
-function getThumb(postId){ let p = postMap[String(postId)]; if(p && (p.media_url||p.video_url)) return p.media_url||p.video_url; return ''; }
 function isToday(t){ if(!t) return false; let d=new Date(t), n=new Date(); return d.getDate()===n.getDate()&&d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear(); }
 function timeAgo(t){ if(!t) return ''; let d=Math.floor((new Date()-new Date(t))/1000); if(d<60) return 'now'; if(d<3600) return Math.floor(d/60)+'m'; if(d<86400) return Math.floor(d/3600)+'h'; return Math.floor(d/86400)+'d'; }
 async function loadNots(){
@@ -83,8 +71,6 @@ async function loadNots(){
     ME=cleanUser(myProf?.username||session.user.email.split('@')[0]);
     let nav=document.getElementById('navPfp'); if(nav && myProf?.avatar_url) nav.src=myProf.avatar_url;
     let {data:profs} = await supa.from('profiles').select('*'); (profs||[]).forEach(p=>{ profileMap[cleanUser(p.username)]=p; profileById[String(p.id)]=p; });
-    try{ let {data:po}=await supa.from('posts').select('id,media_url,video_url').limit(100); (po||[]).forEach(p=>postMap[String(p.id)]=p); }catch(e){}
-    try{ let {data:re}=await supa.from('reels').select('id,media_url,video_url').limit(100); (re||[]).forEach(p=>postMap[String(p.id)]=p); }catch(e){}
     let {data:nots} = await supa.from('notifications').select('*').eq('to_user_id',ME_ID).order('created_at',{ascending:false}).limit(100);
     allNots=(nots||[]).filter(n=>String(n.from_user_id)!==String(ME_ID)&&['like','follow','comment'].includes(n.type)).map(n=>{
       let pr=profileById[String(n.from_user_id)]||{}; let uname=n.from_username||pr.username||'pixoro';
@@ -120,14 +106,10 @@ function oneGroupRow(g){
     let c = allNots.find(n=>String(n.post_id)===String(g.post_id)&&n.type==='comment');
     if(c && c.message) extra = ' <span>"'+c.message.replace('commented: ','').replace(/^"|"$/g,'')+'"</span>';
   }
-  let thumb = g.post_id ? getThumb(g.post_id) : '';
-  let thumbHtml = thumb ? `<img class="thumb" src="${thumb}">` : '';
-  if(g.type==='follow') thumbHtml = `<button class="followBtn" onclick="event.stopPropagation();location.href='./profile.html?u=${first.id}'">Follow</button>`;
-  let avHtml='';
-  if(g.users.length>=2){ avHtml = `<div class="leftAv"><img class="a1" src="${getPfp(g.users[0].id,g.users[0].username)}"><img class="a2" src="${getPfp(g.users[1].id,g.users[1].username)}"></div>`; }
-  else { avHtml = `<div class="leftAv"><img class="singleAv" src="${getPfp(first.id,first.username)}"></div>`; }
+  let icon = g.type==='like' ? '❤️' : g.type==='follow' ? '👤' : '💬';
+  let right = g.type==='follow' ? `<button class="followBtn" onclick="event.stopPropagation();location.href='./profile.html?u=${first.id}'">Follow</button>` : '';
   let click = g.type==='follow' ? `./profile.html?u=${first.id}` : g.post_id ? `./index.html?id=${g.post_id}` : `./profile.html?u=${first.id}`;
-  return `<div class="row" onclick="openGroup('${g.key}','${click}')">${avHtml}<div class="txt">${names}<span>${action}${extra}</span><small>${timeAgo(g.latest)}</small></div>${thumbHtml}</div>`;
+  return `<div class="row" onclick="openGroup('${g.key}','${click}')"><div class="iconMini">${icon}</div><div class="txt">${names}<span>${action}${extra}</span><small>${timeAgo(g.latest)}</small></div>${right}</div>`;
 }
 function renderNots(filter){
   curFilter=filter;
@@ -136,13 +118,13 @@ function renderNots(filter){
   let featGroups = groupNots(list.filter(n=>!isToday(n.created_at)));
   let html='';
   if(filter==='all'){
-    html+=`<div class="sec" style="font-size:18px;padding-bottom:0">Ads</div><div class="row"><div class="adsIcon">↗</div><div class="txt"><b>Ads</b><br><span>Recent activity from your ads.</span></div></div>`;
-    html+=`<div class="sec">Stories about you</div><div class="row"><div class="leftAv"><img class="singleAv" src="https://ui-avatars.com/api/?name=M&background=a259ff&color=fff&size=200&bold=true"></div><div class="txt"><b>Mentions</b><br><span>1 story mentions you.</span></div></div>`;
+    html+=`<div class="sec">Ads</div><div class="row"><div class="iconMini">↗</div><div class="txt"><b>Ads</b><br><span>Recent activity from your ads.</span></div></div>`;
+    html+=`<div class="sec">Stories about you</div><div class="row"><div class="iconMini">💬</div><div class="txt"><b>Mentions</b><br><span>1 story mentions you.</span></div></div>`;
   }
   if(featGroups.length) html+=`<div class="sec">Featured</div>`+featGroups.map(oneGroupRow).join('');
   if(todayGroups.length) html+=`<div class="sec">Today</div>`+todayGroups.map(oneGroupRow).join('');
   if(!featGroups.length && !todayGroups.length){
-    html+=`<div style="text-align:center;padding:60px"><div style="font-size:50px">🔔</div><p style="color:#888;margin-top:10px">No notifications yet da<br><span style="font-size:12px">Like, comment, follow panna inga varum da!</span></p></div>`;
+    html+=`<div style="text-align:center;padding:60px"><svg viewBox="0 0 24 24" style="width:48px;height:48px;fill:none;stroke:#333;stroke-width:1.5"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><p style="color:#888;margin-top:14px">No notifications yet da<br><span style="font-size:12px">Like, comment, follow panna inga varum da!</span></p></div>`;
   }
   document.getElementById('notList').innerHTML=html;
   let hasUnread = allNots.some(n=>!n.is_read);
