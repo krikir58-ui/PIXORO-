@@ -118,7 +118,7 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 <div class="sheet" id="commentSheet" onclick="if(event.target==this)closeSheet('commentSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Comments</b></div><div id="commentList" style="overflow-y:auto;flex:1;max-height:45vh;padding:0 20px"></div><div style="display:flex;gap:10px;align-items:center;padding:10px 20px;border-top:1px solid #eee;margin-top:10px"><input id="commentInput" style="flex:1;background:#F1F1F5;border:0;border-radius:20px;padding:12px 14px;color:#111;outline:none" placeholder="Add kind comment..."><button onclick="postComment()" style="background:#FF4D8D;color:#fff;border:0;border-radius:20px;padding:10px 18px;font-weight:800">Post</button></div></div></div>
 <div class="sheet" id="shareSheet" onclick="if(event.target==this)closeSheet('shareSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Share</b></div><div class="safeCard"><div class="safeItem" onclick="copyLinkSafe()"><div class="txt"><div class="title">📋 Copy Link</div></div></div><div class="safeItem" onclick="shareWA()"><div class="txt"><div class="title">💚 WhatsApp</div></div></div></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=214"></script>
+<script src="js/pixoro-core.js?v=1001"></script>
 <script>
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
@@ -128,65 +128,9 @@ let ME_RAW='',ME_ID='',profileMap={},profileByIdMap={},allPosts=[],allLikes=[],a
 async function waitSupa(){for(let i=0;i<30;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
 window.toggleFollow = window.pixoroToggleFollow;
 window.toggleF = window.pixoroToggleFollow;
-// ✅ CORRECTED v217 - REELS NOTI FIX DA - DEDUP REMOVE + UUID FIX + DEBUG DA
-async function pixoroSendNotification(toUserId, type, postId, msg){
-  try{
-    if(!toUserId || !ME_ID){ console.log('NOTI SKIP - No ID da'); return; }
-    let targetId = String(toUserId);
-    if(!(targetId.includes('-') && targetId.length>20)){
-      let pr = profileByIdMap[targetId] || profileMap[cleanUser(targetId)];
-      if(pr) targetId = String(pr.id);
-      else { let pp = allPosts.find(p=>cleanUser(p.username)===cleanUser(targetId)); if(pp && pp.user_id) targetId = String(pp.user_id); else { console.log('NOTI SKIP - User ID Kedaikala da', toUserId); return; } }
-    }
-    if(targetId === String(ME_ID)){ console.log('NOTI SKIP - Thanakku Thane da'); return; }
-    let s = window.supa || supa; if(!s) return;
-    let safePostId = null;
-    if(postId && String(postId).includes('-') && String(postId).length>20) safePostId = String(postId);
-    console.log('NOTI SEND TRY da ->', type, 'to:', targetId, 'post:', safePostId);
-    let {data, error} = await s.from('notifications').insert({ to_user_id: targetId, from_user_id: ME_ID, from_username: ME_RAW, type: type, post_id: safePostId, message: msg, is_read: false }).select();
-    if(error) console.log('NOTI FAIL da ❌:', error.message, error);
-    else console.log('NOTI SENT da ✅:', data);
-  }catch(e){ console.log('NOTI ERROR da', e); }
-}
+// ✅ FIXED v1001 - NOTI ah TRIGGER thaan pannum da - Frontend OFF da - Triple Varaathu da
+async function pixoroSendNotification(toUserId, type, postId, msg){ return; }
 window.pixoroSendNotification = pixoroSendNotification;
-// ✅ FOLLOW - 2 WAY FIX DA - WRAP + CLICK BACKUP DA
-(function(){
-  let _tries=0;
-  let _iv=setInterval(()=>{
-    _tries++;
-    if(window.pixoroToggleFollow && !window.pixoroToggleFollow._wrapped){
-      let _old=window.pixoroToggleFollow;
-      let _wrapped=async function(name, btn){
-        let wasFollowing = btn && btn.classList.contains('following');
-        if(!wasFollowing && window.PIXORO_FOLLOWING_NAMES && window.PIXORO_FOLLOWING_NAMES.has(cleanUser(name))) wasFollowing=true;
-        await _old(name, btn);
-        if(!wasFollowing){
-          setTimeout(async ()=>{
-            let pr = profileMap[cleanUser(name)];
-            if(pr) await pixoroSendNotification(pr.id, 'follow', null, 'started following you');
-          }, 600);
-        }
-      };
-      _wrapped._wrapped=true;
-      window.pixoroToggleFollow=_wrapped; window.toggleFollow=_wrapped; window.toggleF=_wrapped;
-      clearInterval(_iv);
-    }
-    if(_tries>40) clearInterval(_iv);
-  },500);
-  document.addEventListener('click', async (e)=>{
-    let btn=e.target.closest('[data-follow-user]');
-    if(!btn) return;
-    let name=btn.getAttribute('data-follow-user');
-    if(!name) return;
-    setTimeout(async ()=>{
-      let nowFollowing = btn.classList.contains('following') || btn.innerText.includes('Following');
-      if(nowFollowing){
-        let pr=profileMap[cleanUser(name)];
-        if(pr) await pixoroSendNotification(pr.id, 'follow', null, 'started following you');
-      }
-    }, 1000);
-  });
-})();
 async function init(){
   if(_INIT_DONE) return; _INIT_DONE=true;
   supa=await waitSupa();if(!supa){_INIT_DONE=false;return;}
@@ -237,15 +181,11 @@ function pfpErr(el,uname){
 }
 window.pfpErr=pfpErr;
 function isMyPostObj(p){if(!p)return false;if(p.user_id&&String(p.user_id)===String(ME_ID))return true;return cleanUser(p.username)===cleanUser(ME_RAW)}
+// ✅ FIXED v1001 - Likes ah Post ID vachu mattum Edu da - limit(200) Illa da
 async function load(){try{
-let [r1,r2,likes,saves,follows,comments,views] = await Promise.all([
-  supa.from('posts').select('*').order('created_at',{ascending:false}).limit(12).then(r=>r).catch(()=>({data:[]})),
-  supa.from('reels').select('*').order('created_at',{ascending:false}).limit(12).then(r=>r).catch(()=>({data:[]})),
-  supa.from('likes').select('*').limit(200).then(r=>r).catch(()=>({data:[]})),
-  supa.from('saves').select('*').eq('user_id',ME_ID).then(r=>r).catch(()=>({data:[]})),
-  supa.from('follows').select('*').limit(500).then(r=>r).catch(()=>({data:[]})),
-  supa.from('comments').select('*').order('created_at',{ascending:false}).limit(100).then(r=>r).catch(()=>({data:[]})),
-  supa.from('views').select('*').limit(200).then(r=>r).catch(()=>({data:[]})),
+let [r1,r2] = await Promise.all([
+  supa.from('posts').select('*').order('created_at',{ascending:false}).limit(20).then(r=>r).catch(()=>({data:[]})),
+  supa.from('reels').select('*').order('created_at',{ascending:false}).limit(20).then(r=>r).catch(()=>({data:[]})),
 ]);
 let all=[]; if(r1.data) all=all.concat(r1.data.map(p=>({...p,_from:'posts'}))); if(r2.data) all=all.concat(r2.data.map(p=>({...p,_from:'reels'})));
 let seenUrl=new Set(); let deduped=[];
@@ -268,8 +208,18 @@ all.forEach(p=>{
   if(prof&&prof.username) p.username=cleanUser(prof.username);
   else if(p.username) p.username=cleanUser(p.username);
 });
-allPosts=all;allLikes=likes.data||[];allSaves=saves.data||[];allFollows=follows.data||[];allComments=comments.data||[];allViews=views.data||[];
-window.PIXORO_FOLLOWING=new Set((allFollows||[]).filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));
+allPosts=all;
+let postIds = allPosts.map(p=>String(p.id));
+let likes={data:[]}, saves={data:[]}, follows={data:[]}, comments={data:[]}, views={data:[]};
+if(postIds.length){
+  likes = await supa.from('likes').select('*').in('post_id', postIds).then(r=>r).catch(()=>({data:[]}));
+  saves = await supa.from('saves').select('*').eq('user_id',ME_ID).in('post_id', postIds).then(r=>r).catch(()=>({data:[]}));
+  comments = await supa.from('comments').select('*').in('post_id', postIds).order('created_at',{ascending:false}).then(r=>r).catch(()=>({data:[]}));
+  views = await supa.from('views').select('*').in('post_id', postIds).then(r=>r).catch(()=>({data:[]}));
+}
+follows = await supa.from('follows').select('*').eq('follower_id',ME_ID).then(r=>r).catch(()=>({data:[]}));
+allLikes=likes.data||[];allSaves=saves.data||[];allFollows=follows.data||[];allComments=comments.data||[];allViews=views.data||[];
+window.PIXORO_FOLLOWING=new Set((allFollows||[]).map(f=>String(f.following_id)));
 window.PIXORO_ID_TO_NAME=window.PIXORO_ID_TO_NAME||{};
 window.PIXORO_NAME_TO_ID=window.PIXORO_NAME_TO_ID||{};
 (Object.values(profileMap)||[]).forEach(pp=>{ window.PIXORO_ID_TO_NAME[String(pp.id)]=cleanUser(pp.username); window.PIXORO_NAME_TO_ID[cleanUser(pp.username)]=String(pp.id); });
@@ -285,7 +235,8 @@ async function addRealView(postId){
   let cnt = allViews.filter(v=>String(v.post_id)==String(postId)).length;
   let el = document.querySelector(`[data-viewcount="${postId}"]`);
   if(el) el.innerText = fmtViews(cnt);
-  supa.from('views').insert({post_id:postId, user_id:ME_ID, username:ME_RAW}).then(()=>{}).catch(()=>{});
+  let {error} = await supa.from('views').insert({post_id:postId, user_id:ME_ID, username:ME_RAW});
+  if(error){ allViews = allViews.filter(v=>!(String(v.post_id)==String(postId) && String(v.user_id)==String(ME_ID))); }
 }
 function nextReel(currentVideo){
   let reels=[...document.querySelectorAll('.reel')];
@@ -348,6 +299,7 @@ function observe(){
   document.addEventListener('visibilitychange',()=>{ if(document.hidden) document.querySelectorAll('video').forEach(v=>v.pause()); },{once:true});
 }
 function handleReelTap(el){let now=Date.now();if(now-lastTap<300){clearTimeout(tapTimer);lastTap=0;dblLike(el.dataset.id);return}lastTap=now;tapTimer=setTimeout(()=>{let v=el.querySelector('video.reel-main');if(v){if(!v.src && v.dataset.src){v.src=v.dataset.src;v.load();}if(v.paused){v.muted=false;globalMuted=false;currentVideo=v;v.play();showCenter(el,false)}else{v.pause();showCenter(el,true)}}lastTap=0},300)}
+// ✅ FIXED - Server Fail aana UI ah Thirumba Maathidu da
 async function dblLike(id){
   let reel=document.querySelector(`.reel[data-id="${id}"]`);let b=reel?reel.querySelector('.heartBurst'):null;
   if(b){b.classList.remove('show');void b.offsetWidth;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),900)}
@@ -355,10 +307,7 @@ async function dblLike(id){
   if(!liked){
     allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);
     let {error} = await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});
-    if(!error){
-      let p = allPosts.find(x=> String(x.id)===String(id));
-      if(p){ await pixoroSendNotification(p.user_id, 'like', id, 'liked your post'); }
-    }
+    if(error){ allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID))); updateLikeUI(id,false); showToast('Like Save Aagala da'); }
   }
 }
 async function toggleLike(id){
@@ -366,13 +315,11 @@ async function toggleLike(id){
   if(!liked){
     allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);
     let {error} = await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});
-    if(!error){
-      let p = allPosts.find(x=> String(x.id)===String(id));
-      if(p){ await pixoroSendNotification(p.user_id, 'like', id, 'liked your post'); }
-    }
+    if(error){ allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID))); updateLikeUI(id,false); showToast('Like Save Aagala da: '+error.message); }
   } else {
     allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID)));updateLikeUI(id,false);
-    supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}).catch(()=>{});
+    let {error} = await supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID);
+    if(error){ allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW}); updateLikeUI(id,true); }
   }
 }
 function updateLikeUI(id,liked){let btn=document.getElementById('likeBtn-'+id);let svg=document.getElementById('likeSvg-'+id);let cnt=document.getElementById('likeCnt-'+id);if(btn){if(liked)btn.classList.add('liked');else btn.classList.remove('liked')}if(svg){svg.setAttribute('fill',liked?'#ff3040':'none');svg.setAttribute('stroke',liked?'#ff3040':'#fff');}if(cnt){let n=allLikes.filter(l=>String(l.post_id)==String(id)).length;cnt.innerText=n>0?n:''}}
@@ -412,10 +359,7 @@ async function postComment(){
   let tmp={id:'tmp_'+Date.now(),post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t};
   allComments.unshift(tmp);inp.value='';openCommentSheet(curCommentPost);
   let {error} = await supa.from('comments').insert({post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t});
-  if(!error){
-    let p = allPosts.find(x=> String(x.id)===String(curCommentPost));
-    if(p){ await pixoroSendNotification(p.user_id, 'comment', curCommentPost, 'commented: "'+t+'"'); }
-  }
+  if(error){ allComments = allComments.filter(c=>c.id!==tmp.id); openCommentSheet(curCommentPost); showToast('Comment Save Aagala da'); }
 }
 async function deleteComment(cid,pid){allComments=allComments.filter(c=>String(c.id)!=String(cid));openCommentSheet(pid);supa.from('comments').delete().eq('id',cid).then(()=>{}).catch(()=>{});}
 function openShareSheet(pid){curShareId=pid;document.getElementById('shareSheet').classList.add('show')}
@@ -432,10 +376,13 @@ async function saveR(id){
     let isSaved=allSaves.some(x=>String(x.post_id)===id && String(x.user_id)===String(ME_ID));
     if(isSaved){
       allSaves=allSaves.filter(x=>!(String(x.post_id)===id && String(x.user_id)===String(ME_ID))); updateSaveUI(id,false);
-      supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID).then(()=>{}).catch(()=>{});
+      let {error} = await supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID);
+      if(error){ allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW}); updateSaveUI(id,true); }
     } else {
       allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW}); updateSaveUI(id,true);
-      supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).select().single().then(({data})=>{ if(data) allSaves[allSaves.length-1]=data; }).catch(()=>{});
+      let {data,error} = await supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).select().single();
+      if(error){ allSaves=allSaves.filter(x=>!(String(x.post_id)===id && String(x.user_id)===String(ME_ID))); updateSaveUI(id,false); showToast('Save Aagala da'); }
+      else if(data) allSaves[allSaves.length-1]=data;
     }
   } finally { savingIds.delete(id); }
 }
