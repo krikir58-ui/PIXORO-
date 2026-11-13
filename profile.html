@@ -58,7 +58,7 @@ input[type=range]{width:100%;accent-color:#fff}
 <div class="bottom-nav"><a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a><a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a><a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a><a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a><a href="profile.html" class="active"><img class="navPfp" id="navPfp" src="" onerror="pfpErr(this,'')"><span>Profile</span></a></div>
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=1002"></script>
+<script src="js/pixoro-core.js?v=1003"></script>
 <script>
 function getSupa(){return window.supa}
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase();return u||''}
@@ -162,7 +162,6 @@ async function init(){
   let posts2=all.filter(p=> (String(p.user_id)===String(VIEW_PROFILE.id) || cleanUser(p.username)===cleanUser(VIEW_PROFILE.username)) );
   posts2=posts2.filter(p=> isRealPhoto(p.media_url||p.video_url||p.image_url||p.image) );
   posts2.forEach(p=>{ if(!p.username||p.username.length>20) p.username=VIEW_USER; else p.username=cleanUser(p.username); });
-  // ✅ FIXED v1002 - Block panna User Post Maraikkuren da
   if(isBlocked || isBlockedByThem) posts2=[];
   myPosts=posts2;
   document.getElementById('postCount').textContent=myPosts.length; document.getElementById('tabPosts').innerHTML=`⊞ Posts`; document.getElementById('tabReels').innerHTML=`Reels`; document.getElementById('tabSaved').innerHTML=`Saved`;
@@ -247,8 +246,7 @@ function hideMenu(){ document.getElementById('pixoroMenu').style.display='none' 
 function hidePostLocal(id){ hideMenu(); if(!hiddenLocalIds.includes(String(id))) hiddenLocalIds.push(String(id)); myPosts=myPosts.filter(p=>String(p.id)!==String(id)); renderGrid(currentTab==='reels'?myPosts.filter(isReelPost):myPosts); showToast('Hidden for you da'); }
 async function pixoroRemoveFromGridLocal(id){ hideMenu(); let p=[...myPosts,...savedPosts].find(x=>String(x.id)===String(id)); if(!isOwnerOfPost(p)){ showToast('Un post mattum remove panna mudiyum da'); return; } let supa=getSupa(); let {error}=await supa.from('posts').update({is_archived:true}).eq('id',id); if(error) return showToast('Remove Aagala da'); myPosts=myPosts.filter(p=>String(p.id)!==String(id)); renderGrid(currentTab==='reels'?myPosts.filter(isReelPost):myPosts); }
 async function deletePixoroPost(id){ hideMenu(); let p=[...myPosts,...savedPosts].find(x=>String(x.id)===String(id)); if(!isOwnerOfPost(p)){ showToast('Un post mattum delete panna mudiyum da'); return; } if(!confirm('Delete pannava da?')) return; let supa=getSupa(); let {error}=await supa.from('posts').delete().eq('id',id); if(error) return showToast('Delete Aagala da'); myPosts=myPosts.filter(p=>String(p.id)!==String(id)); renderGrid(currentTab==='reels'?myPosts.filter(isReelPost):myPosts); }
-// ✅ FIXED v1002 - Save la username Koodathu da - UUID mattum da
-async function savePixoroPost(id){ hideMenu(); if(!pixoroIsUuidLocal(ME_ID) || !pixoroIsUuidLocal(id)) return; let supa=getSupa(); let {error}=await supa.from('saves').insert({post_id:id,user_id:ME_ID}); if(error && !String(error.message).includes('duplicate')) return showToast('Save Aagala da'); if(currentTab==='saved') showTab('saved'); }
+async function savePixoroPost(id){ hideMenu(); if(!pixoroIsUuidLocal(ME_ID) || !pixoroIsUuidLocal(id)) return; let supa=getSupa(); let {error}=await supa.from('saves').upsert({post_id:id,user_id:ME_ID},{onConflict:'post_id,user_id'}); if(error && !String(error.message).includes('duplicate')) return showToast('Save Aagala da'); if(currentTab==='saved') showTab('saved'); }
 async function unsaveFromProfile(id){ hideMenu(); let supa=getSupa(); await supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID); savedPosts=savedPosts.filter(p=>String(p.id)!==String(id)); document.getElementById('tabSaved').innerHTML=`Saved`; renderGrid(savedPosts,'No saved posts da'); }
 function sharePixoroPost(id){ hideMenu(); navigator.clipboard.writeText(location.origin+'/index.html?id='+id); }
 async function showTab(type){ currentTab=type; document.getElementById('tabPosts').classList.toggle('active',type=='all'); document.getElementById('tabReels').classList.toggle('active',type=='reels'); let st=document.getElementById('tabSaved'); if(st) st.classList.toggle('active',type=='saved'); if(type=='saved'){ await loadSavedList(); renderGrid(savedPosts,'No saved posts da'); return; } let list=myPosts; if(type=='reels') list=myPosts.filter(isReelPost); renderGrid(list) }
