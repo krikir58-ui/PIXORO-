@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PIXORO - Chats</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=214"></script>
+<script src="js/pixoro-core.js?v=1001"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:76px}
@@ -232,21 +232,29 @@ function openSheet(user,uname){ SHEET_USER=user; SHEET_UNAME=uname; document.get
 function doPin(){ let i=PINNED.indexOf(SHEET_USER); if(i>=0) PINNED.splice(i,1); else PINNED.unshift(SHEET_USER); closeAllSheets(); render(); }
 function doMute(){ let i=MUTED.indexOf(SHEET_USER); if(i>=0) MUTED.splice(i,1); else MUTED.push(SHEET_USER); closeAllSheets(); render(); }
 function doArchive(){ if(!ARCHIVED.includes(SHEET_USER)) ARCHIVED.push(SHEET_USER); closeAllSheets(); render(); }
-// ===== BLOCK - CORRECTED - Oru vaati mattum da =====
-function doBlockFromSheet(){ if(!BLOCKED.includes(SHEET_USER)) BLOCKED.push(SHEET_USER); ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); closeAllSheets(); showToast('Blocked'); render(); if(window.pixoroBlockUser) pixoroBlockUser(SHEET_UNAME); }
-function doUnblock(id,uname){ BLOCKED=BLOCKED.filter(x=>x!==id); showToast('Unblocked'); render(); }
+// ✅ FIXED v1001 - Block ah Server la mattum da - Local la illa da
+async function doBlockFromSheet(){
+  closeAllSheets(); showToast('Blocking...');
+  if(window.pixoroBlockUser){ await window.pixoroBlockUser(SHEET_UNAME); }
+  if(!BLOCKED.includes(SHEET_USER)) BLOCKED.push(SHEET_USER);
+  ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); render();
+}
+async function doUnblock(id,uname){
+  let supa2=window.supa;
+  if(supa2){ await supa2.from('blocked_users').delete().eq('user_id',ME_ID).eq('blocked_user_id',id); }
+  BLOCKED=BLOCKED.filter(x=>x!==id); showToast('Unblocked'); render();
+}
 function doDeleteChatOnly(){ ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); closeAllSheets(); showToast('Deleted'); render(); }
 async function doDeleteAll(){
   let other = SHEET_USER;
   ALL_CHATS=ALL_CHATS.filter(c=>c.other!==other); closeAllSheets(); showToast('Deleted'); render();
   try{
-    // Un messages mattum delete pannu da - vera aalu chat ah thodaatha da
     await supa.from('messages').delete().eq('sender_id',ME_ID).eq('receiver_id',other);
     await supa.from('messages').delete().eq('sender_id',other).eq('receiver_id',ME_ID);
   }catch(e){}
 }
-async function loadNotes(){ let {data}=await supa.from('notes').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false}); NOTES_MAP={}; (data||[]).forEach(n=>{ NOTES_MAP[cleanUser(n.username)]=n.text; }); let usersWithNote = Object.keys(NOTES_MAP).filter(u=>u!==ME_RAW); let myNote = NOTES_MAP[ME_RAW]; let html=''; html+=`<div class="nItem" onclick="document.getElementById('notePop').style.display='block'"><div class="nRing"><div class="nRingInner">${avatarHtml(ME_RAW,'small',true)}${myNote?`<div class="noteBubble">${myNote}</div>`:''}</div></div><div style="font-size:10px;margin-top:4px;color:#aaa">Your note</div></div>`; html+=usersWithNote.slice(0,10).map(u=>`<div class="nItem" onclick="openChatUser('${u}')"><div class="nRing"><div class="nRingInner">${avatarHtml(u,'small',true)}<div class="noteBubble">${NOTES_MAP[u]}</div></div></div><div style="font-size:10px;margin-top:4px;color:#aaa">${u}</div></div>`).join(''); document.getElementById('notes').style.display = (myNote || usersWithNote.length) ? 'flex' : 'none'; document.getElementById('notes').innerHTML=html; }
-async function saveNote(){ let t=document.getElementById('noteText').value.trim(); if(!t) return; let exp=new Date(); exp.setHours(exp.getHours()+24); await supa.from('notes').delete().eq('username',ME_RAW); await supa.from('notes').insert({user_id:ME_ID,username:ME_RAW,text:t,expires_at:exp.toISOString()}); document.getElementById('notePop').style.display='none'; loadNotes(); }
+async function loadNotes(){ let {data}=await supa.from('notes').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false}).limit(50); NOTES_MAP={}; (data||[]).forEach(n=>{ NOTES_MAP[cleanUser(n.username)]=n.text; }); let usersWithNote = Object.keys(NOTES_MAP).filter(u=>u!==ME_RAW); let myNote = NOTES_MAP[ME_RAW]; let html=''; html+=`<div class="nItem" onclick="document.getElementById('notePop').style.display='block'"><div class="nRing"><div class="nRingInner">${avatarHtml(ME_RAW,'small',true)}${myNote?`<div class="noteBubble">${myNote}</div>`:''}</div></div><div style="font-size:10px;margin-top:4px;color:#aaa">Your note</div></div>`; html+=usersWithNote.slice(0,10).map(u=>`<div class="nItem" onclick="openChatUser('${u}')"><div class="nRing"><div class="nRingInner">${avatarHtml(u,'small',true)}<div class="noteBubble">${NOTES_MAP[u]}</div></div></div><div style="font-size:10px;margin-top:4px;color:#aaa">${u}</div></div>`).join(''); document.getElementById('notes').style.display = (myNote || usersWithNote.length) ? 'flex' : 'none'; document.getElementById('notes').innerHTML=html; }
+async function saveNote(){ let t=document.getElementById('noteText').value.trim(); if(!t) return; let exp=new Date(); exp.setHours(exp.getHours()+24); await supa.from('notes').delete().eq('username',ME_RAW); let {error}=await supa.from('notes').insert({user_id:ME_ID,username:ME_RAW,text:t,expires_at:exp.toISOString()}); if(error) return showToast('Note Save Aagala da'); document.getElementById('notePop').style.display='none'; loadNotes(); }
 function renderOnline(){ let online = Object.values(profileMap).filter(p=>p.is_online && cleanUser(p.username)!==ME_RAW).slice(0,12); let box=document.getElementById('onlineBox'); if(!online.length){ box.style.display='none'; return; } box.style.display='block'; document.getElementById('onlineRow').innerHTML=online.map(p=>{ let u=cleanUser(p.username); return `<div class="onItem" onclick="openChatUser('${u}')"><div class="onAva"><div class="onAvaIn">${avatarHtml(u,'small',true)}</div><span class="onDot"></span></div><div style="font-size:11px;margin-top:4px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u}</div><div style="font-size:10px;color:#22C55E;font-weight:700">Online</div></div>` }).join(''); }
 function render(){
   renderOnline();
@@ -284,8 +292,8 @@ function render(){
     return `<div class="chatRow" onmousedown="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" onmouseup="clearTimeout(pressTimer)" ontouchstart="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" ontouchend="clearTimeout(pressTimer)"><div class="avaWrap ${isOn?'':'off'}" onclick="event.stopPropagation();openProfileUser('${cleanUser(uname)}')">${avatarHtml(cleanUser(uname),'',isOn)}${isOn?`<span class="onlineDot"></span>`:``}</div><div class="chatMain" onclick="openChatUser('${cleanUser(uname)}')"><div class="chatTopRow"><span class="chatName" onclick="event.stopPropagation();openProfileUser('${cleanUser(uname)}')">${isPin?'📌 ':''}${cleanUser(uname)}${tickGold} ${isMute?'🔕':''}</span><span class="chatTime">${fmtTime(c.msg.created_at)}</span></div><div class="chatPrevRow"><span class="chatPrev">${tick}${previewTxt}</span>${badge}</div>${statusTxt}${reqBtn}</div></div>`
   }).join('');
 }
-function doBlockFromSheet2(id,uname){ if(!BLOCKED.includes(id)) BLOCKED.push(id); ALL_CHATS=ALL_CHATS.filter(c=>c.other!==id); showToast('Blocked'); render(); }
-// ===== INIT - CORRECTED - FLICKER FIX DA =====
+async function doBlockFromSheet2(id,uname){ if(window.pixoroBlockUser){ await window.pixoroBlockUser(uname); } if(!BLOCKED.includes(id)) BLOCKED.push(id); ALL_CHATS=ALL_CHATS.filter(c=>c.other!==id); showToast('Blocked'); render(); }
+// ✅ FIXED v1001 - INIT - Profiles ah Limit vachu Edu da
 async function init(){
   if(DM_AUTH_DONE) return; DM_AUTH_DONE=true;
   if(!window.supa){DM_AUTH_DONE=false;setTimeout(init,300);return} supa=window.supa;
@@ -293,7 +301,9 @@ async function init(){
   if(!session){ await new Promise(r=>setTimeout(r,800)); let s2=await supa.auth.getSession(); session=s2.data.session; }
   if(!session){location.href='login.html';return}
   ME_ID=session.user.id; window.ME_ID=ME_ID; let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).maybeSingle(); ME_RAW=cleanUser(my?.username||session.user.email.split('@')[0]); window.ME_RAW=ME_RAW; let navPfp=document.getElementById('navPfp'); if(navPfp && my?.avatar_url) navPfp.src=my.avatar_url; else if(navPfp) navPfp.style.display='none';
-  let {data:profs}=await supa.from('profiles').select('*'); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p});
+  let {data:profs}=await supa.from('profiles').select('*').limit(200); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p});
+  let {data: blocked} = await supa.from('blocked_users').select('blocked_user_id').eq('user_id',ME_ID);
+  BLOCKED = (blocked||[]).map(x=>String(x.blocked_user_id));
   await loadUserSettings();
   updatePresence(true); setInterval(()=>updatePresence(true),30000); loadNotes(); load();
   if(window.pixoroRefreshPhotos) await window.pixoroRefreshPhotos();
@@ -302,12 +312,12 @@ async function init(){
   supa.channel('notes-live').on('postgres_changes',{event:'*',schema:'public',table:'notes'},()=>loadNotes()).subscribe();
   document.addEventListener('visibilitychange',()=>{ if(document.hidden) updatePresence(false); else updatePresence(true); });
 }
+// ✅ FIXED v1001 - PRIVACY - En Messages mattum Server la irunthu Edu da - Vera aalu DM Varaathu da
 async function load(){
-  let {data:profs}=await supa.from('profiles').select('*'); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p});
+  let {data:profs}=await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url,is_online,last_seen').limit(200); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p});
   if(window.pixoroRefreshPhotos) window.pixoroRefreshPhotos();
-  let {data}=await supa.from('messages').select('*').order('created_at',{ascending:false}).limit(300); if(!data) data=[];
-  // ===== PRIVACY FIX DA - Un messages mattum da =====
-  data = data.filter(m=> String(m.sender_id)===String(ME_ID) || String(m.receiver_id)===String(ME_ID) || cleanUser(m.sender)===ME_RAW || cleanUser(m.receiver)===ME_RAW );
+  let {data} = await supa.from('messages').select('*').or(`sender_id.eq.${ME_ID},receiver_id.eq.${ME_ID}`).order('created_at',{ascending:false}).limit(200);
+  if(!data) data=[];
   UNREAD_MAP={}; data.forEach(m=>{ if(!isMineMsg(m) && !m.seen){ let oid=otherIdOf(m); UNREAD_MAP[oid]=(UNREAD_MAP[oid]||0)+1; } });
   let map={}; data.forEach(m=>{ let oid=otherIdOf(m); if(!oid || cleanUser(oid)===ME_RAW) return; if(!profileMap[cleanUser(oid)] && !profileById[oid]) return; if(!map[oid] || new Date(m.created_at)>new Date(map[oid].created_at)) map[oid]=m; });
   ALL_CHATS=Object.values(map).map(c=>{ let oid=otherIdOf(c); let raw=(c.text||c.message||c.content||''); let preview=''; if(c.type==='voice'||c.media_type==='voice') preview='Voice'; else if(c.type==='image'||c.media_type==='image'||c.media_path) preview='Photo'; else if(c.type==='video'||c.media_type==='video') preview='Video'; else if(raw.startsWith('{"e2e"')) preview='Message'; else if(raw.trim()) preview=raw.slice(0,40); else preview='Message'; let isFirstFromThem=!isMineMsg(c); let threadType='primary'; if(isFirstFromThem && !c.seen) threadType='requests'; return {other:oid,msg:c,preview,threadType}; });
