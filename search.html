@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Search - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=214"></script>
+<script src="js/pixoro-core.js?v=1001"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{padding:10px 12px;position:sticky;top:0;background:#000;z-index:10}
@@ -53,7 +53,9 @@ function getBestMedia(p){if(p._from==='reels') return {url:p.video_url||p.media_
 function goToPost(p){let best=getBestMedia(p);if(best.isVid){location.href='reels.html?id='+p.id;}else{location.href='index.html?id='+p.id;}}
 window.toggleFollow = window.pixoroToggleFollow;
 window.toggleF = window.pixoroToggleFollow;
-// ===== INIT - CORRECTED - FLICKER FIX DA =====
+// ✅ FIXED v1001 - NOTI ah TRIGGER thaan pannum da - Frontend la Podatha da
+async function pixoroSendNotification(){ return; }
+window.pixoroSendNotification = pixoroSendNotification;
 let SEARCH_AUTH_DONE = false;
 async function init(){
   if(SEARCH_AUTH_DONE) return;
@@ -70,7 +72,7 @@ async function init(){
   ME_ID=session.user.id;window.ME_ID=ME_ID;
   let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
   ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;
-  let {data:profs}=await supa.from('profiles').select('*').limit(500);
+  let {data:profs}=await supa.from('profiles').select('*').limit(100);
   allProfilesCache=profs||[];(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p});
   let el=document.getElementById('navPfp');if(el) el.src=getPfp(ME_RAW);
   if(window.pixoroRefreshPhotos) await window.pixoroRefreshPhotos();
@@ -79,12 +81,12 @@ async function init(){
 }
 async function loadTrending(){
   let all=[];
-  try{let r=await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(30);if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'posts'})));}catch(e){}
+  try{let r=await supa.from('posts').select('*').eq('is_archived',false).order('created_at',{ascending:false}).limit(30);if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'posts'})));}catch(e){}
   try{let r=await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(30);if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'reels'})));}catch(e){}
   let seenUrl=new Set(),seenId=new Set(),deduped=[];
   for(let p of all){
     let raw=(p.media_url||p.video_url||'').trim();if(!raw) continue;
-    if(p.is_archived === true) continue; // reels la is_archived illa da - undefined = show da
+    if(p.is_archived === true) continue;
     let u=raw.split('?')[0].split('#')[0].toLowerCase().trim();
     let fileKey=u.includes('/storage/')?u.split('/storage/')[1]:u;
     if(seenUrl.has(u)||seenUrl.has(fileKey)) continue;
@@ -95,22 +97,34 @@ async function loadTrending(){
   document.getElementById('grid').innerHTML=deduped.map((p,idx)=>{let best=getBestMedia(p);if(!best.url) return '';if(best.isVid) return `<div class="gridItem" onclick="goToPost(allPosts[${idx}])"><video src="${best.url}" muted playsinline preload="metadata"></video><span class="play">▶</span></div>`;return `<div class="gridItem" onclick="goToPost(allPosts[${idx}])"><img src="${best.url}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`;}).join('');
   if(!deduped.length) document.getElementById('grid').innerHTML='<p style="padding:30px;color:#777;text-align:center">No posts yet da</p>';
 }
+let _searchTimer = null;
+// ✅ FIXED v1001 - Search ah Server la irunthu Edu da - Cache la illa da - Pudhu User um Varuvan da
 async function doSearch(){
-  let qRaw=document.getElementById('searchInput').value.trim();
-  let trend=document.getElementById('trendingWrap');let box=document.getElementById('results');
-  if(!qRaw){box.innerHTML='';trend.style.display='block';return;}
-  trend.style.display='none';
-  let cleanQ=cleanUser(qRaw);let lowerQ=qRaw.toLowerCase();
-  let list=allProfilesCache.filter(p=>{if(String(p.id)===String(ME_ID)) return false;let uname=cleanUser(p.username||'');let idLower=String(p.id||'').toLowerCase();return uname.includes(cleanQ)||idLower.includes(lowerQ)||idLower.replace(/-/g,'').includes(lowerQ.replace(/-/g,''));});
-  if(list.length===0){let {data:profs}=await supa.from('profiles').select('*').ilike('username','%'+cleanQ+'%');if(profs) list=profs.filter(p=>String(p.id)!==String(ME_ID));}
-  if(!list.length){box.innerHTML=`<p style="padding:30px 20px;color:#777;text-align:center">No users found da<br>Try: <b style="color:#fff">sanjay</b></p>`;return;}
-  box.innerHTML=list.slice(0,30).map(p=>{
-    let u=cleanUser(p.username);
-    let tick = window.goldTickHTML ? window.goldTickHTML(p) : '';
-    let isFollowing = window.PIXORO_FOLLOWING_NAMES ? window.PIXORO_FOLLOWING_NAMES.has(u) : false;
-    return `<div class="userRow" onclick="location.href='profile.html?u=${p.id}'"><div class="uAva">${avatarHtml(u, p.id)}</div><div style="flex:1;min-width:0" onclick="event.stopPropagation();location.href='profile.html?u=${p.id}'"><b>@${u}${tick}</b><div style="font-size:12px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.bio||'Pixoro User'}</div></div><button data-follow-user="${u}" data-follow-username="${u}" class="followBtnSearch ${isFollowing?'following':''}" onclick="event.stopPropagation();pixoroToggleFollow('${u}',this)">${isFollowing?'Following':'Follow'}</button></div>`;
-  }).join('');
-  if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(async ()=>{
+    let qRaw=document.getElementById('searchInput').value.trim();
+    let trend=document.getElementById('trendingWrap');let box=document.getElementById('results');
+    if(!qRaw){box.innerHTML='';trend.style.display='block';return;}
+    trend.style.display='none';
+    let cleanQ=cleanUser(qRaw);
+    let list=[];
+    try{
+      let {data: profs} = await supa.from('profiles').select('*').ilike('username','%'+cleanQ+'%').limit(30);
+      list = (profs||[]).filter(p=>String(p.id)!==String(ME_ID));
+    }catch(e){}
+    if(!list.length){
+      list = allProfilesCache.filter(p=>{if(String(p.id)===String(ME_ID)) return false;let uname=cleanUser(p.username||'');return uname.includes(cleanQ);});
+    }
+    list.forEach(p=>{ profileMap[cleanUser(p.username)]=p; });
+    if(!list.length){box.innerHTML=`<p style="padding:30px 20px;color:#777;text-align:center">No users found da<br>Try: <b style="color:#fff">sanjay</b></p>`;return;}
+    box.innerHTML=list.slice(0,30).map(p=>{
+      let u=cleanUser(p.username);
+      let tick = window.goldTickHTML ? window.goldTickHTML(p) : '';
+      let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(u) : (window.PIXORO_FOLLOWING_NAMES ? window.PIXORO_FOLLOWING_NAMES.has(u) : false);
+      return `<div class="userRow" onclick="location.href='profile.html?u=${p.id}'"><div class="uAva">${avatarHtml(u, p.id)}</div><div style="flex:1;min-width:0" onclick="event.stopPropagation();location.href='profile.html?u=${p.id}'"><b>@${u}${tick}</b><div style="font-size:12px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.bio||'Pixoro User'}</div></div><button data-follow-user="${u}" data-follow-username="${u}" class="followBtnSearch ${isFollowing?'following':''}" onclick="event.stopPropagation();pixoroToggleFollow('${u}',this)">${isFollowing?'Following':'Follow'}</button></div>`;
+    }).join('');
+    if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
+  }, 250);
 }
 window.goToPost=goToPost;
 init()
