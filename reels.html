@@ -118,7 +118,7 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 <div class="sheet" id="commentSheet" onclick="if(event.target==this)closeSheet('commentSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Comments</b></div><div id="commentList" style="overflow-y:auto;flex:1;max-height:45vh;padding:0 20px"></div><div style="display:flex;gap:10px;align-items:center;padding:10px 20px;border-top:1px solid #eee;margin-top:10px"><input id="commentInput" style="flex:1;background:#F1F1F5;border:0;border-radius:20px;padding:12px 14px;color:#111;outline:none" placeholder="Add kind comment..."><button onclick="postComment()" style="background:#FF4D8D;color:#fff;border:0;border-radius:20px;padding:10px 18px;font-weight:800">Post</button></div></div></div>
 <div class="sheet" id="shareSheet" onclick="if(event.target==this)closeSheet('shareSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Share</b></div><div class="safeCard"><div class="safeItem" onclick="copyLinkSafe()"><div class="txt"><div class="title">📋 Copy Link</div></div></div><div class="safeItem" onclick="shareWA()"><div class="txt"><div class="title">💚 WhatsApp</div></div></div></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=1002"></script>
+<script src="js/pixoro-core.js?v=1003"></script>
 <script>
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
@@ -299,7 +299,6 @@ function observe(){
   document.addEventListener('visibilitychange',()=>{ if(document.hidden) document.querySelectorAll('video').forEach(v=>v.pause()); },{once:true});
 }
 function handleReelTap(el){let now=Date.now();if(now-lastTap<300){clearTimeout(tapTimer);lastTap=0;dblLike(el.dataset.id);return}lastTap=now;tapTimer=setTimeout(()=>{let v=el.querySelector('video.reel-main');if(v){if(!v.src && v.dataset.src){v.src=v.dataset.src;v.load();}if(v.paused){v.muted=false;globalMuted=false;currentVideo=v;v.play();showCenter(el,false)}else{v.pause();showCenter(el,true)}}lastTap=0},300)}
-// ✅ FIXED v1002 - Like la username Koodathu da
 async function dblLike(id){
   if(!pixoroIsUuidLocal(ME_ID) || !pixoroIsUuidLocal(id)) return;
   let reel=document.querySelector(`.reel[data-id="${id}"]`);let b=reel?reel.querySelector('.heartBurst'):null;
@@ -307,7 +306,7 @@ async function dblLike(id){
   let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));
   if(!liked){
     allLikes.push({post_id:id,user_id:ME_ID});updateLikeUI(id,true);
-    let {error} = await supa.from('likes').insert({post_id:id,user_id:ME_ID});
+    let {error} = await supa.from('likes').upsert({post_id:id,user_id:ME_ID},{onConflict:'post_id,user_id'});
     if(error){ allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID))); updateLikeUI(id,false); showToast('Like Save Aagala da'); }
   }
 }
@@ -316,7 +315,7 @@ async function toggleLike(id){
   let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));
   if(!liked){
     allLikes.push({post_id:id,user_id:ME_ID});updateLikeUI(id,true);
-    let {error} = await supa.from('likes').insert({post_id:id,user_id:ME_ID});
+    let {error} = await supa.from('likes').upsert({post_id:id,user_id:ME_ID},{onConflict:'post_id,user_id'});
     if(error){ allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID))); updateLikeUI(id,false); showToast('Like Save Aagala da: '+error.message); }
   } else {
     allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID)));updateLikeUI(id,false);
@@ -372,7 +371,6 @@ function updateSaveUI(id,saved){
   if(btn) btn.classList.toggle('saved',saved);
   if(svg) svg.setAttribute('fill',saved?'#fff':'none');
 }
-// ✅ FIXED v1002 - Save la username Koodathu da
 async function saveR(id){
   id=String(id);
   if(!pixoroIsUuidLocal(ME_ID) || !pixoroIsUuidLocal(id)) return;
@@ -385,7 +383,7 @@ async function saveR(id){
       if(error){ allSaves.push({post_id:id,user_id:ME_ID}); updateSaveUI(id,true); }
     } else {
       allSaves.push({post_id:id,user_id:ME_ID}); updateSaveUI(id,true);
-      let {data,error} = await supa.from('saves').insert({post_id:id,user_id:ME_ID}).select().single();
+      let {data,error} = await supa.from('saves').upsert({post_id:id,user_id:ME_ID},{onConflict:'post_id,user_id'}).select().single();
       if(error){ allSaves=allSaves.filter(x=>!(String(x.post_id)===id && String(x.user_id)===String(ME_ID))); updateSaveUI(id,false); showToast('Save Aagala da'); }
       else if(data) allSaves[allSaves.length-1]=data;
     }
