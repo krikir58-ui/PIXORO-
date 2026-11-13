@@ -3,7 +3,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="js/pixoro-core.js?v=213"></script>
+<script src="js/pixoro-core.js?v=999"></script>
 <style>
 body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif!important;display:flex;justify-content:center;padding:20px}
 .box{width:360px;text-align:center}.card{border:1px solid #262626;padding:20px;border-radius:12px;margin-bottom:10px;background:#0a0a0a}
@@ -40,7 +40,7 @@ button:disabled{opacity:0.6}
 <button onclick="verifyOTP()">Verify OTP ✅</button>
 <p id="timer">Resend in 60s</p>
 <button id="resendBtn" onclick="sendOTP(true)" class="hide" style="background:#262626;color:#FFD700">Resend OTP 🔁</button>
-<button onclick="go('s1')" style="background:#262626;color:#FFD700">Back</button>
+<button onclick="go('s1');localStorage.removeItem('pixoro_pending_email');localStorage.removeItem('pixoro_pending_step');" style="background:#262626;color:#FFD700">Back</button>
 <p id="msgOTP" style="color:#ff3040;font-size:13px"></p>
 </div>
 <div class="card hide" id="s2">
@@ -91,8 +91,8 @@ button:disabled{opacity:0.6}
 </div>
 </div>
 <script>
-let supa=window.supa, curEmail='', forgotEmailVal='', timerInt, LOGIN_CHECK_DONE=false;
-// ===== FIREBASE - SAFE DA - FAIL AANAALUM APP ODAIYAATHU DA =====
+// ✅ FIXED - Email + OTP Step ah localStorage la Save pannu da - Refresh pannalum pogathu da - Final Save ellam SERVER la thaan da
+let supa=window.supa, curEmail=localStorage.getItem('pixoro_pending_email')||'', forgotEmailVal=localStorage.getItem('pixoro_forgot_email')||'', timerInt, LOGIN_CHECK_DONE=false;
 const firebaseConfig = { apiKey: "PASTE_FIREBASE_API_KEY", authDomain: "PASTE_PROJECT.firebaseapp.com", projectId: "PASTE_PROJECT_ID" };
 try{ if(!firebase.apps.length) firebase.initializeApp(firebaseConfig); }catch(e){}
 async function loginToFirebase(){
@@ -118,22 +118,35 @@ async function checkAlreadyLoggedIn(){
   if(LOGIN_CHECK_DONE) return; LOGIN_CHECK_DONE=true;
   supa = await waitSupa();
   if(!supa) return;
-  if(new URLSearchParams(location.search).get('logout')==='1') return;
+  if(new URLSearchParams(location.search).get('logout')==='1'){ localStorage.removeItem('pixoro_pending_email'); localStorage.removeItem('pixoro_pending_step'); return; }
   let {data:{session}} = await supa.auth.getSession();
-  if(!session || !session.user) return;
-  let {data:prof} = await supa.from('profiles').select('username').eq('id',session.user.id).maybeSingle();
-  if(prof && prof.username){ await loginToFirebase(); location.href='index.html'; return; }
-  curEmail = session.user.email || '';
-  go('s2');
+  if(session && session.user){
+    let {data:prof} = await supa.from('profiles').select('username').eq('id',session.user.id).maybeSingle();
+    if(prof && prof.username){ localStorage.removeItem('pixoro_pending_email'); localStorage.removeItem('pixoro_pending_step'); await loginToFirebase(); location.href='index.html'; return; }
+    curEmail = session.user.email || curEmail;
+    localStorage.setItem('pixoro_pending_email', curEmail);
+    go('s2'); return;
+  }
+  // ✅ REFRESH AANALUM - OTP Step la iruntha - OTP Screen thaan kaatu da
+  if(curEmail && localStorage.getItem('pixoro_pending_step')==='otp'){
+    document.getElementById('email').value = curEmail;
+    document.getElementById('otpInfo').innerText='OTP sent to '+curEmail+' - Spam / Promotions la Paaru da 📩';
+    go('sOTP'); startTimer();
+  } else if(curEmail){
+    document.getElementById('email').value = curEmail;
+  }
 }
 checkAlreadyLoggedIn();
 async function sendOTP(isResend){
   supa = await waitSupa();
   if(!supa) return showErr('msg1','Supabase Load Aagala da - Refresh Pannu da 🔄');
   let emailVal = document.getElementById('email').value.trim().toLowerCase();
-  curEmail = emailVal || curEmail;
+  curEmail = emailVal || curEmail || localStorage.getItem('pixoro_pending_email') || '';
   if(!curEmail.includes('@')) return showErr('msg1','Valid Email Podu da');
   showErr('msg1','');
+  // ✅ SERVER ku anuppa munnadi - Email + Step ah localStorage la Save pannidu da
+  localStorage.setItem('pixoro_pending_email', curEmail);
+  localStorage.setItem('pixoro_pending_step', 'otp');
   let btn = document.getElementById('sendBtn');
   if(btn){btn.disabled=true; btn.innerText='Sending... ⏳';}
   let {error}=await supa.auth.signInWithOtp({email:curEmail, options:{shouldCreateUser:true, emailRedirectTo: location.origin + '/index.html'}});
@@ -148,8 +161,11 @@ async function sendOTP(isResend){
   go('sOTP'); startTimer(); setTimeout(()=>document.getElementById('o1').focus(),100);
 }
 async function verifyOTP(){
+  // ✅ Refresh aana kooda - localStorage la irunthu Email ah Edu da
+  if(!curEmail) curEmail = localStorage.getItem('pixoro_pending_email') || '';
   let code=getOTP()
   if(code.length<6) return showErr('msgOTP','6 Digit OTP Podu da')
+  if(!curEmail.includes('@')) return showErr('msgOTP','Email Kaanom da - Back poi Thirumba Email Podu da');
   showErr('msgOTP','Checking... ⏳');
   let {data,error}=await supa.auth.verifyOtp({email:curEmail, token:code, type:'email'})
   if(error){
@@ -163,7 +179,8 @@ async function verifyOTP(){
   }
   let user = session.user;
   let {data:prof} = await supa.from('profiles').select('username').eq('id',user.id).maybeSingle();
-  if(prof && prof.username){ await loginToFirebase(); location.href='index.html'; return; }
+  if(prof && prof.username){ localStorage.removeItem('pixoro_pending_email'); localStorage.removeItem('pixoro_pending_step'); await loginToFirebase(); location.href='index.html'; return; }
+  localStorage.setItem('pixoro_pending_step','profile');
   go('s2')
 }
 async function saveProfile(){
@@ -178,11 +195,9 @@ async function saveProfile(){
   if(upErr) return showErr('msg2',upErr.message);
   let {data:{user}}=await supa.auth.getUser()
   if(!user) return showErr('msg2','Session Illa da - OTP Thirumba Podu da');
-  let {error:profErr} = await supa.from('profiles').upsert({id:user.id, username:u, avatar_url:'https://ui-avatars.com/api/?name='+u.charAt(0).toUpperCase()+'&background=111&color=fff'})
-  if(profErr){
-    let {error:profErr2} = await supa.from('profiles').upsert({id:user.id, username:u, email:curEmail, avatar_url:'https://ui-avatars.com/api/?name='+u.charAt(0).toUpperCase()+'&background=111&color=fff'})
-    if(profErr2) return showErr('msg2','Profile Save Aagala da: '+profErr2.message);
-  }
+  // ✅ PROFILE - SERVER (Supabase profiles Table) la thaan Save aaguthu da
+  let {error:profErr} = await supa.from('profiles').upsert({id:user.id, username:u, email:curEmail, avatar_url:'https://ui-avatars.com/api/?name='+u.charAt(0).toUpperCase()+'&background=111&color=fff'})
+  if(profErr) return showErr('msg2','Profile Save Aagala da: '+profErr.message);
   go('s3')
 }
 function previewPfp(inp){
@@ -193,10 +208,10 @@ function previewPfp(inp){
   document.getElementById('pfpPrev').src=URL.createObjectURL(f)
 }
 async function savePhoto(){
-  let f=document.getElementById('pfpFile').files[0]; if(!f) return location.href='index.html'
+  let f=document.getElementById('pfpFile').files[0]; if(!f){ localStorage.removeItem('pixoro_pending_email'); localStorage.removeItem('pixoro_pending_step'); return location.href='index.html' }
   if(!['image/jpeg','image/jpg','image/png'].includes(f.type)) return showPfpWarn('Thappu File da! JPG / PNG mattum da!')
   if(f.size > 2*1024*1024) return showPfpWarn('Photo romba perusu da! 2MB ku kulla podu da!')
-  let {data:{user}}=await supa.auth.getUser(); let {error}=await supa.storage.from('avatars').upload(user.id+'.jpg', f, {upsert:true}); if(error) return showPfpWarn('Upload Fail da - Skip pannu da'); let {data}=supa.storage.from('avatars').getPublicUrl(user.id+'.jpg'); await supa.from('profiles').update({avatar_url:data.publicUrl}).eq('id',user.id); location.href='index.html'
+  let {data:{user}}=await supa.auth.getUser(); let {error}=await supa.storage.from('avatars').upload(user.id+'.jpg', f, {upsert:true}); if(error) return showPfpWarn('Upload Fail da - Skip pannu da'); let {data}=supa.storage.from('avatars').getPublicUrl(user.id+'.jpg'); await supa.from('profiles').update({avatar_url:data.publicUrl}).eq('id',user.id); localStorage.removeItem('pixoro_pending_email'); localStorage.removeItem('pixoro_pending_step'); location.href='index.html'
 }
 async function loginOld(){
   supa = await waitSupa();
@@ -207,12 +222,14 @@ async function loginOld(){
   let {data,error}=await supa.auth.signInWithPassword({email, password:pass})
   if(error) return showErr('msgOld','Password Thappu da')
   await new Promise(r=>setTimeout(r,500));
+  localStorage.removeItem('pixoro_pending_email'); localStorage.removeItem('pixoro_pending_step');
   await loginToFirebase(); location.href='index.html'
 }
 async function sendForgotOTP(){
   supa = await waitSupa();
-  forgotEmailVal=document.getElementById('forgotEmail').value.trim().toLowerCase()
+  forgotEmailVal=document.getElementById('forgotEmail').value.trim().toLowerCase() || forgotEmailVal
   if(!forgotEmailVal.includes('@')) return showErr('msgForgot','Valid Gmail Podu da')
+  localStorage.setItem('pixoro_forgot_email', forgotEmailVal);
   let {error}=await supa.auth.signInWithOtp({email:forgotEmailVal, options:{shouldCreateUser:false, emailRedirectTo: location.origin + '/index.html'}})
   if(error) return showErr('msgForgot',error.message)
   document.getElementById('forgotStep2').classList.remove('hide')
@@ -220,6 +237,7 @@ async function sendForgotOTP(){
 }
 async function resetPasswordNow(){
   supa = await waitSupa();
+  if(!forgotEmailVal) forgotEmailVal = localStorage.getItem('pixoro_forgot_email')||'';
   let code=getForgotOTP(), p1=document.getElementById('forgotNew').value, p2=document.getElementById('forgotNew2').value
   if(code.length<6) return showErr('msgForgot','6 Digit OTP Podu da')
   if(p1.length<6) return showErr('msgForgot','Password 6+ Letters Podu da')
@@ -228,6 +246,7 @@ async function resetPasswordNow(){
   if(error) return showErr('msgForgot',error.message)
   let {error:err2}=await supa.auth.updateUser({password:p1})
   if(err2) return showErr('msgForgot',err2.message)
+  localStorage.removeItem('pixoro_forgot_email');
   showErr('msgForgot','Super da! Password Maathiduchu!'); go('sOld')
 }
 </script></body></html>
