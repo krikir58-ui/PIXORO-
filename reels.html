@@ -118,17 +118,17 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 <div class="sheet" id="commentSheet" onclick="if(event.target==this)closeSheet('commentSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Comments</b></div><div id="commentList" style="overflow-y:auto;flex:1;max-height:45vh;padding:0 20px"></div><div style="display:flex;gap:10px;align-items:center;padding:10px 20px;border-top:1px solid #eee;margin-top:10px"><input id="commentInput" style="flex:1;background:#F1F1F5;border:0;border-radius:20px;padding:12px 14px;color:#111;outline:none" placeholder="Add kind comment..."><button onclick="postComment()" style="background:#FF4D8D;color:#fff;border:0;border-radius:20px;padding:10px 18px;font-weight:800">Post</button></div></div></div>
 <div class="sheet" id="shareSheet" onclick="if(event.target==this)closeSheet('shareSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Share</b></div><div class="safeCard"><div class="safeItem" onclick="copyLinkSafe()"><div class="txt"><div class="title">📋 Copy Link</div></div></div><div class="safeItem" onclick="shareWA()"><div class="txt"><div class="title">💚 WhatsApp</div></div></div></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=1001"></script>
+<script src="js/pixoro-core.js?v=1002"></script>
 <script>
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 function fmtViews(n){if(n>=1000000)return (n/1000000).toFixed(1).replace('.0','')+'M';if(n>=1000)return (n/1000).toFixed(1).replace('.0','')+'K';return String(n)}
+function pixoroIsUuidLocal(s){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(s||'')); }
 let ME_RAW='',ME_ID='',profileMap={},profileByIdMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=[],mutedUsers=[],blockedUsers=[],hiddenMeta={},lastAction=null,savingIds=new Set(),_INIT_DONE=false
 async function waitSupa(){for(let i=0;i<30;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
 window.toggleFollow = window.pixoroToggleFollow;
 window.toggleF = window.pixoroToggleFollow;
-// ✅ FIXED v1001 - NOTI ah TRIGGER thaan pannum da - Frontend OFF da - Triple Varaathu da
 async function pixoroSendNotification(toUserId, type, postId, msg){ return; }
 window.pixoroSendNotification = pixoroSendNotification;
 async function init(){
@@ -140,7 +140,7 @@ async function init(){
   ME_ID=session.user.id;window.ME_ID=ME_ID;
   let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
   ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;
-  let {data:profs}=await supa.from('profiles').select('*');(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileByIdMap[String(p.id)]=p});
+  let {data:profs}=await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').limit(200);(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileByIdMap[String(p.id)]=p});
   let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);
   if(window.pixoroRefreshPhotos) await window.pixoroRefreshPhotos();
   load()
@@ -181,7 +181,6 @@ function pfpErr(el,uname){
 }
 window.pfpErr=pfpErr;
 function isMyPostObj(p){if(!p)return false;if(p.user_id&&String(p.user_id)===String(ME_ID))return true;return cleanUser(p.username)===cleanUser(ME_RAW)}
-// ✅ FIXED v1001 - Likes ah Post ID vachu mattum Edu da - limit(200) Illa da
 async function load(){try{
 let [r1,r2] = await Promise.all([
   supa.from('posts').select('*').order('created_at',{ascending:false}).limit(20).then(r=>r).catch(()=>({data:[]})),
@@ -209,15 +208,15 @@ all.forEach(p=>{
   else if(p.username) p.username=cleanUser(p.username);
 });
 allPosts=all;
-let postIds = allPosts.map(p=>String(p.id));
+let postIds = allPosts.map(p=>String(p.id)).filter(id=>pixoroIsUuidLocal(id));
 let likes={data:[]}, saves={data:[]}, follows={data:[]}, comments={data:[]}, views={data:[]};
 if(postIds.length){
-  likes = await supa.from('likes').select('*').in('post_id', postIds).then(r=>r).catch(()=>({data:[]}));
+  likes = await supa.from('likes').select('post_id,user_id').in('post_id', postIds).then(r=>r).catch(()=>({data:[]}));
   saves = await supa.from('saves').select('*').eq('user_id',ME_ID).in('post_id', postIds).then(r=>r).catch(()=>({data:[]}));
   comments = await supa.from('comments').select('*').in('post_id', postIds).order('created_at',{ascending:false}).then(r=>r).catch(()=>({data:[]}));
-  views = await supa.from('views').select('*').in('post_id', postIds).then(r=>r).catch(()=>({data:[]}));
+  views = await supa.from('views').select('post_id,user_id').in('post_id', postIds).then(r=>r).catch(()=>({data:[]}));
 }
-follows = await supa.from('follows').select('*').eq('follower_id',ME_ID).then(r=>r).catch(()=>({data:[]}));
+follows = await supa.from('follows').select('follower_id,following_id,status').eq('follower_id',ME_ID).eq('status','accepted').then(r=>r).catch(()=>({data:[]}));
 allLikes=likes.data||[];allSaves=saves.data||[];allFollows=follows.data||[];allComments=comments.data||[];allViews=views.data||[];
 window.PIXORO_FOLLOWING=new Set((allFollows||[]).map(f=>String(f.following_id)));
 window.PIXORO_ID_TO_NAME=window.PIXORO_ID_TO_NAME||{};
@@ -227,15 +226,16 @@ window.PIXORO_FOLLOWING_NAMES=new Set([...window.PIXORO_FOLLOWING].map(id=>clean
 render();}catch(err){console.log(err)}}
 async function addRealView(postId){
   postId=String(postId);
+  if(!pixoroIsUuidLocal(postId) || !pixoroIsUuidLocal(ME_ID)) return;
   if(viewedPosts.has(postId)) return;
   viewedPosts.add(postId);
   let already = allViews.some(v=>String(v.post_id)==String(postId) && String(v.user_id)==String(ME_ID));
   if(already) return;
-  allViews.push({post_id:postId, user_id:ME_ID, username:ME_RAW});
+  allViews.push({post_id:postId, user_id:ME_ID});
   let cnt = allViews.filter(v=>String(v.post_id)==String(postId)).length;
   let el = document.querySelector(`[data-viewcount="${postId}"]`);
   if(el) el.innerText = fmtViews(cnt);
-  let {error} = await supa.from('views').insert({post_id:postId, user_id:ME_ID, username:ME_RAW});
+  let {error} = await supa.from('views').insert({post_id:postId, user_id:ME_ID});
   if(error){ allViews = allViews.filter(v=>!(String(v.post_id)==String(postId) && String(v.user_id)==String(ME_ID))); }
 }
 function nextReel(currentVideo){
@@ -299,27 +299,29 @@ function observe(){
   document.addEventListener('visibilitychange',()=>{ if(document.hidden) document.querySelectorAll('video').forEach(v=>v.pause()); },{once:true});
 }
 function handleReelTap(el){let now=Date.now();if(now-lastTap<300){clearTimeout(tapTimer);lastTap=0;dblLike(el.dataset.id);return}lastTap=now;tapTimer=setTimeout(()=>{let v=el.querySelector('video.reel-main');if(v){if(!v.src && v.dataset.src){v.src=v.dataset.src;v.load();}if(v.paused){v.muted=false;globalMuted=false;currentVideo=v;v.play();showCenter(el,false)}else{v.pause();showCenter(el,true)}}lastTap=0},300)}
-// ✅ FIXED - Server Fail aana UI ah Thirumba Maathidu da
+// ✅ FIXED v1002 - Like la username Koodathu da
 async function dblLike(id){
+  if(!pixoroIsUuidLocal(ME_ID) || !pixoroIsUuidLocal(id)) return;
   let reel=document.querySelector(`.reel[data-id="${id}"]`);let b=reel?reel.querySelector('.heartBurst'):null;
   if(b){b.classList.remove('show');void b.offsetWidth;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),900)}
   let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));
   if(!liked){
-    allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);
-    let {error} = await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});
+    allLikes.push({post_id:id,user_id:ME_ID});updateLikeUI(id,true);
+    let {error} = await supa.from('likes').insert({post_id:id,user_id:ME_ID});
     if(error){ allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID))); updateLikeUI(id,false); showToast('Like Save Aagala da'); }
   }
 }
 async function toggleLike(id){
+  if(!pixoroIsUuidLocal(ME_ID) || !pixoroIsUuidLocal(id)) return;
   let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));
   if(!liked){
-    allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW});updateLikeUI(id,true);
-    let {error} = await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});
+    allLikes.push({post_id:id,user_id:ME_ID});updateLikeUI(id,true);
+    let {error} = await supa.from('likes').insert({post_id:id,user_id:ME_ID});
     if(error){ allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID))); updateLikeUI(id,false); showToast('Like Save Aagala da: '+error.message); }
   } else {
     allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID)));updateLikeUI(id,false);
     let {error} = await supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID);
-    if(error){ allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW}); updateLikeUI(id,true); }
+    if(error){ allLikes.push({post_id:id,user_id:ME_ID}); updateLikeUI(id,true); }
   }
 }
 function updateLikeUI(id,liked){let btn=document.getElementById('likeBtn-'+id);let svg=document.getElementById('likeSvg-'+id);let cnt=document.getElementById('likeCnt-'+id);if(btn){if(liked)btn.classList.add('liked');else btn.classList.remove('liked')}if(svg){svg.setAttribute('fill',liked?'#ff3040':'none');svg.setAttribute('stroke',liked?'#ff3040':'#fff');}if(cnt){let n=allLikes.filter(l=>String(l.post_id)==String(id)).length;cnt.innerText=n>0?n:''}}
@@ -356,9 +358,10 @@ function openCommentSheet(pid){curCommentPost=pid;let list=allComments.filter(c=
 function closeSheet(id){document.getElementById(id).classList.remove('show')}
 async function postComment(){
   let inp=document.getElementById('commentInput');let t=inp.value.trim();if(!t||!curCommentPost)return;
-  let tmp={id:'tmp_'+Date.now(),post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t};
+  if(!pixoroIsUuidLocal(ME_ID) || !pixoroIsUuidLocal(curCommentPost)) return;
+  let tmp={id:'tmp_'+Date.now(),post_id:curCommentPost,user_id:ME_ID,text:t};
   allComments.unshift(tmp);inp.value='';openCommentSheet(curCommentPost);
-  let {error} = await supa.from('comments').insert({post_id:curCommentPost,user_id:ME_ID,username:ME_RAW,text:t});
+  let {error} = await supa.from('comments').insert({post_id:curCommentPost,user_id:ME_ID,text:t});
   if(error){ allComments = allComments.filter(c=>c.id!==tmp.id); openCommentSheet(curCommentPost); showToast('Comment Save Aagala da'); }
 }
 async function deleteComment(cid,pid){allComments=allComments.filter(c=>String(c.id)!=String(cid));openCommentSheet(pid);supa.from('comments').delete().eq('id',cid).then(()=>{}).catch(()=>{});}
@@ -369,18 +372,20 @@ function updateSaveUI(id,saved){
   if(btn) btn.classList.toggle('saved',saved);
   if(svg) svg.setAttribute('fill',saved?'#fff':'none');
 }
+// ✅ FIXED v1002 - Save la username Koodathu da
 async function saveR(id){
   id=String(id);
+  if(!pixoroIsUuidLocal(ME_ID) || !pixoroIsUuidLocal(id)) return;
   if(savingIds.has(id)) return; savingIds.add(id);
   try{
     let isSaved=allSaves.some(x=>String(x.post_id)===id && String(x.user_id)===String(ME_ID));
     if(isSaved){
       allSaves=allSaves.filter(x=>!(String(x.post_id)===id && String(x.user_id)===String(ME_ID))); updateSaveUI(id,false);
       let {error} = await supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID);
-      if(error){ allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW}); updateSaveUI(id,true); }
+      if(error){ allSaves.push({post_id:id,user_id:ME_ID}); updateSaveUI(id,true); }
     } else {
-      allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW}); updateSaveUI(id,true);
-      let {data,error} = await supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}).select().single();
+      allSaves.push({post_id:id,user_id:ME_ID}); updateSaveUI(id,true);
+      let {data,error} = await supa.from('saves').insert({post_id:id,user_id:ME_ID}).select().single();
       if(error){ allSaves=allSaves.filter(x=>!(String(x.post_id)===id && String(x.user_id)===String(ME_ID))); updateSaveUI(id,false); showToast('Save Aagala da'); }
       else if(data) allSaves[allSaves.length-1]=data;
     }
