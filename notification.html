@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Notifications - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=1001"></script>
+<script src="js/pixoro-core.js?v=1002"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 <script>
-// 👉 INGA UN PAZHAYA firebaseConfig AH APDIYE VACHIKO DA - NAAN MAATHALA DA
+// 👉 UN PAZHAYA firebaseConfig AH APDIYE VACHIKO DA - KEY AH CHAT LA PODATHA DA
 const firebaseConfig = {
   apiKey: "AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",
   authDomain: "pixoro-75927.firebaseapp.com",
@@ -86,11 +86,12 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 <script>
 let supa = window.supa;
 function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase() || ''; }
-let ME='', ME_ID='', allNots=[], profileMap={}, profileById={}, followerIds=new Set(), blockedIds=new Set(), acceptedIds=new Set();
+let ME='', ME_ID='', allNots=[], profileMap={}, profileById={}, followerIds=new Set(), blockedIds=new Set(), blockedMeIds=new Set(), acceptedIds=new Set();
 let curFilter='all', _liveStarted=false, _toastTimer=null;
 function isToday(t){ if(!t) return false; let d=new Date(t), n=new Date(); return d.getDate()===n.getDate()&&d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear(); }
 function timeAgo(t){ if(!t) return ''; let d=Math.floor((new Date()-new Date(t))/1000); if(d<60) return 'now'; if(d<3600) return Math.floor(d/60)+'m'; if(d<86400) return Math.floor(d/3600)+'h'; return Math.floor(d/86400)+'d'; }
 function setPushStatus(t){ let el=document.getElementById('pushStatus'); if(el) el.innerText='Push: '+t; }
+function isBlockedUser(id){ return blockedIds.has(String(id)) || blockedMeIds.has(String(id)); }
 async function savePushToken(){
   try{
     setPushStatus('Permission kekuren da...');
@@ -98,7 +99,7 @@ async function savePushToken(){
     if(permission !== 'granted'){ setPushStatus('Permission DENIED da - Allow kudunga da'); return; }
     setPushStatus('Token edukkuren da...');
     let tries=0; while(!swReg && tries<20){ await new Promise(r=>setTimeout(r,300)); tries++; }
-    const token = await messaging.getToken({ vapidKey: "UN_PAZHAYA_VAPID_KEY_AH_INGA_VACHIKO", serviceWorkerRegistration: swReg });
+    const token = await messaging.getToken({ vapidKey: "PASTE_YOUR_VAPID_KEY", serviceWorkerRegistration: swReg });
     if(token){
       setPushStatus('Token kedaichiduchu da ✅ - Server la Saving...');
       if(ME_ID){
@@ -118,11 +119,12 @@ async function loadNots(){
     let {data:myProf} = await supa.from('profiles').select('*').eq('id',ME_ID).maybeSingle();
     ME=cleanUser(myProf?.username||session.user.email.split('@')[0]);
     let nav=document.getElementById('navPfp'); if(nav && myProf?.avatar_url) nav.src=myProf.avatar_url;
-    let {data:profs} = await supa.from('profiles').select('*'); (profs||[]).forEach(p=>{ profileMap[cleanUser(p.username)]=p; profileById[String(p.id)]=p; });
-    try{ let {data:fl}=await supa.from('follows').select('follower_id').eq('following_id',ME_ID); (fl||[]).forEach(r=>followerIds.add(String(r.follower_id))); }catch(e){}
+    let {data:profs} = await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').limit(200); (profs||[]).forEach(p=>{ profileMap[cleanUser(p.username)]=p; profileById[String(p.id)]=p; });
+    try{ let {data:fl}=await supa.from('follows').select('follower_id').eq('following_id',ME_ID).eq('status','accepted'); (fl||[]).forEach(r=>followerIds.add(String(r.follower_id))); }catch(e){}
     try{ let {data:bl}=await supa.from('blocked_users').select('blocked_user_id').eq('user_id',ME_ID); (bl||[]).forEach(r=>blockedIds.add(String(r.blocked_user_id))); }catch(e){}
+    try{ let {data:blMe}=await supa.from('blocked_users').select('user_id').eq('blocked_user_id',ME_ID); (blMe||[]).forEach(r=>blockedMeIds.add(String(r.user_id))); }catch(e){}
     let {data:nots} = await supa.from('notifications').select('*').eq('to_user_id',ME_ID).order('created_at',{ascending:false}).limit(100);
-    allNots=(nots||[]).filter(n=>String(n.from_user_id)!==String(ME_ID)&&['like','follow','comment'].includes(n.type)).filter(n=>!blockedIds.has(String(n.from_user_id))).map(n=>{
+    allNots=(nots||[]).filter(n=>String(n.from_user_id)!==String(ME_ID)&&['like','follow','comment'].includes(n.type)).filter(n=>!isBlockedUser(n.from_user_id)).map(n=>{
       let pr=profileById[String(n.from_user_id)]||{}; let uname=n.from_username||pr.username||'pixoro';
       return {...n, from_username:uname, message:n.message||(n.type==='follow'?'sent you a follow request':n.type==='like'?'liked your post':'commented on your post')};
     });
@@ -160,9 +162,9 @@ function oneGroupRow(g){
   let tag = g.type==='like' ? 'LIKE' : g.type==='follow' ? 'REQUEST' : 'COMMENT';
   let right='';
   if(g.type==='follow' && !acceptedIds.has(String(first.id))){
-    right = `<div class="btnRow"><button class="acceptBtn" onclick="event.stopPropagation();acceptFollow('${first.id}','${g.key}')">Accept</button><button class="rejectBtn" onclick="event.stopPropagation();rejectFollow('${first.id}','${g.key}')">Reject</button><button class="blockBtn" onclick="event.stopPropagation();blockUser('${first.id}','${g.key}')">Block</button></div>`;
+    right = `<div class="btnRow"><button class="acceptBtn" onclick="event.stopPropagation();acceptFollow('${first.id}','${g.key}')">Accept</button><button class="rejectBtn" onclick="event.stopPropagation();rejectFollow('${first.id}','${g.key}')">Reject</button><button class="blockBtn" onclick="event.stopPropagation();blockUser('${first.id}','${g.key}','${cleanUser(first.username)}')">Block</button></div>`;
   } else {
-    right = `<div class="btnRow">${g.type!=='follow' ? `<span class="tagMini">${tag}</span>` : `<span class="tagMini">ACCEPTED</span>`}<button class="blockBtn" onclick="event.stopPropagation();blockUser('${first.id}','${g.key}')">Block</button></div>`;
+    right = `<div class="btnRow">${g.type!=='follow' ? `<span class="tagMini">${tag}</span>` : `<span class="tagMini">ACCEPTED</span>`}<button class="blockBtn" onclick="event.stopPropagation();blockUser('${first.id}','${g.key}','${cleanUser(first.username)}')">Block</button></div>`;
   }
   let click = g.type==='follow' ? `./profile.html?u=${first.id}` : g.post_id ? `./index.html?id=${g.post_id}` : `./profile.html?u=${first.id}`;
   return `<div class="row" onclick="openGroup('${g.key}','${click}')"><div class="txt">${names}<span>${action}${extra}</span>${warn}<small>${timeAgo(g.latest)}</small></div>${right}</div>`;
@@ -187,9 +189,14 @@ async function openGroup(key, url){
   if(g && g.ids.length){ try{ await supa.from('notifications').update({is_read:true}).in('id', g.ids); }catch(e){} g.ids.forEach(id=>{ let n=allNots.find(x=>String(x.id)===String(id)); if(n) n.is_read=true; }); }
   location.href=url;
 }
+// ✅ FIXED v1002 - Accept na Update da - Duplicate Insert illa da
 async function acceptFollow(userId, key){
   acceptedIds.add(String(userId)); followerIds.add(String(userId));
-  try{ await supa.from('follows').upsert({follower_id:userId, following_id:ME_ID, status:'accepted'},{onConflict:'follower_id,following_id'}); }catch(e){ try{ await supa.from('follows').insert({follower_id:userId, following_id:ME_ID, status:'accepted'}); }catch(e2){} }
+  try{
+    let {data: ex} = await supa.from('follows').select('id').eq('follower_id',userId).eq('following_id',ME_ID).maybeSingle();
+    if(ex) await supa.from('follows').update({status:'accepted'}).eq('id', ex.id);
+    else await supa.from('follows').insert({follower_id:userId, following_id:ME_ID, status:'accepted'});
+  }catch(e){}
   try{ await supa.from('notifications').update({is_read:true}).eq('from_user_id',userId).eq('to_user_id',ME_ID).eq('type','follow'); }catch(e){}
   renderNots(curFilter);
   showLiveToast({from_username:'Pixoro', message:'Follow request accepted da'});
@@ -197,14 +204,15 @@ async function acceptFollow(userId, key){
 async function rejectFollow(userId, key){
   allNots = allNots.filter(n=>!(n.type==='follow' && String(n.from_user_id)===String(userId)));
   try{ await supa.from('notifications').delete().eq('from_user_id',userId).eq('to_user_id',ME_ID).eq('type','follow'); }catch(e){}
-  try{ await supa.from('follows').delete().eq('follower_id',userId).eq('following_id',ME_ID); }catch(e){}
+  try{ await supa.from('follows').delete().eq('follower_id',userId).eq('following_id',ME_ID).eq('status','pending'); }catch(e){}
   renderNots(curFilter);
 }
-async function blockUser(userId, key){
+// ✅ FIXED v1002 - Block ah Server RPC la mattum da - Direct Insert illa da
+async function blockUser(userId, key, uname){
   if(!confirm('Block panna vaa? Inime ivanga notification varaathu da')) return;
   blockedIds.add(String(userId));
   allNots = allNots.filter(n=>String(n.from_user_id)!==String(userId));
-  try{ await supa.from('blocked_users').insert({user_id:ME_ID, blocked_user_id:userId}); }catch(e){}
+  try{ if(window.pixoroBlockUser && uname) await window.pixoroBlockUser(uname); else await supa.from('blocked_users').insert({user_id:ME_ID, blocked_user_id:userId}); }catch(e){}
   try{ await supa.from('notifications').delete().eq('from_user_id',userId).eq('to_user_id',ME_ID); }catch(e){}
   renderNots(curFilter);
   showLiveToast({from_username:'Pixoro', message:'Blocked da - Safe ah iru da'});
@@ -216,7 +224,7 @@ function startLive(){
     s.channel('pixoro-live-noti-'+ME_ID)
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:'to_user_id=eq.'+ME_ID},(payload)=>{
         let n=payload.new; if(String(n.from_user_id)===String(ME_ID)) return;
-        if(blockedIds.has(String(n.from_user_id))) return;
+        if(isBlockedUser(n.from_user_id)) return;
         if(!profileById[String(n.from_user_id)]){
           s.from('profiles').select('*').eq('id',n.from_user_id).maybeSingle().then(({data})=>{ if(data){ profileById[String(data.id)]=data; profileMap[cleanUser(data.username)]=data; renderNots(curFilter); } });
         }
