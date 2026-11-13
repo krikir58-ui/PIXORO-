@@ -69,7 +69,7 @@ html{background:#000}body{background:#000!important;color:#fff;max-width:450px;m
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
 <div id="choice" class="createBar" onclick="if(event.target==this)hideChoice()"><div class="createPill"><b onclick="location.href='./post-create.html'">POST</b><b onclick="location.href='./reel-create.html'" class="on">REELS</b><b onclick="location.href='./story-upload.html'">STORY</b><b onclick="location.href='./live.html'">LIVE</b></div><div class="createClose" onclick="hideChoice()">Cancel ✕</div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=214"></script>
+<script src="js/pixoro-core.js?v=1001"></script>
 <script>function enableNotif(){ location.href='./notification.html'; }</script>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
@@ -78,11 +78,7 @@ function showChoice(){document.getElementById('choice').classList.add('show')} f
 let supa=window.supa;function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase();return u||''}
 let ME_RAW='',ME='',ME_ID='',ME_PFP='',allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=[],allViews=[],viewedStories=[],lastTap=0,feedMode='foryou',curMenuPost=null;
 function getSupa(){return window.supa||supa} window.getSupa=getSupa;
-// ✅ FINAL v218 - TRIGGER MATTUM NOTI PANNUM DA - FRONTEND OFF DA - DOUBLE ILLA DA
-async function pixoroSendNotification(toUserId, type, postId, msg){
-  // Trigger thaan pannum da - Frontend onnum panna venaam da - Double aayidum da
-  return;
-}
+async function pixoroSendNotification(toUserId, type, postId, msg){ return; }
 window.pixoroSendNotification = pixoroSendNotification;
 function profileById(id){return allProfiles.find(x=>String(x.id)===String(id))||null}
 function profileByName(n){return allProfiles.find(x=>cleanUser(x.username)===cleanUser(n))||null}
@@ -103,10 +99,6 @@ function getRealPfp(u){
   let p=profileById(u)||profileByName(u);
   let url = p ? (p.avatar_url||p.profile_pic||p.photo_url||'') : '';
   if(url && url.includes('http') && url.length>10) return url;
-  if(window._PIXORO_PFP_CACHE){
-    let cached = window._PIXORO_PFP_CACHE[cleanUser(displayNameFor(u))] || window._PIXORO_PFP_CACHE[String(u)];
-    if(cached) return cached;
-  }
   return '';
 }
 function getPfp(u){ let r=getRealPfp(u); if(r) return r; let uname=displayNameFor(u); let L=avatarLetterFor(u,uname); return 'https://ui-avatars.com/api/?name='+L+'&background=ff5ea8&color=fff&size=200&bold=true'; }
@@ -200,27 +192,16 @@ async function checkLogin(){
   try{ if(window.pixoroLoadFollowing) await window.pixoroLoadFollowing(); }catch(e){ console.log('Follow load fail - Feed continue da'); }
   loadAll();
 }
+// ✅ FIXED - SERVER ONLY DA - Like ah Post ID vachu mattum Edu da - limit(200) Illa da
 async function loadAll(){
   try{
     supa=getSupa();if(!supa)return;
-    let pr={data:[]}, po={data:[]}, re={data:[]}, li={data:[]}, vi={data:[]}, sa={data:[]}, st={data:[]}, fo={data:[]};
+    let pr={data:[]}, po={data:[]}, re={data:[]}, st={data:[]};
     try{ pr = await supa.from('profiles').select('*'); }catch(e){}
-    try{ po = await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(12); }catch(e){}
-    try{ re = await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(12); }catch(e){}
-    try{ li = await supa.from('likes').select('*').limit(200); }catch(e){}
-    try{ vi = await supa.from('views').select('*').limit(200); }catch(e){}
-    try{ sa = await supa.from('saves').select('*').limit(200); }catch(e){}
+    try{ po = await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(20); }catch(e){}
+    try{ re = await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(20); }catch(e){}
     try{ st = await supa.from('stories').select('*').order('created_at',{ascending:false}).limit(20); }catch(e){}
-    try{ fo = await supa.from('follows').select('*').limit(500); }catch(e){}
-    allProfiles=pr.data||[];allLikes=li.data||[];allViews=vi.data||[];allSaves=sa.data||[];allFollows=fo.data||[];
-    if(window.PIXORO_FOLLOWING){
-      window.PIXORO_FOLLOWING=new Set((allFollows||[]).filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));
-      window.PIXORO_ID_TO_NAME = window.PIXORO_ID_TO_NAME || {};
-      window.PIXORO_NAME_TO_ID = window.PIXORO_NAME_TO_ID || {};
-      (allProfiles||[]).forEach(pp=>{ window.PIXORO_ID_TO_NAME[String(pp.id)] = cleanUser(pp.username); window.PIXORO_NAME_TO_ID[cleanUser(pp.username)] = String(pp.id); });
-      window.PIXORO_FOLLOWING_NAMES = new Set([...window.PIXORO_FOLLOWING].map(id=>cleanUser(window.PIXORO_ID_TO_NAME[id]||'')));
-    }
-    if(window.pixoroRefreshPhotos) window.pixoroRefreshPhotos();
+    allProfiles=pr.data||[];
     var merged=[];(po.data||[]).forEach(p=>merged.push({...p,_from:'posts'}));(re.data||[]).forEach(p=>merged.push({...p,_from:'reels'}));
     var seenUrl=new Set(),deduped=[];
     for(let p of merged){
@@ -237,6 +218,24 @@ async function loadAll(){
       seenUrl.add(u);seenUrl.add(fileKey);deduped.push(p);
     }
     allPosts=deduped;
+    // ✅ SERVER la irunthu - Intha Feed Post ku mattum Like / Save / Follow Edu da - Full Table Illa da
+    let postIds = allPosts.map(p=>String(p.id));
+    let li={data:[]}, sa={data:[]}, fo={data:[]}, vi={data:[]};
+    if(postIds.length){
+      try{ li = await supa.from('likes').select('*').in('post_id', postIds); }catch(e){}
+      try{ sa = await supa.from('saves').select('*').eq('user_id', ME_ID).in('post_id', postIds); }catch(e){}
+    }
+    try{ fo = await supa.from('follows').select('*').eq('follower_id', ME_ID); }catch(e){}
+    try{ vi = await supa.from('views').select('*').in('post_id', postIds); }catch(e){}
+    allLikes=li.data||[]; allViews=vi.data||[]; allSaves=sa.data||[]; allFollows=fo.data||[];
+    if(window.PIXORO_FOLLOWING){
+      window.PIXORO_FOLLOWING=new Set((allFollows||[]).map(f=>String(f.following_id)));
+      window.PIXORO_ID_TO_NAME = window.PIXORO_ID_TO_NAME || {};
+      window.PIXORO_NAME_TO_ID = window.PIXORO_NAME_TO_ID || {};
+      (allProfiles||[]).forEach(pp=>{ window.PIXORO_ID_TO_NAME[String(pp.id)] = cleanUser(pp.username); window.PIXORO_NAME_TO_ID[cleanUser(pp.username)] = String(pp.id); });
+      window.PIXORO_FOLLOWING_NAMES = new Set([...window.PIXORO_FOLLOWING].map(id=>cleanUser(window.PIXORO_ID_TO_NAME[id]||'')));
+    }
+    if(window.pixoroRefreshPhotos) window.pixoroRefreshPhotos();
     allStories=(st.data||[]).map(s=>{let prof=profileById(s.user_id);s.username=prof?prof.username:(s.username||'');s.username=cleanUser(s.username);return s}).filter(s=>{if(!s.expires_at)return true;return new Date(s.expires_at)>new Date()});
     renderStories();renderFeed();
     if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
@@ -284,6 +283,7 @@ function renderFeed(){let feedPosts=[...allPosts];if(feedMode=='foryou'){feedPos
 let _homeIO=null;
 function observeHomeVideos(){let vs=document.querySelectorAll('.post video.main');if(_homeIO) _homeIO.disconnect();_homeIO=new IntersectionObserver(es=>{es.forEach(e=>{let v=e.target;if(e.isIntersecting){if(!v.src && v.dataset.src){v.src=v.dataset.src;v.load();}v.muted=true;v.play().catch(()=>{})}else{v.pause()}})},{threshold:0.4,rootMargin:'200px 0px'});vs.forEach(v=>_homeIO.observe(v))}
 function handleTap(id){let now=Date.now();if(now-lastTap<300){doubleLike(id);lastTap=0}else{lastTap=now}}
+// ✅ FIXED - SERVER Fail aana - UI ah Thirumba Maathidu da - Poyya Like Kaatathu da
 async function doubleLike(id){
   let burst=document.getElementById('burst-'+id);if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show')}
   let liked=allLikes.some(l=>String(l.post_id)==String(id)&&(l.user_id==ME_ID));if(liked)return;
@@ -292,8 +292,7 @@ async function doubleLike(id){
   let c=document.getElementById('likeCount-'+id);if(c)c.innerText=parseInt(c.innerText||'0')+1;
   supa=getSupa();if(!supa) return;
   let {error}=await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});
-  if(error) console.log('SERVER SAVE FAIL:',error.message);
-  // Trigger thaan Notification pannum da - Frontend onnum panna venaam da
+  if(error){ console.log('SERVER SAVE FAIL:',error.message); allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&(l.user_id==ME_ID))); if(btn)btn.classList.remove('liked'); if(c)c.innerText=Math.max(0,parseInt(c.innerText||'1')-1); showToast('Like Save Aagala da - Thirumba Try pannu da'); }
 }
 async function fastLike(id){
   let liked=allLikes.some(l=>String(l.post_id)==String(id)&&(l.user_id==ME_ID));
@@ -304,23 +303,21 @@ async function fastLike(id){
     let burst=document.getElementById('burst-'+id);if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show')}
     if(supa){
       let {error}=await supa.from('likes').insert({post_id:id,user_id:ME_ID,username:ME_RAW});
-      if(error) console.log('SERVER SAVE FAIL:',error.message);
-      // Trigger thaan Notification pannum da
+      if(error){ console.log('SERVER SAVE FAIL:',error.message); allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&(l.user_id==ME_ID))); if(btn)btn.classList.remove('liked'); if(c)c.innerText=Math.max(0,parseInt(c.innerText||'1')-1); showToast('Like Save Aagala da: '+error.message); }
     }
   } else {
     allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&(l.user_id==ME_ID)));if(btn)btn.classList.remove('liked');if(c)c.innerText=Math.max(0,parseInt(c.innerText||'1')-1);
-    if(supa){ let {error}=await supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID); if(error) console.log('SERVER SAVE FAIL:',error.message); }
+    if(supa){ let {error}=await supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID); if(error){ console.log('SERVER SAVE FAIL:',error.message); allLikes.push({post_id:id,user_id:ME_ID,username:ME_RAW}); if(btn)btn.classList.add('liked'); if(c)c.innerText=parseInt(c.innerText||'0')+1; } }
   }
 }
-// ✅ FOLLOW - Trigger thaan pannum da - Frontend Double Fix Remove Pannen da
 async function savePost(id,btn){
   supa=getSupa(); let s=allSaves.some(x=>String(x.post_id)==String(id)&&(x.user_id==ME_ID));
   if(s){
     allSaves=allSaves.filter(x=>!(String(x.post_id)==String(id)&&(x.user_id==ME_ID))); if(btn) btn.classList.remove('saved');
-    if(supa){ let {error}=await supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID); if(error) console.log('SERVER SAVE FAIL:',error.message); else console.log('SERVER SAVE OK - unsave'); }
+    if(supa){ let {error}=await supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID); if(error){ allSaves.push({post_id:id,user_id:ME_ID}); if(btn) btn.classList.add('saved'); console.log('SERVER SAVE FAIL:',error.message); } }
   } else {
     allSaves.push({post_id:id,user_id:ME_ID,username:ME_RAW}); if(btn) btn.classList.add('saved');
-    if(supa){ let {error}=await supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}); if(error) console.log('SERVER SAVE FAIL:',error.message); else console.log('SERVER SAVE OK - save'); }
+    if(supa){ let {error}=await supa.from('saves').insert({post_id:id,user_id:ME_ID,username:ME_RAW}); if(error){ allSaves=allSaves.filter(x=>!(String(x.post_id)==String(id)&&(x.user_id==ME_ID))); if(btn) btn.classList.remove('saved'); console.log('SERVER SAVE FAIL:',error.message); showToast('Save Aagala da'); } }
   }
 }
 window.savePost=savePost;
@@ -329,8 +326,7 @@ function closeComment(){document.getElementById('commentModal').style.display='n
 async function addComment(){
   supa=getSupa();let t=document.getElementById('commentInput').value.trim();if(!t||!window.currentPostId||!supa)return;
   let {error}=await supa.from('comments').insert({post_id:window.currentPostId,user_id:ME_ID,username:ME_RAW,text:t});
-  if(error) console.log('SERVER SAVE FAIL:',error.message);
-  // Trigger thaan Notification pannum da
+  if(error){ console.log('SERVER SAVE FAIL:',error.message); showToast('Comment Save Aagala da'); return; }
   document.getElementById('commentInput').value='';openComment(window.currentPostId)
 }
 function checkMiniUpload(){
