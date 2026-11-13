@@ -69,7 +69,7 @@ html{background:#000}body{background:#000!important;color:#fff;max-width:450px;m
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
 <div id="choice" class="createBar" onclick="if(event.target==this)hideChoice()"><div class="createPill"><b onclick="location.href='./post-create.html'">POST</b><b onclick="location.href='./reel-create.html'" class="on">REELS</b><b onclick="location.href='./story-upload.html'">STORY</b><b onclick="location.href='./live.html'">LIVE</b></div><div class="createClose" onclick="hideChoice()">Cancel ✕</div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=1002"></script>
+<script src="js/pixoro-core.js?v=1003"></script>
 <script>function enableNotif(){ location.href='./notification.html'; }</script>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
@@ -282,7 +282,6 @@ function renderFeed(){let feedPosts=[...allPosts];if(feedMode=='foryou'){feedPos
 let _homeIO=null;
 function observeHomeVideos(){let vs=document.querySelectorAll('.post video.main');if(_homeIO) _homeIO.disconnect();_homeIO=new IntersectionObserver(es=>{es.forEach(e=>{let v=e.target;if(e.isIntersecting){if(!v.src && v.dataset.src){v.src=v.dataset.src;v.load();}v.muted=true;v.play().catch(()=>{})}else{v.pause()}})},{threshold:0.4,rootMargin:'200px 0px'});vs.forEach(v=>_homeIO.observe(v))}
 function handleTap(id){let now=Date.now();if(now-lastTap<300){doubleLike(id);lastTap=0}else{lastTap=now}}
-// ✅ FIXED v1002 - Like la username Koodathu da - UUID mattum da
 async function doubleLike(id){
   if(!pixoroIsUuidLocal(ME_ID) || !pixoroIsUuidLocal(id)) return;
   let burst=document.getElementById('burst-'+id);if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show')}
@@ -291,7 +290,7 @@ async function doubleLike(id){
   let btn=document.getElementById('likeBtn-'+id);if(btn)btn.classList.add('liked');
   let c=document.getElementById('likeCount-'+id);if(c)c.innerText=parseInt(c.innerText||'0')+1;
   supa=getSupa();if(!supa) return;
-  let {error}=await supa.from('likes').insert({post_id:id,user_id:ME_ID});
+  let {error}=await supa.from('likes').upsert({post_id:id,user_id:ME_ID},{onConflict:'post_id,user_id'});
   if(error){ console.log('SERVER SAVE FAIL:',error.message); allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&(l.user_id==ME_ID))); if(btn)btn.classList.remove('liked'); if(c)c.innerText=Math.max(0,parseInt(c.innerText||'1')-1); showToast('Like Save Aagala da - Thirumba Try pannu da'); }
 }
 async function fastLike(id){
@@ -303,7 +302,7 @@ async function fastLike(id){
     allLikes.push({post_id:id,user_id:ME_ID});if(btn)btn.classList.add('liked');if(c)c.innerText=parseInt(c.innerText||'0')+1;
     let burst=document.getElementById('burst-'+id);if(burst){burst.classList.remove('show');void burst.offsetWidth;burst.classList.add('show')}
     if(supa){
-      let {error}=await supa.from('likes').insert({post_id:id,user_id:ME_ID});
+      let {error}=await supa.from('likes').upsert({post_id:id,user_id:ME_ID},{onConflict:'post_id,user_id'});
       if(error){ console.log('SERVER SAVE FAIL:',error.message); allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&(l.user_id==ME_ID))); if(btn)btn.classList.remove('liked'); if(c)c.innerText=Math.max(0,parseInt(c.innerText||'1')-1); showToast('Like Save Aagala da: '+error.message); }
     }
   } else {
@@ -311,7 +310,6 @@ async function fastLike(id){
     if(supa){ let {error}=await supa.from('likes').delete().eq('post_id',id).eq('user_id',ME_ID); if(error){ console.log('SERVER SAVE FAIL:',error.message); allLikes.push({post_id:id,user_id:ME_ID}); if(btn)btn.classList.add('liked'); if(c)c.innerText=parseInt(c.innerText||'0')+1; } }
   }
 }
-// ✅ FIXED v1002 - Save la username Koodathu da
 async function savePost(id,btn){
   if(!pixoroIsUuidLocal(ME_ID) || !pixoroIsUuidLocal(id)) return;
   supa=getSupa(); let s=allSaves.some(x=>String(x.post_id)==String(id)&&(x.user_id==ME_ID));
@@ -320,7 +318,7 @@ async function savePost(id,btn){
     if(supa){ let {error}=await supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID); if(error){ allSaves.push({post_id:id,user_id:ME_ID}); if(btn) btn.classList.add('saved'); console.log('SERVER SAVE FAIL:',error.message); } }
   } else {
     allSaves.push({post_id:id,user_id:ME_ID}); if(btn) btn.classList.add('saved');
-    if(supa){ let {error}=await supa.from('saves').insert({post_id:id,user_id:ME_ID}); if(error){ allSaves=allSaves.filter(x=>!(String(x.post_id)==String(id)&&(x.user_id==ME_ID))); if(btn) btn.classList.remove('saved'); console.log('SERVER SAVE FAIL:',error.message); showToast('Save Aagala da'); } }
+    if(supa){ let {error}=await supa.from('saves').upsert({post_id:id,user_id:ME_ID},{onConflict:'post_id,user_id'}); if(error){ allSaves=allSaves.filter(x=>!(String(x.post_id)==String(id)&&(x.user_id==ME_ID))); if(btn) btn.classList.remove('saved'); console.log('SERVER SAVE FAIL:',error.message); showToast('Save Aagala da'); } }
   }
 }
 window.savePost=savePost;
