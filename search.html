@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Search - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=1001"></script>
+<script src="js/pixoro-core.js?v=1002"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{padding:10px 12px;position:sticky;top:0;background:#000;z-index:10}
@@ -30,7 +30,7 @@ input::placeholder{color:#777}
 <script>
 let supa=window.supa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
-let ME_RAW='',ME_ID='',profileMap={},allProfilesCache=[],allPosts=[]
+let ME_RAW='',ME_ID='',profileMap={},allProfilesCache=[],allPosts=[],blockedIds=new Set()
 function getRealPfp(u){
   let p = profileMap[cleanUser(u)] || allProfilesCache.find(x=>String(x.id)===String(u));
   let url = p ? (p.avatar_url||p.profile_pic||p.photo_url||'') : '';
@@ -53,10 +53,18 @@ function getBestMedia(p){if(p._from==='reels') return {url:p.video_url||p.media_
 function goToPost(p){let best=getBestMedia(p);if(best.isVid){location.href='reels.html?id='+p.id;}else{location.href='index.html?id='+p.id;}}
 window.toggleFollow = window.pixoroToggleFollow;
 window.toggleF = window.pixoroToggleFollow;
-// ✅ FIXED v1001 - NOTI ah TRIGGER thaan pannum da - Frontend la Podatha da
 async function pixoroSendNotification(){ return; }
 window.pixoroSendNotification = pixoroSendNotification;
 let SEARCH_AUTH_DONE = false;
+async function loadBlocked(){
+  try{
+    let {data} = await window.supa.from('blocked_users').select('blocked_user_id').eq('user_id', ME_ID);
+    blockedIds = new Set((data||[]).map(x=>String(x.blocked_user_id)));
+    // Enna Block pannavangalum Maraikanum da
+    let {data: byMe} = await window.supa.from('blocked_users').select('user_id').eq('blocked_user_id', ME_ID);
+    (byMe||[]).forEach(x=> blockedIds.add(String(x.user_id)));
+  }catch(e){}
+}
 async function init(){
   if(SEARCH_AUTH_DONE) return;
   if(!window.supa){setTimeout(init,300);return}
@@ -72,13 +80,15 @@ async function init(){
   ME_ID=session.user.id;window.ME_ID=ME_ID;
   let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
   ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;
-  let {data:profs}=await supa.from('profiles').select('*').limit(100);
-  allProfilesCache=profs||[];(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p});
+  await loadBlocked();
+  let {data:profs}=await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url,bio,full_name,display_name').limit(100);
+  allProfilesCache=(profs||[]).filter(p=>!blockedIds.has(String(p.id)));(allProfilesCache||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p});
   let el=document.getElementById('navPfp');if(el) el.src=getPfp(ME_RAW);
   if(window.pixoroRefreshPhotos) await window.pixoroRefreshPhotos();
   if(window.pixoroLoadFollowing) await window.pixoroLoadFollowing();
   loadTrending();
 }
+// ✅ FIXED v1002 - Trending la Block panna User Post Varaathu da
 async function loadTrending(){
   let all=[];
   try{let r=await supa.from('posts').select('*').eq('is_archived',false).order('created_at',{ascending:false}).limit(30);if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'posts'})));}catch(e){}
@@ -87,6 +97,7 @@ async function loadTrending(){
   for(let p of all){
     let raw=(p.media_url||p.video_url||'').trim();if(!raw) continue;
     if(p.is_archived === true) continue;
+    if(p.user_id && blockedIds.has(String(p.user_id))) continue;
     let u=raw.split('?')[0].split('#')[0].toLowerCase().trim();
     let fileKey=u.includes('/storage/')?u.split('/storage/')[1]:u;
     if(seenUrl.has(u)||seenUrl.has(fileKey)) continue;
@@ -98,7 +109,7 @@ async function loadTrending(){
   if(!deduped.length) document.getElementById('grid').innerHTML='<p style="padding:30px;color:#777;text-align:center">No posts yet da</p>';
 }
 let _searchTimer = null;
-// ✅ FIXED v1001 - Search ah Server la irunthu Edu da - Cache la illa da - Pudhu User um Varuvan da
+// ✅ FIXED v1002 - Search la Block panna User Vara Maatan da
 async function doSearch(){
   clearTimeout(_searchTimer);
   _searchTimer = setTimeout(async ()=>{
@@ -109,11 +120,11 @@ async function doSearch(){
     let cleanQ=cleanUser(qRaw);
     let list=[];
     try{
-      let {data: profs} = await supa.from('profiles').select('*').ilike('username','%'+cleanQ+'%').limit(30);
-      list = (profs||[]).filter(p=>String(p.id)!==String(ME_ID));
+      let {data: profs} = await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url,bio').ilike('username','%'+cleanQ+'%').limit(30);
+      list = (profs||[]).filter(p=>String(p.id)!==String(ME_ID) && !blockedIds.has(String(p.id)));
     }catch(e){}
     if(!list.length){
-      list = allProfilesCache.filter(p=>{if(String(p.id)===String(ME_ID)) return false;let uname=cleanUser(p.username||'');return uname.includes(cleanQ);});
+      list = allProfilesCache.filter(p=>{if(String(p.id)===String(ME_ID)) return false;if(blockedIds.has(String(p.id))) return false;let uname=cleanUser(p.username||'');return uname.includes(cleanQ);});
     }
     list.forEach(p=>{ profileMap[cleanUser(p.username)]=p; });
     if(!list.length){box.innerHTML=`<p style="padding:30px 20px;color:#777;text-align:center">No users found da<br>Try: <b style="color:#fff">sanjay</b></p>`;return;}
