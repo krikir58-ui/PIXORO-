@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PIXORO Chat</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=server_only_final"></script>
+<script src="js/pixoro-core.js?v=1001"></script>
 <style>
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{margin:0;background:#000!important;color:#fff;max-width:450px;height:100dvh;height:100svh;margin:auto;display:flex;flex-direction:column;-webkit-touch-callout:none;overflow:hidden}
@@ -151,19 +151,8 @@ let pc=null,localStream=null,CALL_TYPE='audio',PENDING_OFFER=null,CALL_ACTIVE=fa
 let SAFE_CUR=null, PRIV_CUR=null, DM_CUR=null, DM_STACK=[], DM_LAST_GROUP=null;
 const SAFE_TYPES=[{k:'photo',t:'Photo'},{k:'view',t:'View Photo'},{k:'call',t:'Call'},{k:'voice',t:'Voice'},{k:'stranger',t:'Stranger'},{k:'imgblock',t:'Image Block'}];
 const PRIV_TYPES=[{k:'seen',t:'Seen'},{k:'typing',t:'Typing'},{k:'active',t:'Active'},{k:'showLastSeen',t:'Last Seen'},{k:'otpblock',t:'OTP Block'},{k:'linkwarn',t:'Link Warning'}];
-const DM_GROUPS=[
-  {title:'What you see', items:[{k:'msgRequest',t:'Message Request'},{k:'privacy',t:'Privacy'}]},
-  {title:'Your app and media', items:[{k:'media',t:'Media & Calls'},{k:'safety',t:'Safety'}]},
-  {title:'For families', items:[{k:'girl',t:'Girl Safety'},{k:'kids',t:'Kids Help'}]},
-];
-const DM_SUB={
-  privacy:[{k:'seen',t:'Seen'},{k:'typing',t:'Typing'},{k:'active',t:'Active'},{k:'showLastSeen',t:'Last Seen'},{k:'otpblock',t:'OTP Block'},{k:'linkwarn',t:'Link Warning'}],
-  media:[{k:'audiocall',t:'Audio Call'},{k:'videocall',t:'Video Call'},{k:'camera',t:'Camera'}],
-  safety:[{k:'antispam',t:'Anti-Spam'},{k:'mute',t:'Mute'},{k:'vanish',t:'Vanish'},{k:'disappear',t:'Disappear 24H'}],
-  girl:[{k:'girl_photo',t:'Photo'},{k:'girl_view',t:'View Photo'},{k:'girl_call',t:'Call'},{k:'girl_voice',t:'Voice'},{k:'girl_stranger',t:'Stranger'},{k:'girl_imgblock',t:'Image Block'}],
-  kids:[{k:'kids_mode',t:'Kids Mode'},{k:'kids_help',t:'Help Button'}],
-  reqGroup:[{k:'reqPhoto',t:'Request Photo'},{k:'reqVoice',t:'Request Voice'},{k:'reqPreview',t:'Request Preview'}],
-};
+const DM_GROUPS=[{title:'What you see', items:[{k:'msgRequest',t:'Message Request'},{k:'privacy',t:'Privacy'}]},{title:'Your app and media', items:[{k:'media',t:'Media & Calls'},{k:'safety',t:'Safety'}]},{title:'For families', items:[{k:'girl',t:'Girl Safety'},{k:'kids',t:'Kids Help'}]}];
+const DM_SUB={privacy:[{k:'seen',t:'Seen'},{k:'typing',t:'Typing'},{k:'active',t:'Active'},{k:'showLastSeen',t:'Last Seen'},{k:'otpblock',t:'OTP Block'},{k:'linkwarn',t:'Link Warning'}],media:[{k:'audiocall',t:'Audio Call'},{k:'videocall',t:'Video Call'},{k:'camera',t:'Camera'}],safety:[{k:'antispam',t:'Anti-Spam'},{k:'mute',t:'Mute'},{k:'vanish',t:'Vanish'},{k:'disappear',t:'Disappear 24H'}],girl:[{k:'girl_photo',t:'Photo'},{k:'girl_view',t:'View Photo'},{k:'girl_call',t:'Call'},{k:'girl_voice',t:'Voice'},{k:'girl_stranger',t:'Stranger'},{k:'girl_imgblock',t:'Image Block'}],kids:[{k:'kids_mode',t:'Kids Mode'},{k:'kids_help',t:'Help Button'}],reqGroup:[{k:'reqPhoto',t:'Request Photo'},{k:'reqVoice',t:'Request Voice'},{k:'reqPreview',t:'Request Preview'}]};
 const DM_TITLES={privacy:'Privacy',media:'Media & Calls',safety:'Safety',girl:'Girl Safety',kids:'Kids Help',reqGroup:'Request Settings',msgRequest:'Message Request'};
 function getSafeVal(k){ return GIRL_SAFETY[k]; }
 function getPrivVal(k){ let m={seen:DM_SEEN,typing:DM_TYPING,active:DM_ACTIVE,showLastSeen:SHOW_LASTSEEN,otpblock:DM_OTP_BLOCK,linkwarn:DM_LINK_WARN}; return m[k]; }
@@ -172,73 +161,19 @@ function renderSafeList(){ let el=$('safeList'); if(!el) return; el.innerHTML=SA
 function openSafeDetail(k){ SAFE_CUR=k; let o=SAFE_TYPES.find(x=>x.k===k); $('safeDetailTitle').textContent=o?o.t:k; $('safeList').style.display='none'; $('safeDetail').style.display='block'; let v=getSafeVal(k); $('safeAllowBtn').className='bigBtn '+(v?'selAllow':''); $('safeDenyBtn').className='bigBtn '+(!v?'selDeny':''); }
 function closeSafeDetail(){ SAFE_CUR=null; $('safeDetail').style.display='none'; $('safeList').style.display='block'; renderSafeList(); }
 function setSafeDetail(v){ if(!SAFE_CUR) return; saveGirlSafety(SAFE_CUR,v); $('safeAllowBtn').className='bigBtn '+(v?'selAllow':''); $('safeDenyBtn').className='bigBtn '+(!v?'selDeny':''); }
-function renderPrivacyList(){ let el=$('privacyList'); if(!el) return; el.innerHTML=PRIV_TYPES.map(o=>{ let v=getPrivVal(o.k); return `<div class="typeRow" onclick="openPrivacyDetail('${o.k}')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center"><span class="st ${v?'on':'off'}">${v?'ON':'OFF'}</span><span>›</span></span></div>` }).join(''); }
+function renderPrivacyList(){ let el=$('privacyList'); if(!el) return; el.innerHTML=PRIV_TYPES.map(o=>{ let v=getPrivVal(o.k); return `<div class="typeRow" onclick="openPrivacyDetail('${o.k}')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center"><span class="st ${v?'on':'off'}">${v?'ON':'OFF'}</span><span>›</span></span></div>`; }).join(''); }
 function openPrivacyDetail(k){ PRIV_CUR=k; let o=PRIV_TYPES.find(x=>x.k===k); $('privacyDetailTitle').textContent=o?o.t:k; $('privacyList').style.display='none'; $('privacyDetail').style.display='block'; let v=getPrivVal(k); $('privacyAllowBtn').className='bigBtn '+(v?'selAllow':''); $('privacyDenyBtn').className='bigBtn '+(!v?'selDeny':''); }
 function closePrivacyDetail(){ PRIV_CUR=null; $('privacyDetail').style.display='none'; $('privacyList').style.display='block'; renderPrivacyList(); }
 function setPrivacyDetail(v){ if(!PRIV_CUR) return; saveDMSetting(PRIV_CUR,v); $('privacyAllowBtn').className='bigBtn '+(v?'selAllow':''); $('privacyDenyBtn').className='bigBtn '+(!v?'selDeny':''); }
-function renderDmLevel1(){
-  $('dmSettingsTitle').textContent='Settings';
-  let h='';
-  DM_GROUPS.forEach(g=>{
-    h+=`<div class="secTitle">${g.title}</div>`;
-    g.items.forEach(o=>{
-      let isGroup=!!DM_SUB[o.k];
-      let label=isGroup?'':`<span class="st ${getDmVal(o.k)==='none'||getDmVal(o.k)===false?'off':'on'}">${getDmVal(o.k)}</span>`;
-      h+=`<div class="typeRow" onclick="openDmGroup('${o.k}')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center">${label}<span>›</span></span></div>`;
-    });
-  });
-  h+=`<div class="secTitle">Message Request</div><div class="typeRow" onclick="openDmGroup('reqGroup')"><b>Request Settings</b><span>›</span></div>`;
-  let p1=$('dmPage1'); p1.innerHTML=h; p1.style.display='block'; p1.classList.add('slideIn');
-  $('dmPage2').style.display='none'; $('dmPage3').style.display='none'; DM_STACK=['level1'];
-}
-function openDmGroup(k){
-  if(k==='msgRequest'){ openDmDetail('msgRequest','level1'); return; }
-  let items=DM_SUB[k]; if(!items) return; DM_LAST_GROUP=k; showDmPage2(DM_TITLES[k]||k, items);
-}
-function showDmPage2(title, items){
-  $('dmSettingsTitle').textContent=title;
-  let h=`<button class="backBtn2" onclick="renderDmLevel1()">←</button>`;
-  h+=items.map(o=>{ let v=getDmVal(o.k); return `<div class="typeRow" onclick="openDmDetail('${o.k}','level2')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center"><span class="st ${v?'on':'off'}">${v?'ON':'OFF'}</span><span>›</span></span></div>`; }).join('');
-  let p2=$('dmPage2'); p2.innerHTML=h; p2.style.display='block'; p2.classList.add('slideIn');
-  $('dmPage1').style.display='none'; $('dmPage3').style.display='none'; DM_STACK=['level1','level2'];
-}
-function openDmDetail(k, from){
-  DM_CUR=k;
-  let all=[...Object.values(DM_SUB).flat(), {k:'msgRequest',t:'Message Request'}];
-  let o=all.find(x=>x.k===k)||{t:k};
-  $('dmSettingsTitle').textContent=o.t;
-  let body='';
-  if(k==='msgRequest'){
-    body=`<div style="display:flex;gap:10px"><button class="bigBtn ${MY_MSG_REQUEST==='everyone'?'selAllow':''}" onclick="setDmMsgRequest('everyone')">Everyone</button><button class="bigBtn ${MY_MSG_REQUEST==='followers'?'selAllow':''}" onclick="setDmMsgRequest('followers')">Followers</button><button class="bigBtn ${MY_MSG_REQUEST==='none'?'selDeny':''}" onclick="setDmMsgRequest('none')">No One</button></div>`;
-  } else {
-    let v=getDmVal(k);
-    body=`<div style="display:flex;gap:10px"><button class="bigBtn ${v?'selAllow':''}" onclick="setDmDetailBool('${k}',true)">ALLOW</button><button class="bigBtn ${!v?'selDeny':''}" onclick="setDmDetailBool('${k}',false)">NOT ALLOW</button></div>`;
-  }
-  let h=`<button class="backBtn2" onclick="goBackDm()">←</button><div style="margin-top:14px">${body}</div><button onclick="goBackDm()" style="width:100%;margin-top:12px;padding:13px;background:linear-gradient(135deg,#FF4D8D,#FF7AB8);border:0;border-radius:14px;color:#fff;font-weight:900">DONE</button>`;
-  let p3=$('dmPage3'); p3.innerHTML=h; p3.style.display='block'; p3.classList.add('slideIn');
-  $('dmPage1').style.display='none'; $('dmPage2').style.display='none'; DM_STACK=['level1','level2','level3'];
-}
-function goBackDm(){
-  if(DM_STACK.length>=3 && DM_LAST_GROUP && DM_SUB[DM_LAST_GROUP]){ showDmPage2(DM_TITLES[DM_LAST_GROUP], DM_SUB[DM_LAST_GROUP]); }
-  else { renderDmLevel1(); }
-}
+function renderDmLevel1(){ $('dmSettingsTitle').textContent='Settings'; let h=''; DM_GROUPS.forEach(g=>{ h+=`<div class="secTitle">${g.title}</div>`; g.items.forEach(o=>{ let isGroup=!!DM_SUB[o.k]; let label=isGroup?'':`<span class="st ${getDmVal(o.k)==='none'||getDmVal(o.k)===false?'off':'on'}">${getDmVal(o.k)}</span>`; h+=`<div class="typeRow" onclick="openDmGroup('${o.k}')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center">${label}<span>›</span></span></div>`; }); }); h+=`<div class="secTitle">Message Request</div><div class="typeRow" onclick="openDmGroup('reqGroup')"><b>Request Settings</b><span>›</span></div>`; let p1=$('dmPage1'); p1.innerHTML=h; p1.style.display='block'; p1.classList.add('slideIn'); $('dmPage2').style.display='none'; $('dmPage3').style.display='none'; DM_STACK=['level1']; }
+function openDmGroup(k){ if(k==='msgRequest'){ openDmDetail('msgRequest','level1'); return; } let items=DM_SUB[k]; if(!items) return; DM_LAST_GROUP=k; showDmPage2(DM_TITLES[k]||k, items); }
+function showDmPage2(title, items){ $('dmSettingsTitle').textContent=title; let h=`<button class="backBtn2" onclick="renderDmLevel1()">←</button>`; h+=items.map(o=>{ let v=getDmVal(o.k); return `<div class="typeRow" onclick="openDmDetail('${o.k}','level2')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center"><span class="st ${v?'on':'off'}">${v?'ON':'OFF'}</span><span>›</span></span></div>`; }).join(''); let p2=$('dmPage2'); p2.innerHTML=h; p2.style.display='block'; p2.classList.add('slideIn'); $('dmPage1').style.display='none'; $('dmPage3').style.display='none'; DM_STACK=['level1','level2']; }
+function openDmDetail(k, from){ DM_CUR=k; let all=[...Object.values(DM_SUB).flat(), {k:'msgRequest',t:'Message Request'}]; let o=all.find(x=>x.k===k)||{t:k}; $('dmSettingsTitle').textContent=o.t; let body=''; if(k==='msgRequest'){ body=`<div style="display:flex;gap:10px"><button class="bigBtn ${MY_MSG_REQUEST==='everyone'?'selAllow':''}" onclick="setDmMsgRequest('everyone')">Everyone</button><button class="bigBtn ${MY_MSG_REQUEST==='followers'?'selAllow':''}" onclick="setDmMsgRequest('followers')">Followers</button><button class="bigBtn ${MY_MSG_REQUEST==='none'?'selDeny':''}" onclick="setDmMsgRequest('none')">No One</button></div>`; } else { let v=getDmVal(k); body=`<div style="display:flex;gap:10px"><button class="bigBtn ${v?'selAllow':''}" onclick="setDmDetailBool('${k}',true)">ALLOW</button><button class="bigBtn ${!v?'selDeny':''}" onclick="setDmDetailBool('${k}',false)">NOT ALLOW</button></div>`; } let h=`<button class="backBtn2" onclick="goBackDm()">←</button><div style="margin-top:14px">${body}</div><button onclick="goBackDm()" style="width:100%;margin-top:12px;padding:13px;background:linear-gradient(135deg,#FF4D8D,#FF7AB8);border:0;border-radius:14px;color:#fff;font-weight:900">DONE</button>`; let p3=$('dmPage3'); p3.innerHTML=h; p3.style.display='block'; p3.classList.add('slideIn'); $('dmPage1').style.display='none'; $('dmPage2').style.display='none'; DM_STACK=['level1','level2','level3']; }
+function goBackDm(){ if(DM_STACK.length>=3 && DM_LAST_GROUP && DM_SUB[DM_LAST_GROUP]){ showDmPage2(DM_TITLES[DM_LAST_GROUP], DM_SUB[DM_LAST_GROUP]); } else { renderDmLevel1(); } }
 function renderDmTypeList(){ renderDmLevel1(); }
 function closeDmTypeDetail(){ goBackDm(); }
 function setDmMsgRequest(v){ MY_MSG_REQUEST=v; saveMyMsgRequest(); openDmDetail('msgRequest','level1'); renderDmLevel1(); }
-function setDmDetailBool(k,v){
-  if(k==='reqPhoto') MY_REQ_PHOTO=v; else if(k==='reqVoice') MY_REQ_VOICE=v; else if(k==='reqPreview') MY_REQ_PREVIEW=v;
-  else if(k==='audiocall') ALLOW_AUDIO=v; else if(k==='videocall') ALLOW_VIDEO=v; else if(k==='camera') ALLOW_CAMERA=v;
-  else if(k==='antispam') DM_ANTISPAM=v; else if(k==='mute') DM_MUTE=v; else if(k==='vanish') DM_VANISH=v; else if(k==='disappear') DM_DISAPPEAR=v?'24h':'off';
-  else if(k==='seen') DM_SEEN=v; else if(k==='typing') DM_TYPING=v; else if(k==='active') DM_ACTIVE=v; else if(k==='showLastSeen') SHOW_LASTSEEN=v;
-  else if(k==='otpblock') DM_OTP_BLOCK=v; else if(k==='linkwarn') DM_LINK_WARN=v;
-  else if(k==='girl_photo') GIRL_SAFETY.photo=v; else if(k==='girl_view') GIRL_SAFETY.view=v; else if(k==='girl_call') GIRL_SAFETY.call=v; else if(k==='girl_voice') GIRL_SAFETY.voice=v; else if(k==='girl_stranger') GIRL_SAFETY.stranger=v; else if(k==='girl_imgblock') GIRL_SAFETY.imgblock=v;
-  else if(k==='kids_mode') KIDS_MODE=v; else if(k==='kids_help') KIDS_HELP=v;
-  if(['reqPhoto','reqVoice','reqPreview'].includes(k)) saveMyMsgRequest();
-  else if(k.startsWith('girl_')) saveGirlSafety(k.replace('girl_',''),v);
-  else if(k==='kids_mode'||k==='kids_help') savePerChat();
-  else saveDMSetting(k,v);
-  openDmDetail(k,'level2');
-}
+function setDmDetailBool(k,v){ if(k==='reqPhoto') MY_REQ_PHOTO=v; else if(k==='reqVoice') MY_REQ_VOICE=v; else if(k==='reqPreview') MY_REQ_PREVIEW=v; else if(k==='audiocall') ALLOW_AUDIO=v; else if(k==='videocall') ALLOW_VIDEO=v; else if(k==='camera') ALLOW_CAMERA=v; else if(k==='antispam') DM_ANTISPAM=v; else if(k==='mute') DM_MUTE=v; else if(k==='vanish') DM_VANISH=v; else if(k==='disappear') DM_DISAPPEAR=v?'24h':'off'; else if(k==='seen') DM_SEEN=v; else if(k==='typing') DM_TYPING=v; else if(k==='active') DM_ACTIVE=v; else if(k==='showLastSeen') SHOW_LASTSEEN=v; else if(k==='otpblock') DM_OTP_BLOCK=v; else if(k==='linkwarn') DM_LINK_WARN=v; else if(k==='girl_photo') GIRL_SAFETY.photo=v; else if(k==='girl_view') GIRL_SAFETY.view=v; else if(k==='girl_call') GIRL_SAFETY.call=v; else if(k==='girl_voice') GIRL_SAFETY.voice=v; else if(k==='girl_stranger') GIRL_SAFETY.stranger=v; else if(k==='girl_imgblock') GIRL_SAFETY.imgblock=v; else if(k==='kids_mode') KIDS_MODE=v; else if(k==='kids_help') KIDS_HELP=v; if(['reqPhoto','reqVoice','reqPreview'].includes(k)) saveMyMsgRequest(); else if(k.startsWith('girl_')) saveGirlSafety(k.replace('girl_',''),v); else if(k==='kids_mode'||k==='kids_help') savePerChat(); else saveDMSetting(k,v); openDmDetail(k,'level2'); }
 function showWarning(msg){ let w=$('warnBar'); if(!w) return; w.textContent=msg; w.style.display='block'; clearTimeout(window._warnT); window._warnT=setTimeout(()=>w.style.display='none',1500); }
 function closeDMSettingsSlow(){ let s=$('dmSettingSheet'); let bd=$('sheetBackdrop'); s.classList.remove('open'); bd.classList.remove('open'); setTimeout(()=>{ bd.style.display='none'; },350); }
 function closeAllSheets(){ closeDMSettingsSlow(); ['menu','optMenu'].forEach(id=>{ let e=$(id); if(e) e.style.display='none'; }); }
@@ -248,42 +183,20 @@ function getDMState(){ return {active:DM_ACTIVE,typing:DM_TYPING,seen:DM_SEEN,al
 function getGirlState(){ return GIRL_SAFETY; }
 function applyDMState(d){ if(!d) return; DM_ACTIVE=d.active??true; DM_TYPING=d.typing??true; DM_SEEN=d.seen??true; DM_ALLOW=d.allow||'everyone'; SHOW_LASTSEEN=d.showLastSeen??true; DM_OTP_BLOCK=d.otpblock??true; DM_LINK_WARN=d.linkwarn??true; DM_VANISH=d.vanish||false; DM_DISAPPEAR=d.disappear||'off'; DM_SHOT_ALERT=d.shotalert??true; DM_ANTISPAM=d.antispam??true; DM_MUTE=d.mute||false; ALLOW_AUDIO=d.audiocall??true; ALLOW_VIDEO=d.videocall??true; ALLOW_CAMERA=d.camera??true; KIDS_MODE=d.kids_mode??false; KIDS_HELP=d.kids_help??true; }
 function applyGirlState(g){ if(!g) return; GIRL_SAFETY={photo:g.photo??true,view:g.view??true,call:g.call??true,voice:g.voice??true,stranger:g.stranger??true,imgblock:g.imgblock??true}; }
-// SERVER MATTUM - 100% Supabase
-async function savePerChat(){
-  if(!CHAT_ID||!ME_ID||!OTHER_ID||!supa) return;
-  let {error}=await supa.from('chat_settings').upsert({user_id:ME_ID,chat_id:CHAT_ID,other_id:OTHER_ID,dm_settings:getDMState(),girl_settings:getGirlState(),updated_at:new Date().toISOString()},{onConflict:'user_id,chat_id'});
-  if(error) console.log('SERVER SAVE FAIL:',error.message); else console.log('SERVER SAVE OK');
-}
-async function loadPerChat(){
-  if(!CHAT_ID||!ME_ID||!supa) return;
-  let {data,error}=await supa.from('chat_settings').select('dm_settings,girl_settings').eq('user_id',ME_ID).eq('chat_id',CHAT_ID).maybeSingle();
-  if(error){ console.log('SERVER LOAD FAIL:',error.message); return; }
-  if(data){ applyDMState(data.dm_settings); applyGirlState(data.girl_settings); }
-  syncAllMassUI();
-}
-async function saveMyMsgRequest(){
-  if(!ME_ID||!supa) return;
-  let {error}=await supa.from('user_settings').upsert({user_id:ME_ID,msg_request:MY_MSG_REQUEST,req_photo:MY_REQ_PHOTO,req_voice:MY_REQ_VOICE,req_preview:MY_REQ_PREVIEW,dm_active:DM_ACTIVE,dm_typing:DM_TYPING,dm_seen:DM_SEEN,dm_allow:DM_ALLOW,show_lastseen:SHOW_LASTSEEN,updated_at:new Date().toISOString()},{onConflict:'user_id'});
-  if(error) console.log('SERVER SAVE FAIL:',error.message); else console.log('SERVER SAVE OK');
-}
-async function loadMyMsgRequest(){
-  if(!ME_ID||!supa) return;
-  let {data}=await supa.from('user_settings').select('*').eq('user_id',ME_ID).maybeSingle();
-  if(data){ MY_MSG_REQUEST=data.msg_request||'everyone'; MY_REQ_PHOTO=data.req_photo??false; MY_REQ_VOICE=data.req_voice??false; MY_REQ_PREVIEW=data.req_preview??true; if(data.dm_settings) applyDMState(data.dm_settings); }
-  syncReqUI();
-}
+async function savePerChat(){ if(!CHAT_ID||!ME_ID||!OTHER_ID||!supa) return; let {error}=await supa.from('chat_settings').upsert({user_id:ME_ID,chat_id:CHAT_ID,other_id:OTHER_ID,dm_settings:getDMState(),girl_settings:getGirlState(),updated_at:new Date().toISOString()},{onConflict:'user_id,chat_id'}); if(error) console.log('SERVER SAVE FAIL:',error.message); }
+async function loadPerChat(){ if(!CHAT_ID||!ME_ID||!supa) return; let {data,error}=await supa.from('chat_settings').select('dm_settings,girl_settings').eq('user_id',ME_ID).eq('chat_id',CHAT_ID).maybeSingle(); if(error) return; if(data){ applyDMState(data.dm_settings); applyGirlState(data.girl_settings); } syncAllMassUI(); }
+async function saveMyMsgRequest(){ if(!ME_ID||!supa) return; await supa.from('user_settings').upsert({user_id:ME_ID,msg_request:MY_MSG_REQUEST,req_photo:MY_REQ_PHOTO,req_voice:MY_REQ_VOICE,req_preview:MY_REQ_PREVIEW,dm_active:DM_ACTIVE,dm_typing:DM_TYPING,dm_seen:DM_SEEN,dm_allow:DM_ALLOW,show_lastseen:SHOW_LASTSEEN,updated_at:new Date().toISOString()},{onConflict:'user_id'}); }
+async function loadMyMsgRequest(){ if(!ME_ID||!supa) return; let {data}=await supa.from('user_settings').select('*').eq('user_id',ME_ID).maybeSingle(); if(data){ MY_MSG_REQUEST=data.msg_request||'everyone'; MY_REQ_PHOTO=data.req_photo??false; MY_REQ_VOICE=data.req_voice??false; MY_REQ_PREVIEW=data.req_preview??true; if(data.dm_settings) applyDMState(data.dm_settings); } syncReqUI(); }
 async function loadOtherMsgRequest(){ if(!OTHER_ID||!supa) return; try{ let {data}=await supa.from('user_settings').select('*').eq('user_id',OTHER_ID).maybeSingle(); if(data){ OTHER_MSG_REQUEST=data.msg_request||'everyone'; OTHER_REQ_PHOTO=data.req_photo||false; OTHER_REQ_VOICE=data.req_voice||false; OTHER_REQ_PREVIEW=data.req_preview??true; } }catch(e){} try{ let {data:msgs}=await supa.from('messages').select('id,sender_id').eq('chat_id',CHAT_ID).limit(200); let mine=(msgs||[]).filter(m=>String(m.sender_id)===ME_ID).length; MY_MSG_COUNT=mine; IS_REQUEST_PENDING=(mine===0); }catch(e){} syncReqUI(); showRequestBanner(); }
 function syncReqUI(){ renderSafeList(); renderPrivacyList(); renderDmLevel1(); }
 function setMyMsgRequest(v){ MY_MSG_REQUEST=v; syncReqUI(); saveMyMsgRequest(); showWarning('Saved'); }
-function setMyReq(k,v,btn){ if(k==='reqPhoto') MY_REQ_PHOTO=v; if(k==='reqVoice') MY_REQ_VOICE=v; if(k==='reqPreview') MY_REQ_PREVIEW=v; saveMyMsgRequest(); }
 function showRequestBanner(){ let box=$('box'); if(!box) return; let old=document.getElementById('reqBanner'); if(old) old.remove(); if(OTHER_MSG_REQUEST==='none'){ let d=document.createElement('div'); d.id='reqBanner'; d.style.cssText='background:#FF3B30;color:#fff;text-align:center;padding:10px;font-size:13px;font-weight:700;margin:8px;border-radius:12px'; d.textContent='Blocked'; box.prepend(d); return; } if(IS_REQUEST_PENDING && (MY_MSG_REQUEST==='followers' || OTHER_MSG_REQUEST==='followers')){ let d=document.createElement('div'); d.id='reqBanner'; d.style.cssText='background:#1F1F1F;border:1px solid #FF4D8D;border-radius:14px;padding:12px;margin:8px;text-align:center'; d.innerHTML='<b>Message Request</b><div style="display:flex;gap:8px;margin-top:10px"><button onclick="acceptRequest()" style="flex:1;background:#22C55E;border:0;color:#fff;padding:10px;border-radius:12px;font-weight:800">Accept</button><button onclick="declineRequest()" style="flex:1;background:#333;border:0;color:#fff;padding:10px;border-radius:12px;font-weight:800">Decline</button><button onclick="blockSelected()" style="flex:1;background:#FF3B30;border:0;color:#fff;padding:10px;border-radius:12px;font-weight:800">Block</button></div>'; box.prepend(d); } }
-async function acceptRequest(){ IS_REQUEST_PENDING=false; let b=document.getElementById('reqBanner'); if(b) b.remove(); showWarning('Accepted'); if(MY_MSG_COUNT===0){ try{ await supa.from('messages').insert({chat_id:CHAT_ID,sender_id:ME_ID,receiver_id:OTHER_ID,sender:ME,receiver:OTHER,text:'Hi',message:'Hi',type:'text',seen:false,status:'sent'}); }catch(e){} } await loadMessages(); }
+// ✅ FIXED v1001 - Accept la Hi Pogathu da
+async function acceptRequest(){ IS_REQUEST_PENDING=false; let b=document.getElementById('reqBanner'); if(b) b.remove(); showWarning('Accepted'); await loadMessages(); }
 function declineRequest(){ let b=document.getElementById('reqBanner'); if(b) b.remove(); location.href='dm.html'; }
 function syncAllMassUI(){ let el=$('girlSafetyStatus'); if(el){ let on=GIRL_SAFETY.photo && GIRL_SAFETY.call; el.textContent=on?'Safety ON':'Safety OFF'; el.style.color=on?'#22C55E':'#FFAA00'; } let mn=$('massChatName'); if(mn && OTHER) mn.textContent=OTHER; syncReqUI(); }
 function saveDMSetting(k,v){ if(k==='active') DM_ACTIVE=v; if(k==='typing') DM_TYPING=v; if(k==='seen'){ DM_SEEN=v; loadMessages(); } if(k==='allow') DM_ALLOW=v; if(k==='showLastSeen') SHOW_LASTSEEN=v; if(k==='otpblock') DM_OTP_BLOCK=v; if(k==='linkwarn') DM_LINK_WARN=v; if(k==='vanish') DM_VANISH=v; if(k==='disappear') DM_DISAPPEAR=v; if(k==='shotalert') DM_SHOT_ALERT=v; if(k==='antispam') DM_ANTISPAM=v; if(k==='mute') DM_MUTE=v; if(k==='audiocall') ALLOW_AUDIO=v; if(k==='videocall') ALLOW_VIDEO=v; if(k==='camera') ALLOW_CAMERA=v; updateOnlineUI(); savePerChat(); saveMyMsgRequest(); }
 function saveGirlSafety(k,v){ GIRL_SAFETY[k]=v; if(k==='photo' && !v) ALLOW_CAMERA=false; if(k==='photo' && v) ALLOW_CAMERA=true; if(k==='call' && !v){ ALLOW_AUDIO=false; ALLOW_VIDEO=false; } if(k==='call' && v){ ALLOW_AUDIO=true; ALLOW_VIDEO=true; } savePerChat(); syncAllMassUI(); }
-function setMass(k,v,btn){ saveDMSetting(k,v); syncAllMassUI(); }
-function setMassGirl(k,v,btn){ saveGirlSafety(k,v); syncAllMassUI(); }
 function cleanName(v){return String(v||'').trim().replace(/^@/,'').toLowerCase();}
 function scrollBottom(){$('box').scrollTop=$('box').scrollHeight;}
 function isMineMsg(m){ return String(m.sender_id)===ME_ID || cleanName(m.sender)===ME; }
@@ -291,17 +204,14 @@ function openProfile(){ closeAllSheets(); $('profileSheet').style.display='block
 function closeProfile(){ $('profileSheet').style.display='none'; $('optMenu').style.display='none'; $('privacyPage').style.display='none'; $('chatControlsPage').style.display='none'; }
 function openPrivacy(){ renderPrivacyList(); closePrivacyDetail(); $('privacyPage').style.display='block'; }
 function openChatControls(){ $('chatControlsPage').style.display='block'; }
-function openTheme(){ }
 function toggleDisappear(){ let v=DM_DISAPPEAR==='off'?'24h':'off'; saveDMSetting('disappear',v); $('disTxt').textContent=v==='off'?'Off':'24 Hours'; syncAllMassUI(); }
 function toggleMuteProfile(){ DM_MUTE=!DM_MUTE; saveDMSetting('mute',DM_MUTE); $('muteTxt').textContent=DM_MUTE?'Unmute':'Mute'; syncAllMassUI(); }
 function goProfile(){ location.href='profile.html?user='+encodeURIComponent(OTHER); }
 function openSearchBar(){ let b=$('pixSearchBar'); let show=b.style.display!=='flex'; b.style.display=show?'flex':'none'; if(show) $('pixSearchInput').focus(); }
 function pixSearchChat(q){ q=q.toLowerCase().trim(); if(!q){ $('pixSearchCount').style.display='none'; return; } let els=[...document.querySelectorAll('#box .bub')]; let found=els.filter(e=>e.textContent.toLowerCase().includes(q)); $('pixSearchCount').style.display='block'; $('pixSearchCount').textContent=found.length+' found'; if(found[0]) found[0].scrollIntoView({behavior:'smooth',block:'center'}); }
-function createGroup(){ }
 function moveToGeneral(){ document.getElementById('chatControlsPage').style.display='none'; }
 function doRestrict(){ showWarning('Restricted'); $('optMenu').style.display='none'; $('privacyPage').style.display='none'; }
 document.addEventListener('contextmenu',e=>{ if(e.target.tagName==='IMG'||e.target.tagName==='VIDEO') e.preventDefault(); });
-document.addEventListener('dragstart',e=>{ if(e.target.tagName==='IMG') e.preventDefault(); });
 function isUnsafeText(v){ let low=v.toLowerCase(); if(DM_OTP_BLOCK){ if(low.includes('otp')||low.includes('password')||low.includes('pin')||low.includes('cvv')) return 'BLOCKED'; if(/^\d{4,6}$/.test(v.trim())) return 'BLOCKED'; } if(DM_LINK_WARN && (v.includes('http://')||v.includes('https://')||v.includes('t.me/')||v.includes('bit.ly'))) return 'Link'; return ''; }
 async function removeWhiteBg(imgEl){ try{ if(!imgEl || imgEl.dataset.whiteDone) return; imgEl.dataset.whiteDone='1'; if(!imgEl.complete || !imgEl.naturalWidth) await new Promise(r=>{ imgEl.onload=r; imgEl.onerror=r; }); if(!imgEl.naturalWidth) return; let c=document.createElement('canvas'); c.width=imgEl.naturalWidth; c.height=imgEl.naturalHeight; let ctx=c.getContext('2d'); ctx.fillStyle='#000'; ctx.fillRect(0,0,c.width,c.height); ctx.drawImage(imgEl,0,0); let d=ctx.getImageData(0,0,c.width,c.height); let px=d.data; for(let i=0;i<px.length;i+=4){ if(px[i]>240 && px[i+1]>240 && px[i+2]>240){ px[i]=0; px[i+1]=0; px[i+2]=0; } } ctx.putImageData(d,0,0); imgEl.src=c.toDataURL('image/png'); }catch(e){} }
 function setHeaderAvatar(url, uname){ let wrap=$('pfpWrap'); let L=(cleanName(uname||'P').charAt(0).toUpperCase()||'P'); if(url && !url.includes('ui-avatars')){ wrap.innerHTML=`<img src="${url}"><span id="pfpDot"></span>`; let im=wrap.querySelector('img'); if(im) removeWhiteBg(im); } else { wrap.innerHTML=`<div class="hAva">${L}</div><span id="pfpDot"></span>`; } }
@@ -330,7 +240,8 @@ async function reactSelected(){ const {error}=await supa.from('messages').update
 async function unsendSelected(){ if(SEL_PHOTO?.media_path&&window.pixoroUnsendPhoto){ await pixoroUnsendPhoto(selectedMessage,SEL_PHOTO.media_path); } else { const {error}=await supa.from('messages').delete().eq('id',selectedMessage).eq('sender_id',ME_ID); if(error) showWarning('Failed'); } $('menu').style.display='none'; await loadMessages(); }
 async function reportSelected(){ if(window.pixoroReportPhoto) await pixoroReportPhoto(OTHER_ID,selectedMessage,'Unsafe'); $('menu').style.display='none'; showWarning('Reported'); }
 async function blockSelected(){ if(window.pixoroBlockUser) await pixoroBlockUser(OTHER); $('menu').style.display='none'; location.href='dm.html'; }
-async function clearChat(){ const {error}=await supa.from('messages').delete().eq('chat_id',CHAT_ID); if(error) showWarning('Failed'); else await loadMessages(); closeAllSheets(); }
+// ✅ FIXED - Clear Chat ah En Chat mattum Delete pannu da
+async function clearChat(){ if(!confirm('Clear this chat da?')) return; const {error}=await supa.from('messages').delete().eq('chat_id',CHAT_ID).or(`sender_id.eq.${ME_ID},receiver_id.eq.${ME_ID}`); if(error) showWarning('Failed'); else await loadMessages(); closeAllSheets(); }
 function createPC(){ pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]}); pc.onicecandidate=e=>{ if(e.candidate && channel) channel.send({type:'broadcast',event:'call-ice',payload:{from:ME,to:OTHER,candidate:e.candidate}}); }; pc.ontrack=e=>{ let rv=$('remoteVideo'); if(rv){ rv.srcObject=e.streams[0]; rv.play().catch(()=>{}); } $('callStatus').textContent='Connected'; }; return pc; }
 async function startCall(type){ if(OTHER_MSG_REQUEST==='none'){ showWarning('Blocked'); return; } if(IS_REQUEST_PENDING){ showWarning('Blocked'); return; } if(!GIRL_SAFETY.call){ showWarning('Blocked'); return; } if(type==='audio' && !ALLOW_AUDIO){ showWarning('Blocked'); return; } if(type==='video' && !ALLOW_VIDEO){ showWarning('Blocked'); return; } CALL_TYPE=type; CALL_ACTIVE=true; try{ let constraints = type==='video' ? {video:true,audio:true} : {video:false,audio:true}; localStream=await navigator.mediaDevices.getUserMedia(constraints); }catch(e){ showWarning('Allow Camera / Mic'); CALL_ACTIVE=false; return; } $('callView').style.display='flex'; $('callName').textContent=OTHER; $('callStatus').textContent= type==='video' ? 'Video Calling...' : 'Audio Calling...'; $('localVideo').srcObject=localStream; if(type==='audio'){ $('localVideo').style.display='none'; } else $('localVideo').style.display='block'; createPC(); localStream.getTracks().forEach(t=>pc.addTrack(t,localStream)); let offer=await pc.createOffer(); await pc.setLocalDescription(offer); if(channel) channel.send({type:'broadcast',event:'call-offer',payload:{from:ME,to:OTHER,type:type,sdp:offer}}); }
 async function acceptCall(){ if(!PENDING_OFFER) return; if(!GIRL_SAFETY.call){ showWarning('Blocked'); return; } CALL_TYPE=PENDING_OFFER.type; CALL_ACTIVE=true; $('incomingCall').style.display='none'; try{ let constraints = CALL_TYPE==='video' ? {video:true,audio:true} : {video:false,audio:true}; localStream=await navigator.mediaDevices.getUserMedia(constraints); }catch(e){ showWarning('Allow Camera / Mic'); return; } $('callView').style.display='flex'; $('callName').textContent=OTHER; $('callStatus').textContent='Connecting...'; $('localVideo').srcObject=localStream; if(CALL_TYPE==='audio') $('localVideo').style.display='none'; else $('localVideo').style.display='block'; createPC(); localStream.getTracks().forEach(t=>pc.addTrack(t,localStream)); await pc.setRemoteDescription(new RTCSessionDescription(PENDING_OFFER.sdp)); let ans=await pc.createAnswer(); await pc.setLocalDescription(ans); if(channel) channel.send({type:'broadcast',event:'call-answer',payload:{from:ME,to:OTHER,sdp:ans}}); PENDING_OFFER=null; }
@@ -340,9 +251,41 @@ function cleanupCall(){ $('callView').style.display='none'; $('incomingCall').st
 function toggleMute(){ if(!localStream) return; MIC_MUTED=!MIC_MUTED; localStream.getAudioTracks().forEach(t=>t.enabled=!MIC_MUTED); $('muteBtn').textContent=MIC_MUTED?'🔇':'🎤'; $('muteBtn').style.background=MIC_MUTED?'#FF3B30':'#333'; }
 function toggleCamera(){ if(!localStream) return; CAM_OFF=!CAM_OFF; localStream.getVideoTracks().forEach(t=>t.enabled=!CAM_OFF); $('camBtn').textContent=CAM_OFF?'🚫':'📷'; }
 async function handleCallSignal(ev,payload){ if(!payload || payload.to!==ME) return; if(ev==='call-offer'){ if(CALL_ACTIVE) return; if(!GIRL_SAFETY.call) return; if(IS_REQUEST_PENDING) return; PENDING_OFFER=payload; $('incName').textContent=payload.from; $('incType').textContent= payload.type==='video' ? 'Incoming Video Call...' : 'Incoming Audio Call...'; $('incAva').textContent=payload.from.charAt(0).toUpperCase(); $('incomingCall').style.display='flex'; } if(ev==='call-answer'){ if(pc && payload.sdp){ await pc.setRemoteDescription(new RTCSessionDescription(payload.sdp)); } } if(ev==='call-ice'){ if(pc && payload.candidate){ try{ await pc.addIceCandidate(new RTCIceCandidate(payload.candidate)); }catch(e){} } } if(ev==='call-end'){ cleanupCall(); } }
-async function init(){ try{ if(!window.supa){ setTimeout(init,200); return; } supa=window.supa; const targetRaw = new URLSearchParams(location.search).get('user') || ''; const target = cleanName(targetRaw); if(!target){ location.href='dm.html'; return; } $('uname').textContent=target; $('online').textContent='last seen recently'; setHeaderAvatar('', target); const {data:{session}, error:seErr} = await supa.auth.getSession(); if(seErr) throw seErr; if(!session){ location.href='login.html'; return; } ME_ID=session.user.id; const {data:mine, error:e1} = await supa.from('profiles').select('id,username,avatar_url').eq('id',ME_ID).single(); if(e1) throw e1; const {data:other, error:e2} = await supa.from('profiles').select('id,username,avatar_url,is_online,last_seen').ilike('username',target).maybeSingle(); if(e2) throw e2; if(!other) throw new Error('User not found'); if(other.id===ME_ID) throw new Error('Cannot chat with yourself'); ME=cleanName(mine.username); OTHER=cleanName(other.username); OTHER_ID=other.id; OTHER_PFP=other.avatar_url||''; CHAT_ID=[ME_ID,OTHER_ID].sort().join('_'); await loadPerChat(); await loadMyMsgRequest(); await loadOtherMsgRequest(); $('uname').textContent=OTHER; setHeaderAvatar(OTHER_PFP, OTHER); CUR_ONLINE=!!other.is_online; CUR_LASTSEEN=other.last_seen; updateOnlineUI(); $('smallSafe').style.display='block'; updateMyPresence(true); setInterval(()=>updateMyPresence(true),30000); setInterval(()=>refreshOnline(),10000); await loadMessages(); channel=supa.channel('pixoro-chat-'+CHAT_ID).on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:'chat_id=eq.'+CHAT_ID},()=>loadMessages()).on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles',filter:'id=eq.'+OTHER_ID},()=>refreshOnline()).on('broadcast',{event:'typing'},(p)=>{ if(!DM_TYPING) return; if(p.payload&&p.payload.user!==ME) $('typing').innerHTML=p.payload.typing?'<div class="typingBub"><i></i><i></i><i></i></div>':''; }).on('broadcast',{event:'call-offer'},(p)=>handleCallSignal('call-offer',p.payload)).on('broadcast',{event:'call-answer'},(p)=>handleCallSignal('call-answer',p.payload)).on('broadcast',{event:'call-ice'},(p)=>handleCallSignal('call-ice',p.payload)).on('broadcast',{event:'call-end'},(p)=>handleCallSignal('call-end',p.payload)).subscribe(); }catch(e){ showWarning(e.message); } }
-$('inp').addEventListener('keydown',e=>{ if(e.key==='Enter') sendMessage(); });
+// ✅ FIXED v1001 - INIT + REALTIME - Cut Aana Edam da
+let _INIT_DONE=false;
+async function init(){
+  if(_INIT_DONE) return; _INIT_DONE=true;
+  supa=window.supa; if(!supa){ _INIT_DONE=false; setTimeout(init,300); return; }
+  let {data:{session}}=await supa.auth.getSession();
+  if(!session){ location.href='login.html'; return; }
+  ME_ID=session.user.id; window.ME_ID=ME_ID;
+  let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).maybeSingle();
+  ME=cleanName(my?.username||session.user.email.split('@')[0]); window.ME_RAW=ME;
+  let raw=new URLSearchParams(location.search).get('user')||new URLSearchParams(location.search).get('u')||'';
+  if(!raw){ location.href='dm.html'; return; }
+  let otherProf=null;
+  if(raw.includes('-') && raw.length>20){ let {data}=await supa.from('profiles').select('*').eq('id',raw).maybeSingle(); otherProf=data; }
+  if(!otherProf){ let {data}=await supa.from('profiles').select('*').eq('username',cleanName(raw)).maybeSingle(); otherProf=data; }
+  if(!otherProf){ $('uname').textContent='User Not Found'; return; }
+  OTHER_ID=String(otherProf.id); OTHER=cleanName(otherProf.username); OTHER_PFP=otherProf.avatar_url||otherProf.profile_pic||'';
+  $('uname').textContent=OTHER; setHeaderAvatar(OTHER_PFP, OTHER);
+  CHAT_ID=[ME_ID,OTHER_ID].sort().join('_');
+  await loadMyMsgRequest(); await loadPerChat(); await loadOtherMsgRequest();
+  await refreshOnline(); updateMyPresence(true);
+  await loadMessages();
+  if(channel) supa.removeChannel(channel);
+  channel=supa.channel('chat-'+CHAT_ID)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'chat_id=eq.'+CHAT_ID},()=>loadMessages())
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages',filter:'chat_id=eq.'+CHAT_ID},()=>loadMessages())
+    .on('postgres_changes',{event:'DELETE',schema:'public',table:'messages',filter:'chat_id=eq.'+CHAT_ID},()=>loadMessages())
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles',filter:'id=eq.'+OTHER_ID},()=>refreshOnline())
+    .on('broadcast',{event:'typing'},({payload})=>{ if(payload.user!==ME){ $('typing').innerHTML=payload.typing?'<span class="typingBub"><i></i><i></i><i></i></span>':''; } })
+    .on('broadcast',{event:'call-offer'},({payload})=>handleCallSignal('call-offer',payload))
+    .on('broadcast',{event:'call-answer'},({payload})=>handleCallSignal('call-answer',payload))
+    .on('broadcast',{event:'call-ice'},({payload})=>handleCallSignal('call-ice',payload))
+    .on('broadcast',{event:'call-end'},({payload})=>handleCallSignal('call-end',payload))
+    .subscribe();
+  document.addEventListener('visibilitychange',()=>{ if(document.hidden) updateMyPresence(false); else updateMyPresence(true); });
+}
 init();
-document.addEventListener('visibilitychange',()=>{ if(document.hidden) updateMyPresence(false); else updateMyPresence(true); });
-window.addEventListener('beforeunload',()=>{ if(channel&&supa) supa.removeChannel(channel); if(recorder&&recorder.state==='recording') recorder.stop(); if(CALL_ACTIVE) endCall(); });
 </script></body></html>
