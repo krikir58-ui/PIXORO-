@@ -1,7 +1,100 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Pixoro - Profile</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js?v=1004"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
+.top{position:sticky;top:0;background:#000;z-index:10;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222}
+.top b{font-size:18px}
+.profileHead{text-align:center;padding:20px 14px}
+#pfpImg{width:110px;height:110px;border-radius:50%;object-fit:cover;border:3px solid #ff5ea8;background:#222}
+.stats{display:flex;justify-content:center;gap:30px;margin:14px 0}
+.stats div{text-align:center;cursor:pointer}
+.stats b{display:block;font-size:18px}
+.stats span{font-size:12px;color:#888}
+#bioText{font-size:14px;margin:6px 0}
+#linkText{font-size:13px;color:#00d4ff}
+#actionArea{display:flex;gap:10px;justify-content:center;margin:14px 0}
+.btn{flex:1;max-width:160px;padding:11px;border:0;border-radius:10px;background:#222;color:#fff;font-weight:700;cursor:pointer}
+.btnPrimary{background:#fff;color:#000}
+#blockedBanner{display:none;background:#2a1215;color:#ff6b6b;padding:10px;border-radius:10px;margin:10px 14px;text-align:center;font-size:13px}
+#highlightList{display:flex;gap:12px;overflow-x:auto;padding:10px 14px}
+.h-item{flex:0 0 62px;text-align:center;cursor:pointer}
+.h-circle{width:58px;height:58px;border-radius:50%;overflow:hidden;border:2px solid #ff5ea8;margin:0 auto}
+.h-circle img{width:100%;height:100%;object-fit:cover}
+.h-text{font-size:11px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabs{display:flex;border-top:1px solid #222;border-bottom:1px solid #222}
+.tabs button{flex:1;padding:12px;background:none;border:0;color:#888;font-weight:700;cursor:pointer}
+.tabs button.active{color:#fff;border-bottom:2px solid #fff}
+#myGrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}
+.gridItem{aspect-ratio:1/1;overflow:hidden;background:#111;cursor:pointer;position:relative}
+.gridItem img,.gridItem video{width:100%;height:100%;object-fit:cover}
+.gridReelIcon{position:absolute;top:6px;right:6px}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;height:60px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e;font-size:11px}
+.bottom-nav a.active{color:#fff}
+.bottom-nav a img{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #fff}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;z-index:999;align-items:flex-end;justify-content:center}
+.sheet.show{display:flex}
+.sheetBox{background:#1a1a1a;width:100%;max-width:450px;border-radius:20px 20px 0 0;padding:16px;max-height:80vh;overflow:auto}
+.sheetBox input,.sheetBox textarea{width:100%;background:#222;border:0;padding:12px;border-radius:12px;color:#fff;outline:none;margin:8px 0}
+.whiteBtn{background:#fff;color:#000;border:0;padding:6px 14px;border-radius:20px;font-weight:700;cursor:pointer}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#FFD700;color:#000;padding:10px 18px;border-radius:20px;font-weight:800;display:none;z-index:9999}
+#pixoroMenu{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#1a1a1a;border-radius:20px 20px 0 0;padding:14px;display:none;z-index:999}
+#pixoroMenu div{padding:13px;border-bottom:1px solid #222;cursor:pointer}
+#pixoroMenu .delete{color:#ff3040}
+#pixoroMenu .blockBtn{color:#ff6b6b}
+#cropOverlay{position:fixed;inset:0;background:#000;display:none;z-index:1000;align-items:center;justify-content:center;flex-direction:column}
+#cropCircle{width:280px;height:280px;border-radius:50%;overflow:hidden;position:relative;border:2px solid #fff}
+#cropImg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.hlCover{width:62px;height:62px;border-radius:50%;object-fit:cover;border:2px solid #333;cursor:pointer}
+#followModal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;z-index:999;align-items:flex-end;justify-content:center}
+#followModal.show{display:flex}
+</style>
+</head>
+<body>
+<!-- ✅ BODY IRUKKU DA - ITHU ILLANA WHITE THAAN -->
+<div class="top"><b id="topUsername">Loading...</b><span onclick="openSettings()" style="cursor:pointer;font-size:22px">⋮</span></div>
+<div class="profileHead">
+<img id="pfpImg" src="https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true">
+<div class="stats">
+<div onclick="pixoroOpenFollowList('posts')"><b id="postCount">0</b><span>Posts</span></div>
+<div onclick="pixoroOpenFollowList('followers')"><b id="followerCount">0</b><span>Followers</span></div>
+<div onclick="pixoroOpenFollowList('following')"><b id="followingCount">0</b><span>Following</span></div>
+</div>
+<div id="bioText"></div>
+<div id="linkText"></div>
+<div id="actionArea"></div>
+</div>
+<div id="blockedBanner">Blocked da</div>
+<div id="highlightList" style="display:none"></div>
+<div class="tabs">
+<button id="tabPosts" class="active" onclick="showTab('all')">⊞ Posts</button>
+<button id="tabReels" onclick="showTab('reels')">Reels</button>
+<button id="tabSaved" onclick="showTab('saved')">Saved</button>
+</div>
+<div id="myGrid"><p style="text-align:center;padding:40px;color:#888;grid-column:1/4">Loading da...</p></div>
+<div id="toast"></div>
+<div id="pixoroMenu"></div>
+<div id="followModal"><div class="sheetBox" style="border-radius:20px 20px 0 0"><div style="display:flex;justify-content:space-between"><b id="followModalTitle">Followers</b><span onclick="document.getElementById('followModal').classList.remove('show')" style="cursor:pointer">✕</span></div><div id="followModalList" style="margin-top:10px"></div></div></div>
+<div id="setSheet" class="sheet"><div class="sheetBox"><b>Settings</b><div style="padding:12px 0;cursor:pointer" onclick="doPixoroLogout()">🚪 Logout</div><div style="padding:12px 0;cursor:pointer" onclick="document.getElementById('setSheet').style.display='none'">Cancel</div></div></div>
+<div id="editSheet" class="sheet"><div class="sheetBox"><b>Edit Profile</b><img id="editPfpPreview" src="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;display:block;margin:12px auto"><button onclick="document.getElementById('pfpInput').click()" style="width:100%;padding:10px;background:#222;color:#fff;border:0;border-radius:12px">Change Photo</button><input type="file" id="pfpInput" accept="image/*" hidden><input id="editName" placeholder="Name"><input id="editUsername" placeholder="Username"><textarea id="editBio" placeholder="Bio"></textarea><input id="editLink" placeholder="Link"><button onclick="saveEdit()" style="width:100%;padding:13px;background:#FFD700;color:#000;border:0;border-radius:12px;font-weight:900">Save 🔥</button><button onclick="document.getElementById('editSheet').style.display='none'" style="width:100%;padding:12px;background:#222;color:#fff;border:0;border-radius:12px;margin-top:8px">Cancel</button></div></div>
+<div id="hlEditSheet" class="sheet"><div class="sheetBox"><b>Edit Highlight</b><input id="hlEditName" placeholder="Highlight Name"><div id="hlCoverPicker" style="display:flex;gap:10px;margin:10px 0"></div><input type="file" id="hlCoverInput" accept="image/*" hidden><button onclick="saveHighlightEdit()" style="width:100%;padding:12px;background:#FFD700;color:#000;border:0;border-radius:12px;font-weight:900">Save</button><button onclick="deleteHighlight()" style="width:100%;padding:12px;background:#ff3040;color:#fff;border:0;border-radius:12px;margin-top:8px">Delete Highlight</button><button onclick="document.getElementById('hlEditSheet').style.display='none'" style="width:100%;padding:12px;background:#222;color:#fff;border:0;border-radius:12px;margin-top:8px">Cancel</button></div></div>
+<div id="cropOverlay"><div id="cropCircle"><img id="cropImg"></div><input type="range" id="zoomRange" min="1" max="2.5" step="0.1" value="1" style="width:200px;margin:20px"><div style="display:flex;gap:10px"><button onclick="applyCrop()" style="padding:12px 24px;background:#FFD700;border:0;border-radius:12px;font-weight:900">Done</button><button onclick="closeCrop()" style="padding:12px 24px;background:#222;color:#fff;border:0;border-radius:12px">Cancel</button></div></div>
+<div class="bottom-nav">
+<a href="index.html">🏠<span>Home</span></a>
+<a href="search.html">🔍<span>Search</span></a>
+<a href="reels.html">▶️<span>Reels</span></a>
+<a href="dm.html">💬<span>DM</span></a>
+<a href="profile.html" class="active"><img id="navPfp" src="https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true"><span>Profile</span></a>
+</div>
+
 <script>
-// ✅ CORRECTED PROFILE - FULL
+// ✅ CORRECTED PROFILE - FULL - Un script ithuku keezha ottu da, mela ulla HTML ah azhikatha da!
 let supa=null;
 function getSupa(){
   if(window.supa) supa=window.supa;
@@ -291,3 +384,5 @@ let hlInput=document.getElementById('hlCoverInput'); if(hlInput) hlInput.addEven
 window.addEventListener('pixoroFollowChanged', ()=>{ updateFollowMsg(); syncProfileFollow(); });
 init()
 </script>
+</script>
+</body></html>
