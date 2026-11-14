@@ -1,62 +1,3 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Profile - Pixoro</title>
-<style>
-html{background:#000}*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
-.top{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e1e1e;position:sticky;top:0;background:#000;z-index:50;height:56px}
-.topName{font-size:20px!important;font-weight:900;color:#fff;letter-spacing:.2px}
-.topRight{display:flex;gap:14px;align-items:center}
-.topIcon{width:34px;height:34px;border-radius:50%;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:#fff;background:transparent}
-.pfpBig{width:82px!important;height:82px!important;border-radius:50%;background:transparent!important;padding:0!important;cursor:pointer;border:none!important;box-shadow:none!important;flex-shrink:0}
-.pfpBigInner{width:100%;height:100%;border-radius:50%;background:transparent!important;padding:0!important;overflow:hidden}
-.pfpBigInner img{width:100%;height:100%;border-radius:50%;object-fit:cover;background:transparent!important}
-.stats{display:flex;gap:22px;text-align:center}.stats b{display:block;font-size:17px}.stats span{font-size:12px;color:#aaa}
-.stats div{cursor:pointer}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:10px}.grid img,.grid video{width:100%;aspect-ratio:1/1;object-fit:cover;background:#000}
-.gridItem{position:relative;background:#000;overflow:hidden;cursor:pointer}
-.gridReelIcon{position:absolute;right:6px;top:6px;font-size:14px;text-shadow:0 1px 4px #000;z-index:5}
-.btn{border:1.2px solid #fff!important;background:transparent!important;background-color:transparent!important;color:#fff!important;padding:10px 0;border-radius:20px;width:100%;font-weight:700;font-size:14px;box-shadow:none!important;height:36px!important;display:flex!important;align-items:center!important;justify-content:center!important}
-.btnPrimary{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.2px solid #fff!important;font-weight:700;font-size:14px}
-.btnPrimary.following,.btn.following{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.2px solid #fff!important}
-[data-follow-user]{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.2px solid #fff!important;height:30px!important;min-width:80px!important;font-size:14px!important;border-radius:8px!important;padding:0 14px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;position:relative!important;overflow:hidden!important}
-[data-follow-user].following{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.2px solid #fff!important}
-[data-follow-user].following::after{content:''!important;position:absolute!important;top:0!important;bottom:0!important;width:60%!important;left:-60%!important;z-index:1!important;pointer-events:none!important;background:linear-gradient(90deg,transparent,#FF004C,#FF8A00,#FFEE00,#00E676,#00B0FF,#7A00FF,transparent)!important;animation:rainbowLight .7s linear 6 forwards!important}
-@keyframes rainbowLight{0%{left:-60%;opacity:0}20%{opacity:1}100%{left:110%;opacity:0}}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:60px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:9999}
-.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e}.bottom-nav a.active{color:#fff}.bottom-nav span{font-size:10px;color:#8e8e8e}.bottom-nav a.active span{color:#fff;font-weight:700}.bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}.bottom-nav a.active svg{stroke:#fff;fill:none!important}.bottom-nav a.active svg rect{fill:none!important;stroke:#fff!important}.bottom-nav a.active svg path{fill:#fff!important}.bottom-nav a img.navPfp{width:26px!important;height:26px!important;border-radius:50%;object-fit:cover;border:1.5px solid #fff;background:transparent!important}
-.tab{padding:12px 0;flex:1;text-align:center;font-size:13px;color:#666;border-bottom:2px solid transparent;cursor:pointer;background:transparent}
-.tab.active{color:#fff;border-bottom:2px solid #fff;background:transparent}
-.highlights{display:flex;gap:16px;margin:18px 0;overflow-x:auto}.h-item{text-align:center;min-width:62px}.h-circle{width:62px!important;height:62px!important;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #fff;overflow:hidden}.h-circle img{width:100%;height:100%;object-fit:cover}.h-text{font-size:10px;margin-top:6px}
-.editSheet,.setSheet{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:800;display:none;align-items:flex-end;justify-content:center;padding-bottom:60px}
-.sheetBox{background:#0a0a0a;width:100%;max-width:450px;border-radius:22px 22px 0 0;border:1px solid #333;max-height:calc(90vh - 60px);overflow-y:auto;padding:18px;padding-bottom:30px}
-.sItem{padding:16px 18px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
-.fieldBox{border:1px solid #333;border-radius:14px;padding:10px 14px 12px;margin-top:12px;background:#111}.fieldBox span{display:block;font-size:12px;color:#888}.fieldBox input,.fieldBox textarea{width:100%;background:transparent;border:0;outline:0;color:#fff;font-size:16px;font-weight:600;padding:4px 0 0;font-family:sans-serif;resize:none}
-.cropOverlay{position:fixed;inset:0;background:#000;z-index:2000;display:none;flex-direction:column}.cropStage{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}.cropCircle{width:280px;height:280px;border-radius:50%;overflow:hidden;border:3px solid #fff;touch-action:none;background:transparent!important;box-shadow:0 0 0 9999px rgba(0,0,0,.7);position:relative}.cropCircle img{position:absolute;left:50%;top:50%;max-width:none;cursor:grab;transform:translate(-50%,-50%)}
-input[type=range]{width:100%;accent-color:#fff}
-.pixoroMenu{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#111;border:1px solid #fff;border-radius:16px;width:92%;max-width:420px;z-index:9999;display:none;padding:8px}
-.pixoroMenu div{padding:14px;border:1.2px solid #fff;border-radius:12px;margin:6px;background:transparent;color:#fff;cursor:pointer;font-size:14px;font-weight:700;text-align:center}
-.pixoroMenu div.delete{color:#ff3040;border-color:#ff3040}
-.pixoroMenu div.blockBtn{color:#fff;border-color:#fff}
-.hlCover{width:62px!important;height:62px!important;border-radius:50%;object-fit:cover;border:2px solid #fff;cursor:pointer}
-.followModal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:none;align-items:flex-end;justify-content:center}
-.followModal.show{display:flex}
-.whiteBtn{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.2px solid #fff!important;padding:10px 14px;border-radius:20px;font-weight:700;height:30px!important;min-width:80px!important;font-size:14px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}
-.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:99px;font-size:13px;font-weight:800;z-index:9999;display:none;white-space:nowrap}
-</style></head><body>
-<div class="top"><b class="topName" id="topUsername"></b><div class="topRight"><span class="topIcon" onclick="openSettings()">☰</span></div></div>
-<div style="padding:15px"><div style="display:flex;gap:18px;align-items:center"><div class="pfpBig" onclick="openEditSheet()"><div class="pfpBigInner"><img id="pfpImg" src="" onerror="pfpErr(this,'')"></div></div>
-<div class="stats">
-<div onclick="pixoroOpenFollowList('posts')"><b id="postCount">0</b><span>Posts</span></div>
-<div onclick="pixoroOpenFollowList('followers')"><b id="followerCount">0</b><span>Followers</span></div>
-<div onclick="pixoroOpenFollowList('following')"><b id="followingCount">0</b><span>Following</span></div>
-</div></div><div style="margin-top:14px"><div id="bioText" style="font-size:14px;margin-top:8px"></div><div id="linkText" style="font-size:13px;color:#fff;margin-top:6px"></div></div><div class="highlights" id="highlightList" style="display:none"></div><div style="display:flex;gap:8px;margin-top:12px" id="actionArea"><button class="btn btnPrimary" onclick="openEditSheet()">Edit Profile</button><button class="btn" onclick="shareProfile()">Share Profile</button></div><div id="blockedBanner" style="display:none;text-align:center;padding:20px;color:#888">This user is blocked da<br><button onclick="unblockUserMain()" style="margin-top:10px;background:transparent;border:1.2px solid #fff;color:#fff;padding:10px 20px;border-radius:20px">Unblock</button></div><div style="display:flex;border-top:1px solid #222;margin-top:18px"><div class="tab active" id="tabPosts" onclick="showTab('all')">⊞ Posts</div><div class="tab" id="tabReels" onclick="showTab('reels')">Reels</div><div class="tab" id="tabSaved" onclick="showTab('saved')">Saved</div></div><div id="myGrid" class="grid"></div></div>
-<div id="pixoroMenu" class="pixoroMenu"></div>
-<div id="followModal" class="followModal" onclick="if(event.target==this) this.classList.remove('show')"><div style="background:#111;width:100%;max-width:450px;border-radius:22px 22px 0 0;border:1px solid #333;max-height:70vh;overflow-y:auto;padding:10px 0 30px"><div id="followModalTitle" style="text-align:center;font-weight:900;padding:10px">Followers</div><div id="followModalList"></div></div></div>
-<div id="hlEditSheet" style="position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:none;align-items:flex-end;justify-content:center"><div style="background:#111;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:18px;border:1px solid #333"><div style="text-align:center;font-weight:900">⭐ Edit Highlight</div><div style="display:flex;gap:10px;margin:14px 0;overflow-x:auto" id="hlCoverPicker"></div><input id="hlEditName" placeholder="Highlight Name" style="width:100%;background:#222;border:1px solid #fff;color:#fff;padding:12px;border-radius:12px;outline:none"><button onclick="saveHighlightEdit()" class="whiteBtn" style="width:100%;margin-top:10px">Save Changes</button><button onclick="deleteHighlight()" style="width:100%;background:transparent;color:#ff3040;border:1.2px solid #ff3040;padding:12px;border-radius:12px;font-weight:800;margin-top:8px">🗑️ Delete Highlight</button><div onclick="document.getElementById('hlEditSheet').style.display='none'" style="text-align:center;padding:12px;color:#888">Cancel</div></div></div>
-<input type="file" id="hlCoverInput" accept="image/*" style="display:none">
-<div id="setSheet" class="setSheet"><div class="sheetBox"><div style="text-align:center;font-weight:900;padding-bottom:12px">Pixoro Settings ⚙️</div><div class="sItem" onclick="openEditSheet()"><span>👤 Edit Profile</span><span>›</span></div><div class="sItem" onclick="doPixoroLogout()" style="color:#ff3b30"><span>🚪 Log Out</span><span>›</span></div><div onclick="document.getElementById('setSheet').style.display='none'" style="margin:14px;background:#111;padding:12px;border-radius:12px;text-align:center;color:#888">Cancel</div></div></div>
-<div id="editSheet" class="editSheet"><div class="sheetBox"><b style="display:block;text-align:center">Edit Profile</b><div style="text-align:center;margin:14px"><img id="editPfpPreview" src="" style="width:90px;height:90px;border-radius:50%;border:2px solid #fff;object-fit:cover"><br><button onclick="document.getElementById('pfpInput').click()" style="margin-top:8px;background:transparent;border:1.2px solid #fff;color:#fff;padding:6px 14px;border-radius:20px">Change Photo</button><input type="file" id="pfpInput" accept="image/*" style="display:none"></div><div class="fieldBox"><span>Name</span><input id="editName"></div><div class="fieldBox"><span>Username</span><input id="editUsername"></div><div class="fieldBox"><span>Bio</span><textarea id="editBio" rows="2"></textarea></div><div class="fieldBox"><span>Link</span><input id="editLink"></div><button onclick="saveEdit()" style="width:100%;background:transparent;color:#fff;padding:12px;border-radius:20px;font-weight:700;margin-top:16px;border:1.2px solid #fff">Save - Server Sync</button><div onclick="document.getElementById('editSheet').style.display='none'" style="text-align:center;padding:12px;color:#888">Cancel</div></div></div>
-<div id="cropOverlay" class="cropOverlay"><div style="padding:14px;display:flex;justify-content:space-between"><span onclick="closeCrop()" style="font-size:20px;cursor:pointer">✕</span><b>Adjust Profile Photo</b><span onclick="applyCrop()" style="color:#fff;font-weight:900;cursor:pointer">Done</span></div><div class="cropStage"><div class="cropCircle" id="cropCircle"><img id="cropImg"></div></div><div style="padding:18px"><input type="range" id="zoomRange" min="1" max="3" step="0.01" value="1"><div style="display:flex;gap:8px;margin-top:14px"><button onclick="resetCrop()" style="flex:1;background:transparent;color:#fff;padding:12px;border-radius:12px;border:1.2px solid #fff">Reset</button><button onclick="applyCrop()" style="flex:2;background:transparent;color:#fff;padding:12px;border-radius:20px;font-weight:700;border:1.2px solid #fff">Crop & Save</button></div></div></div>
-<div class="bottom-nav"><a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a><a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a><a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a><a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a><a href="profile.html" class="active"><img class="navPfp" id="navPfp" src="" onerror="pfpErr(this,'')"><span>Profile</span></a></div>
-<div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js?v=1003"></script>
 <script>
@@ -70,9 +11,31 @@ window.pixoroSendNotification = pixoroSendNotification;
 function isReelPost(p){ if(p._from==='reels') return true; if(p.media_type==='reel'||p.media_type==='video'||p.media_type==='reels') return true; let m=(p.media_url||p.video_url||'').toLowerCase().split('?')[0]; return m.endsWith('.mp4')||m.endsWith('.mov')||m.endsWith('.webm')||m.endsWith('.m4v'); }
 function getBestMedia(p){ if(p._from==='reels') return {url:p.video_url||p.media_url||'',isVid:true}; let m=(p.media_url||p.video_url||'').toLowerCase().split('?')[0]; if(m.endsWith('.mp4')||m.endsWith('.mov')||m.endsWith('.webm')||m.endsWith('.m4v')) return {url:p.media_url||p.video_url,isVid:true}; return {url:p.media_url||p.video_url||p.image_url||p.image||'',isVid:false}; }
 function isRealPhoto(url){ if(!url) return false; if(url.includes('ui-avatars')||url.includes('placeholder')||url.includes('undefined')) return false; return true; }
-function letterFor(uname){ let l=(cleanUser(uname||'P').charAt(0).toUpperCase()||'P'); if(!/[A-Z]/.test(l)) l='P'; return l; }
-function getPfpFrom(p){ if(p&&(p.avatar_url||p.profile_pic||p.photo_url)) return p.avatar_url||p.profile_pic||p.photo_url; if(p && window._PIXORO_PFP_CACHE){ let cached = window._PIXORO_PFP_CACHE[cleanUser(p.username||'')] || window._PIXORO_PFP_CACHE[String(p.id||'')]; if(cached) return cached; } return 'https://ui-avatars.com/api/?name='+letterFor(p?.username||'P')+'&background=111&color=fff&size=200&bold=true'; }
-function pfpErr(el,uname){ if(el.dataset.errDone) return; el.dataset.errDone='1'; el.onerror=null; let cur=el.src||''; if(cur.includes('ui-avatars')) return; el.src='https://ui-avatars.com/api/?name='+letterFor(uname||VIEW_USER||ME_RAW||'P')+'&background=111&color=fff&size=200&bold=true'; }
+
+// ===== CORRECTED: G VARAKOODATHU =====
+function getCleanAvatar(url){
+  if(!url || !String(url).includes('http')) return '';
+  if(String(url).includes('ui-avatars.com')) return '';
+  return String(url).trim();
+}
+function withCacheBust(url){
+  if(!url) return url;
+  return url + (url.includes('?') ? '&' : '?') + 't=' + Date.now();
+}
+function letterFor(uname){ return 'P'; } // G vendaam - P mattum
+function getPfpFrom(p){
+  let url = p ? getCleanAvatar(p.avatar_url||p.profile_pic||p.photo_url||'') : '';
+  if(url) return withCacheBust(url);
+  if(p && window._PIXORO_PFP_CACHE){
+    let cached = getCleanAvatar(window._PIXORO_PFP_CACHE[cleanUser(p.username||'')] || window._PIXORO_PFP_CACHE[String(p.id||'')]);
+    if(cached) return withCacheBust(cached);
+  }
+  return 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true';
+}
+function pfpErr(el,uname){
+  el.onerror=null;
+  el.src='https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true';
+}
 window.pfpErr=pfpErr;
 function displayNameFor(u){ if(!u) return ME_RAW||'user'; let p=allProfiles.find(x=>String(x.id)===String(u))||allProfiles.find(x=>cleanUser(x.username)===cleanUser(u)); if(p&&p.username) return cleanUser(p.username); if(String(u)===String(ME_ID)) return ME_RAW||'user'; let cu=cleanUser(u); if(cu.length>20) return ME_RAW||'user'; return cu||ME_RAW||'user'; }
 function updateFollowMsg(){ return; }
@@ -119,7 +82,7 @@ async function init(){
   let rawParam = new URLSearchParams(location.search).get('u') || new URLSearchParams(location.search).get('user') || '';
   let vp=null;
   if(rawParam && rawParam.includes('-') && rawParam.length>20){ let {data}=await supa.from('profiles').select('*').eq('id', rawParam).maybeSingle(); if(data) vp=data; }
-  if(!vp){ let urlU=cleanUser(rawParam); VIEW_USER=urlU||ME_RAW; if(urlU===''||urlU===ME_RAW) vp=myProfile; else { let {data}=await supa.from('profiles').select('*').eq('username',VIEW_USER).maybeSingle(); if(data) vp=data; else { let {data:allP}=await supa.from('profiles').select('id,username,avatar_url,bio,link,website,full_name,display_name').limit(100); vp=(allP||[]).find(p=>cleanUser(p.username)===VIEW_USER)||null } } }
+  if(!vp){ let urlU=cleanUser(rawParam); VIEW_USER=urlU||ME_RAW; if(urlU===''||urlU===ME_RAW) vp=myProfile; else { let {data}=await supa.from('profiles').select('*').eq('username',VIEW_USER).maybeSingle(); if(data) vp=data; else { let {data:allP}=await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url,bio,link,website,full_name,display_name').limit(100); vp=(allP||[]).find(p=>cleanUser(p.username)===VIEW_USER)||null } } }
   if(!vp){document.getElementById('topUsername').innerText='User Not Found';return}
   VIEW_PROFILE=vp; VIEW_USER=cleanUser(vp.username);
   let isMine=String(VIEW_PROFILE.id)===String(ME_ID);
@@ -189,7 +152,7 @@ async function pixoroOpenFollowList(type){
     let pr = profsMap[String(pid)] || allProfiles.find(p=> String(p.id)===String(pid));
     let uname = pr ? cleanUser(pr.username) : displayNameFor(pid);
     if(!uname||uname==='user') uname = displayNameFor(pid);
-    let pfp = pr ? getPfpFrom(pr) : 'https://ui-avatars.com/api/?name='+letterFor(uname)+'&background=111&color=fff&size=200&bold=true';
+    let pfp = pr ? getPfpFrom(pr) : 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true';
     let tick2 = pr && window.goldTickHTML ? window.goldTickHTML(pr) : '';
     let isF = window.PIXORO_FOLLOWING ? window.PIXORO_FOLLOWING.has(String(pid)) : false;
     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><img src="${pfp}" onerror="pfpErr(this,'${uname}')" onclick="location.href='profile.html?u=${pid}'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer"><b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='profile.html?u=${pid}'">${uname}${tick2}</b>${String(pid)===String(ME_ID)?'<span style="color:#888;font-size:12px">You</span>':`<button data-follow-user="${uname}" data-follow-username="${uname}" onclick="pixoroToggleFollow('${uname}',this)" class="whiteBtn followBtnPerusa">${isF?'Following':'Follow'}</button>`}</div>`;
@@ -197,7 +160,7 @@ async function pixoroOpenFollowList(type){
   listEl.innerHTML=html; modal.classList.add('show');
   cleanFollowBtnsProfile();
 }
-async function loadHighlights(){ let supa=getSupa(); let h=document.getElementById('highlightList'); if(!h) return; if(blockedUsers.includes(String(VIEW_PROFILE.id))){ h.style.display='none'; return; } let {data:st}=await supa.from('stories').select('*').eq('user_id',VIEW_PROFILE.id).eq('is_highlight',true).order('created_at',{ascending:false}); let list=(st||[]); if(!list.length){ let fromPosts=myPosts.filter(p=>p.is_highlight===true); if(fromPosts.length) list=fromPosts; } allHighlights=list; if(!list.length){ h.style.display='none'; h.innerHTML=''; return; } let groups={}; list.forEach(s=>{ let n=s.highlight_name||'Highlight'; if(!groups[n]) groups[n]=s; else if(s.highlight_cover) groups[n]=s; }); let grouped=Object.entries(groups).map(([name,s])=>{ let cover=s.highlight_cover||list.find(x=>(x.highlight_name||'Highlight')===name&&x.highlight_cover)?.highlight_cover||s.image_url||s.media_url||s.image||''; return {name,cover,count:list.filter(x=>(x.highlight_name||'Highlight')===name).length}; }); h.style.display='flex'; h.innerHTML=grouped.map(g=>`<div class="h-item" data-hl="${g.name}" oncontextmenu="event.preventDefault();openHighlightEdit('${g.name.replace(/'/g,"\\'")}');return false" onclick="location.href='story-view.html?u=${VIEW_USER}'"><div class="h-circle"><img src="${g.cover}" onerror="this.src='https://ui-avatars.com/api/?name='+letterFor('${g.name}')+'&background=111&color=fff&size=200&bold=true'"></div><div class="h-text">${g.name}</div></div>`).join(''); document.querySelectorAll('.h-item').forEach(el=>{ let t; el.addEventListener('touchstart',()=>{ t=setTimeout(()=>{ openHighlightEdit(el.dataset.hl); },600) }); el.addEventListener('touchend',()=>clearTimeout(t)); el.addEventListener('touchmove',()=>clearTimeout(t)); }); }
+async function loadHighlights(){ let supa=getSupa(); let h=document.getElementById('highlightList'); if(!h) return; if(blockedUsers.includes(String(VIEW_PROFILE.id))){ h.style.display='none'; return; } let {data:st}=await supa.from('stories').select('*').eq('user_id',VIEW_PROFILE.id).eq('is_highlight',true).order('created_at',{ascending:false}); let list=(st||[]); if(!list.length){ let fromPosts=myPosts.filter(p=>p.is_highlight===true); if(fromPosts.length) list=fromPosts; } allHighlights=list; if(!list.length){ h.style.display='none'; h.innerHTML=''; return; } let groups={}; list.forEach(s=>{ let n=s.highlight_name||'Highlight'; if(!groups[n]) groups[n]=s; else if(s.highlight_cover) groups[n]=s; }); let grouped=Object.entries(groups).map(([name,s])=>{ let cover=s.highlight_cover||list.find(x=>(x.highlight_name||'Highlight')===name&&x.highlight_cover)?.highlight_cover||s.image_url||s.media_url||s.image||''; return {name,cover,count:list.filter(x=>(x.highlight_name||'Highlight')===name).length}; }); h.style.display='flex'; h.innerHTML=grouped.map(g=>`<div class="h-item" data-hl="${g.name}" oncontextmenu="event.preventDefault();openHighlightEdit('${g.name.replace(/'/g,"\\'")}');return false" onclick="location.href='story-view.html?u=${VIEW_USER}'"><div class="h-circle"><img src="${g.cover}" onerror="this.src='https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true'"></div><div class="h-text">${g.name}</div></div>`).join(''); document.querySelectorAll('.h-item').forEach(el=>{ let t; el.addEventListener('touchstart',()=>{ t=setTimeout(()=>{ openHighlightEdit(el.dataset.hl); },600) }); el.addEventListener('touchend',()=>clearTimeout(t)); el.addEventListener('touchmove',()=>clearTimeout(t)); }); }
 function openHighlightEdit(name){ if(String(VIEW_PROFILE.id)!==String(ME_ID)) return; editingHL=name; editingCover=''; document.getElementById('hlEditName').value=name; let covers=allHighlights.filter(s=>(s.highlight_name||'Highlight')===name).map(s=>s.image_url||s.media_url||s.image).filter(Boolean); let unique=[...new Set(covers)]; document.getElementById('hlCoverPicker').innerHTML=`<div onclick="document.getElementById('hlCoverInput').click()" style="min-width:62px;height:62px;border-radius:50%;background:#222;display:grid;place-items:center;font-size:22px;border:2px dashed #fff;cursor:pointer">📸</div>`+unique.map(u=>`<img src="${u}" onclick="selectHLCover('${u}')" class="hlCover">`).join(''); document.getElementById('hlEditSheet').style.display='flex'; }
 function selectHLCover(url){ editingCover=url; document.querySelectorAll('#hlCoverPicker .hlCover').forEach(i=>i.style.border='2px solid #333'); event.target.style.border='2px solid #00ff66'; }
 async function saveHighlightEdit(){ let newName=document.getElementById('hlEditName').value.trim()||editingHL; let supa=getSupa(); let upd={highlight_name:newName}; if(editingCover) upd.highlight_cover=editingCover; await supa.from('stories').update(upd).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true); document.getElementById('hlEditSheet').style.display='none'; loadHighlights(); }
@@ -253,7 +216,53 @@ async function showTab(type){ currentTab=type; document.getElementById('tabPosts
 function openSettings(){document.getElementById('setSheet').style.display='flex'}
 function openEditSheet(){ if(String(VIEW_PROFILE.id)!==String(ME_ID)) return; document.getElementById('editName').value=VIEW_PROFILE.full_name||VIEW_PROFILE.display_name||''; document.getElementById('editUsername').value=VIEW_USER; document.getElementById('editBio').value=VIEW_PROFILE.bio||''; document.getElementById('editLink').value=VIEW_PROFILE.link||VIEW_PROFILE.website||''; document.getElementById('editSheet').style.display='flex' }
 async function doPixoroLogout(){let supa=getSupa();await supa.auth.signOut();location.href='login.html'}
-async function saveEdit(){ let supa=getSupa(); let n=document.getElementById('editName').value.trim(),u=cleanUser(document.getElementById('editUsername').value.trim()),b=document.getElementById('editBio').value,l=document.getElementById('editLink').value.trim(),np=document.getElementById('editPfpPreview').dataset.new; if(!u) return; let oldU=ME_RAW; let avatarUrl=VIEW_PROFILE?.avatar_url||''; if(np&&np.startsWith('data:')){ try{let res=await fetch(np);let blob=await res.blob();let fileName=Date.now()+'_'+ME_RAW+'.jpg';let {error:upErr}=await supa.storage.from('avatars').upload(fileName,blob,{contentType:'image/jpeg'}); if(!upErr){let {data}=supa.storage.from('avatars').getPublicUrl(fileName); avatarUrl=data.publicUrl}}catch(e){} } let update={username:u,display_name:n,full_name:n,bio:b,avatar_url:avatarUrl}; let {error}=await supa.from('profiles').update(update).eq('id',ME_ID); if(error){ if(error.message.includes('full_name')){ let {error:e2}=await supa.from('profiles').update({username:u,display_name:n,bio:b,avatar_url:avatarUrl}).eq('id',ME_ID); if(e2) return showToast('Save Aagala da')} else return showToast('Save Aagala da')} if(l){try{await supa.from('profiles').update({link:l}).eq('id',ME_ID)}catch(e){} try{await supa.from('profiles').update({website:l}).eq('id',ME_ID)}catch(e){}} if(u!==oldU){supa.from('posts').update({username:u}).eq('username',oldU).then(()=>{}); supa.from('stories').update({username:u}).eq('username',oldU).then(()=>{});} document.getElementById('editSheet').style.display='none'; setTimeout(()=>{location.href='profile.html?u='+ME_ID},600) }
+
+// ===== CORRECTED saveEdit - MAIN FIX =====
+async function saveEdit(){
+  let supa=getSupa();
+  let n=document.getElementById('editName').value.trim(),
+      u=cleanUser(document.getElementById('editUsername').value.trim()),
+      b=document.getElementById('editBio').value,
+      l=document.getElementById('editLink').value.trim(),
+      np=document.getElementById('editPfpPreview').dataset.new;
+  if(!u) return;
+  let oldU=ME_RAW;
+  let avatarUrl=VIEW_PROFILE?.avatar_url||'';
+  if(np && np.startsWith('data:')){
+    try{
+      let res=await fetch(np); let blob=await res.blob();
+      let fileName=Date.now()+'_'+ME_RAW+'.jpg';
+      let {error:upErr}=await supa.storage.from('avatars').upload(fileName,blob,{contentType:'image/jpeg', upsert:true});
+      if(!upErr){
+        let {data}=supa.storage.from('avatars').getPublicUrl(fileName);
+        avatarUrl=data.publicUrl;
+      }
+    }catch(e){}
+  }
+  // 3 column lum onne photo - vera page vera column paakathu
+  let update={username:u, display_name:n, full_name:n, bio:b, avatar_url:avatarUrl, profile_pic:avatarUrl, photo_url:avatarUrl};
+  let {error}=await supa.from('profiles').update(update).eq('id',ME_ID);
+  if(error){
+    let {error:e2}=await supa.from('profiles').update({username:u, display_name:n, bio:b, avatar_url:avatarUrl, profile_pic:avatarUrl, photo_url:avatarUrl}).eq('id',ME_ID);
+    if(e2) return showToast('Save Aagala da');
+  }
+  if(l){ try{await supa.from('profiles').update({link:l, website:l}).eq('id',ME_ID)}catch(e){} }
+  if(u!==oldU){
+    supa.from('posts').update({username:u}).eq('username',oldU).then(()=>{});
+    supa.from('stories').update({username:u}).eq('username',oldU).then(()=>{});
+  }
+  // ELLA PAGE KUM SOLLU - ITHU THAAN MAIN
+  if(avatarUrl){
+    localStorage.setItem('pixoro_pfp_updated', avatarUrl);
+    VIEW_PROFILE.avatar_url=avatarUrl; VIEW_PROFILE.profile_pic=avatarUrl; VIEW_PROFILE.photo_url=avatarUrl;
+    let pfpEl=document.getElementById('pfpImg'); if(pfpEl) pfpEl.src=withCacheBust(avatarUrl);
+    let navEl=document.getElementById('navPfp'); if(navEl) navEl.src=withCacheBust(avatarUrl);
+    let editEl=document.getElementById('editPfpPreview'); if(editEl) editEl.src=withCacheBust(avatarUrl);
+  }
+  document.getElementById('editSheet').style.display='none';
+  showToast('Saved da 🔥 - Ella page lum maaridum da');
+  setTimeout(()=>{location.href='profile.html?u='+ME_ID},600);
+}
 function shareProfile(){ navigator.clipboard.writeText(location.origin+'/profile.html?u='+VIEW_PROFILE.id); }
 let cropX=0,cropY=0,cropScale=1,cropDragging=false,cropStartX=0,cropStartY=0,cropOrigX=0,cropOrigY=0,cropImgEl=document.getElementById('cropImg');
 function updateCropTransform(){cropImgEl.style.transform=`translate(-50%,-50%) translate(${cropX}px,${cropY}px) scale(${cropScale})`}
@@ -270,4 +279,4 @@ document.getElementById('pfpInput').addEventListener('change',e=>{let f=e.target
 document.getElementById('hlCoverInput').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{editingCover=ev.target.result};r.readAsDataURL(f)})
 window.addEventListener('pixoroFollowChanged', ()=>{ updateFollowMsg(); syncProfileFollow(); });
 init()
-</script></body></html>
+</script>
