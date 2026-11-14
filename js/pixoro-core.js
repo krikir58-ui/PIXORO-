@@ -1,33 +1,22 @@
-// ===== PIXORO CORE - CORRECTED v1004 - FULL =====
+// ===== PIXORO CORE - CORRECTED v1005 - OLD STYLE + NOTIFICATION FIX - FULL =====
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
-
-// ✅ CORRECTED 1: Vera page kum theriyanum
 window.PIXORO_URL = SUPA_URL;
 window.PIXORO_KEY = SUPA_KEY;
-
 if(!window.supa && window.supabase && window.supabase.createClient){
   window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
   console.log("✅ Pixoro Supa Connected da!");
 }
-
-// ✅ CORRECTED 2: getSupa - ella page um itha thaan use pannanum
 function pixoroGetSupa(){
   if(window.supa) return window.supa;
   if(window.supabase && window.supabase.createClient){
-    try{
-      window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-      return window.supa;
-    }catch(e){ return null; }
+    try{ window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY); return window.supa; }catch(e){ return null; }
   }
   return null;
 }
 window.getSupa = pixoroGetSupa;
 window.pixoroGetSupa = pixoroGetSupa;
-
-function pixoroGetBase(){
-  return location.href.split('?')[0].split('#')[0].replace(/\/[^\/]*$/,'/') + '';
-}
+function pixoroGetBase(){ return location.href.split('?')[0].split('#')[0].replace(/\/[^\/]*$/,'/') + ''; }
 window.pixoroGetBase = pixoroGetBase;
 window.getBase = pixoroGetBase;
 function isGoldUser(p){
@@ -45,24 +34,37 @@ function goldTickHTML(p){
 window.isGoldUser = isGoldUser;
 window.goldTickHTML = goldTickHTML;
 window.getTick = goldTickHTML;
+
+// ✅ CORRECTED v1005: PAZHAYA STYLE AH THODATHA CSS DA - VILLAIN BLOCK AH THOOKITEN DA
 (function(){
   if(document.getElementById('pixoro-speed-css')) return;
   let css = `
   *{ -webkit-tap-highlight-color:transparent!important; tap-highlight-color:transparent!important; }
-  button, a, div, img, video{ -webkit-tap-highlight-color:transparent!important; outline:none!important; -webkit-touch-callout:none!important; }
-  button:active, a:active{ box-shadow:none!important; outline:none!important; transform:none!important; }
   button{ touch-action:manipulation!important; }
-  .topPlus, .createBtn, .plusBtn, .topAdd{ width:auto!important;height:auto!important;background:transparent!important;background-image:none!important;color:#fff!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:28px!important;font-weight:300!important;cursor:pointer!important;box-shadow:none!important;padding:0 6px!important;border:none!important; }
-  .bellWhite{ display:flex!important;width:auto!important;height:auto!important;background:transparent!important;color:#fff!important;font-size:22px!important;cursor:pointer!important;border:none!important;align-items:center!important;justify-content:center!important;padding:0 8px!important; }
-  .bellWhite svg{ width:22px!important;height:22px!important;stroke:#fff!important;fill:none!important; }
-  .reelsTop b, .topTitle{ font-family:'Segoe UI',system-ui,sans-serif!important;font-size:20px!important;font-weight:600!important;color:#fff!important; }
-  .reel-pfp-wrap{width:40px!important;height:40px!important;min-width:40px!important;border:2px solid #fff!important}
+  /* ✅ PAZHAYA PIXORO STYLE - ITHA THAAN DA THIRUMBA KONDU VANTHEN DA */
+  .pixoro-logo, .top b, .reelsTop b, .topTitle{ font-family:'Segoe UI',system-ui,sans-serif!important; font-size:26px!important; font-weight:900!important; background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff)!important; -webkit-background-clip:text!important; -webkit-text-fill-color:transparent!important; background-clip:text!important; }
+  .reel-pfp-wrap{width:40px!important;height:40px!important;min-width:40px!important;border:2px solid #ff5ea8!important}
+  .sRing{border:2px solid #ff5ea8!important}
   .audioDisc{width:28px!important;height:28px!important;border:2px solid #fff!important}
   .reel-username{font-size:15px!important;font-weight:700!important;cursor:pointer!important}
   .msgBtn, .messageBtn{ background:transparent!important;color:#fff!important;border:1.2px solid #fff!important; }
-  .createIco{ background:transparent!important;border:1.2px solid #fff!important;color:#fff!important; }
   .reel-main{ background:#000!important; }
   .reel-main.bgRemove{ object-fit:contain!important;background:#000!important; }
+  /* ✅ BELL DOT - NOTIFICATION DA */
+  .bellWrap{position:relative!important;cursor:pointer!important}
+  #pixoroBellDot{position:absolute!important;top:-2px!important;right:-2px!important;width:9px!important;height:9px!important;background:#ff3040!important;border-radius:50%!important;display:none;z-index:5}
+  /* ✅ ELLA PAGE LUM SAME BOTTOM NAV DA */
+  .bottom-nav{position:fixed!important;bottom:0!important;left:0!important;right:0!important;max-width:450px!important;margin:0 auto!important;width:100%!important;height:60px!important;background:#000!important;border-top:1px solid #262626!important;display:flex!important;justify-content:space-around!important;align-items:center!important;z-index:100!important}
+  .bottom-nav a{display:flex!important;flex-direction:column!important;align-items:center!important;gap:3px!important;text-decoration:none!important;color:#8e8e8e!important;font-size:10px!important}
+  .bottom-nav a svg{width:22px!important;height:22px!important;fill:none!important;stroke:#8e8e8e!important;stroke-width:1.8!important}
+  .bottom-nav a.active{color:#fff!important}
+  .bottom-nav a.active svg{stroke:#fff!important}
+  .bottom-nav a.active span{color:#fff!important;font-weight:700!important}
+  .bottom-nav span{font-size:10px!important;color:#8e8e8e!important}
+  .bottom-nav a img.navPfp, .bottom-nav a img#navPfp{width:26px!important;height:26px!important;border-radius:50%!important;object-fit:cover!important;border:1.5px solid #fff!important}
+  /* ✅ FOLLOW BUTTON - PAZHAYA STYLE DA */
+  .followBtnPost,.followBtnSearch,.followBtnPerusa{ background:transparent!important;color:#fff!important;border:1.5px solid #fff!important;padding:4px 12px!important;border-radius:8px!important;font-size:12px!important;font-weight:700!important;cursor:pointer!important }
+  .followBtnPost.following,.followBtnSearch.following,.followBtnPerusa.following{ border-color:#666!important;color:#aaa!important }
   `;
   let s = document.createElement('style'); s.id='pixoro-speed-css'; s.innerText = css; document.head.appendChild(s);
   if(location.pathname.includes('index') || location.pathname.endsWith('/')){
@@ -100,9 +102,7 @@ window.pixoroRefreshPhotos = async function(){
       window._PIXORO_PFP_CACHE[String(pr.id)] = url;
     });
     let nav = document.getElementById('navPfp');
-    if(nav && window.ME_ID && window._PIXORO_PFP_CACHE[String(window.ME_ID)]){
-      nav.src = window._PIXORO_PFP_CACHE[String(window.ME_ID)] + '?t=' + Date.now();
-    }
+    if(nav && window.ME_ID && window._PIXORO_PFP_CACHE[String(window.ME_ID)]){ nav.src = window._PIXORO_PFP_CACHE[String(window.ME_ID)] + '?t=' + Date.now(); }
     document.querySelectorAll('img[data-pfp-for], img[data-user-id], .reel-pfp-wrap img, .post-pfp img').forEach(img=>{
       let key = String(img.dataset.pfpFor || img.dataset.userId || img.alt || '').toLowerCase().replace('@','');
       let cached = window._PIXORO_PFP_CACHE[key];
@@ -242,10 +242,7 @@ async function pixoroLike(postId, userId){
   let s = pixoroGetSupa(); if(!s) return false;
   try{
     let {data:ex} = await s.from('likes').select('id').eq('post_id',postId).eq('user_id',window.ME_ID).maybeSingle();
-    if(ex){
-      await s.from('likes').delete().eq('id', ex.id);
-      return false;
-    }
+    if(ex){ await s.from('likes').delete().eq('id', ex.id); return false; }
     let {error} = await s.from('likes').insert({post_id:postId, user_id:window.ME_ID});
     if(error){ console.log('LIKE SERVER FAIL:',error.message); return false; }
     return true;
@@ -256,10 +253,7 @@ async function pixoroToggleLike(postId, btn){
   if(btn){
     btn.classList.toggle('liked', !!liked);
     let countEl = document.querySelector(`[data-like-count="${postId}"]`);
-    if(countEl){
-      let cur = parseInt(countEl.innerText||'0')||0;
-      countEl.innerText = liked ? cur+1 : Math.max(0, cur-1);
-    }
+    if(countEl){ let cur = parseInt(countEl.innerText||'0')||0; countEl.innerText = liked ? cur+1 : Math.max(0, cur-1); }
   }
   return liked;
 }
@@ -286,9 +280,7 @@ async function pixoroSavePost(fileUrl, isReel, caption){
   let row = { user_id: session.user.id, username: window.ME_RAW, media_url: fileUrl, video_url: isReel ? fileUrl : null, image_url: !isReel ? fileUrl : null, media_type: isReel ? 'reel' : 'post', caption: caption || 'Just Pixoro', is_archived:false };
   let {error} = await s.from('posts').insert(row);
   if(error){ console.log('POST SAVE FAIL', error.message); return; }
-  if(isReel){
-    await s.from('reels').insert({ user_id: session.user.id, username: window.ME_RAW, video_url: fileUrl, caption: caption || 'Just Pixoro' });
-  }
+  if(isReel){ await s.from('reels').insert({ user_id: session.user.id, username: window.ME_RAW, video_url: fileUrl, caption: caption || 'Just Pixoro' }); }
   location.href = './reels.html';
 }
 async function loadProfileRealCount(){
@@ -313,19 +305,11 @@ async function pixoroOpenFollowList(type){
   if(!window.ME_ID) await pixoroFixMe();
   let s = pixoroGetSupa(); if(!s) return;
   let list = [];
-  if(type==='following'){
-    let {data} = await s.from('follows').select('*').eq('follower_id', window.ME_ID).eq('status','accepted');
-    list = data||[];
-  } else {
-    let {data} = await s.from('follows').select('*').eq('following_id', window.ME_ID).eq('status','accepted');
-    list = data||[];
-  }
+  if(type==='following'){ let {data} = await s.from('follows').select('*').eq('follower_id', window.ME_ID).eq('status','accepted'); list = data||[]; }
+  else { let {data} = await s.from('follows').select('*').eq('following_id', window.ME_ID).eq('status','accepted'); list = data||[]; }
   let ids = list.map(f=> type==='following' ? f.following_id : f.follower_id).filter(Boolean);
   let profs = [];
-  if(ids.length){
-    let {data} = await s.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').in('id', ids);
-    profs = data||[];
-  }
+  if(ids.length){ let {data} = await s.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').in('id', ids); profs = data||[]; }
   let html = list.map(f=>{
     let pid = type==='following' ? f.following_id : f.follower_id;
     let pr = (profs||[]).find(p=> String(p.id)===String(pid));
@@ -495,7 +479,7 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
-console.log('PIXORO CORE v1004 SERVER ONLY LOADED - G FIX DA');
+console.log('PIXORO CORE v1005 SERVER ONLY LOADED - OLD STYLE + G FIX DA');
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
@@ -570,3 +554,17 @@ window.pixoroUnsendPhoto = pixoroUnsendPhoto;
 window.pixoroReportPhoto = pixoroReportPhoto;
 window.pixoroSavePhoto = pixoroSavePhoto;
 window.pixoroPreviewText = pixoroPreviewText;
+
+// ✅ CORRECTED v1005: NOTIFICATION BELL - CORE LAYE IRUKKU DA, INIME POOGATHU DA
+async function pixoroCheckBell(){
+  try{
+    let s = pixoroGetSupa(); if(!s) return;
+    if(!window.ME_ID){ let {data:{session}} = await s.auth.getSession(); if(session?.user?.id) window.ME_ID = session.user.id; else return; }
+    let {data} = await s.from('notifications').select('id').eq('to_user_id', window.ME_ID).eq('is_read', false).limit(1);
+    let dot = document.getElementById('pixoroBellDot');
+    if(dot) dot.style.display = (data && data.length) ? 'block' : 'none';
+  }catch(e){}
+}
+window.pixoroCheckBell = pixoroCheckBell;
+setInterval(pixoroCheckBell, 15000);
+setTimeout(pixoroCheckBell, 3000);
