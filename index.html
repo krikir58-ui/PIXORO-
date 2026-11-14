@@ -1,23 +1,96 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js?v=1004"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
+.top{position:sticky;top:0;background:#000;z-index:10;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222}
+.top b{font-size:26px;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.top .icons{font-size:22px;display:flex;gap:14px}
+.tabs{display:flex;gap:8px;padding:10px 12px}
+.tabs button{flex:1;padding:9px;border:0;border-radius:20px;background:#1a1a1a;color:#aaa;font-weight:700;cursor:pointer}
+.tabs button.active{background:#fff;color:#000}
+#storyBar{display:flex;gap:12px;overflow-x:auto;padding:10px 12px;scrollbar-width:none}
+#storyBar::-webkit-scrollbar{display:none}
+.sItem{flex:0 0 62px;text-align:center;cursor:pointer}
+.sRing{width:60px;height:60px;border-radius:50%;padding:2px;border:2px solid #ff5ea8;margin:0 auto;overflow:hidden}
+.sRingInner{width:100%;height:100%;border-radius:50%;overflow:hidden}
+.sName{font-size:11px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sAddWrap{position:relative;width:60px;height:60px;margin:0 auto}
+.sAddPlus{position:absolute;bottom:0;right:0;background:#ff5ea8;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-weight:900;border:2px solid #000}
+.avaLetterHome{width:100%;height:100%;display:grid;place-items:center;font-weight:900;background:#222}
+.post{border-bottom:1px solid #222;padding-bottom:14px;margin-bottom:10px}
+.postTop{display:flex;justify-content:space-between;align-items:center;padding:10px 12px}
+.pfpRing{width:38px;height:38px;border-radius:50%;padding:2px;border:2px solid #ff5ea8;overflow:hidden;flex-shrink:0}
+.pfpInner{width:100%;height:100%;border-radius:50%;overflow:hidden}
+.post .main{width:100%;max-height:520px;object-fit:cover;background:#111;display:block}
+.followBtnPost{background:transparent;color:#fff;border:1.5px solid #fff;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
+.followBtnPost.following{border-color:#666;color:#aaa}
+.actions{display:flex;justify-content:space-between;padding:10px 14px}
+.actions .left{display:flex;gap:16px}
+.act{background:none;border:0;color:#fff;cursor:pointer}
+.act svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:1.8}
+.act.liked svg{fill:#ff3040;stroke:#ff3040}
+.act.saved svg{fill:#fff}
+.heart-burst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:90px;opacity:0;pointer-events:none;transition:.3s}
+.heart-burst.show{transform:translate(-50%,-50%) scale(1);opacity:1}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;height:60px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e;font-size:11px}
+.bottom-nav a.active{color:#fff}
+.bottom-nav a img{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #fff}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#FFD700;color:#000;padding:10px 18px;border-radius:20px;font-weight:800;display:none;z-index:9999;white-space:nowrap}
+#choice,#postMenu{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;z-index:999;align-items:flex-end;justify-content:center}
+#choice.show,#postMenu.show{display:flex}
+#postMenuBox{background:#1a1a1a;width:100%;max-width:450px;border-radius:20px 20px 0 0;padding:14px}
+.menuItem{padding:14px;border-bottom:1px solid #222;cursor:pointer;font-weight:600}
+#commentModal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;z-index:999;align-items:flex-end;justify-content:center}
+#commentModal>div{background:#111;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:70vh;overflow:auto;padding:14px}
+#miniBox{position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#111;border:1px solid #333;border-radius:14px;padding:10px 14px;display:none;gap:10px;align-items:center;z-index:9999;width:92%;max-width:420px}
+#miniImg{width:40px;height:40px;border-radius:8px;object-fit:cover}
+#miniFill{height:6px;background:#FFD700;border-radius:6px;width:10%}
+</style>
+</head>
+<body>
+<!-- ✅ ITHU THAAN DA MUKKIYAM - BODY LA CONTENT IRUKKANUM, ILLANA WHITE THAAN -->
+<div class="top"><b>Pixoro</b><div class="icons"><span onclick="location.href='search.html'">🔍</span><span onclick="location.href='dm.html'">💬<span id="pixoroBellDot" style="display:none;color:red">●</span></span></div></div>
+<div class="tabs">
+<button id="tabForYou" class="active" onclick="setFeedMode('foryou')">For You</button>
+<button id="tabFollowing" onclick="setFeedMode('following')">Following</button>
+<button id="tabLatest" onclick="setFeedMode('latest')">Latest</button>
+</div>
+<div id="storyBar"></div>
+<div id="feed"><p style="text-align:center;padding:40px;color:#888">Loading Pixoro da... 🔥</p></div>
+<div id="miniBox"><img id="miniImg"><div style="flex:1"><div id="miniTxt" style="font-size:13px">Uploading...</div><div style="background:#333;height:6px;border-radius:6px;margin-top:6px"><div id="miniFill"></div></div></div><b id="miniPct">10%</b></div>
+<div id="toast"></div>
+<div id="choice"></div>
+<div id="postMenu"><div id="postMenuBox"></div></div>
+<div id="commentModal"><div><div style="display:flex;justify-content:space-between"><b>Comments</b><span onclick="closeComment()" style="cursor:pointer">✕</span></div><div id="commentList" style="margin:12px 0"></div><div style="display:flex;gap:8px"><div id="myCommentPfpWrap" style="width:32px;height:32px;border-radius:50%;overflow:hidden"></div><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#222;border:0;padding:10px;border-radius:20px;color:#fff;outline:none"><button onclick="addComment()" style="background:#FFD700;border:0;padding:10px 16px;border-radius:20px;font-weight:800">Post</button></div></div></div>
+<div class="bottom-nav">
+<a href="index.html" class="active">🏠<span>Home</span></a>
+<a href="search.html">🔍<span>Search</span></a>
+<a href="reels.html">▶️<span>Reels</span></a>
+<a href="dm.html">💬<span>DM</span></a>
+<a href="profile.html"><img id="navPfp" src="https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true"><span>Profile</span></a>
+</div>
+
 <script>
 // ===== PIXORO CORRECTED - FULL CODE =====
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 window.showToast=showToast;
 function showChoice(){let c=document.getElementById('choice');if(c)c.classList.add('show')} function hideChoice(){let c=document.getElementById('choice');if(c)c.classList.remove('show')}
-
-// ✅ CORRECTED 1: supa ah ippo pudika koodathu, function la pudikanum
 let supa=null;
 function getSupa(){
   if(window.supa) supa=window.supa;
-  // pixoro-core.js la supa varalana, inga ve create pannidu
   if(!supa && window.supabase && window.PIXORO_URL && window.PIXORO_KEY){
     try{ window.supa=window.supabase.createClient(window.PIXORO_URL, window.PIXORO_KEY); supa=window.supa; }catch(e){}
   }
   return window.supa||supa;
 }
 window.getSupa=getSupa;
-
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase();return u||''}
 let ME_RAW='',ME='',ME_ID='',ME_PFP='',allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=[],allViews=[],lastTap=0,feedMode='foryou',curMenuPost=null;
 function pixoroIsUuidLocal(s){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(s||'')); }
@@ -144,8 +217,6 @@ window.addEventListener('focus', async ()=>{
   }catch(e){}
 });
 let AUTH_DONE = false;
-
-// ✅ CORRECTED 2: checkLogin - white screen vara koodathu, supa illa naalum Login kaatum
 async function checkLogin(){
   for(let i=0;i<30;i++){ if(getSupa()) break; await new Promise(r=>setTimeout(r,200)); }
   supa = getSupa();
@@ -375,3 +446,4 @@ function checkMiniUpload(){
 checkMiniUpload();
 checkLogin()
 </script>
+</body></html>
