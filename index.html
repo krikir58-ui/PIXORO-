@@ -4,12 +4,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=1004"></script>
+<script src="js/pixoro-core.js?v=1007"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif;background-image:none!important}
 body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{position:sticky;top:0;background:#000;z-index:10;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222}
-.top b{font-size:26px;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.top b{font-size:26px;color:#fff;background:none!important}
 .top .icons{font-size:22px;display:flex;gap:14px}
 .tabs{display:flex;gap:8px;padding:10px 12px}
 .tabs button{flex:1;padding:9px;border:0;border-radius:20px;background:#1a1a1a;color:#aaa;font-weight:700;cursor:pointer}
@@ -17,17 +17,18 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70p
 #storyBar{display:flex;gap:12px;overflow-x:auto;padding:10px 12px;scrollbar-width:none}
 #storyBar::-webkit-scrollbar{display:none}
 .sItem{flex:0 0 62px;text-align:center;cursor:pointer}
-.sRing{width:60px;height:60px;border-radius:50%;padding:2px;border:2px solid #ff5ea8;margin:0 auto;overflow:hidden}
-.sRingInner{width:100%;height:100%;border-radius:50%;overflow:hidden}
+.sRing{width:60px;height:60px;border-radius:50%;padding:2px;border:2px solid #fff;margin:0 auto;overflow:hidden;background:#111}
+.sRingInner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#111}
 .sName{font-size:11px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sAddWrap{position:relative;width:60px;height:60px;margin:0 auto}
-.sAddPlus{position:absolute;bottom:0;right:0;background:#ff5ea8;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-weight:900;border:2px solid #000}
-.avaLetterHome{width:100%;height:100%;display:grid;place-items:center;font-weight:900;background:#222}
-.post{border-bottom:1px solid #222;padding-bottom:14px;margin-bottom:10px}
+.sAddPlus{position:absolute;bottom:0;right:0;background:#fff;color:#000;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-weight:900;border:2px solid #000}
+.avaLetterHome{width:100%;height:100%;display:grid;place-items:center;font-weight:900;background:#222;color:#fff}
+.post{border-bottom:1px solid #222;padding-bottom:14px;margin-bottom:10px;background:#000}
 .postTop{display:flex;justify-content:space-between;align-items:center;padding:10px 12px}
-.pfpRing{width:38px;height:38px;border-radius:50%;padding:2px;border:2px solid #ff5ea8;overflow:hidden;flex-shrink:0}
-.pfpInner{width:100%;height:100%;border-radius:50%;overflow:hidden}
-.post .main{width:100%;max-height:520px;object-fit:cover;background:#111;display:block}
+.pfpRing{width:38px;height:38px;border-radius:50%;padding:2px;border:2px solid #fff;overflow:hidden;flex-shrink:0;background:#111}
+.pfpInner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#222}
+.post .main{width:100%;background:#111;display:block}
+.postMediaBlock{width:100%;min-height:180px;background:#fff;color:#000;display:grid;place-items:center;text-align:center;padding:20px;font-weight:900;font-size:16px;border-radius:12px}
 .followBtnPost{background:transparent;color:#fff;border:1.5px solid #fff;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
 .followBtnPost.following{border-color:#666;color:#aaa}
 .actions{display:flex;justify-content:space-between;padding:10px 14px}
@@ -38,10 +39,14 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70p
 .act.saved svg{fill:#fff}
 .heart-burst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:90px;opacity:0;pointer-events:none;transition:.3s}
 .heart-burst.show{transform:translate(-50%,-50%) scale(1);opacity:1}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;height:60px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
-.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e;font-size:11px}
-.bottom-nav a.active{color:#fff}
-.bottom-nav a img{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #fff}
+/* ✅ BOTTOM NAV - WHITE BLOCK DA, IMAGE ILLA DA */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;height:60px;background:#000;border-top:1.5px solid #fff;display:flex;justify-content:space-around;align-items:center;z-index:100}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e;font-size:11px;background:transparent}
+.bottom-nav a svg{width:22px;height:22px;fill:none;stroke:#8e8e8e;stroke-width:1.8}
+.bottom-nav a.active{color:#000;background:#fff;border-radius:12px;padding:4px 10px}
+.bottom-nav a.active svg{stroke:#000}
+.bottom-nav a.active span{color:#000;font-weight:900}
+img{display:none!important}
 #toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#FFD700;color:#000;padding:10px 18px;border-radius:20px;font-weight:800;display:none;z-index:9999;white-space:nowrap}
 #choice,#postMenu{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;z-index:999;align-items:flex-end;justify-content:center}
 #choice.show,#postMenu.show{display:flex}
@@ -50,12 +55,10 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70p
 #commentModal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;z-index:999;align-items:flex-end;justify-content:center}
 #commentModal>div{background:#111;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:70vh;overflow:auto;padding:14px}
 #miniBox{position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#111;border:1px solid #333;border-radius:14px;padding:10px 14px;display:none;gap:10px;align-items:center;z-index:9999;width:92%;max-width:420px}
-#miniImg{width:40px;height:40px;border-radius:8px;object-fit:cover}
 #miniFill{height:6px;background:#FFD700;border-radius:6px;width:10%}
 </style>
 </head>
 <body>
-<!-- ✅ ITHU THAAN DA MUKKIYAM - BODY LA CONTENT IRUKKANUM, ILLANA WHITE THAAN -->
 <div class="top"><b>Pixoro</b><div class="icons"><span onclick="location.href='search.html'">🔍</span><span onclick="location.href='dm.html'">💬<span id="pixoroBellDot" style="display:none;color:red">●</span></span></div></div>
 <div class="tabs">
 <button id="tabForYou" class="active" onclick="setFeedMode('foryou')">For You</button>
@@ -64,21 +67,19 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70p
 </div>
 <div id="storyBar"></div>
 <div id="feed"><p style="text-align:center;padding:40px;color:#888">Loading Pixoro da... 🔥</p></div>
-<div id="miniBox"><img id="miniImg"><div style="flex:1"><div id="miniTxt" style="font-size:13px">Uploading...</div><div style="background:#333;height:6px;border-radius:6px;margin-top:6px"><div id="miniFill"></div></div></div><b id="miniPct">10%</b></div>
+<div id="miniBox"><div style="flex:1"><div id="miniTxt" style="font-size:13px">Uploading...</div><div style="background:#333;height:6px;border-radius:6px;margin-top:6px"><div id="miniFill"></div></div></div><b id="miniPct">10%</b></div>
 <div id="toast"></div>
 <div id="choice"></div>
 <div id="postMenu"><div id="postMenuBox"></div></div>
 <div id="commentModal"><div><div style="display:flex;justify-content:space-between"><b>Comments</b><span onclick="closeComment()" style="cursor:pointer">✕</span></div><div id="commentList" style="margin:12px 0"></div><div style="display:flex;gap:8px"><div id="myCommentPfpWrap" style="width:32px;height:32px;border-radius:50%;overflow:hidden"></div><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#222;border:0;padding:10px;border-radius:20px;color:#fff;outline:none"><button onclick="addComment()" style="background:#FFD700;border:0;padding:10px 16px;border-radius:20px;font-weight:800">Post</button></div></div></div>
 <div class="bottom-nav">
-<a href="index.html" class="active">🏠<span>Home</span></a>
-<a href="search.html">🔍<span>Search</span></a>
-<a href="reels.html">▶️<span>Reels</span></a>
-<a href="dm.html">💬<span>DM</span></a>
-<a href="profile.html"><img id="navPfp" src="https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true"><span>Profile</span></a>
+<a href="index.html" class="active"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
+<a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
+<a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a>
+<a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
+<a href="profile.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg><span>Profile</span></a>
 </div>
-
 <script>
-// ===== PIXORO CORRECTED - FULL CODE =====
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 window.showToast=showToast;
 function showChoice(){let c=document.getElementById('choice');if(c)c.classList.add('show')} function hideChoice(){let c=document.getElementById('choice');if(c)c.classList.remove('show')}
@@ -109,49 +110,15 @@ function displayNameFor(u){
   if(cu.length>20) return ME_RAW||'user';
   return cu||ME_RAW||'user';
 }
-function getCleanAvatar(url){
-  if(!url || !String(url).includes('http')) return '';
-  let u = String(url).trim();
-  if(u.includes('ui-avatars.com')) return '';
-  return u;
-}
-function getRealPfp(u){
-  if(!u) return '';
-  if(String(u)===String(ME_ID)){
-    let my = getCleanAvatar(ME_PFP);
-    if(my) return my;
-    let p = profileById(ME_ID);
-    let url2 = p ? getCleanAvatar(p.avatar_url||p.profile_pic||p.photo_url||'') : '';
-    if(url2) return url2;
-    return '';
-  }
-  let p=profileById(u)||profileByName(u);
-  let url = p ? getCleanAvatar(p.avatar_url||p.profile_pic||p.photo_url||'') : '';
-  if(url) return url;
-  return '';
-}
-function withCacheBust(url){
-  if(!url) return url;
-  let sep = url.includes('?') ? '&' : '?';
-  return url + sep + 't=' + Date.now();
-}
-function getPfp(u){
-  let r=getRealPfp(u);
-  if(r) return withCacheBust(r);
-  return 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true';
-}
+// ✅ v1007: IMAGE ILLA DA - AVATAR LETTER MATTUM DA
+function getCleanAvatar(url){ return ''; }
+function getRealPfp(u){ return ''; }
+function withCacheBust(url){ return url; }
+function getPfp(u){ return ''; }
 function avatarLetterFor(u, uname){ return 'P'; }
-function avatarHtmlHome(u, uname){
-  let url=getRealPfp(u);
-  if(url) return `<img src="${withCacheBust(url)}" onerror="this.style.display='none'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
-  return `<div class="avaLetterHome" style="background:#222">P</div>`;
-}
-function avatarHtmlSmall(u, uname){
-  let url=getRealPfp(u);
-  if(url) return `<img src="${withCacheBust(url)}" onerror="this.style.display='none'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
-  return `<div style="width:100%;height:100%;border-radius:50%;background:#222;display:grid;place-items:center;font-weight:900;color:#fff">P</div>`;
-}
-function pfpErr(el,uname){ el.onerror=null; el.src='https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true'; }
+function avatarHtmlHome(u, uname){ return `<div class="avaLetterHome">P</div>`; }
+function avatarHtmlSmall(u, uname){ return `<div style="width:100%;height:100%;border-radius:50%;background:#222;display:grid;place-items:center;font-weight:900;color:#fff">P</div>`; }
+function pfpErr(el,uname){ if(el) el.style.display='none'; }
 window.pfpErr=pfpErr;
 function isMyPostObj(p){return String(p.user_id)===String(ME_ID)}
 function resolveUserId(otherId){
@@ -191,31 +158,10 @@ async function pixoroCheckBell(){
 window.pixoroCheckBell = pixoroCheckBell;
 setInterval(pixoroCheckBell, 15000);
 window.pixoroRefreshPhotos = function(){
-  let el=document.getElementById('navPfp');
-  let real = getRealPfp(ME_ID);
-  if(el && real) el.src = withCacheBust(real);
   let cp=document.getElementById('myCommentPfpWrap'); if(cp) cp.innerHTML = avatarHtmlSmall(ME_ID, ME_RAW);
-  if(typeof renderFeed==='function' && allPosts.length) renderFeed();
-  if(typeof renderStories==='function') renderStories();
 };
-window.addEventListener('storage', (e)=>{
-  if(e.key==='pixoro_pfp_updated'){
-    let newUrl = e.newValue || '';
-    if(newUrl){ ME_PFP = newUrl; let pr = profileById(ME_ID); if(pr) pr.avatar_url = newUrl; }
-    window.pixoroRefreshPhotos();
-  }
-});
-window.addEventListener('focus', async ()=>{
-  if(!getSupa() || !ME_ID) return;
-  try{
-    let {data} = await getSupa().from('profiles').select('avatar_url').eq('id', ME_ID).maybeSingle();
-    if(data && data.avatar_url && data.avatar_url !== ME_PFP){
-      ME_PFP = data.avatar_url;
-      let pr = profileById(ME_ID); if(pr) pr.avatar_url = data.avatar_url;
-      window.pixoroRefreshPhotos();
-    }
-  }catch(e){}
-});
+window.addEventListener('storage', (e)=>{});
+window.addEventListener('focus', async ()=>{});
 let AUTH_DONE = false;
 async function checkLogin(){
   for(let i=0;i<30;i++){ if(getSupa()) break; await new Promise(r=>setTimeout(r,200)); }
@@ -239,33 +185,20 @@ async function checkLogin(){
     return;
   }
   let {data:profile} = await supa.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
-  if(profile && profile.username){
-    ME_RAW=cleanUser(profile.username); ME_PFP=getCleanAvatar(profile.avatar_url||profile.profile_pic||profile.photo_url||'');
-  } else {
-    ME_RAW=cleanUser(session.user.email||'user'); ME_PFP='';
-  }
-  ME=ME_RAW;ME_ID=session.user.id;window.ME=ME_RAW;window.ME_ID=ME_ID;window.ME_RAW=ME_RAW;window.ME_PFP=ME_PFP;
+  if(profile && profile.username){ ME_RAW=cleanUser(profile.username); ME_PFP=''; } else { ME_RAW=cleanUser(session.user.email||'user'); ME_PFP=''; }
+  ME=ME_RAW;ME_ID=session.user.id;window.ME=ME_RAW;window.ME_ID=ME_ID;window.ME_RAW=ME_RAW;window.ME_PFP='';
   try{ if(window.pixoroLoadFollowing) await window.pixoroLoadFollowing(); }catch(e){}
   loadAll();
 }
 async function loadAll(){
   try{
     supa=getSupa();if(!supa)return;
-    try{
-      let {data:fresh} = await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').eq('id', ME_ID).maybeSingle();
-      if(fresh && fresh.avatar_url){ ME_PFP = getCleanAvatar(fresh.avatar_url); window.ME_PFP = ME_PFP; }
-    }catch(e){}
     let pr={data:[]}, po={data:[]}, re={data:[]}, st={data:[]};
-    try{ pr = await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').limit(100); }catch(e){}
+    try{ pr = await supa.from('profiles').select('id,username').limit(100); }catch(e){}
     try{ po = await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(20); }catch(e){}
     try{ re = await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(20); }catch(e){}
     try{ st = await supa.from('stories').select('*').order('created_at',{ascending:false}).limit(20); }catch(e){}
     allProfiles=pr.data||[];
-    if(ME_ID){
-      let idx = allProfiles.findIndex(x=>String(x.id)===String(ME_ID));
-      if(idx>=0 && ME_PFP) allProfiles[idx].avatar_url = ME_PFP;
-      else if(ME_PFP) allProfiles.push({id:ME_ID, username:ME_RAW, avatar_url:ME_PFP});
-    }
     var merged=[];(po.data||[]).forEach(p=>merged.push({...p,_from:'posts'}));(re.data||[]).forEach(p=>merged.push({...p,_from:'reels'}));
     var seenUrl=new Set(),deduped=[];
     for(let p of merged){
@@ -301,24 +234,17 @@ async function loadAll(){
     allStories=(st.data||[]).map(s=>{let prof=profileById(s.user_id);s.username=prof?prof.username:(s.username||'');s.username=cleanUser(s.username);return s}).filter(s=>{if(!s.expires_at)return true;return new Date(s.expires_at)>new Date()});
     renderStories();renderFeed();
     if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
-    let el=document.getElementById('navPfp');
-    if(el){
-      let real = getRealPfp(ME_ID);
-      if(real) el.src=withCacheBust(real); else el.src=getPfp(ME_ID);
-    }
     let cp=document.getElementById('myCommentPfpWrap'); if(cp) cp.innerHTML = avatarHtmlSmall(ME_ID, ME_RAW);
     pixoroCheckBell();
   }catch(e){
     console.log('Load Error',e);
     let feed=document.getElementById('feed');
-    if(feed && (!allPosts || !allPosts.length)){
-      feed.innerHTML='<p style="text-align:center;padding:40px;color:#888">No posts da</p>';
-    }
+    if(feed && (!allPosts || !allPosts.length)){ feed.innerHTML='<p style="text-align:center;padding:40px;color:#888">No posts da</p>'; }
   }
 }
 function renderStories(){
   let bar=document.getElementById('storyBar'); if(!bar) return;
-  let myStories=allStories.filter(s=>String(s.user_id)===String(ME_ID));let otherStories=allStories.filter(s=>String(s.user_id)!==String(ME_ID));let grouped={};otherStories.forEach(s=>{let key=s.user_id||cleanUser(s.username||'');if(!grouped[key])grouped[key]=s});let html='';if(myStories.length>0){let s=myStories[0];html+=`<div class="sItem" onclick="openMyStory()"><div class="sRing"><div class="sRingInner">${avatarHtmlSmall(ME_ID, ME_RAW)}</div></div><div class="sName">Your Story</div></div>`}else{html+=`<div class="sItem" onclick="location.href='./story-upload.html'"><div class="sAddWrap"><div style="width:60px;height:60px;border-radius:50%;overflow:hidden;border:2px solid #ff5ea8">${avatarHtmlSmall(ME_ID, ME_RAW)}</div><div class="sAddPlus">+</div></div><div class="sName">Your Story</div></div>`}Object.values(grouped).forEach(s=>{let nm=displayNameFor(s.user_id||s.username);html+=`<div class="sItem" onclick="openOtherStory('${s.user_id||s.username}')"><div class="sRing"><div class="sRingInner">${avatarHtmlSmall(s.user_id||s.username, nm)}</div></div><div class="sName">${nm}</div></div>`});bar.innerHTML=html}
+  let myStories=allStories.filter(s=>String(s.user_id)===String(ME_ID));let otherStories=allStories.filter(s=>String(s.user_id)!==String(ME_ID));let grouped={};otherStories.forEach(s=>{let key=s.user_id||cleanUser(s.username||'');if(!grouped[key])grouped[key]=s});let html='';if(myStories.length>0){html+=`<div class="sItem" onclick="openMyStory()"><div class="sRing"><div class="sRingInner">${avatarHtmlSmall(ME_ID, ME_RAW)}</div></div><div class="sName">Your Story</div></div>`}else{html+=`<div class="sItem" onclick="location.href='./story-upload.html'"><div class="sAddWrap"><div style="width:60px;height:60px;border-radius:50%;overflow:hidden;border:2px solid #fff">${avatarHtmlSmall(ME_ID, ME_RAW)}</div><div class="sAddPlus">+</div></div><div class="sName">Your Story</div></div>`}Object.values(grouped).forEach(s=>{let nm=displayNameFor(s.user_id||s.username);html+=`<div class="sItem" onclick="openOtherStory('${s.user_id||s.username}')"><div class="sRing"><div class="sRingInner">${avatarHtmlSmall(s.user_id||s.username, nm)}</div></div><div class="sName">${nm}</div></div>`});bar.innerHTML=html}
 function openMyStory(){let s=allStories.find(x=>String(x.user_id)===String(ME_ID));if(!s)return location.href='./story-upload.html';location.href='./story-view.html?u='+(s.user_id||s.username)} function openOtherStory(u){location.href='./story-view.html?u='+u}
 function openPostMenu(postId, ownerId){
   curMenuPost=postId;
@@ -346,7 +272,7 @@ function copyPostLink(id){
 window.openPostMenu=openPostMenu; window.closePostMenu=closePostMenu; window.copyPostLink=copyPostLink;
 function renderFeed(){
   let feedEl=document.getElementById('feed'); if(!feedEl) return;
-  let feedPosts=[...allPosts];if(feedMode=='foryou'){feedPosts.sort((a,b)=>viralScore(b)-viralScore(a))}else if(feedMode=='following'){let followingIds=window.PIXORO_FOLLOWING && window.PIXORO_FOLLOWING.size ? window.PIXORO_FOLLOWING : new Set(allFollows.filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));feedPosts=feedPosts.filter(p=>String(p.user_id)===String(ME_ID)||followingIds.has(String(p.user_id)));feedPosts.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));}else if(feedMode=='latest'){feedPosts.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));}let html='';for(let idx=0;idx<feedPosts.length;idx++){let p=feedPosts[idx];let ownerKey=p.user_id;if(!ownerKey || String(ownerKey).length<20){let pr=profileByName(p.username);if(pr) ownerKey=pr.id;else ownerKey=p.username}let lCount=allLikes.filter(l=>String(l.post_id)==String(p.id)).length;let isLiked=allLikes.some(l=>String(l.post_id)==String(p.id)&&(l.user_id==ME_ID));let isSaved=allSaves.some(s=>String(s.post_id)==String(p.id)&&(s.user_id==ME_ID));let best=getBestMedia(p);let mUrl=best.url||'';let mediaHtml=best.isVid?(idx===0?`<video class="main" src="${mUrl}" loop muted playsinline preload="metadata"></video>`:`<video class="main" data-src="${mUrl}" loop muted playsinline preload="none"></video>`):`<img class="main" src="${mUrl}" loading="${idx===0?'eager':'lazy'}" decoding="async" onerror="this.src='https://via.placeholder.com/400x500/111/fff?text=Pixoro'">`;let isMe=String(ownerKey)===String(ME_ID);let followName=cleanUser(p.username || displayNameFor(ownerKey) || '');let isFollowing = window.PIXORO_FOLLOWING_NAMES ? window.PIXORO_FOLLOWING_NAMES.has(followName) : (window.PIXORO_FOLLOWING ? window.PIXORO_FOLLOWING.has(String(ownerKey)) : allFollows.some(f=>String(f.follower_id)===String(ME_ID)&&String(f.following_id)===String(ownerKey)));let followBtnHtml='';if(!isMe && followName && followName!=='null' && followName!=='undefined' && followName!=='user'){followBtnHtml=`<button data-follow-user="${followName}" data-follow-username="${followName}" class="followBtnPost ${isFollowing?'following':''}" onclick="event.stopPropagation();pixoroToggleFollow('${followName}',this)">${isFollowing?'Following':'Follow'}</button>`}let uname=displayNameFor(ownerKey);html+=`<div class="post" id="post-${p.id}"><div class="postTop"><div style="display:flex;align-items:center;gap:10px"><div class="pfpRing" onclick="location.href='./profile.html?u=${ownerKey}'"><div class="pfpInner">${avatarHtmlHome(ownerKey, uname)}</div></div><div style="display:flex;align-items:center;gap:8px"><b onclick="location.href='./profile.html?u=${ownerKey}'">${uname}</b><span style="font-size:11px;color:#888">• ${timeAgo(p.created_at)}</span>${followBtnHtml}</div>${p._from==='reels'?'<span style="font-size:10px;background:#ff5ea8;padding:2px 6px;border-radius:10px">REEL</span>':''}</div><span onclick="event.stopPropagation();openPostMenu('${p.id}','${ownerKey}')" style="cursor:pointer;font-size:20px;padding:4px 8px">⋮</span></div><div style="position:relative" onclick="handleTap('${p.id}')">${mediaHtml}<div id="burst-${p.id}" class="heart-burst">❤</div></div><div class="actions"><div class="left"><button id="likeBtn-${p.id}" class="act ${isLiked?'liked':''}" onclick="fastLike('${p.id}')"><svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg></button><button class="act" onclick="openComment('${p.id}')"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button><button class="act" onclick="copyPostLink('${p.id}')"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div><button class="act ${isSaved?'saved':''}" onclick="savePost('${p.id}',this)"><svg viewBox="0 0 24 24"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></button></div><div style="padding:0 14px"><b><span id="likeCount-${p.id}">${lCount}</span> likes</b><br><b onclick="location.href='./profile.html?u=${ownerKey}'" style="cursor:pointer">${uname}</b> ${p.caption||''}</div></div>`}
+  let feedPosts=[...allPosts];if(feedMode=='foryou'){feedPosts.sort((a,b)=>viralScore(b)-viralScore(a))}else if(feedMode=='following'){let followingIds=window.PIXORO_FOLLOWING && window.PIXORO_FOLLOWING.size ? window.PIXORO_FOLLOWING : new Set(allFollows.filter(f=>String(f.follower_id)===String(ME_ID)).map(f=>String(f.following_id)));feedPosts=feedPosts.filter(p=>String(p.user_id)===String(ME_ID)||followingIds.has(String(p.user_id)));feedPosts.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));}else if(feedMode=='latest'){feedPosts.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));}let html='';for(let idx=0;idx<feedPosts.length;idx++){let p=feedPosts[idx];let ownerKey=p.user_id;if(!ownerKey || String(ownerKey).length<20){let pr=profileByName(p.username);if(pr) ownerKey=pr.id;else ownerKey=p.username}let lCount=allLikes.filter(l=>String(l.post_id)==String(p.id)).length;let isLiked=allLikes.some(l=>String(l.post_id)==String(p.id)&&(l.user_id==ME_ID));let isSaved=allSaves.some(s=>String(s.post_id)==String(p.id)&&(s.user_id==ME_ID));let best=getBestMedia(p);let mUrl=best.url||'';let mediaHtml=best.isVid?`<video class="main" src="${mUrl}" loop muted playsinline preload="metadata" style="background:#000"></video>`:`<div class="postMediaBlock">${p.caption||'Pixoro Post'}</div>`;let isMe=String(ownerKey)===String(ME_ID);let followName=cleanUser(p.username || displayNameFor(ownerKey) || '');let isFollowing = window.PIXORO_FOLLOWING_NAMES ? window.PIXORO_FOLLOWING_NAMES.has(followName) : (window.PIXORO_FOLLOWING ? window.PIXORO_FOLLOWING.has(String(ownerKey)) : allFollows.some(f=>String(f.follower_id)===String(ME_ID)&&String(f.following_id)===String(ownerKey)));let followBtnHtml='';if(!isMe && followName && followName!=='null' && followName!=='undefined' && followName!=='user'){followBtnHtml=`<button data-follow-user="${followName}" data-follow-username="${followName}" class="followBtnPost ${isFollowing?'following':''}" onclick="event.stopPropagation();pixoroToggleFollow('${followName}',this)">${isFollowing?'Following':'Follow'}</button>`}let uname=displayNameFor(ownerKey);html+=`<div class="post" id="post-${p.id}"><div class="postTop"><div style="display:flex;align-items:center;gap:10px"><div class="pfpRing" onclick="location.href='./profile.html?u=${ownerKey}'"><div class="pfpInner">${avatarHtmlHome(ownerKey, uname)}</div></div><div style="display:flex;align-items:center;gap:8px"><b onclick="location.href='./profile.html?u=${ownerKey}'">${uname}</b><span style="font-size:11px;color:#888">• ${timeAgo(p.created_at)}</span>${followBtnHtml}</div>${p._from==='reels'?'<span style="font-size:10px;background:#fff;color:#000;padding:2px 6px;border-radius:10px">REEL</span>':''}</div><span onclick="event.stopPropagation();openPostMenu('${p.id}','${ownerKey}')" style="cursor:pointer;font-size:20px;padding:4px 8px">⋮</span></div><div style="position:relative" onclick="handleTap('${p.id}')">${mediaHtml}<div id="burst-${p.id}" class="heart-burst">❤</div></div><div class="actions"><div class="left"><button id="likeBtn-${p.id}" class="act ${isLiked?'liked':''}" onclick="fastLike('${p.id}')"><svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.2-8.4C1.2 9.2 2.5 4 8.1 4c2.2 0 3.3 1.2 3.9 2.2C12.6 5.2 13.7 4 15.9 4 21.5 4 22.8 9.2 21.2 12.6 19 16.65 12 21 12 21z"/></svg></button><button class="act" onclick="openComment('${p.id}')"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button><button class="act" onclick="copyPostLink('${p.id}')"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div><button class="act ${isSaved?'saved':''}" onclick="savePost('${p.id}',this)"><svg viewBox="0 0 24 24"><path d="M19 21L12 16L5 21V5C5 3.9 5.9 3 7 3H17C18.1 3 19 3.9 19 5V21Z"/></svg></button></div><div style="padding:0 14px"><b><span id="likeCount-${p.id}">${lCount}</span> likes</b><br><b onclick="location.href='./profile.html?u=${ownerKey}'" style="cursor:pointer">${uname}</b> ${p.caption||''}</div></div>`}
   feedEl.innerHTML=html||'<p style="text-align:center;padding:40px;color:#888">No posts da</p>';observeHomeVideos();if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();}
 let _homeIO=null;
 function observeHomeVideos(){let vs=document.querySelectorAll('.post video.main');if(_homeIO) _homeIO.disconnect();_homeIO=new IntersectionObserver(es=>{es.forEach(e=>{let v=e.target;if(e.isIntersecting){if(!v.src && v.dataset.src){v.src=v.dataset.src;v.load();}v.muted=true;v.play().catch(()=>{})}else{v.pause()}})},{threshold:0.4,rootMargin:'200px 0px'});vs.forEach(v=>_homeIO.observe(v))}
@@ -408,7 +334,6 @@ function checkMiniUpload(){
   let box=document.getElementById('miniBox');
   if(!box) return;
   box.style.display='flex';
-  let mi=document.getElementById('miniImg');if(mi)mi.src=media;
   let mp=document.getElementById('miniPct');if(mp)mp.innerText='10%';
   let mf=document.getElementById('miniFill');if(mf)mf.style.width='10%';
   let mt=document.getElementById('miniTxt');if(mt)mt.innerText='Mella Upload Aaguthu da - Feed Paakalam da';
