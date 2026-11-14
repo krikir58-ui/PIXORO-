@@ -1,4 +1,4 @@
-// ===== PIXORO MAIN - SERVER ONLY - v1002 - LIKE UUID FIX DA =====
+// ===== PIXORO MAIN - SERVER ONLY - v1003 - G FIX + WHITE SCREEN FIX DA =====
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 if(!window.supa && window.supabase && window.supabase.createClient){
@@ -45,44 +45,62 @@ window.getTick = goldTickHTML;
   .reel-main.bgRemove{ object-fit:contain!important;background:#000!important; }
   `;
   let s = document.createElement('style'); s.id='pixoro-speed-css'; s.innerText = css; document.head.appendChild(s);
-  if(location.pathname.includes('index') || location.pathname.endsWith('/')) document.body.classList.add('isHome');
+  // CORRECTED: WHITE SCREEN FIX - body illa na crash aagakoodathu
+  if(location.pathname.includes('index') || location.pathname.endsWith('/')){
+    if(document.body) document.body.classList.add('isHome');
+    else document.addEventListener('DOMContentLoaded', ()=>{ if(document.body) document.body.classList.add('isHome'); });
+  }
 })();
 window._PIXORO_PFP_CACHE = window._PIXORO_PFP_CACHE || {};
+// ===== CORRECTED: G FULL AH REMOVE - P MATTUM =====
 window.getPfp = function(p){
   if(p && typeof p === 'object'){
     let url = p?.avatar_url || p?.avatar || p?.profile_pic || p?.pfp || p?.photo_url;
-    if(url && String(url).startsWith('http') && !String(url).includes('undefined')) return url;
-    let name = (p?.username || p?.name || 'G').toString().replace('@','').trim() || 'G';
-    let cached = window._PIXORO_PFP_CACHE[name.toLowerCase()];
-    if(cached) return cached;
-    return 'https://ui-avatars.com/api/?name=' + name.charAt(0).toUpperCase() + '&background=111&color=fff&size=300&bold=true';
+    if(url && String(url).startsWith('http') && !String(url).includes('undefined') && !String(url).includes('ui-avatars')) return url;
+    let name = (p?.username || p?.name || '').toString().replace('@','').trim().toLowerCase() || '';
+    let cached = name ? window._PIXORO_PFP_CACHE[name] : '';
+    if(cached && !String(cached).includes('ui-avatars')) return cached;
+    return 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=300&bold=true';
   }
   if(typeof p === 'string'){
-    let name = p.replace('@','').trim() || 'G';
-    let cached = window._PIXORO_PFP_CACHE[name.toLowerCase()];
-    if(cached) return cached;
-    return 'https://ui-avatars.com/api/?name=' + name.charAt(0).toUpperCase() + '&background=111&color=fff&size=300&bold=true';
+    let name = p.replace('@','').trim().toLowerCase() || '';
+    let cached = window._PIXORO_PFP_CACHE[name] || window._PIXORO_PFP_CACHE[String(p)];
+    if(cached && !String(cached).includes('ui-avatars')) return cached;
+    return 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=300&bold=true';
   }
-  return 'https://ui-avatars.com/api/?name=G&background=111&color=fff&size=300&bold=true';
+  return 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=300&bold=true';
 };
+// ===== CORRECTED: PROFILE PHOTO SYNC + CACHE BUST =====
 window.pixoroRefreshPhotos = async function(){
   try{
     if(!window.supa) return;
     let {data:profs} = await window.supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').limit(200);
     (profs||[]).forEach(pr=>{
       let url = pr.avatar_url || pr.profile_pic || pr.photo_url;
-      if(!url) return;
+      if(!url || String(url).includes('ui-avatars')) return;
       let uname = String(pr.username||'').toLowerCase().replace('@','');
       window._PIXORO_PFP_CACHE[uname] = url;
       window._PIXORO_PFP_CACHE[String(pr.id)] = url;
     });
+    let nav = document.getElementById('navPfp');
+    if(nav && window.ME_ID && window._PIXORO_PFP_CACHE[String(window.ME_ID)]){
+      nav.src = window._PIXORO_PFP_CACHE[String(window.ME_ID)] + '?t=' + Date.now();
+    }
     document.querySelectorAll('img[data-pfp-for], img[data-user-id], .reel-pfp-wrap img, .post-pfp img').forEach(img=>{
       let key = String(img.dataset.pfpFor || img.dataset.userId || img.alt || '').toLowerCase().replace('@','');
       let cached = window._PIXORO_PFP_CACHE[key];
-      if(cached && img.src !== cached && !img.src.includes(cached.split('?')[0])) img.src = cached;
+      if(cached && !img.src.includes(cached.split('?')[0])) img.src = cached + '?t=' + Date.now();
     });
   }catch(e){}
 };
+// CORRECTED: Profile la maathina ella page kum theriyanum
+window.addEventListener('storage', (e)=>{
+  if(e.key==='pixoro_pfp_updated' && e.newValue && !String(e.newValue).includes('ui-avatars')){
+    if(window.ME_ID) window._PIXORO_PFP_CACHE[String(window.ME_ID)] = e.newValue;
+    let nav = document.getElementById('navPfp'); if(nav) nav.src = e.newValue + '?t=' + Date.now();
+    if(window.pixoroRefreshPhotos) window.pixoroRefreshPhotos();
+  }
+});
 window.ME_ID = window.ME_ID || null;
 window.ME_RAW = window.ME_RAW || '';
 function pixoroIsUuid(s){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(s||'')); }
@@ -167,7 +185,6 @@ async function getPixoroFeed(){
   clean.sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
   return clean;
 }
-// ✅ FIXED v1002 - Views ku UUID mattum da - Null koodathu da
 function pixoroReelSetup(videoEl, postId, userId){
   if(!videoEl) return;
   videoEl.loop = true; videoEl.muted = true; videoEl.playsInline = true; videoEl.autoplay = true;
@@ -192,7 +209,6 @@ function pixoroReelSetup(videoEl, postId, userId){
 }
 async function pixoroSendNotification(toUserId, type, postId, message){ return; }
 window.pixoroSendNotification = pixoroSendNotification;
-// ✅ FIXED v1002 - Like ku UUID mattum da - uuid = text Error Varaathu da
 async function pixoroLike(postId, userId){
   await pixoroFixMe();
   if(!pixoroIsUuid(window.ME_ID)) return false;
@@ -221,7 +237,6 @@ async function pixoroToggleLike(postId, btn){
   return liked;
 }
 window.pixoroToggleLike = pixoroToggleLike;
-// ✅ FIXED v1002 - Save ku UUID mattum da
 async function pixoroSave(postId, userId){
   await pixoroFixMe();
   if(!pixoroIsUuid(window.ME_ID) || !pixoroIsUuid(postId)) return;
@@ -236,7 +251,6 @@ async function getPixoroExplore(myId, myFollows){
   let all = await getAllPixoroPosts();
   return (all||[]).filter(p=> String(p.user_id)!==String(myId) && !myFollows.includes(String(p.user_id)));
 }
-// ✅ FIXED v1002 - Reels ku user_id UUID ah anuppu da
 async function pixoroSavePost(fileUrl, isReel, caption){
   let {data:{session}} = await window.supa.auth.getSession();
   if(!session) return;
@@ -286,7 +300,8 @@ async function pixoroOpenFollowList(type){
     let pid = type==='following' ? f.following_id : f.follower_id;
     let pr = (profs||[]).find(p=> String(p.id)===String(pid));
     let uname = pr?.username || f.following_name || f.follower_name || 'user';
-    let pfp = pr?.avatar_url || pr?.profile_pic || 'https://ui-avatars.com/api/?name='+uname[0]+'&background=fff&color=000';
+    // CORRECTED: G illa - P mattum, photo_url um edu
+    let pfp = pr?.avatar_url || pr?.profile_pic || pr?.photo_url || 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true';
     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><img src="${pfp}" onclick="location.href='./profile.html?u=${pid}'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer"><b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='./profile.html?u=${pid}'">${uname}</b><button onclick="location.href='./profile.html?u=${pid}'" style="background:#fff;color:#000;border:0;padding:6px 14px;border-radius:20px;font-weight:700">View</button></div>`;
   }).join('') || `<div style="color:#888;text-align:center;padding:20px">No ${type} yet</div>`;
   let old = document.getElementById('followModal'); if(old) old.remove();
@@ -367,7 +382,7 @@ function pixoroLoadFollowing(){
       window.PIXORO_ID_TO_NAME[String(p.id)] = pixoroCleanName(p.username);
       window.PIXORO_NAME_TO_ID[pixoroCleanName(p.username)] = String(p.id);
       let url = p.avatar_url || p.profile_pic || p.photo_url;
-      if(url && String(url).includes('http')){ window._PIXORO_PFP_CACHE[pixoroCleanName(p.username)] = url; window._PIXORO_PFP_CACHE[String(p.id)] = url; }
+      if(url && String(url).includes('http') && !String(url).includes('ui-avatars')){ window._PIXORO_PFP_CACHE[pixoroCleanName(p.username)] = url; window._PIXORO_PFP_CACHE[String(p.id)] = url; }
     });
     window.PIXORO_FOLLOWING_NAMES = new Set([...window.PIXORO_FOLLOWING].map(id=>pixoroCleanName(window.PIXORO_ID_TO_NAME[id]||'')).filter(Boolean));
     pixoroPaintAllFollowBtns();
@@ -448,7 +463,7 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
-console.log('PIXORO CORE v1002 SERVER ONLY LOADED - LIKE UUID FIX DA');
+console.log('PIXORO CORE v1003 SERVER ONLY LOADED - G FIX DA');
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
