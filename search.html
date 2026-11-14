@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Search - Pixoro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=1002"></script>
+<script src="js/pixoro-core.js?v=1004"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px}
 .top{padding:10px 12px;position:sticky;top:0;background:#000;z-index:10}
@@ -28,7 +28,16 @@ input::placeholder{color:#777}
 <div id="trendingWrap"><div class="grid" id="grid"></div></div>
 <div class="bottom-nav"><a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a><a href="search.html" class="active"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a><a href="reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a><a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
 <script>
-let supa=window.supa;
+// ✅ CORRECTED - supa ah ippo pudika koodathu da
+let supa=null;
+function getSupa(){
+  if(window.supa) supa=window.supa;
+  if(!supa && window.supabase && window.PIXORO_URL && window.PIXORO_KEY){
+    try{ window.supa=window.supabase.createClient(window.PIXORO_URL, window.PIXORO_KEY); supa=window.supa; }catch(e){}
+  }
+  return window.supa||supa;
+}
+window.getSupa=getSupa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
 let ME_RAW='',ME_ID='',profileMap={},allProfilesCache=[],allPosts=[],blockedIds=new Set()
 function getRealPfp(u){
@@ -58,18 +67,23 @@ window.pixoroSendNotification = pixoroSendNotification;
 let SEARCH_AUTH_DONE = false;
 async function loadBlocked(){
   try{
-    let {data} = await window.supa.from('blocked_users').select('blocked_user_id').eq('user_id', ME_ID);
+    let s=getSupa(); if(!s) return;
+    let {data} = await s.from('blocked_users').select('blocked_user_id').eq('user_id', ME_ID);
     blockedIds = new Set((data||[]).map(x=>String(x.blocked_user_id)));
-    // Enna Block pannavangalum Maraikanum da
-    let {data: byMe} = await window.supa.from('blocked_users').select('user_id').eq('blocked_user_id', ME_ID);
+    let {data: byMe} = await s.from('blocked_users').select('user_id').eq('blocked_user_id', ME_ID);
     (byMe||[]).forEach(x=> blockedIds.add(String(x.user_id)));
   }catch(e){}
 }
+// ✅ CORRECTED - init white ah nikka koodathu da
 async function init(){
   if(SEARCH_AUTH_DONE) return;
-  if(!window.supa){setTimeout(init,300);return}
+  for(let i=0;i<30;i++){ if(getSupa()) break; await new Promise(r=>setTimeout(r,200)); }
+  if(!getSupa()){
+    document.getElementById('grid').innerHTML='<p style="padding:30px;color:#888;text-align:center">Supabase Connect Aagala da<br>pixoro-core.js la URL / KEY check pannu da<br><button onclick="location.reload()" style="background:#FFD700;color:#000;border:0;padding:10px 20px;border-radius:10px;font-weight:900;margin-top:10px">Refresh</button></p>';
+    return;
+  }
   SEARCH_AUTH_DONE = true;
-  supa=window.supa;
+  supa=getSupa();
   let {data:{session}} = await supa.auth.getSession();
   if(!session){
     await new Promise(r=>setTimeout(r,800));
@@ -88,11 +102,11 @@ async function init(){
   if(window.pixoroLoadFollowing) await window.pixoroLoadFollowing();
   loadTrending();
 }
-// ✅ FIXED v1002 - Trending la Block panna User Post Varaathu da
 async function loadTrending(){
+  let s=getSupa(); if(!s) return;
   let all=[];
-  try{let r=await supa.from('posts').select('*').eq('is_archived',false).order('created_at',{ascending:false}).limit(30);if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'posts'})));}catch(e){}
-  try{let r=await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(30);if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'reels'})));}catch(e){}
+  try{let r=await s.from('posts').select('*').eq('is_archived',false).order('created_at',{ascending:false}).limit(30);if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'posts'})));}catch(e){}
+  try{let r=await s.from('reels').select('*').order('created_at',{ascending:false}).limit(30);if(r.data) all=all.concat(r.data.map(p=>({...p,_from:'reels'})));}catch(e){}
   let seenUrl=new Set(),seenId=new Set(),deduped=[];
   for(let p of all){
     let raw=(p.media_url||p.video_url||'').trim();if(!raw) continue;
@@ -109,10 +123,10 @@ async function loadTrending(){
   if(!deduped.length) document.getElementById('grid').innerHTML='<p style="padding:30px;color:#777;text-align:center">No posts yet da</p>';
 }
 let _searchTimer = null;
-// ✅ FIXED v1002 - Search la Block panna User Vara Maatan da
 async function doSearch(){
   clearTimeout(_searchTimer);
   _searchTimer = setTimeout(async ()=>{
+    let s=getSupa(); if(!s) return;
     let qRaw=document.getElementById('searchInput').value.trim();
     let trend=document.getElementById('trendingWrap');let box=document.getElementById('results');
     if(!qRaw){box.innerHTML='';trend.style.display='block';return;}
@@ -120,7 +134,7 @@ async function doSearch(){
     let cleanQ=cleanUser(qRaw);
     let list=[];
     try{
-      let {data: profs} = await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url,bio').ilike('username','%'+cleanQ+'%').limit(30);
+      let {data: profs} = await s.from('profiles').select('id,username,avatar_url,profile_pic,photo_url,bio').ilike('username','%'+cleanQ+'%').limit(30);
       list = (profs||[]).filter(p=>String(p.id)!==String(ME_ID) && !blockedIds.has(String(p.id)));
     }catch(e){}
     if(!list.length){
