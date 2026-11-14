@@ -1,122 +1,3 @@
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Pixoro Reels - Full Screen</title>
-<style>
-html{background:#000}*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
-.reelWrap{width:100vw;height:100dvh;overflow-y:scroll;overflow-x:hidden;scroll-snap-type:y mandatory;scroll-behavior:auto;background:#000;position:fixed;top:0;left:0;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-.reelWrap::-webkit-scrollbar{display:none}
-.reel{width:100vw!important;height:100dvh!important;flex-shrink:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#000!important;contain:content}
-.reel-main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;z-index:2!important;display:block!important;background:#000}
-.reel .reel-main + .reel-main{display:none!important}
-.progress{position:absolute;top:0;left:0;height:2px;background:#FF4D8D;width:0%;z-index:20}
-.vBar{position:absolute!important;right:10px!important;bottom:110px!important;display:flex!important;flex-direction:column!important;gap:20px!important;align-items:center!important;z-index:15!important}
-.vBtn{display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;width:48px!important;cursor:pointer!important;-webkit-tap-highlight-color:transparent!important;background:transparent!important;box-shadow:none!important}
-.vBtn span{font-size:11px!important;font-weight:700!important;color:#fff!important;text-shadow:none!important}
-.vBtn svg{width:28px!important;height:28px!important;stroke:#fff!important;fill:none!important;stroke-width:1.8!important}
-.vBtn:active{transform:scale(0.85);background:transparent!important;box-shadow:none!important}
-.vBtn.liked svg{fill:#ff3040!important;stroke:#ff3040!important}
-.vBtn.saved svg{fill:#fff!important;stroke:#fff!important}
-.vBtn.tildeBtn{background:transparent!important;border:none!important;width:36px!important;height:36px!important;display:flex!important;align-items:center!important;justify-content:center!important}
-.vBtn.tildeBtn span{font-size:20px!important;font-weight:900!important;color:#fff!important}
-.audioDiscInBar{width:34px!important;height:34px!important;border-radius:50%!important;border:2px solid #fff!important;overflow:hidden!important;animation:spin 3.5s linear infinite!important;background:#111!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:16px!important}
-.audioWrap{display:flex!important;flex-direction:column!important;align-items:center!important}
-@keyframes spin{to{transform:rotate(360deg)}}
-.btm{position:absolute!important;left:12px!important;right:82px!important;bottom:65px!important;z-index:10!important;text-shadow:none!important;background:none!important;background-image:none!important;padding:20px 0 0 0;box-shadow:none!important}
-.reel-pfp-wrap{width:40px!important;height:40px!important;min-width:40px!important;border-radius:50%!important;overflow:hidden!important;border:2px solid #fff!important;cursor:pointer;flex-shrink:0}
-.reel-pfp-wrap img{width:100%!important;height:100%!important;object-fit:cover}
-.reel-username{font-size:15px!important;font-weight:700!important;cursor:pointer;max-width:120px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-.reel-caption{margin-top:6px!important;font-size:13px!important;color:#ddd!important;line-height:1.4;display:block!important;max-height:42px!important;overflow:hidden!important}
-.followBtnPerusa,[data-follow-user]{height:32px!important;min-width:86px!important;padding:0 16px!important;margin-left:10px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0!important;border-radius:8px!important;font-size:14px!important;font-weight:800!important;line-height:1!important;white-space:nowrap!important;-webkit-tap-highlight-color:transparent!important;outline:none!important;transition:all .2s ease!important;text-shadow:none!important;position:relative!important;overflow:hidden!important;isolation:isolate!important;background:transparent!important;background-color:transparent!important;background-image:none!important;box-shadow:none!important;color:#fff!important;border:1.2px solid rgba(255,255,255,.9)!important}
-.followBtnPerusa.following,[data-follow-user].following{color:#fff!important;border:1.2px solid rgba(255,255,255,.9)!important;opacity:1!important;background:transparent!important;background-color:transparent!important}
-.followBtnPerusa.following::after,[data-follow-user].following::after,.followBtnPerusa.flash::after,[data-follow-user].flash::after{content:''!important;position:absolute!important;top:0!important;bottom:0!important;width:60%!important;left:-60%!important;z-index:1!important;pointer-events:none!important;background:linear-gradient(90deg, transparent, #FF004C, #FF8A00, #FFEE00, #00E676, #00B0FF, #7A00FF, transparent)!important;animation:rainbowLight .7s linear 6 forwards!important}
-@keyframes rainbowLight{0%{left:-60%;opacity:0}20%{opacity:1}100%{left:110%;opacity:0}}
-.followBtnPerusa:active,[data-follow-user]:active{transform:scale(.96)!important;box-shadow:none!important;background:transparent!important}
-.reelsTop{position:fixed;top:0;left:0;right:0;width:100vw;z-index:90;display:flex!important;justify-content:space-between!important;align-items:center!important;height:56px;padding:0 16px;background:#000!important;background-image:none!important;pointer-events:none}
-.reelsTop b{color:#fff!important;font-size:24px!important;font-weight:800!important}
-.reelsTop b span{color:#FF4D8D!important}
-.topRight{display:flex!important;gap:12px!important;align-items:center!important;pointer-events:auto}
-.volBtn,.searchTopBtn{background:transparent!important;border:none!important;width:28px!important;height:28px!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:20px;position:relative}
-.hashtag{color:#FF4D8D!important;font-weight:700!important;cursor:pointer!important}
-.bottom-nav{position:fixed!important;bottom:0!important;left:0!important;right:0!important;width:100vw!important;height:64px!important;background:#000!important;border-top:1px solid #222!important;display:flex!important;justify-content:space-around!important;align-items:center!important;z-index:100!important}
-.bottom-nav a{color:#888!important;text-decoration:none!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:2px!important;padding-bottom:4px!important}
-.bottom-nav a svg{width:24px!important;height:24px!important;stroke:#888!important;stroke-width:1.8!important;fill:none!important}
-.bottom-nav a.active{color:#fff!important;border-bottom:2px solid #FF2DCC!important}
-.bottom-nav a.active svg{stroke:#fff!important;fill:none!important}
-.bottom-nav a.active svg rect{fill:none!important;stroke:#fff!important}
-.bottom-nav a.active svg path{fill:none!important;stroke:#fff!important}
-.bottom-nav span{font-size:11px!important;color:#888!important}
-.bottom-nav a.active span{color:#fff!important;font-weight:800!important}
-.bottom-nav a img.navPfp{width:26px!important;height:26px!important;border-radius:50%!important;border:1.5px solid #fff!important;object-fit:cover!important}
-.centerCtrl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:0;transition:opacity .25s;z-index:25;background:rgba(0,0,0,0.4);width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.centerCtrl.show{opacity:1}
-.centerIcon svg{width:36px!important;height:36px!important;fill:#fff!important}
-.heartBurst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);pointer-events:none;z-index:50;opacity:0;width:120px;height:120px;display:flex;align-items:center;justify-content:center}
-.heartBurst::before{content:'❤';font-size:90px!important;color:#ff3040!important}
-.heartBurst.show{animation:pixoroHeartPop 1.1s cubic-bezier(0.17,0.89,0.32,1.28) forwards}
-@keyframes pixoroHeartPop{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(1.25);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
-.sheet{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;align-items:flex-end;justify-content:center}
-.sheet.show{display:flex}
-.sheetBox{background:#fff;width:100%;max-width:480px;border-radius:28px 28px 0 0;padding:10px 0 34px;max-height:88vh;display:flex;flex-direction:column;overflow-y:auto}
-.sheetHandle{width:36px;height:5px;background:#ddd;border-radius:10px;margin:8px auto 18px}
-.pixHead{text-align:center;padding:0 20px 14px}
-.pixHead b{font-size:17px;font-weight:800;color:#111}
-.pixHead p{font-size:12px;color:#999;margin-top:4px}
-.safeCard{margin:0 12px 12px;background:#F6F6F8;border-radius:18px;overflow:hidden}
-.safeItem{padding:16px 18px;display:flex;gap:14px;align-items:center;cursor:pointer}
-.safeItem:active{background:#EFEFF3}
-.safeItem .icon{width:36px;height:36px;border-radius:10px;background:#EDEDF2;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.safeItem .txt{flex:1}
-.safeItem .title{font-size:15px;font-weight:600;color:#111}
-.safeItem .sub{font-size:12px;color:#999;margin-top:2px}
-.undoBar{margin:12px 16px 0;background:#F1F1F5;border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#111}
-.undoBtn{color:#FF4D8D;font-weight:700;cursor:pointer}
-.cRow{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;border-bottom:1px solid #eee}
-.cRow .del{color:#ff3b30;font-size:12px;font-weight:700;cursor:pointer}
-.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:800;z-index:9999;display:none;white-space:nowrap;max-width:90vw}
-</style></head><body>
-<div class="reelsTop"><b>Pixor<span>o</span></b><div class="topRight">
-<div class="searchTopBtn" onclick="location.href='search.html'"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg></div>
-<div class="volBtn" id="volIcon" onclick="toggleMuteAll()"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></div>
-</div></div>
-<div class="reelWrap" id="reelWrap"></div>
-<div id="toast" class="toast"></div>
-<div id="miniBox" style="position:fixed;bottom:76px;left:12px;right:12px;max-width:426px;margin:auto;background:#1a0b2e;border:1px solid #a259ff;border-radius:14px;padding:10px;display:none;z-index:2000;align-items:center;gap:10px">
-<img id="miniImg" style="width:44px;height:60px;object-fit:cover;border-radius:8px">
-<div style="flex:1"><div style="font-weight:700;font-size:13px;color:#fff">Uploading Reel... <span id="miniPct">0%</span></div><div style="font-size:11px;color:#aaa" id="miniTxt">Mella Upload Aaguthu da - Reels Paakalam da</div><div style="height:6px;background:#333;border-radius:20px;overflow:hidden;margin-top:6px"><div id="miniFill" style="height:100%;width:0%;background:linear-gradient(90deg,#7b2fff,#ff2dcc);transition:.3s"></div></div></div>
-<span onclick="document.getElementById('miniBox').style.display='none'" style="cursor:pointer;color:#fff">✕</span>
-</div>
-<div class="bottom-nav">
-<a href="index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
-<a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
-<a href="reels.html" class="active"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z"/></svg><span>Reels</span></a>
-<a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
-<a href="profile.html"><img class="navPfp" id="navPfp" src="" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=P&background=FF4D8D&color=fff&size=200&bold=true'"><span>Profile</span></a>
-</div>
-<div class="sheet" id="ownerSheet" onclick="if(event.target==this)closeSheet('ownerSheet')"><div class="sheetBox">
-<div class="sheetHandle"></div><div class="pixHead"><b>Your Pixoro ✨</b><p>Namba reels - safe ah</p></div>
-<div class="safeCard">
-<div class="safeItem" onclick="editReel()"><div class="icon">✏️</div><div class="txt"><div class="title">Edit caption</div><div class="sub">Words maathu - safe</div></div></div>
-<div class="safeItem" onclick="shareQR()"><div class="icon">🔗</div><div class="txt"><div class="title">Share link</div><div class="sub">Friends ku share - enjoy</div></div></div>
-</div>
-<div class="safeCard"><div class="safeItem" onclick="deleteSafe()"><div class="icon">🗑️</div><div class="txt"><div class="title" style="color:#ff3b30">Delete - Safe</div><div class="sub">30 days archive la irukkum</div></div></div>
-</div></div></div>
-<div class="sheet" id="viewerSheet" onclick="if(event.target==this)closeSheet('viewerSheet')"><div class="sheetBox">
-<div class="sheetHandle"></div><div class="pixHead"><b>Pixoro Safe 🌿</b><p>Safe enjoy - No alert da</p></div>
-<div class="safeCard">
-<div class="safeItem" onclick="saveReel()"><div class="icon">🔖</div><div class="txt"><div class="title">Save for later</div><div class="sub">Pirigu paakalam - Profile Saved la Theriyum</div></div></div>
-<div class="safeItem" onclick="copyLinkSafe()"><div class="icon">📤</div><div class="txt"><div class="title">Share</div><div class="sub">Jolly ah share pannu</div></div></div>
-<div class="safeItem" onclick="openFriendProfile()"><div class="icon">👤</div><div class="txt"><div class="title">View Profile</div><div class="sub">Friend profile paaru</div></div></div>
-</div>
-<div class="safeCard">
-<div class="safeItem" onclick="notInterestedSafe()"><div class="icon">😶</div><div class="txt"><div class="title">Show less like this</div><div class="sub">Intha maari venda - Safe</div></div></div>
-<div class="safeItem" onclick="hideReelSafe()"><div class="icon">🙈</div><div class="txt"><div class="title">Hide this reel</div><div class="sub">Ippo paaka venda</div></div></div>
-<div class="safeItem" onclick="reportSafe()"><div class="icon">🛡️</div><div class="txt"><div class="title">Report - Keep safe</div><div class="sub">No alert - Safe</div></div></div>
-</div>
-</div></div>
-<div class="sheet" id="commentSheet" onclick="if(event.target==this)closeSheet('commentSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Comments</b></div><div id="commentList" style="overflow-y:auto;flex:1;max-height:45vh;padding:0 20px"></div><div style="display:flex;gap:10px;align-items:center;padding:10px 20px;border-top:1px solid #eee;margin-top:10px"><input id="commentInput" style="flex:1;background:#F1F1F5;border:0;border-radius:20px;padding:12px 14px;color:#111;outline:none" placeholder="Add kind comment..."><button onclick="postComment()" style="background:#FF4D8D;color:#fff;border:0;border-radius:20px;padding:10px 18px;font-weight:800">Post</button></div></div></div>
-<div class="sheet" id="shareSheet" onclick="if(event.target==this)closeSheet('shareSheet')"><div class="sheetBox"><div class="sheetHandle"></div><div class="pixHead"><b>Share</b></div><div class="safeCard"><div class="safeItem" onclick="copyLinkSafe()"><div class="txt"><div class="title">📋 Copy Link</div></div></div><div class="safeItem" onclick="shareWA()"><div class="txt"><div class="title">💚 WhatsApp</div></div></div></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js?v=1003"></script>
 <script>
@@ -125,26 +6,39 @@ function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.s
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 function fmtViews(n){if(n>=1000000)return (n/1000000).toFixed(1).replace('.0','')+'M';if(n>=1000)return (n/1000).toFixed(1).replace('.0','')+'K';return String(n)}
 function pixoroIsUuidLocal(s){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(s||'')); }
-let ME_RAW='',ME_ID='',profileMap={},profileByIdMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=[],mutedUsers=[],blockedUsers=[],hiddenMeta={},lastAction=null,savingIds=new Set(),_INIT_DONE=false
+let ME_RAW='',ME_ID='',ME_PFP='',profileMap={},profileByIdMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=[],mutedUsers=[],blockedUsers=[],hiddenMeta={},lastAction=null,savingIds=new Set(),_INIT_DONE=false
 async function waitSupa(){for(let i=0;i<30;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
 window.toggleFollow = window.pixoroToggleFollow;
 window.toggleF = window.pixoroToggleFollow;
 async function pixoroSendNotification(toUserId, type, postId, msg){ return; }
 window.pixoroSendNotification = pixoroSendNotification;
-async function init(){
-  if(_INIT_DONE) return; _INIT_DONE=true;
-  supa=await waitSupa();if(!supa){_INIT_DONE=false;return;}
-  let {data:{session}}=await supa.auth.getSession();
-  if(!session){ await new Promise(r=>setTimeout(r,800)); let s2=await supa.auth.getSession(); session=s2.data.session; }
-  if(!session){location.href='login.html';return}
-  ME_ID=session.user.id;window.ME_ID=ME_ID;
-  let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
-  ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;
-  let {data:profs}=await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').limit(200);(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileByIdMap[String(p.id)]=p});
-  let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);
-  if(window.pixoroRefreshPhotos) await window.pixoroRefreshPhotos();
-  load()
+
+// ===== CORRECTED: SINGLE SOURCE OF TRUTH =====
+function getCleanAvatar(url){
+  if(!url || !String(url).includes('http')) return '';
+  if(String(url).includes('ui-avatars.com')) return '';
+  return String(url).trim();
 }
+function withCacheBust(url){
+  if(!url) return url;
+  return url + (url.includes('?') ? '&' : '?') + 't=' + Date.now();
+}
+function getPfp(u){
+  if(!u) return 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true';
+  // 1. En photo - ME_PFP thaan
+  if(String(u)===String(ME_ID) && ME_PFP) return withCacheBust(getCleanAvatar(ME_PFP));
+  // 2. Vera user - ID la irunthu mattum edu
+  let p = profileByIdMap[String(u)] || profileMap[cleanUser(u)];
+  let url = p ? getCleanAvatar(p.avatar_url||p.profile_pic||p.photo_url||'') : '';
+  if(url) return withCacheBust(url);
+  // 3. G kaata koodathu - grey P mattum
+  return 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true';
+}
+function pfpErr(el,uname){
+  el.onerror=null;
+  el.src='https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true';
+}
+window.pfpErr=pfpErr;
 function displayNameFor(u){
   if(!u) return ME_RAW||'user';
   let p=profileByIdMap[String(u)]||profileMap[cleanUser(u)];
@@ -156,31 +50,50 @@ function displayNameFor(u){
   if(cu.length>20) return ME_RAW||'user';
   return cu||ME_RAW||'user';
 }
-function getPfp(u){
-  if(!u) return 'https://ui-avatars.com/api/?name=P&background=FF4D8D&color=fff&size=200&bold=true';
-  let p=profileByIdMap[String(u)]||profileMap[cleanUser(u)];
-  if(p&&(p.avatar_url||p.profile_pic||p.photo_url)) return p.avatar_url||p.profile_pic||p.photo_url;
-  if(window._PIXORO_PFP_CACHE){
-    let cached = window._PIXORO_PFP_CACHE[cleanUser(displayNameFor(u))] || window._PIXORO_PFP_CACHE[String(u)];
-    if(cached) return cached;
-  }
-  let uname = p ? cleanUser(p.username) : '';
-  if(!uname){ let pp=allPosts.find(x=>String(x.user_id)===String(u)); if(pp) uname=cleanUser(pp.username); }
-  if(!uname && String(u)===String(ME_ID)) uname=ME_RAW;
-  if(!uname) uname=displayNameFor(u);
-  let letter=(uname||'P').charAt(0).toUpperCase();
-  if(!/[A-Z]/.test(letter)) letter='P';
-  return 'https://ui-avatars.com/api/?name='+letter+'&background=FF4D8D&color=fff&size=200&bold=true';
-}
-function pfpErr(el,uname){
-  if(el.dataset.errDone) return; el.dataset.errDone='1';
-  let letter=(cleanUser(uname||'P').charAt(0).toUpperCase()||'P');
-  if(!/[A-Z]/.test(letter)) letter='P';
-  el.onerror=null;
-  el.src='https://ui-avatars.com/api/?name='+letter+'&background=FF4D8D&color=fff&size=200&bold=true';
-}
-window.pfpErr=pfpErr;
 function isMyPostObj(p){if(!p)return false;if(p.user_id&&String(p.user_id)===String(ME_ID))return true;return cleanUser(p.username)===cleanUser(ME_RAW)}
+
+async function init(){
+  if(_INIT_DONE) return; _INIT_DONE=true;
+  supa=await waitSupa();if(!supa){_INIT_DONE=false;return;}
+  let {data:{session}}=await supa.auth.getSession();
+  if(!session){ await new Promise(r=>setTimeout(r,800)); let s2=await supa.auth.getSession(); session=s2.data.session; }
+  if(!session){location.href='login.html';return}
+  ME_ID=session.user.id;window.ME_ID=ME_ID;
+  let {data:myProf}=await supa.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
+  ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;
+  ME_PFP=getCleanAvatar(myProf?.avatar_url||myProf?.profile_pic||myProf?.photo_url||'');
+  window.ME_PFP=ME_PFP;
+  let {data:profs}=await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').limit(200);(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileByIdMap[String(p.id)]=p});
+  if(ME_ID && ME_PFP){
+    profileByIdMap[String(ME_ID)]={...(profileByIdMap[String(ME_ID)]||{}),id:ME_ID,username:ME_RAW,avatar_url:ME_PFP};
+    profileMap[cleanUser(ME_RAW)]=profileByIdMap[String(ME_ID)];
+  }
+  let el=document.getElementById('navPfp');if(el && ME_PFP) el.src=withCacheBust(ME_PFP);
+  if(window.pixoroRefreshPhotos) await window.pixoroRefreshPhotos();
+  load()
+}
+// CORRECTED: Profile la maathina Reels kum auto maarum
+window.addEventListener('storage',(e)=>{
+  if(e.key==='pixoro_pfp_updated' && e.newValue){
+    ME_PFP=e.newValue; window.ME_PFP=e.newValue;
+    if(profileByIdMap[String(ME_ID)]) profileByIdMap[String(ME_ID)].avatar_url=e.newValue;
+    let el=document.getElementById('navPfp'); if(el) el.src=withCacheBust(e.newValue);
+    if(typeof render==='function') render();
+  }
+});
+window.addEventListener('focus', async ()=>{
+  if(!supa || !ME_ID) return;
+  try{
+    let {data}=await supa.from('profiles').select('avatar_url').eq('id',ME_ID).maybeSingle();
+    if(data && data.avatar_url && data.avatar_url!==ME_PFP){
+      ME_PFP=data.avatar_url; window.ME_PFP=data.avatar_url;
+      if(profileByIdMap[String(ME_ID)]) profileByIdMap[String(ME_ID)].avatar_url=data.avatar_url;
+      let el=document.getElementById('navPfp'); if(el) el.src=withCacheBust(data.avatar_url);
+      if(typeof render==='function') render();
+    }
+  }catch(e){}
+});
+
 async function load(){try{
 let [r1,r2] = await Promise.all([
   supa.from('posts').select('*').order('created_at',{ascending:false}).limit(20).then(r=>r).catch(()=>({data:[]})),
@@ -287,7 +200,7 @@ return `<div class="reel" data-id="${p.id}" onclick="handleReelTap(this)"><div c
 <div class="vBtn tildeBtn" onclick="event.stopPropagation();openPixoroSheet('${p.id}','${p.user_id}','${followName}')"><span>~</span></div>
 <div class="audioWrap" onclick="event.stopPropagation();toggleMuteAll()"><div class="audioDiscInBar">🎵</div></div>
 </div>
-<div class="btm"><div style="display:flex;align-items:center;gap:10px"><div class="reel-pfp-wrap" onclick="event.stopPropagation();location.href='profile.html?u=${p.user_id}'"><img src="${getPfp(p.user_id||p.username)}" onerror="pfpErr(this,'${followName}')" loading="lazy"></div><b class="reel-username" onclick="event.stopPropagation();location.href='profile.html?u=${p.user_id}'">${followName}${tick}</b>${followBtn}</div>${captionHtml}<div style="font-size:12px;color:#ddd;margin-top:6px;font-weight:700">▶ <span data-viewcount="${p.id}">${fmtViews(vCount)}</span> views</div></div>
+<div class="btm"><div style="display:flex;align-items:center;gap:10px"><div class="reel-pfp-wrap" onclick="event.stopPropagation();location.href='profile.html?u=${p.user_id}'"><img src="${getPfp(p.user_id)}" onerror="pfpErr(this,'${followName}')" loading="lazy"></div><b class="reel-username" onclick="event.stopPropagation();location.href='profile.html?u=${p.user_id}'">${followName}${tick}</b>${followBtn}</div>${captionHtml}<div style="font-size:12px;color:#ddd;margin-top:6px;font-weight:700">▶ <span data-viewcount="${p.id}">${fmtViews(vCount)}</span> views</div></div>
 </div>`
 }).join('');observe(); if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();}
 let _reelIO=null;
@@ -353,7 +266,7 @@ async function hideReelSafe(){
   setTimeout(()=>render(),200); closeSheet('viewerSheet'); showToast('Hidden for you da');
 }
 function reportSafe(){ closeSheet('viewerSheet'); showToast('Reported da - Safe da'); }
-function openCommentSheet(pid){curCommentPost=pid;let list=allComments.filter(c=>String(c.post_id)==String(pid));document.getElementById('commentList').innerHTML=list.length?list.map(c=>{let isMyC=String(c.user_id)==String(ME_ID)||cleanUser(c.username)==cleanUser(ME_RAW);let nm=displayNameFor(c.user_id||c.username);return `<div class="cRow"><div style="display:flex;gap:8px;align-items:center"><img src="${getPfp(c.user_id||c.username)}" onerror="pfpErr(this,'${nm}')" style="width:28px;height:28px;border-radius:50%"><div><b>${nm}</b> <span style="font-size:13px;color:#555"> ${c.text||''}</span></div></div>${isMyC?`<span class="del" onclick="deleteComment('${c.id}','${pid}')">Delete</span>`:''}</div>`}).join(''):'<div style="text-align:center;color:#999;padding:20px">No comments yet - Be kind 💜</div>';document.getElementById('commentSheet').classList.add('show');}
+function openCommentSheet(pid){curCommentPost=pid;let list=allComments.filter(c=>String(c.post_id)==String(pid));document.getElementById('commentList').innerHTML=list.length?list.map(c=>{let isMyC=String(c.user_id)==String(ME_ID)||cleanUser(c.username)==cleanUser(ME_RAW);let nm=displayNameFor(c.user_id||c.username);return `<div class="cRow"><div style="display:flex;gap:8px;align-items:center"><img src="${getPfp(c.user_id)}" onerror="pfpErr(this,'${nm}')" style="width:28px;height:28px;border-radius:50%"><div><b>${nm}</b> <span style="font-size:13px;color:#555"> ${c.text||''}</span></div></div>${isMyC?`<span class="del" onclick="deleteComment('${c.id}','${pid}')">Delete</span>`:''}</div>`}).join(''):'<div style="text-align:center;color:#999;padding:20px">No comments yet - Be kind 💜</div>';document.getElementById('commentSheet').classList.add('show');}
 function closeSheet(id){document.getElementById(id).classList.remove('show')}
 async function postComment(){
   let inp=document.getElementById('commentInput');let t=inp.value.trim();if(!t||!curCommentPost)return;
@@ -434,4 +347,4 @@ function checkMiniUpload(){
 }
 checkMiniUpload();
 init()
-</script></body></html>
+</script>
