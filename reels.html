@@ -1,5 +1,72 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Pixoro - Reels</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js?v=1004"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+body{background:#000;color:#fff;max-width:450px;margin:0 auto;padding-bottom:60px}
+.top{position:sticky;top:0;background:#000;z-index:10;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.top b{font-size:22px}
+#reelWrap{scroll-snap-type:y mandatory;overflow-y:auto;height:calc(100vh - 120px)}
+.reel{position:relative;height:calc(100vh - 120px);scroll-snap-align:start;background:#000;overflow:hidden}
+.reel-main{width:100%;height:100%;object-fit:cover;background:#000}
+.progress{position:absolute;top:0;left:0;height:3px;background:#FF4D8D;width:0;z-index:5}
+.heartBurst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:90px;opacity:0;pointer-events:none;transition:.3s;z-index:10}
+.heartBurst.show{transform:translate(-50%,-50%) scale(1);opacity:1}
+.centerCtrl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0;pointer-events:none;transition:.3s;z-index:10}
+.centerCtrl.show{opacity:1}
+.centerIcon{width:70px;height:70px;background:rgba(0,0,0,.6);border-radius:50%;display:grid;place-items:center}
+.centerIcon svg{width:32px;height:32px}
+.vBar{position:absolute;right:10px;bottom:110px;display:flex;flex-direction:column;gap:16px;z-index:5;align-items:center}
+.vBtn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:700;background:none;border:0;color:#fff}
+.vBtn.liked{color:#ff3040}
+.vBtn.saved{color:#fff}
+.tildeBtn span{font-size:28px;line-height:1}
+.audioWrap{width:36px;height:36px;border-radius:50%;background:#222;display:grid;place-items:center;cursor:pointer}
+.btm{position:absolute;left:12px;right:60px;bottom:16px;z-index:5}
+.reel-pfp-wrap{width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid #fff;flex-shrink:0}
+.reel-pfp-wrap img{width:100%;height:100%;object-fit:cover}
+.reel-username{font-size:15px;font-weight:700}
+.followBtnPerusa{background:transparent;color:#fff;border:1.5px solid #fff;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
+.followBtnPerusa.following{border-color:#666;color:#aaa}
+.reel-caption{font-size:14px;margin-top:8px}
+.hashtag{color:#00d4ff;cursor:pointer}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;height:60px;background:#000;border-top:1px solid #262626;display:flex;justify-content:space-around;align-items:center;z-index:100}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e;font-size:11px}
+.bottom-nav a.active{color:#fff}
+.bottom-nav a img{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid #fff}
+.sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:450px;background:#1a1a1a;border-radius:20px 20px 0 0;padding:16px;z-index:999;display:none}
+.sheet.show{display:block}
+.sheet button{width:100%;padding:13px;border:0;background:#222;color:#fff;border-radius:12px;margin:5px 0;text-align:left;font-weight:600}
+.cRow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #222}
+.del{color:#ff3040;font-size:12px;cursor:pointer}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#FF4D8D;color:#fff;padding:10px 18px;border-radius:20px;font-weight:800;display:none;z-index:9999}
+#miniBox{position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#111;border:1px solid #333;border-radius:14px;padding:10px 14px;display:none;gap:10px;align-items:center;z-index:9999;width:92%;max-width:420px}
+#miniImg{width:40px;height:40px;border-radius:8px;object-fit:cover}
+#miniFill{height:6px;background:#FF4D8D;border-radius:6px;width:10%}
+</style>
+</head>
+<body>
+<!-- ✅ BODY IRUKKU DA - ITHU ILLANA WHITE THAAN -->
+<div class="top"><b>Pixoro Reels</b><div><span id="volIcon" onclick="toggleMuteAll()" style="cursor:pointer;font-size:22px">🔊</span></div></div>
+<div id="reelWrap"><p style="text-align:center;padding:100px;color:#888">Loading Reels da... 🔥</p></div>
+<div id="miniBox"><img id="miniImg"><div style="flex:1"><div id="miniTxt" style="font-size:13px">Uploading...</div><div style="background:#333;height:6px;border-radius:6px;margin-top:6px"><div id="miniFill"></div></div></div><b id="miniPct">10%</b></div>
+<div id="toast"></div>
+<div id="commentSheet" class="sheet"><div style="display:flex;justify-content:space-between"><b>Comments</b><span onclick="closeSheet('commentSheet')" style="cursor:pointer">✕</span></div><div id="commentList" style="margin:12px 0;max-height:300px;overflow:auto"></div><div style="display:flex;gap:8px"><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#222;border:0;padding:10px;border-radius:20px;color:#fff;outline:none"><button onclick="postComment()" style="background:#FF4D8D;border:0;padding:10px 16px;border-radius:20px;color:#fff;font-weight:800">Post</button></div></div>
+<div id="shareSheet" class="sheet"><b>Share</b><button onclick="copyLinkSafe()">🔗 Copy Link</button><button onclick="shareWA()">💬 Share on WhatsApp</button><button onclick="closeSheet('shareSheet')">Cancel</button></div>
+<div id="ownerSheet" class="sheet"><b>Your Reel</b><button onclick="editReel()">✏️ Edit</button><button onclick="shareQR()">🔗 Copy Link</button><button onclick="deleteSafe()" style="color:#ff3040">🗑️ Delete</button><button onclick="closeSheet('ownerSheet')">Cancel</button></div>
+<div id="viewerSheet" class="sheet"><b>Options</b><button onclick="openFriendProfile()">👤 View Profile</button><button onclick="saveReel()">🔖 Save</button><button onclick="copyLinkSafe()">🔗 Copy Link</button><button onclick="notInterestedSafe()">🙈 Not Interested</button><button onclick="hideReelSafe()">🙈 Hide</button><button onclick="reportSafe()">🚩 Report</button><button onclick="closeSheet('viewerSheet')">Cancel</button></div>
+<div class="bottom-nav">
+<a href="index.html">🏠<span>Home</span></a>
+<a href="search.html">🔍<span>Search</span></a>
+<a href="reels.html" class="active">▶️<span>Reels</span></a>
+<a href="dm.html">💬<span>DM</span></a>
+<a href="profile.html"><img id="navPfp" src="https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true"><span>Profile</span></a>
+</div>
+
 <script>
 // ✅ CORRECTED - Reels Full
 let supa=null;
@@ -55,7 +122,6 @@ function displayNameFor(u){
   return cu||ME_RAW||'user';
 }
 function isMyPostObj(p){if(!p)return false;if(p.user_id&&String(p.user_id)===String(ME_ID))return true;return cleanUser(p.username)===cleanUser(ME_RAW)}
-
 async function init(){
   if(_INIT_DONE) return; _INIT_DONE=true;
   supa=await waitSupa();
@@ -103,7 +169,6 @@ window.addEventListener('focus', async ()=>{
     }
   }catch(e){}
 });
-
 async function load(){try{
 supa=getSupa(); if(!supa) return;
 let [r1,r2] = await Promise.all([
@@ -368,3 +433,4 @@ function checkMiniUpload(){
 checkMiniUpload();
 init()
 </script>
+</body></html>
