@@ -1,4 +1,4 @@
-// ===== PIXORO CORE - CORRECTED v1005 - OLD STYLE + NOTIFICATION FIX - FULL =====
+// ===== PIXORO CORE - CORRECTED v1007 - NO IMAGE + NO BACKGROUND - FULL =====
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 window.PIXORO_URL = SUPA_URL;
@@ -35,34 +35,32 @@ window.isGoldUser = isGoldUser;
 window.goldTickHTML = goldTickHTML;
 window.getTick = goldTickHTML;
 
-// ✅ CORRECTED v1005: PAZHAYA STYLE AH THODATHA CSS DA - VILLAIN BLOCK AH THOOKITEN DA
+// ✅ v1007: NO IMAGE + NO BACKGROUND - PAZHAYA MARI WHITE BLOCK MATTUM DA
 (function(){
   if(document.getElementById('pixoro-speed-css')) return;
   let css = `
-  *{ -webkit-tap-highlight-color:transparent!important; tap-highlight-color:transparent!important; }
+  *{ -webkit-tap-highlight-color:transparent!important; tap-highlight-color:transparent!important; background-image:none!important; }
   button{ touch-action:manipulation!important; }
-  /* ✅ PAZHAYA PIXORO STYLE - ITHA THAAN DA THIRUMBA KONDU VANTHEN DA */
-  .pixoro-logo, .top b, .reelsTop b, .topTitle{ font-family:'Segoe UI',system-ui,sans-serif!important; font-size:26px!important; font-weight:900!important; background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff)!important; -webkit-background-clip:text!important; -webkit-text-fill-color:transparent!important; background-clip:text!important; }
-  .reel-pfp-wrap{width:40px!important;height:40px!important;min-width:40px!important;border:2px solid #ff5ea8!important}
-  .sRing{border:2px solid #ff5ea8!important}
-  .audioDisc{width:28px!important;height:28px!important;border:2px solid #fff!important}
+  body{ background:#000!important; }
+  /* ✅ LOGO - GRADIENT BACKGROUND KODA ILLA DA, WHITE MATTUM DA */
+  .pixoro-logo, .top b, .reelsTop b, .topTitle{ font-family:'Segoe UI',system-ui,sans-serif!important; font-size:26px!important; font-weight:900!important; color:#fff!important; background:none!important; -webkit-text-fill-color:#fff!important; }
+  /* ✅ ELLA IMAGE AH REMOVE DA - ORU FILE LAYUM IMAGE ILLA DA */
+  img{ display:none!important; width:0!important; height:0!important; }
+  .reel-pfp-wrap, .audioDisc, .sRing, .post-pfp, .navPfp, #navPfp, #pfpImg, #editPfpPreview{ display:none!important; }
   .reel-username{font-size:15px!important;font-weight:700!important;cursor:pointer!important}
   .msgBtn, .messageBtn{ background:transparent!important;color:#fff!important;border:1.2px solid #fff!important; }
   .reel-main{ background:#000!important; }
   .reel-main.bgRemove{ object-fit:contain!important;background:#000!important; }
-  /* ✅ BELL DOT - NOTIFICATION DA */
   .bellWrap{position:relative!important;cursor:pointer!important}
   #pixoroBellDot{position:absolute!important;top:-2px!important;right:-2px!important;width:9px!important;height:9px!important;background:#ff3040!important;border-radius:50%!important;display:none;z-index:5}
-  /* ✅ ELLA PAGE LUM SAME BOTTOM NAV DA */
-  .bottom-nav{position:fixed!important;bottom:0!important;left:0!important;right:0!important;max-width:450px!important;margin:0 auto!important;width:100%!important;height:60px!important;background:#000!important;border-top:1px solid #262626!important;display:flex!important;justify-content:space-around!important;align-items:center!important;z-index:100!important}
-  .bottom-nav a{display:flex!important;flex-direction:column!important;align-items:center!important;gap:3px!important;text-decoration:none!important;color:#8e8e8e!important;font-size:10px!important}
-  .bottom-nav a svg{width:22px!important;height:22px!important;fill:none!important;stroke:#8e8e8e!important;stroke-width:1.8!important}
-  .bottom-nav a.active{color:#fff!important}
-  .bottom-nav a.active svg{stroke:#fff!important}
-  .bottom-nav a.active span{color:#fff!important;font-weight:700!important}
-  .bottom-nav span{font-size:10px!important;color:#8e8e8e!important}
-  .bottom-nav a img.navPfp, .bottom-nav a img#navPfp{width:26px!important;height:26px!important;border-radius:50%!important;object-fit:cover!important;border:1.5px solid #fff!important}
-  /* ✅ FOLLOW BUTTON - PAZHAYA STYLE DA */
+  /* ✅ ELLA PAGE LUM SAME BOTTOM NAV - WHITE BLOCK DA */
+  .bottom-nav{position:fixed!important;bottom:0!important;left:0!important;right:0!important;max-width:450px!important;margin:0 auto!important;width:100%!important;height:60px!important;background:#000!important;border-top:1.5px solid #fff!important;display:flex!important;justify-content:space-around!important;align-items:center!important;z-index:100!important}
+  .bottom-nav a{display:flex!important;flex-direction:column!important;align-items:center!important;gap:3px!important;text-decoration:none!important;color:#8e8e8e!important;font-size:10px!important;background:transparent!important}
+  .bottom-nav a svg{width:22px!important;height:22px!important;fill:none!important;stroke:#8e8e8e!important;stroke-width:1.8!important;display:block!important}
+  .bottom-nav a.active{color:#000!important;background:#fff!important;border-radius:12px!important;padding:4px 10px!important}
+  .bottom-nav a.active svg{stroke:#000!important}
+  .bottom-nav a.active span{color:#000!important;font-weight:900!important}
+  .bottom-nav span{font-size:10px!important}
   .followBtnPost,.followBtnSearch,.followBtnPerusa{ background:transparent!important;color:#fff!important;border:1.5px solid #fff!important;padding:4px 12px!important;border-radius:8px!important;font-size:12px!important;font-weight:700!important;cursor:pointer!important }
   .followBtnPost.following,.followBtnSearch.following,.followBtnPerusa.following{ border-color:#666!important;color:#aaa!important }
   `;
@@ -72,51 +70,11 @@ window.getTick = goldTickHTML;
     else document.addEventListener('DOMContentLoaded', ()=>{ if(document.body) document.body.classList.add('isHome'); });
   }
 })();
-window._PIXORO_PFP_CACHE = window._PIXORO_PFP_CACHE || {};
-window.getPfp = function(p){
-  if(p && typeof p === 'object'){
-    let url = p?.avatar_url || p?.avatar || p?.profile_pic || p?.pfp || p?.photo_url;
-    if(url && String(url).startsWith('http') && !String(url).includes('undefined') && !String(url).includes('ui-avatars')) return url;
-    let name = (p?.username || p?.name || '').toString().replace('@','').trim().toLowerCase() || '';
-    let cached = name ? window._PIXORO_PFP_CACHE[name] : '';
-    if(cached && !String(cached).includes('ui-avatars')) return cached;
-    return 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=300&bold=true';
-  }
-  if(typeof p === 'string'){
-    let name = p.replace('@','').trim().toLowerCase() || '';
-    let cached = window._PIXORO_PFP_CACHE[name] || window._PIXORO_PFP_CACHE[String(p)];
-    if(cached && !String(cached).includes('ui-avatars')) return cached;
-    return 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=300&bold=true';
-  }
-  return 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=300&bold=true';
-};
-window.pixoroRefreshPhotos = async function(){
-  try{
-    let s = pixoroGetSupa(); if(!s) return;
-    let {data:profs} = await s.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').limit(200);
-    (profs||[]).forEach(pr=>{
-      let url = pr.avatar_url || pr.profile_pic || pr.photo_url;
-      if(!url || String(url).includes('ui-avatars')) return;
-      let uname = String(pr.username||'').toLowerCase().replace('@','');
-      window._PIXORO_PFP_CACHE[uname] = url;
-      window._PIXORO_PFP_CACHE[String(pr.id)] = url;
-    });
-    let nav = document.getElementById('navPfp');
-    if(nav && window.ME_ID && window._PIXORO_PFP_CACHE[String(window.ME_ID)]){ nav.src = window._PIXORO_PFP_CACHE[String(window.ME_ID)] + '?t=' + Date.now(); }
-    document.querySelectorAll('img[data-pfp-for], img[data-user-id], .reel-pfp-wrap img, .post-pfp img').forEach(img=>{
-      let key = String(img.dataset.pfpFor || img.dataset.userId || img.alt || '').toLowerCase().replace('@','');
-      let cached = window._PIXORO_PFP_CACHE[key];
-      if(cached && !img.src.includes(cached.split('?')[0])) img.src = cached + '?t=' + Date.now();
-    });
-  }catch(e){}
-};
-window.addEventListener('storage', (e)=>{
-  if(e.key==='pixoro_pfp_updated' && e.newValue && !String(e.newValue).includes('ui-avatars')){
-    if(window.ME_ID) window._PIXORO_PFP_CACHE[String(window.ME_ID)] = e.newValue;
-    let nav = document.getElementById('navPfp'); if(nav) nav.src = e.newValue + '?t=' + Date.now();
-    if(window.pixoroRefreshPhotos) window.pixoroRefreshPhotos();
-  }
-});
+window._PIXORO_PFP_CACHE = {};
+// ✅ v1007: IMAGE YE ILLA DA - getPfp EMPTY THAAN DA
+window.getPfp = function(p){ return ''; };
+window.pixoroRefreshPhotos = async function(){ return; };
+window.addEventListener('storage', (e)=>{});
 window.ME_ID = window.ME_ID || null;
 window.ME_RAW = window.ME_RAW || '';
 function pixoroIsUuid(s){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(s||'')); }
@@ -301,6 +259,7 @@ async function loadProfileRealCount(){
   document.querySelectorAll('#reelCount, .reelCount').forEach(e=> e.innerText = reels.length);
   return {mine, reels};
 }
+// ✅ v1007: FOLLOW LIST LA IMAGE ILLA DA - PERU MATTUM DA
 async function pixoroOpenFollowList(type){
   if(!window.ME_ID) await pixoroFixMe();
   let s = pixoroGetSupa(); if(!s) return;
@@ -309,13 +268,12 @@ async function pixoroOpenFollowList(type){
   else { let {data} = await s.from('follows').select('*').eq('following_id', window.ME_ID).eq('status','accepted'); list = data||[]; }
   let ids = list.map(f=> type==='following' ? f.following_id : f.follower_id).filter(Boolean);
   let profs = [];
-  if(ids.length){ let {data} = await s.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').in('id', ids); profs = data||[]; }
+  if(ids.length){ let {data} = await s.from('profiles').select('id,username').in('id', ids); profs = data||[]; }
   let html = list.map(f=>{
     let pid = type==='following' ? f.following_id : f.follower_id;
     let pr = (profs||[]).find(p=> String(p.id)===String(pid));
     let uname = pr?.username || f.following_name || f.follower_name || 'user';
-    let pfp = pr?.avatar_url || pr?.profile_pic || pr?.photo_url || 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><img src="${pfp}" onclick="location.href='./profile.html?u=${pid}'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer"><b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='./profile.html?u=${pid}'">${uname}</b><button onclick="location.href='./profile.html?u=${pid}'" style="background:#fff;color:#000;border:0;padding:6px 14px;border-radius:20px;font-weight:700">View</button></div>`;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='./profile.html?u=${pid}'">${uname}</b><button onclick="location.href='./profile.html?u=${pid}'" style="background:#fff;color:#000;border:0;padding:6px 14px;border-radius:20px;font-weight:700">View</button></div>`;
   }).join('') || `<div style="color:#888;text-align:center;padding:20px">No ${type} yet</div>`;
   let old = document.getElementById('followModal'); if(old) old.remove();
   let m = document.createElement('div'); m.id = 'followModal';
@@ -391,12 +349,10 @@ function pixoroLoadFollowing(){
     window.PIXORO_FOLLOWING = new Set((data||[]).map(x=>String(x.following_id)));
     pixoroPaintAllFollowBtns();
   }).catch(()=>{});
-  s.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').limit(200).then(({data})=>{
+  s.from('profiles').select('id,username').limit(200).then(({data})=>{
     (data||[]).forEach(p=>{
       window.PIXORO_ID_TO_NAME[String(p.id)] = pixoroCleanName(p.username);
       window.PIXORO_NAME_TO_ID[pixoroCleanName(p.username)] = String(p.id);
-      let url = p.avatar_url || p.profile_pic || p.photo_url;
-      if(url && String(url).includes('http') && !String(url).includes('ui-avatars')){ window._PIXORO_PFP_CACHE[pixoroCleanName(p.username)] = url; window._PIXORO_PFP_CACHE[String(p.id)] = url; }
     });
     window.PIXORO_FOLLOWING_NAMES = new Set([...window.PIXORO_FOLLOWING].map(id=>pixoroCleanName(window.PIXORO_ID_TO_NAME[id]||'')).filter(Boolean));
     pixoroPaintAllFollowBtns();
@@ -479,8 +435,9 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
-console.log('PIXORO CORE v1005 SERVER ONLY LOADED - OLD STYLE + G FIX DA');
+console.log('PIXORO CORE v1007 - NO IMAGE + NO BACKGROUND LOADED DA');
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
+// ✅ v1007: PHOTO UPLOAD KODA IMAGE AH KATTATHU DA - TEXT MATTUM DA
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
   if(file.size > PHOTO_CONFIG.maxSize) throw new Error('Photo 5MB ku mela irukka koodathu da');
@@ -501,14 +458,7 @@ async function pixoroUploadPhoto(file, chatId){
   if(error) throw error;
   return path;
 }
-async function pixoroGetPhotoUrl(path){
-  if(!path) return '';
-  if(path.startsWith('http')) return path;
-  let s = pixoroGetSupa(); if(!s) return '';
-  const {data,error} = await s.storage.from('dms').createSignedUrl(path, 3600);
-  if(error) return '';
-  return data.signedUrl;
-}
+async function pixoroGetPhotoUrl(path){ return ''; }
 async function pixoroCanSendPhotoTo(otherId){
   if(!pixoroIsUuid(window.ME_ID) || !pixoroIsUuid(otherId)) return {ok:false, msg:'Invalid user da'};
   let s = pixoroGetSupa(); if(!s) return {ok:false, msg:'Supabase illa da'};
@@ -534,17 +484,13 @@ async function pixoroReportPhoto(otherId, msgId, reason){
   let s = pixoroGetSupa(); if(!s) return;
   await s.from('reports').insert({reported_by: window.ME_ID, reported_id: otherId, message_id: msgId, reason: reason||'Unsafe photo'});
 }
-async function pixoroSavePhoto(mediaPath){
-  const url = await pixoroGetPhotoUrl(mediaPath);
-  if(!url) return;
-  const a=document.createElement('a'); a.href=url; a.download='pixoro_photo.jpg'; a.click();
-}
+async function pixoroSavePhoto(mediaPath){ return; }
 function pixoroPreviewText(m){
   if(!m) return '';
-  if(m.type==='image' || m.media_type==='image' || m.media_path) return '📷 Photo';
-  if(m.type==='video' || m.media_type==='video') return '🎬 Video';
-  if(m.type==='voice') return '🎙️ Voice';
-  return '💬 Message';
+  if(m.type==='image' || m.media_type==='image' || m.media_path) return 'Photo';
+  if(m.type==='video' || m.media_type==='video') return 'Video';
+  if(m.type==='voice') return 'Voice';
+  return 'Message';
 }
 window.pixoroCleanPhoto = pixoroCleanPhoto;
 window.pixoroUploadPhoto = pixoroUploadPhoto;
@@ -554,8 +500,6 @@ window.pixoroUnsendPhoto = pixoroUnsendPhoto;
 window.pixoroReportPhoto = pixoroReportPhoto;
 window.pixoroSavePhoto = pixoroSavePhoto;
 window.pixoroPreviewText = pixoroPreviewText;
-
-// ✅ CORRECTED v1005: NOTIFICATION BELL - CORE LAYE IRUKKU DA, INIME POOGATHU DA
 async function pixoroCheckBell(){
   try{
     let s = pixoroGetSupa(); if(!s) return;
@@ -568,3 +512,8 @@ async function pixoroCheckBell(){
 window.pixoroCheckBell = pixoroCheckBell;
 setInterval(pixoroCheckBell, 15000);
 setTimeout(pixoroCheckBell, 3000);
+// ✅ v1007: HTML LA IRUKKURA ELLA IMG AH YUM THOOKIDU DA
+function pixoroRemoveAllImages(){ document.querySelectorAll('img').forEach(im=> im.remove()); }
+window.pixoroRemoveAllImages = pixoroRemoveAllImages;
+setTimeout(pixoroRemoveAllImages, 500);
+document.addEventListener('DOMContentLoaded', pixoroRemoveAllImages);
