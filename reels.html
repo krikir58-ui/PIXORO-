@@ -1,19 +1,26 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=1003"></script>
+<script src="js/pixoro-core.js?v=1004"></script>
 <script>
-let supa=window.supa;
+// ✅ CORRECTED - Reels Full
+let supa=null;
+function getSupa(){
+  if(window.supa) supa=window.supa;
+  if(!supa && window.supabase && window.PIXORO_URL && window.PIXORO_KEY){
+    try{ window.supa=window.supabase.createClient(window.PIXORO_URL, window.PIXORO_KEY); supa=window.supa; }catch(e){}
+  }
+  return window.supa||supa;
+}
+window.getSupa=getSupa;
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||''}
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 function fmtViews(n){if(n>=1000000)return (n/1000000).toFixed(1).replace('.0','')+'M';if(n>=1000)return (n/1000).toFixed(1).replace('.0','')+'K';return String(n)}
 function pixoroIsUuidLocal(s){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(s||'')); }
 let ME_RAW='',ME_ID='',ME_PFP='',profileMap={},profileByIdMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=[],mutedUsers=[],blockedUsers=[],hiddenMeta={},lastAction=null,savingIds=new Set(),_INIT_DONE=false
-async function waitSupa(){for(let i=0;i<30;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
+async function waitSupa(){for(let i=0;i<30;i++){let s=getSupa();if(s)return s;await new Promise(r=>setTimeout(r,100))}return getSupa()}
 window.toggleFollow = window.pixoroToggleFollow;
 window.toggleF = window.pixoroToggleFollow;
 async function pixoroSendNotification(toUserId, type, postId, msg){ return; }
 window.pixoroSendNotification = pixoroSendNotification;
-
-// ===== CORRECTED: SINGLE SOURCE OF TRUTH =====
 function getCleanAvatar(url){
   if(!url || !String(url).includes('http')) return '';
   if(String(url).includes('ui-avatars.com')) return '';
@@ -25,13 +32,10 @@ function withCacheBust(url){
 }
 function getPfp(u){
   if(!u) return 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true';
-  // 1. En photo - ME_PFP thaan
   if(String(u)===String(ME_ID) && ME_PFP) return withCacheBust(getCleanAvatar(ME_PFP));
-  // 2. Vera user - ID la irunthu mattum edu
   let p = profileByIdMap[String(u)] || profileMap[cleanUser(u)];
   let url = p ? getCleanAvatar(p.avatar_url||p.profile_pic||p.photo_url||'') : '';
   if(url) return withCacheBust(url);
-  // 3. G kaata koodathu - grey P mattum
   return 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true';
 }
 function pfpErr(el,uname){
@@ -54,7 +58,13 @@ function isMyPostObj(p){if(!p)return false;if(p.user_id&&String(p.user_id)===Str
 
 async function init(){
   if(_INIT_DONE) return; _INIT_DONE=true;
-  supa=await waitSupa();if(!supa){_INIT_DONE=false;return;}
+  supa=await waitSupa();
+  if(!supa){
+    _INIT_DONE=false;
+    let w=document.getElementById('reelWrap');
+    if(w) w.innerHTML='<div style="color:#fff;text-align:center;padding:120px 20px">Supabase Connect Aagala da<br><span style="color:#888;font-size:13px">pixoro-core.js la URL / KEY check pannu da</span><br><br><button onclick="location.reload()" style="background:#FF4D8D;color:#fff;border:0;padding:10px 20px;border-radius:20px;font-weight:800">Refresh</button></div>';
+    return;
+  }
   let {data:{session}}=await supa.auth.getSession();
   if(!session){ await new Promise(r=>setTimeout(r,800)); let s2=await supa.auth.getSession(); session=s2.data.session; }
   if(!session){location.href='login.html';return}
@@ -72,7 +82,6 @@ async function init(){
   if(window.pixoroRefreshPhotos) await window.pixoroRefreshPhotos();
   load()
 }
-// CORRECTED: Profile la maathina Reels kum auto maarum
 window.addEventListener('storage',(e)=>{
   if(e.key==='pixoro_pfp_updated' && e.newValue){
     ME_PFP=e.newValue; window.ME_PFP=e.newValue;
@@ -82,6 +91,7 @@ window.addEventListener('storage',(e)=>{
   }
 });
 window.addEventListener('focus', async ()=>{
+  supa=getSupa();
   if(!supa || !ME_ID) return;
   try{
     let {data}=await supa.from('profiles').select('avatar_url').eq('id',ME_ID).maybeSingle();
@@ -95,6 +105,7 @@ window.addEventListener('focus', async ()=>{
 });
 
 async function load(){try{
+supa=getSupa(); if(!supa) return;
 let [r1,r2] = await Promise.all([
   supa.from('posts').select('*').order('created_at',{ascending:false}).limit(20).then(r=>r).catch(()=>({data:[]})),
   supa.from('reels').select('*').order('created_at',{ascending:false}).limit(20).then(r=>r).catch(()=>({data:[]})),
@@ -148,6 +159,7 @@ async function addRealView(postId){
   let cnt = allViews.filter(v=>String(v.post_id)==String(postId)).length;
   let el = document.querySelector(`[data-viewcount="${postId}"]`);
   if(el) el.innerText = fmtViews(cnt);
+  supa=getSupa(); if(!supa) return;
   let {error} = await supa.from('views').insert({post_id:postId, user_id:ME_ID});
   if(error){ allViews = allViews.filter(v=>!(String(v.post_id)==String(postId) && String(v.user_id)==String(ME_ID))); }
 }
@@ -168,6 +180,7 @@ function getBestMedia(p){
 }
 function render(){
 let wrap=document.getElementById('reelWrap');
+if(!wrap) return;
 let visiblePosts=allPosts.filter(p=>!hiddenPosts.includes(String(p.id)) && !mutedUsers.includes(String(p.user_id)) && !blockedUsers.includes(String(p.user_id)) && !p.is_archived);
 if(visiblePosts.length===0){ wrap.innerHTML=`<div style="color:#fff;text-align:center;padding:120px 20px">No Reels da<br><span style="color:#888;font-size:13px">Plus button la poi oru Reel podu da</span><br><br><button onclick="location.href='index.html'" style="background:#FF4D8D;color:#fff;border:0;padding:10px 20px;border-radius:20px;font-weight:800">Go Home</button></div>`; return; }
 wrap.innerHTML=visiblePosts.map((p,idx)=>{
@@ -219,6 +232,7 @@ async function dblLike(id){
   let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));
   if(!liked){
     allLikes.push({post_id:id,user_id:ME_ID});updateLikeUI(id,true);
+    supa=getSupa(); if(!supa) return;
     let {error} = await supa.from('likes').upsert({post_id:id,user_id:ME_ID},{onConflict:'post_id,user_id'});
     if(error){ allLikes=allLikes.filter(l=>!(String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID))); updateLikeUI(id,false); showToast('Like Save Aagala da'); }
   }
@@ -226,6 +240,7 @@ async function dblLike(id){
 async function toggleLike(id){
   if(!pixoroIsUuidLocal(ME_ID) || !pixoroIsUuidLocal(id)) return;
   let liked=allLikes.some(l=>String(l.post_id)==String(id)&&String(l.user_id)==String(ME_ID));
+  supa=getSupa(); if(!supa) return;
   if(!liked){
     allLikes.push({post_id:id,user_id:ME_ID});updateLikeUI(id,true);
     let {error} = await supa.from('likes').upsert({post_id:id,user_id:ME_ID},{onConflict:'post_id,user_id'});
@@ -248,8 +263,11 @@ async function deleteSafe(){
   if(p && !isMyPostObj(p)){ showToast('Un reel mattum delete panna mudiyum da'); closeSheet('ownerSheet'); return; }
   if(hiddenPosts.includes(String(curSheetId))) return;
   hiddenPosts.push(String(curSheetId));
-  if(p && p._from==='posts') supa.from('posts').update({is_archived:true}).eq('id',curSheetId).then(()=>{});
-  if(p && p._from==='reels') supa.from('posts').update({is_archived:true}).eq('id',curSheetId).then(()=>{});
+  supa=getSupa();
+  if(supa){
+    if(p && p._from==='posts') supa.from('posts').update({is_archived:true}).eq('id',curSheetId).then(()=>{});
+    if(p && p._from==='reels') supa.from('posts').update({is_archived:true}).eq('id',curSheetId).then(()=>{});
+  }
   setTimeout(()=>render(),200); closeSheet('ownerSheet'); showToast('Deleted da');
 }
 async function saveReel(){ await saveR(curSheetId); closeSheet('viewerSheet'); }
@@ -267,18 +285,19 @@ async function hideReelSafe(){
 }
 function reportSafe(){ closeSheet('viewerSheet'); showToast('Reported da - Safe da'); }
 function openCommentSheet(pid){curCommentPost=pid;let list=allComments.filter(c=>String(c.post_id)==String(pid));document.getElementById('commentList').innerHTML=list.length?list.map(c=>{let isMyC=String(c.user_id)==String(ME_ID)||cleanUser(c.username)==cleanUser(ME_RAW);let nm=displayNameFor(c.user_id||c.username);return `<div class="cRow"><div style="display:flex;gap:8px;align-items:center"><img src="${getPfp(c.user_id)}" onerror="pfpErr(this,'${nm}')" style="width:28px;height:28px;border-radius:50%"><div><b>${nm}</b> <span style="font-size:13px;color:#555"> ${c.text||''}</span></div></div>${isMyC?`<span class="del" onclick="deleteComment('${c.id}','${pid}')">Delete</span>`:''}</div>`}).join(''):'<div style="text-align:center;color:#999;padding:20px">No comments yet - Be kind 💜</div>';document.getElementById('commentSheet').classList.add('show');}
-function closeSheet(id){document.getElementById(id).classList.remove('show')}
+function closeSheet(id){let el=document.getElementById(id); if(el) el.classList.remove('show')}
 async function postComment(){
   let inp=document.getElementById('commentInput');let t=inp.value.trim();if(!t||!curCommentPost)return;
   if(!pixoroIsUuidLocal(ME_ID) || !pixoroIsUuidLocal(curCommentPost)) return;
   let tmp={id:'tmp_'+Date.now(),post_id:curCommentPost,user_id:ME_ID,text:t};
   allComments.unshift(tmp);inp.value='';openCommentSheet(curCommentPost);
+  supa=getSupa(); if(!supa) return;
   let {error} = await supa.from('comments').insert({post_id:curCommentPost,user_id:ME_ID,text:t});
   if(error){ allComments = allComments.filter(c=>c.id!==tmp.id); openCommentSheet(curCommentPost); showToast('Comment Save Aagala da'); }
 }
-async function deleteComment(cid,pid){allComments=allComments.filter(c=>String(c.id)!=String(cid));openCommentSheet(pid);supa.from('comments').delete().eq('id',cid).then(()=>{}).catch(()=>{});}
+async function deleteComment(cid,pid){allComments=allComments.filter(c=>String(c.id)!=String(cid));openCommentSheet(pid);supa=getSupa(); if(supa) supa.from('comments').delete().eq('id',cid).then(()=>{}).catch(()=>{});}
 function openShareSheet(pid){curShareId=pid;document.getElementById('shareSheet').classList.add('show')}
-function toggleMuteAll(){globalMuted=!globalMuted;document.querySelectorAll('video').forEach(v=>v.muted=globalMuted);document.getElementById('volIcon').innerHTML=globalMuted?'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>':'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>'}
+function toggleMuteAll(){globalMuted=!globalMuted;document.querySelectorAll('video').forEach(v=>v.muted=globalMuted);let vi=document.getElementById('volIcon'); if(vi) vi.innerHTML=globalMuted?'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>':'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>'}
 function updateSaveUI(id,saved){
   let btn=document.getElementById('saveBtn-'+id); let svg=document.getElementById('saveSvg-'+id);
   if(btn) btn.classList.toggle('saved',saved);
@@ -290,6 +309,7 @@ async function saveR(id){
   if(savingIds.has(id)) return; savingIds.add(id);
   try{
     let isSaved=allSaves.some(x=>String(x.post_id)===id && String(x.user_id)===String(ME_ID));
+    supa=getSupa(); if(!supa) return;
     if(isSaved){
       allSaves=allSaves.filter(x=>!(String(x.post_id)===id && String(x.user_id)===String(ME_ID))); updateSaveUI(id,false);
       let {error} = await supa.from('saves').delete().eq('post_id',id).eq('user_id',ME_ID);
@@ -310,25 +330,25 @@ function checkMiniUpload(){
   let box=document.getElementById('miniBox');
   if(!box) return;
   box.style.display='flex';
-  document.getElementById('miniImg').src=media;
-  document.getElementById('miniPct').innerText='10%';
-  document.getElementById('miniFill').style.width='10%';
-  document.getElementById('miniTxt').innerText='Mella Upload Aaguthu da - Reels Paakalam da';
+  let mi=document.getElementById('miniImg'); if(mi) mi.src=media;
+  let mp=document.getElementById('miniPct'); if(mp) mp.innerText='10%';
+  let mf=document.getElementById('miniFill'); if(mf) mf.style.width='10%';
+  let mt=document.getElementById('miniTxt'); if(mt) mt.innerText='Mella Upload Aaguthu da - Reels Paakalam da';
   let tries=0;
   let iv=setInterval(async ()=>{
     tries++;
     let pct=Math.min(90, 10 + tries*15);
-    document.getElementById('miniFill').style.width=pct+'%';
-    document.getElementById('miniPct').innerText=pct+'%';
+    let mf2=document.getElementById('miniFill'); if(mf2) mf2.style.width=pct+'%';
+    let mp2=document.getElementById('miniPct'); if(mp2) mp2.innerText=pct+'%';
     try{
-      let s=window.supa;
+      let s=getSupa();
       if(s){
         let {data}=await s.from('posts').select('id').eq('media_url',media).limit(1);
         if(data && data.length){
           clearInterval(iv);
-          document.getElementById('miniFill').style.width='100%';
-          document.getElementById('miniPct').innerText='100%';
-          document.getElementById('miniTxt').innerText='Done da 🔥 - Reel Reels la Irukku da';
+          let mf3=document.getElementById('miniFill'); if(mf3) mf3.style.width='100%';
+          let mp3=document.getElementById('miniPct'); if(mp3) mp3.innerText='100%';
+          let mt3=document.getElementById('miniTxt'); if(mt3) mt3.innerText='Done da 🔥 - Reel Reels la Irukku da';
           showToast('Reel Upload Done da 🔥');
           setTimeout(()=>{box.style.display='none';},2500);
           if(typeof load==='function') load();
@@ -338,9 +358,9 @@ function checkMiniUpload(){
     }catch(e){}
     if(tries>10){
       clearInterval(iv);
-      document.getElementById('miniFill').style.width='100%';
-      document.getElementById('miniPct').innerText='100%';
-      document.getElementById('miniTxt').innerText='Done da 🔥';
+      let mf4=document.getElementById('miniFill'); if(mf4) mf4.style.width='100%';
+      let mp4=document.getElementById('miniPct'); if(mp4) mp4.innerText='100%';
+      let mt4=document.getElementById('miniTxt'); if(mt4) mt4.innerText='Done da 🔥';
       setTimeout(()=>{box.style.display='none';},2000);
     }
   },1200);
