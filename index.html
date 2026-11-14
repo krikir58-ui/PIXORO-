@@ -1,82 +1,12 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Pixoro - Final Mass Killa</title>
-<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="css/feed.css"><link rel="stylesheet" href="css/comments.css">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-html{background:#000}body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px;overflow-x:hidden}
-.top{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;background:#000;position:sticky;top:0;z-index:50;border-bottom:1px solid #111;height:56px}
-.topPlus{width:auto!important;height:auto!important;background:transparent!important;color:#fff!important;font-size:28px!important;cursor:pointer;padding:0 6px!important;border:none!important}
-.bellWhite{display:flex!important;width:auto!important;height:auto!important;background:transparent!important;color:#fff!important;font-size:22px!important;cursor:pointer;border:none!important;padding:0 8px!important;align-items:center;justify-content:center;position:relative}.bellWhite svg{width:22px!important;height:22px!important;fill:none!important;stroke:#fff!important}
-.post{background:#000;border:1px solid #151515;border-radius:20px;margin:10px 8px 14px;overflow:hidden;padding-bottom:10px;box-shadow:0 4px 20px rgba(0,0,0,0.4);contain:content}
-.postTop{padding:10px 12px;display:flex;align-items:center;justify-content:space-between}
-.postTop b{font-size:15px!important;font-weight:700!important;cursor:pointer}
-.post img.main{width:100%!important;aspect-ratio:4/5!important;object-fit:cover!important;display:block;border-radius:12px;background:#111;filter:contrast(1.05) saturate(1.05)}
-.post video.main{width:100%!important;aspect-ratio:4/5!important;object-fit:cover!important;display:block;background:#111;border-radius:12px}
-.actions{padding:10px 12px;display:flex;justify-content:space-between;align-items:center}.left{display:flex!important;gap:12px!important;align-items:center}
-.act{width:28px!important;height:28px!important;cursor:pointer;background:none;border:0;display:inline-flex;align-items:center;justify-content:center}.act svg{width:26px!important;height:26px!important;fill:none;stroke:#fff;stroke-width:1.8}
-.act.liked svg{fill:#FF0A33;stroke:#FF0A33;animation:beat .45s ease}.act.saved svg{fill:#fff;stroke:#fff}
-@keyframes beat{0%{transform:scale(1)}30%{transform:scale(1.35)}60%{transform:scale(.95)}100%{transform:scale(1)}}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:52px;background:#000;border-top:1px solid #1f1f1f;display:flex;justify-content:space-around;align-items:center;z-index:100}
-.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e;flex:1;transition:0.15s}
-.bottom-nav a svg{width:24px;height:24px;fill:none;stroke:#8e8e8e;stroke-width:1.8;transition:0.15s}
-.bottom-nav a.active{color:#fff!important}
-.bottom-nav a.active svg{stroke:#fff!important;fill:none!important}
-.bottom-nav a.active svg rect{fill:none!important;stroke:#fff!important}
-.bottom-nav a.active svg path{fill:#fff!important}
-.bottom-nav span{font-size:10px;color:#8e8e8e}
-.bottom-nav a.active span{color:#fff!important;font-weight:800}
-.bottom-nav a img.navPfp{width:24px;height:24px;border-radius:50%;object-fit:cover;border:1.5px solid #fff;background:#111}
-.pfpRing{width:38px!important;height:38px!important;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00,#ffcc00);padding:2px;cursor:pointer;flex-shrink:0}.pfpInner{width:100%;height:100%;border-radius:50%;background:#000;padding:1.5px;overflow:hidden}.pfpInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
-.avaLetterHome{width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);display:grid;place-items:center;font-weight:900;font-size:16px;color:#fff}
-.storyBar{display:flex;gap:14px;padding:10px 12px;overflow-x:auto;background:#000;border-bottom:1px solid #111;min-height:92px}.storyBar::-webkit-scrollbar{display:none}
-.sItem{text-align:center;min-width:64px;max-width:64px;cursor:pointer}.sRing{width:60px;height:60px;border-radius:50%;padding:2.3px;background:linear-gradient(135deg,#ff5ea8,#ff7a00,#a259ff)!important}.sRing.seen{background:#222!important}.sRingInner{width:100%;height:100%;border-radius:50%;background:#000;padding:2px;overflow:hidden}.sRingInner img{width:100%;height:100%;border-radius:50%;object-fit:cover}
-.sAddWrap{position:relative;width:60px;height:60px}.sAddImg{width:60px;height:60px;border-radius:50%;object-fit:cover;background:#111;border:2px solid #ff5ea8}.sAddPlus{position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;background:linear-gradient(135deg,#ff5ea8,#ff7a00);border-radius:50%;border:3px solid #000;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:900}
-.sName{font-size:10.5px;margin-top:6px;color:#fff;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.heart-burst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:110px;color:#FF0A33;pointer-events:none;opacity:0}.heart-burst.show{animation:burst .9s forwards}@keyframes burst{0%{transform:translate(-50%,-50%) scale(0);opacity:0}25%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
-.postMenuSheet{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:600;display:none;align-items:flex-end;justify-content:center}.postMenuSheet.show{display:flex}.postMenuBox{background:#1a1a1a;width:100%;max-width:450px;border-radius:22px 22px 0 0;padding:12px 14px 30px;border:1px solid #333;max-height:85vh;overflow-y:auto}.menuItem{padding:14px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #222;cursor:pointer;font-size:14px}.menuItem.delete{color:#ff3040}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
-.createBar{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;display:none;align-items:flex-end;justify-content:center}.createBar.show{display:flex}.createPill{display:flex;justify-content:center;gap:18px;padding:14px;background:#000;border-top:1px solid #222;width:100%;max-width:450px}.createPill b{font-size:12px;letter-spacing:1px;color:#888;cursor:pointer;white-space:nowrap;padding-bottom:4px}.createPill b.on{color:#fff;border-bottom:2px solid #FF2DCC}.createClose{position:absolute;bottom:58px;left:50%;transform:translateX(-50%);color:#888;font-size:13px}
-.trendBar{display:flex;gap:8px;padding:10px 12px;overflow-x:auto;border-bottom:1px solid #111}.trendBar::-webkit-scrollbar{display:none}.trendChip{background:#111;border:1px solid #ff5ea866;padding:7px 12px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer}
-.feedTabs{display:flex;border-bottom:1px solid #111}.feedTab{flex:1;text-align:center;padding:12px;font-size:13px;color:#888;cursor:pointer;font-weight:700}.feedTab.active{color:#fff;border-bottom:2px solid #ff5ea8}
-.singleBanner{background:linear-gradient(90deg,#ff5ea8,#ff7a00);padding:10px;text-align:center;font-size:13px;font-weight:800}
-.followBtnPost,[data-follow-user]{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.5px solid #fff!important;padding:0 14px!important;border-radius:8px!important;font-size:14px!important;line-height:1!important;font-weight:600!important;white-space:nowrap!important;box-shadow:none!important;height:30px!important;min-width:80px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}
-.followBtnPost.following,[data-follow-user].following{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.5px solid rgba(255,255,255,.6)!important}
-#feed{min-height:300px}
-.skel{height:340px;background:#111;border-radius:20px;margin:10px 8px;animation:sk 1s infinite alternate}
-@keyframes sk{from{opacity:.6}to{opacity:1}}
-</style></head><body>
-<div class="top"><b style="font-size:26px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="location.href='./notification.html'"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span id="pixoroBellDot" style="display:none;position:absolute;top:-2px;right:2px;width:10px;height:10px;background:#FF0A33;border-radius:50%;border:2px solid #000"></span></div></div></div>
-<div id="singleBanner" class="singleBanner" style="display:none">Single Post View - <span onclick="location.href='./index.html'" style="text-decoration:underline;cursor:pointer">Back to Feed</span></div>
-<div class="storyBar" id="storyBar"></div>
-<div class="feedTabs"><div class="feedTab active" id="tabForYou" onclick="setFeedMode('foryou')">For You</div><div class="feedTab" id="tabFollowing" onclick="setFeedMode('following')">Following</div><div class="feedTab" id="tabLatest" onclick="setFeedMode('latest')">Latest</div></div>
-<div id="trendBar" class="trendBar" style="display:none"></div>
-<div id="feed"><div class="skel"></div><div class="skel"></div></div>
-<div id="toast" class="toast"></div>
-<div id="miniBox" style="position:fixed;bottom:64px;left:12px;right:12px;max-width:426px;margin:auto;background:#1a0b2e;border:1px solid #a259ff;border-radius:14px;padding:10px;display:none;z-index:2000;align-items:center;gap:10px">
-<img id="miniImg" style="width:44px;height:60px;object-fit:cover;border-radius:8px">
-<div style="flex:1"><div style="font-weight:700;font-size:13px">Uploading Reel... <span id="miniPct">0%</span></div><div style="font-size:11px;color:#aaa" id="miniTxt">Mella Upload Aaguthu da - Feed Paakalam da</div><div style="height:6px;background:#333;border-radius:20px;overflow:hidden;margin-top:6px"><div id="miniFill" style="height:100%;width:0%;background:linear-gradient(90deg,#7b2fff,#ff2dcc);transition:.3s"></div></div></div>
-<span onclick="document.getElementById('miniBox').style.display='none'" style="cursor:pointer">✕</span>
-</div>
-<div class="bottom-nav">
-<a class="active" href="./index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
-<a href="./search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
-<a href="./reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a>
-<a href="./dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
-<a href="./profile.html"><img class="navPfp" id="navPfp" src="" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true'"><span>Profile</span></a>
-</div>
-<div id="commentModal" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #333"><b>Comments</b><span onclick="closeComment()" style="font-size:22px">X</span></div><div id="commentList" style="flex:1;overflow-y:auto;padding:12px"></div><div style="padding:10px;border-top:1px solid #333;display:flex;gap:10px"><div id="myCommentPfpWrap" style="width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#222"></div><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#000;border:1px solid #333;padding:12px 14px;border-radius:20px;color:#fff"><button onclick="addComment()" style="background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:0;color:#fff;font-weight:900;padding:10px 16px;border-radius:20px">Post</button></div></div></div>
-<div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
-<div id="choice" class="createBar" onclick="if(event.target==this)hideChoice()"><div class="createPill"><b onclick="location.href='./post-create.html'">POST</b><b onclick="location.href='./reel-create.html'" class="on">REELS</b><b onclick="location.href='./story-upload.html'">STORY</b><b onclick="location.href='./live.html'">LIVE</b></div><div class="createClose" onclick="hideChoice()">Cancel ✕</div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/pixoro-core.js?v=1003"></script>
-<script>function enableNotif(){ location.href='./notification.html'; }</script>
 <script>
 function showToast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 window.showToast=showToast;
 function showChoice(){document.getElementById('choice').classList.add('show')} function hideChoice(){document.getElementById('choice').classList.remove('show')}
-let supa=window.supa;function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase();return u||''}
-let ME_RAW='',ME='',ME_ID='',ME_PFP='',allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=[],allViews=[],viewedStories=[],lastTap=0,feedMode='foryou',curMenuPost=null;
+let supa=window.supa;
+function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase();return u||''}
+let ME_RAW='',ME='',ME_ID='',ME_PFP='',allPosts=[],allLikes=[],allSaves=[],allStories=[],allFollows=[],allProfiles=[],allViews=[],lastTap=0,feedMode='foryou',curMenuPost=null;
 function getSupa(){return window.supa||supa} window.getSupa=getSupa;
 function pixoroIsUuidLocal(s){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(s||'')); }
 async function pixoroSendNotification(toUserId, type, postId, msg){ return; }
@@ -94,39 +24,58 @@ function displayNameFor(u){
   if(cu.length>20) return ME_RAW||'user';
   return cu||ME_RAW||'user';
 }
+
+// ===== CORRECTED: SINGLE SOURCE OF TRUTH - PROFILE PHOTO =====
+// Profile la irukura photo thaan ella page kum - vera edathula irunthu eduka koodathu
+function getCleanAvatar(url){
+  if(!url || !String(url).includes('http')) return '';
+  let u = String(url).trim();
+  // ui-avatars G vara koodathu - atha full ah block pannitom
+  if(u.includes('ui-avatars.com')) return '';
+  return u;
+}
 function getRealPfp(u){
   if(!u) return '';
-  if(String(u)===String(ME_ID) && ME_PFP && ME_PFP.includes('http') && ME_PFP.length>10) return ME_PFP;
+  // 1. En photo - ME_PFP thaan first
+  if(String(u)===String(ME_ID)){
+    let my = getCleanAvatar(ME_PFP);
+    if(my) return my;
+    // ME_PFP empty na profiles la irunthu edu
+    let p = profileById(ME_ID);
+    let url2 = p ? getCleanAvatar(p.avatar_url||p.profile_pic||p.photo_url||'') : '';
+    if(url2) return url2;
+    return '';
+  }
+  // 2. Vera user photo - profiles table la irunthu mattum edu
   let p=profileById(u)||profileByName(u);
-  let url = p ? (p.avatar_url||p.profile_pic||p.photo_url||'') : '';
-  if(url && url.includes('http') && url.length>10) return url;
+  let url = p ? getCleanAvatar(p.avatar_url||p.profile_pic||p.photo_url||'') : '';
+  if(url) return url;
   return '';
 }
-function getPfp(u){ let r=getRealPfp(u); if(r) return r; let uname=displayNameFor(u); let L=avatarLetterFor(u,uname); return 'https://ui-avatars.com/api/?name='+L+'&background=ff5ea8&color=fff&size=200&bold=true'; }
-function avatarLetterFor(u, uname){
-  let name = cleanUser(uname||'') || cleanUser(displayNameFor(u)||'') || '';
-  let onlyLetters = name.replace(/[^a-zA-Z]/g,'');
-  let letter = onlyLetters.charAt(0).toUpperCase();
-  if(!letter) letter='P';
-  return letter;
+// Cache odaikura maari - pazhaya photo kaata koodathu
+function withCacheBust(url){
+  if(!url) return url;
+  let sep = url.includes('?') ? '&' : '?';
+  return url + sep + 't=' + Date.now();
 }
+function getPfp(u){
+  let r=getRealPfp(u);
+  if(r) return withCacheBust(r);
+  // G kaata koodathu - grey circle mattum
+  return 'https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true';
+}
+function avatarLetterFor(u, uname){ return 'P'; } // G letter vendaam
 function avatarHtmlHome(u, uname){
   let url=getRealPfp(u);
-  let L=avatarLetterFor(u, uname);
-  if(url) return `<img src="${url}" onerror="this.outerHTML='<div class=&quot;avaLetterHome&quot;>${L}</div>'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
-  return `<div class="avaLetterHome">${L}</div>`;
+  if(url) return `<img src="${withCacheBust(url)}" onerror="this.style.display='none'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+  return `<div class="avaLetterHome" style="background:#222">P</div>`;
 }
 function avatarHtmlSmall(u, uname){
   let url=getRealPfp(u);
-  let L=avatarLetterFor(u, uname);
-  if(url) return `<img src="${url}" onerror="this.outerHTML='<div style=\\'width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);display:grid;place-items:center;font-weight:900;color:#fff\\'>${L}</div>'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
-  return `<div style="width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);display:grid;place-items:center;font-weight:900;color:#fff">${L}</div>`;
+  if(url) return `<img src="${withCacheBust(url)}" onerror="this.style.display='none'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+  return `<div style="width:100%;height:100%;border-radius:50%;background:#222;display:grid;place-items:center;font-weight:900;color:#fff">P</div>`;
 }
-function pfpErr(el,uname){
-  let letter=avatarLetterFor(null, uname);
-  el.onerror=null;
-  el.src='https://ui-avatars.com/api/?name='+letter+'&background=ff5ea8&color=fff&size=200&bold=true';
-}
+function pfpErr(el,uname){ el.onerror=null; el.src='https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true'; }
 window.pfpErr=pfpErr;
 function isMyPostObj(p){return String(p.user_id)===String(ME_ID)}
 function resolveUserId(otherId){
@@ -165,6 +114,36 @@ async function pixoroCheckBell(){
 }
 window.pixoroCheckBell = pixoroCheckBell;
 setInterval(pixoroCheckBell, 15000);
+
+// ===== CORRECTED: PROFILE PHOTO SYNC - ELLA PAGE KUM =====
+// Profile la maathina, Reels / Home / ella page kum auto maaranum
+window.pixoroRefreshPhotos = function(){
+  let el=document.getElementById('navPfp');
+  let real = getRealPfp(ME_ID);
+  if(el && real) el.src = withCacheBust(real);
+  let cp=document.getElementById('myCommentPfpWrap'); if(cp) cp.innerHTML = avatarHtmlSmall(ME_ID, ME_RAW);
+  if(typeof renderFeed==='function' && allPosts.length) renderFeed();
+  if(typeof renderStories==='function') renderStories();
+};
+window.addEventListener('storage', (e)=>{
+  if(e.key==='pixoro_pfp_updated'){
+    let newUrl = e.newValue || '';
+    if(newUrl){ ME_PFP = newUrl; let pr = profileById(ME_ID); if(pr) pr.avatar_url = newUrl; }
+    window.pixoroRefreshPhotos();
+  }
+});
+window.addEventListener('focus', async ()=>{
+  if(!getSupa() || !ME_ID) return;
+  try{
+    let {data} = await getSupa().from('profiles').select('avatar_url').eq('id', ME_ID).maybeSingle();
+    if(data && data.avatar_url && data.avatar_url !== ME_PFP){
+      ME_PFP = data.avatar_url;
+      let pr = profileById(ME_ID); if(pr) pr.avatar_url = data.avatar_url;
+      window.pixoroRefreshPhotos();
+    }
+  }catch(e){}
+});
+
 let AUTH_DONE = false;
 async function checkLogin(){
   for(let i=0;i<50;i++){ if(window.supa) break; await new Promise(r=>setTimeout(r,200)); }
@@ -185,23 +164,34 @@ async function checkLogin(){
   }
   let {data:profile} = await supa.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
   if(profile && profile.username){
-    ME_RAW=cleanUser(profile.username);ME_PFP=profile.avatar_url||'';
+    ME_RAW=cleanUser(profile.username); ME_PFP=getCleanAvatar(profile.avatar_url||profile.profile_pic||profile.photo_url||'');
   } else {
-    ME_RAW=cleanUser(session.user.email||'user');ME_PFP='';
+    ME_RAW=cleanUser(session.user.email||'user'); ME_PFP='';
   }
-  ME=ME_RAW;ME_ID=session.user.id;window.ME=ME_RAW;window.ME_ID=ME_ID;window.ME_RAW=ME_RAW;
-  try{ if(window.pixoroLoadFollowing) await window.pixoroLoadFollowing(); }catch(e){ console.log('Follow load fail - Feed continue da'); }
+  ME=ME_RAW;ME_ID=session.user.id;window.ME=ME_RAW;window.ME_ID=ME_ID;window.ME_RAW=ME_RAW;window.ME_PFP=ME_PFP;
+  try{ if(window.pixoroLoadFollowing) await window.pixoroLoadFollowing(); }catch(e){}
   loadAll();
 }
 async function loadAll(){
   try{
     supa=getSupa();if(!supa)return;
+    // CORRECTED: En profile ah fresh ah edu - pazhaya cache vendaam
+    try{
+      let {data:fresh} = await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').eq('id', ME_ID).maybeSingle();
+      if(fresh && fresh.avatar_url){ ME_PFP = getCleanAvatar(fresh.avatar_url); window.ME_PFP = ME_PFP; }
+    }catch(e){}
     let pr={data:[]}, po={data:[]}, re={data:[]}, st={data:[]};
     try{ pr = await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').limit(100); }catch(e){}
     try{ po = await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(20); }catch(e){}
     try{ re = await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(20); }catch(e){}
     try{ st = await supa.from('stories').select('*').order('created_at',{ascending:false}).limit(20); }catch(e){}
     allProfiles=pr.data||[];
+    // En profile ah allProfiles la update pannu - athu thaan main
+    if(ME_ID){
+      let idx = allProfiles.findIndex(x=>String(x.id)===String(ME_ID));
+      if(idx>=0 && ME_PFP) allProfiles[idx].avatar_url = ME_PFP;
+      else if(ME_PFP) allProfiles.push({id:ME_ID, username:ME_RAW, avatar_url:ME_PFP});
+    }
     var merged=[];(po.data||[]).forEach(p=>merged.push({...p,_from:'posts'}));(re.data||[]).forEach(p=>merged.push({...p,_from:'reels'}));
     var seenUrl=new Set(),deduped=[];
     for(let p of merged){
@@ -234,13 +224,13 @@ async function loadAll(){
       (allProfiles||[]).forEach(pp=>{ window.PIXORO_ID_TO_NAME[String(pp.id)] = cleanUser(pp.username); window.PIXORO_NAME_TO_ID[cleanUser(pp.username)] = String(pp.id); });
       window.PIXORO_FOLLOWING_NAMES = new Set([...window.PIXORO_FOLLOWING].map(id=>cleanUser(window.PIXORO_ID_TO_NAME[id]||'')));
     }
-    if(window.pixoroRefreshPhotos) window.pixoroRefreshPhotos();
     allStories=(st.data||[]).map(s=>{let prof=profileById(s.user_id);s.username=prof?prof.username:(s.username||'');s.username=cleanUser(s.username);return s}).filter(s=>{if(!s.expires_at)return true;return new Date(s.expires_at)>new Date()});
     renderStories();renderFeed();
     if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
     let el=document.getElementById('navPfp');
     if(el){
-      if(ME_PFP && ME_PFP.includes('http')) el.src=ME_PFP; else el.src=getPfp(ME_ID);
+      let real = getRealPfp(ME_ID);
+      if(real) el.src=withCacheBust(real); else el.src=getPfp(ME_ID);
     }
     let cp=document.getElementById('myCommentPfpWrap'); if(cp) cp.innerHTML = avatarHtmlSmall(ME_ID, ME_RAW);
     pixoroCheckBell();
@@ -376,4 +366,4 @@ function checkMiniUpload(){
 }
 checkMiniUpload();
 checkLogin()
-</script></body></html>
+</script>
