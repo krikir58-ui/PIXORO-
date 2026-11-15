@@ -92,7 +92,8 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 <a href="search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
 <a href="reels.html" class="active"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z"/></svg><span>Reels</span></a>
 <a href="dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
-<a href="profile.html"><img class="navPfp" id="navPfp" src="" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=P&background=FF4D8D&color=fff&size=200&bold=true'"><span>Profile</span></a>
+<!-- ✅ FIXED 2: navPfp src="" ah thookiten da -->
+<a href="profile.html"><img class="navPfp" id="navPfp" src="https://ui-avatars.com/api/?name=P&background=FF4D8D&color=fff&size=200&bold=true" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=P&background=FF4D8D&color=fff&size=200&bold=true'"><span>Profile</span></a>
 </div>
 <div class="sheet" id="ownerSheet" onclick="if(event.target==this)closeSheet('ownerSheet')"><div class="sheetBox">
 <div class="sheetHandle"></div><div class="pixHead"><b>Your Pixoro ✨</b><p>Namba reels - safe ah</p></div>
@@ -126,6 +127,8 @@ function showToast(m){let t=document.getElementById('toast');if(!t)return;t.inne
 function fmtViews(n){if(n>=1000000)return (n/1000000).toFixed(1).replace('.0','')+'M';if(n>=1000)return (n/1000).toFixed(1).replace('.0','')+'K';return String(n)}
 function pixoroIsUuidLocal(s){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(s||'')); }
 let ME_RAW='',ME_ID='',profileMap={},profileByIdMap={},allPosts=[],allLikes=[],allSaves=[],allFollows=[],allComments=[],allViews=[],curCommentPost=null,globalMuted=true,lastTap=0,tapTimer=null,curShareId=null,currentVideo=null,viewedPosts=new Set(),curSheetId=null,curSheetUser=null,curSheetUsername='',hiddenPosts=[],mutedUsers=[],blockedUsers=[],hiddenMeta={},lastAction=null,savingIds=new Set(),_INIT_DONE=false
+// ✅ FIXED 1: ?id= single reel da
+let SINGLE_REEL_ID = new URLSearchParams(location.search).get('id') || '';
 async function waitSupa(){for(let i=0;i<30;i++){if(window.supa)return window.supa;await new Promise(r=>setTimeout(r,100))}return window.supa}
 window.toggleFollow = window.pixoroToggleFollow;
 window.toggleF = window.pixoroToggleFollow;
@@ -142,7 +145,7 @@ async function init(){
   ME_RAW=cleanUser(myProf?.username||session.user.email.split('@')[0]);window.ME_RAW=ME_RAW;
   let {data:profs}=await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').limit(200);(profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileByIdMap[String(p.id)]=p});
   let el=document.getElementById('navPfp');if(el)el.src=getPfp(ME_RAW);
-  if(window.pixoroRefreshPhotos) await window.pixoroRefreshPhotos();
+  // ✅ FIXED 3: pixoroRefreshPhotos ah koopidala da
   load()
 }
 function displayNameFor(u){
@@ -207,6 +210,10 @@ all.forEach(p=>{
   if(prof&&prof.username) p.username=cleanUser(prof.username);
   else if(p.username) p.username=cleanUser(p.username);
 });
+// ✅ FIXED 1: SINGLE REEL ah muthalla kondu vaa da
+if(SINGLE_REEL_ID){
+  all.sort((a,b)=> (String(b.id)===String(SINGLE_REEL_ID) ? 1 : 0) - (String(a.id)===String(SINGLE_REEL_ID) ? 1 : 0));
+}
 allPosts=all;
 let postIds = allPosts.map(p=>String(p.id)).filter(id=>pixoroIsUuidLocal(id));
 let likes={data:[]}, saves={data:[]}, follows={data:[]}, comments={data:[]}, views={data:[]};
