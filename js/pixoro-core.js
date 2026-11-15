@@ -1,4 +1,4 @@
-// ===== PIXORO CORE - CORRECTED v1007 - NO IMAGE + NO BACKGROUND - FULL =====
+// ===== PIXORO CORE - CORRECTED v1008 - IMAGE VARUM DA - FULL =====
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 window.PIXORO_URL = SUPA_URL;
@@ -35,25 +35,20 @@ window.isGoldUser = isGoldUser;
 window.goldTickHTML = goldTickHTML;
 window.getTick = goldTickHTML;
 
-// ✅ v1007: NO IMAGE + NO BACKGROUND - PAZHAYA MARI WHITE BLOCK MATTUM DA
+// ✅ v1008: IMAGE MARAIKKA KOODATHU DA - CSS la img ah thodave illa da
 (function(){
   if(document.getElementById('pixoro-speed-css')) return;
   let css = `
-  *{ -webkit-tap-highlight-color:transparent!important; tap-highlight-color:transparent!important; background-image:none!important; }
+  *{ -webkit-tap-highlight-color:transparent!important; tap-highlight-color:transparent!important; }
   button{ touch-action:manipulation!important; }
   body{ background:#000!important; }
-  /* ✅ LOGO - GRADIENT BACKGROUND KODA ILLA DA, WHITE MATTUM DA */
   .pixoro-logo, .top b, .reelsTop b, .topTitle{ font-family:'Segoe UI',system-ui,sans-serif!important; font-size:26px!important; font-weight:900!important; color:#fff!important; background:none!important; -webkit-text-fill-color:#fff!important; }
-  /* ✅ ELLA IMAGE AH REMOVE DA - ORU FILE LAYUM IMAGE ILLA DA */
-  img{ display:none!important; width:0!important; height:0!important; }
-  .reel-pfp-wrap, .audioDisc, .sRing, .post-pfp, .navPfp, #navPfp, #pfpImg, #editPfpPreview{ display:none!important; }
   .reel-username{font-size:15px!important;font-weight:700!important;cursor:pointer!important}
   .msgBtn, .messageBtn{ background:transparent!important;color:#fff!important;border:1.2px solid #fff!important; }
   .reel-main{ background:#000!important; }
   .reel-main.bgRemove{ object-fit:contain!important;background:#000!important; }
   .bellWrap{position:relative!important;cursor:pointer!important}
   #pixoroBellDot{position:absolute!important;top:-2px!important;right:-2px!important;width:9px!important;height:9px!important;background:#ff3040!important;border-radius:50%!important;display:none;z-index:5}
-  /* ✅ ELLA PAGE LUM SAME BOTTOM NAV - WHITE BLOCK DA */
   .bottom-nav{position:fixed!important;bottom:0!important;left:0!important;right:0!important;max-width:450px!important;margin:0 auto!important;width:100%!important;height:60px!important;background:#000!important;border-top:1.5px solid #fff!important;display:flex!important;justify-content:space-around!important;align-items:center!important;z-index:100!important}
   .bottom-nav a{display:flex!important;flex-direction:column!important;align-items:center!important;gap:3px!important;text-decoration:none!important;color:#8e8e8e!important;font-size:10px!important;background:transparent!important}
   .bottom-nav a svg{width:22px!important;height:22px!important;fill:none!important;stroke:#8e8e8e!important;stroke-width:1.8!important;display:block!important}
@@ -71,8 +66,16 @@ window.getTick = goldTickHTML;
   }
 })();
 window._PIXORO_PFP_CACHE = {};
-// ✅ v1007: IMAGE YE ILLA DA - getPfp EMPTY THAAN DA
-window.getPfp = function(p){ return ''; };
+// ✅ v1008 FIXED: getPfp - IMAGE VARANUM DA
+window.getPfp = function(p){
+  if(!p) return 'https://ui-avatars.com/api/?name=P&background=ff5ea8&color=fff&size=200&bold=true';
+  if(typeof p === 'string' && p.includes('http')) return p;
+  if(p.avatar_url) return p.avatar_url;
+  if(p.profile_pic) return p.profile_pic;
+  if(p.photo_url) return p.photo_url;
+  let n = p.username || 'P';
+  return 'https://ui-avatars.com/api/?name='+String(n).charAt(0)+'&background=ff5ea8&color=fff&size=200&bold=true';
+};
 window.pixoroRefreshPhotos = async function(){ return; };
 window.addEventListener('storage', (e)=>{});
 window.ME_ID = window.ME_ID || null;
@@ -259,7 +262,7 @@ async function loadProfileRealCount(){
   document.querySelectorAll('#reelCount, .reelCount').forEach(e=> e.innerText = reels.length);
   return {mine, reels};
 }
-// ✅ v1007: FOLLOW LIST LA IMAGE ILLA DA - PERU MATTUM DA
+// ✅ v1008: FOLLOW LIST LA PFP KODA VARUM DA
 async function pixoroOpenFollowList(type){
   if(!window.ME_ID) await pixoroFixMe();
   let s = pixoroGetSupa(); if(!s) return;
@@ -268,12 +271,13 @@ async function pixoroOpenFollowList(type){
   else { let {data} = await s.from('follows').select('*').eq('following_id', window.ME_ID).eq('status','accepted'); list = data||[]; }
   let ids = list.map(f=> type==='following' ? f.following_id : f.follower_id).filter(Boolean);
   let profs = [];
-  if(ids.length){ let {data} = await s.from('profiles').select('id,username').in('id', ids); profs = data||[]; }
+  if(ids.length){ let {data} = await s.from('profiles').select('id,username,avatar_url').in('id', ids); profs = data||[]; }
   let html = list.map(f=>{
     let pid = type==='following' ? f.following_id : f.follower_id;
     let pr = (profs||[]).find(p=> String(p.id)===String(pid));
     let uname = pr?.username || f.following_name || f.follower_name || 'user';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='./profile.html?u=${pid}'">${uname}</b><button onclick="location.href='./profile.html?u=${pid}'" style="background:#fff;color:#000;border:0;padding:6px 14px;border-radius:20px;font-weight:700">View</button></div>`;
+    let pfp = pr?.avatar_url || 'https://ui-avatars.com/api/?name='+uname.charAt(0)+'&background=ff5ea8&color=fff';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><img src="${pfp}" style="width:36px;height:36px;border-radius:50%;object-fit:cover"><b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='./profile.html?u=${pid}'">${uname}</b><button onclick="location.href='./profile.html?u=${pid}'" style="background:#fff;color:#000;border:0;padding:6px 14px;border-radius:20px;font-weight:700">View</button></div>`;
   }).join('') || `<div style="color:#888;text-align:center;padding:20px">No ${type} yet</div>`;
   let old = document.getElementById('followModal'); if(old) old.remove();
   let m = document.createElement('div'); m.id = 'followModal';
@@ -435,9 +439,8 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
-console.log('PIXORO CORE v1007 - NO IMAGE + NO BACKGROUND LOADED DA');
+console.log('PIXORO CORE v1008 - IMAGE VARUM DA');
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
-// ✅ v1007: PHOTO UPLOAD KODA IMAGE AH KATTATHU DA - TEXT MATTUM DA
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
   if(file.size > PHOTO_CONFIG.maxSize) throw new Error('Photo 5MB ku mela irukka koodathu da');
@@ -458,7 +461,14 @@ async function pixoroUploadPhoto(file, chatId){
   if(error) throw error;
   return path;
 }
-async function pixoroGetPhotoUrl(path){ return ''; }
+// ✅ v1008 FIXED: Photo URL varanum da
+async function pixoroGetPhotoUrl(path){
+  if(!path) return '';
+  if(path.includes('http')) return path;
+  let s = pixoroGetSupa(); if(!s) return '';
+  let {data} = s.storage.from('dms').getPublicUrl(path);
+  return data?.publicUrl || '';
+}
 async function pixoroCanSendPhotoTo(otherId){
   if(!pixoroIsUuid(window.ME_ID) || !pixoroIsUuid(otherId)) return {ok:false, msg:'Invalid user da'};
   let s = pixoroGetSupa(); if(!s) return {ok:false, msg:'Supabase illa da'};
@@ -512,8 +522,4 @@ async function pixoroCheckBell(){
 window.pixoroCheckBell = pixoroCheckBell;
 setInterval(pixoroCheckBell, 15000);
 setTimeout(pixoroCheckBell, 3000);
-// ✅ v1007: HTML LA IRUKKURA ELLA IMG AH YUM THOOKIDU DA
-function pixoroRemoveAllImages(){ document.querySelectorAll('img').forEach(im=> im.remove()); }
-window.pixoroRemoveAllImages = pixoroRemoveAllImages;
-setTimeout(pixoroRemoveAllImages, 500);
-document.addEventListener('DOMContentLoaded', pixoroRemoveAllImages);
+// ✅ v1008: pixoroRemoveAllImages ILLA DA - THOOKITEN DA
