@@ -1,0 +1,258 @@
+// ===== PIXORO DM - v1008 - THANI FILE DA =====
+let supa=null;
+function getSupa(){
+  if(window.supa) supa=window.supa;
+  if(!supa && window.supabase && window.PIXORO_URL && window.PIXORO_KEY){
+    try{ window.supa=window.supabase.createClient(window.PIXORO_URL, window.PIXORO_KEY); supa=window.supa; }catch(e){}
+  }
+  return window.supa||supa;
+}
+window.getSupa=getSupa;
+let ME_RAW='', ME_ID='', profileMap={}, profileById={}, CUR_TAB='all', ALL_CHATS=[], NOTES_MAP={}, SEARCH_Q='', UNREAD_MAP={}, SHEET_USER='', SHEET_UNAME='', PINNED=[], MUTED=[], ARCHIVED=[], BLOCKED=[], BLOCKED_BY_ME=new Set(), BLOCKED_ME=new Set();
+let DM_ACTIVE=true, DM_TYPING=true, DM_SEEN=true, DM_ALLOW='everyone', SHOW_LASTSEEN=true;
+let MSG_REQUEST='everyone', REQ_PHOTO=false, REQ_VOICE=false, REQ_PREVIEW=true;
+let DM_OTP_BLOCK=true, DM_LINK_WARN=true, DM_ANTISPAM=true, ALLOW_AUDIO=true, ALLOW_VIDEO=true, ALLOW_CAMERA=true;
+let GIRL_SAFETY={photo:true,call:true,voice:true};
+let KIDS_MODE=false, KIDS_HELP=true;
+let DM_CUR=null, DM_STACK=[], DM_LAST_GROUP=null, DM_AUTH_DONE=false;
+const DM_GROUPS=[
+  {title:'What you see', items:[{k:'msgRequest',t:'Message Request'},{k:'privacy',t:'Privacy'}]},
+  {title:'Your app and media', items:[{k:'media',t:'Media & Calls'},{k:'safety',t:'Safety'}]},
+  {title:'For families', items:[{k:'girl',t:'Girl Safety'},{k:'kids',t:'Kids Help'}]},
+];
+const DM_SUB={
+  privacy:[{k:'active',t:'Active'},{k:'typing',t:'Typing'},{k:'seen',t:'Seen'},{k:'showLastSeen',t:'Last Seen'}],
+  media:[{k:'audiocall',t:'Audio Call'},{k:'videocall',t:'Video Call'},{k:'camera',t:'Camera'}],
+  safety:[{k:'otpblock',t:'OTP Block'},{k:'linkwarn',t:'Link Warning'},{k:'antispam',t:'Anti-Spam'}],
+  girl:[{k:'girl_photo',t:'Photo'},{k:'girl_call',t:'Call'},{k:'girl_voice',t:'Voice'}],
+  kids:[{k:'kids_mode',t:'Kids Mode'},{k:'kids_help',t:'Help Button'}],
+  reqGroup:[{k:'reqPhoto',t:'Request Photo'},{k:'reqVoice',t:'Request Voice'},{k:'reqPreview',t:'Request Preview'}],
+};
+const DM_TITLES={privacy:'Privacy',media:'Media & Calls',safety:'Safety',girl:'Girl Safety',kids:'Kids Help',reqGroup:'Request Settings',msgRequest:'Message Request'};
+function getDmVal(k){ if(k==='msgRequest') return MSG_REQUEST; if(k==='reqPhoto') return REQ_PHOTO; if(k==='reqVoice') return REQ_VOICE; if(k==='reqPreview') return REQ_PREVIEW; if(k==='active') return DM_ACTIVE; if(k==='typing') return DM_TYPING; if(k==='seen') return DM_SEEN; if(k==='showLastSeen') return SHOW_LASTSEEN; if(k==='allow') return DM_ALLOW; if(k==='audiocall') return ALLOW_AUDIO; if(k==='videocall') return ALLOW_VIDEO; if(k==='camera') return ALLOW_CAMERA; if(k==='otpblock') return DM_OTP_BLOCK; if(k==='linkwarn') return DM_LINK_WARN; if(k==='antispam') return DM_ANTISPAM; if(k==='girl_photo') return GIRL_SAFETY.photo; if(k==='girl_call') return GIRL_SAFETY.call; if(k==='girl_voice') return GIRL_SAFETY.voice; if(k==='kids_mode') return KIDS_MODE; if(k==='kids_help') return KIDS_HELP; return true; }
+function collectAllSettings(){ return {msg_request:MSG_REQUEST,req_photo:REQ_PHOTO,req_voice:REQ_VOICE,req_preview:REQ_PREVIEW,dm_active:DM_ACTIVE,dm_typing:DM_TYPING,dm_seen:DM_SEEN,dm_allow:DM_ALLOW,show_lastseen:SHOW_LASTSEEN,otpblock:DM_OTP_BLOCK,linkwarn:DM_LINK_WARN,antispam:DM_ANTISPAM,audiocall:ALLOW_AUDIO,videocall:ALLOW_VIDEO,camera:ALLOW_CAMERA,girl_photo:GIRL_SAFETY.photo,girl_call:GIRL_SAFETY.call,girl_voice:GIRL_SAFETY.voice,kids_mode:KIDS_MODE,kids_help:KIDS_HELP}; }
+function applyAllSettings(s){ if(!s) return; MSG_REQUEST=s.msg_request||'everyone'; REQ_PHOTO=s.req_photo??false; REQ_VOICE=s.req_voice??false; REQ_PREVIEW=s.req_preview??true; DM_ACTIVE=s.dm_active??true; DM_TYPING=s.dm_typing??true; DM_SEEN=s.dm_seen??true; DM_ALLOW=s.dm_allow||'everyone'; SHOW_LASTSEEN=s.show_lastseen??true; DM_OTP_BLOCK=s.otpblock??true; DM_LINK_WARN=s.linkwarn??true; DM_ANTISPAM=s.antispam??true; ALLOW_AUDIO=s.audiocall??true; ALLOW_VIDEO=s.videocall??true; ALLOW_CAMERA=s.camera??true; GIRL_SAFETY={photo:s.girl_photo??true,call:s.girl_call??true,voice:s.girl_voice??true}; KIDS_MODE=s.kids_mode??false; KIDS_HELP=s.kids_help??true; }
+function renderDmLevel1(){
+  document.getElementById('dmSettingsTitle').textContent='Settings';
+  let h='';
+  DM_GROUPS.forEach(g=>{
+    h+=`<div class="secTitle">${g.title}</div>`;
+    g.items.forEach(o=>{
+      let isGroup=!!DM_SUB[o.k];
+      let label=isGroup?'':`<span class="st ${getDmVal(o.k)==='none'||getDmVal(o.k)===false?'off':'on'}">${getDmVal(o.k)}</span>`;
+      h+=`<div class="typeRow" onclick="openDmGroup('${o.k}')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center">${label}<span>›</span></span></div>`;
+    });
+  });
+  h+=`<div class="secTitle">Message Request</div><div class="typeRow" onclick="openDmGroup('reqGroup')"><b>Request Settings</b><span>›</span></div>`;
+  let p1=document.getElementById('dmPage1'); p1.innerHTML=h; p1.style.display='block'; p1.classList.add('slideIn');
+  document.getElementById('dmPage2').style.display='none'; document.getElementById('dmPage3').style.display='none';
+  DM_STACK=['level1'];
+}
+function openDmGroup(k){
+  if(k==='msgRequest'){ openDmDetail('msgRequest','level1'); return; }
+  let items=DM_SUB[k]; if(!items) return;
+  DM_LAST_GROUP=k;
+  showDmPage2(DM_TITLES[k]||k, items);
+}
+function showDmPage2(title, items){
+  document.getElementById('dmSettingsTitle').textContent=title;
+  let h=`<button class="backBtn2" onclick="renderDmLevel1()">←</button>`;
+  h+=items.map(o=>{ let v=getDmVal(o.k); return `<div class="typeRow" onclick="openDmDetail('${o.k}','level2')"><b>${o.t}</b><span style="display:flex;gap:8px;align-items:center"><span class="st ${v?'on':'off'}">${v?'ON':'OFF'}</span><span>›</span></span></div>`; }).join('');
+  let p2=document.getElementById('dmPage2'); p2.innerHTML=h; p2.style.display='block'; p2.classList.add('slideIn');
+  document.getElementById('dmPage1').style.display='none'; document.getElementById('dmPage3').style.display='none';
+  DM_STACK=['level1','level2'];
+}
+function openDmDetail(k, from){
+  DM_CUR=k;
+  let all=[...Object.values(DM_SUB).flat(), {k:'msgRequest',t:'Message Request'}, {k:'allow',t:'Allow Messages'}];
+  let o=all.find(x=>x.k===k)||{t:k};
+  document.getElementById('dmSettingsTitle').textContent=o.t;
+  let body='';
+  if(k==='msgRequest'){
+    body=`<div style="display:flex;gap:10px"><button class="bigBtn ${MSG_REQUEST==='everyone'?'selAllow':''}" onclick="setDmMsgRequest('everyone')">Everyone</button><button class="bigBtn ${MSG_REQUEST==='followers'?'selAllow':''}" onclick="setDmMsgRequest('followers')">Followers</button><button class="bigBtn ${MSG_REQUEST==='none'?'selDeny':''}" onclick="setDmMsgRequest('none')">No One</button></div>`;
+  } else if(k==='allow'){
+    body=`<div style="display:flex;gap:10px"><button class="bigBtn ${DM_ALLOW==='everyone'?'selAllow':''}" onclick="setDmAllowDetail('everyone')">Everyone</button><button class="bigBtn ${DM_ALLOW==='none'?'selDeny':''}" onclick="setDmAllowDetail('none')">No One</button></div>`;
+  } else {
+    let v=getDmVal(k);
+    body=`<div style="display:flex;gap:10px"><button class="bigBtn ${v?'selAllow':''}" onclick="setDmDetailBool('${k}',true)">ALLOW</button><button class="bigBtn ${!v?'selDeny':''}" onclick="setDmDetailBool('${k}',false)">NOT ALLOW</button></div>`;
+  }
+  let h=`<button class="backBtn2" onclick="goBackDm()">←</button><div style="margin-top:14px">${body}</div><button onclick="goBackDm()" style="width:100%;margin-top:12px;padding:13px;background:linear-gradient(135deg,#FF4D8D,#FF7AB8);border:0;border-radius:14px;color:#fff;font-weight:900">DONE</button>`;
+  let p3=document.getElementById('dmPage3'); p3.innerHTML=h; p3.style.display='block'; p3.classList.add('slideIn');
+  document.getElementById('dmPage1').style.display='none'; document.getElementById('dmPage2').style.display='none';
+  DM_STACK=['level1','level2','level3'];
+}
+function goBackDm(){
+  if(DM_STACK.length>=3 && DM_LAST_GROUP && DM_SUB[DM_LAST_GROUP]){
+    showDmPage2(DM_TITLES[DM_LAST_GROUP], DM_SUB[DM_LAST_GROUP]);
+  } else {
+    renderDmLevel1();
+  }
+}
+function setDmMsgRequest(v){ MSG_REQUEST=v; saveUserSettings(); openDmDetail('msgRequest','level1'); }
+function setDmAllowDetail(v){ DM_ALLOW=v; saveUserSettings(); openDmDetail('allow','level2'); }
+function setDmDetailBool(k,v){
+  if(k==='reqPhoto') REQ_PHOTO=v; if(k==='reqVoice') REQ_VOICE=v; if(k==='reqPreview') REQ_PREVIEW=v;
+  if(k==='active') DM_ACTIVE=v; if(k==='typing') DM_TYPING=v; if(k==='seen') DM_SEEN=v; if(k==='showLastSeen') SHOW_LASTSEEN=v;
+  if(k==='audiocall') ALLOW_AUDIO=v; if(k==='videocall') ALLOW_VIDEO=v; if(k==='camera') ALLOW_CAMERA=v;
+  if(k==='otpblock') DM_OTP_BLOCK=v; if(k==='linkwarn') DM_LINK_WARN=v; if(k==='antispam') DM_ANTISPAM=v;
+  if(k==='girl_photo') GIRL_SAFETY.photo=v; if(k==='girl_call') GIRL_SAFETY.call=v; if(k==='girl_voice') GIRL_SAFETY.voice=v;
+  if(k==='kids_mode') KIDS_MODE=v; if(k==='kids_help') KIDS_HELP=v;
+  saveUserSettings(); openDmDetail(k,'level2'); render();
+}
+function renderDmTypeList(){ renderDmLevel1(); }
+function closeDmTypeDetail(){ goBackDm(); }
+function setTab(t,btn){ CUR_TAB=t; document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on')); if(btn) btn.classList.add('on'); render(); }
+function closeDMSettingsSlow(){ let s=document.getElementById('dmSettingSheet'); let bd=document.getElementById('sheetBackdrop'); s.classList.remove('open'); bd.classList.remove('open'); setTimeout(()=>{ bd.style.display='none'; },350); }
+function closeAllSheets(){ closeDMSettingsSlow(); let sh=document.getElementById('sheet'); if(sh) sh.style.display='none'; let np=document.getElementById('notePop'); if(np) np.style.display='none'; }
+function openDMSettings(){ closeAllSheets(); renderDmLevel1(); let s=document.getElementById('dmSettingSheet'); let bd=document.getElementById('sheetBackdrop'); s.classList.add('open'); bd.classList.add('open'); bd.style.display='block'; }
+function openChatUser(u){ closeAllSheets(); location.href='chat.html?user='+encodeURIComponent(u); }
+function openProfileUser(u){
+  closeAllSheets();
+  let p = profileMap[cleanUser(u)] || profileById[u];
+  let pid = p ? String(p.id) : String(u||'');
+  if(pid) location.href='profile.html?u='+encodeURIComponent(pid);
+  else location.href='profile.html?u='+encodeURIComponent(u);
+}
+function goSearch(){ closeAllSheets(); location.href='search.html'; }
+function syncMassUI(){ renderDmLevel1(); }
+async function saveUserSettings(){
+  supa=getSupa();
+  if(!ME_ID||!supa) return;
+  let all = collectAllSettings();
+  let {error} = await supa.from('user_settings').upsert({user_id:ME_ID,msg_request:MSG_REQUEST,req_photo:REQ_PHOTO,req_voice:REQ_VOICE,req_preview:REQ_PREVIEW,dm_active:DM_ACTIVE,dm_typing:DM_TYPING,dm_seen:DM_SEEN,dm_allow:DM_ALLOW,show_lastseen:SHOW_LASTSEEN,dm_settings:all,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+  if(error) console.log('SERVER SAVE FAIL:',error.message); else console.log('SERVER SAVE OK');
+}
+async function loadUserSettings(){
+  supa=getSupa();
+  if(!ME_ID||!supa) return;
+  let {data,error} = await supa.from('user_settings').select('*').eq('user_id',ME_ID).maybeSingle();
+  if(error){ console.log('SERVER LOAD FAIL:',error.message); return; }
+  if(!data) return;
+  if(data.dm_settings && typeof data.dm_settings==='object' && Object.keys(data.dm_settings).length>2){ applyAllSettings(data.dm_settings); }
+  else { MSG_REQUEST=data.msg_request||'everyone'; REQ_PHOTO=data.req_photo??false; REQ_VOICE=data.req_voice??false; REQ_PREVIEW=data.req_preview??true; DM_ACTIVE=data.dm_active??true; DM_TYPING=data.dm_typing??true; DM_SEEN=data.dm_seen??true; DM_ALLOW=data.dm_allow||'everyone'; SHOW_LASTSEEN=data.show_lastseen??true; }
+  syncMassUI();
+}
+function cleanUser(u){ if(!u) return ''; u=String(u).trim(); if(u.includes('@')) u=u.split('@')[0]; return u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase()||'' }
+function letterFor(u){ let l=(cleanUser(u||'P').charAt(0).toUpperCase()||'P'); return /[A-Z]/.test(l)?l:'P'; }
+function showToast(m){ let t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',1500); }
+function realPfp(u){ let p=profileMap[cleanUser(u)]||profileById[u]; let url=p?.avatar_url||p?.profile_pic||''; if(url && !url.includes('ui-avatars')) return url; if(window._PIXORO_PFP_CACHE){ let cached = window._PIXORO_PFP_CACHE[cleanUser(u)] || window._PIXORO_PFP_CACHE[String(u)]; if(cached) return cached; } return ''; }
+function avatarHtml(u, size, isOnline){ let url=realPfp(u); let L=letterFor(u); let cls = size==='small' ? 'avaSmall' : 'ava'; let lcls = size==='small' ? 'avaLetterSmall' : 'avaLetter'; if(isOnline===false) lcls+=' off'; if(url) return `<img class="${cls}" src="${url}" onerror="this.outerHTML='<div class=&quot;${lcls}&quot;>${L}</div>'">`; return `<div class="${lcls}">${L}</div>`; }
+function fmtTime(t){ let d=new Date(t); let now=new Date(); if(d.toDateString()===now.toDateString()) return d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); let y=new Date(); y.setDate(now.getDate()-1); if(d.toDateString()===y.toDateString()) return 'Yesterday'; return d.toLocaleDateString([], {day:'numeric',month:'short'}); }
+function lastSeenText(p){ if(!p) return 'Offline'; if(p.is_online) return '● Online'; if(!SHOW_LASTSEEN) return 'Offline'; if(!p.last_seen) return 'Offline'; let d=new Date(p.last_seen); let now=new Date(); let diff=Math.floor((now-d)/1000); if(diff<60) return 'Active just now'; if(diff<3600) return 'Active '+Math.floor(diff/60)+'m ago'; if(d.toDateString()===now.toDateString()) return 'Active today '+d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); let y=new Date(); y.setDate(now.getDate()-1); if(d.toDateString()===y.toDateString()) return 'Active Yesterday '+d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); return 'Active '+d.toLocaleDateString([], {day:'numeric',month:'short'}); }
+async function updatePresence(o){ supa=getSupa(); if(!ME_ID || !supa) return; if(!DM_ACTIVE){ o=false; } await supa.from('profiles').update({is_online:o,last_seen:new Date().toISOString()}).eq('id',ME_ID); }
+function isMineMsg(m){ return String(m.sender_id)===ME_ID || cleanUser(m.sender)===ME_RAW; }
+function otherIdOf(m){ if(isMineMsg(m) && m.receiver_id) return String(m.receiver_id); if(!isMineMsg(m) && m.sender_id) return String(m.sender_id); let name = isMineMsg(m) ? cleanUser(m.receiver) : cleanUser(m.sender); let p = profileMap[name]; return p ? String(p.id) : name; }
+function isBlockedChat(other){ return BLOCKED_BY_ME.has(String(other)) || BLOCKED_ME.has(String(other)); }
+function onSearch(v){ SEARCH_Q=v.toLowerCase().trim(); render(); }
+let pressTimer=null;
+function openSheet(user,uname){ SHEET_USER=user; SHEET_UNAME=uname; document.getElementById('sheetName').innerText='@'+uname; let p=profileById[user]; let st=document.getElementById('sheetStatus'); st.innerText=lastSeenText(p); st.style.color=p?.is_online?'#22C55E':'#888'; document.getElementById('sheet').style.display='block'; document.getElementById('sheetBackdrop').style.display='block'; }
+function doPin(){ let i=PINNED.indexOf(SHEET_USER); if(i>=0) PINNED.splice(i,1); else PINNED.unshift(SHEET_USER); closeAllSheets(); render(); }
+function doMute(){ let i=MUTED.indexOf(SHEET_USER); if(i>=0) MUTED.splice(i,1); else MUTED.push(SHEET_USER); closeAllSheets(); render(); }
+function doArchive(){ if(!ARCHIVED.includes(SHEET_USER)) ARCHIVED.push(SHEET_USER); closeAllSheets(); render(); }
+async function doBlockFromSheet(){
+  closeAllSheets(); showToast('Blocking...');
+  if(window.pixoroBlockUser){ await window.pixoroBlockUser(SHEET_UNAME); }
+  BLOCKED_BY_ME.add(String(SHEET_USER));
+  if(!BLOCKED.includes(SHEET_USER)) BLOCKED.push(SHEET_USER);
+  ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); render();
+}
+async function doUnblock(id,uname){
+  let s=getSupa();
+  if(s){ await s.from('blocked_users').delete().eq('user_id',ME_ID).eq('blocked_user_id',id); }
+  BLOCKED=BLOCKED.filter(x=>x!==id); BLOCKED_BY_ME.delete(String(id)); showToast('Unblocked'); render();
+}
+function doDeleteChatOnly(){ ALL_CHATS=ALL_CHATS.filter(c=>c.other!==SHEET_USER); closeAllSheets(); showToast('Deleted'); render(); }
+async function doDeleteAll(){
+  let other = SHEET_USER;
+  ALL_CHATS=ALL_CHATS.filter(c=>c.other!==other); closeAllSheets(); showToast('Deleted'); render();
+  try{
+    supa=getSupa(); if(!supa) return;
+    await supa.from('messages').delete().eq('sender_id',ME_ID).eq('receiver_id',other);
+    await supa.from('messages').delete().eq('sender_id',other).eq('receiver_id',ME_ID);
+  }catch(e){}
+}
+async function loadNotes(){ supa=getSupa(); if(!supa) return; let {data}=await supa.from('notes').select('*').gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false}).limit(50); NOTES_MAP={}; (data||[]).forEach(n=>{ let uid = n.user_id ? String(n.user_id) : ''; if(uid && isBlockedChat(uid)) return; NOTES_MAP[cleanUser(n.username)]=n.text; }); let usersWithNote = Object.keys(NOTES_MAP).filter(u=>u!==ME_RAW); let myNote = NOTES_MAP[ME_RAW]; let html=''; html+=`<div class="nItem" onclick="document.getElementById('notePop').style.display='block'"><div class="nRing"><div class="nRingInner">${avatarHtml(ME_RAW,'small',true)}${myNote?`<div class="noteBubble">${myNote}</div>`:''}</div></div><div style="font-size:10px;margin-top:4px;color:#aaa">Your note</div></div>`; html+=usersWithNote.slice(0,10).map(u=>`<div class="nItem" onclick="openChatUser('${u}')"><div class="nRing"><div class="nRingInner">${avatarHtml(u,'small',true)}<div class="noteBubble">${NOTES_MAP[u]}</div></div></div><div style="font-size:10px;margin-top:4px;color:#aaa">${u}</div></div>`).join(''); document.getElementById('notes').style.display = (myNote || usersWithNote.length) ? 'flex' : 'none'; document.getElementById('notes').innerHTML=html; }
+async function saveNote(){ supa=getSupa(); if(!supa) return showToast('Supabase Connect Aagala da'); let t=document.getElementById('noteText').value.trim(); if(!t) return; let exp=new Date(); exp.setHours(exp.getHours()+24); await supa.from('notes').delete().eq('user_id',ME_ID); let {error}=await supa.from('notes').insert({user_id:ME_ID,username:ME_RAW,text:t,expires_at:exp.toISOString()}); if(error) return showToast('Note Save Aagala da'); document.getElementById('notePop').style.display='none'; loadNotes(); }
+function renderOnline(){ let online = Object.values(profileMap).filter(p=>p.is_online && cleanUser(p.username)!==ME_RAW && !isBlockedChat(p.id)).slice(0,12); let box=document.getElementById('onlineBox'); if(!online.length){ box.style.display='none'; return; } box.style.display='block'; document.getElementById('onlineRow').innerHTML=online.map(p=>{ let u=cleanUser(p.username); return `<div class="onItem" onclick="openChatUser('${u}')"><div class="onAva"><div class="onAvaIn">${avatarHtml(u,'small',true)}</div><span class="onDot"></span></div><div style="font-size:11px;margin-top:4px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u}</div><div style="font-size:10px;color:#22C55E;font-weight:700">Online</div></div>` }).join(''); }
+function render(){
+  renderOnline();
+  let reqs = ALL_CHATS.filter(c=>c.threadType==='requests' && !isBlockedChat(c.other));
+  if(MSG_REQUEST==='none') reqs=[];
+  let rc=document.getElementById('reqCount'); if(reqs.length){ rc.style.display='inline'; rc.textContent=reqs.length; } else rc.style.display='none';
+  let bc=document.getElementById('blkCount'); if(BLOCKED.length){ bc.style.display='inline'; bc.textContent=BLOCKED.length; } else bc.style.display='none';
+  if(CUR_TAB==='blocked'){
+    if(!BLOCKED.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No Blocked Users</div>`; return; }
+    document.getElementById('list').innerHTML=BLOCKED.map(id=>{ let uname=profileById[id]?.username||id; let cu=cleanUser(uname); let isOn=!!profileById[id]?.is_online; return `<div class="blockRow"><div class="avaWrap ${isOn?'':'off'}" onclick="event.stopPropagation();openProfileUser('${cu}')">${avatarHtml(cu,'',isOn)}${isOn?`<span class="onlineDot"></span>`:``}</div><div style="flex:1" onclick="openProfileUser('${cu}')"><b style="color:#fff">${cu}</b><div style="font-size:12px;color:#888">Blocked</div></div><button onclick="doUnblock('${id}','${cu}')" style="background:#FF4D8D;color:#fff;border:0;padding:8px 16px;border-radius:20px;font-weight:700">Unblock</button></div>` }).join(''); return;
+  }
+  let list=ALL_CHATS.filter(c=>!ARCHIVED.includes(c.other) && !isBlockedChat(c.other));
+  if(CUR_TAB==='unread') list=list.filter(c=>(UNREAD_MAP[c.other]||0)>0);
+  if(CUR_TAB==='requests') list=reqs;
+  if(CUR_TAB==='archived') list=ALL_CHATS.filter(c=>ARCHIVED.includes(c.other) && !isBlockedChat(c.other));
+  if(SEARCH_Q) list=list.filter(c=>{ let n=(profileById[c.other]?.username||c.other||'').toLowerCase(); return n.includes(SEARCH_Q)||c.preview.toLowerCase().includes(SEARCH_Q); });
+  list.sort((a,b)=>{ let pa=PINNED.includes(a.other)?1:0, pb=PINNED.includes(b.other)?1:0; if(pa!==pb) return pb-pa; return new Date(b.msg.created_at)-new Date(a.msg.created_at); });
+  if(CUR_TAB==='requests' && !list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No Requests<br>${MSG_REQUEST==='none'?'Message Request OFF':'No new messages'}</div>`; return; }
+  if(CUR_TAB==='archived' && !list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No Archived Chats</div>`; return; }
+  if(!list.length){ document.getElementById('list').innerHTML=`<div style="padding:40px;color:#888">No chats<br><button onclick="goSearch()" style="margin-top:12px;background:#FF4D8D;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:700">+ New Chat</button></div>`; return; }
+  let totalUnread = Object.values(UNREAD_MAP).reduce((a,b)=>a+b,0);
+  let nav=document.getElementById('navTotal'); if(totalUnread){ nav.style.display='grid'; nav.textContent=totalUnread>99?'99+':totalUnread; } else nav.style.display='none';
+  let seenOff = !DM_SEEN;
+  document.getElementById('list').innerHTML=list.map(c=>{
+    let uname=profileById[c.other]?.username||c.other; let uc=UNREAD_MAP[c.other]||0; let badge=uc?`<span class="unreadBadge ${MUTED.includes(c.other)?'grey':''}">${uc>99?'99+':uc}</span>`:``; let isPin=PINNED.includes(c.other); let isMute=MUTED.includes(c.other);
+    let isMine=isMineMsg(c.msg);
+    let tick = seenOff ? '' : (isMine?`<span class="tick ${c.msg.seen?'blue':'grey'}">${c.msg.seen?'✓✓':'✓'}</span> `:'');
+    let p=profileById[c.other]; let isOn=!!p?.is_online;
+    let statusTxt = isOn ? `<span style="color:#22C55E;font-size:11px">● Online</span>` : ``;
+    let previewTxt = (CUR_TAB==='requests' && !REQ_PREVIEW) ? 'Message Request' : c.preview;
+    if(CUR_TAB==='requests' && !REQ_PHOTO && (c.msg.media_path || c.msg.media_type==='image')) previewTxt='Photo Request';
+    if(CUR_TAB==='requests' && !REQ_VOICE && c.msg.media_type==='voice') previewTxt='Voice Request';
+    let tickGold = window.goldTickHTML ? window.goldTickHTML(p||{username:uname}) : '';
+    let reqBtn = CUR_TAB==='requests' ? `<div style="display:flex;gap:8px;margin-top:6px"><button onclick="event.stopPropagation();openChatUser('${cleanUser(uname)}')" style="flex:1;background:#22C55E;color:#fff;border:0;padding:7px;border-radius:16px;font-weight:700">Accept</button><button onclick="event.stopPropagation();doBlockFromSheet2('${c.other}','${cleanUser(uname)}')" style="flex:1;background:#1F1F1F;color:#fff;border:0;padding:7px;border-radius:16px">Decline</button></div>` : '';
+    return `<div class="chatRow" onmousedown="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" onmouseup="clearTimeout(pressTimer)" ontouchstart="pressTimer=setTimeout(()=>openSheet('${c.other}','${cleanUser(uname)}'),600)" ontouchend="clearTimeout(pressTimer)"><div class="avaWrap ${isOn?'':'off'}" onclick="event.stopPropagation();openProfileUser('${cleanUser(uname)}')">${avatarHtml(cleanUser(uname),'',isOn)}${isOn?`<span class="onlineDot"></span>`:``}</div><div class="chatMain" onclick="openChatUser('${cleanUser(uname)}')"><div class="chatTopRow"><span class="chatName" onclick="event.stopPropagation();openProfileUser('${cleanUser(uname)}')">${isPin?'📌 ':''}${cleanUser(uname)}${tickGold} ${isMute?'🔕':''}</span><span class="chatTime">${fmtTime(c.msg.created_at)}</span></div><div class="chatPrevRow"><span class="chatPrev">${tick}${previewTxt}</span>${badge}</div>${statusTxt}${reqBtn}</div></div>`
+  }).join('');
+}
+async function doBlockFromSheet2(id,uname){ if(window.pixoroBlockUser){ await window.pixoroBlockUser(uname); } BLOCKED_BY_ME.add(String(id)); if(!BLOCKED.includes(id)) BLOCKED.push(id); ALL_CHATS=ALL_CHATS.filter(c=>c.other!==id); showToast('Blocked'); render(); }
+async function loadBlockedBoth(){
+  supa=getSupa(); if(!supa) return;
+  try{
+    let {data: mine} = await supa.from('blocked_users').select('blocked_user_id').eq('user_id',ME_ID);
+    BLOCKED_BY_ME = new Set((mine||[]).map(x=>String(x.blocked_user_id)));
+    let {data: meBlocked} = await supa.from('blocked_users').select('user_id').eq('blocked_user_id',ME_ID);
+    BLOCKED_ME = new Set((meBlocked||[]).map(x=>String(x.user_id)));
+    BLOCKED = [...BLOCKED_BY_ME];
+  }catch(e){}
+}
+async function init(){
+  if(DM_AUTH_DONE) return; DM_AUTH_DONE=true;
+  for(let i=0;i<30;i++){ if(getSupa()) break; await new Promise(r=>setTimeout(r,200)); }
+  supa=getSupa();
+  if(!supa){
+    DM_AUTH_DONE=false;
+    document.getElementById('list').innerHTML='<div style="padding:40px;color:#888">Supabase Connect Aagala da<br><button onclick="location.reload()" style="margin-top:12px;background:#FF4D8D;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:700">Refresh</button></div>';
+    return;
+  }
+  let {data:{session}}=await supa.auth.getSession();
+  if(!session){ await new Promise(r=>setTimeout(r,800)); let s2=await supa.auth.getSession(); session=s2.data.session; }
+  if(!session){location.href='login.html';return}
+  ME_ID=session.user.id; window.ME_ID=ME_ID; let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).maybeSingle(); ME_RAW=cleanUser(my?.username||session.user.email.split('@')[0]); window.ME_RAW=ME_RAW; let navPfp=document.getElementById('navPfp'); if(navPfp && my?.avatar_url) navPfp.src=my.avatar_url;
+  let {data:profs}=await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url,is_online,last_seen').limit(200); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p});
+  await loadBlockedBoth();
+  await loadUserSettings();
+  updatePresence(true); setInterval(()=>updatePresence(true),30000); loadNotes(); load();
+  supa.channel('dm-list').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},()=>load()).subscribe();
+  supa.channel('presence-live').on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles'},()=>{ load(); }).subscribe();
+  supa.channel('notes-live').on('postgres_changes',{event:'*',schema:'public',table:'notes'},()=>loadNotes()).subscribe();
+  document.addEventListener('visibilitychange',()=>{ if(document.hidden) updatePresence(false); else updatePresence(true); });
+}
+async function load(){
+  supa=getSupa(); if(!supa) return;
+  let {data:profs}=await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url,is_online,last_seen').limit(200); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p});
+  await loadBlockedBoth();
+  let {data} = await supa.from('messages').select('*').or(`sender_id.eq.${ME_ID},receiver_id.eq.${ME_ID}`).order('created_at',{ascending:false}).limit(200);
+  if(!data) data=[];
+  data = data.filter(m=>{ let oid = otherIdOf(m); return oid && !isBlockedChat(oid); });
+  UNREAD_MAP={}; data.forEach(m=>{ if(!isMineMsg(m) && !m.seen){ let oid=otherIdOf(m); UNREAD_MAP[oid]=(UNREAD_MAP[oid]||0)+1; } });
+  let map={}; data.forEach(m=>{ let oid=otherIdOf(m); if(!oid || cleanUser(oid)===ME_RAW) return; if(!profileMap[cleanUser(oid)] && !profileById[oid]) return; if(!map[oid] || new Date(m.created_at)>new Date(map[oid].created_at)) map[oid]=m; });
+  ALL_CHATS=Object.values(map).map(c=>{ let oid=otherIdOf(c); let raw=(c.text||c.message||c.content||''); let preview=''; if(c.type==='voice'||c.media_type==='voice') preview='Voice'; else if(c.type==='image'||c.media_type==='image'||c.media_path) preview='Photo'; else if(c.type==='video'||c.media_type==='video') preview='Video'; else if(raw.startsWith('{"e2e"')) preview='Message'; else if(raw.trim()) preview=raw.slice(0,40); else preview='Message'; let isFirstFromThem=!isMineMsg(c); let threadType='primary'; if(isFirstFromThem && !c.seen) threadType='requests'; return {other:oid,msg:c,preview,threadType}; });
+  render();
+}
+init();
