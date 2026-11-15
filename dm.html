@@ -1,6 +1,7 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PIXORO - Chats</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/pixoro-core.js?v=1004"></script>
+<!-- ✅ FIXED 1: v1003 da - ella page um same da -->
+<script src="js/pixoro-core.js?v=1003"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:76px}
@@ -92,9 +93,9 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
   <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:18px" id="dmSettingsTitle">Settings</b><span onclick="closeDMSettingsSlow()" style="background:#1F1F1F;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;cursor:pointer">✕</span></div>
   <div id="dmStack"><div id="dmPage1"></div><div id="dmPage2" style="display:none"></div><div id="dmPage3" style="display:none"></div></div>
 </div>
-<div class="bottom-nav"><a href="index.html"><span style="font-size:22px">⌂</span><span>Home</span></a><a href="search.html"><span style="font-size:21px">🔍</span><span>Search</span></a><a href="reels.html"><span style="font-size:21px">▶️</span><span>Reels</span></a><a href="dm.html" class="active"><span style="font-size:21px">💬</span><span>DM</span><span class="navBadge" id="navTotal" style="display:none">0</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a></div>
+<!-- ✅ FIXED 2: navPfp src="" ah thookiten da -->
+<div class="bottom-nav"><a href="index.html"><span style="font-size:22px">⌂</span><span>Home</span></a><a href="search.html"><span style="font-size:21px">🔍</span><span>Search</span></a><a href="reels.html"><span style="font-size:21px">▶️</span><span>Reels</span></a><a href="dm.html" class="active"><span style="font-size:21px">💬</span><span>DM</span><span class="navBadge" id="navTotal" style="display:none">0</span></a><a href="profile.html"><img class="navPfp" id="navPfp" src="https://ui-avatars.com/api/?name=P&background=FF4D8D&color=fff&size=200&bold=true" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true'"><span>Profile</span></a></div>
 <script>
-// ✅ CORRECTED DM - FULL
 let supa=null;
 function getSupa(){
   if(window.supa) supa=window.supa;
@@ -329,12 +330,12 @@ async function init(){
   let {data:{session}}=await supa.auth.getSession();
   if(!session){ await new Promise(r=>setTimeout(r,800)); let s2=await supa.auth.getSession(); session=s2.data.session; }
   if(!session){location.href='login.html';return}
-  ME_ID=session.user.id; window.ME_ID=ME_ID; let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).maybeSingle(); ME_RAW=cleanUser(my?.username||session.user.email.split('@')[0]); window.ME_RAW=ME_RAW; let navPfp=document.getElementById('navPfp'); if(navPfp && my?.avatar_url) navPfp.src=my.avatar_url; else if(navPfp) navPfp.style.display='none';
+  ME_ID=session.user.id; window.ME_ID=ME_ID; let {data:my}=await supa.from('profiles').select('*').eq('id',ME_ID).maybeSingle(); ME_RAW=cleanUser(my?.username||session.user.email.split('@')[0]); window.ME_RAW=ME_RAW; let navPfp=document.getElementById('navPfp'); if(navPfp && my?.avatar_url) navPfp.src=my.avatar_url;
   let {data:profs}=await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url,is_online,last_seen').limit(200); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p});
   await loadBlockedBoth();
   await loadUserSettings();
   updatePresence(true); setInterval(()=>updatePresence(true),30000); loadNotes(); load();
-  if(window.pixoroRefreshPhotos) await window.pixoroRefreshPhotos();
+  // ✅ FIXED 3: pixoroRefreshPhotos ah koopidala da
   supa.channel('dm-list').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},()=>load()).subscribe();
   supa.channel('presence-live').on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles'},()=>{ load(); }).subscribe();
   supa.channel('notes-live').on('postgres_changes',{event:'*',schema:'public',table:'notes'},()=>loadNotes()).subscribe();
@@ -344,7 +345,7 @@ async function load(){
   supa=getSupa(); if(!supa) return;
   let {data:profs}=await supa.from('profiles').select('id,username,avatar_url,profile_pic,photo_url,is_online,last_seen').limit(200); (profs||[]).forEach(p=>{profileMap[cleanUser(p.username)]=p;profileById[p.id]=p});
   await loadBlockedBoth();
-  if(window.pixoroRefreshPhotos) window.pixoroRefreshPhotos();
+  // ✅ FIXED 3: inga yum pixoroRefreshPhotos illa da
   let {data} = await supa.from('messages').select('*').or(`sender_id.eq.${ME_ID},receiver_id.eq.${ME_ID}`).order('created_at',{ascending:false}).limit(200);
   if(!data) data=[];
   data = data.filter(m=>{ let oid = otherIdOf(m); return oid && !isBlockedChat(oid); });
