@@ -1,9 +1,12 @@
 // feed.js - PIXORO Feed - FIXED da Giri!
-import { supabase } from './supabase.js' // supa Illa da - supabase da!
+// import illa da - pixoro-core la iruntha supa va edukuren da
+function getSupa(){ return window.supa; }
 
 export async function getFeed(currentUserId) {
   try {
     if(!currentUserId) return []
+    const supabase = getSupa();
+    if(!supabase) return [];
 
     const { data: following } = await supabase
       .from('follows')
@@ -13,11 +16,11 @@ export async function getFeed(currentUserId) {
     const followingIds = following ? following.map(f => f.following_id) : [];
     const allowedIds = [...followingIds, currentUserId];
 
-    // Public + Follow Panna Private - Mattum da
+    // Posts + Reels - Rendum da - Photo varanum la da
     const { data: reels, error } = await supabase
       .from('reels')
       .select(`
-        id, video_url, caption, visibility, shared_with, created_at, user_id,
+        id, video_url, media_url, caption, visibility, shared_with, created_at, user_id,
         profiles ( id, username, avatar_url, is_private_account, is_verified )
       `)
       .order('created_at', { ascending: false })
@@ -25,13 +28,28 @@ export async function getFeed(currentUserId) {
 
     if (error) throw error;
 
-    // Filter - JS la Pannu da - Simple da - Bug Varaathu da
-    const filtered = (reels || []).filter(r => {
-      if(r.visibility === 'private_share') return false // DM Mattum da - Feed la Varaathu da
-      if(!r.profiles.is_private_account) return true // Public na - OK da
+    const { data: posts } = await supabase
+      .from('posts')
+      .select(`
+        id, media_url, video_url, caption, created_at, user_id,
+        profiles ( id, username, avatar_url, is_private_account, is_verified )
+      `)
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    let all = [...(reels||[]), ...(posts||[])];
+
+    // Filter - JS la Pannu da - Simple da
+    const filtered = all.filter(r => {
+      if(r.visibility === 'private_share') return false // DM Mattum da
+      let prof = r.profiles;
+      if(!prof) return true;
+      if(!prof.is_private_account) return true // Public na - OK da
       return allowedIds.includes(r.user_id) // Private na - Follow Panna Mattum da
     });
 
+    // Date vachu sort pannu da - Latest mela varum da
+    filtered.sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
     return filtered;
 
   } catch (err) {
@@ -41,7 +59,8 @@ export async function getFeed(currentUserId) {
 }
 
 export async function renderFeed(currentUserId) {
-  const feedContainer = document.getElementById('feedContainer');
+  // FIXED da - feedContainer illa da, feed thaan da
+  const feedContainer = document.getElementById('feed') || document.getElementById('feedContainer');
   if (!feedContainer) return;
   
   feedContainer.innerHTML = '<p style="color:#888;text-align:center;">Loading da Giri... ⏳</p>';
@@ -52,15 +71,23 @@ export async function renderFeed(currentUserId) {
     return;
   }
 
-  feedContainer.innerHTML = reels.map(reel => `
+  feedContainer.innerHTML = reels.map(reel => {
+    let prof = reel.profiles || {};
+    let media = reel.video_url || reel.media_url || '';
+    let isVid = media.toLowerCase().includes('.mp4') || media.toLowerCase().includes('.mov') || media.toLowerCase().includes('.webm');
+    let mediaHtml = isVid ? `<video src="${media}" controls style="width:100%;border-radius:12px;background:#000;"></video>` : `<img src="${media}" style="width:100%;border-radius:12px;object-fit:cover;aspect-ratio:4/5">`;
+    return `
     <div class="reel-card" style="background:#151515;border-radius:20px;margin-bottom:16px;padding:12px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <img src="${reel.profiles.avatar_url || 'default.png'}" style="width:36px;height:36px;border-radius:50%;">
-        <b style="color:white;">${reel.profiles.username} ${reel.profiles.is_verified ? '✔️💙' : ''}</b>
-        <span style="color:#888;font-size:12px;">${reel.profiles.is_private_account ? '🔒 Private' : '🌍 Public'}</span>
+        <img src="${prof.avatar_url || 'https://ui-avatars.com/api/?name=P&background=ff5ea8&color=fff'}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+        <b style="color:white;">${prof.username || 'user'} ${prof.is_verified ? '✔️💙' : ''}</b>
+        <span style="color:#888;font-size:12px;">${prof.is_private_account ? '🔒 Private' : '🌍 Public'}</span>
       </div>
-      <video src="${reel.video_url}" controls style="width:100%;border-radius:12px;background:#000;"></video>
+      ${mediaHtml}
       <p style="color:white;margin-top:8px;">${reel.caption || ''}</p>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
+// HTML la irunthu koopida - window la vai da
+window.getFeed = getFeed;
+window.renderFeed = renderFeed;
