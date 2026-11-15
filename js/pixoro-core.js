@@ -1,4 +1,4 @@
-// ===== PIXORO CORE - CORRECTED v1008 - IMAGE VARUM DA - FULL =====
+// ===== PIXORO CORE - CORRECTED v1009 - WHITE BG REMOVE + TOP NOTE + PAZHAYA PHOTO DA - FULL =====
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 window.PIXORO_URL = SUPA_URL;
@@ -35,7 +35,8 @@ window.isGoldUser = isGoldUser;
 window.goldTickHTML = goldTickHTML;
 window.getTick = goldTickHTML;
 
-// ✅ v1008: IMAGE MARAIKKA KOODATHU DA - CSS la img ah thodave illa da
+// ✅ v1009 FIX 1: WHITE BG THOOKITEN DA - BOTTOM NAV ACTIVE TRANSPARENT DA
+// ✅ v1009 FIX 2: MELLA NOTIFICATION MAARI BLOCK - ELLA PAGE LAYUM - BACKGROUND ILLA DA
 (function(){
   if(document.getElementById('pixoro-speed-css')) return;
   let css = `
@@ -49,24 +50,38 @@ window.getTick = goldTickHTML;
   .reel-main.bgRemove{ object-fit:contain!important;background:#000!important; }
   .bellWrap{position:relative!important;cursor:pointer!important}
   #pixoroBellDot{position:absolute!important;top:-2px!important;right:-2px!important;width:9px!important;height:9px!important;background:#ff3040!important;border-radius:50%!important;display:none;z-index:5}
-  .bottom-nav{position:fixed!important;bottom:0!important;left:0!important;right:0!important;max-width:450px!important;margin:0 auto!important;width:100%!important;height:60px!important;background:#000!important;border-top:1.5px solid #fff!important;display:flex!important;justify-content:space-around!important;align-items:center!important;z-index:100!important}
-  .bottom-nav a{display:flex!important;flex-direction:column!important;align-items:center!important;gap:3px!important;text-decoration:none!important;color:#8e8e8e!important;font-size:10px!important;background:transparent!important}
+  .bottom-nav{position:fixed!important;bottom:0!important;left:0!important;right:0!important;max-width:450px!important;margin:0 auto!important;width:100%!important;height:60px!important;background:#000!important;border-top:1px solid #222!important;display:flex!important;justify-content:space-around!important;align-items:center!important;z-index:100!important}
+  .bottom-nav a{display:flex!important;flex-direction:column!important;align-items:center!important;gap:3px!important;text-decoration:none!important;color:#8e8e8e!important;font-size:10px!important;background:transparent!important;background-color:transparent!important;box-shadow:none!important}
   .bottom-nav a svg{width:22px!important;height:22px!important;fill:none!important;stroke:#8e8e8e!important;stroke-width:1.8!important;display:block!important}
-  .bottom-nav a.active{color:#000!important;background:#fff!important;border-radius:12px!important;padding:4px 10px!important}
-  .bottom-nav a.active svg{stroke:#000!important}
-  .bottom-nav a.active span{color:#000!important;font-weight:900!important}
+  .bottom-nav a.active{color:#fff!important;background:transparent!important;background-color:transparent!important;border-radius:0!important;padding:4px 10px!important;box-shadow:none!important;border-bottom:2px solid #FF2DCC!important}
+  .bottom-nav a.active svg{stroke:#fff!important;fill:none!important}
+  .bottom-nav a.active span{color:#fff!important;font-weight:900!important}
   .bottom-nav span{font-size:10px!important}
   .followBtnPost,.followBtnSearch,.followBtnPerusa{ background:transparent!important;color:#fff!important;border:1.5px solid #fff!important;padding:4px 12px!important;border-radius:8px!important;font-size:12px!important;font-weight:700!important;cursor:pointer!important }
   .followBtnPost.following,.followBtnSearch.following,.followBtnPerusa.following{ border-color:#666!important;color:#aaa!important }
+  /* ✅ MELLA NOTIFICATION BLOCK - BACKGROUND ILLA DA - TRANSPARENT DA */
+  #pixoroTopNote{ position:fixed!important; top:0!important; left:0!important; right:0!important; z-index:999!important; display:flex!important; justify-content:center!important; pointer-events:none!important; background:transparent!important; background-color:transparent!important; }
+  #pixoroTopNote div{ background:rgba(0,0,0,0.65)!important; backdrop-filter:blur(10px); color:#fff!important; font-size:12px!important; font-weight:700!important; padding:8px 14px!important; border-radius:0 0 16px 16px!important; border:1px solid rgba(255,255,255,0.15)!important; border-top:0!important; pointer-events:auto!important; cursor:pointer!important; }
   `;
   let s = document.createElement('style'); s.id='pixoro-speed-css'; s.innerText = css; document.head.appendChild(s);
   if(location.pathname.includes('index') || location.pathname.endsWith('/')){
     if(document.body) document.body.classList.add('isHome');
     else document.addEventListener('DOMContentLoaded', ()=>{ if(document.body) document.body.classList.add('isHome'); });
   }
+  // ✅ MELLA NOTE AH ELLA PAGE LAYUM PODUREN DA
+  function addTopNote(){
+    if(document.getElementById('pixoroTopNote')) return;
+    if(!document.body) return;
+    let n = document.createElement('div');
+    n.id = 'pixoroTopNote';
+    n.innerHTML = `<div onclick="location.href='dm.html'">🔔 Pixoro - New Updates Paaru da ›</div>`;
+    document.body.appendChild(n);
+    setTimeout(()=>{ if(n) n.style.display='none'; }, 5000);
+  }
+  if(document.readyState !== 'loading') addTopNote();
+  else document.addEventListener('DOMContentLoaded', addTopNote);
 })();
 window._PIXORO_PFP_CACHE = {};
-// ✅ v1008 FIXED: getPfp - IMAGE VARANUM DA
 window.getPfp = function(p){
   if(!p) return 'https://ui-avatars.com/api/?name=P&background=ff5ea8&color=fff&size=200&bold=true';
   if(typeof p === 'string' && p.includes('http')) return p;
@@ -95,6 +110,7 @@ async function pixoroFixMe(){
     }
   }catch(e){}
 }
+// ✅ v1009 FIX 3: PAZHAYA PHOTO YUM VARANUM DA - posts + reels rendu vum edukuren da
 async function getAllPixoroPosts(){
   let s = pixoroGetSupa(); if(!s) return [];
   let all = [];
@@ -102,7 +118,7 @@ async function getAllPixoroPosts(){
   try{ let r2 = await s.from('reels').select('*').order('created_at',{ascending:false}).limit(100); if(r2.data) all = all.concat(r2.data.map(p=>({...p,_from:'reels'}))); }catch(e){}
   let seen = new Set(), out = [];
   for(let p of all){
-    let url = String(p.media_url||p.video_url||'').split('?')[0].toLowerCase();
+    let url = String(p.media_url||p.video_url||p.image_url||p.image||'').split('?')[0].toLowerCase();
     if(url && seen.has(url)) continue;
     if(url) seen.add(url);
     out.push(p);
@@ -262,7 +278,6 @@ async function loadProfileRealCount(){
   document.querySelectorAll('#reelCount, .reelCount').forEach(e=> e.innerText = reels.length);
   return {mine, reels};
 }
-// ✅ v1008: FOLLOW LIST LA PFP KODA VARUM DA
 async function pixoroOpenFollowList(type){
   if(!window.ME_ID) await pixoroFixMe();
   let s = pixoroGetSupa(); if(!s) return;
@@ -277,7 +292,7 @@ async function pixoroOpenFollowList(type){
     let pr = (profs||[]).find(p=> String(p.id)===String(pid));
     let uname = pr?.username || f.following_name || f.follower_name || 'user';
     let pfp = pr?.avatar_url || 'https://ui-avatars.com/api/?name='+uname.charAt(0)+'&background=ff5ea8&color=fff';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><img src="${pfp}" style="width:36px;height:36px;border-radius:50%;object-fit:cover"><b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='./profile.html?u=${pid}'">${uname}</b><button onclick="location.href='./profile.html?u=${pid}'" style="background:#fff;color:#000;border:0;padding:6px 14px;border-radius:20px;font-weight:700">View</button></div>`;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><img src="${pfp}" style="width:36px;height:36px;border-radius:50%;object-fit:cover"><b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='./profile.html?u=${pid}'">${uname}</b><button onclick="location.href='./profile.html?u=${pid}'" style="background:transparent;color:#fff;border:1.2px solid #fff;padding:6px 14px;border-radius:20px;font-weight:700">View</button></div>`;
   }).join('') || `<div style="color:#888;text-align:center;padding:20px">No ${type} yet</div>`;
   let old = document.getElementById('followModal'); if(old) old.remove();
   let m = document.createElement('div'); m.id = 'followModal';
@@ -439,7 +454,7 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
-console.log('PIXORO CORE v1008 - IMAGE VARUM DA');
+console.log('PIXORO CORE v1009 - WHITE BG REMOVE + TOP NOTE + PAZHAYA PHOTO DA');
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
@@ -461,7 +476,6 @@ async function pixoroUploadPhoto(file, chatId){
   if(error) throw error;
   return path;
 }
-// ✅ v1008 FIXED: Photo URL varanum da
 async function pixoroGetPhotoUrl(path){
   if(!path) return '';
   if(path.includes('http')) return path;
@@ -522,4 +536,3 @@ async function pixoroCheckBell(){
 window.pixoroCheckBell = pixoroCheckBell;
 setInterval(pixoroCheckBell, 15000);
 setTimeout(pixoroCheckBell, 3000);
-// ✅ v1008: pixoroRemoveAllImages ILLA DA - THOOKITEN DA
