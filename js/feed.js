@@ -1,33 +1,28 @@
-// ===== PIXORO FEED - v1011 - EXPORT ILLA DA - AUTO RUN AAGUM DA - PHOTO VARUM DA =====
+// ===== PIXORO FEED - v1012 - POST + MAIN CLASS ADD PANNIYACHU DA - PHOTO VARUM DA =====
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
 
 function feedClean(u){ if(!u) return ''; return String(u).trim().replace('@','').toLowerCase(); }
 function getSupa(){ return window.supa || (window.getSupa ? window.getSupa() : null); }
 
-// ✅ FIX 1: profiles JOIN illa da - JOIN fail aana feed empty aagidum da - thaniya edukuren da
 async function getFeed(currentUserId){
   try{
     let s = getSupa(); if(!s) return [];
     let all = [];
-    // Reels
     try{
       let r = await s.from('reels').select('*').order('created_at',{ascending:false}).limit(50);
       if(r.data) all = all.concat(r.data.map(p=>({...p,_from:'reels'})));
     }catch(e){}
-    // Posts - PHOTO INGA THAAN DA
     try{
       let r = await s.from('posts').select('*').order('created_at',{ascending:false}).limit(50);
       if(r.data) all = all.concat(r.data.map(p=>({...p,_from:'posts'})));
     }catch(e){}
-    // Profiles thaniya
     let profMap = {};
     try{
       let r = await s.from('profiles').select('id,username,avatar_url,profile_pic,photo_url,is_verified').limit(200);
       (r.data||[]).forEach(p=>{ profMap[String(p.id)] = p; });
     }catch(e){}
     all.forEach(p=>{ if(profMap[String(p.user_id)]) p.profiles = profMap[String(p.user_id)]; });
-    // Private filter
     let allowedIds = [String(currentUserId)];
     try{
       let f = await s.from('follows').select('following_id').eq('follower_id', currentUserId).eq('status','accepted');
@@ -41,7 +36,6 @@ async function getFeed(currentUserId){
       if(!prof.is_private_account) return true;
       return allowedIds.includes(String(r.user_id));
     });
-    // Dedup - same photo 2 vaati varathu da
     let seen = new Set(), out = [];
     for(let p of filtered){
       let url = String(p.media_url||p.video_url||p.image_url||'').split('?')[0].toLowerCase();
@@ -94,6 +88,7 @@ function renderFeedList(){
     box.innerHTML = `<div style="padding:40px;text-align:center;color:#888">No posts yet da<br><button onclick="location.href='./post-create.html'" style="margin-top:12px;background:#FF2DCC;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:800">+ Post Pannu da</button></div>`;
     return;
   }
+  // ✅ v1012 CORRECT ADD DA - .post + img.main + pfpRing + .actions + .act da - feed.css ku 100% match da
   box.innerHTML = list.map(p=>{
     let prof = p.profiles || {};
     let uname = feedClean(prof.username || p.username || 'user');
@@ -101,26 +96,31 @@ function renderFeedList(){
     let tick = window.goldTickHTML ? window.goldTickHTML(prof.username ? prof : p) : '';
     let m = feedGetMedia(p);
     let mediaHtml = m.isVid
-      ? `<video src="${m.url}" muted playsinline loop preload="metadata" onclick="this.paused?this.play():this.pause()" style="width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#000"></video>`
-      : `<img src="${m.url}" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#111" onerror="this.parentElement.style.display='none'">`;
+      ? `<video class="main" src="${m.url}" muted playsinline loop preload="metadata" onclick="this.paused?this.play():this.pause()"></video>`
+      : `<img class="main" src="${m.url}" loading="lazy" onerror="this.closest('.post').style.display='none'">`;
     let isMine = String(p.user_id)===String(FEED_ME_ID);
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
-    return `<div class="reel-card" style="background:#151515;border-radius:20px;margin:0 12px 16px;padding:12px;border:1px solid #222">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-        <img src="${pfp}" onclick="location.href='./profile.html?u=${p.user_id}'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer">
-        <b style="color:#fff;flex:1;cursor:pointer" onclick="location.href='./profile.html?u=${p.user_id}'">@${uname}${tick}</b>
-        <span style="color:#888;font-size:12px">${feedTime(p.created_at)}</span>
-        ${!isMine ? `<button data-follow-user="${uname}" onclick="pixoroToggleFollow('${uname}',this)" style="background:transparent;color:#fff;border:1.2px solid #fff;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:700">${isFollowing?'Following':'Follow'}</button>` : ''}
+    let liked = FEED_LIKES.has(String(p.id)) ? 'liked' : '';
+    return `<div class="post">
+      <div class="postTop">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="pfpRing" onclick="location.href='./profile.html?u=${p.user_id}'"><div class="pfpInner"><img src="${pfp}" onerror="this.outerHTML='<div class=&quot;avaLetterHome&quot;>${uname.charAt(0).toUpperCase()}</div>'"></div></div>
+          <div><b onclick="location.href='./profile.html?u=${p.user_id}'">@${uname}${tick}</b><div style="font-size:11px;color:#888">${feedTime(p.created_at)}</div></div>
+        </div>
+        ${!isMine ? `<button data-follow-user="${uname}" class="followBtnPost ${isFollowing?'following':''}" onclick="pixoroToggleFollow('${uname}',this)">${isFollowing?'Following':'Follow'}</button>` : '<span>⋯</span>'}
       </div>
       ${mediaHtml}
-      <div style="display:flex;gap:16px;font-size:22px;margin-top:10px"><span onclick="pixoroToggleLike('${p.id}',this)" style="cursor:pointer">❤️</span><span onclick="openComment('${p.id}')" style="cursor:pointer">💬</span><span onclick="sharePost('${p.id}')" style="cursor:pointer">↗️</span></div>
-      <p style="color:#fff;margin-top:8px;font-size:14px"><b>@${uname}</b> ${p.caption||''}</p>
+      <div class="actions"><div class="left">
+        <button class="act ${liked}" onclick="pixoroToggleLike('${p.id}',this);this.classList.toggle('liked')"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9C.5 8.5 2.5 5 6 5c2 0 3.5 1 6 3.5C14.5 6 16 5 18 5c3.5 0 5.5 3.5 3.5 7-2.5 4.5-9.5 9-9.5 9z"/></svg></button>
+        <button class="act" onclick="openComment('${p.id}')"><svg viewBox="0 0 24 24"><path d="M21 11.5c0 4-3.8 7.5-9 7.5-1 0-2-.1-2.8-.4L3 20l1.4-4.5C3.5 14.3 3 13 3 11.5 3 7.5 6.8 4 12 4s9 3.5 9 7.5z"/></svg></button>
+        <button class="act" onclick="sharePost('${p.id}')"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+      </div></div>
+      <div style="padding:0 12px;font-size:14px"><b>@${uname}</b> ${p.caption||''}</div>
     </div>`;
   }).join('');
   if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
 }
 
-// ✅ FIX 2: ithu thaan da renderFeed - index.html la irunthu koopida koodiya peru da
 async function renderFeed(currentUserId){
   let box = document.getElementById('feed');
   if(!box) return;
@@ -166,7 +166,7 @@ async function loadStories(){
     let {data}=await s.from('stories').select('*').order('created_at',{ascending:false}).limit(20);
     let bar=document.getElementById('storyBar'); if(!bar) return;
     if(!data||!data.length){ bar.style.display='none'; return; }
-    bar.innerHTML = data.map(st=>`<div onclick="location.href='./story.html?id=${st.id}'" style="text-align:center;cursor:pointer;flex:0 0 62px"><div style="width:56px;height:56px;border-radius:50%;padding:2px;border:2px solid #FF2DCC;margin:0 auto;overflow:hidden"><img src="${st.media_url||st.image_url||''}" style="width:100%;height:100%;border-radius:50%;object-fit:cover"></div><div style="font-size:10px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${feedClean(st.username||'user')}</div></div>`).join('');
+    bar.innerHTML = data.map(st=>`<div class="sItem" onclick="location.href='./story.html?id=${st.id}'"><div class="sRing"><div class="sRingInner"><img src="${st.media_url||st.image_url||''}"></div></div><div class="sName">${feedClean(st.username||'user')}</div></div>`).join('');
   }catch(e){}
 }
 function showChoice(){ let c=document.getElementById('choice'); if(c) c.style.display='flex'; }
@@ -192,6 +192,5 @@ async function addComment(){
   inp.value=''; loadComments(window.CURRENT_COMMENT_POST);
 }
 window.addComment=addComment;
-// ✅ FIX 3: AUTO RUN DA - yaarum koopida vendaam da
 if(document.readyState !== 'loading') loadFeed();
 else document.addEventListener('DOMContentLoaded', loadFeed);
