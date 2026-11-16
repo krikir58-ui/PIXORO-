@@ -1,9 +1,17 @@
-// ===== PIXORO FEED - v1020 - CIRCLE PHOTO FIX + ENNAKU FOLLOW VARA KOODATHU DA =====
+// ===== PIXORO FEED - v1022 - OREY PROFILE PHOTO ELLA PAGE KUM + FOLLOW FIX + CIRCLE FIX DA =====
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
+let MY_PFP = ''; // ✅ Orey Photo da - Profile la irukka photo da
 
 function feedClean(u){ if(!u) return ''; return String(u).trim().replaceAll('@','').toLowerCase(); }
 function getSupa(){ return window.supa || (window.getSupa ? window.getSupa() : null); }
+
+// ✅ OREY PHOTO FUNCTION DA - ID / Name maathinaalum athe photo thaan da
+window.pixoroGetPfp = function(prof, userId, uname){
+  let isMineNow = String(userId)===String(FEED_ME_ID) || feedClean(uname)===feedClean(FEED_ME_RAW);
+  if(isMineNow && MY_PFP) return MY_PFP; // En post na En Profile Photo thaan da
+  return String(prof?.avatar_url || prof?.profile_pic || prof?.photo_url || '').trim();
+};
 
 async function getFeed(currentUserId){
   try{
@@ -91,9 +99,8 @@ function renderFeedList(){
   box.innerHTML = list.map(p=>{
     let prof = p.profiles || {};
     let uname = feedClean(prof.username || p.username || 'user');
-    // ✅ v1020 FIX 1 DA - CIRCLE PHOTO - Karuppu Block varathu da
-    // avatar illa na / broken na, ui-avatars karuppu photo vendaam da, Letter mattum da
-    let pfp = String(prof.avatar_url || prof.profile_pic || prof.photo_url || '').trim();
+    // ✅ OREY PHOTO DA - Profile la irukka photo thaan ellathukum da
+    let pfp = window.pixoroGetPfp(prof, p.user_id, uname);
     let avatarHtml = pfp
       ? `<img src="${pfp}" onerror="this.remove();this.parentElement.querySelector('.avaLetterHome').style.display='grid'">`
       : '';
@@ -102,8 +109,7 @@ function renderFeedList(){
     let mediaHtml = m.isVid
       ? `<video class="main" src="${m.url}" muted playsinline loop preload="metadata" onclick="this.paused?this.play():this.pause()"></video>`
       : `<img class="main" src="${m.url}" loading="lazy" onerror="this.closest('.post').style.display='none'">`;
-    // ✅ v1020 FIX 2 DA - ENNAKU FOLLOW VARA KOODATHU DA
-    // user_id mattum illa da, username um check pannurom da - rendu la ethuvum match aana un post thaan da
+    // ✅ ENNAKU FOLLOW VARA KOODATHU DA
     let isMine = String(p.user_id)===String(FEED_ME_ID) || uname === feedClean(FEED_ME_RAW) || uname === feedClean(window.ME_RAW||'');
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
     let liked = FEED_LIKES.has(String(p.id)) ? 'liked' : '';
@@ -124,22 +130,18 @@ function renderFeedList(){
       <div style="padding:0 12px;font-size:14px"><b>${uname}</b> ${p.caption||''}</div>
     </div>`;
   }).join('');
-  // ✅ v1020 FIX 3 DA - pixoroPaintAllFollowBtns en post la Follow ah thirumba kaamikka koodathu da
-  // Athu vera file la iruntha kooda, inga un post button ah hide pannidurom da
-  document.querySelectorAll('.post').forEach((postEl, idx)=>{
-    let p = list[idx]; if(!p) return;
-    let uname2 = feedClean(p.profiles?.username || p.username || 'user');
-    let isMine2 = String(p.user_id)===String(FEED_ME_ID) || uname2 === feedClean(FEED_ME_RAW);
-    if(isMine2){ let btn = postEl.querySelector('[data-follow-user]'); if(btn) btn.outerHTML = '<span>⋯</span>'; }
-  });
+  // ✅ En post la Follow thirumba vantha hide pannu da - double lock da
+  let hideMyFollow = ()=>{
+    document.querySelectorAll('.post').forEach((postEl, idx)=>{
+      let p = list[idx]; if(!p) return;
+      let uname2 = feedClean(p.profiles?.username || p.username || 'user');
+      let isMine2 = String(p.user_id)===String(FEED_ME_ID) || uname2 === feedClean(FEED_ME_RAW);
+      if(isMine2){ let btn = postEl.querySelector('[data-follow-user]'); if(btn) btn.outerHTML = '<span>⋯</span>'; }
+    });
+  };
+  hideMyFollow();
   if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
-  // Paint pannathukku aprom thirumba oru thadava check pannu da - en post la Follow varave koodathu da
-  document.querySelectorAll('.post').forEach((postEl, idx)=>{
-    let p = list[idx]; if(!p) return;
-    let uname2 = feedClean(p.profiles?.username || p.username || 'user');
-    let isMine2 = String(p.user_id)===String(FEED_ME_ID) || uname2 === feedClean(FEED_ME_RAW);
-    if(isMine2){ let btn = postEl.querySelector('[data-follow-user]'); if(btn) btn.outerHTML = '<span>⋯</span>'; }
-  });
+  hideMyFollow();
 }
 
 async function renderFeed(currentUserId){
@@ -165,8 +167,11 @@ async function loadFeed(){
   FEED_ME_ID = session.user.id; window.ME_ID = FEED_ME_ID;
   let {data:myProf} = await s.from('profiles').select('*').eq('id', FEED_ME_ID).maybeSingle();
   FEED_ME_RAW = feedClean(myProf?.username || session.user.email.split('@')[0]); window.ME_RAW = FEED_ME_RAW;
+  // ✅ Orey Photo va ID vachu save pannurom da - Name maathinaalum photo maaraathu da
+  MY_PFP = String(myProf?.avatar_url || myProf?.profile_pic || myProf?.photo_url || '').trim();
+  window.MY_PFP = MY_PFP; window.ME_PFP = MY_PFP;
   let navPfp = document.getElementById('navPfp');
-  if(navPfp && myProf?.avatar_url) navPfp.src = myProf.avatar_url;
+  if(navPfp && MY_PFP) navPfp.src = MY_PFP;
   if(window.pixoroLoadFollowing) window.pixoroLoadFollowing();
   FEED_ALL = await getFeed(FEED_ME_ID);
   try{
