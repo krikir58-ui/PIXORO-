@@ -1,4 +1,4 @@
-// ===== PIXORO FEED - v1012 - POST + MAIN CLASS ADD PANNIYACHU DA - PHOTO VARUM DA =====
+// ===== PIXORO FEED - v1018 - GOLD TICK REMOVE + REAL PHOTO ONLY DA =====
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
 
@@ -19,7 +19,7 @@ async function getFeed(currentUserId){
     }catch(e){}
     let profMap = {};
     try{
-      let r = await s.from('profiles').select('id,username,avatar_url,profile_pic,photo_url,is_verified').limit(200);
+      let r = await s.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').limit(200);
       (r.data||[]).forEach(p=>{ profMap[String(p.id)] = p; });
     }catch(e){}
     all.forEach(p=>{ if(profMap[String(p.user_id)]) p.profiles = profMap[String(p.user_id)]; });
@@ -88,12 +88,12 @@ function renderFeedList(){
     box.innerHTML = `<div style="padding:40px;text-align:center;color:#888">No posts yet da<br><button onclick="location.href='./post-create.html'" style="margin-top:12px;background:#FF2DCC;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:800">+ Post Pannu da</button></div>`;
     return;
   }
-  // ✅ v1012 CORRECT ADD DA - .post + img.main + pfpRing + .actions + .act da - feed.css ku 100% match da
   box.innerHTML = list.map(p=>{
     let prof = p.profiles || {};
     let uname = feedClean(prof.username || p.username || 'user');
-    let pfp = prof.avatar_url || prof.profile_pic || prof.photo_url || ('https://ui-avatars.com/api/?name='+uname.charAt(0)+'&background=ff5ea8&color=fff');
-    let tick = window.goldTickHTML ? window.goldTickHTML(prof.username ? prof : p) : '';
+    // ✅ REAL PHOTO ONLY DA - Server la irunthu avatar mattum da
+    let pfp = prof.avatar_url || prof.profile_pic || prof.photo_url || ('https://ui-avatars.com/api/?name='+uname.charAt(0)+'&background=111&color=fff&size=200&bold=true');
+    // ✅ GOLD TICK REMOVE - tick variable full ah delete panniten da
     let m = feedGetMedia(p);
     let mediaHtml = m.isVid
       ? `<video class="main" src="${m.url}" muted playsinline loop preload="metadata" onclick="this.paused?this.play():this.pause()"></video>`
@@ -105,7 +105,7 @@ function renderFeedList(){
       <div class="postTop">
         <div style="display:flex;align-items:center;gap:10px">
           <div class="pfpRing" onclick="location.href='./profile.html?u=${p.user_id}'"><div class="pfpInner"><img src="${pfp}" onerror="this.outerHTML='<div class=&quot;avaLetterHome&quot;>${uname.charAt(0).toUpperCase()}</div>'"></div></div>
-          <div><b onclick="location.href='./profile.html?u=${p.user_id}'">@${uname}${tick}</b><div style="font-size:11px;color:#888">${feedTime(p.created_at)}</div></div>
+          <div><b onclick="location.href='./profile.html?u=${p.user_id}'">@${uname}</b><div style="font-size:11px;color:#888">${feedTime(p.created_at)}</div></div>
         </div>
         ${!isMine ? `<button data-follow-user="${uname}" class="followBtnPost ${isFollowing?'following':''}" onclick="pixoroToggleFollow('${uname}',this)">${isFollowing?'Following':'Follow'}</button>` : '<span>⋯</span>'}
       </div>
@@ -158,17 +158,10 @@ async function loadFeed(){
     if(single){ FEED_ALL = [single, ...FEED_ALL.filter(p=>String(p.id)!==String(pid))]; let b=document.getElementById('singleBanner'); if(b) b.style.display='block'; }
   }
   renderFeedList();
-  loadStories();
+  // ✅ STORY AH stories.js la irunthu mattum edukanum da - inga duplicate vendaam da
+  if(window.loadStories) window.loadStories();
 }
-async function loadStories(){
-  try{
-    let s=getSupa(); if(!s) return;
-    let {data}=await s.from('stories').select('*').order('created_at',{ascending:false}).limit(20);
-    let bar=document.getElementById('storyBar'); if(!bar) return;
-    if(!data||!data.length){ bar.style.display='none'; return; }
-    bar.innerHTML = data.map(st=>`<div class="sItem" onclick="location.href='./story.html?id=${st.id}'"><div class="sRing"><div class="sRingInner"><img src="${st.media_url||st.image_url||''}"></div></div><div class="sName">${feedClean(st.username||'user')}</div></div>`).join('');
-  }catch(e){}
-}
+// ✅ DUPLICATE loadStories AH FULL AH DELETE PANNITEN DA - stories.js thaan use aagum da, media_url vera photo varathu da
 function showChoice(){ let c=document.getElementById('choice'); if(c) c.style.display='flex'; }
 function hideChoice(){ let c=document.getElementById('choice'); if(c) c.style.display='none'; }
 window.showChoice=showChoice; window.hideChoice=hideChoice;
