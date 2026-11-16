@@ -1,4 +1,4 @@
-// ===== PIXORO FEED - v1022 - OREY PROFILE PHOTO ELLA PAGE KUM + FOLLOW FIX + CIRCLE FIX DA =====
+// ===== PIXORO FEED - v1023 - OREY PROFILE PHOTO ELLA PAGE KUM + FOLLOW FIX + CIRCLE FIX DA =====
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
 let MY_PFP = ''; // ✅ Orey Photo da - Profile la irukka photo da
@@ -6,11 +6,11 @@ let MY_PFP = ''; // ✅ Orey Photo da - Profile la irukka photo da
 function feedClean(u){ if(!u) return ''; return String(u).trim().replaceAll('@','').toLowerCase(); }
 function getSupa(){ return window.supa || (window.getSupa ? window.getSupa() : null); }
 
-// ✅ OREY PHOTO FUNCTION DA - ID / Name maathinaalum athe photo thaan da
+// ✅ OREY PHOTO FUNCTION DA - avatar_url mattum thaan da
 window.pixoroGetPfp = function(prof, userId, uname){
   let isMineNow = String(userId)===String(FEED_ME_ID) || feedClean(uname)===feedClean(FEED_ME_RAW);
-  if(isMineNow && MY_PFP) return MY_PFP; // En post na En Profile Photo thaan da
-  return String(prof?.avatar_url || prof?.profile_pic || prof?.photo_url || '').trim();
+  if(isMineNow && MY_PFP) return MY_PFP;
+  return String(prof?.avatar_url || '').trim();
 };
 
 async function getFeed(currentUserId){
@@ -27,7 +27,8 @@ async function getFeed(currentUserId){
     }catch(e){}
     let profMap = {};
     try{
-      let r = await s.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').limit(200);
+      // ✅ FIXED DA - avatar_url mattum thaan da
+      let r = await s.from('profiles').select('id,username,avatar_url').limit(200);
       (r.data||[]).forEach(p=>{ profMap[String(p.id)] = p; });
     }catch(e){}
     all.forEach(p=>{ if(profMap[String(p.user_id)]) p.profiles = profMap[String(p.user_id)]; });
@@ -99,8 +100,9 @@ function renderFeedList(){
   box.innerHTML = list.map(p=>{
     let prof = p.profiles || {};
     let uname = feedClean(prof.username || p.username || 'user');
-    // ✅ OREY PHOTO DA - Profile la irukka photo thaan ellathukum da
-    let pfp = window.pixoroGetPfp(prof, p.user_id, uname);
+    // ✅ OREY PHOTO DA - avatar_url mattum thaan da
+    let pfp = String(prof?.avatar_url || '').trim();
+    if(!pfp && String(p.user_id)===String(FEED_ME_ID) && MY_PFP) pfp = MY_PFP;
     let avatarHtml = pfp
       ? `<img src="${pfp}" onerror="this.remove();this.parentElement.querySelector('.avaLetterHome').style.display='grid'">`
       : '';
@@ -109,7 +111,6 @@ function renderFeedList(){
     let mediaHtml = m.isVid
       ? `<video class="main" src="${m.url}" muted playsinline loop preload="metadata" onclick="this.paused?this.play():this.pause()"></video>`
       : `<img class="main" src="${m.url}" loading="lazy" onerror="this.closest('.post').style.display='none'">`;
-    // ✅ ENNAKU FOLLOW VARA KOODATHU DA
     let isMine = String(p.user_id)===String(FEED_ME_ID) || uname === feedClean(FEED_ME_RAW) || uname === feedClean(window.ME_RAW||'');
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
     let liked = FEED_LIKES.has(String(p.id)) ? 'liked' : '';
@@ -130,7 +131,6 @@ function renderFeedList(){
       <div style="padding:0 12px;font-size:14px"><b>${uname}</b> ${p.caption||''}</div>
     </div>`;
   }).join('');
-  // ✅ En post la Follow thirumba vantha hide pannu da - double lock da
   let hideMyFollow = ()=>{
     document.querySelectorAll('.post').forEach((postEl, idx)=>{
       let p = list[idx]; if(!p) return;
@@ -167,8 +167,8 @@ async function loadFeed(){
   FEED_ME_ID = session.user.id; window.ME_ID = FEED_ME_ID;
   let {data:myProf} = await s.from('profiles').select('*').eq('id', FEED_ME_ID).maybeSingle();
   FEED_ME_RAW = feedClean(myProf?.username || session.user.email.split('@')[0]); window.ME_RAW = FEED_ME_RAW;
-  // ✅ Orey Photo va ID vachu save pannurom da - Name maathinaalum photo maaraathu da
-  MY_PFP = String(myProf?.avatar_url || myProf?.profile_pic || myProf?.photo_url || '').trim();
+  // ✅ FIXED DA - avatar_url mattum thaan da
+  MY_PFP = String(myProf?.avatar_url || '').trim();
   window.MY_PFP = MY_PFP; window.ME_PFP = MY_PFP;
   let navPfp = document.getElementById('navPfp');
   if(navPfp && MY_PFP) navPfp.src = MY_PFP;
