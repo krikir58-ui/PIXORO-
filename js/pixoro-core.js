@@ -1,4 +1,4 @@
-// ===== PIXORO CORE - CORRECTED v1009 - WHITE BG REMOVE + TOP NOTE + PAZHAYA PHOTO DA - FULL =====
+// ===== PIXORO CORE - CORRECTED v1010 - TOP NOTE KEELA + CLOSE BTN DA - FULL =====
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 window.PIXORO_URL = SUPA_URL;
@@ -34,9 +34,6 @@ function goldTickHTML(p){
 window.isGoldUser = isGoldUser;
 window.goldTickHTML = goldTickHTML;
 window.getTick = goldTickHTML;
-
-// ✅ v1009 FIX 1: WHITE BG THOOKITEN DA - BOTTOM NAV ACTIVE TRANSPARENT DA
-// ✅ v1009 FIX 2: MELLA NOTIFICATION MAARI BLOCK - ELLA PAGE LAYUM - BACKGROUND ILLA DA
 (function(){
   if(document.getElementById('pixoro-speed-css')) return;
   let css = `
@@ -59,8 +56,8 @@ window.getTick = goldTickHTML;
   .bottom-nav span{font-size:10px!important}
   .followBtnPost,.followBtnSearch,.followBtnPerusa{ background:transparent!important;color:#fff!important;border:1.5px solid #fff!important;padding:4px 12px!important;border-radius:8px!important;font-size:12px!important;font-weight:700!important;cursor:pointer!important }
   .followBtnPost.following,.followBtnSearch.following,.followBtnPerusa.following{ border-color:#666!important;color:#aaa!important }
-  /* ✅ MELLA NOTIFICATION BLOCK - BACKGROUND ILLA DA - TRANSPARENT DA */
-  #pixoroTopNote{ position:fixed!important; top:0!important; left:0!important; right:0!important; z-index:999!important; display:flex!important; justify-content:center!important; pointer-events:none!important; background:transparent!important; background-color:transparent!important; }
+  /* ✅ v1010 FIX: TOP NOTE - LOGO MELA OTTATHU DA - 58px KEELA DA */
+  #pixoroTopNote{ position:fixed!important; top:58px!important; left:0!important; right:0!important; z-index:999!important; display:flex!important; justify-content:center!important; pointer-events:none!important; background:transparent!important; background-color:transparent!important; }
   #pixoroTopNote div{ background:rgba(0,0,0,0.65)!important; backdrop-filter:blur(10px); color:#fff!important; font-size:12px!important; font-weight:700!important; padding:8px 14px!important; border-radius:0 0 16px 16px!important; border:1px solid rgba(255,255,255,0.15)!important; border-top:0!important; pointer-events:auto!important; cursor:pointer!important; }
   `;
   let s = document.createElement('style'); s.id='pixoro-speed-css'; s.innerText = css; document.head.appendChild(s);
@@ -68,13 +65,13 @@ window.getTick = goldTickHTML;
     if(document.body) document.body.classList.add('isHome');
     else document.addEventListener('DOMContentLoaded', ()=>{ if(document.body) document.body.classList.add('isHome'); });
   }
-  // ✅ MELLA NOTE AH ELLA PAGE LAYUM PODUREN DA
   function addTopNote(){
     if(document.getElementById('pixoroTopNote')) return;
     if(!document.body) return;
     let n = document.createElement('div');
     n.id = 'pixoroTopNote';
-    n.innerHTML = `<div onclick="location.href='dm.html'">🔔 Pixoro - New Updates Paaru da ›</div>`;
+    // ✅ v1010 FIX: CLOSE BTN SERTHUTEN DA
+    n.innerHTML = `<div onclick="location.href='dm.html'">🔔 Pixoro - New Updates Paaru da › <span onclick="event.stopPropagation();document.getElementById('pixoroTopNote').style.display='none'" style="margin-left:8px;opacity:.6">✕</span></div>`;
     document.body.appendChild(n);
     setTimeout(()=>{ if(n) n.style.display='none'; }, 5000);
   }
@@ -110,7 +107,6 @@ async function pixoroFixMe(){
     }
   }catch(e){}
 }
-// ✅ v1009 FIX 3: PAZHAYA PHOTO YUM VARANUM DA - posts + reels rendu vum edukuren da
 async function getAllPixoroPosts(){
   let s = pixoroGetSupa(); if(!s) return [];
   let all = [];
@@ -454,7 +450,7 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
-console.log('PIXORO CORE v1009 - WHITE BG REMOVE + TOP NOTE + PAZHAYA PHOTO DA');
+console.log('PIXORO CORE v1010 - TOP NOTE KEELA + CLOSE BTN DA');
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
