@@ -1,4 +1,4 @@
-// ===== PIXORO STORY - v1022 - OREY PROFILE PHOTO ELLA PAGE KUM DA =====
+// ===== PIXORO STORY - v1023 - OREY PROFILE PHOTO ELLA PAGE KUM DA =====
 async function loadStories(){
   let bar = document.getElementById('storyBar'); if(!bar) return;
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
@@ -12,10 +12,10 @@ async function loadStories(){
   let byUser = {};
   list.forEach(st=>{ let k = String(st.user_id||st.username); if(!byUser[k]) byUser[k] = []; byUser[k].push(st); });
 
-  // ✅ Profiles la irunthu Real Photo va edu da - Story la avatar illa da
+  // ✅ FIXED DA - avatar_url mattum thaan da
   let profMap = {};
   try{
-    let r = await s.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').limit(200);
+    let r = await s.from('profiles').select('id,username,avatar_url').limit(200);
     (r.data||[]).forEach(p=>{ profMap[String(p.id)] = p; });
   }catch(e){}
 
@@ -25,20 +25,20 @@ async function loadStories(){
   try{
     const { data: { user } } = await s.auth.getUser();
     if(user){
-      const { data: prof } = await s.from('profiles').select('avatar_url,profile_pic,photo_url,username').eq('id', user.id).single();
+      // ✅ FIXED DA - avatar_url mattum thaan da
+      const { data: prof } = await s.from('profiles').select('avatar_url,username').eq('id', user.id).single();
       if(prof){
-        let p = String(prof.avatar_url || prof.profile_pic || prof.photo_url || '').trim();
+        let p = String(prof.avatar_url || '').trim();
         if(p) myAvatar = p;
         if(prof.username) myName = prof.username;
-        // ✅ Orey Photo va save pannidu da - Feed kum ithu thaan da
         window.MY_PFP = myAvatar; window.ME_PFP = myAvatar;
       }
     }
   }catch(e){}
-  // ✅ Photo illa na Letter thaan da - Karuppu Block vendaam da
-  let myLetter = `<div class="avaLetterHome" style="background:linear-gradient(135deg,#ff5ea8,#ff7a00)!important">Y</div>`;
+  // ✅ FIXED DA - Y nu hardcode vendaam da - Un name oda first letter thaan da
+  let myFirst = String(myName || 'Y').replace('@','').charAt(0).toUpperCase();
   let myImg = myAvatar ? `<img class="sAddImg" src="${myAvatar}" onerror="this.remove();this.parentElement.querySelector('.sLetter').style.display='grid'">` : '';
-  let myLetterHtml = `<div class="sLetter avaLetterHome" style="display:${myAvatar ? 'none' : 'grid'};width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">Y</div>`;
+  let myLetterHtml = `<div class="sLetter avaLetterHome" style="display:${myAvatar ? 'none' : 'grid'};width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">${myFirst}</div>`;
 
   let myHasStory = !!byUser[String(window.ME_ID)];
 
@@ -49,13 +49,12 @@ async function loadStories(){
 
   // ✅ REAL STORY - Profile Photo mattum thaan da, Story Photo illa da
   Object.keys(byUser).forEach(k=>{
-    if(k === String(window.ME_ID)) return; // En story ah thaniya kaamikka vendaam da
+    if(k === String(window.ME_ID)) return;
     let arr = byUser[k]; let first = arr[0];
     let uname = String(first.username || profMap[k]?.username || 'user').replace('@','').toLowerCase();
-    // ✅ FIX DA - Story la irunthu edukka koodathu da, Profiles la irunthu edukkanum da
+    // ✅ FIXED DA - Profiles la irunthu mattum thaan da
     let prof = profMap[k] || {};
-    let avatar = String(prof.avatar_url || prof.profile_pic || prof.photo_url || first.avatar_url || '').trim();
-    // ✅ En story na En Profile Photo thaan da - ID / Name maathinaalum da
+    let avatar = String(prof.avatar_url || '').trim();
     if(k === String(window.ME_ID) && (window.MY_PFP || window.ME_PFP)) avatar = window.MY_PFP || window.ME_PFP;
     let letter = uname.charAt(0).toUpperCase();
     let imgHtml = avatar ? `<img src="${avatar}" onerror="this.remove();this.parentElement.querySelector('.sLetter2').style.display='grid'">` : '';
@@ -65,7 +64,6 @@ async function loadStories(){
       <div class="sName">${uname}</div></div>`;
   });
 
-  // ✅ Enakku story iruntha My Story ah click panna en story kaamikum da
   if(myHasStory){
     html = html.replace(`onclick="location.href='./story-upload.html'"`, `onclick="location.href='./story.html?user=${window.ME_ID}'"`);
   }
