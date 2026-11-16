@@ -1,68 +1,19 @@
-let curPostId=null, replyTo=null, selectedCmt=null;
-
-function timeAgo(d){if(!d)return'now';let diff=Math.floor((new Date()-new Date(d))/1000);if(diff<10)return'just now';if(diff<60)return diff+'s';if(diff<3600)return Math.floor(diff/60)+'m';if(diff<86400)return Math.floor(diff/3600)+'h';if(diff<604800)return Math.floor(diff/86400)+'d';return new Date(d).toLocaleDateString()}
-
-function openComments(id){curPostId=id;document.getElementById('commentModal').style.display='flex';renderComments()}
-function closeComments(){document.getElementById('commentModal').style.display='none';cancelReply();closeCmtOptions()}
-function cancelReply(){replyTo=null;document.getElementById('replyTag').style.display='none'}
-function setReply(u){replyTo=u;document.getElementById('replyTag').style.display='flex';document.getElementById('replyTxt').innerText='Replying to @'+u;document.getElementById('cmtInput').value='@'+u+' ';document.getElementById('cmtInput').focus()}
-function addEmoji(e){document.getElementById('cmtInput').value+=e;document.getElementById('cmtInput').focus()}
-function showCmtOptions(cId,username){selectedCmt={id:cId,username};let isMine=username===ME;document.getElementById('cmtOptContent').innerHTML=`${isMine?`<button onclick="deleteComment(${cId})" style="color:#ff3040">🗑️ Delete</button>`:''}<button onclick="reportComment(${cId})">🚩 Report</button>${!isMine?`<button onclick="blockUser('${username}')" style="color:#ff3040">🚫 Block @${username}</button>`:''}<button onclick="closeCmtOptions()" style="color:#888">Cancel</button>`;document.getElementById('cmtOptionModal').style.display='flex'}
-function closeCmtOptions(){document.getElementById('cmtOptionModal').style.display='none'}
-
-// --- SPEED DELETE - Instant da! ---
-async function deleteComment(cId){
-  if(!confirm('Delete ah?')) return;
-  
-  // 1. UDANE UI la irunthu thookidum - Speed ku!
-  allComments = allComments.filter(c => c.id !== cId);
-  renderComments();
-  renderFeed();
-  closeCmtOptions();
-  
-  // 2. Aprom than database la delete pannum
-  await supa.from('comments').delete().eq('id',cId);
+// ===== PIXORO COMMENT - v1013 - THANI FILE DA =====
+function openComment(id){ window.CURRENT_COMMENT_POST = id; let m = document.getElementById('commentModal'); if(m) m.style.display = 'flex'; loadComments(id); }
+function closeComment(){ let m = document.getElementById('commentModal'); if(m) m.style.display = 'none'; }
+window.openComment = openComment; window.closeComment = closeComment;
+async function loadComments(postId){
+  try{
+    let s = window.getSupa ? window.getSupa() : window.supa;
+    let {data} = await s.from('comments').select('*').eq('post_id',postId).order('created_at',{ascending:true});
+    let box = document.getElementById('commentList'); if(!box) return;
+    box.innerHTML = (data||[]).map(c=>`<div style="display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #222"><img src="${window.pixoroGetAvatar(c)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover"><div><b>@${String(c.username||'user').replace('@','')}</b> <span>${c.text||c.content||''}</span></div></div>`).join('') || '<p style="color:#888">No comments yet da</p>';
+  }catch(e){}
 }
-
-async function reportComment(){alert('Reported @'+selectedCmt.username+' 🔵');closeCmtOptions()}
-async function blockUser(username){if(!confirm('Block @'+username+'?'))return;try{await supa.from('blocks').insert({blocker:ME,blocked:username})}catch(e){}if(!blockedUsers.includes(username))blockedUsers.push(username);closeCmtOptions();renderComments();renderFeed()}
-
-function renderComments(){
-  let cmts=allComments.filter(c=>c.post_id==curPostId).filter(c=>!blockedUsers.includes(c.username));
-  let html=''; for(let c of cmts){html+=`<div class="cmtRow"><div class="cmtAvatar">${c.username[0].toUpperCase()}</div><div class="cmtContent" onclick="showCmtOptions(${c.id},'${c.username}')"><div class="cmtUser">${c.username} <span style="color:#777;margin-left:6px">${timeAgo(c.created_at)}</span></div><div class="cmtText">${c.comment}</div><div class="cmtMeta"><b onclick="event.stopPropagation();setReply('${c.username}')">Reply</b> • •••</div></div></div>`}
-  if(cmts.length==0) html='<p style="text-align:center;color:#777;margin-top:30px">No comments yet<br><small>Be first 🔵</small></p>';
-  document.getElementById('cmtList').innerHTML=html
+async function addComment(){
+  let inp = document.getElementById('commentInput'); let txt = inp.value.trim(); if(!txt) return;
+  let s = window.getSupa ? window.getSupa() : window.supa;
+  await s.from('comments').insert({post_id: window.CURRENT_COMMENT_POST, user_id: window.ME_ID, username: window.ME_RAW, text: txt});
+  inp.value = ''; loadComments(window.CURRENT_COMMENT_POST);
 }
-
-// --- SPEED POST - Instant da! ---
-async function postComment(){
-  let txt=document.getElementById('cmtInput').value.trim();
-  if(!txt||!curPostId) return;
-  
-  // 1. UDANE UI la kaamikkanum
-  let tempComment = {
-    id: Date.now(), // temp id
-    post_id: curPostId,
-    username: ME,
-    comment: txt,
-    created_at: new Date()
-  };
-  allComments.push(tempComment);
-  document.getElementById('cmtInput').value='';
-  cancelReply();
-  renderComments();
-  renderFeed();
-  
-  // 2. Aprom database ku anuppu
-  let {data, error}=await supa.from('comments').insert({post_id:curPostId,username:ME,comment:txt}).select().single();
-  if(error){
-    alert(error.message);
-    // Fail aana thiruppi remove pannu
-    allComments = allComments.filter(c => c.id !== tempComment.id);
-    renderComments();
-    return;
-  }
-  // Real id ah replace pannu
-  let idx = allComments.findIndex(c => c.id === tempComment.id);
-  if(idx !== -1) allComments[idx] = data;
-}
+window.addComment = addComment; window.loadComments = loadComments;
