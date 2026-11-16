@@ -1,4 +1,4 @@
-// ===== PIXORO FEED - v1019 - @ REMOVE + GOLD TICK REMOVE + REAL PHOTO ONLY DA =====
+// ===== PIXORO FEED - v1020 - CIRCLE PHOTO FIX + ENNAKU FOLLOW VARA KOODATHU DA =====
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
 
@@ -91,20 +91,26 @@ function renderFeedList(){
   box.innerHTML = list.map(p=>{
     let prof = p.profiles || {};
     let uname = feedClean(prof.username || p.username || 'user');
-    // ✅ REAL PHOTO ONLY DA - Server la irunthu avatar mattum da
-    let pfp = prof.avatar_url || prof.profile_pic || prof.photo_url || ('https://ui-avatars.com/api/?name='+uname.charAt(0)+'&background=111&color=fff&size=200&bold=true');
-    // ✅ GOLD TICK REMOVE + @ REMOVE DA
+    // ✅ v1020 FIX 1 DA - CIRCLE PHOTO - Karuppu Block varathu da
+    // avatar illa na / broken na, ui-avatars karuppu photo vendaam da, Letter mattum da
+    let pfp = String(prof.avatar_url || prof.profile_pic || prof.photo_url || '').trim();
+    let avatarHtml = pfp
+      ? `<img src="${pfp}" onerror="this.remove();this.parentElement.querySelector('.avaLetterHome').style.display='grid'">`
+      : '';
+    let letterHtml = `<div class="avaLetterHome" style="display:${pfp ? 'none' : 'grid'}">${uname.charAt(0).toUpperCase()}</div>`;
     let m = feedGetMedia(p);
     let mediaHtml = m.isVid
       ? `<video class="main" src="${m.url}" muted playsinline loop preload="metadata" onclick="this.paused?this.play():this.pause()"></video>`
       : `<img class="main" src="${m.url}" loading="lazy" onerror="this.closest('.post').style.display='none'">`;
-    let isMine = String(p.user_id)===String(FEED_ME_ID);
+    // ✅ v1020 FIX 2 DA - ENNAKU FOLLOW VARA KOODATHU DA
+    // user_id mattum illa da, username um check pannurom da - rendu la ethuvum match aana un post thaan da
+    let isMine = String(p.user_id)===String(FEED_ME_ID) || uname === feedClean(FEED_ME_RAW) || uname === feedClean(window.ME_RAW||'');
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
     let liked = FEED_LIKES.has(String(p.id)) ? 'liked' : '';
     return `<div class="post">
       <div class="postTop">
         <div style="display:flex;align-items:center;gap:10px">
-          <div class="pfpRing" onclick="location.href='./profile.html?u=${p.user_id}'"><div class="pfpInner"><img src="${pfp}" onerror="this.outerHTML='<div class=&quot;avaLetterHome&quot;>${uname.charAt(0).toUpperCase()}</div>'"></div></div>
+          <div class="pfpRing" onclick="location.href='./profile.html?u=${p.user_id}'"><div class="pfpInner">${avatarHtml}${letterHtml}</div></div>
           <div><b onclick="location.href='./profile.html?u=${p.user_id}'">${uname}</b><div style="font-size:11px;color:#888">${feedTime(p.created_at)}</div></div>
         </div>
         ${!isMine ? `<button data-follow-user="${uname}" class="followBtnPost ${isFollowing?'following':''}" onclick="pixoroToggleFollow('${uname}',this)">${isFollowing?'Following':'Follow'}</button>` : '<span>⋯</span>'}
@@ -118,7 +124,22 @@ function renderFeedList(){
       <div style="padding:0 12px;font-size:14px"><b>${uname}</b> ${p.caption||''}</div>
     </div>`;
   }).join('');
+  // ✅ v1020 FIX 3 DA - pixoroPaintAllFollowBtns en post la Follow ah thirumba kaamikka koodathu da
+  // Athu vera file la iruntha kooda, inga un post button ah hide pannidurom da
+  document.querySelectorAll('.post').forEach((postEl, idx)=>{
+    let p = list[idx]; if(!p) return;
+    let uname2 = feedClean(p.profiles?.username || p.username || 'user');
+    let isMine2 = String(p.user_id)===String(FEED_ME_ID) || uname2 === feedClean(FEED_ME_RAW);
+    if(isMine2){ let btn = postEl.querySelector('[data-follow-user]'); if(btn) btn.outerHTML = '<span>⋯</span>'; }
+  });
   if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
+  // Paint pannathukku aprom thirumba oru thadava check pannu da - en post la Follow varave koodathu da
+  document.querySelectorAll('.post').forEach((postEl, idx)=>{
+    let p = list[idx]; if(!p) return;
+    let uname2 = feedClean(p.profiles?.username || p.username || 'user');
+    let isMine2 = String(p.user_id)===String(FEED_ME_ID) || uname2 === feedClean(FEED_ME_RAW);
+    if(isMine2){ let btn = postEl.querySelector('[data-follow-user]'); if(btn) btn.outerHTML = '<span>⋯</span>'; }
+  });
 }
 
 async function renderFeed(currentUserId){
