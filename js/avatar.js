@@ -1,36 +1,51 @@
-// ===== PIXORO AVATAR - v1013 - CIRCLE LA REAL PHOTO DA =====
+// ===== PIXORO AVATAR - v1014 - 1 PHOTO = ELLA PAGE KUM - INSTAGRAM SECRET DA =====
 window.PIXORO_AVATAR_MAP = window.PIXORO_AVATAR_MAP || {};
+
 async function pixoroLoadAvatars(){
-  let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
+  let s = window.getSupa ? window.getSupa() : window.supa;
+  if(!s) return;
   try{
-    let r = await s.from('profiles').select('id,username,avatar_url,profile_pic,photo_url').limit(500);
+    // ✅ FIX 1 DA - avatar_url mattum thaan da - profile_pic/photo_url vendaam da
+    let r = await s.from('profiles').select('id,avatar_url').limit(500);
     (r.data||[]).forEach(p=>{
-      let url = p.avatar_url || p.profile_pic || p.photo_url || '';
-      if(url){
-        window.PIXORO_AVATAR_MAP[String(p.id)] = url;
-        window.PIXORO_AVATAR_MAP[String(p.username||'').toLowerCase()] = url;
-      }
+      let url = String(p.avatar_url || '').trim();
+      if(url) window.PIXORO_AVATAR_MAP[String(p.id)] = url;
     });
     // ✅ Circle ellam update pannidu da
     document.querySelectorAll('[data-avatar-user]').forEach(img=>{
-      let u = img.dataset.avatarUser; let url = window.PIXORO_AVATAR_MAP[u] || window.PIXORO_AVATAR_MAP[String(u).toLowerCase()];
+      let u = img.dataset.avatarUser;
+      let url = window.PIXORO_AVATAR_MAP[String(u)];
       if(url) img.src = url;
     });
     // ✅ Bottom nav Profile photo
     let nav = document.getElementById('navPfp');
     if(nav && window.ME_ID && window.PIXORO_AVATAR_MAP[String(window.ME_ID)]) nav.src = window.PIXORO_AVATAR_MAP[String(window.ME_ID)];
-  }catch(e){}
+    // ✅ My Story photo - Ithu thaan mukkiyam da
+    let myStory = document.getElementById('myStoryImg');
+    if(myStory && window.ME_ID && window.PIXORO_AVATAR_MAP[String(window.ME_ID)]) myStory.src = window.PIXORO_AVATAR_MAP[String(window.ME_ID)];
+  }catch(e){ console.log('avatar error', e); }
 }
 window.pixoroLoadAvatars = pixoroLoadAvatars;
+
 window.pixoroGetAvatar = function(p){
-  if(!p) return 'https://ui-avatars.com/api/?name=P&background=ff5ea8&color=fff&size=200&bold=true';
+  // ✅ FIX 2 DA - Fake ui-avatars photo vendaam da - Empty na '' thaan da
+  if(!p) return '';
   if(typeof p === 'string'){
-    let u = window.PIXORO_AVATAR_MAP[p] || window.PIXORO_AVATAR_MAP[String(p).toLowerCase()];
-    if(u) return u;
-    return 'https://ui-avatars.com/api/?name='+String(p).charAt(0).toUpperCase()+'&background=ff5ea8&color=fff&size=200&bold=true';
+    return window.PIXORO_AVATAR_MAP[String(p)] || '';
   }
-  let url = p.avatar_url || p.profile_pic || p.photo_url || window.PIXORO_AVATAR_MAP[String(p.user_id||p.id||'')] || window.PIXORO_AVATAR_MAP[String(p.username||'').toLowerCase()] || '';
-  if(url) return url;
-  let n = (p.username||'P').charAt(0).toUpperCase();
-  return 'https://ui-avatars.com/api/?name='+n+'&background=ff5ea8&color=fff&size=200&bold=true';
+  // ✅ FIX 3 DA - ID vachu mattum thaan da - username vendaam da
+  let url = p.avatar_url || window.PIXORO_AVATAR_MAP[String(p.user_id || p.id || '')] || '';
+  return String(url || '').trim();
+};
+
+// ✅ En photo va thaniya edukka - Story / Profile ku da
+window.pixoroGetMyPfp = async function(){
+  let s = window.getSupa ? window.getSupa() : window.supa;
+  if(!s) return '';
+  let {data:{user}} = await s.auth.getUser();
+  if(!user) return '';
+  let {data} = await s.from('profiles').select('avatar_url').eq('id', user.id).single();
+  let photo = String(data?.avatar_url || '').trim();
+  if(photo){ window.PIXORO_AVATAR_MAP[String(user.id)] = photo; window.MY_PFP = photo; }
+  return photo;
 };
