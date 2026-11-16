@@ -1,8 +1,8 @@
-// ===== PIXORO FEED - v1018 - GOLD TICK REMOVE + REAL PHOTO ONLY DA =====
+// ===== PIXORO FEED - v1019 - @ REMOVE + GOLD TICK REMOVE + REAL PHOTO ONLY DA =====
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
 
-function feedClean(u){ if(!u) return ''; return String(u).trim().replace('@','').toLowerCase(); }
+function feedClean(u){ if(!u) return ''; return String(u).trim().replaceAll('@','').toLowerCase(); }
 function getSupa(){ return window.supa || (window.getSupa ? window.getSupa() : null); }
 
 async function getFeed(currentUserId){
@@ -93,7 +93,7 @@ function renderFeedList(){
     let uname = feedClean(prof.username || p.username || 'user');
     // ✅ REAL PHOTO ONLY DA - Server la irunthu avatar mattum da
     let pfp = prof.avatar_url || prof.profile_pic || prof.photo_url || ('https://ui-avatars.com/api/?name='+uname.charAt(0)+'&background=111&color=fff&size=200&bold=true');
-    // ✅ GOLD TICK REMOVE - tick variable full ah delete panniten da
+    // ✅ GOLD TICK REMOVE + @ REMOVE DA
     let m = feedGetMedia(p);
     let mediaHtml = m.isVid
       ? `<video class="main" src="${m.url}" muted playsinline loop preload="metadata" onclick="this.paused?this.play():this.pause()"></video>`
@@ -105,7 +105,7 @@ function renderFeedList(){
       <div class="postTop">
         <div style="display:flex;align-items:center;gap:10px">
           <div class="pfpRing" onclick="location.href='./profile.html?u=${p.user_id}'"><div class="pfpInner"><img src="${pfp}" onerror="this.outerHTML='<div class=&quot;avaLetterHome&quot;>${uname.charAt(0).toUpperCase()}</div>'"></div></div>
-          <div><b onclick="location.href='./profile.html?u=${p.user_id}'">@${uname}</b><div style="font-size:11px;color:#888">${feedTime(p.created_at)}</div></div>
+          <div><b onclick="location.href='./profile.html?u=${p.user_id}'">${uname}</b><div style="font-size:11px;color:#888">${feedTime(p.created_at)}</div></div>
         </div>
         ${!isMine ? `<button data-follow-user="${uname}" class="followBtnPost ${isFollowing?'following':''}" onclick="pixoroToggleFollow('${uname}',this)">${isFollowing?'Following':'Follow'}</button>` : '<span>⋯</span>'}
       </div>
@@ -115,7 +115,7 @@ function renderFeedList(){
         <button class="act" onclick="openComment('${p.id}')"><svg viewBox="0 0 24 24"><path d="M21 11.5c0 4-3.8 7.5-9 7.5-1 0-2-.1-2.8-.4L3 20l1.4-4.5C3.5 14.3 3 13 3 11.5 3 7.5 6.8 4 12 4s9 3.5 9 7.5z"/></svg></button>
         <button class="act" onclick="sharePost('${p.id}')"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
       </div></div>
-      <div style="padding:0 12px;font-size:14px"><b>@${uname}</b> ${p.caption||''}</div>
+      <div style="padding:0 12px;font-size:14px"><b>${uname}</b> ${p.caption||''}</div>
     </div>`;
   }).join('');
   if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
@@ -158,10 +158,8 @@ async function loadFeed(){
     if(single){ FEED_ALL = [single, ...FEED_ALL.filter(p=>String(p.id)!==String(pid))]; let b=document.getElementById('singleBanner'); if(b) b.style.display='block'; }
   }
   renderFeedList();
-  // ✅ STORY AH stories.js la irunthu mattum edukanum da - inga duplicate vendaam da
   if(window.loadStories) window.loadStories();
 }
-// ✅ DUPLICATE loadStories AH FULL AH DELETE PANNITEN DA - stories.js thaan use aagum da, media_url vera photo varathu da
 function showChoice(){ let c=document.getElementById('choice'); if(c) c.style.display='flex'; }
 function hideChoice(){ let c=document.getElementById('choice'); if(c) c.style.display='none'; }
 window.showChoice=showChoice; window.hideChoice=hideChoice;
@@ -176,7 +174,7 @@ async function loadComments(postId){
   try{
     let s=getSupa(); let {data}=await s.from('comments').select('*').eq('post_id',postId).order('created_at',{ascending:true});
     let box=document.getElementById('commentList'); if(!box) return;
-    box.innerHTML=(data||[]).map(c=>`<div style="padding:8px 0;border-bottom:1px solid #222"><b>@${feedClean(c.username||'user')}</b> <span>${c.text||c.content||''}</span></div>`).join('') || '<p style="color:#888">No comments yet da</p>';
+    box.innerHTML=(data||[]).map(c=>`<div style="padding:8px 0;border-bottom:1px solid #222"><b>${feedClean(c.username||'user')}</b> <span>${c.text||c.content||''}</span></div>`).join('') || '<p style="color:#888">No comments yet da</p>';
   }catch(e){}
 }
 async function addComment(){
