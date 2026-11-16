@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="style.css?v=1014">
 <link rel="stylesheet" href="css/feed.css?v=1014">
 <link rel="stylesheet" href="css/comments.css?v=1014">
-<!-- STYLE AH INGA VAIKKA KOODATHU DA - css/feed.css la irukku da -->
 </head>
 <body>
 <div class="top"><b style="font-size:26px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="location.href='./notification.html'"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span id="pixoroBellDot" style="display:none;position:absolute;top:-2px;right:2px;width:10px;height:10px;background:#FF0A33;border-radius:50%;border:2px solid #000"></span></div></div></div>
@@ -27,24 +26,64 @@
 <a href="./search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
 <a href="./reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a>
 <a href="./dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
-<a href="./profile.html"><img class="navPfp" id="navPfp" src="https://ui-avatars.com/api/?name=P&background=ff5ea8&color=fff&size=200&bold=true" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=P&background=111&color=fff&size=200&bold=true'"><span>Profile</span></a>
+<a href="./profile.html"><img class="navPfp" id="navPfp" src="" style="background:#222"><span>Profile</span></a>
 </div>
 <div id="commentModal" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #333"><b>Comments</b><span onclick="closeComment()" style="font-size:22px">X</span></div><div id="commentList" style="flex:1;overflow-y:auto;padding:12px"></div><div style="padding:10px;border-top:1px solid #333;display:flex;gap:10px"><div id="myCommentPfpWrap" style="width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#222"></div><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#000;border:1px solid #333;padding:12px 14px;border-radius:20px;color:#fff"><button onclick="addComment()" style="background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:0;color:#fff;font-weight:900;padding:10px 16px;border-radius:20px">Post</button></div></div></div>
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
 <div id="choice" class="createBar" onclick="if(event.target==this)hideChoice()"><div class="createPill"><b onclick="location.href='./post-create.html'">POST</b><b onclick="location.href='./reel-create.html'" class="on">REELS</b><b onclick="location.href='./story-upload.html'">STORY</b><b onclick="location.href='./live.html'">LIVE</b></div><div class="createClose" onclick="hideChoice()">Cancel ✕</div></div>
 
-<!-- ✅ v1014 - THANi THANi FILE - ORDER MUKKIYAM DA - app.js / db.js POTTAL CLASH AAGUM DA -->
+<!-- ✅ FIXED DA - v1024 - Pazhaya cache ah udaikkrom da -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js?v=1014"></script>
-<script src="js/pixoro-core.js?v=1014"></script>
-<script src="js/profile-sync.js?v=1017"></script>
-<script src="js/avatar.js?v=1014"></script>
-<script src="js/follow.js?v=1014"></script>
-<script src="js/likes.js?v=1014"></script>
-<script src="js/comments.js?v=1014"></script>
-<script src="js/share.js?v=1014"></script>
-<script src="js/save.js?v=1014"></script>
-<script src="js/stories.js?v=1014"></script>
-<script src="js/feed.js?v=1014"></script>
+<script src="js/supabase.js?v=1024"></script>
+<script src="js/pixoro-core.js?v=1024"></script>
+<script src="js/avatar.js?v=1024"></script>
+<script src="js/follow.js?v=1024"></script>
+<script src="js/likes.js?v=1024"></script>
+<script src="js/comments.js?v=1024"></script>
+<script src="js/share.js?v=1024"></script>
+<script src="js/save.js?v=1024"></script>
+<script src="js/stories.js?v=1024"></script>
+<script src="js/feed.js?v=1024"></script>
+
+<script>
+// ===== PIXORO FORCE PFP - Profile Photo thaan My Story + Feed la varanum da =====
+async function pixoroForcePfp(){
+  try{
+    let s = window.getSupa ? window.getSupa() : window.supa;
+    if(!s) return;
+    let {data:{user}} = await s.auth.getUser();
+    if(!user) return;
+    let {data:prof} = await s.from('profiles').select('avatar_url').eq('id', user.id).single();
+    let photo = String(prof?.avatar_url || '').trim();
+    if(!photo) return;
+    window.MY_PFP = photo;
+    let nav = document.getElementById('navPfp');
+    if(nav) nav.src = photo;
+    document.querySelectorAll('.sAddWrap').forEach(w=>{
+      let img = w.querySelector('img');
+      let letter = w.querySelector('.sLetter');
+      if(letter) letter.style.display = 'none';
+      if(img) img.src = photo;
+      else {
+        let n = document.createElement('img');
+        n.className = 'sAddImg'; n.src = photo;
+        n.style.cssText = 'width:60px;height:60px;border-radius:50%;object-fit:cover;display:block';
+        w.prepend(n);
+      }
+    });
+    document.querySelectorAll('.post').forEach(post=>{
+      let nameEl = post.querySelector('.postTop b');
+      if(nameEl && nameEl.innerText.trim().toLowerCase() === 'giri_office'){
+        let img = post.querySelector('.pfpInner img');
+        let letter = post.querySelector('.avaLetterHome');
+        if(letter) letter.style.display = 'none';
+        if(img) img.src = photo;
+      }
+    });
+  }catch(e){}
+}
+setInterval(pixoroForcePfp, 1000);
+document.addEventListener('DOMContentLoaded', ()=>{ setTimeout(pixoroForcePfp, 800); });
+</script>
 </body>
 </html>
