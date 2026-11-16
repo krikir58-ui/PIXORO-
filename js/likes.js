@@ -1,34 +1,18 @@
-import { getUser } from './auth.js';
-
-export function initLikes(){
-  window.doLike = (imgKey)=>{
-    let u=getUser();
-    let key = 'pixoro_like_'+imgKey;
-    let likes = JSON.parse(localStorage.getItem(key) || '[]');
-    
-    let isLiked = likes.includes(u);
-    
-    // 1. UDANE UI LA MAATHU DA - SPEED!
-    let newLikes;
-    if(!isLiked) {
-      newLikes = [...likes, u];
-    } else {
-      newLikes = likes.filter(x=>x!==u);
-    }
-    
-    // 2. LocalStorage save
-    localStorage.setItem(key, JSON.stringify(newLikes));
-    
-    // 3. UI la mattum instant ah update pannu - full feed reload venda!
-    let btn = document.querySelector(`[data-like-key="${imgKey}"]`);
-    if(btn) {
-      let count = newLikes.length;
-      let liked = newLikes.includes(u);
-      btn.innerHTML = `${liked ? '❤️' : '🤍'} ${count > 0 ? count : ''}`;
+// ===== PIXORO LIKE - v1013 - THANI FILE DA =====
+async function pixoroToggleLike(postId, btn){
+  let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
+  if(!window.ME_ID){ let {data:{session}} = await s.auth.getSession(); if(session) window.ME_ID = session.user.id; else return; }
+  try{
+    let {data:ex} = await s.from('likes').select('id').eq('post_id',postId).eq('user_id',window.ME_ID).maybeSingle();
+    let liked = false;
+    if(ex){ await s.from('likes').delete().eq('id',ex.id); liked = false; }
+    else { await s.from('likes').insert({post_id:postId, user_id:window.ME_ID}); liked = true; }
+    if(btn){
       btn.classList.toggle('liked', liked);
-      // Little pop animation da!
-      btn.style.transform = 'scale(1.3)';
-      setTimeout(()=> btn.style.transform = 'scale(1)', 150);
+      let c = document.querySelector(`[data-like-count="${postId}"]`);
+      if(c){ let cur = parseInt(c.innerText||'0')||0; c.innerText = liked ? cur+1 : Math.max(0,cur-1); }
     }
-  };
+    return liked;
+  }catch(e){ return false; }
 }
+window.pixoroToggleLike = pixoroToggleLike;
