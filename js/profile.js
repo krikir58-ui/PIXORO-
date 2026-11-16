@@ -1,4 +1,4 @@
-// ===== PIXORO PROFILE - v1008 - THANI FILE DA =====
+// ===== PIXORO PROFILE - v1009 - OREY PHOTO ELLA PAGE KUM + KARUPPU BLOCK REMOVE DA =====
 function getSupa(){return window.supa}
 function cleanUser(u){if(!u)return'';u=String(u).trim();if(u.includes('@'))u=u.split('@')[0];u=u.replace(/[^a-zA-Z0-9_.]/g,'').toLowerCase();return u||''}
 function pixoroIsUuidLocal(s){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(s||'')); }
@@ -10,8 +10,17 @@ function isReelPost(p){ if(p._from==='reels') return true; if(p.media_type==='re
 function getBestMedia(p){ if(p._from==='reels') return {url:p.video_url||p.media_url||'',isVid:true}; let m=(p.media_url||p.video_url||'').toLowerCase().split('?')[0]; if(m.endsWith('.mp4')||m.endsWith('.mov')||m.endsWith('.webm')||m.endsWith('.m4v')) return {url:p.media_url||p.video_url,isVid:true}; return {url:p.media_url||p.video_url||p.image_url||p.image||'',isVid:false}; }
 function isRealPhoto(url){ if(!url) return false; if(url.includes('ui-avatars')||url.includes('placeholder')||url.includes('undefined')) return false; return true; }
 function letterFor(uname){ let l=(cleanUser(uname||'P').charAt(0).toUpperCase()||'P'); if(!/[A-Z]/.test(l)) l='P'; return l; }
-function getPfpFrom(p){ if(p&&(p.avatar_url||p.profile_pic||p.photo_url)) return p.avatar_url||p.profile_pic||p.photo_url; if(p && window._PIXORO_PFP_CACHE){ let cached = window._PIXORO_PFP_CACHE[cleanUser(p.username||'')] || window._PIXORO_PFP_CACHE[String(p.id||'')]; if(cached) return cached; } return 'https://ui-avatars.com/api/?name='+letterFor(p?.username||'P')+'&background=111&color=fff&size=200&bold=true'; }
-function pfpErr(el,uname){ if(el.dataset.errDone) return; el.dataset.errDone='1'; el.onerror=null; let cur=el.src||''; if(cur.includes('ui-avatars')) return; el.src='https://ui-avatars.com/api/?name='+letterFor(uname||VIEW_USER||ME_RAW||'P')+'&background=111&color=fff&size=200&bold=true'; }
+// ✅ FIX 1 DA - OREY PHOTO - Photo illa na '' thaan da, Karuppu ui-avatars vendaam da
+function getPfpFrom(p){
+  if(!p) return '';
+  // ✅ En profile na En Profile Photo thaan da - ID vachu check pannurom da
+  if(String(p.id)===String(ME_ID) && window.MY_PFP) return window.MY_PFP;
+  if(p.avatar_url||p.profile_pic||p.photo_url) return p.avatar_url||p.profile_pic||p.photo_url;
+  if(p && window._PIXORO_PFP_CACHE){ let cached = window._PIXORO_PFP_CACHE[cleanUser(p.username||'')] || window._PIXORO_PFP_CACHE[String(p.id||'')]; if(cached) return cached; }
+  return ''; // ✅ Karuppu photo vendaam da - Letter thaan kaamikum da
+}
+// ✅ FIX 2 DA - Photo broken na hide pannu da, Letter kaamikum da
+function pfpErr(el,uname){ if(el.dataset.errDone) return; el.dataset.errDone='1'; el.onerror=null; el.style.display='none'; let letterEl = el.parentElement?.querySelector('.avaLetterHome, .pfpLetter'); if(letterEl) letterEl.style.display='grid'; }
 window.pfpErr=pfpErr;
 function displayNameFor(u){ if(!u) return ME_RAW||'user'; let p=allProfiles.find(x=>String(x.id)===String(u))||allProfiles.find(x=>cleanUser(x.username)===cleanUser(u)); if(p&&p.username) return cleanUser(p.username); if(String(u)===String(ME_ID)) return ME_RAW||'user'; let cu=cleanUser(u); if(cu.length>20) return ME_RAW||'user'; return cu||ME_RAW||'user'; }
 function updateFollowMsg(){ return; }
@@ -54,6 +63,9 @@ async function init(){
   if(!session){location.href='login.html';return}
   let {data:myProfile}=await supa.from('profiles').select('*').eq('id',session.user.id).maybeSingle(); if(!myProfile){location.href='setup-username.html';return}
   ME_RAW=cleanUser(myProfile.username||session.user.email.split('@')[0]); ME_ID=session.user.id; window.ME_ID=ME_ID; window.ME_RAW=ME_RAW;
+  // ✅ Orey Photo va global la save pannu da - Feed / Story / Profile ellathukum ithu thaan da
+  let _myP = String(myProfile.avatar_url||myProfile.profile_pic||myProfile.photo_url||'').trim();
+  window.MY_PFP=_myP; window.ME_PFP=_myP;
   if(window.pixoroLoadFollowing) await window.pixoroLoadFollowing();
   let rawParam = new URLSearchParams(location.search).get('u') || new URLSearchParams(location.search).get('user') || '';
   let vp=null;
@@ -66,9 +78,10 @@ async function init(){
   let tick = window.goldTickHTML ? window.goldTickHTML(VIEW_PROFILE) : '';
   document.getElementById('topUsername').innerHTML=cleanUser(VIEW_PROFILE.username)+tick;
   document.getElementById('bioText').innerText=VIEW_PROFILE.bio||''; document.getElementById('linkText').innerText=VIEW_PROFILE.link||VIEW_PROFILE.website||'';
-  let pfpEl=document.getElementById('pfpImg'); pfpEl.dataset.errDone=''; pfpEl.src=getPfpFrom(VIEW_PROFILE); pfpEl.onerror=()=>pfpErr(pfpEl,VIEW_USER);
-  document.getElementById('editPfpPreview').src=getPfpFrom(VIEW_PROFILE);
-  let navEl=document.getElementById('navPfp'); navEl.dataset.errDone=''; navEl.src=getPfpFrom(myProfile); navEl.onerror=()=>pfpErr(navEl,ME_RAW);
+  // ✅ Profile Photo - Orey Photo da
+  let pfpEl=document.getElementById('pfpImg'); pfpEl.dataset.errDone=''; let _pfp = getPfpFrom(VIEW_PROFILE); if(_pfp){ pfpEl.src=_pfp; pfpEl.style.display='block'; } else { pfpEl.style.display='none'; } pfpEl.onerror=()=>pfpErr(pfpEl,VIEW_USER);
+  let _ep = document.getElementById('editPfpPreview'); if(_ep){ let _epP = getPfpFrom(VIEW_PROFILE); if(_epP) _ep.src=_epP; }
+  let navEl=document.getElementById('navPfp'); if(navEl){ navEl.dataset.errDone=''; let _navP = getPfpFrom(myProfile); if(_navP){ navEl.src=_navP; navEl.style.display='block'; } navEl.onerror=()=>pfpErr(navEl,ME_RAW); }
   let [myFollowsRes, viewFollowersRes, viewFollowingRes, allP2Res, blRes, blMeRes, postsRes, postsByNameRes, reelsRes, reelsByNameRes] = await Promise.all([
     supa.from('follows').select('follower_id,following_id,status').eq('follower_id', ME_ID).eq('status','accepted').then(r=>r).catch(()=>({data:[]})),
     supa.from('follows').select('*', {count:'exact', head:true}).eq('following_id', VIEW_PROFILE.id).eq('status','accepted').then(r=>r).catch(()=>({count:0})),
@@ -129,15 +142,16 @@ async function pixoroOpenFollowList(type){
     let pr = profsMap[String(pid)] || allProfiles.find(p=> String(p.id)===String(pid));
     let uname = pr ? cleanUser(pr.username) : displayNameFor(pid);
     if(!uname||uname==='user') uname = displayNameFor(pid);
-    let pfp = pr ? getPfpFrom(pr) : 'https://ui-avatars.com/api/?name='+letterFor(uname)+'&background=111&color=fff&size=200&bold=true';
+    let pfp = pr ? getPfpFrom(pr) : '';
+    let pfpHtml = pfp ? `<img src="${pfp}" onerror="pfpErr(this,'${uname}')" onclick="location.href='profile.html?u=${pid}'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer">` : `<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);display:grid;place-items:center;font-weight:900;color:#fff">${letterFor(uname)}</div>`;
     let tick2 = pr && window.goldTickHTML ? window.goldTickHTML(pr) : '';
     let isF = window.PIXORO_FOLLOWING ? window.PIXORO_FOLLOWING.has(String(pid)) : false;
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><img src="${pfp}" onerror="pfpErr(this,'${uname}')" onclick="location.href='profile.html?u=${pid}'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer"><b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='profile.html?u=${pid}'">${uname}${tick2}</b>${String(pid)===String(ME_ID)?'<span style="color:#888;font-size:12px">You</span>':`<button data-follow-user="${uname}" data-follow-username="${uname}" onclick="pixoroToggleFollow('${uname}',this)" class="whiteBtn followBtnPerusa">${isF?'Following':'Follow'}</button>`}</div>`;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222">${pfpHtml}<b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='profile.html?u=${pid}'">${uname}${tick2}</b>${String(pid)===String(ME_ID)?'<span style="color:#888;font-size:12px">You</span>':`<button data-follow-user="${uname}" data-follow-username="${uname}" onclick="pixoroToggleFollow('${uname}',this)" class="whiteBtn followBtnPerusa">${isF?'Following':'Follow'}</button>`}</div>`;
   }).join('')||`<div style="color:#888;text-align:center;padding:20px">No ${type} yet</div>`;
   listEl.innerHTML=html; modal.classList.add('show');
   cleanFollowBtnsProfile();
 }
-async function loadHighlights(){ let supa=getSupa(); let h=document.getElementById('highlightList'); if(!h) return; if(blockedUsers.includes(String(VIEW_PROFILE.id))){ h.style.display='none'; return; } let {data:st}=await supa.from('stories').select('*').eq('user_id',VIEW_PROFILE.id).eq('is_highlight',true).order('created_at',{ascending:false}); let list=(st||[]); if(!list.length){ let fromPosts=myPosts.filter(p=>p.is_highlight===true); if(fromPosts.length) list=fromPosts; } allHighlights=list; if(!list.length){ h.style.display='none'; h.innerHTML=''; return; } let groups={}; list.forEach(s=>{ let n=s.highlight_name||'Highlight'; if(!groups[n]) groups[n]=s; else if(s.highlight_cover) groups[n]=s; }); let grouped=Object.entries(groups).map(([name,s])=>{ let cover=s.highlight_cover||list.find(x=>(x.highlight_name||'Highlight')===name&&x.highlight_cover)?.highlight_cover||s.image_url||s.media_url||s.image||''; return {name,cover,count:list.filter(x=>(x.highlight_name||'Highlight')===name).length}; }); h.style.display='flex'; h.innerHTML=grouped.map(g=>`<div class="h-item" data-hl="${g.name}" oncontextmenu="event.preventDefault();openHighlightEdit('${g.name.replace(/'/g,"\\'")}');return false" onclick="location.href='story-view.html?u=${VIEW_USER}'"><div class="h-circle"><img src="${g.cover}" onerror="this.src='https://ui-avatars.com/api/?name='+letterFor('${g.name}')+'&background=111&color=fff&size=200&bold=true'"></div><div class="h-text">${g.name}</div></div>`).join(''); document.querySelectorAll('.h-item').forEach(el=>{ let t; el.addEventListener('touchstart',()=>{ t=setTimeout(()=>{ openHighlightEdit(el.dataset.hl); },600) }); el.addEventListener('touchend',()=>clearTimeout(t)); el.addEventListener('touchmove',()=>clearTimeout(t)); }); }
+async function loadHighlights(){ let supa=getSupa(); let h=document.getElementById('highlightList'); if(!h) return; if(blockedUsers.includes(String(VIEW_PROFILE.id))){ h.style.display='none'; return; } let {data:st}=await supa.from('stories').select('*').eq('user_id',VIEW_PROFILE.id).eq('is_highlight',true).order('created_at',{ascending:false}); let list=(st||[]); if(!list.length){ let fromPosts=myPosts.filter(p=>p.is_highlight===true); if(fromPosts.length) list=fromPosts; } allHighlights=list; if(!list.length){ h.style.display='none'; h.innerHTML=''; return; } let groups={}; list.forEach(s=>{ let n=s.highlight_name||'Highlight'; if(!groups[n]) groups[n]=s; else if(s.highlight_cover) groups[n]=s; }); let grouped=Object.entries(groups).map(([name,s])=>{ let cover=s.highlight_cover||list.find(x=>(x.highlight_name||'Highlight')===name&&x.highlight_cover)?.highlight_cover||s.image_url||s.media_url||s.image||''; return {name,cover,count:list.filter(x=>(x.highlight_name||'Highlight')===name).length}; }); h.style.display='flex'; h.innerHTML=grouped.map(g=>`<div class="h-item" data-hl="${g.name}" oncontextmenu="event.preventDefault();openHighlightEdit('${g.name.replace(/'/g,"\\'")}');return false" onclick="location.href='story-view.html?u=${VIEW_USER}'"><div class="h-circle"><img src="${g.cover}" onerror="this.style.display='none'"></div><div class="h-text">${g.name}</div></div>`).join(''); document.querySelectorAll('.h-item').forEach(el=>{ let t; el.addEventListener('touchstart',()=>{ t=setTimeout(()=>{ openHighlightEdit(el.dataset.hl); },600) }); el.addEventListener('touchend',()=>clearTimeout(t)); el.addEventListener('touchmove',()=>clearTimeout(t)); }); }
 function openHighlightEdit(name){ if(String(VIEW_PROFILE.id)!==String(ME_ID)) return; editingHL=name; editingCover=''; document.getElementById('hlEditName').value=name; let covers=allHighlights.filter(s=>(s.highlight_name||'Highlight')===name).map(s=>s.image_url||s.media_url||s.image).filter(Boolean); let unique=[...new Set(covers)]; document.getElementById('hlCoverPicker').innerHTML=`<div onclick="document.getElementById('hlCoverInput').click()" style="min-width:62px;height:62px;border-radius:50%;background:#222;display:grid;place-items:center;font-size:22px;border:2px dashed #fff;cursor:pointer">📸</div>`+unique.map(u=>`<img src="${u}" onclick="selectHLCover('${u}')" class="hlCover">`).join(''); document.getElementById('hlEditSheet').style.display='flex'; }
 function selectHLCover(url){ editingCover=url; document.querySelectorAll('#hlCoverPicker .hlCover').forEach(i=>i.style.border='2px solid #333'); event.target.style.border='2px solid #00ff66'; }
 async function saveHighlightEdit(){ let newName=document.getElementById('hlEditName').value.trim()||editingHL; let supa=getSupa(); let upd={highlight_name:newName}; if(editingCover) upd.highlight_cover=editingCover; await supa.from('stories').update(upd).eq('user_id',ME_ID).eq('highlight_name',editingHL).eq('is_highlight',true); document.getElementById('hlEditSheet').style.display='none'; loadHighlights(); }
