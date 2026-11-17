@@ -1,37 +1,4 @@
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pixoro - New Post</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-body{background:#000;color:#fff;max-width:450px;margin:0 auto;min-height:100vh}
-.pTop{display:flex;align-items:center;justify-content:space-between;padding:14px;height:56px}
-.pTop b{font-size:20px;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
-.pTop span{font-size:26px;cursor:pointer;width:32px;text-align:center}
-.tabs{display:flex;gap:8px;padding:10px 14px}
-.tabs button{padding:10px 18px;border:0;border-radius:25px;background:#1a1a1a;color:#fff;font-weight:800;font-size:14px;cursor:pointer}
-.tabs button.on{background:linear-gradient(90deg,#a259ff,#ff2dcc)}
-.pickBtn{margin:0 14px 10px;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);border:0;color:#fff;padding:14px;width:calc(100% - 28px);border-radius:25px;font-weight:900;font-size:15px;cursor:pointer;height:48px}
-.recHead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px}
-.recHead b{font-size:15px;background:#1a1a1a;padding:8px 14px;border-radius:20px}
-.recHead button{background:#1a1a1a;color:#fff;border:0;padding:8px 14px;border-radius:20px;font-weight:800;cursor:pointer}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:4px 14px}
-.g{aspect-ratio:1/1;background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:32px;cursor:pointer;border-radius:12px}
-.g small{font-size:13px;color:#aaa}
-.msg{text-align:center;color:#888;font-size:13px;padding:20px;line-height:1.6}
-.bottomTabs{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;background:#000;border-top:1px solid #222;display:flex;justify-content:center;gap:28px;padding:14px 0;height:52px;z-index:99}
-.bottomTabs button{background:transparent;border:0;color:#888;font-weight:800;font-size:14px;letter-spacing:1px;cursor:pointer}
-.bottomTabs button.on{color:#fff;border-bottom:3px solid #ff2dcc}
-</style></head><body>
-<div class="pTop"><span onclick="location.href='./index.html'">✕</span><b>PIXORO - New Post</b><span onclick="location.href='./story-camera.html'">📷</span></div>
-<div class="tabs"><button class="on">✨ Edits</button><button>📝 Drafts</button><button>🎬 Templates</button></div>
-<button class="pickBtn" onclick="document.getElementById('fileInp').click()">📷 Photo / Video Edu Da</button>
-<input type="file" id="fileInp" accept="image/*,video/*" hidden>
-<input type="file" id="videoInp" accept="video/*" hidden>
-<div class="recHead"><b>Recents ∨</b><button onclick="document.getElementById('fileInp').click()">☑ Select</button></div>
-<div class="grid"><div class="g" onclick="location.href='./story-camera.html'">📷<small>Camera</small></div><div class="g" onclick="document.getElementById('fileInp').click()">🖼️<small>Gallery</small></div><div class="g" onclick="document.getElementById('videoInp').click()">🎬<small>Video</small></div></div>
-<p class="msg">Un Gallery la irunthu Photo select pannu da 📷<br>Select / Camera Click pannu da</p>
-<div class="bottomTabs"><button onclick="location.href='./story-upload.html'">STORY</button><button class="on" onclick="location.href='./post-create.html'">POST</button><button onclick="location.href='./reel-create.html'">REEL</button><button onclick="location.href='./live.html'">LIVE</button></div>
-<script>
-function go(f,t){let r=new FileReader();r.onload=()=>{sessionStorage.setItem('pixoro_post_data',r.result);sessionStorage.setItem('pixoro_post_type',t);location.href='./post-editor.html'};r.readAsDataURL(f)}
-document.getElementById('fileInp').addEventListener('change',e=>{let f=e.target.files[0];if(f)go(f,f.type.startsWith('video')?'video':'image')});
-document.getElementById('videoInp').addEventListener('change',e=>{let f=e.target.files[0];if(f)go(f,'video')});
-</script></body></html>
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{background:#000;color:#fff;font-family:Arial;margin:0;padding:10px} .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:10px} .skeleton{background:#222;height:120px;position:relative;overflow:hidden} .skeleton::after{content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,#ffffff33,transparent);animation:sh 1.2s infinite} @keyframes sh{to{left:100%}} .next{background:#ff5ea8;color:#fff;border:0;padding:12px;width:100%;border-radius:10px;font-weight:700;margin-top:10px}</style></head>
+<body><div style="display:flex;justify-content:space-between"><span onclick="history.back()">X</span><b>New Post</b><span>Next</span></div>
+<div class="grid"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+<button class="next" onclick="location.href='./post-filter.html'">Next - Filter</button></body></html>
