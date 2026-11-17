@@ -4,8 +4,9 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
 html,body{width:100%;height:100%;background:#000;overflow:hidden}
 body{max-width:100% !important;margin:0}
-.page{position:fixed;inset:0;width:100%;height:100dvh;background:#000;z-index:9999;isolation:isolate;background:radial-gradient(circle at 50% 0%,#ff149322,transparent 50%),#000}
-.photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.page{position:fixed;inset:0;width:100%;height:100dvh;background:#000;z-index:9999;isolation:isolate}
+.photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+.empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#888;font-size:13px;text-align:center;padding:20px;z-index:5}
 .top{position:absolute;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:16px 14px;background:linear-gradient(to bottom,rgba(0,0,0,.65),transparent)}
 .top span{font-size:24px;cursor:pointer}.top b{font-size:17px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .side{position:absolute;right:10px;top:75px;bottom:130px;width:62px;z-index:20;background:rgba(20,20,20,.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid #ff5ea866;border-radius:30px;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:14px;overflow-y:auto;scrollbar-width:none}
@@ -15,7 +16,7 @@ body{max-width:100% !important;margin:0}
 .bottom{position:absolute;bottom:0;left:0;right:0;z-index:20;padding:12px 14px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,rgba(0,0,0,.75),transparent)}
 .cap{width:100%;background:rgba(0,0,0,.5);border:1px solid #ff5ea8;border-radius:12px;color:#fff;padding:11px;margin-bottom:10px;outline:none}
 .actions{display:flex;gap:8px}
-.pill{flex:1;background:linear-gradient(90deg,#ff5ea8,#a259ff);border:none;color:#fff;padding:13px;border-radius:999px;font-weight:700;font-size:13px;box-shadow:0 4px 15px #ff149344}
+.pill{flex:1;background:linear-gradient(90deg,#ff5ea8,#a259ff);border:none;color:#fff;padding:13px;border-radius:999px;font-weight:700;font-size:13px;box-shadow:0 4px 15px #ff149344;cursor:pointer}
 .pill.green{background:linear-gradient(90deg,#00ff66,#00d4ff);color:#000}
 .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:99999;display:none;white-space:nowrap}
 .textOverlay{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);z-index:25;font-size:28px;font-weight:900;text-shadow:2px 2px 0 #000;text-align:center;max-width:90%;background:linear-gradient(90deg,#ff5ea8,#ff7a00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -23,9 +24,11 @@ body{max-width:100% !important;margin:0}
 .heartBtn.liked{background:linear-gradient(135deg,#ff1493,#ff7a00);border-color:#ff1493}
 </style></head><body>
 <div class="page">
-<img class="photo" id="eImg" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1080">
+<!-- ✅ REAL PHOTO MATTUM DA - FAKE UNSPLASH ILLA DA - SRC EMPTY DA -->
+<img class="photo" id="eImg" src="" style="display:none">
+<div class="empty" id="emptyBox">📷<br>Photo Select Pannala da<br><span style="font-size:12px">Back poi Real Photo Edu da</span><button onclick="location.href='story-upload.html'" style="margin-top:10px;background:linear-gradient(90deg,#ff5ea8,#a259ff);border:0;color:#fff;padding:10px 18px;border-radius:20px;font-weight:800;cursor:pointer">Back - Photo Edu →</button></div>
 <div id="textOverlay" class="textOverlay"></div>
-<div class="top"><span onclick="location.href='index.html'">✕</span><b>PIXORO Story</b><span>⋯</span></div>
+<div class="top"><span onclick="location.href='story-upload.html'">✕</span><b>PIXORO Story</b><span>⋯</span></div>
 <div class="side">
 <div onclick="addText()">Aa<span>Text</span></div>
 <div onclick="showToast('Sticker - Adutha update la da')">😊<span>Sticker</span></div>
@@ -50,8 +53,9 @@ body{max-width:100% !important;margin:0}
 function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
 const supa=window.supabase.createClient('https://yecpltndhlzfjplzhcpm.supabase.co','sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_')
 let params = new URLSearchParams(location.search)
-let m = params.get('media') || ''
-let type = params.get('type') || 'image'
+// ✅ REAL PHOTO - URL la illana sessionStorage la irunthu Edu da - Fake illa da
+let m = params.get('media') || sessionStorage.getItem('pixoro_story_data') || sessionStorage.getItem('pixoro_story_url') || ''
+let type = params.get('type') || sessionStorage.getItem('pixoro_story_type') || 'image'
 let ME = '', ME_ID = ''
 async function init(){
   let { data: { session } } = await supa.auth.getSession()
@@ -59,13 +63,20 @@ async function init(){
   let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
   ME = (profile?.username || session.user.email.split('@')[0]).toLowerCase()
   ME_ID = session.user.id
-  if(m){
+  // ✅ REAL PHOTO MATTUM KAATU DA - ILLANA EMPTY KAATU DA
+  if(m && !m.includes('unsplash') && !m.includes('picsum') && !m.includes('placeholder')){
+    document.getElementById('emptyBox').style.display='none';
     let el = document.getElementById('eImg')
+    el.style.display='block';
     if(type==='video'){
       el.outerHTML = `<video class="photo" id="eImg" src="${m}" autoplay loop muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video>`
     } else {
       el.src = m
     }
+  } else {
+    // Fake / Illana - Empty thaan da
+    document.getElementById('eImg').style.display='none';
+    document.getElementById('emptyBox').style.display='flex';
   }
 }
 init()
@@ -80,8 +91,9 @@ function addText(){
   });
 }
 async function postStory(aud){
+  // ✅ FAKE CHECK DA - Unsplash na Post panna Vidaathe da
   let media = m || document.getElementById('eImg').src
-  if(!media || media.includes('unsplash')){ showToast('Photo illa da - Select pannu da'); return }
+  if(!media || media.includes('unsplash') || media.includes('picsum') || media.includes('placeholder')){ showToast('Photo illa da - Select pannu da'); location.href='story-upload.html'; return }
   if(!ME_ID){ let {data:{session}} = await supa.auth.getSession(); if(session){ ME_ID = session.user.id } }
   if(!ME_ID){ showToast('Login pannu da'); return; }
   let exp=new Date(); exp.setHours(exp.getHours()+24);
@@ -89,6 +101,7 @@ async function postStory(aud){
   let { error } = await supa.from('stories').insert({user_id: ME_ID, username: ME, image_url: media, media_url: media, media_type: type, caption: caption, audience: aud, expires_at: exp.toISOString()})
   if(error){ showToast('DB Error: '+error.message); return; }
   showToast('Story Posted da! 🔥');
+  sessionStorage.removeItem('pixoro_story_data');
   setTimeout(()=>{ location.href='index.html'; },800);
 }
 </script></body></html>
