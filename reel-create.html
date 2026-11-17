@@ -1,108 +1,37 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js"></script>
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pixoro - New Reel</title>
 <style>
-*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;min-height:100vh}
-.top{display:flex;align-items:center;gap:10px;padding:12px}.top b{font-size:17px}.top b span{color:#FF2DCC}
-.pill{display:flex;gap:6px;margin:0 12px}.pill button{flex:1;background:#1a1a1a;border:1px solid #222;padding:9px;border-radius:20px;color:#fff;font-size:12px;font-weight:700;cursor:pointer}.pill button.on{background:linear-gradient(90deg,#7B2FFF,#FF2DCC);border:0}
-.sec{display:flex;justify-content:space-between;padding:12px 12px 6px;font-size:14px;font-weight:800}.sec span{font-size:12px;background:#1a1a1a;padding:5px 10px;border-radius:12px;cursor:pointer}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;padding:0 2px}.cell{aspect-ratio:3/4;background:#111;position:relative;overflow:hidden;border-radius:6px;cursor:pointer}.cell video{width:100%;height:100%;object-fit:cover}.cell .dur{position:absolute;right:5px;bottom:5px;font-size:11px;background:rgba(0,0,0,.7);padding:2px 6px;border-radius:10px}.cell.cam{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:12px;color:#aaa}
-.tabs{display:flex;justify-content:center;gap:18px;padding:14px;border-top:1px solid #222;position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:auto;background:#000;z-index:10}.tabs b{font-size:12px;letter-spacing:1px;color:#888;cursor:pointer}.tabs b.on{color:#fff;border-bottom:2px solid #FF2DCC;padding-bottom:4px}
-.preview{height:58vh;background:#000;position:relative}.preview video{width:100%;height:100%;object-fit:contain}
-.bar{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:#aaa;cursor:pointer}
-.tools{display:flex;gap:8px;justify-content:flex-start;padding:8px 10px;overflow-x:auto}.tool{background:#1a1a1a;border:1px solid #222;padding:10px 12px;border-radius:12px;text-align:center;font-size:11px;min-width:62px;cursor:pointer;flex-shrink:0;color:#fff}.tool span{font-size:18px;display:block}
-.bot{display:flex;justify-content:space-between;padding:12px;gap:10px}.bot button{flex:1;padding:13px;border-radius:20px;border:0;font-weight:800;cursor:pointer}.bot .nxt{background:linear-gradient(90deg,#7B2FFF,#FF2DCC);color:#fff}
-.timeline{display:none;padding:10px;background:#0a0a0a}.timeline .track{display:flex;gap:2px;overflow-x:auto;height:48px}.timeline .frame{flex:0 0 42px;height:48px;background:#222;border-radius:6px;overflow:hidden}.timeline .frame video{width:100%;height:100%;object-fit:cover}
-.trimBox{padding:12px;background:#0a0a0a}input[type=range]{width:100%;accent-color:#FF2DCC;margin:8px 0}
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:800;display:none;z-index:999;white-space:nowrap}
-#bar{height:6px;background:#222;border-radius:20px;overflow:hidden;margin:12px;display:none}#bar div{height:100%;width:0%;background:linear-gradient(90deg,#7B2FFF,#FF2DCC);transition:.3s}
-.empty{grid-column:1/-1;text-align:center;color:#888;font-size:13px;padding:30px 10px;line-height:1.6}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+body{background:#000;color:#fff;max-width:450px;margin:0 auto;min-height:100vh}
+.pTop{display:flex;align-items:center;justify-content:space-between;padding:14px;height:56px}
+.pTop b{font-size:20px;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.pTop span{font-size:26px;cursor:pointer;width:32px;text-align:center}
+.tabs{display:flex;gap:8px;padding:10px 14px}
+.tabs button{padding:10px 18px;border:0;border-radius:25px;background:#1a1a1a;color:#fff;font-weight:800;font-size:14px;cursor:pointer}
+.tabs button.on{background:linear-gradient(90deg,#a259ff,#ff2dcc)}
+.pickBtn{margin:0 14px 10px;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);border:0;color:#fff;padding:14px;width:calc(100% - 28px);border-radius:25px;font-weight:900;font-size:15px;cursor:pointer;height:48px}
+.recHead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px}
+.recHead b{font-size:15px;background:#1a1a1a;padding:8px 14px;border-radius:20px}
+.recHead button{background:#1a1a1a;color:#fff;border:0;padding:8px 14px;border-radius:20px;font-weight:800;cursor:pointer}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:4px 14px}
+.g{aspect-ratio:1/1;background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:32px;cursor:pointer;border-radius:12px}
+.g small{font-size:13px;color:#aaa}
+.msg{text-align:center;color:#888;font-size:13px;padding:20px;line-height:1.6}
+.bottomTabs{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;background:#000;border-top:1px solid #222;display:flex;justify-content:center;gap:28px;padding:14px 0;height:52px;z-index:99}
+.bottomTabs button{background:transparent;border:0;color:#888;font-weight:800;font-size:14px;letter-spacing:1px;cursor:pointer}
+.bottomTabs button.on{color:#fff;border-bottom:3px solid #ff2dcc}
 </style></head><body>
-
-<div id="p1">
-<div class="top"><span onclick="location.href='index.html'" style="font-size:24px;cursor:pointer">✕</span><b>PIX<span>O</span>RO - New reel</b><span style="margin-left:auto;font-size:22px" onclick="document.getElementById('f').click()">📷</span></div>
-<div class="pill"><button class="on" onclick="showTab(this,'edits')">✨ Edits</button><button onclick="showTab(this,'drafts')">📝 Drafts</button><button onclick="showTab(this,'templates')">🎬 Templates</button></div>
-<div class="sec"><span>Recents ∨</span><span onclick="document.getElementById('f').click()">☑ Select</span></div>
-<div class="grid" id="grid">
-<div class="cell cam" onclick="document.getElementById('f').click()"><span style="font-size:28px">📷</span>Camera</div>
-</div>
-<div id="emptyMsg" class="empty">Un Gallery la irunthu Video select pannu da 📷<br>Select / Camera Click pannu da</div>
-<div style="height:70px"></div>
-<div class="tabs"><b onclick="location.href='story-upload.html'">STORY</b><b onclick="location.href='post-create.html'">POST</b><b class="on">REEL</b><b onclick="location.href='live.html'">LIVE</b></div>
-</div>
-
-<div id="p2" style="display:none">
-<div class="top"><span onclick="backToSelect()" style="font-size:24px;cursor:pointer">✕</span><b>PIXORO Reel</b><span style="margin-left:auto">Try Edits ✨</span></div>
-<div class="preview"><video id="v" playsinline controls></video><div class="bar" onclick="showTimeline()">Swipe up to edit ↑</div></div>
-<div class="timeline" id="tl">
-<div style="display:flex;justify-content:space-between;font-size:12px"><span id="tInfo">0.0s - 30.0s</span><span>↩ ↪</span></div>
-<div class="track" id="track"></div>
-<div style="padding:10px 0;font-size:13px;color:#aaa;line-height:1.9">+ Add audio<br>+ Add text</div>
-<div class="trimBox">
-<label style="font-size:12px;color:#888">START</label><input type="range" id="sR" min="0" max="60" step="0.1" value="0">
-<label style="font-size:12px;color:#888">END</label><input type="range" id="eR" min="0" max="60" step="0.1" value="30">
-<button onclick="previewTrim()" style="width:100%;background:#1a1a1a;border:1px solid #222;color:#fff;padding:11px;border-radius:12px;font-weight:800;margin-top:8px;cursor:pointer">Preview Trim</button>
-</div>
-</div>
-<div class="tools"><div class="tool" onclick="addAudio()"><span>🎵</span>Audio</div><div class="tool" onclick="addText()"><span>Aa</span>Text</div><div class="tool" onclick="addVoice()"><span>🎙️</span>Voice</div><div class="tool" onclick="addCap()"><span>CC</span>Captions</div><div class="tool" onclick="addSticker()"><span>😍</span>Sticker</div><div class="tool" onclick="addFilter()"><span>✨</span>Filters</div></div>
-<div id="bar"><div id="fill"></div></div>
-<div id="status" style="text-align:center;font-size:12px;color:#888"></div>
-<div class="bot"><button onclick="showTimeline()" style="background:#1a1a1a;color:#fff">Edit video</button><button class="nxt" id="nextBtn" onclick="goEditPage()">Next →</button></div>
-</div>
-
-<div id="toast" class="toast"></div>
-<input type="file" id="f" hidden accept="video/*" multiple onchange="h(event)">
+<div class="pTop"><span onclick="location.href='./index.html'">✕</span><b>PIXORO - New Reel</b><span onclick="location.href='./story-camera.html'">📷</span></div>
+<div class="tabs"><button class="on">✨ Edits</button><button>📝 Drafts</button><button>🎬 Templates</button></div>
+<button class="pickBtn" onclick="document.getElementById('fileInp').click()">📷 Photo / Video Edu Da</button>
+<input type="file" id="fileInp" accept="image/*,video/*" hidden>
+<input type="file" id="videoInp" accept="video/*" hidden>
+<div class="recHead"><b>Recents ∨</b><button onclick="document.getElementById('fileInp').click()">☑ Select</button></div>
+<div class="grid"><div class="g" onclick="location.href='./story-camera.html'">📷<small>Camera</small></div><div class="g" onclick="document.getElementById('fileInp').click()">🖼️<small>Gallery</small></div><div class="g" onclick="document.getElementById('videoInp').click()">🎬<small>Video</small></div></div>
+<p class="msg">Un Gallery la irunthu Photo select pannu da 📷<br>Select / Camera Click pannu da</p>
+<div class="bottomTabs"><button onclick="location.href='./story-upload.html'">STORY</button><button onclick="location.href='./post-create.html'">POST</button><button class="on" onclick="location.href='./reel-create.html'">REEL</button><button onclick="location.href='./live.html'">LIVE</button></div>
 <script>
-let supa=window.supa, selFile=null, selUrl='', publicUrl='', dur=0, start=0, end=30, ME_RAW='', ME_ID='';
-let v=document.getElementById('v');
-let edit={text:'',filter:'none',speed:1,stickers:'',audio:''};
-let myVideos=[];
-function showToast(m){let t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
-async function init(){let {data:{session}}=await supa.auth.getSession();if(!session){location.href='login.html';return}ME_ID=session.user.id;let {data:p}=await supa.from('profiles').select('*').eq('id',ME_ID).single();ME_RAW=(p?.username||session.user.email.split('@')[0]).toLowerCase();}
-init();
-function showTab(el,n){document.querySelectorAll('.pill button').forEach(b=>b.classList.remove('on'));el.classList.add('on');showToast(n+' - Coming soon da 🔥');}
-function h(e){
- let files=[...e.target.files]; if(!files.length) return;
- files.forEach(f=>{
-   let url=URL.createObjectURL(f);
-   myVideos.push({file:f, url:url});
-   let grid=document.getElementById('grid');
-   let div=document.createElement('div'); div.className='cell';
-   div.innerHTML=`<video src="${url}" muted preload="metadata"></video><span class="dur">▶</span>`;
-   div.onclick=()=>{ selFile=f; selUrl=url; showPreview(url); showToast('Video Selected da 🔥'); };
-   grid.appendChild(div);
-   let vid=div.querySelector('video'); vid.onloadedmetadata=()=>{ div.querySelector('.dur').innerText='0:'+Math.floor(vid.duration).toString().padStart(2,'0'); };
- });
- document.getElementById('emptyMsg').style.display='none';
- showToast(myVideos.length+' video selected da 🔥 - Oru video va click pannu da');
- e.target.value='';
-}
-function showPreview(url){document.getElementById('p1').style.display='none';document.getElementById('p2').style.display='block';v.src=url;v.play();v.onloadedmetadata=()=>{dur=v.duration;document.getElementById('sR').max=dur;document.getElementById('eR').max=dur;end=Math.min(30,dur);document.getElementById('eR').value=end;update();makeTrack(url);}}
-function backToSelect(){document.getElementById('p2').style.display='none';document.getElementById('p1').style.display='block';v.pause();}
-function makeTrack(url){let t=document.getElementById('track');t.innerHTML='';for(let i=0;i<10;i++)t.innerHTML+=`<div class="frame"><video src="${url}#t=${i}" muted preload="metadata"></video></div>`}
-function showTimeline(){let tl=document.getElementById('tl');tl.style.display=tl.style.display==='block'?'none':'block';}
-function update(){start=parseFloat(document.getElementById('sR').value);end=parseFloat(document.getElementById('eR').value);if(end<=start)end=start+1;if(end-start>30)end=start+30;document.getElementById('eR').value=end;document.getElementById('tInfo').innerText=start.toFixed(1)+'s - '+end.toFixed(1)+'s';v.currentTime=start;}
-document.getElementById('sR').oninput=update;document.getElementById('eR').oninput=update;
-function previewTrim(){v.currentTime=start;v.play();setTimeout(()=>v.pause(),(end-start)*1000);}
-function addAudio(){showToast('Audio add pannu da 🎵');}
-function addText(){let txt=prompt('Text type pannu da');if(txt){edit.text=txt;showToast('Text added: '+txt);}}
-function addVoice(){showToast('Voice - Mic la pesu da 🎙️');}
-function addCap(){showToast('Captions auto add aagum da');}
-function addSticker(){edit.stickers+='🔥 ';showToast('Sticker added 🔥');}
-function addFilter(){edit.filter=edit.filter==='none'?'contrast(1.3) saturate(1.5)':'none';v.style.filter=edit.filter;showToast('Filter applied ✨');}
-async function goEditPage(){
-  if(!selFile){showToast('Select a video da');return}
-  let btn=document.getElementById('nextBtn');btn.disabled=true;btn.innerText='Uploading...';
-  document.getElementById('bar').style.display='block';document.getElementById('fill').style.width='40%';document.getElementById('status').innerText='Uploading... 40%';
-  try{
-    let fileName=Date.now()+'_'+ME_RAW+'.mp4';
-    let {error}=await supa.storage.from('reels').upload(fileName, selFile);
-    if(error) throw error;
-    document.getElementById('fill').style.width='80%';document.getElementById('status').innerText='Done... 80%';
-    let {data}=supa.storage.from('reels').getPublicUrl(fileName);
-    publicUrl=data.publicUrl;
-    let q=new URLSearchParams({media:publicUrl,type:'video',trim_start:String(start),trim_end:String(end),filter:edit.filter,speed:String(edit.speed),text:edit.text,stickers:edit.stickers,audio:edit.audio});
-    location.href='reel-edit.html?'+q.toString();
-  }catch(e){showToast('Try again da');btn.disabled=false;btn.innerText='Next →';}
-}
+function go(f,t){let r=new FileReader();r.onload=()=>{sessionStorage.setItem('pixoro_reel_data',r.result);sessionStorage.setItem('pixoro_reel_type',t);location.href='./reel-editor.html'};r.readAsDataURL(f)}
+document.getElementById('fileInp').addEventListener('change',e=>{let f=e.target.files[0];if(f)go(f,f.type.startsWith('video')?'video':'image')});
+document.getElementById('videoInp').addEventListener('change',e=>{let f=e.target.files[0];if(f)go(f,'video')});
 </script></body></html>
