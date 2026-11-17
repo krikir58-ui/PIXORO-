@@ -1,92 +1,37 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js"></script>
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pixoro - New Post</title>
 <style>
-*{margin:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:sans-serif;max-width:450px;margin:auto;padding-bottom:80px}
-.top{padding:14px;display:flex;justify-content:space-between;align-items:center}
-.top b{font-size:22px;font-weight:900}
-.pills{display:flex;gap:8px;padding:6px 12px}.pills b{flex:1;text-align:center;padding:12px;border-radius:999px;background:#1a1a1a;font-size:13px;color:#ccc}.pills b.on{background:linear-gradient(90deg,#7b2fff,#FF2DCC);color:#fff}
-.row{display:flex;justify-content:space-between;padding:12px}.row b{background:#1a1a1a;padding:8px 12px;border-radius:999px;font-size:13px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px}
-.cell{height:170px;background:#111;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;overflow:hidden;position:relative}
-.cell video{width:100%;height:100%;object-fit:cover}
-.cell img{width:100%;height:100%;object-fit:cover}
-.empty{text-align:center;color:#888;padding:40px 20px;font-size:14px;line-height:1.6}
-.btn{margin:12px;background:#fff;border:0;width:calc(100% - 24px);padding:14px;border-radius:20px;font-weight:900}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
-.progress{margin:0 12px;background:#111;border:1px solid #222;border-radius:12px;padding:10px;display:none}
-.bar{height:6px;background:#333;border-radius:10px;overflow:hidden;margin-top:6px}
-.barFill{height:100%;background:#00C853;width:0%}
-.tabs{display:flex;justify-content:center;gap:18px;padding:14px;border-top:1px solid #222;position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:auto;background:#000;z-index:10}.tabs b{font-size:12px;letter-spacing:1px;color:#888;cursor:pointer}.tabs b.on{color:#fff;border-bottom:2px solid #FF2DCC;padding-bottom:4px}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+body{background:#000;color:#fff;max-width:450px;margin:0 auto;min-height:100vh}
+.pTop{display:flex;align-items:center;justify-content:space-between;padding:14px;height:56px}
+.pTop b{font-size:20px;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.pTop span{font-size:26px;cursor:pointer;width:32px;text-align:center}
+.tabs{display:flex;gap:8px;padding:10px 14px}
+.tabs button{padding:10px 18px;border:0;border-radius:25px;background:#1a1a1a;color:#fff;font-weight:800;font-size:14px;cursor:pointer}
+.tabs button.on{background:linear-gradient(90deg,#a259ff,#ff2dcc)}
+.pickBtn{margin:0 14px 10px;background:linear-gradient(90deg,#ff5ea8,#a259ff,#ff7a00);border:0;color:#fff;padding:14px;width:calc(100% - 28px);border-radius:25px;font-weight:900;font-size:15px;cursor:pointer;height:48px}
+.recHead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px}
+.recHead b{font-size:15px;background:#1a1a1a;padding:8px 14px;border-radius:20px}
+.recHead button{background:#1a1a1a;color:#fff;border:0;padding:8px 14px;border-radius:20px;font-weight:800;cursor:pointer}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:4px 14px}
+.g{aspect-ratio:1/1;background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:32px;cursor:pointer;border-radius:12px}
+.g small{font-size:13px;color:#aaa}
+.msg{text-align:center;color:#888;font-size:13px;padding:20px;line-height:1.6}
+.bottomTabs{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;background:#000;border-top:1px solid #222;display:flex;justify-content:center;gap:28px;padding:14px 0;height:52px;z-index:99}
+.bottomTabs button{background:transparent;border:0;color:#888;font-weight:800;font-size:14px;letter-spacing:1px;cursor:pointer}
+.bottomTabs button.on{color:#fff;border-bottom:3px solid #ff2dcc}
 </style></head><body>
-<div class="top"><b>✕ &nbsp;PIX<span style="color:#FF2DCC">O</span>RO - New post</b><span>📷</span></div>
-<div class="pills"><b class="on">✨ Edits</b><b>📝 Drafts</b><b>🎬 Templates</b></div>
-<div class="row"><b>Recents ∨</b><b onclick="document.getElementById('f').click()">☑ Select</b></div>
-<div class="grid" id="grid"><div class="cell" onclick="document.getElementById('f').click()">📷<br><span style="color:#aaa;font-size:13px">Camera</span></div></div>
-<div class="empty" id="emptyMsg">Un Gallery la irunthu Photo select pannu da 📷<br>Select / Camera Click pannu da</div>
-<div class="progress" id="prog"><div style="display:flex;justify-content:space-between;font-size:11px;color:#aaa"><span id="progText">Compressing... 💾</span><span id="progSize"></span></div><div class="bar"><div class="barFill" id="progFill"></div></div></div>
-<button class="btn" onclick="go()">Next →</button>
-<div class="tabs"><b onclick="location.href='story-upload.html'">STORY</b><b class="on">POST</b><b onclick="location.href='reel-create.html'">REEL</b><b onclick="location.href='live.html'">LIVE</b></div>
-<div id="toast" class="toast"></div>
-<input type="file" id="f" hidden accept="image/*,video/*" onchange="h(event)">
+<div class="pTop"><span onclick="location.href='./index.html'">✕</span><b>PIXORO - New Post</b><span onclick="location.href='./story-camera.html'">📷</span></div>
+<div class="tabs"><button class="on">✨ Edits</button><button>📝 Drafts</button><button>🎬 Templates</button></div>
+<button class="pickBtn" onclick="document.getElementById('fileInp').click()">📷 Photo / Video Edu Da</button>
+<input type="file" id="fileInp" accept="image/*,video/*" hidden>
+<input type="file" id="videoInp" accept="video/*" hidden>
+<div class="recHead"><b>Recents ∨</b><button onclick="document.getElementById('fileInp').click()">☑ Select</button></div>
+<div class="grid"><div class="g" onclick="location.href='./story-camera.html'">📷<small>Camera</small></div><div class="g" onclick="document.getElementById('fileInp').click()">🖼️<small>Gallery</small></div><div class="g" onclick="document.getElementById('videoInp').click()">🎬<small>Video</small></div></div>
+<p class="msg">Un Gallery la irunthu Photo select pannu da 📷<br>Select / Camera Click pannu da</p>
+<div class="bottomTabs"><button onclick="location.href='./story-upload.html'">STORY</button><button class="on" onclick="location.href='./post-create.html'">POST</button><button onclick="location.href='./reel-create.html'">REEL</button><button onclick="location.href='./live.html'">LIVE</button></div>
 <script>
-let supa = window.supa
-function showToast(m){let t=document.getElementById('toast');if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000)}
-window.alert = function(msg){ showToast(String(msg||'').slice(0,40) || 'Adutha side la problem da'); };
-window.confirm = function(msg){ showToast(msg); return true; };
-let ME_RAW=''
-async function checkAuth(){
-  let { data: { session } } = await supa.auth.getSession()
-  if(!session){ location.href='login.html'; return; }
-  let { data: profile } = await supa.from('profiles').select('*').eq('id', session.user.id).single()
-  ME_RAW = (profile?.username || session.user.email.split('@')[0]).toLowerCase()
-}
-checkAuth()
-async function compressImage(file){
-  return new Promise(res=>{
-    let img=new Image(); let url=URL.createObjectURL(file);
-    img.onload=()=>{ let w=img.width,h=img.height; let maxW=720; if(w>maxW){ h=h*maxW/w; w=maxW; } let c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); c.toBlob(b=>{ res(new File([b],file.name.replace(/\.[^.]+$/,'')+'.jpg',{type:'image/jpeg'})); },'image/jpeg',0.72); URL.revokeObjectURL(url); };
-    img.onerror=()=>res(file); img.src=url;
-  });
-}
-function formatSize(b){ if(b<1024) return b+' B'; if(b<1048576) return (b/1024).toFixed(0)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
-let m=''; let mType='image';
-async function h(e){
-  let f=e.target.files[0]; if(!f) return;
-  let isVideo=f.type.startsWith('video');
-  mType=isVideo?'video':'image';
-  if(isVideo && f.size > 15*1024*1024){ showToast('Video perusu da! 15MB kulla irukura video eduthuko'); e.target.value=''; return; }
-  let url=URL.createObjectURL(f);
-  document.getElementById('emptyMsg').style.display='none';
-  let grid=document.getElementById('grid');
-  let old=grid.querySelector('.realCell'); if(old) old.remove();
-  let div=document.createElement('div'); div.className='cell realCell';
-  div.innerHTML=isVideo?`<video src="${url}" autoplay muted loop></video>`:`<img src="${url}">`;
-  grid.appendChild(div);
-  document.getElementById('prog').style.display='block';
-  document.getElementById('progText').innerText=isVideo?'Uploading Video... ⏳':'Compressing Photo... 💾';
-  document.getElementById('progSize').innerText='Original: '+formatSize(f.size);
-  document.getElementById('progFill').style.width='30%';
-  showToast('Uploading... ⏳');
-  let uploadFile=f;
-  if(!isVideo){
-    uploadFile=await compressImage(f);
-    document.getElementById('progText').innerText='Compressed! '+formatSize(f.size)+' → '+formatSize(uploadFile.size)+' ✅';
-    document.getElementById('progFill').style.width='70%';
-    showToast('Compress aayiduchu da! '+formatSize(f.size)+' → '+formatSize(uploadFile.size));
-  }
-  let bucket=isVideo?'reels':'posts';
-  let fileName=Date.now()+'_'+ME_RAW+'_'+uploadFile.name.replace(/[^a-zA-Z0-9.]/g,'_');
-  let {error}=await supa.storage.from(bucket).upload(fileName,uploadFile);
-  if(error){ showToast('Adutha side la problem da - Try again'); document.getElementById('prog').style.display='none'; return; }
-  let {data}=supa.storage.from(bucket).getPublicUrl(fileName);
-  m=data.publicUrl;
-  document.getElementById('progFill').style.width='100%';
-  document.getElementById('progText').innerText='Upload Done ✅ Storage Saved!';
-  showToast('Upload Done da Giri! 🔥 Next ku po da');
-}
-function go(){ 
-  if(!m){showToast('Photo select pannu da Giri!');return} 
-  location.href='post-upload.html?media='+encodeURIComponent(m)+'&type='+mType
-}
+function go(f,t){let r=new FileReader();r.onload=()=>{sessionStorage.setItem('pixoro_post_data',r.result);sessionStorage.setItem('pixoro_post_type',t);location.href='./post-editor.html'};r.readAsDataURL(f)}
+document.getElementById('fileInp').addEventListener('change',e=>{let f=e.target.files[0];if(f)go(f,f.type.startsWith('video')?'video':'image')});
+document.getElementById('videoInp').addEventListener('change',e=>{let f=e.target.files[0];if(f)go(f,'video')});
 </script></body></html>
