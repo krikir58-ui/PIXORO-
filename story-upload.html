@@ -17,6 +17,15 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;min-height:100vh}
 .g{aspect-ratio:1/1;background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:32px;cursor:pointer;border-radius:12px}
 .g small{font-size:13px;color:#aaa}
 .msg{text-align:center;color:#888;font-size:13px;padding:20px;line-height:1.6}
+.aud{margin:4px 14px 10px;display:flex;gap:8px}
+.aud button{flex:1;padding:12px;border:0;border-radius:25px;background:#1a1a1a;color:#fff;font-weight:800;font-size:13px;cursor:pointer}
+.aud button.on{background:linear-gradient(90deg,#ff5ea8,#ff7a00)}
+.aud button.on.green{background:linear-gradient(90deg,#00ff66,#00d4ff);color:#000}
+.closeBox{margin:0 14px 10px;background:#111;border:1px solid #00ff66;border-radius:16px;padding:12px;display:none}
+.closeBox b{font-size:13px}
+.closeBox input{width:100%;background:#222;border:1px solid #333;color:#fff;padding:10px;border-radius:10px;margin-top:8px;outline:none}
+.closeList{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+.closeList span{background:#00ff66;color:#000;padding:5px 10px;border-radius:20px;font-size:12px;font-weight:800}
 .bottomTabs{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;background:#000;border-top:1px solid #222;display:flex;justify-content:center;gap:28px;padding:14px 0;height:52px;z-index:99}
 .bottomTabs button{background:transparent;border:0;color:#888;font-weight:800;font-size:14px;letter-spacing:1px;cursor:pointer}
 .bottomTabs button.on{color:#fff;border-bottom:3px solid #ff2dcc}
@@ -28,10 +37,37 @@ body{background:#000;color:#fff;max-width:450px;margin:0 auto;min-height:100vh}
 <input type="file" id="videoInp" accept="video/*" hidden>
 <div class="recHead"><b>Recents ∨</b><button onclick="document.getElementById('fileInp').click()">☑ Select</button></div>
 <div class="grid"><div class="g" onclick="location.href='./story-camera.html'">📷<small>Camera</small></div><div class="g" onclick="document.getElementById('fileInp').click()">🖼️<small>Gallery</small></div><div class="g" onclick="document.getElementById('videoInp').click()">🎬<small>Video</small></div></div>
+
+<!-- ✅ CLOSE FRIENDS - ITHU THAAN PUTHUSU DA -->
+<div class="aud"><button id="btnAll" class="on" onclick="setAud('everyone')">🌍 Everyone</button><button id="btnClose" onclick="setAud('close_friends')">💚 Close Friends</button></div>
+<div class="closeBox" id="closeBox"><b>💚 Close Friends - Yaar Paakkanum da?</b><input id="closeInput" placeholder="@username type pannu da - Enter adichu Add pannu da" onkeydown="if(event.key==='Enter')addClose()"><div class="closeList" id="closeList"></div><div style="font-size:11px;color:#888;margin-top:6px">Empty na - Un Close Friends List la irukkavanga mattum Paappanga da ✅</div></div>
+
 <p class="msg">Un Gallery la irunthu Photo select pannu da 📷<br>Select / Camera Click pannu da</p>
 <div class="bottomTabs"><button class="on" onclick="location.href='./story-upload.html'">STORY</button><button onclick="location.href='./post-create.html'">POST</button><button onclick="location.href='./reel-create.html'">REEL</button><button onclick="location.href='./live.html'">LIVE</button></div>
 <script>
-function go(f,t){let r=new FileReader();r.onload=()=>{sessionStorage.setItem('pixoro_story_data',r.result);sessionStorage.setItem('pixoro_story_type',t);location.href='./story-editor.html'};r.readAsDataURL(f)}
+let storyAud='everyone', closeList=JSON.parse(localStorage.getItem('pixoro_close_friends')||'[]');
+function renderClose(){
+  let box=document.getElementById('closeList');
+  box.innerHTML=closeList.length?closeList.map((u,i)=>`<span>@${u} <b onclick="removeClose(${i})" style="cursor:pointer">✕</b></span>`).join(''):'<span style="background:#222;color:#aaa">Innum Yaarum Illa da</span>';
+}
+renderClose();
+function setAud(v){
+  storyAud=v;
+  sessionStorage.setItem('pixoro_story_aud',v);
+  document.getElementById('btnAll').classList.toggle('on',v==='everyone');
+  document.getElementById('btnClose').classList.toggle('on',v==='close_friends');
+  document.getElementById('btnClose').classList.toggle('green',v==='close_friends');
+  document.getElementById('closeBox').style.display=v==='close_friends'?'block':'none';
+}
+function addClose(){
+  let inp=document.getElementById('closeInput');
+  let u=inp.value.trim().replace('@','').toLowerCase();
+  if(!u) return;
+  if(!closeList.includes(u)){ closeList.push(u); localStorage.setItem('pixoro_close_friends',JSON.stringify(closeList)); }
+  inp.value=''; renderClose();
+}
+function removeClose(i){ closeList.splice(i,1); localStorage.setItem('pixoro_close_friends',JSON.stringify(closeList)); renderClose(); }
+function go(f,t){let r=new FileReader();r.onload=()=>{sessionStorage.setItem('pixoro_story_data',r.result);sessionStorage.setItem('pixoro_story_type',t);sessionStorage.setItem('pixoro_story_aud',storyAud);sessionStorage.setItem('pixoro_close_list',JSON.stringify(closeList));location.href='./story-editor.html'};r.readAsDataURL(f)}
 document.getElementById('fileInp').addEventListener('change',e=>{let f=e.target.files[0];if(f)go(f,f.type.startsWith('video')?'video':'image')});
 document.getElementById('videoInp').addEventListener('change',e=>{let f=e.target.files[0];if(f)go(f,'video')});
 </script></body></html>
