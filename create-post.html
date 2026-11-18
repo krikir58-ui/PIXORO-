@@ -3,219 +3,111 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>New post - Pixoro</title>
-<link rel="stylesheet" href="css/create-post.css?v=1038">
+<title>Edit - Pixoro</title>
 <style>
-.step{display:none}
-.step.on{display:block}
-.step2Wrap{position:relative;width:100%;height:calc(100vh - 70px);background:#000;display:grid;place-items:center;overflow:hidden}
-.step2Wrap img{width:100%;height:100%;object-fit:cover}
-.editTools{position:absolute;bottom:90px;left:0;right:0;display:flex;justify-content:space-around;padding:0 10px}
-.editTools div{text-align:center;font-size:11px}
-.editTools span{display:grid;place-items:center;width:56px;height:56px;background:#222;border-radius:16px;font-size:22px;margin-bottom:4px}
-.filterRow{display:flex;gap:8px;padding:10px 16px;overflow-x:auto;background:#000}
-.filterRow button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px;white-space:nowrap}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:system-ui}
+.top{display:flex;justify-content:space-between;align-items:center;padding:14px;font-size:20px;background:#000}
+.top span{cursor:pointer}
+.top .next{color:#4d7cff;font-weight:700}
+/* ✅ PHOTO - MELA MATTUM DA - 55vh MATTUM DA - KEELA POGAATHU DA */
+.wrap{position:relative;width:100%;height:55vh;background:#000;overflow:hidden;display:grid;place-items:center}
+.wrap img,.wrap video{width:100%;height:100%;object-fit:cover}
+/* ✅ KEELA - FULL BLACK PANEL DA - PHOTO ILLA DA - 100% BLACK DA */
+.bottomPanel{background:#000;padding:12px 12px 16px;border-top:1px solid #222}
+.editTools{display:flex;justify-content:space-around;padding:6px 0 12px}
+.editTools div{text-align:center;font-size:12px;color:#fff}
+.editTools span{display:grid;place-items:center;width:60px;height:60px;background:#222;border-radius:18px;font-size:26px;margin-bottom:4px}
+.sourceRow{display:flex;gap:10px;padding:0 0 12px}
+.sourceRow button{flex:1;padding:13px;border-radius:16px;border:1px solid #333;background:#111;color:#fff;font-weight:700}
+.filterRow{display:flex;gap:8px;padding:0 0 12px;overflow-x:auto}
+.filterRow button{background:#111;color:#fff;border:1px solid #333;padding:10px 16px;border-radius:30px;white-space:nowrap}
 .filterRow button.on{background:#fff;color:#000}
-.captionInput{width:100%;background:transparent;border:0;color:#fff;font-size:16px;padding:16px;outline:none;resize:none;min-height:60px}
-.shareBtn{background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;border:0;padding:14px;border-radius:14px;font-weight:900;width:100%;font-size:16px}
-.draftBtn{background:#222;color:#fff;border:0;padding:14px;border-radius:14px;font-weight:700;width:100%}
+.bottom{display:flex;gap:10px;padding:0 0 4px}
+.bottom button{flex:1;padding:14px;border-radius:20px;border:0;font-weight:800}
+.editBtn{background:#222;color:#fff}
+.nextBtn{background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff}
 </style>
 </head>
 <body>
+<div class="top"><span onclick="history.back()">←</span><b>Edit</b><span class="next" onclick="goShare()">Next</span></div>
 
-<!-- ================= PAGE 1 - SELECT DA - UPLOAD ILLA DA ================= -->
-<div id="step1" class="step on">
-<div class="top"><span onclick="location.href='./index.html'">✕</span><b>New post</b><span onclick="goToEditFromTop()">Next</span></div>
-<div class="bgToggle">
-  <button class="on" onclick="setPostBg('black',this)">⬛ Black Block</button>
-  <button onclick="setPostBg('transparent',this)">🔲 BG Remove</button>
-</div>
-<div class="preview" id="previewBox">
-  <img id="prev" src="" style="display:none">
-  <div class="empty" id="emptyBox">📷<small>Photo Select Pannu da<br>Real Photo Mattum Varum da</small></div>
-</div>
-<div class="head"><b>Your Photo</b><button onclick="document.getElementById('file').click()">☑️ Select Real Photo</button></div>
-<!-- ✅ FAKE TILE ILLA DA - SELECT PANNA PHOTO MATTUM DA -->
-<div class="grid" id="grid" style="padding:0 16px 90px">
-  <div id="noPhotoMsg" style="grid-column:1/-1;text-align:center;color:#777;font-size:13px;padding:20px">Innum Photo Select Pannala da<br>Select Button ah Thodu da - Gallery Open Aagum da</div>
-</div>
-<div class="bottomNav">
-  <button class="on">POST</button>
-  <button onclick="location.href='./create-reels.html'">REELS</button>
-  <button onclick="location.href='./create-story.html'">STORY</button>
-  <button onclick="location.href='./live.html'">LIVE</button>
-  <button onclick="location.href='./create-reels.html'">INSTANTS</button>
-</div>
-</div>
-
-<!-- ================= PAGE 2 - EDIT DA - UPLOAD ILLA DA ================= -->
-<div id="step2" class="step">
-<div class="top"><span onclick="showStep(1)">✕</span><b></b><span></span></div>
-<div class="step2Wrap">
+<!-- ✅ PHOTO AREA - MELA MATTUM DA -->
+<div class="wrap">
   <img id="editImg" src="" style="display:none">
-  <div id="editTextOverlay" style="position:absolute;top:40%;left:0;right:0;text-align:center;font-size:28px;font-weight:900;text-shadow:0 2px 10px #000;display:none"></div>
-  <div style="position:absolute;bottom:170px;left:0;right:0;text-align:center;color:#fff;font-size:13px">Swipe up to edit</div>
+  <video id="editVid" src="" style="display:none" muted loop playsinline autoplay></video>
+  <div id="textOver" style="position:absolute;top:35%;left:0;right:0;text-align:center;font-size:28px;font-weight:900;text-shadow:0 2px 10px #000;display:none"></div>
+  <!-- ✅ SWIPE TEXT - OREY VAATI MATTUM DA -->
+  <div style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:13px;color:#fff;text-shadow:0 1px 5px #000">Swipe up to edit</div>
+</div>
+
+<!-- ✅ KEELA - FULL BLACK DA - PHOTO VARATHU DA - ITHU THAAN DA GIRI -->
+<div class="bottomPanel">
+  <!-- ✅ OREY ROW MATTUM DA - AUDIO / VOICE / CAPTIONS - RENDAM ROW - DELETE DA -->
   <div class="editTools">
     <div onclick="addText()"><span>Aa</span>Text</div>
     <div onclick="addSticker()"><span>😊</span>Stickers</div>
-    <div onclick="alert('Filter - Keela Irukku da')"><span>✨</span>Filter</div>
+    <div onclick="document.getElementById('filterRow').scrollIntoView({behavior:'smooth'})"><span>✨</span>Filter</div>
     <div onclick="alert('Crop - Coming Soon da')"><span>✂️</span>Crop</div>
   </div>
-</div>
-<div class="filterRow" id="filterRow">
-  <button class="on" onclick="setFilter('none',this)">Original</button>
-  <button onclick="setFilter('grayscale(1)',this)">B&W</button>
-  <button onclick="setFilter('sepia(.8)',this)">Sepia</button>
-  <button onclick="setFilter('saturate(1.8)',this)">Vivid</button>
-  <button onclick="setFilter('brightness(.8) contrast(1.1)',this)">Fade</button>
-</div>
-<div style="display:flex;gap:10px;padding:0 16px 16px;background:#000">
-  <button onclick="alert('Edit - Coming Soon da')" style="flex:1;background:#222;color:#fff;border:0;padding:14px;border-radius:20px">Edit</button>
-  <button onclick="showStep(3)" style="flex:1;background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;border:0;padding:14px;border-radius:20px;font-weight:900">Next →</button>
-</div>
-</div>
 
-<!-- ================= PAGE 3 - SHARE DA - ITHULA MATTUM UPLOAD DA ================= -->
-<div id="step3" class="step">
-<div class="top"><span onclick="showStep(2)">←</span><b>New post</b><span></span></div>
-<div style="display:flex;justify-content:center;padding:10px">
-  <div style="position:relative;width:200px;aspect-ratio:1/1;background:#000;border-radius:20px;overflow:hidden">
-    <img id="shareImg" src="" style="width:100%;height:100%;object-fit:cover;display:none">
+  <div class="sourceRow">
+    <button onclick="location.href='./create.html'">📁 Gallery</button>
+    <button onclick="document.getElementById('file').click()">📷 Camera</button>
+  </div>
+
+  <div class="filterRow" id="filterRow">
+    <button class="on" onclick="setFilter('none',this)">Original</button>
+    <button onclick="setFilter('grayscale(1)',this)">B&W</button>
+    <button onclick="setFilter('sepia(.8)',this)">Sepia</button>
+    <button onclick="setFilter('contrast(1.4) saturate(1.6)',this)">Vivid</button>
+    <button onclick="setFilter('brightness(1.2)',this)">Fade</button>
+  </div>
+
+  <div class="bottom">
+    <button class="editBtn" onclick="alert('Edit - Coming Soon da')">Edit</button>
+    <button class="nextBtn" onclick="goShare()">Next →</button>
   </div>
 </div>
-<textarea id="captionInput" class="captionInput" placeholder="Write a caption and add hashtags..."></textarea>
-<div style="display:flex;gap:8px;padding:0 16px">
-  <button style="background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px" onclick="addHashtag()"># Hashtags</button>
-  <button style="background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px" onclick="alert('Poll - Coming Soon da')">☰ Poll</button>
-  <button style="background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px" onclick="alert('Prompt - Coming Soon da')">🔍 Prompt</button>
-</div>
-<div style="padding:16px">
-  <div style="display:flex;justify-content:space-between;padding:12px 0" onclick="alert('Tag people - Coming Soon da')"><span>👤 Tag people</span><span>›</span></div>
-  <div style="display:flex;justify-content:space-between;padding:12px 0" onclick="alert('Location - Coming Soon da')"><span>📍 Add location</span><span>›</span></div>
-  <div style="font-size:12px;color:#888">People you share this content with can see the location you tag and view this content on the map.</div>
-</div>
-<!-- ✅ UPLOAD - ITHULA MATTUM DA - PAGE 1 / 2 LA - UPLOAD ILLA DA -->
-<div style="display:flex;gap:10px;padding:0 16px 20px">
-  <button class="draftBtn" onclick="alert('Draft Saved da')">Save draft</button>
-  <button class="shareBtn" id="shareBtn" onclick="uploadPost()">Share</button>
-</div>
-<div id="uploadStatus" style="text-align:center;font-size:12px;color:#aaa;padding-bottom:20px"></div>
-</div>
 
-<input type="file" id="file" accept="image/*" hidden>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js?v=1038"></script>
-<script src="js/pixoro-core.js?v=1038"></script>
+<input type="file" id="file" accept="image/*,video/*" capture="environment" hidden>
 <script>
-// ✅ NO LOCALSTORAGE DA - MEMORY LA MATTUM DA - 3 STEP - 1 HTML LA DA - FILE POOGAATHU DA
-let postBg = 'black';
-let selectedFile = null;
-let selectedBlobUrl = '';
-let currentFilter = 'none';
-
-function showStep(n){
-  document.querySelectorAll('.step').forEach(s=>s.classList.remove('on'));
-  document.getElementById('step'+n).classList.add('on');
-  window.scrollTo(0,0);
+let currentFilter='none', currentText='';
+function openDB(){
+  return new Promise((res,rej)=>{
+    let req=indexedDB.open('pixoro-db',1);
+    req.onupgradeneeded=()=>{ req.result.createObjectStore('media'); };
+    req.onsuccess=()=>res(req.result); req.onerror=()=>rej(req.error);
+  });
 }
-function applyPostBg(mode){
-  let box = document.getElementById('previewBox');
-  let img = document.getElementById('prev');
-  if(mode==='black'){ box.style.background='#000'; box.style.borderColor='#222'; img.style.background='#000'; img.style.objectFit='contain'; }
-  if(mode==='transparent'){ box.style.background='repeating-conic-gradient(#222 0% 25%, #000 0% 50%) 50% / 20px 20px'; img.style.background='transparent'; img.style.objectFit='contain'; }
+async function getDB(k){ let db=await openDB(); return new Promise((res,rej)=>{ let r=db.transaction('media','readonly').objectStore('media').get(k); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function saveDB(k,v){ let db=await openDB(); let tx=db.transaction('media','readwrite'); tx.objectStore('media').put(v,k); }
+async function load(){
+  let blob=await getDB('pixoro_create_media');
+  let kind=await getDB('pixoro_create_kind') || 'image';
+  if(!blob){ alert('Photo Illa da - Thirumba Select Pannu da'); location.href='./create.html'; return; }
+  let url=URL.createObjectURL(blob);
+  if(kind==='video'){ let v=document.getElementById('editVid'); v.src=url; v.style.display='block'; v.play(); }
+  else { let p=document.getElementById('editImg'); p.src=url; p.style.display='block'; }
+  currentFilter=await getDB('pixoro_create_filter') || 'none';
+  document.getElementById('editImg').style.filter=currentFilter;
+  document.getElementById('editVid').style.filter=currentFilter;
+  currentText=await getDB('pixoro_create_text') || '';
+  if(currentText){ let o=document.getElementById('textOver'); o.textContent=currentText; o.style.display='block'; }
 }
-function setPostBg(mode, btn){
-  document.querySelectorAll('.bgToggle button').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on'); postBg = mode; applyPostBg(mode);
-}
-applyPostBg(postBg);
-
-function setFilter(f, btn){
-  currentFilter = f;
+load();
+function setFilter(f,btn){
+  currentFilter=f;
   document.querySelectorAll('#filterRow button').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  ['prev','editImg','shareImg'].forEach(id=>{ let el=document.getElementById(id); if(el) el.style.filter=f; });
+  if(btn) btn.classList.add('on');
+  document.getElementById('editImg').style.filter=f;
+  document.getElementById('editVid').style.filter=f;
+  saveDB('pixoro_create_filter', f);
 }
-function addText(){
-  let t = prompt('Text ezhuthu da'); if(!t) return;
-  let o = document.getElementById('editTextOverlay'); o.textContent=t; o.style.display='block';
-}
-function addSticker(){
-  let s = prompt('Sticker emoji podu da - 😍 🔥 ❤️'); if(!s) return;
-  let o = document.getElementById('editTextOverlay'); o.textContent=(o.textContent+' '+s).trim(); o.style.display='block';
-}
-function addHashtag(){
-  let c=document.getElementById('captionInput'); c.value=c.value+' #pixoro '; c.focus();
-}
-function goToEditFromTop(){
-  if(!selectedFile){ alert('Photo Select Pannu da'); document.getElementById('file').click(); return; }
-  goToEdit();
-}
-
-document.getElementById('file').onchange = (e) => {
-  let f = e.target.files[0]; if(!f) return;
-  if(!f.type.startsWith('image/')){ alert('Post ku - Photo Mattum da - Video va - Reels la Podu da'); return; }
-  let reader = new FileReader();
-  reader.onload = function(){
-    let img = new Image();
-    img.onload = function(){
-      let canvas = document.createElement('canvas');
-      let maxW = 1080, w = img.width, h = img.height;
-      if(w > maxW){ h = h * maxW / w; w = maxW; }
-      canvas.width = w; canvas.height = h;
-      let ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
-      ctx.drawImage(img,0,0,w,h);
-      canvas.toBlob((blob)=>{
-        if(!blob) return;
-        if(selectedBlobUrl) URL.revokeObjectURL(selectedBlobUrl);
-        selectedFile = new File([blob], 'post.jpg', {type:'image/jpeg'});
-        selectedBlobUrl = URL.createObjectURL(blob);
-        let p = document.getElementById('prev');
-        p.src = selectedBlobUrl; p.style.display='block';
-        document.getElementById('emptyBox').style.display='none';
-        document.getElementById('noPhotoMsg').style.display='none';
-        let grid = document.getElementById('grid');
-        grid.innerHTML = '';
-        let div = document.createElement('div');
-        div.className='tile'; div.innerHTML='<img src="'+selectedBlobUrl+'">';
-        grid.appendChild(div);
-        goToEdit();
-      }, 'image/jpeg', 0.85);
-    };
-    img.src = reader.result;
-  };
-  reader.readAsDataURL(f);
-};
-
-function goToEdit(){
-  let eImg = document.getElementById('editImg'); eImg.src = selectedBlobUrl; eImg.style.display='block';
-  let sImg = document.getElementById('shareImg'); sImg.src = selectedBlobUrl; sImg.style.display='block';
-  showStep(2);
-}
-
-async function uploadPost(){
-  if(!selectedFile){ alert('Photo Select Pannu da'); showStep(1); return; }
-  let btn = document.getElementById('shareBtn');
-  let status = document.getElementById('uploadStatus');
-  btn.disabled = true; btn.textContent = 'Sharing... ⏳'; status.textContent = 'Server ku Upload Aaguthu da...';
-  try{
-    if(!window.supabaseClient) throw new Error('Supabase connect aagala da - js/supabase.js check pannu da');
-    let fileName = 'posts/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.jpg';
-    let { error } = await window.supabaseClient.storage.from('posts').upload(fileName, selectedFile);
-    if(error) throw error;
-    let { data: urlData } = window.supabaseClient.storage.from('posts').getPublicUrl(fileName);
-    let caption = document.getElementById('captionInput').value || '';
-    let { error: dbError } = await window.supabaseClient.from('posts').insert([{ image_url: urlData.publicUrl, caption: caption, media_type: 'image' }]);
-    if(dbError) throw dbError;
-    alert('Shared da 🎉 - Server la Save Aayiduchu da');
-    location.href = './index.html';
-  }catch(err){
-    alert('Share fail da - ' + err.message);
-    btn.disabled = false; btn.textContent = 'Share';
-  }
-}
+function addText(){ let t=prompt('Text ezhuthu da'); if(!t) return; currentText=t; let o=document.getElementById('textOver'); o.textContent=t; o.style.display='block'; saveDB('pixoro_create_text',t); }
+function addSticker(){ let s=prompt('Sticker - 😍 🔥 ❤️'); if(!s) return; currentText=currentText+' '+s; let o=document.getElementById('textOver'); o.textContent=currentText; o.style.display='block'; saveDB('pixoro_create_text',currentText); }
+document.getElementById('file').onchange=(e)=>{ let f=e.target.files[0]; if(!f) return; saveDB('pixoro_create_media', f); saveDB('pixoro_create_kind', f.type.includes('video')?'video':'image'); location.reload(); };
+async function goShare(){ await saveDB('pixoro_create_filter', currentFilter); await saveDB('pixoro_create_text', currentText); location.href='./create-share.html'; }
 </script>
 </body>
 </html>
