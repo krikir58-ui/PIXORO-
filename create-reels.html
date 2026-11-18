@@ -7,45 +7,43 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#000;color:#fff;font-family:system-ui}
-.top{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;font-size:22px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;font-size:22px;background:#000}
 .top b{font-size:20px}
-.tabs{display:flex;gap:8px;padding:10px 16px;overflow-x:auto}
+.tabs{display:flex;gap:8px;padding:10px 16px;overflow-x:auto;background:#000}
 .tabs div{background:#222;padding:10px 16px;border-radius:20px;white-space:nowrap;font-weight:700;cursor:pointer}
 .tabs div.on{background:#fff;color:#000}
-/* ✅ IMAGE LA - BLOCK WHITE VENUM DA - ITHU THAAN DA */
-.bgToggle{display:flex;gap:8px;padding:0 16px 10px;overflow-x:auto}
+.bgToggle{display:flex;gap:8px;padding:0 16px 10px;overflow-x:auto;background:#000}
 .bgToggle button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px;white-space:nowrap;cursor:pointer}
 .bgToggle button.on{background:#fff;color:#000}
-.head{display:flex;justify-content:space-between;align-items:center;padding:10px 16px}
+.head{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#000}
 .head button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;padding-bottom:90px}
-/* ✅ WHITE BLOCK - PHOTO KU - WHITE BACKGROUND DA */
-.grid .tile{width:100%;aspect-ratio:3/4;object-fit:cover;background:#fff;display:grid;place-items:center;font-size:30px;color:#000;cursor:pointer;position:relative;overflow:hidden}
-.grid .tile img{width:100%;height:100%;object-fit:cover;background:#fff}
+/* ✅ CORRECTED - OREY THEME - POST MARIYE - CHINNA WHITE BOX MATTUM DA */
+.preview{width:calc(100% - 32px);margin:0 16px;aspect-ratio:9/16;max-height:320px;background:#fff;border-radius:20px;display:grid;place-items:center;position:relative;overflow:hidden;padding:10px;box-sizing:border-box}
+.preview img,.preview video{width:100%;height:100%;object-fit:contain;background:#fff;border-radius:14px}
+.preview .empty{font-size:50px;text-align:center;color:#000}
+.preview .empty small{display:block;font-size:12px;color:#888;margin-top:6px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;padding-bottom:90px;background:#000}
+/* ✅ CORRECTED - GRID - WHITE ILLA DA - BLACK THAAN DA - POST MARIYE DA */
+.grid .tile{width:100%;aspect-ratio:3/4;object-fit:cover;background:#111;display:grid;place-items:center;font-size:30px;color:#fff;cursor:pointer;position:relative;overflow:hidden}
+.grid .tile img{width:100%;height:100%;object-fit:cover;background:#111}
 .grid .tile small{font-size:11px;color:#888}
-.cam{display:grid;place-items:center;background:#fff !important;color:#000 !important;font-size:34px}
+.cam{display:grid;place-items:center;background:#222 !important;color:#fff !important;font-size:34px}
 .bottom{position:fixed;bottom:16px;left:0;right:0;display:flex;justify-content:center;z-index:10}
 .bottom div{background:#222;padding:12px 20px;border-radius:30px;display:flex;gap:22px;letter-spacing:2px}
 .bottom b{opacity:.6;cursor:pointer}
 .bottom b.on{opacity:1;border-bottom:2px solid #fff}
-.preview{width:100%;aspect-ratio:9/16;background:#fff;display:grid;place-items:center;position:relative;overflow:hidden}
-.preview img,.preview video{width:100%;height:100%;object-fit:cover;background:#fff}
-.preview .empty{font-size:50px;text-align:center;color:#000}
-.preview .empty small{display:block;font-size:12px;color:#888;margin-top:6px}
 </style>
 </head>
 <body>
 <div class="top"><span onclick="location.href='./index.html'">✕</span><b>New reel</b><span>⚙️</span></div>
 <div class="tabs"><div>🎬 Edits</div><div>📁 Drafts · 2</div><div>📋 Templates</div></div>
 
-<!-- ✅ IMAGE LA - BLOCK WHITE VENUM DA - ITHU THAAN DA GIRI -->
 <div class="bgToggle">
   <button class="on" onclick="setGridBg('white',this)">⬜ White Block</button>
   <button onclick="setGridBg('black',this)">⬛ Black Block</button>
-  <button onclick="setGridBg('transparent',this)">🔲 No BG - Remove</button>
+  <button onclick="setGridBg('transparent',this)">🔲 BG Remove</button>
 </div>
 
-<!-- ✅ PREVIEW - WHITE BLOCK LA - UN PHOTO VARUM DA -->
 <div class="preview" id="previewBox">
   <div class="empty" id="emptyBox">📷<small>Video / Photo Select Pannu da<br>White Block la Varum da</small></div>
   <img id="prevImg" src="" style="display:none">
@@ -54,7 +52,6 @@ body{background:#000;color:#fff;font-family:system-ui}
 
 <div class="head"><b>Recents ⌄</b><button onclick="document.getElementById('file').click()">☑️ Select</button></div>
 
-<!-- ✅ PICSUM FULL DELETE DA - VERA YAARO PHOTO VARAATHU DA - WHITE BLOCK MATTUM DA -->
 <div class="grid" id="grid">
   <div class="tile cam" onclick="document.getElementById('file').click()">📷<br><small>Gallery</small></div>
   <div class="tile" onclick="document.getElementById('file').click()">➕<br><small>Add</small></div>
@@ -68,19 +65,26 @@ body{background:#000;color:#fff;font-family:system-ui}
 <script src="js/supabase.js"></script>
 <script src="js/pixoro-core.js"></script>
 <script>
-// ✅ GRID BG - WHITE / BLACK / REMOVE - MAATHU DA
+// ✅ CORRECTED - BG - PREVIEW MATTUM MAARUM DA - GRID MAARAATHU DA - ELLA PAGE KUM SAME DA
 function setGridBg(mode, btn){
   document.querySelectorAll('.bgToggle button').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   localStorage.setItem('pixoro_reel_bg', mode);
   let preview = document.getElementById('previewBox');
-  let tiles = document.querySelectorAll('.grid .tile');
-  if(mode==='white'){ preview.style.background='#fff'; tiles.forEach(t=>{ t.style.background='#fff'; t.style.color='#000'; }); }
-  if(mode==='black'){ preview.style.background='#000'; tiles.forEach(t=>{ t.style.background='#000'; t.style.color='#fff'; }); }
-  if(mode==='transparent'){ preview.style.background='repeating-conic-gradient(#222 0% 25%, #000 0% 50%) 50% / 20px 20px'; tiles.forEach(t=>{ t.style.background='#111'; t.style.color='#fff'; }); }
+  let img = document.getElementById('prevImg');
+  let vid = document.getElementById('prevVid');
+  if(mode==='white'){ preview.style.background='#fff'; preview.style.padding='10px'; img.style.background='#fff'; img.style.objectFit='contain'; vid.style.objectFit='contain'; }
+  if(mode==='black'){ preview.style.background='#000'; preview.style.padding='0px'; img.style.background='#000'; img.style.objectFit='cover'; vid.style.objectFit='cover'; }
+  if(mode==='transparent'){ preview.style.background='repeating-conic-gradient(#222 0% 25%, #000 0% 50%) 50% / 20px 20px'; preview.style.padding='0px'; img.style.background='transparent'; img.style.objectFit='contain'; }
+  if(mode==='transparent') alert('BG Remove On da ✨ - White Block Remove Aachu da - Photo Mattum Theriyum da');
+  if(mode==='white') alert('White Block On da ⬜ - Photo Suthi - White Theriyum da');
 }
+// ✅ INIT - LAST TIME SELECT PANNA BG - ATHU THAAN VARUM DA
+let savedBg = localStorage.getItem('pixoro_reel_bg') || 'white';
+document.querySelectorAll('.bgToggle button').forEach(b=>b.classList.remove('on'));
+document.querySelectorAll('.bgToggle button')[savedBg==='white'?0:savedBg==='black'?1:2].classList.add('on');
+setGridBg(savedBg, document.querySelectorAll('.bgToggle button')[savedBg==='white'?0:savedBg==='black'?1:2]);
 
-// ✅ SELECT - PICSUM ILLA DA - UN PHOTO MATTUM DA
 function selectMedia(url){
   if(!url || url.includes('picsum')) return;
   localStorage.setItem('pixoro_reel_media', url);
@@ -88,20 +92,16 @@ function selectMedia(url){
   location.href='./create-reels-edit.html';
 }
 
-// ✅ FIX - BLOB ILLA DA - FileReader + Compress - DataURL da - Black Screen Varaathu da
 document.getElementById('file').onchange = (e) => {
   let f = e.target.files[0]; if(!f) return;
   let isVideo = f.type.includes('video');
-  // ✅ VIDEO - DataURL Perusa Irukkum da - Athaan - Video va - Direct ah - Preview la Kaamikkum da - LocalStorage la - Blob Vekka Maattom da
   if(isVideo){
-    // Video ku - Size Check - 50MB ku Mela - Venaam da
     if(f.size > 50*1024*1024){ alert('Video - 50MB ku Mela Irukku da - Chinna Video Select Pannu da'); return; }
     let reader = new FileReader();
     reader.onload = function(){
       localStorage.setItem('pixoro_reel_media', reader.result);
       localStorage.setItem('pixoro_reel_type','video');
       localStorage.setItem('pixoro_reel_file_name', f.name);
-      // Preview la - Kaamikkum da
       let v = document.getElementById('prevVid');
       v.src = reader.result; v.style.display='block'; v.play();
       document.getElementById('emptyBox').style.display='none';
@@ -110,7 +110,6 @@ document.getElementById('file').onchange = (e) => {
     reader.readAsDataURL(f);
     return;
   }
-  // ✅ PHOTO - Compress + WHITE BLOCK BACKGROUND DA
   let reader = new FileReader();
   reader.onload = function(){
     let img = new Image();
@@ -118,18 +117,17 @@ document.getElementById('file').onchange = (e) => {
       let canvas = document.createElement('canvas');
       let maxW = 720, w = img.width, h = img.height;
       if(w > maxW){ h = h * maxW / w; w = maxW; }
-      canvas.width = w; canvas.height = h;
-      let ctx = canvas.getContext('2d');
-      // ✅ BACKGROUND REMOVE - WHITE BLOCK DA - PHOTO KU - PINNAADI - WHITE DA
+      // ✅ WHITE BLOCK - CANVAS LA - WHITE BORDER - SHARE PANNA KOODA VARUM DA
       let bg = localStorage.getItem('pixoro_reel_bg') || 'white';
+      let pad = bg === 'white' ? 20 : 0;
+      canvas.width = w + pad*2; canvas.height = h + pad*2;
+      let ctx = canvas.getContext('2d');
       ctx.fillStyle = bg === 'black' ? '#000' : '#fff';
-      if(bg === 'transparent'){ ctx.fillStyle = '#fff'; }
-      ctx.fillRect(0,0,w,h);
-      ctx.drawImage(img,0,0,w,h);
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(img,pad,pad,w,h);
       let dataUrl = canvas.toDataURL('image/jpeg', 0.85);
       localStorage.setItem('pixoro_reel_media', dataUrl);
       localStorage.setItem('pixoro_reel_type','image');
-      // Preview + Grid la - White Block la - Kaamikkum da
       let p = document.getElementById('prevImg');
       p.src = dataUrl; p.style.display='block';
       document.getElementById('emptyBox').style.display='none';
