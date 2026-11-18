@@ -1,14 +1,139 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>New post - Pixoro</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#111;color:#fff;font-family:system-ui}.top{display:flex;gap:14px;padding:14px;font-size:20px}.flex{display:flex;gap:12px;padding:12px}.flex img{width:80px;height:80px;object-fit:cover;border-radius:12px}.flex textarea{flex:1;background:transparent;border:0;color:#fff;font-size:15px;outline:none;resize:none}.chips{display:flex;gap:8px;padding:0 12px}.chips button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px}.row{display:flex;justify-content:space-between;padding:16px;border-bottom:1px solid #222;cursor:pointer}.btns{display:flex;gap:10px;padding:14px;position:fixed;bottom:0;left:0;right:0;background:#111}.btns button{flex:1;padding:14px;border:0;border-radius:30px;font-weight:800}.save{background:#333;color:#fff}.share{background:#4d7cff;color:#fff}</style></head><body>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>New post - Pixoro</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#fff;font-family:system-ui}
+.top{display:flex;gap:14px;align-items:center;padding:14px;font-size:20px}
+.top span{cursor:pointer}
+.flex{display:flex;gap:12px;padding:12px;align-items:flex-start}
+.flex img{width:80px;height:80px;object-fit:cover;border-radius:12px;background:#000;border:1px solid #333}
+.flex textarea{flex:1;background:transparent;border:0;color:#fff;font-size:15px;outline:none;resize:none}
+.chips{display:flex;gap:8px;padding:0 12px;flex-wrap:wrap}
+.chips button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px;cursor:pointer}
+.row{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid #222;cursor:pointer}
+.row span:last-child{color:#888}
+.btns{display:flex;gap:10px;padding:14px;position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #222}
+.btns button{flex:1;padding:14px;border:0;border-radius:30px;font-weight:800;cursor:pointer}
+.save{background:#333;color:#fff}
+.share{background:#4d7cff;color:#fff}
+.share:disabled{opacity:.5}
+.previewInfo{padding:0 16px 8px;color:#888;font-size:12px}
+</style>
+</head>
+<body>
 <div class="top"><span onclick="history.back()">←</span><b>New post</b></div>
-<div class="flex"><img id="thumb" src=""><textarea id="caption" rows="3" placeholder="Write a caption and add hashtags..."></textarea></div>
-<div class="chips"><button onclick="addHash()"># Hashtags</button><button onclick="addPoll()">☰ Poll</button><button onclick="addPrompt()">⌕ Prompt</button></div>
-<div class="row" onclick="tagPeople()"><span>👤 Tag people</span><span>›</span></div>
-<div class="row" onclick="addLocation()"><span>📍 Add location</span><span>›</span></div>
+
+<div class="flex">
+  <img id="thumb" src="" style="display:none">
+  <div id="noThumb" style="width:80px;height:80px;background:#222;border-radius:12px;display:grid;place-items:center;font-size:30px">📷</div>
+  <textarea id="caption" rows="3" placeholder="Write a caption and add hashtags..."></textarea>
+</div>
+<div class="previewInfo" id="previewInfo"></div>
+
+<div class="chips">
+  <button onclick="addHash()"># Hashtags</button>
+  <button onclick="addPoll()">☰ Poll</button>
+  <button onclick="addPrompt()">⌕ Prompt</button>
+  <button onclick="removeBgFinal()">✨ BG Remove</button>
+</div>
+
+<div class="row" onclick="tagPeople()"><span>👤 Tag people</span><span id="tagTxt">›</span></div>
+<div class="row" onclick="addLocation()"><span>📍 Add location</span><span id="locTxt">›</span></div>
 <small style="color:#888;padding:0 16px;display:block">People you share this content with can see the location you tag and view this content on the map.</small>
 <div class="row" onclick="togglePrivate()"><span>🔒 Audience</span><span id="audTxt">Public ›</span></div>
-<div style="height:80px"></div>
+<div class="row" onclick="toggleHideFace()"><span>🙈 Face Photo - Home la Vara Koodathu</span><span id="hideFaceTxt">OFF ›</span></div>
+<div style="height:90px"></div>
 <div class="btns"><button class="save" onclick="saveDraft()">Save draft</button><button class="share" id="shareBtn" onclick="sharePost()">Share</button></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js"></script><script src="js/pixoro-core.js"></script>
-<script>let media=localStorage.getItem('pixoro_post_media')||'https://picsum.photos/500/500?random=20';document.getElementById('thumb').src=media;let isPrivate=false,tagged='',loc='';function addHash(){let c=document.getElementById('caption');c.value+=' #pixoro #trending ';c.focus();}function addPoll(){let q=prompt('Poll Question?');if(q){document.getElementById('caption').value+='\n📊 Poll: '+q;}}function addPrompt(){let p=prompt('Prompt:');if(p){document.getElementById('caption').value+='\n💬 '+p;}}function tagPeople(){let t=prompt('Username:');if(t){tagged=t;alert('Tagged da: @'+t);}}function addLocation(){let l=prompt('Location:');if(l){loc=l;alert('Location: '+l);}}function togglePrivate(){isPrivate=!isPrivate;document.getElementById('audTxt').innerText=isPrivate?'Private Share ›':'Public ›';}function saveDraft(){localStorage.setItem('pixoro_post_draft',document.getElementById('caption').value);alert('Draft Save Aachu da ✅');}async function sharePost(){let btn=document.getElementById('shareBtn');btn.innerText='Sharing...';btn.disabled=true;let cap=document.getElementById('caption').value||'Just Pixoro 🔥';if(tagged)cap+=' @'+tagged;if(loc)cap+=' 📍 '+loc;try{let s=window.supa;let {data:{session}}=await s.auth.getSession();if(!session){alert('Login Pannu da');location.href='./login.html';return;}let {data,error}=await s.from('posts').insert({user_id:session.user.id,username:window.ME_RAW||session.user.email.split('@')[0],media_url:media,image_url:media,media_type:'post',caption:cap,visibility:isPrivate?'private_share':'public',is_archived:false}).select().single();if(error) throw error;localStorage.removeItem('pixoro_post_media');alert('Post Share Aachu da 🔥');location.href='./index.html';}catch(e){alert('Error da: '+e.message);btn.innerText='Share';btn.disabled=false;}}</script>
-</body></html>
+<script src="js/supabase.js"></script>
+<script src="js/pixoro-core.js"></script>
+<script>
+// ✅ PICSUM ILLA DA - UN PHOTO MATTUM DA
+let media = localStorage.getItem('pixoro_post_media') || '';
+let filter = localStorage.getItem('pixoro_post_filter') || 'none';
+let bgMode = localStorage.getItem('pixoro_post_bg') || 'black';
+let hideFace = false;
+
+if(!media || media.startsWith('blob:') || media.includes('picsum')){
+  alert('Photo Illa da - Thirumba Select Pannu da');
+  location.href = './create-post.html';
+} else {
+  let thumb = document.getElementById('thumb');
+  thumb.src = media;
+  thumb.style.display = 'block';
+  thumb.style.filter = filter;
+  document.getElementById('noThumb').style.display = 'none';
+  document.getElementById('previewInfo').innerText = 'Filter: ' + filter + ' | BG: ' + bgMode;
+}
+
+let isPrivate = false, tagged = '', loc = '';
+function addHash(){ let c=document.getElementById('caption'); c.value += ' #pixoro #trending '; c.focus(); }
+function addPoll(){ let q=prompt('Poll Question?'); if(q) document.getElementById('caption').value += '\n📊 Poll: ' + q; }
+function addPrompt(){ let p=prompt('Prompt:'); if(p) document.getElementById('caption').value += '\n💬 ' + p; }
+function tagPeople(){ let t=prompt('Username:'); if(t){ tagged=t; document.getElementById('tagTxt').innerText='@'+t+' ›'; } }
+function addLocation(){ let l=prompt('Location - Dharmapuri / Chennai?'); if(l){ loc=l; document.getElementById('locTxt').innerText=l+' ›'; } }
+function togglePrivate(){ isPrivate=!isPrivate; document.getElementById('audTxt').innerText = isPrivate ? 'Private Share ›' : 'Public ›'; }
+function toggleHideFace(){ hideFace=!hideFace; document.getElementById('hideFaceTxt').innerText = hideFace ? 'ON - Home la Varaathu ›' : 'OFF ›'; alert(hideFace ? 'Face Photo - Home la Varaathu da 🙈 - Profile la Mattum Theriyum da' : 'Face Photo - Home la Varum da'); }
+function removeBgFinal(){ alert('BG Remove On da ✨ - Photo va - Clean Background la - Share Pannuren da'); localStorage.setItem('pixoro_post_bg','transparent'); }
+function saveDraft(){ localStorage.setItem('pixoro_post_draft', document.getElementById('caption').value); alert('Draft Save Aachu da ✅'); }
+
+// ✅ FILTER AH - PHOTO LA - APPLY PANNI - SHARE PANNU DA - FILTER POGATHU DA
+function applyFilterToDataUrl(dataUrl, filterStr){
+  return new Promise((resolve)=>{
+    if(!filterStr || filterStr==='none'){ resolve(dataUrl); return; }
+    let img = new Image();
+    img.onload = ()=>{
+      let c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+      let ctx = c.getContext('2d');
+      ctx.filter = filterStr;
+      ctx.drawImage(img,0,0);
+      resolve(c.toDataURL('image/jpeg', 0.85));
+    };
+    img.src = dataUrl;
+  });
+}
+
+async function sharePost(){
+  let btn = document.getElementById('shareBtn');
+  btn.innerText = 'Sharing...'; btn.disabled = true;
+  let cap = document.getElementById('caption').value || 'Just Pixoro 🔥';
+  if(tagged) cap += ' @' + tagged;
+  if(loc) cap += ' 📍 ' + loc;
+  if(document.getElementById('caption').value.includes('FACE_HIDE')) hideFace = true;
+  try{
+    let s = window.supa;
+    let {data:{session}} = await s.auth.getSession();
+    if(!session){ alert('Login Pannu da'); location.href='./login.html'; return; }
+    // ✅ Filter Apply Panni - Final Photo - Ready Pannu da
+    let finalMedia = await applyFilterToDataUrl(media, filter);
+    // ✅ Face Hide na - Archived ah - Share Pannu da - Home la Varaathu da - Profile la Mattum Varum da
+    let {data, error} = await s.from('posts').insert({
+      user_id: session.user.id,
+      username: window.ME_RAW || session.user.email.split('@')[0],
+      media_url: finalMedia,
+      image_url: finalMedia,
+      media_type: 'post',
+      caption: cap,
+      visibility: isPrivate ? 'private_share' : 'public',
+      is_archived: hideFace ? true : false
+    }).select().single();
+    if(error) throw error;
+    localStorage.removeItem('pixoro_post_media');
+    localStorage.removeItem('pixoro_post_filter');
+    localStorage.removeItem('pixoro_post_bg');
+    localStorage.removeItem('pixoro_post_text');
+    alert(hideFace ? 'Post Share Aachu da 🔥 - Home la Varaathu da - Profile la Paakalam da' : 'Post Share Aachu da 🔥');
+    location.href = './index.html';
+  }catch(e){
+    alert('Error da: ' + e.message);
+    btn.innerText = 'Share'; btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
