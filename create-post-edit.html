@@ -3,181 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Edit Post - Pixoro</title>
+<title>Edit - Pixoro</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#000;color:#fff;font-family:system-ui}
 .top{display:flex;justify-content:space-between;align-items:center;padding:14px;font-size:20px}
 .top span{cursor:pointer}
-.wrap{height:60vh;background:#000;position:relative;overflow:hidden;display:grid;place-items:center}
-.wrap img{width:100%;height:100%;object-fit:contain;background:transparent}
-.wrap .empty{font-size:50px;text-align:center;opacity:.6}
-.wrap .empty small{display:block;font-size:13px;color:#888;margin-top:8px}
-.tabs{display:flex;gap:10px;padding:12px;justify-content:center;overflow-x:auto}
-.tabs b{padding:8px 16px;background:#222;border-radius:20px;white-space:nowrap;cursor:pointer}
-.tabs b.on{background:#fff;color:#000}
-.filters{display:flex;gap:10px;overflow-x:auto;padding:12px}
-.filters div{text-align:center;flex-shrink:0;cursor:pointer}
-.filters img{width:80px;height:80px;object-fit:cover;border-radius:12px;border:2px solid transparent;background:#111}
-.filters div.on img{border-color:#fff}
-.filters small{font-size:11px}
-.bottom{display:flex;justify-content:space-between;padding:14px}
-.bottom button{border:0;padding:14px 22px;border-radius:30px;font-weight:800;cursor:pointer}
-.next{background:#4d7cff;color:#fff}
-.bgRow{display:flex;gap:10px;padding:0 12px 12px;overflow-x:auto}
-.bgRow button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px;white-space:nowrap}
-.bgRow button.on{background:#fff;color:#000}
+.top .next{color:#4d7cff;font-weight:700}
+.wrap{position:relative;width:100%;height:62vh;background:#000;overflow:hidden;display:grid;place-items:center}
+.wrap img,.wrap video{width:100%;height:100%;object-fit:cover}
+.editTools{position:absolute;bottom:20px;left:0;right:0;display:flex;justify-content:space-around}
+.editTools div{text-align:center;font-size:12px}
+.editTools span{display:grid;place-items:center;width:60px;height:60px;background:#222;border-radius:18px;font-size:26px;margin-bottom:4px}
+.sourceRow{display:flex;gap:10px;padding:12px}
+.sourceRow button{flex:1;padding:14px;border-radius:16px;border:1px solid #333;background:#111;color:#fff;font-weight:700}
+.toolRow{display:flex;gap:8px;padding:0 12px 10px;overflow-x:auto}
+.toolRow button{background:#111;color:#fff;border:1px solid #333;padding:10px 16px;border-radius:30px;white-space:nowrap}
+.filterRow{display:flex;gap:8px;padding:0 12px 12px;overflow-x:auto}
+.filterRow button{background:#111;color:#fff;border:1px solid #333;padding:10px 16px;border-radius:30px;white-space:nowrap}
+.filterRow button.on{background:#fff;color:#000}
+.bottom{display:flex;gap:10px;padding:0 16px 16px}
+.bottom button{flex:1;padding:14px;border-radius:20px;border:0;font-weight:800}
+.editBtn{background:#222;color:#fff}
+.nextBtn{background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff}
 </style>
 </head>
 <body>
-<div class="top"><span onclick="history.back()">←</span><b>Edit</b><span onclick="goNext()" style="color:#4d7cff">Next</span></div>
-
-<div class="wrap" id="wrapBox">
-  <img id="img" src="" style="display:none">
-  <div class="empty" id="emptyBox">📷<small>Photo Load Aaguthu da...<br>Konjam Wait Pannu da</small></div>
-  <div id="textOver" style="position:absolute;top:35%;left:0;right:0;text-align:center;font-size:28px;font-weight:900;text-shadow:0 2px 10px #000;display:none;z-index:5"></div>
+<div class="top"><span onclick="history.back()">←</span><b>Edit</b><span class="next" onclick="goShare()">Next</span></div>
+<div class="wrap">
+  <img id="editImg" src="" style="display:none">
+  <video id="editVid" src="" style="display:none" muted loop playsinline autoplay></video>
+  <div id="textOver" style="position:absolute;top:35%;left:0;right:0;text-align:center;font-size:28px;font-weight:900;text-shadow:0 2px 10px #000;display:none"></div>
+  <div style="position:absolute;bottom:100px;left:0;right:0;text-align:center;font-size:13px">Swipe up to edit</div>
+  <div class="editTools">
+    <div onclick="addText()"><span>Aa</span>Text</div>
+    <div onclick="addSticker()"><span>😊</span>Stickers</div>
+    <div onclick="document.getElementById('filterRow').scrollIntoView({behavior:'smooth'})"><span>✨</span>Filter</div>
+    <div onclick="alert('Crop - Coming Soon da')"><span>✂️</span>Crop</div>
+  </div>
 </div>
-
-<!-- ✅ WHITE BG - DELETE DA - BLACK + NO BG + BLUR MATTUM DA -->
-<div class="bgRow">
-  <button class="on" onclick="setBg('black',this)">⬛ Black BG</button>
-  <button onclick="setBg('transparent',this)">🔲 No BG</button>
-  <button onclick="setBg('blur',this)">🌀 Blur BG</button>
+<div class="sourceRow"><button onclick="location.href='./create.html'">📁 Gallery</button><button onclick="document.getElementById('file').click()">📷 Camera</button></div>
+<div class="toolRow"><button onclick="alert('Crop - Coming Soon da')">✂️ Crop</button><button>🎨 Filter</button><button onclick="adjust('brightness')">☀️ Bright</button><button onclick="addText()">🔤 Text</button></div>
+<div class="filterRow" id="filterRow">
+  <button class="on" onclick="setFilter('none',this)">Original</button>
+  <button onclick="setFilter('grayscale(1)',this)">B&W</button>
+  <button onclick="setFilter('sepia(.8)',this)">Sepia</button>
+  <button onclick="setFilter('contrast(1.4) saturate(1.6)',this)">Vivid</button>
+  <button onclick="setFilter('brightness(1.2)',this)">Fade</button>
 </div>
-
-<div class="tabs"><b class="on" onclick="showTab('filter',this)">Filter</b><b onclick="showTab('edit',this)">Edit</b><b onclick="addText()">Aa Text</b><b onclick="addSticker()">😊 Sticker</b></div>
-
-<!-- ✅ PICSUM ILLA DA - UN PHOTO THAAN - FILTER PREVIEW LA VARUM DA -->
-<div class="filters" id="filterRow">
-  <div class="on" onclick="setF('none',this)"><img id="f0" src=""><br><small>Original</small></div>
-  <div onclick="setF('grayscale(1)',this)"><img id="f1" src="" style="filter:grayscale(1)"><br><small>B&W</small></div>
-  <div onclick="setF('sepia(.8)',this)"><img id="f2" src="" style="filter:sepia(.8)"><br><small>Sepia</small></div>
-  <div onclick="setF('contrast(1.4) saturate(1.6)',this)"><img id="f3" src="" style="filter:contrast(1.4) saturate(1.6)"><br><small>Vivid</small></div>
-  <div onclick="setF('brightness(1.2)',this)"><img id="f4" src="" style="filter:brightness(1.2)"><br><small>Fade</small></div>
-  <div onclick="setF('contrast(1.2) brightness(1.1) saturate(1.3)',this)"><img id="f5" src="" style="filter:contrast(1.2) brightness(1.1) saturate(1.3)"><br><small>Mass</small></div>
-</div>
-
-<div class="filters" id="editRow" style="display:none">
-  <button onclick="adjust('brightness')" style="background:#222;color:#fff;border:0;padding:10px 16px;border-radius:20px">Brightness</button>
-  <button onclick="adjust('contrast')" style="background:#222;color:#fff;border:0;padding:10px 16px;border-radius:20px">Contrast</button>
-  <button onclick="adjust('saturate')" style="background:#222;color:#fff;border:0;padding:10px 16px;border-radius:20px">Saturation</button>
-  <button onclick="removeBg()" style="background:#ff2d55;color:#fff;border:0;padding:10px 16px;border-radius:20px">✨ BG Remove</button>
-</div>
-
-<div class="bottom"><button onclick="history.back()" style="background:#222;color:#fff">Edit photo</button><button class="next" onclick="goNext()">Next →</button></div>
-
+<div class="bottom"><button class="editBtn" onclick="alert('Edit - Coming Soon da')">Edit</button><button class="nextBtn" onclick="goShare()">Next →</button></div>
+<input type="file" id="file" accept="image/*,video/*" capture="environment" hidden>
 <script>
-// ✅ NO LOCALSTORAGE DA - INDEXEDDB LA - FILE AH - VAIKKUROM DA - PAGE MAARI PONAALUM POOGAATHU DA
-let currentFilter = 'none';
-let currentBg = 'black';
-let currentText = '';
-let imgEl = document.getElementById('img');
-let currentBlobUrl = '';
-
+let currentFilter='none', currentText='';
 function openDB(){
   return new Promise((res,rej)=>{
-    let req = indexedDB.open('pixoro-db',1);
-    req.onupgradeneeded = ()=>{ req.result.createObjectStore('media'); };
-    req.onsuccess = ()=>res(req.result);
-    req.onerror = ()=>rej(req.error);
+    let req=indexedDB.open('pixoro-db',1);
+    req.onupgradeneeded=()=>{ req.result.createObjectStore('media'); };
+    req.onsuccess=()=>res(req.result); req.onerror=()=>rej(req.error);
   });
 }
-async function getMedia(){
-  let db = await openDB();
-  return new Promise((res,rej)=>{
-    let tx = db.transaction('media','readonly');
-    let req = tx.objectStore('media').get('pixoro_post_media');
-    req.onsuccess = ()=>res(req.result);
-    req.onerror = ()=>rej(req.error);
-  });
+async function getDB(k){ let db=await openDB(); return new Promise((res,rej)=>{ let r=db.transaction('media','readonly').objectStore('media').get(k); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function saveDB(k,v){ let db=await openDB(); let tx=db.transaction('media','readwrite'); tx.objectStore('media').put(v,k); }
+async function load(){
+  let blob=await getDB('pixoro_create_media');
+  let kind=await getDB('pixoro_create_kind') || 'image';
+  if(!blob){ alert('Photo Illa da - Thirumba Select Pannu da'); location.href='./create.html'; return; }
+  let url=URL.createObjectURL(blob);
+  if(kind==='video'){ let v=document.getElementById('editVid'); v.src=url; v.style.display='block'; v.play(); }
+  else { let p=document.getElementById('editImg'); p.src=url; p.style.display='block'; }
+  currentFilter=await getDB('pixoro_create_filter') || 'none';
+  document.getElementById('editImg').style.filter=currentFilter;
+  document.getElementById('editVid').style.filter=currentFilter;
+  currentText=await getDB('pixoro_create_text') || '';
+  if(currentText){ let o=document.getElementById('textOver'); o.textContent=currentText; o.style.display='block'; }
 }
-async function saveMeta(){
-  let db = await openDB();
-  let tx = db.transaction('media','readwrite');
-  tx.objectStore('media').put(currentFilter,'pixoro_post_filter');
-  tx.objectStore('media').put(currentBg,'pixoro_post_bg');
-  tx.objectStore('media').put(currentText,'pixoro_post_text');
+load();
+function setFilter(f,btn){
+  currentFilter=f;
+  document.querySelectorAll('#filterRow button').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  document.getElementById('editImg').style.filter=f;
+  document.getElementById('editVid').style.filter=f;
+  saveDB('pixoro_create_filter', f);
 }
-
-async function loadPhoto(){
-  try{
-    let blob = await getMedia();
-    if(!blob){
-      alert('Photo Illa da - Thirumba Select Pannu da');
-      location.href = './create-post.html';
-      return;
-    }
-    currentBlobUrl = URL.createObjectURL(blob);
-    imgEl.src = currentBlobUrl;
-    imgEl.style.display = 'block';
-    document.getElementById('emptyBox').style.display = 'none';
-    ['f0','f1','f2','f3','f4','f5'].forEach(id => { document.getElementById(id).src = currentBlobUrl; });
-    // Pazhaya Filter / Text - Irundha - Load Pannu da
-    let db = await openDB();
-    let tx = db.transaction('media','readonly');
-    let store = tx.objectStore('media');
-    let fReq = store.get('pixoro_post_filter');
-    fReq.onsuccess = ()=>{ if(fReq.result){ currentFilter = fReq.result; imgEl.style.filter = currentFilter; } };
-    let tReq = store.get('pixoro_post_text');
-    tReq.onsuccess = ()=>{ if(tReq.result){ currentText = tReq.result; let o=document.getElementById('textOver'); o.innerText=currentText; o.style.display='block'; } };
-  }catch(e){
-    alert('Photo Load Aagala da - Thirumba Select Pannu da');
-    location.href = './create-post.html';
-  }
-}
-loadPhoto();
-
-function setF(f, el){
-  currentFilter = f;
-  imgEl.style.filter = f;
-  saveMeta();
-  document.querySelectorAll('#filterRow div').forEach(d => d.classList.remove('on'));
-  el.classList.add('on');
-}
-
-function showTab(t, el){
-  document.querySelectorAll('.tabs b').forEach(b => b.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById('filterRow').style.display = t === 'filter' ? 'flex' : 'none';
-  document.getElementById('editRow').style.display = t === 'edit' ? 'flex' : 'none';
-}
-
-function adjust(type){
-  let v = prompt(type + ' - 0.5 to 2 - Value Podu da:', '1.2');
-  if(v){ currentFilter = type + '(' + v + ')'; imgEl.style.filter = currentFilter; saveMeta(); }
-}
-
-function addText(){
-  let t = prompt('Text ezhuthu da:');
-  if(t){ currentText = t; let o = document.getElementById('textOver'); o.innerText = t; o.style.display = 'block'; saveMeta(); }
-}
-
-function addSticker(){
-  let s = prompt('Sticker - 😍 🔥 ❤️');
-  if(s){ currentText = currentText + ' ' + s; let o = document.getElementById('textOver'); o.innerText = currentText; o.style.display = 'block'; saveMeta(); }
-}
-
-// ✅ WHITE DELETE DA - BLACK + NO BG + BLUR MATTUM DA
-function setBg(mode, btn){
-  document.querySelectorAll('.bgRow button').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  currentBg = mode;
-  let wrap = document.getElementById('wrapBox');
-  if(mode === 'black'){ wrap.style.background = '#000'; imgEl.style.background = '#000'; }
-  if(mode === 'transparent'){ wrap.style.background = 'repeating-conic-gradient(#222 0% 25%, #000 0% 50%) 50% / 20px 20px'; imgEl.style.background = 'transparent'; }
-  if(mode === 'blur'){ wrap.style.background = '#000'; imgEl.style.background = '#000'; }
-  saveMeta();
-}
-
-function removeBg(){
-  alert('BG Remove - On Panniten da ✨\nPhoto va - Black Background la - Clean ah Kaamikkum da');
-  setBg('transparent', document.querySelectorAll('.bgRow button')[1]);
-}
-
-async function goNext(){
-  await saveMeta();
-  location.href = './create-post-upload.html';
-}
+function adjust(t){ let v=prompt(t+' - 0.5 to 2:','1.2'); if(v){ currentFilter=t+'('+v+')'; setFilter(currentFilter,null); } }
+function addText(){ let t=prompt('Text ezhuthu da'); if(!t) return; currentText=t; let o=document.getElementById('textOver'); o.textContent=t; o.style.display='block'; saveDB('pixoro_create_text',t); }
+function addSticker(){ let s=prompt('Sticker - 😍 🔥 ❤️'); if(!s) return; currentText=currentText+' '+s; let o=document.getElementById('textOver'); o.textContent=currentText; o.style.display='block'; saveDB('pixoro_create_text',currentText); }
+document.getElementById('file').onchange=(e)=>{ let f=e.target.files[0]; if(!f) return; saveDB('pixoro_create_media', f); saveDB('pixoro_create_kind', f.type.includes('video')?'video':'image'); location.reload(); };
+async function goShare(){ await saveDB('pixoro_create_filter', currentFilter); await saveDB('pixoro_create_text', currentText); location.href='./create-share.html'; }
 </script>
 </body>
 </html>
