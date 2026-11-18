@@ -1,17 +1,230 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>New reel - Pixoro</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#111;color:#fff;font-family:system-ui}.top{display:flex;gap:14px;align-items:center;padding:14px;font-size:20px}.cover{width:150px;height:220px;object-fit:cover;border-radius:20px;display:block;margin:14px auto;position:relative}.editCover{position:absolute;left:50%;transform:translateX(-50%);bottom:22px;background:rgba(0,0,0,.6);padding:8px 14px;border-radius:20px;font-size:13px}textarea{width:100%;background:transparent;border:0;color:#fff;padding:14px;font-size:16px;outline:none;resize:none}.chips{display:flex;gap:8px;padding:0 14px}.chips button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px}.row{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid #222;cursor:pointer}.row small{color:#888}.btns{display:flex;gap:10px;padding:14px;position:fixed;bottom:0;left:0;right:0;background:#111}.btns button{flex:1;padding:14px;border:0;border-radius:30px;font-weight:800;font-size:15px}.save{background:#333;color:#fff}.share{background:#4d7cff;color:#fff}</style></head><body>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>New reel - Pixoro</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#fff;font-family:system-ui}
+.top{display:flex;gap:14px;align-items:center;padding:14px;font-size:20px}
+.top span{cursor:pointer}
+/* ✅ CORRECTED - WHITE BLOCK - PHOTO SUTHI - WHITE DA */
+.coverWrap{width:160px;height:230px;margin:14px auto;position:relative;background:#fff;border-radius:20px;overflow:hidden;display:grid;place-items:center;border:2px solid #fff;padding:10px;box-sizing:border-box}
+.coverWrap img,.coverWrap video{width:100%;height:100%;object-fit:contain;background:#fff;border-radius:14px}
+.coverWrap .empty{color:#000;font-size:40px;text-align:center}
+.coverWrap .empty small{display:block;font-size:11px;color:#888;margin-top:4px}
+.editCover{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;background:rgba(0,0,0,.7);padding:8px 14px;border-radius:20px;font-size:13px;cursor:pointer;color:#fff;z-index:3}
+.bgRow{display:flex;gap:8px;padding:0 14px 10px;overflow-x:auto}
+.bgRow button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px;white-space:nowrap;cursor:pointer}
+.bgRow button.on{background:#fff;color:#000}
+textarea{width:100%;background:transparent;border:0;color:#fff;padding:14px;font-size:16px;outline:none;resize:none}
+.chips{display:flex;gap:8px;padding:0 14px;flex-wrap:wrap}
+.chips button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px;cursor:pointer}
+.row{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid #222;cursor:pointer}
+.row small{color:#888}
+.btns{display:flex;gap:10px;padding:14px;position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #222}
+.btns button{flex:1;padding:14px;border:0;border-radius:30px;font-weight:800;font-size:15px;cursor:pointer}
+.save{background:#333;color:#fff}
+.share{background:#4d7cff;color:#fff}
+.share:disabled{opacity:.5}
+.previewInfo{padding:0 16px 6px;color:#888;font-size:12px}
+</style>
+</head>
+<body>
 <div class="top"><span onclick="history.back()">←</span><b>New reel</b></div>
-<div style="position:relative;text-align:center"><img class="cover" id="coverImg" src=""><div class="editCover" onclick="document.getElementById('coverFile').click()">Edit cover</div></div>
+
+<div style="position:relative;text-align:center">
+  <div class="coverWrap" id="coverWrap">
+    <img id="coverImg" src="" style="display:none">
+    <video id="coverVid" src="" style="display:none" muted loop playsinline autoplay></video>
+    <div class="empty" id="coverEmpty">📷<small>Cover Illa da</small></div>
+    <div class="editCover" onclick="document.getElementById('coverFile').click()">Edit cover</div>
+  </div>
+</div>
+
+<div class="bgRow">
+  <button class="on" onclick="setCoverBg('white',this)">⬜ White Block</button>
+  <button onclick="setCoverBg('black',this)">⬛ Black Block</button>
+  <button onclick="setCoverBg('transparent',this)">🔲 BG Remove</button>
+  <button onclick="setCoverBg('blur',this)">🌀 Blur BG</button>
+</div>
+
 <input type="file" id="coverFile" accept="image/*" hidden>
 <textarea id="caption" rows="2" placeholder="Write a caption and add hashtags..."></textarea>
-<div class="chips"><button onclick="addHash()"># Hashtags</button><button onclick="addPoll()">☰ Poll</button><button onclick="addPrompt()">⌕ Prompt</button></div>
-<div class="row" onclick="tagPeople()"><span>👤 Tag people</span><span>›</span></div>
-<div class="row" onclick="addLocation()"><span>📍 Add location</span><span>›</span></div>
+<div class="previewInfo" id="previewInfo"></div>
+<div class="chips">
+  <button onclick="addHash()"># Hashtags</button>
+  <button onclick="addPoll()">☰ Poll</button>
+  <button onclick="addPrompt()">⌕ Prompt</button>
+  <button onclick="removeBgFinal()">✨ BG Remove</button>
+</div>
+<div class="row" onclick="tagPeople()"><span>👤 Tag people</span><span id="tagTxt">›</span></div>
+<div class="row" onclick="addLocation()"><span>📍 Add location</span><span id="locTxt">›</span></div>
 <small style="color:#888;padding:0 16px;display:block">People you share this content with can see the location you tag and view this content on the map.</small>
 <div class="row" onclick="renameAudio()"><span>🎵 Rename audio</span><span id="audioName">Original Audio ›</span></div>
 <div class="row" onclick="togglePrivate()"><span>🔒 Audience</span><span id="audTxt">Public ›</span></div>
-<div style="height:80px"></div>
+<div class="row" onclick="toggleHideFace()"><span>🙈 Face Photo - Home la Vara Koodathu</span><span id="hideFaceTxt">OFF ›</span></div>
+<div style="height:90px"></div>
 <div class="btns"><button class="save" onclick="saveDraft()">Save draft</button><button class="share" id="shareBtn" onclick="shareReel()">Share</button></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js"></script><script src="js/pixoro-core.js"></script><script src="js/reels-visibility.js"></script>
-<script>let media=localStorage.getItem('pixoro_reel_media')||'https://picsum.photos/400/700?random=10';document.getElementById('coverImg').src=media;let isPrivate=false,tagged='',loc='';document.getElementById('coverFile').onchange=(e)=>{let u=URL.createObjectURL(e.target.files[0]);document.getElementById('coverImg').src=u;localStorage.setItem('pixoro_reel_cover',u);};function addHash(){let c=document.getElementById('caption');c.value+=' #pixoro #trending ';c.focus();}function addPoll(){let q=prompt('Poll Question?');if(q){let c=document.getElementById('caption');c.value+='\n📊 Poll: '+q+' | Yes / No';}}function addPrompt(){let p=prompt('Prompt ezhuthu da:');if(p){let c=document.getElementById('caption');c.value+='\n💬 '+p;}}function tagPeople(){let t=prompt('Yaara Tag Panna da? username:');if(t){tagged=t;alert('Tagged da: @'+t);}}function addLocation(){let l=prompt('Location - Dharmapuri / Chennai?');if(l){loc=l;alert('Location Add Aachu da: '+l);}}function renameAudio(){let a=prompt('Audio Name:',document.getElementById('audioName').innerText);if(a){document.getElementById('audioName').innerText=a+' ›';localStorage.setItem('pixoro_reel_audio',a);}}function togglePrivate(){isPrivate=!isPrivate;document.getElementById('audTxt').innerText=isPrivate?'Private Share ›':'Public ›';}function saveDraft(){localStorage.setItem('pixoro_reel_draft',document.getElementById('caption').value);alert('Draft Save Aachu da ✅');}async function shareReel(){let btn=document.getElementById('shareBtn');btn.innerText='Sharing...';btn.disabled=true;let cap=document.getElementById('caption').value||'Just Pixoro 🔥';if(tagged)cap+=' @'+tagged;if(loc)cap+=' 📍 '+loc;try{let s=window.supa;let {data:{session}}=await s.auth.getSession();if(!session){alert('Login Pannu da');location.href='./login.html';return;}let r=await window.uploadReelPixoro(session.user.id,media,isPrivate,null,cap);if(r.error){alert('Share Fail da: '+r.error);btn.innerText='Share';btn.disabled=false;return;}localStorage.removeItem('pixoro_reel_media');alert('Reels Share Aachu da 🔥');location.href='./reels.html';}catch(e){alert('Error da: '+e.message);btn.innerText='Share';btn.disabled=false;}}</script>
-</body></html>
+<script src="js/supabase.js"></script>
+<script src="js/pixoro-core.js"></script>
+<script src="js/reels-visibility.js"></script>
+<script>
+let media = localStorage.getItem('pixoro_reel_media') || '';
+let type = localStorage.getItem('pixoro_reel_type') || 'image';
+let filter = localStorage.getItem('pixoro_reel_filter') || 'none';
+let bgMode = localStorage.getItem('pixoro_reel_bg') || 'white';
+let hideFace = false;
+let isPrivate = false, tagged = '', loc = '';
+
+if(!media || media.startsWith('blob:') || media.includes('picsum')){
+  alert('Photo / Video Illa da - Thirumba Select Pannu da');
+  location.href = './create-reels.html';
+} else {
+  let cImg = document.getElementById('coverImg');
+  let cVid = document.getElementById('coverVid');
+  if(type === 'video'){ cVid.src = media; cVid.style.display = 'block'; cVid.style.filter = filter; }
+  else { cImg.src = media; cImg.style.display = 'block'; cImg.style.filter = filter; }
+  document.getElementById('coverEmpty').style.display = 'none';
+  document.getElementById('previewInfo').innerText = 'Filter: ' + filter + ' | BG: ' + bgMode + ' | Type: ' + type;
+  applyCoverBg(bgMode);
+  // ✅ BG Button - Correct ah - ON la Irukkanum da
+  document.querySelectorAll('.bgRow button').forEach(b => b.classList.remove('on'));
+  let idx = bgMode==='white'?0:bgMode==='black'?1:bgMode==='transparent'?2:3;
+  document.querySelectorAll('.bgRow button')[idx].classList.add('on');
+}
+
+// ✅ CORRECTED - WHITE BLOCK + BG REMOVE - FULL FIX DA
+function applyCoverBg(mode){
+  let wrap = document.getElementById('coverWrap');
+  let cImg = document.getElementById('coverImg');
+  let cVid = document.getElementById('coverVid');
+  if(mode === 'white'){
+    wrap.style.background = '#fff';
+    wrap.style.borderColor = '#fff';
+    wrap.style.padding = '10px';
+    cImg.style.background = '#fff';
+    cImg.style.objectFit = 'contain';
+    cVid.style.objectFit = 'contain';
+    cVid.style.background = '#fff';
+  }
+  if(mode === 'black'){
+    wrap.style.background = '#000';
+    wrap.style.borderColor = '#333';
+    wrap.style.padding = '0px';
+    cImg.style.background = '#000';
+    cImg.style.objectFit = 'cover';
+    cVid.style.objectFit = 'cover';
+  }
+  if(mode === 'transparent'){
+    wrap.style.background = 'repeating-conic-gradient(#222 0% 25%, #000 0% 50%) 50% / 20px 20px';
+    wrap.style.borderColor = '#333';
+    wrap.style.padding = '0px';
+    cImg.style.background = 'transparent';
+    cImg.style.objectFit = 'contain';
+    cVid.style.objectFit = 'contain';
+  }
+  if(mode === 'blur'){
+    wrap.style.background = '#000';
+    wrap.style.borderColor = '#333';
+    wrap.style.padding = '0px';
+    cImg.style.background = '#000';
+    cImg.style.objectFit = 'cover';
+    cVid.style.objectFit = 'cover';
+  }
+}
+function setCoverBg(mode, btn){
+  document.querySelectorAll('.bgRow button').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  bgMode = mode; localStorage.setItem('pixoro_reel_bg', mode);
+  applyCoverBg(mode);
+  if(mode === 'transparent') alert('BG Remove On da ✨ - White Block Remove Aachu da - Photo Mattum Theriyum da');
+  if(mode === 'white') alert('White Block On da ⬜ - Photo Suthi - White Theriyum da');
+}
+function removeBgFinal(){ setCoverBg('transparent', document.querySelectorAll('.bgRow button')[2]); }
+
+// ✅ COVER - BLOB ILLA - FileReader + White Block Canvas da
+document.getElementById('coverFile').onchange = (e) => {
+  let f = e.target.files[0]; if(!f) return;
+  let reader = new FileReader();
+  reader.onload = function(){
+    let img = new Image();
+    img.onload = function(){
+      let canvas = document.createElement('canvas');
+      let maxW = 720, w = img.width, h = img.height;
+      if(w > maxW){ h = h * maxW / w; w = maxW; }
+      // ✅ WHITE BLOCK - Canvas la - White Border Add Pannu da - Share Panna Kooda - White Block Varum da
+      let pad = 20;
+      canvas.width = w + pad*2; canvas.height = h + pad*2;
+      let ctx = canvas.getContext('2d');
+      if(bgMode === 'black'){ ctx.fillStyle = '#000'; }
+      else if(bgMode === 'transparent'){ ctx.fillStyle = '#000'; }
+      else { ctx.fillStyle = '#fff'; }
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(img,pad,pad,w,h);
+      let dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      let cImg = document.getElementById('coverImg');
+      cImg.src = dataUrl; cImg.style.display = 'block';
+      document.getElementById('coverVid').style.display = 'none';
+      document.getElementById('coverEmpty').style.display = 'none';
+      localStorage.setItem('pixoro_reel_cover', dataUrl);
+      media = dataUrl; type = 'image';
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(f);
+};
+
+function addHash(){ let c=document.getElementById('caption'); c.value += ' #pixoro #trending '; c.focus(); }
+function addPoll(){ let q=prompt('Poll Question?'); if(q){ let c=document.getElementById('caption'); c.value += '\n📊 Poll: ' + q + ' | Yes / No'; } }
+function addPrompt(){ let p=prompt('Prompt ezhuthu da:'); if(p){ let c=document.getElementById('caption'); c.value += '\n💬 ' + p; } }
+function tagPeople(){ let t=prompt('Yaara Tag Panna da? username:'); if(t){ tagged=t; document.getElementById('tagTxt').innerText='@'+t+' ›'; } }
+function addLocation(){ let l=prompt('Location - Dharmapuri / Chennai?'); if(l){ loc=l; document.getElementById('locTxt').innerText=l+' ›'; } }
+function renameAudio(){ let a=prompt('Audio Name:', document.getElementById('audioName').innerText); if(a){ document.getElementById('audioName').innerText=a+' ›'; localStorage.setItem('pixoro_reel_audio', a); } }
+function togglePrivate(){ isPrivate=!isPrivate; document.getElementById('audTxt').innerText = isPrivate ? 'Private Share ›' : 'Public ›'; }
+function toggleHideFace(){ hideFace=!hideFace; document.getElementById('hideFaceTxt').innerText = hideFace ? 'ON - Home la Varaathu ›' : 'OFF ›'; }
+function saveDraft(){ localStorage.setItem('pixoro_reel_draft', document.getElementById('caption').value); alert('Draft Save Aachu da ✅'); }
+
+function applyFilterToDataUrl(dataUrl, filterStr){
+  return new Promise((resolve)=>{
+    if(!filterStr || filterStr==='none' || dataUrl.startsWith('data:video')){ resolve(dataUrl); return; }
+    let img = new Image();
+    img.onload = ()=>{
+      let c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+      let ctx = c.getContext('2d'); ctx.filter = filterStr; ctx.drawImage(img,0,0);
+      resolve(c.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = ()=> resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+async function shareReel(){
+  let btn = document.getElementById('shareBtn');
+  btn.innerText = 'Sharing...'; btn.disabled = true;
+  let cap = document.getElementById('caption').value || 'Just Pixoro 🔥';
+  if(tagged) cap += ' @' + tagged;
+  if(loc) cap += ' 📍 ' + loc;
+  try{
+    let s = window.supa;
+    let {data:{session}} = await s.auth.getSession();
+    if(!session){ alert('Login Pannu da'); location.href='./login.html'; return; }
+    let finalMedia = await applyFilterToDataUrl(media, filter);
+    if(hideFace) cap += ' #FACE_HIDE';
+    let cover = localStorage.getItem('pixoro_reel_cover') || finalMedia;
+    let r = await window.uploadReelPixoro(session.user.id, finalMedia, isPrivate, null, cap, cover);
+    if(r && r.error){ alert('Share Fail da: ' + r.error); btn.innerText='Share'; btn.disabled=false; return; }
+    localStorage.removeItem('pixoro_reel_media');
+    localStorage.removeItem('pixoro_reel_filter');
+    localStorage.removeItem('pixoro_reel_bg');
+    localStorage.removeItem('pixoro_reel_cover');
+    alert(hideFace ? 'Reels Share Aachu da 🔥 - Home la Varaathu da' : 'Reels Share Aachu da 🔥');
+    location.href = './reels.html';
+  }catch(e){ alert('Error da: ' + e.message); btn.innerText='Share'; btn.disabled=false; }
+}
+</script>
+</body>
+</html>
