@@ -4,13 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>New post - Pixoro</title>
-<!-- ✅ CSS THANIIYA DA - INLINE <style> - ILLA DA -->
-<link rel="stylesheet" href="css/create-post.css?v=1035">
+<link rel="stylesheet" href="css/create-post.css?v=1037">
 </head>
 <body>
 <div class="top"><span onclick="location.href='./index.html'">✕</span><b>New post</b><span onclick="goNext()">Next</span></div>
 
-<!-- ✅ WHITE BLOCK - DELETE DA - BLACK + BG REMOVE MATTUM DA -->
 <div class="bgToggle">
   <button class="on" onclick="setPostBg('black',this)">⬛ Black Block</button>
   <button onclick="setPostBg('transparent',this)">🔲 BG Remove</button>
@@ -18,27 +16,24 @@
 
 <div class="preview" id="previewBox">
   <img id="prev" src="" style="display:none">
-  <div class="empty" id="emptyBox">📷<small>Photo Select Pannu da<br>Black la Varum da</small></div>
+  <div class="empty" id="emptyBox">📷<small>Photo Select Pannu da<br>Real Photo Mattum Varum da</small></div>
 </div>
 
-<div class="head"><b>Recents ⌄</b><button onclick="document.getElementById('file').click()">☑️ Select</button></div>
+<div class="head"><b>Your Photo</b><button onclick="document.getElementById('file').click()">☑️ Select Real Photo</button></div>
 
-<!-- ✅ CAPTION BOX - FILE SELECT PANNA MATTUM - THERIYUM DA - SAME PAGE LA DA -->
 <div id="captionBox" style="display:none;padding:0 16px 12px;background:#000">
   <textarea id="captionInput" placeholder="Caption ezhuthu da..." style="width:100%;min-height:70px;background:#111;border:1px solid #222;border-radius:14px;color:#fff;padding:12px;font-size:14px;resize:vertical"></textarea>
   <button id="postBtn" onclick="uploadPost()" style="width:100%;margin-top:10px;background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:0;color:#fff;font-weight:900;padding:14px;border-radius:20px;font-size:15px;cursor:pointer">Post Pannu da 🚀</button>
   <div id="uploadStatus" style="text-align:center;font-size:12px;color:#aaa;margin-top:8px"></div>
 </div>
 
-<div class="grid" id="grid">
-  <div class="tile" onclick="document.getElementById('file').click()">📷<br><small>Gallery</small></div>
-  <div class="tile" onclick="document.getElementById('file').click()" style="opacity:.4">➕</div>
-  <div class="tile" onclick="document.getElementById('file').click()" style="opacity:.4">➕</div>
+<!-- ✅ FAKE TILE ILLA DA - GALLERY / + / + - DELETE DA - SELECT PANNA PHOTO MATTUM DA -->
+<div class="grid" id="grid" style="padding:0 16px 90px">
+  <div id="noPhotoMsg" style="grid-column:1/-1;text-align:center;color:#777;font-size:13px;padding:20px">Innum Photo Select Pannala da<br>Select Button ah Thodu da - Gallery Open Aagum da</div>
 </div>
 
 <input type="file" id="file" accept="image/*" hidden>
 
-<!-- ✅ OREY BOTTOM - REELS / STORY / LIVE LAYUM - ITHAYE PODU DA -->
 <div class="bottomNav">
   <button class="on" onclick="location.href='./create-post.html'">POST</button>
   <button onclick="location.href='./create-reels.html'">REELS</button>
@@ -48,12 +43,12 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js?v=1035"></script>
-<script src="js/pixoro-core.js?v=1035"></script>
+<script src="js/supabase.js?v=1037"></script>
+<script src="js/pixoro-core.js?v=1037"></script>
 <script>
-// ✅ NO LOCALSTORAGE DA - MEMORY LA MATTUM DA - VARIABLE LA MATTUM DA
+// ✅ NO LOCALSTORAGE DA - MEMORY LA MATTUM DA
 let postBg = 'black';
-let selectedFile = null; // ✅ File - Inga Mattum da - Engayum Save Pannala da
+let selectedFile = null;
 let selectedBlobUrl = '';
 
 function applyPostBg(mode){
@@ -65,7 +60,7 @@ function applyPostBg(mode){
 function setPostBg(mode, btn){
   document.querySelectorAll('.bgToggle button').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  postBg = mode; // ✅ VARIABLE MATTUM DA
+  postBg = mode;
   applyPostBg(mode);
 }
 applyPostBg(postBg);
@@ -80,6 +75,7 @@ function showPreview(url){
 document.getElementById('file').onchange = (e) => {
   let f = e.target.files[0]; if(!f) return;
   if(!f.type.startsWith('image/')){ alert('Post ku - Photo Mattum da - Video va - Reels la Podu da'); return; }
+  // ✅ REAL PHOTO DA - NEE GALLERY LA SELECT PANNA FILE DA
   let reader = new FileReader();
   reader.onload = function(){
     let img = new Image();
@@ -87,7 +83,6 @@ document.getElementById('file').onchange = (e) => {
       let canvas = document.createElement('canvas');
       let maxW = 1080, w = img.width, h = img.height;
       if(w > maxW){ h = h * maxW / w; w = maxW; }
-      // ✅ WHITE ILLA DA - FULL BLACK THAAN DA - CANVAS LAYUM BLACK DA
       canvas.width = w; canvas.height = h;
       let ctx = canvas.getContext('2d');
       ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
@@ -98,11 +93,14 @@ document.getElementById('file').onchange = (e) => {
         selectedFile = new File([blob], 'post.jpg', {type:'image/jpeg'});
         selectedBlobUrl = URL.createObjectURL(blob);
         showPreview(selectedBlobUrl);
+        // ✅ FAKE TILE AH REPLACE PANNA Vendaam da - REAL PHOTO MATTUM KAAMIKKUROM DA
+        document.getElementById('noPhotoMsg').style.display='none';
         let grid = document.getElementById('grid');
+        grid.innerHTML = '';
         let div = document.createElement('div');
         div.className = 'tile'; div.innerHTML = '<img src="'+selectedBlobUrl+'">';
         div.onclick = () => showPreview(selectedBlobUrl);
-        grid.prepend(div);
+        grid.appendChild(div);
       }, 'image/jpeg', 0.85);
     };
     img.src = reader.result;
@@ -116,7 +114,6 @@ function goNext(){
     document.getElementById('file').click();
     return;
   }
-  // ✅ Vera Page ku Poga Vendaam da - Athe Page laye Caption Box Kaamikkrom da
   document.getElementById('captionBox').style.display='block';
   document.getElementById('captionInput').focus();
   document.getElementById('captionBox').scrollIntoView({behavior:'smooth'});
@@ -127,32 +124,24 @@ async function uploadPost(){
   let btn = document.getElementById('postBtn');
   let status = document.getElementById('uploadStatus');
   btn.disabled = true; btn.textContent = 'Uploading... ⏳';
-  status.textContent = 'Supabase ku Upload Aaguthu da...';
+  status.textContent = 'Server ku Upload Aaguthu da...';
   try{
-    // ✅ DIRECT SUPABASE UPLOAD DA - localStorage / Edit Page - Theva Illa da
-    // Un js/supabase.js la - supabase client irundha - Itha Use Pannu da
-    // Illana - Inga - Un Upload Function ah - Podu da
-    if(window.supabaseClient){
-      let fileName = 'posts/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.jpg';
-      let { data, error } = await window.supabaseClient.storage.from('posts').upload(fileName, selectedFile);
-      if(error) throw error;
-      let { data: urlData } = window.supabaseClient.storage.from('posts').getPublicUrl(fileName);
-      let caption = document.getElementById('captionInput').value || '';
-      // Posts table la insert pannu da - Un table name ku etha maari maathu da
-      let { error: dbError } = await window.supabaseClient.from('posts').insert([{ image_url: urlData.publicUrl, caption: caption, media_type: 'image' }]);
-      if(dbError) throw dbError;
-      status.textContent = 'Posted da 🎉';
-      alert('Posted da 🎉');
-      location.href = './index.html';
-      return;
-    }
-    // Supabase client illana - Temporary ah - Inga varum da
-    alert('Supabase client connect aagala da - js/supabase.js la - supabaseClient check pannu da');
+    if(!window.supabaseClient) throw new Error('Supabase connect aagala da - js/supabase.js check pannu da');
+    let fileName = 'posts/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.jpg';
+    let { error } = await window.supabaseClient.storage.from('posts').upload(fileName, selectedFile);
+    if(error) throw error;
+    let { data: urlData } = window.supabaseClient.storage.from('posts').getPublicUrl(fileName);
+    let caption = document.getElementById('captionInput').value || '';
+    let { error: dbError } = await window.supabaseClient.from('posts').insert([{ image_url: urlData.publicUrl, caption: caption, media_type: 'image' }]);
+    if(dbError) throw dbError;
+    status.textContent = 'Posted da 🎉';
+    alert('Posted da 🎉 - Server la Save Aayiduchu da');
+    location.href = './index.html';
   }catch(err){
     console.error(err);
-    alert('Upload fail aayiduchu da - ' + (err.message || 'Try again da'));
+    alert('Upload fail da - ' + (err.message || 'Try again da'));
+    btn.disabled = false; btn.textContent = 'Post Pannu da 🚀';
   }
-  btn.disabled = false; btn.textContent = 'Post Pannu da 🚀';
 }
 </script>
 </body>
