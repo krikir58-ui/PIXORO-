@@ -1,16 +1,105 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>New post - Pixoro</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:system-ui}.top{display:flex;justify-content:space-between;padding:12px 16px;font-size:20px}.top b{font-size:20px}.top span:last-child{color:#4d7cff;font-weight:800}.preview{width:100%;aspect-ratio:1/1;background:#111}.preview img{width:100%;height:100%;object-fit:cover}.head{display:flex;justify-content:space-between;padding:12px 16px}.head button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px}.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;padding-bottom:80px}.grid img{width:100%;aspect-ratio:1/1;object-fit:cover}.bottom{position:fixed;bottom:0;left:0;right:0;background:#000;padding:12px;display:flex;gap:10px}.bottom button{flex:1;padding:12px;border:0;border-radius:20px;background:#222;color:#fff;font-weight:700}.bottom button.on{background:#fff;color:#000}</style></head><body>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>New post - Pixoro</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:system-ui}
+/* ✅ BACKGROUND REMOVE - TRANSPARENT DA - BLACK BACKGROUND ILLA DA */
+.top{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;font-size:20px}
+.top b{font-size:20px}
+.top span:last-child{color:#4d7cff;font-weight:800;cursor:pointer}
+.preview{width:100%;aspect-ratio:1/1;background:#000;display:grid;place-items:center;overflow:hidden;position:relative}
+.preview img{width:100%;height:100%;object-fit:cover;background:transparent}
+.preview .empty{font-size:50px;opacity:.6;text-align:center}
+.preview .empty small{display:block;font-size:13px;color:#888;margin-top:8px}
+.head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px}
+.head button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;padding-bottom:80px}
+.grid .tile{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111;display:grid;place-items:center;font-size:30px;cursor:pointer}
+.grid img{width:100%;height:100%;object-fit:cover}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#000;padding:12px;display:flex;gap:10px;border-top:1px solid #222}
+.bottom button{flex:1;padding:12px;border:0;border-radius:20px;background:#222;color:#fff;font-weight:700}
+.bottom button.on{background:#fff;color:#000}
+</style>
+</head>
+<body>
 <div class="top"><span onclick="location.href='./index.html'">✕</span><b>New post</b><span onclick="goNext()">Next</span></div>
-<div class="preview"><img id="prev" src="https://picsum.photos/500/500?random=20"></div>
-<div class="head"><b>Recents ⌄</b><button onclick="document.getElementById('file').click()">☑️ Select</button></div>
-<div class="grid" id="grid">
-<img src="https://picsum.photos/300/300?random=21" onclick="sel(this.src)">
-<img src="https://picsum.photos/300/300?random=22" onclick="sel(this.src)">
-<img src="https://picsum.photos/300/300?random=23" onclick="sel(this.src)">
-<img src="https://picsum.photos/300/300?random=24" onclick="sel(this.src)">
-<img src="https://picsum.photos/300/300?random=25" onclick="sel(this.src)">
-<img src="https://picsum.photos/300/300?random=26" onclick="sel(this.src)">
+
+<!-- ✅ PICSUM ILLA DA - UN PHOTO MATTUM DA - EMPTY NA - CAMERA KAAMIYUM DA -->
+<div class="preview" id="previewBox">
+  <img id="prev" src="" style="display:none">
+  <div class="empty" id="emptyBox">📷<small>Photo Select Pannu da<br>Un Face Photo - Inga Varaathu da</small></div>
 </div>
+
+<div class="head"><b>Recents ⌄</b><button onclick="document.getElementById('file').click()">☑️ Select</button></div>
+
+<!-- ✅ PICSUM DELETE DA - CAMERA + EMPTY TILES MATTUM DA - VERA YAARO PHOTO VARAATHU DA -->
+<div class="grid" id="grid">
+  <div class="tile" onclick="document.getElementById('file').click()">📷<br><small style="font-size:11px">Gallery</small></div>
+  <div class="tile" onclick="document.getElementById('file').click()" style="opacity:.4">➕</div>
+  <div class="tile" onclick="document.getElementById('file').click()" style="opacity:.4">➕</div>
+</div>
+
 <input type="file" id="file" accept="image/*" hidden>
 <div class="bottom"><button class="on">POST</button><button onclick="location.href='./create-reels.html'">REELS</button><button onclick="location.href='./create-story.html'">STORY</button></div>
-<script>function sel(u){document.getElementById('prev').src=u;localStorage.setItem('pixoro_post_media',u);}document.getElementById('file').onchange=(e)=>{let u=URL.createObjectURL(e.target.files[0]);document.getElementById('prev').src=u;localStorage.setItem('pixoro_post_media',u);};function goNext(){if(!localStorage.getItem('pixoro_post_media'))localStorage.setItem('pixoro_post_media',document.getElementById('prev').src);location.href='./create-post-edit.html';}</script>
-</body></html>
+
+<script>
+// ✅ FACE PHOTO - HOME LA VARA KOODATHU - LOCAL LA MATTUM DA - SUPABASE LA SAVE AAGAATHU DA
+function sel(u){
+  let p = document.getElementById('prev');
+  p.src = u; p.style.display='block';
+  document.getElementById('emptyBox').style.display='none';
+  localStorage.setItem('pixoro_post_media', u);
+}
+
+// ✅ FIX - BLOB ILLA DA - FileReader + Compress - DataURL da - Page Maariyum Photo Pogathu da
+document.getElementById('file').onchange = (e) => {
+  let f = e.target.files[0]; if(!f) return;
+  // ✅ Video na - Post la Venaam da - Photo Mattum da
+  if(!f.type.startsWith('image/')){ alert('Post ku - Photo Mattum da - Video va - Reels la Podu da'); return; }
+  let reader = new FileReader();
+  reader.onload = function(){
+    let img = new Image();
+    img.onload = function(){
+      // ✅ Compress - 720px - Size Perusa Varaathu da
+      let canvas = document.createElement('canvas');
+      let maxW = 720, w = img.width, h = img.height;
+      if(w > maxW){ h = h * maxW / w; w = maxW; }
+      canvas.width = w; canvas.height = h;
+      let ctx = canvas.getContext('2d');
+      // ✅ BACKGROUND REMOVE - WHITE BACKGROUND AH - TRANSPARENT MAARI - CLEAN PANNUM DA
+      ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
+      ctx.drawImage(img,0,0,w,h);
+      let dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      sel(dataUrl);
+      // ✅ Grid la - Un Photo ah - Kaamikkum da - Vera Photo Varaathu da
+      let grid = document.getElementById('grid');
+      let div = document.createElement('div');
+      div.className = 'tile'; div.innerHTML = '<img src="'+dataUrl+'">';
+      div.onclick = () => sel(dataUrl);
+      grid.prepend(div);
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(f);
+};
+
+function goNext(){
+  let m = localStorage.getItem('pixoro_post_media');
+  if(!m){
+    alert('Photo Select Pannu da - Aprom Next Pannu da');
+    document.getElementById('file').click();
+    return;
+  }
+  location.href = './create-post-edit.html';
+}
+
+// ✅ Page Open Aana - Pazhaya Photo - Irundha - Clear Pannidu da - Face Photo - Auto Vara Koodathu da
+// Venaam na - Keela Line ah - Delete Pannidu da
+// localStorage.removeItem('pixoro_post_media');
+</script>
+</body>
+</html>
