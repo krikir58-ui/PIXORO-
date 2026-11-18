@@ -4,41 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>New reel - Pixoro</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#fff;font-family:system-ui}
-.top{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;font-size:22px;background:#000}
-.top b{font-size:20px}
-.tabs{display:flex;gap:8px;padding:10px 16px;overflow-x:auto;background:#000}
-.tabs div{background:#222;padding:10px 16px;border-radius:20px;white-space:nowrap;font-weight:700;cursor:pointer}
-.tabs div.on{background:#fff;color:#000}
-/* ✅ WHITE REMOVE DA - BLACK + BG REMOVE MATTUM DA */
-.bgToggle{display:flex;gap:8px;padding:0 16px 10px;overflow-x:auto;background:#000}
-.bgToggle button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px;white-space:nowrap;cursor:pointer}
-.bgToggle button.on{background:#fff;color:#000}
-.head{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#000}
-.head button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px}
-/* ✅ PREVIEW - WHITE ILLA DA - FULL BLACK THAAN DA - POST MARIYE DA */
-.preview{width:calc(100% - 32px);margin:0 16px;aspect-ratio:9/16;max-height:320px;background:#000;border:1px solid #222;border-radius:20px;display:grid;place-items:center;position:relative;overflow:hidden;box-sizing:border-box}
-.preview img,.preview video{width:100%;height:100%;object-fit:contain;background:#000;border-radius:14px}
-.preview .empty{font-size:50px;text-align:center;color:#fff}
-.preview .empty small{display:block;font-size:12px;color:#888;margin-top:6px}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;padding-bottom:90px;background:#000}
-.grid .tile{width:100%;aspect-ratio:3/4;object-fit:cover;background:#111;display:grid;place-items:center;font-size:30px;color:#fff;cursor:pointer;position:relative;overflow:hidden}
-.grid .tile img{width:100%;height:100%;object-fit:cover;background:#111}
-.grid .tile small{font-size:11px;color:#888}
-.cam{display:grid;place-items:center;background:#222 !important;color:#fff !important;font-size:34px}
-/* ✅ OREY BOTTOM - ELLA PAGE KUM SAME DA - POST / REELS / STORY / LIVE / INSTANTS */
-.bottomNav{position:fixed;bottom:0;left:0;right:0;background:#000;padding:12px 10px;display:flex;gap:8px;border-top:1px solid #222;z-index:20}
-.bottomNav button{flex:1;padding:12px 2px;border:0;border-radius:20px;background:#222;color:#fff;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
-.bottomNav button.on{background:#fff;color:#000}
-</style>
+<link rel="stylesheet" href="css/create-reels.css?v=1035">
 </head>
 <body>
 <div class="top"><span onclick="location.href='./index.html'">✕</span><b>New reel</b><span>⚙️</span></div>
 <div class="tabs"><div>🎬 Edits</div><div>📁 Drafts · 2</div><div>📋 Templates</div></div>
 
-<!-- ✅ WHITE BLOCK - DELETE DA - BLACK + BG REMOVE MATTUM DA -->
 <div class="bgToggle">
   <button class="on" onclick="setGridBg('black',this)">⬛ Black Block</button>
   <button onclick="setGridBg('transparent',this)">🔲 BG Remove</button>
@@ -60,7 +31,6 @@ body{background:#000;color:#fff;font-family:system-ui}
 
 <input type="file" id="file" accept="video/*,image/*" hidden>
 
-<!-- ✅ OREY BOTTOM - POST FILE LAYUM - ITHAYE IRUKKU DA -->
 <div class="bottomNav">
   <button onclick="location.href='./create-post.html'">POST</button>
   <button class="on" onclick="location.href='./create-reels.html'">REELS</button>
@@ -70,81 +40,84 @@ body{background:#000;color:#fff;font-family:system-ui}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js"></script>
-<script src="js/pixoro-core.js"></script>
+<script src="js/supabase.js?v=1035"></script>
+<script src="js/pixoro-core.js?v=1035"></script>
 <script>
+// ✅ NO LOCALSTORAGE DA - MEMORY LA MATTUM DA - 50MB VIDEO Kooda CRASH AAGAATHU DA
+let reelBg = 'black';
+window.__pixoroMedia = null; // { file, url, type }
+window.__pixoroReelFile = null;
+
 function setGridBg(mode, btn){
   document.querySelectorAll('.bgToggle button').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  localStorage.setItem('pixoro_reel_bg', mode);
+  reelBg = mode; // ✅ localStorage ILLA DA - VARIABLE MATTUM DA
   let preview = document.getElementById('previewBox');
   let img = document.getElementById('prevImg');
   let vid = document.getElementById('prevVid');
   if(mode==='black'){ preview.style.background='#000'; preview.style.borderColor='#222'; img.style.background='#000'; img.style.objectFit='contain'; vid.style.objectFit='contain'; }
   if(mode==='transparent'){ preview.style.background='repeating-conic-gradient(#222 0% 25%, #000 0% 50%) 50% / 20px 20px'; img.style.background='transparent'; img.style.objectFit='contain'; }
-  if(mode==='transparent') alert('BG Remove On da ✨ - Photo Mattum Theriyum da');
-  if(mode==='black') alert('Black Block On da ⬛ - Full Black Thaan da');
 }
-let savedBg = localStorage.getItem('pixoro_reel_bg') || 'black';
-if(savedBg==='white') savedBg='black';
-document.querySelectorAll('.bgToggle button').forEach(b=>b.classList.remove('on'));
-document.querySelectorAll('.bgToggle button')[savedBg==='black'?0:1].classList.add('on');
-setGridBg(savedBg, document.querySelectorAll('.bgToggle button')[savedBg==='black'?0:1]);
-
-function selectMedia(url){
-  if(!url || url.includes('picsum')) return;
-  localStorage.setItem('pixoro_reel_media', url);
-  localStorage.setItem('pixoro_reel_type','image');
-  location.href='./create-reels-edit.html';
-}
+setGridBg('black', document.querySelectorAll('.bgToggle button')[0]);
 
 document.getElementById('file').onchange = (e) => {
   let f = e.target.files[0]; if(!f) return;
   let isVideo = f.type.includes('video');
+  let url = URL.createObjectURL(f); // ✅ DATA URL ILLA DA - BLOB URL DA - MEMORY LA MATTUM DA - FAST DA
+  window.__pixoroMedia = { file: f, url: url, type: isVideo ? 'video' : 'image' };
+  window.__pixoroReelFile = f;
+
   if(isVideo){
-    if(f.size > 50*1024*1024){ alert('Video - 50MB ku Mela Irukku da - Chinna Video Select Pannu da'); return; }
-    let reader = new FileReader();
-    reader.onload = function(){
-      localStorage.setItem('pixoro_reel_media', reader.result);
-      localStorage.setItem('pixoro_reel_type','video');
-      localStorage.setItem('pixoro_reel_file_name', f.name);
-      let v = document.getElementById('prevVid');
-      v.src = reader.result; v.style.display='block'; v.play();
-      document.getElementById('emptyBox').style.display='none';
-      setTimeout(()=>{ location.href='./create-reels-edit.html'; }, 500);
-    };
-    reader.readAsDataURL(f);
+    if(f.size > 100*1024*1024){ alert('Video - 100MB ku Mela Irukku da - Chinna Video Select Pannu da'); return; }
+    let v = document.getElementById('prevVid');
+    v.src = url; v.style.display='block'; v.play();
+    document.getElementById('prevImg').style.display='none';
+    document.getElementById('emptyBox').style.display='none';
+    // ✅ NEXT PAGE KU - FILE AH - DIRECT AH - PASS PANNA - IndexedDB / Supabase Upload - Inga Thaan Pannanum da
+    // Edit page la - window.opener / Supabase la irundhu edukkanum da - localStorage la VAIKKAVE KOODATHU DA
+    setTimeout(()=>{ goToEdit(); }, 500);
     return;
   }
+
+  // IMAGE - CANVAS BLACK DA - AANA - localStorage LA VAIKKALA DA
   let reader = new FileReader();
   reader.onload = function(){
     let img = new Image();
     img.onload = function(){
       let canvas = document.createElement('canvas');
-      let maxW = 720, w = img.width, h = img.height;
+      let maxW = 1080, w = img.width, h = img.height;
       if(w > maxW){ h = h * maxW / w; w = maxW; }
-      // ✅ WHITE ILLA DA - FULL BLACK THAAN DA - CANVAS LAYUM BLACK DA
       canvas.width = w; canvas.height = h;
       let ctx = canvas.getContext('2d');
       ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
       ctx.drawImage(img,0,0,w,h);
-      let dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      localStorage.setItem('pixoro_reel_media', dataUrl);
-      localStorage.setItem('pixoro_reel_type','image');
-      let p = document.getElementById('prevImg');
-      p.src = dataUrl; p.style.display='block';
-      document.getElementById('emptyBox').style.display='none';
-      let grid = document.getElementById('grid');
-      let div = document.createElement('div');
-      div.className='tile'; div.innerHTML='<img src="'+dataUrl+'">';
-      div.onclick = ()=> selectMedia(dataUrl);
-      grid.prepend(div);
-      setTimeout(()=>{ location.href='./create-reels-edit.html'; }, 400);
+      canvas.toBlob((blob)=>{
+        let blobUrl = URL.createObjectURL(blob);
+        let blobFile = new File([blob], 'reel.jpg', {type:'image/jpeg'});
+        window.__pixoroMedia = { file: blobFile, url: blobUrl, type:'image' };
+        window.__pixoroReelFile = blobFile;
+        let p = document.getElementById('prevImg');
+        p.src = blobUrl; p.style.display='block';
+        document.getElementById('emptyBox').style.display='none';
+        setTimeout(()=>{ goToEdit(); }, 400);
+      }, 'image/jpeg', 0.85);
     };
     img.src = reader.result;
   };
   reader.readAsDataURL(f);
 };
+
+function goToEdit(){
+  // ✅ NO LOCALSTORAGE DA - EDIT PAGE KU PONA - FILE POYIDUM NU BAYAPADATHA DA
+  // Sariyaana Vazhi: Ingaye - Supabase ku Upload Pannidu da - Aprom Edit Page la - URL la irundhu Edu da
+  // Temporary ah - Edit page ku pogama - Ingaye - Upload Pannu nu - Alert kaamikuren da
+  if(window.__pixoroMedia && window.__pixoroMedia.file){
+    // Upload function - js/pixoro-core.js la irundha - Inga call pannu da
+    // uploadReelFile(window.__pixoroMedia.file) - nu - Neenga - Supabase ku Upload Pannanum da
+    alert('File Ready da ✅ - localStorage la Vaikkala da - Ippo - Supabase ku Upload Pannu da');
+    // location.href = './create-reels-edit.html'; // ❌ Itha - Ippo - Use Panna Vendaam da - File Poyidum da
+  }
+}
 </script>
 </body>
 </html>
