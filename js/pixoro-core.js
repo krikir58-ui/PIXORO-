@@ -1,5 +1,6 @@
-// ===== PIXORO CORE - CORRECTED v1010 - TOP NOTE KEELA + CLOSE BTN DA - FULL =====
+// ===== PIXORO CORE - CORRECTED v1011 - TOP NOTE KEELA + CLOSE BTN + SAFE DA - FULL =====
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
+// ✅ UN KEY AH INGA PODU DA - PAZHAYA KEY AH APDIYE VACHIDU DA
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 window.PIXORO_URL = SUPA_URL;
 window.PIXORO_KEY = SUPA_KEY;
@@ -27,13 +28,9 @@ function isGoldUser(p){
   let u = String(p.username||p.name||'').toLowerCase().replace('@','').trim();
   return u === 'giri_official' || u === 'giri_ceo';
 }
-function goldTickHTML(p){
-  if(!isGoldUser(p)) return '';
-  return ' <span style="color:#FFD700;font-size:14px">✔</span>';
-}
-window.isGoldUser = isGoldUser;
-window.goldTickHTML = goldTickHTML;
-window.getTick = goldTickHTML;
+function goldTickHTML(p){ if(!isGoldUser(p)) return ''; return ' <span style="color:#FFD700;font-size:14px">✔</span>'; }
+window.isGoldUser = isGoldUser; window.goldTickHTML = goldTickHTML; window.getTick = goldTickHTML;
+
 (function(){
   if(document.getElementById('pixoro-speed-css')) return;
   let css = `
@@ -56,28 +53,33 @@ window.getTick = goldTickHTML;
   .bottom-nav span{font-size:10px!important}
   .followBtnPost,.followBtnSearch,.followBtnPerusa{ background:transparent!important;color:#fff!important;border:1.5px solid #fff!important;padding:4px 12px!important;border-radius:8px!important;font-size:12px!important;font-weight:700!important;cursor:pointer!important }
   .followBtnPost.following,.followBtnSearch.following,.followBtnPerusa.following{ border-color:#666!important;color:#aaa!important }
-  /* ✅ v1010 FIX: TOP NOTE - LOGO MELA OTTATHU DA - 58px KEELA DA */
-  #pixoroTopNote{ position:fixed!important; top:58px!important; left:0!important; right:0!important; z-index:999!important; display:flex!important; justify-content:center!important; pointer-events:none!important; background:transparent!important; background-color:transparent!important; }
+  #pixoroTopNote{ position:fixed!important; top:58px!important; left:0!important; right:0!important; z-index:999!important; display:flex!important; justify-content:center!important; pointer-events:none!important; background:transparent!important; }
   #pixoroTopNote div{ background:rgba(0,0,0,0.65)!important; backdrop-filter:blur(10px); color:#fff!important; font-size:12px!important; font-weight:700!important; padding:8px 14px!important; border-radius:0 0 16px 16px!important; border:1px solid rgba(255,255,255,0.15)!important; border-top:0!important; pointer-events:auto!important; cursor:pointer!important; }
+  .pfpRing{ width:40px;height:40px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5); flex-shrink:0; }
+  .pfpInner{ width:100%;height:100%;border-radius:50%;overflow:hidden;background:#000;display:grid;place-items:center; }
+  .pfpInner img{ width:100%;height:100%;object-fit:cover; }
   `;
   let s = document.createElement('style'); s.id='pixoro-speed-css'; s.innerText = css; document.head.appendChild(s);
   if(location.pathname.includes('index') || location.pathname.endsWith('/')){
     if(document.body) document.body.classList.add('isHome');
     else document.addEventListener('DOMContentLoaded', ()=>{ if(document.body) document.body.classList.add('isHome'); });
   }
+  // ✅ v1011 CORRECTED - TOP NOTE + CLOSE BTN - THANITHANIYA DA - KALAKKATHU DA
   function addTopNote(){
     if(document.getElementById('pixoroTopNote')) return;
     if(!document.body) return;
     let n = document.createElement('div');
     n.id = 'pixoroTopNote';
-    // ✅ v1010 FIX: CLOSE BTN SERTHUTEN DA
-    n.innerHTML = `<div onclick="location.href='dm.html'">🔔 Pixoro - New Updates Paaru da › <span onclick="event.stopPropagation();document.getElementById('pixoroTopNote').style.display='none'" style="margin-left:8px;opacity:.6">✕</span></div>`;
+    n.innerHTML = `<div id="topNoteInner">🔔 Pixoro - New Updates Paaru da › <span id="topNoteClose" style="margin-left:8px;opacity:.6;padding:0 6px;cursor:pointer">✕</span></div>`;
     document.body.appendChild(n);
+    document.getElementById('topNoteInner').onclick = ()=>{ location.href='dm.html'; };
+    document.getElementById('topNoteClose').onclick = (e)=>{ e.stopPropagation(); n.style.display='none'; };
     setTimeout(()=>{ if(n) n.style.display='none'; }, 5000);
   }
   if(document.readyState !== 'loading') addTopNote();
   else document.addEventListener('DOMContentLoaded', addTopNote);
 })();
+
 window._PIXORO_PFP_CACHE = {};
 window.getPfp = function(p){
   if(!p) return 'https://ui-avatars.com/api/?name=P&background=ff5ea8&color=fff&size=200&bold=true';
@@ -89,7 +91,6 @@ window.getPfp = function(p){
   return 'https://ui-avatars.com/api/?name='+String(n).charAt(0)+'&background=ff5ea8&color=fff&size=200&bold=true';
 };
 window.pixoroRefreshPhotos = async function(){ return; };
-window.addEventListener('storage', (e)=>{});
 window.ME_ID = window.ME_ID || null;
 window.ME_RAW = window.ME_RAW || '';
 function pixoroIsUuid(s){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(s||'')); }
@@ -110,7 +111,7 @@ async function pixoroFixMe(){
 async function getAllPixoroPosts(){
   let s = pixoroGetSupa(); if(!s) return [];
   let all = [];
-  try{ let r1 = await s.from('posts').select('*').order('created_at',{ascending:false}).limit(100); if(r1.data) all = all.concat(r1.data.map(p=>({...p,_from:'posts'}))); }catch(e){ console.log('posts fetch fail', e.message); }
+  try{ let r1 = await s.from('posts').select('*').order('created_at',{ascending:false}).limit(100); if(r1.data) all = all.concat(r1.data.map(p=>({...p,_from:'posts'}))); }catch(e){}
   try{ let r2 = await s.from('reels').select('*').order('created_at',{ascending:false}).limit(100); if(r2.data) all = all.concat(r2.data.map(p=>({...p,_from:'reels'}))); }catch(e){}
   let seen = new Set(), out = [];
   for(let p of all){
@@ -145,7 +146,7 @@ async function pixoroBlockUser(target){
   if(!confirm('Full ah Block Pannava da?')) return;
   let s = pixoroGetSupa(); if(!s) return;
   let {data, error} = await s.rpc('toggle_block_by_name', {target_name: raw});
-  if(error){ return; }
+  if(error) return;
   setTimeout(()=> location.reload(), 500);
 }
 async function pixoroGetHiddenIds(){
@@ -177,6 +178,7 @@ async function getPixoroFeed(){
   let blocked = await pixoroGetBlockedIds();
   let clean = (all||[]).filter(p=>{
     if(p.is_archived === true) return false;
+    if(p.visibility === 'private_share') return false;
     if(p.user_id && blocked.includes(String(p.user_id))) return false;
     return true;
   });
@@ -246,15 +248,19 @@ async function getPixoroExplore(myId, myFollows){
   let all = await getAllPixoroPosts();
   return (all||[]).filter(p=> String(p.user_id)!==String(myId) && !myFollows.includes(String(p.user_id)));
 }
+// ✅ v1011 CORRECTED - pixoroSavePost - Post + Reels - Visibility ah Use Pannum da - Double Insert Illa da
 async function pixoroSavePost(fileUrl, isReel, caption){
   let s = pixoroGetSupa(); if(!s) return;
   let {data:{session}} = await s.auth.getSession();
   if(!session) return;
-  let row = { user_id: session.user.id, username: window.ME_RAW, media_url: fileUrl, video_url: isReel ? fileUrl : null, image_url: !isReel ? fileUrl : null, media_type: isReel ? 'reel' : 'post', caption: caption || 'Just Pixoro', is_archived:false };
+  let cap = caption || 'Just Pixoro';
+  let row = { user_id: session.user.id, username: window.ME_RAW, media_url: fileUrl, video_url: isReel ? fileUrl : null, image_url: !isReel ? fileUrl : null, media_type: isReel ? 'reel' : 'post', caption: cap, is_archived:false, visibility:'public' };
   let {error} = await s.from('posts').insert(row);
   if(error){ console.log('POST SAVE FAIL', error.message); return; }
-  if(isReel){ await s.from('reels').insert({ user_id: session.user.id, username: window.ME_RAW, video_url: fileUrl, caption: caption || 'Just Pixoro' }); }
-  location.href = './reels.html';
+  if(isReel && window.uploadReelPixoro){
+    await window.uploadReelPixoro(session.user.id, fileUrl, false, null, cap);
+  }
+  location.href = isReel ? './reels.html' : './index.html';
 }
 async function loadProfileRealCount(){
   await pixoroFixMe();
@@ -450,7 +456,7 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
-console.log('PIXORO CORE v1010 - TOP NOTE KEELA + CLOSE BTN DA');
+console.log('PIXORO CORE v1011 - TOP NOTE KEELA + CLOSE BTN DA');
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
