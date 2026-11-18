@@ -4,78 +4,158 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>New post - Pixoro</title>
-<link rel="stylesheet" href="css/create-post.css?v=1037">
+<link rel="stylesheet" href="css/create-post.css?v=1038">
+<style>
+.step{display:none}
+.step.on{display:block}
+.step2Wrap{position:relative;width:100%;height:calc(100vh - 70px);background:#000;display:grid;place-items:center;overflow:hidden}
+.step2Wrap img{width:100%;height:100%;object-fit:cover}
+.editTools{position:absolute;bottom:90px;left:0;right:0;display:flex;justify-content:space-around;padding:0 10px}
+.editTools div{text-align:center;font-size:11px}
+.editTools span{display:grid;place-items:center;width:56px;height:56px;background:#222;border-radius:16px;font-size:22px;margin-bottom:4px}
+.filterRow{display:flex;gap:8px;padding:10px 16px;overflow-x:auto;background:#000}
+.filterRow button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px;white-space:nowrap}
+.filterRow button.on{background:#fff;color:#000}
+.captionInput{width:100%;background:transparent;border:0;color:#fff;font-size:16px;padding:16px;outline:none;resize:none;min-height:60px}
+.shareBtn{background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;border:0;padding:14px;border-radius:14px;font-weight:900;width:100%;font-size:16px}
+.draftBtn{background:#222;color:#fff;border:0;padding:14px;border-radius:14px;font-weight:700;width:100%}
+</style>
 </head>
 <body>
-<div class="top"><span onclick="location.href='./index.html'">✕</span><b>New post</b><span onclick="goNext()">Next</span></div>
 
+<!-- ================= PAGE 1 - SELECT DA - UPLOAD ILLA DA ================= -->
+<div id="step1" class="step on">
+<div class="top"><span onclick="location.href='./index.html'">✕</span><b>New post</b><span onclick="goToEditFromTop()">Next</span></div>
 <div class="bgToggle">
   <button class="on" onclick="setPostBg('black',this)">⬛ Black Block</button>
   <button onclick="setPostBg('transparent',this)">🔲 BG Remove</button>
 </div>
-
 <div class="preview" id="previewBox">
   <img id="prev" src="" style="display:none">
   <div class="empty" id="emptyBox">📷<small>Photo Select Pannu da<br>Real Photo Mattum Varum da</small></div>
 </div>
-
 <div class="head"><b>Your Photo</b><button onclick="document.getElementById('file').click()">☑️ Select Real Photo</button></div>
-
-<div id="captionBox" style="display:none;padding:0 16px 12px;background:#000">
-  <textarea id="captionInput" placeholder="Caption ezhuthu da..." style="width:100%;min-height:70px;background:#111;border:1px solid #222;border-radius:14px;color:#fff;padding:12px;font-size:14px;resize:vertical"></textarea>
-  <button id="postBtn" onclick="uploadPost()" style="width:100%;margin-top:10px;background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:0;color:#fff;font-weight:900;padding:14px;border-radius:20px;font-size:15px;cursor:pointer">Post Pannu da 🚀</button>
-  <div id="uploadStatus" style="text-align:center;font-size:12px;color:#aaa;margin-top:8px"></div>
-</div>
-
-<!-- ✅ FAKE TILE ILLA DA - GALLERY / + / + - DELETE DA - SELECT PANNA PHOTO MATTUM DA -->
+<!-- ✅ FAKE TILE ILLA DA - SELECT PANNA PHOTO MATTUM DA -->
 <div class="grid" id="grid" style="padding:0 16px 90px">
   <div id="noPhotoMsg" style="grid-column:1/-1;text-align:center;color:#777;font-size:13px;padding:20px">Innum Photo Select Pannala da<br>Select Button ah Thodu da - Gallery Open Aagum da</div>
 </div>
-
-<input type="file" id="file" accept="image/*" hidden>
-
 <div class="bottomNav">
-  <button class="on" onclick="location.href='./create-post.html'">POST</button>
+  <button class="on">POST</button>
   <button onclick="location.href='./create-reels.html'">REELS</button>
   <button onclick="location.href='./create-story.html'">STORY</button>
   <button onclick="location.href='./live.html'">LIVE</button>
   <button onclick="location.href='./create-reels.html'">INSTANTS</button>
 </div>
+</div>
+
+<!-- ================= PAGE 2 - EDIT DA - UPLOAD ILLA DA ================= -->
+<div id="step2" class="step">
+<div class="top"><span onclick="showStep(1)">✕</span><b></b><span></span></div>
+<div class="step2Wrap">
+  <img id="editImg" src="" style="display:none">
+  <div id="editTextOverlay" style="position:absolute;top:40%;left:0;right:0;text-align:center;font-size:28px;font-weight:900;text-shadow:0 2px 10px #000;display:none"></div>
+  <div style="position:absolute;bottom:170px;left:0;right:0;text-align:center;color:#fff;font-size:13px">Swipe up to edit</div>
+  <div class="editTools">
+    <div onclick="addText()"><span>Aa</span>Text</div>
+    <div onclick="addSticker()"><span>😊</span>Stickers</div>
+    <div onclick="alert('Filter - Keela Irukku da')"><span>✨</span>Filter</div>
+    <div onclick="alert('Crop - Coming Soon da')"><span>✂️</span>Crop</div>
+  </div>
+</div>
+<div class="filterRow" id="filterRow">
+  <button class="on" onclick="setFilter('none',this)">Original</button>
+  <button onclick="setFilter('grayscale(1)',this)">B&W</button>
+  <button onclick="setFilter('sepia(.8)',this)">Sepia</button>
+  <button onclick="setFilter('saturate(1.8)',this)">Vivid</button>
+  <button onclick="setFilter('brightness(.8) contrast(1.1)',this)">Fade</button>
+</div>
+<div style="display:flex;gap:10px;padding:0 16px 16px;background:#000">
+  <button onclick="alert('Edit - Coming Soon da')" style="flex:1;background:#222;color:#fff;border:0;padding:14px;border-radius:20px">Edit</button>
+  <button onclick="showStep(3)" style="flex:1;background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;border:0;padding:14px;border-radius:20px;font-weight:900">Next →</button>
+</div>
+</div>
+
+<!-- ================= PAGE 3 - SHARE DA - ITHULA MATTUM UPLOAD DA ================= -->
+<div id="step3" class="step">
+<div class="top"><span onclick="showStep(2)">←</span><b>New post</b><span></span></div>
+<div style="display:flex;justify-content:center;padding:10px">
+  <div style="position:relative;width:200px;aspect-ratio:1/1;background:#000;border-radius:20px;overflow:hidden">
+    <img id="shareImg" src="" style="width:100%;height:100%;object-fit:cover;display:none">
+  </div>
+</div>
+<textarea id="captionInput" class="captionInput" placeholder="Write a caption and add hashtags..."></textarea>
+<div style="display:flex;gap:8px;padding:0 16px">
+  <button style="background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px" onclick="addHashtag()"># Hashtags</button>
+  <button style="background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px" onclick="alert('Poll - Coming Soon da')">☰ Poll</button>
+  <button style="background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px" onclick="alert('Prompt - Coming Soon da')">🔍 Prompt</button>
+</div>
+<div style="padding:16px">
+  <div style="display:flex;justify-content:space-between;padding:12px 0" onclick="alert('Tag people - Coming Soon da')"><span>👤 Tag people</span><span>›</span></div>
+  <div style="display:flex;justify-content:space-between;padding:12px 0" onclick="alert('Location - Coming Soon da')"><span>📍 Add location</span><span>›</span></div>
+  <div style="font-size:12px;color:#888">People you share this content with can see the location you tag and view this content on the map.</div>
+</div>
+<!-- ✅ UPLOAD - ITHULA MATTUM DA - PAGE 1 / 2 LA - UPLOAD ILLA DA -->
+<div style="display:flex;gap:10px;padding:0 16px 20px">
+  <button class="draftBtn" onclick="alert('Draft Saved da')">Save draft</button>
+  <button class="shareBtn" id="shareBtn" onclick="uploadPost()">Share</button>
+</div>
+<div id="uploadStatus" style="text-align:center;font-size:12px;color:#aaa;padding-bottom:20px"></div>
+</div>
+
+<input type="file" id="file" accept="image/*" hidden>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js?v=1037"></script>
-<script src="js/pixoro-core.js?v=1037"></script>
+<script src="js/supabase.js?v=1038"></script>
+<script src="js/pixoro-core.js?v=1038"></script>
 <script>
-// ✅ NO LOCALSTORAGE DA - MEMORY LA MATTUM DA
+// ✅ NO LOCALSTORAGE DA - MEMORY LA MATTUM DA - 3 STEP - 1 HTML LA DA - FILE POOGAATHU DA
 let postBg = 'black';
 let selectedFile = null;
 let selectedBlobUrl = '';
+let currentFilter = 'none';
 
+function showStep(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('on'));
+  document.getElementById('step'+n).classList.add('on');
+  window.scrollTo(0,0);
+}
 function applyPostBg(mode){
   let box = document.getElementById('previewBox');
   let img = document.getElementById('prev');
-  if(mode==='black'){ box.style.background='#000'; box.style.borderColor='#222'; img.style.background='#000'; img.style.objectFit='contain'; box.style.padding='0px'; }
-  if(mode==='transparent'){ box.style.background='repeating-conic-gradient(#222 0% 25%, #000 0% 50%) 50% / 20px 20px'; img.style.background='transparent'; img.style.objectFit='contain'; box.style.padding='0px'; }
+  if(mode==='black'){ box.style.background='#000'; box.style.borderColor='#222'; img.style.background='#000'; img.style.objectFit='contain'; }
+  if(mode==='transparent'){ box.style.background='repeating-conic-gradient(#222 0% 25%, #000 0% 50%) 50% / 20px 20px'; img.style.background='transparent'; img.style.objectFit='contain'; }
 }
 function setPostBg(mode, btn){
   document.querySelectorAll('.bgToggle button').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  postBg = mode;
-  applyPostBg(mode);
+  btn.classList.add('on'); postBg = mode; applyPostBg(mode);
 }
 applyPostBg(postBg);
 
-function showPreview(url){
-  let p = document.getElementById('prev');
-  p.src = url; p.style.display='block';
-  document.getElementById('emptyBox').style.display='none';
-  document.getElementById('captionBox').style.display='block';
+function setFilter(f, btn){
+  currentFilter = f;
+  document.querySelectorAll('#filterRow button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  ['prev','editImg','shareImg'].forEach(id=>{ let el=document.getElementById(id); if(el) el.style.filter=f; });
+}
+function addText(){
+  let t = prompt('Text ezhuthu da'); if(!t) return;
+  let o = document.getElementById('editTextOverlay'); o.textContent=t; o.style.display='block';
+}
+function addSticker(){
+  let s = prompt('Sticker emoji podu da - 😍 🔥 ❤️'); if(!s) return;
+  let o = document.getElementById('editTextOverlay'); o.textContent=(o.textContent+' '+s).trim(); o.style.display='block';
+}
+function addHashtag(){
+  let c=document.getElementById('captionInput'); c.value=c.value+' #pixoro '; c.focus();
+}
+function goToEditFromTop(){
+  if(!selectedFile){ alert('Photo Select Pannu da'); document.getElementById('file').click(); return; }
+  goToEdit();
 }
 
 document.getElementById('file').onchange = (e) => {
   let f = e.target.files[0]; if(!f) return;
   if(!f.type.startsWith('image/')){ alert('Post ku - Photo Mattum da - Video va - Reels la Podu da'); return; }
-  // ✅ REAL PHOTO DA - NEE GALLERY LA SELECT PANNA FILE DA
   let reader = new FileReader();
   reader.onload = function(){
     let img = new Image();
@@ -92,15 +172,16 @@ document.getElementById('file').onchange = (e) => {
         if(selectedBlobUrl) URL.revokeObjectURL(selectedBlobUrl);
         selectedFile = new File([blob], 'post.jpg', {type:'image/jpeg'});
         selectedBlobUrl = URL.createObjectURL(blob);
-        showPreview(selectedBlobUrl);
-        // ✅ FAKE TILE AH REPLACE PANNA Vendaam da - REAL PHOTO MATTUM KAAMIKKUROM DA
+        let p = document.getElementById('prev');
+        p.src = selectedBlobUrl; p.style.display='block';
+        document.getElementById('emptyBox').style.display='none';
         document.getElementById('noPhotoMsg').style.display='none';
         let grid = document.getElementById('grid');
         grid.innerHTML = '';
         let div = document.createElement('div');
-        div.className = 'tile'; div.innerHTML = '<img src="'+selectedBlobUrl+'">';
-        div.onclick = () => showPreview(selectedBlobUrl);
+        div.className='tile'; div.innerHTML='<img src="'+selectedBlobUrl+'">';
         grid.appendChild(div);
+        goToEdit();
       }, 'image/jpeg', 0.85);
     };
     img.src = reader.result;
@@ -108,23 +189,17 @@ document.getElementById('file').onchange = (e) => {
   reader.readAsDataURL(f);
 };
 
-function goNext(){
-  if(!selectedFile){
-    alert('Photo Select Pannu da - Aprom Next Pannu da');
-    document.getElementById('file').click();
-    return;
-  }
-  document.getElementById('captionBox').style.display='block';
-  document.getElementById('captionInput').focus();
-  document.getElementById('captionBox').scrollIntoView({behavior:'smooth'});
+function goToEdit(){
+  let eImg = document.getElementById('editImg'); eImg.src = selectedBlobUrl; eImg.style.display='block';
+  let sImg = document.getElementById('shareImg'); sImg.src = selectedBlobUrl; sImg.style.display='block';
+  showStep(2);
 }
 
 async function uploadPost(){
-  if(!selectedFile){ alert('Photo Select Pannu da'); return; }
-  let btn = document.getElementById('postBtn');
+  if(!selectedFile){ alert('Photo Select Pannu da'); showStep(1); return; }
+  let btn = document.getElementById('shareBtn');
   let status = document.getElementById('uploadStatus');
-  btn.disabled = true; btn.textContent = 'Uploading... ⏳';
-  status.textContent = 'Server ku Upload Aaguthu da...';
+  btn.disabled = true; btn.textContent = 'Sharing... ⏳'; status.textContent = 'Server ku Upload Aaguthu da...';
   try{
     if(!window.supabaseClient) throw new Error('Supabase connect aagala da - js/supabase.js check pannu da');
     let fileName = 'posts/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.jpg';
@@ -134,13 +209,11 @@ async function uploadPost(){
     let caption = document.getElementById('captionInput').value || '';
     let { error: dbError } = await window.supabaseClient.from('posts').insert([{ image_url: urlData.publicUrl, caption: caption, media_type: 'image' }]);
     if(dbError) throw dbError;
-    status.textContent = 'Posted da 🎉';
-    alert('Posted da 🎉 - Server la Save Aayiduchu da');
+    alert('Shared da 🎉 - Server la Save Aayiduchu da');
     location.href = './index.html';
   }catch(err){
-    console.error(err);
-    alert('Upload fail da - ' + (err.message || 'Try again da'));
-    btn.disabled = false; btn.textContent = 'Post Pannu da 🚀';
+    alert('Share fail da - ' + err.message);
+    btn.disabled = false; btn.textContent = 'Share';
   }
 }
 </script>
