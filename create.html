@@ -12,7 +12,7 @@
 <div class="top">
   <a href="index.html">✕ Cancel</a>
   <b>Create</b>
-  <b style="color:#0095f6">Next</b>
+  <b style="color:#0095f6;cursor:pointer" onclick="goNext()">Next</b>
 </div>
 
 <div class="tabs">
@@ -22,17 +22,14 @@
 </div>
 
 <div class="preview-box" id="previewBox">
-  <img id="previewImg">
-  <video id="previewVideo" controls loop></video>
-
-  <!-- ⬜ SKELETON BLOCK -->
+  <img id="previewImg" style="display:none">
+  <video id="previewVideo" controls loop style="display:none"></video>
   <div class="skeleton-wrap" id="placeholder">
     <div class="skeleton sk-big"></div>
     <div class="skeleton sk-line"></div>
     <div class="skeleton sk-line2"></div>
     <p id="placeholderText">Photo Select Pannu da</p>
   </div>
-
   <div id="storyTextOverlay"></div>
 </div>
 
@@ -79,8 +76,54 @@
   <input type="text" id="tags" placeholder="👥 People Tag Pannu da">
 </div>
 
-<button class="share-btn" onclick="shareNow()">Share → Pixoro</button>
+<button class="share-btn" onclick="goNext()">Share → Pixoro</button>
 
+<script src="./pixoro-store.js"></script>
 <script src="js/create.js"></script>
+<script>
+let curType = sessionStorage.getItem('pixoro_type') || 'post';
+function showTab(t){
+  curType = t; sessionStorage.setItem('pixoro_type', t);
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('btn-'+(t==='reel'?'reel':'post'))?.classList.add('active');
+  if(t==='reel') document.getElementById('btn-reel').classList.add('active');
+  if(t==='story') document.getElementById('btn-story').classList.add('active');
+  if(t==='post') document.getElementById('btn-post').classList.add('active');
+}
+let _oldOnFile = window.onFile;
+function onFile(input){
+  let f = input.files[0]; if(!f) return;
+  pixoroSave(curType, f);
+  sessionStorage.setItem('pixoro_caption', document.getElementById('caption').value || '');
+  let url = URL.createObjectURL(f);
+  document.getElementById('placeholder').style.display='none';
+  if(f.type.startsWith('video')){
+    let v=document.getElementById('previewVideo'); v.style.display='block'; v.src=url;
+    document.getElementById('previewImg').style.display='none';
+  } else {
+    let im=document.getElementById('previewImg'); im.style.display='block'; im.src=url;
+    document.getElementById('previewVideo').style.display='none';
+  }
+  if(typeof _oldOnFile==='function'){ try{ _oldOnFile(input); }catch(e){} }
+}
+function setEdit(){}
+function applyFilter(f, el){
+  document.getElementById('previewImg').style.filter=f;
+  document.getElementById('previewVideo').style.filter=f;
+  sessionStorage.setItem('pixoro_filter', f);
+  if(el){ document.querySelectorAll('#filterRow button').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
+}
+function addStoryText(){ let t=prompt('Text Eluthu da:'); if(t){ document.getElementById('storyTextOverlay').innerText=t; sessionStorage.setItem('pixoro_text', t); } }
+function addSticker(){ alert('Sticker - Next Update la da!'); }
+function addMusicStory(){ alert('Music - Next Update la da!'); }
+function goNext(){
+  pixoroGet(b=>{
+    if(!b){ alert('Mudhalla Photo Select Pannu da!'); return; }
+    sessionStorage.setItem('pixoro_caption', document.getElementById('caption').value || '');
+    location.href='./create-edit.html';
+  });
+}
+function shareNow(){ goNext(); }
+</script>
 </body>
 </html>
