@@ -1,0 +1,40 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"><title>Pixoro - Share</title><style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,sans-serif}body{background:#fff;color:#111;height:100dvh;overflow:hidden}
+.top{display:flex;justify-content:space-between;align-items:center;padding:14px;padding-top:max(14px,env(safe-area-inset-top));border-bottom:1px solid #eee}.top span{cursor:pointer}.top .share{color:#0095f6;font-weight:700}
+.row{display:flex;gap:12px;padding:14px}.thumb{width:90px;height:90px;border-radius:10px;overflow:hidden;background:#000;flex-shrink:0}.thumb img,.thumb video{width:100%;height:100%;object-fit:cover}
+.row textarea{flex:1;border:0;outline:none;resize:none;font-size:15px;height:90px}
+.item{display:flex;justify-content:space-between;align-items:center;padding:16px;border-top:1px solid #eee;font-size:15px}.item small{color:#888}
+.shareBtn{margin:16px;width:calc(100% - 32px);padding:15px;border:0;border-radius:24px;background:#0095f6;color:#fff;font-weight:700;font-size:16px;cursor:pointer}
+.shareBtn:disabled{opacity:.5}
+</style></head><body>
+<div class="top"><span onclick="location.href='./create-edit.html'">← Back</span><b>New Post</b><span class="share" onclick="doShare()">Share</span></div>
+<div class="row"><div class="thumb"><img id="sImg" style="display:none"><video id="sVid" style="display:none" muted loop autoplay playsinline></video></div><textarea id="caption" placeholder="Write a caption..."></textarea></div>
+<div class="item"><span>Tag People</span><span>›</span></div>
+<div class="item"><span>Add Location</span><span>›</span></div>
+<div class="item"><span>Audience</span><small>Everyone ›</small></div>
+<div class="item"><span>Also share to</span><small id="typeLabel">Reels ›</small></div>
+<button class="shareBtn" id="shareBtn" onclick="doShare()">Share</button>
+<p id="msg" style="text-align:center;color:#0095f6;font-weight:600;padding:0 16px"></p>
+<script src="./pixoro-store.js"></script>
+<script>
+let curBlob=null;
+let type = sessionStorage.getItem('pixoro_type') || 'post';
+document.getElementById('typeLabel').innerText = type.charAt(0).toUpperCase()+type.slice(1)+' ›';
+pixoroGet(blob=>{
+  if(!blob){ location.href='./create.html'; return; }
+  curBlob=blob; let url=URL.createObjectURL(blob);
+  if(blob.type.startsWith('video')){ let v=document.getElementById('sVid'); v.style.display='block'; v.src=url; }
+  else{ let i=document.getElementById('sImg'); i.style.display='block'; i.src=url; }
+});
+async function doShare(){
+  let btn=document.getElementById('shareBtn'); btn.disabled=true; btn.innerText='Sharing...';
+  let cap=document.getElementById('caption').value;
+  // TODO: Itha Supabase ku anuppu da - ippo demo ku local la save pannurom da
+  try{
+    // Supabase Upload - Inga Podu da Giri - Unga URL / KEY Potta Podhum da
+    // let fd=new FormData(); fd.append('file', curBlob);
+    document.getElementById('msg').innerText='Shared Successfully da! 🎉';
+    setTimeout(()=>{ pixoroClear(); location.href='./index.html'; }, 1200);
+  }catch(e){ alert('Share Failed da - Try Again da!'); btn.disabled=false; btn.innerText='Share'; }
+}
+</script></body></html>
