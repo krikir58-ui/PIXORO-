@@ -94,7 +94,7 @@ function renderFeedList(){
   }
   list = list.filter(p=>{ let m=feedGetMedia(p); return m.url && m.url.includes('http'); });
   if(!list.length){
-    box.innerHTML = `<div style="padding:40px;text-align:center;color:#888">No posts yet da<br><button onclick="location.href='./post-create.html'" style="margin-top:12px;background:#FF2DCC;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:800">+ Post Pannu da</button></div>`;
+    box.innerHTML = `<div style="padding:40px;text-align:center;color:#888">No posts yet da<br><button onclick="location.href='./create.html'" style="margin-top:12px;background:#FF2DCC;color:#fff;border:0;padding:10px 18px;border-radius:20px;font-weight:800">+ Post Pannu da</button></div>`;
     return;
   }
   box.innerHTML = list.map(p=>{
@@ -186,7 +186,8 @@ async function loadFeed(){
   renderFeedList();
   if(window.loadStories) window.loadStories();
 }
-function showChoice(){ let c=document.getElementById('choice'); if(c) c.style.display='flex'; }
+// ✅ CORRECT - + Thotta - Direct ah Create ku Pogum da - Choice Sheet Venaam da
+function showChoice(){ location.href = './create.html'; }
 function hideChoice(){ let c=document.getElementById('choice'); if(c) c.style.display='none'; }
 window.showChoice=showChoice; window.hideChoice=hideChoice;
 function sharePost(id){ let u=location.origin+'/index.html?id='+id; if(navigator.share){ navigator.share({title:'Pixoro',url:u}); } else { navigator.clipboard.writeText(u); showToast('Link Copy Aachu da'); } }
