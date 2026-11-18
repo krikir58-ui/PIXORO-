@@ -1,0 +1,7 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Share Reels - Pixoro</title><link rel="stylesheet" href="css/pixoro-style.css"></head><body>
+<div class="top"><b onclick="history.back()">←</b><b>Share Reels</b><b></b></div>
+<div class="preview" style="max-height:300px"><video autoplay loop muted playsinline id="uVid"></video></div>
+<textarea id="cap" rows="3" placeholder="Reels caption ezhuthu da... 🔥"></textarea>
+<button class="share" onclick="share()">Share Reels →</button>
+<script>let v=document.getElementById('uVid');v.src=localStorage.getItem('pixoro_temp_reel')||'https://cdn.pixabay.com/video/2020/05/25/40130-424930032_large.mp4';v.style.filter=localStorage.getItem('pixoro_temp_reel_filter')||'none';function share(){let reels=JSON.parse(localStorage.getItem('pixoro_reels')||'[]');reels.unshift({id:Date.now(),user:'giri_pixoro',img:'https://i.pravatar.cc/100?img=12',video:localStorage.getItem('pixoro_temp_reel'),caption:document.getElementById('cap').value||'Pixoro Reels da! 🔥',likes:0,comments:[]});localStorage.setItem('pixoro_reels',JSON.stringify(reels));location.href='./reels-view.html'}</script>
+</body></html>
