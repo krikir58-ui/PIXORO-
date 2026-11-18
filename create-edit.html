@@ -1,0 +1,37 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"><title>Pixoro - Edit</title><style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,sans-serif}body{background:#000;color:#fff;height:100dvh;overflow:hidden}
+.app{width:100%;height:100dvh;position:relative;background:#000}
+.top{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:16px;padding-top:max(16px,env(safe-area-inset-top));background:linear-gradient(to bottom,rgba(0,0,0,.85),transparent)}.top span{cursor:pointer;text-shadow:0 1px 5px #000}.top .next{color:#0095f6;font-weight:700}
+.preview{position:absolute;inset:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden}.preview img,.preview video{width:100%;height:100%;object-fit:cover}
+.overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:30px;font-weight:800;text-align:center;text-shadow:0 2px 10px #000;max-width:90%;word-break:break-word;z-index:5}
+.bottom{position:absolute;bottom:0;left:0;right:0;z-index:10;background:linear-gradient(to top,rgba(0,0,0,.9),transparent);padding:12px;padding-bottom:max(12px,env(safe-area-inset-bottom))}
+.tools{display:flex;gap:8px;overflow-x:auto;margin-bottom:10px;scrollbar-width:none}.tools::-webkit-scrollbar{display:none}.tools button{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);padding:10px 14px;border-radius:20px;white-space:nowrap;backdrop-filter:blur(10px);cursor:pointer}
+.cap input{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.5);color:#fff;outline:none;margin-bottom:10px}
+.bRow{display:flex;gap:10px}.bRow button{flex:1;padding:14px;border-radius:24px;border:0;font-weight:700;font-size:15px;cursor:pointer}.b1{background:rgba(255,255,255,.2);color:#fff}.b2{background:#0095f6;color:#fff}
+</style></head><body><div class="app">
+<div class="top"><span onclick="location.href='./create.html'">← Back</span><b>Edit</b><span class="next" onclick="location.href='./create-share.html'">Next</span></div>
+<div class="preview"><img id="eImg" style="display:none"><video id="eVid" style="display:none" muted loop autoplay playsinline></video><div class="overlay" id="overlay"></div></div>
+<div class="bottom"><div class="tools"><button onclick="addText()">🎵 Audio</button><button onclick="addText()">🔤 Text</button><button onclick="alert('Voice - Next Update la da!')">🎙️ Voice</button><button onclick="alert('Captions - Next Update la da!')">💬 Captions</button><button onclick="alert('Stickers - Next Update la da!')">😀 Stickers</button><button onclick="changeFilter()">✨ Filter</button></div><div class="cap"><input id="editText" placeholder="Text Eluthu da..." oninput="document.getElementById('overlay').innerText=this.value;sessionStorage.setItem('pixoro_text',this.value)"></div><div class="bRow"><button class="b1" onclick="location.href='./create.html'">Discard</button><button class="b2" onclick="location.href='./create-share.html'">Next →</button></div></div>
+</div>
+<script src="./pixoro-store.js"></script>
+<script>
+let curFilter = sessionStorage.getItem('pixoro_filter') || 'none';
+pixoroGet(blob => {
+  if(!blob){ location.href='./create.html'; return; }
+  let url = URL.createObjectURL(blob);
+  let isVideo = blob.type.startsWith('video');
+  let img = document.getElementById('eImg'), vid = document.getElementById('eVid');
+  if(isVideo){ vid.style.display='block'; vid.src=url; vid.style.filter=curFilter; }
+  else{ img.style.display='block'; img.src=url; img.style.filter=curFilter; }
+  document.getElementById('overlay').innerText = sessionStorage.getItem('pixoro_text')||'';
+  document.getElementById('editText').value = sessionStorage.getItem('pixoro_text')||'';
+});
+function addText(){ let v=prompt('Text Eluthu da:'); if(v){ document.getElementById('overlay').innerText=v; document.getElementById('editText').value=v; sessionStorage.setItem('pixoro_text',v); } }
+function changeFilter(){
+  let f2=prompt('Filter: original / bw / vivid / sepia');
+  let map={bw:'grayscale(1)',vivid:'contrast(1.3) saturate(1.4)',sepia:'sepia(.8)',original:'none'};
+  let nf=map[f2]||'none'; curFilter=nf;
+  document.getElementById('eImg').style.filter=nf; document.getElementById('eVid').style.filter=nf;
+  sessionStorage.setItem('pixoro_filter',nf);
+}
+</script></body></html>
