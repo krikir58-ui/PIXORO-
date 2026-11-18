@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>New reel - Pixoro</title>
-<link rel="stylesheet" href="css/create-reels.css?v=1035">
+<link rel="stylesheet" href="css/create-reels.css?v=1037">
 </head>
 <body>
 <div class="top"><span onclick="location.href='./index.html'">✕</span><b>New reel</b><span>⚙️</span></div>
-<div class="tabs"><div>🎬 Edits</div><div>📁 Drafts · 2</div><div>📋 Templates</div></div>
+<div class="tabs"><div>🎬 Edits</div><div>📁 Drafts</div><div>📋 Templates</div></div>
 
 <div class="bgToggle">
   <button class="on" onclick="setGridBg('black',this)">⬛ Black Block</button>
@@ -16,17 +16,23 @@
 </div>
 
 <div class="preview" id="previewBox">
-  <div class="empty" id="emptyBox">📷<small>Video / Photo Select Pannu da<br>Black la Varum da</small></div>
+  <div class="empty" id="emptyBox">📷<small>Video / Photo Select Pannu da<br>Real File Mattum Varum da</small></div>
   <img id="prevImg" src="" style="display:none">
   <video id="prevVid" src="" style="display:none" muted loop playsinline></video>
 </div>
 
-<div class="head"><b>Recents ⌄</b><button onclick="document.getElementById('file').click()">☑️ Select</button></div>
+<div class="head"><b>Your File</b><button onclick="document.getElementById('file').click()">☑️ Select Real Video / Photo</button></div>
 
-<div class="grid" id="grid">
-  <div class="tile cam" onclick="document.getElementById('file').click()">📷<br><small>Gallery</small></div>
-  <div class="tile" onclick="document.getElementById('file').click()">➕<br><small>Add</small></div>
-  <div class="tile" onclick="document.getElementById('file').click()">➕<br><small>Add</small></div>
+<!-- ✅ CAPTION + UPLOAD - SAME PAGE LA DA - EDIT PAGE KU POGA VENDAAM DA - FILE POOGAATHU DA -->
+<div id="captionBox" style="display:none;padding:0 16px 12px;background:#000">
+  <textarea id="captionInput" placeholder="Reel caption ezhuthu da..." style="width:100%;min-height:60px;background:#111;border:1px solid #222;border-radius:14px;color:#fff;padding:12px;font-size:14px"></textarea>
+  <button id="postBtn" onclick="uploadReel()" style="width:100%;margin-top:10px;background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:0;color:#fff;font-weight:900;padding:14px;border-radius:20px;font-size:15px;cursor:pointer">Reel Post Pannu da 🚀</button>
+  <div id="uploadStatus" style="text-align:center;font-size:12px;color:#aaa;margin-top:8px"></div>
+</div>
+
+<!-- ✅ FAKE TILE ILLA DA - GALLERY / + / + - DELETE DA - SELECT PANNA FILE MATTUM DA -->
+<div class="grid" id="grid" style="padding:0 16px 90px">
+  <div id="noPhotoMsg" style="grid-column:1/-1;text-align:center;color:#777;font-size:13px;padding:20px">Innum File Select Pannala da<br>Select Button ah Thodu da - Gallery Open Aagum da</div>
 </div>
 
 <input type="file" id="file" accept="video/*,image/*" hidden>
@@ -40,18 +46,19 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js?v=1035"></script>
-<script src="js/pixoro-core.js?v=1035"></script>
+<script src="js/supabase.js?v=1037"></script>
+<script src="js/pixoro-core.js?v=1037"></script>
 <script>
-// ✅ NO LOCALSTORAGE DA - MEMORY LA MATTUM DA - 50MB VIDEO Kooda CRASH AAGAATHU DA
+// ✅ NO LOCALSTORAGE DA - MEMORY LA MATTUM DA - VARIABLE LA MATTUM DA
 let reelBg = 'black';
-window.__pixoroMedia = null; // { file, url, type }
-window.__pixoroReelFile = null;
+let selectedFile = null;
+let selectedUrl = '';
+let selectedType = 'image';
 
 function setGridBg(mode, btn){
   document.querySelectorAll('.bgToggle button').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  reelBg = mode; // ✅ localStorage ILLA DA - VARIABLE MATTUM DA
+  reelBg = mode;
   let preview = document.getElementById('previewBox');
   let img = document.getElementById('prevImg');
   let vid = document.getElementById('prevVid');
@@ -63,23 +70,24 @@ setGridBg('black', document.querySelectorAll('.bgToggle button')[0]);
 document.getElementById('file').onchange = (e) => {
   let f = e.target.files[0]; if(!f) return;
   let isVideo = f.type.includes('video');
-  let url = URL.createObjectURL(f); // ✅ DATA URL ILLA DA - BLOB URL DA - MEMORY LA MATTUM DA - FAST DA
-  window.__pixoroMedia = { file: f, url: url, type: isVideo ? 'video' : 'image' };
-  window.__pixoroReelFile = f;
+  if(isVideo && f.size > 100*1024*1024){ alert('Video - 100MB ku Mela Irukku da - Chinna Video Select Pannu da'); return; }
 
+  // ✅ VIDEO NA - DIRECT BLOB URL DA - COMPRESS PANNA VENDAAM DA - QUALITY POOGAATHU DA
   if(isVideo){
-    if(f.size > 100*1024*1024){ alert('Video - 100MB ku Mela Irukku da - Chinna Video Select Pannu da'); return; }
+    if(selectedUrl) URL.revokeObjectURL(selectedUrl);
+    selectedFile = f; selectedType = 'video'; selectedUrl = URL.createObjectURL(f);
     let v = document.getElementById('prevVid');
-    v.src = url; v.style.display='block'; v.play();
+    v.src = selectedUrl; v.style.display='block'; v.play();
     document.getElementById('prevImg').style.display='none';
     document.getElementById('emptyBox').style.display='none';
-    // ✅ NEXT PAGE KU - FILE AH - DIRECT AH - PASS PANNA - IndexedDB / Supabase Upload - Inga Thaan Pannanum da
-    // Edit page la - window.opener / Supabase la irundhu edukkanum da - localStorage la VAIKKAVE KOODATHU DA
-    setTimeout(()=>{ goToEdit(); }, 500);
+    document.getElementById('captionBox').style.display='block';
+    document.getElementById('noPhotoMsg').style.display='none';
+    let grid = document.getElementById('grid');
+    grid.innerHTML = '<div class="tile"><video src="'+selectedUrl+'" muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video></div>';
     return;
   }
 
-  // IMAGE - CANVAS BLACK DA - AANA - localStorage LA VAIKKALA DA
+  // ✅ IMAGE NA - BLACK CANVAS LA - CONVERT PANNI - REAL FILE AH - VAIKKUROM DA
   let reader = new FileReader();
   reader.onload = function(){
     let img = new Image();
@@ -92,14 +100,17 @@ document.getElementById('file').onchange = (e) => {
       ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
       ctx.drawImage(img,0,0,w,h);
       canvas.toBlob((blob)=>{
-        let blobUrl = URL.createObjectURL(blob);
-        let blobFile = new File([blob], 'reel.jpg', {type:'image/jpeg'});
-        window.__pixoroMedia = { file: blobFile, url: blobUrl, type:'image' };
-        window.__pixoroReelFile = blobFile;
+        if(selectedUrl) URL.revokeObjectURL(selectedUrl);
+        selectedFile = new File([blob], 'reel.jpg', {type:'image/jpeg'});
+        selectedType = 'image'; selectedUrl = URL.createObjectURL(blob);
         let p = document.getElementById('prevImg');
-        p.src = blobUrl; p.style.display='block';
+        p.src = selectedUrl; p.style.display='block';
+        document.getElementById('prevVid').style.display='none';
         document.getElementById('emptyBox').style.display='none';
-        setTimeout(()=>{ goToEdit(); }, 400);
+        document.getElementById('captionBox').style.display='block';
+        document.getElementById('noPhotoMsg').style.display='none';
+        let grid = document.getElementById('grid');
+        grid.innerHTML = '<div class="tile"><img src="'+selectedUrl+'"></div>';
       }, 'image/jpeg', 0.85);
     };
     img.src = reader.result;
@@ -107,15 +118,28 @@ document.getElementById('file').onchange = (e) => {
   reader.readAsDataURL(f);
 };
 
-function goToEdit(){
-  // ✅ NO LOCALSTORAGE DA - EDIT PAGE KU PONA - FILE POYIDUM NU BAYAPADATHA DA
-  // Sariyaana Vazhi: Ingaye - Supabase ku Upload Pannidu da - Aprom Edit Page la - URL la irundhu Edu da
-  // Temporary ah - Edit page ku pogama - Ingaye - Upload Pannu nu - Alert kaamikuren da
-  if(window.__pixoroMedia && window.__pixoroMedia.file){
-    // Upload function - js/pixoro-core.js la irundha - Inga call pannu da
-    // uploadReelFile(window.__pixoroMedia.file) - nu - Neenga - Supabase ku Upload Pannanum da
-    alert('File Ready da ✅ - localStorage la Vaikkala da - Ippo - Supabase ku Upload Pannu da');
-    // location.href = './create-reels-edit.html'; // ❌ Itha - Ippo - Use Panna Vendaam da - File Poyidum da
+async function uploadReel(){
+  if(!selectedFile){ alert('File Select Pannu da'); document.getElementById('file').click(); return; }
+  let btn = document.getElementById('postBtn');
+  let status = document.getElementById('uploadStatus');
+  btn.disabled = true; btn.textContent = 'Uploading... ⏳';
+  status.textContent = 'Server ku Upload Aaguthu da...';
+  try{
+    if(!window.supabaseClient) throw new Error('Supabase connect aagala da - js/supabase.js check pannu da');
+    let ext = selectedType==='video' ? 'mp4' : 'jpg';
+    let fileName = 'reels/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.' + ext;
+    let { error } = await window.supabaseClient.storage.from('reels').upload(fileName, selectedFile);
+    if(error) throw error;
+    let { data: urlData } = window.supabaseClient.storage.from('reels').getPublicUrl(fileName);
+    let caption = document.getElementById('captionInput').value || '';
+    let { error: dbError } = await window.supabaseClient.from('posts').insert([{ image_url: selectedType==='image' ? urlData.publicUrl : null, video_url: selectedType==='video' ? urlData.publicUrl : null, caption: caption, media_type: selectedType }]);
+    if(dbError) throw dbError;
+    status.textContent = 'Posted da 🎉';
+    alert('Reel Posted da 🎉 - Server la Save Aayiduchu da');
+    location.href = './index.html';
+  }catch(err){
+    alert('Upload fail da - ' + err.message);
+    btn.disabled = false; btn.textContent = 'Reel Post Pannu da 🚀';
   }
 }
 </script>
