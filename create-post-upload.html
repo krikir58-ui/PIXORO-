@@ -1,0 +1,7 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Share Post - Pixoro</title><link rel="stylesheet" href="css/pixoro-style.css"></head><body>
+<div class="top"><b onclick="history.back()">←</b><b>Share Post</b><b></b></div>
+<div class="preview" style="max-height:300px"><img id="uImg"></div>
+<textarea id="cap" rows="3" placeholder="Caption ezhuthu da... #pixoro"></textarea>
+<button class="share" onclick="share()">Share Post →</button>
+<script>document.getElementById('uImg').src=localStorage.getItem('pixoro_temp_post')||'https://picsum.photos/450/450?random=10';document.getElementById('uImg').style.filter=localStorage.getItem('pixoro_temp_filter')||'none';function share(){let posts=JSON.parse(localStorage.getItem('pixoro_posts')||'[]');posts.unshift({id:Date.now(),user:'giri_pixoro',img:'https://i.pravatar.cc/100?img=12',photo:localStorage.getItem('pixoro_temp_post'),caption:document.getElementById('cap').value||'Pixoro la new post da! 🔥',likes:0});localStorage.setItem('pixoro_posts',JSON.stringify(posts));location.href='./index.html'}</script>
+</body></html>
