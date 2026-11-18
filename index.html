@@ -4,24 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Pixoro - Final Mass Killa</title>
-<link rel="stylesheet" href="style.css?v=1027">
-<link rel="stylesheet" href="css/feed.css?v=1027">
-<link rel="stylesheet" href="css/comments.css?v=1027">
-<link rel="stylesheet" href="css/plus.css?v=1027">
+<link rel="stylesheet" href="style.css?v=1028">
+<link rel="stylesheet" href="css/feed.css?v=1028">
+<link rel="stylesheet" href="css/comments.css?v=1028">
+<link rel="stylesheet" href="css/plus.css?v=1028">
+<link rel="stylesheet" href="css/pixoro-style.css?v=1028">
 </head>
 <body>
-<div class="top"><b style="font-size:26px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="location.href='./notification.html'"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span id="pixoroBellDot" style="display:none;position:absolute;top:-2px;right:2px;width:10px;height:10px;background:#FF0A33;border-radius:50%;border:2px solid #000"></span></div></div></div>
+<div class="top"><b style="font-size:26px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="showChoice()">+</div><div class="bellWhite" onclick="location.href='./notification.html'" style="position:relative"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span id="pixoroBellDot" style="display:none;position:absolute;top:-2px;right:2px;width:10px;height:10px;background:#FF0A33;border-radius:50%;border:2px solid #000"></span></div></div></div>
+
 <div id="singleBanner" class="singleBanner" style="display:none">Single Post View - <span onclick="location.href='./index.html'" style="text-decoration:underline;cursor:pointer">Back to Feed</span></div>
-<div class="storyBar" id="storyBar"></div>
+
+<!-- ✅ FIX: storyBar + storyRow - Rendum ID - stories.js ku Match da -->
+<div class="storyBar" id="storyBar"><div id="storyRow" class="story-row" style="display:flex;gap:12px;overflow-x:auto;padding:10px 12px"></div></div>
+
 <div class="feedTabs"><div class="feedTab active" id="tabForYou" onclick="setFeedMode('foryou')">For You</div><div class="feedTab" id="tabFollowing" onclick="setFeedMode('following')">Following</div><div class="feedTab" id="tabLatest" onclick="setFeedMode('latest')">Latest</div></div>
 <div id="trendBar" class="trendBar" style="display:none"></div>
 <div id="feed"><div class="skel"></div><div class="skel"></div></div>
 <div id="toast" class="toast"></div>
+
 <div id="miniBox" style="position:fixed;bottom:64px;left:12px;right:12px;max-width:426px;margin:auto;background:#1a0b2e;border:1px solid #a259ff;border-radius:14px;padding:10px;display:none;z-index:2000;align-items:center;gap:10px">
 <img id="miniImg" style="width:44px;height:60px;object-fit:cover;border-radius:8px">
 <div style="flex:1"><div style="font-weight:700;font-size:13px">Uploading Reel... <span id="miniPct">0%</span></div><div style="font-size:11px;color:#aaa" id="miniTxt">Mella Upload Aaguthu da - Feed Paakalam da</div><div style="height:6px;background:#333;border-radius:20px;overflow:hidden;margin-top:6px"><div id="miniFill" style="height:100%;width:0%;background:linear-gradient(90deg,#7b2fff,#ff2dcc);transition:.3s"></div></div></div>
 <span onclick="document.getElementById('miniBox').style.display='none'" style="cursor:pointer">X</span>
 </div>
+
 <div class="bottom-nav">
 <a class="active" href="./index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
 <a href="./search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
@@ -29,6 +36,7 @@
 <a href="./dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
 <a href="./profile.html"><img class="navPfp" id="navPfp" src="" style="background:#222"><span>Profile</span></a>
 </div>
+
 <div id="commentModal" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #333"><b>Comments</b><span onclick="closeComment()" style="font-size:22px">X</span></div><div id="commentList" style="flex:1;overflow-y:auto;padding:12px"></div><div style="padding:10px;border-top:1px solid #333;display:flex;gap:10px"><div id="myCommentPfpWrap" style="width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#222"></div><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#000;border:1px solid #333;padding:12px 14px;border-radius:20px;color:#fff"><button onclick="addComment()" style="background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:0;color:#fff;font-weight:900;padding:10px 16px;border-radius:20px">Post</button></div></div></div>
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
 
@@ -43,16 +51,24 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js?v=1027"></script>
-<script src="js/pixoro-core.js?v=1027"></script>
-<script src="js/plus.js?v=1027"></script>
-<script src="js/avatar.js?v=1027"></script>
-<script src="js/follow.js?v=1027"></script>
-<script src="js/likes.js?v=1027"></script>
-<script src="js/comments.js?v=1027"></script>
-<script src="js/share.js?v=1027"></script>
-<script src="js/save.js?v=1027"></script>
-<script src="js/stories.js?v=1027"></script>
-<script src="js/feed.js?v=1027"></script>
+<!-- ✅ ORDER CORRECT DA - Supa -> Core -> Visibility -> Feed da -->
+<script src="js/supabase.js?v=1028"></script>
+<script src="js/pixoro-core.js?v=1028"></script>
+<script src="js/reels-visibility.js?v=1028"></script>
+<script src="js/plus.js?v=1028"></script>
+<script src="js/avatar.js?v=1028"></script>
+<script src="js/follow.js?v=1028"></script>
+<script src="js/likes.js?v=1028"></script>
+<script src="js/comments.js?v=1028"></script>
+<script src="js/share.js?v=1028"></script>
+<script src="js/save.js?v=1028"></script>
+<script src="js/stories.js?v=1028"></script>
+<script src="js/feed.js?v=1028"></script>
+<script>
+  // ✅ FIX: showChoice - Choice ah Kaamikkum da - feed.js la irundha - Override Aagathu da
+  // feed.js la showChoice() -> create.html nu irukku - Itha Vachitta - Choice Varum da
+  window.showChoice = function(){ let c=document.getElementById('choice'); if(c) c.classList.add('show'); };
+  window.hideChoice = function(){ let c=document.getElementById('choice'); if(c) c.classList.remove('show'); };
+</script>
 </body>
 </html>
