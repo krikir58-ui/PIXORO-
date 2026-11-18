@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create - Pixoro</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/create.css">
+</head>
+<body>
+
+<div class="top">
+  <a href="index.html">✕ Cancel</a>
+  <b>Create</b>
+  <b style="color:#0095f6">Next</b>
+</div>
+
+<div class="tabs">
+  <button id="btn-post" class="active" onclick="showTab('post')">Post</button>
+  <button id="btn-reel" onclick="showTab('reel')">Reels</button>
+  <button id="btn-story" onclick="showTab('story')">Story</button>
+</div>
+
+<div class="preview-box" id="previewBox">
+  <img id="previewImg">
+  <video id="previewVideo" controls loop></video>
+
+  <!-- ⬜ SKELETON BLOCK -->
+  <div class="skeleton-wrap" id="placeholder">
+    <div class="skeleton sk-big"></div>
+    <div class="skeleton sk-line"></div>
+    <div class="skeleton sk-line2"></div>
+    <p id="placeholderText">Photo Select Pannu da</p>
+  </div>
+
+  <div id="storyTextOverlay"></div>
+</div>
+
+<div class="select-btns">
+  <label for="fileInput">📁 Gallery</label>
+  <button onclick="document.getElementById('fileInput').click()">📷 Camera</button>
+  <input type="file" id="fileInput" accept="image/*,video/*" hidden onchange="onFile(this)">
+</div>
+
+<div class="edit-bar" id="editBar">
+  <button onclick="setEdit('crop')">✂️ Crop</button>
+  <button onclick="setEdit('filter')" class="active">🎨 Filter</button>
+  <button onclick="setEdit('bright')">☀️ Bright</button>
+  <button onclick="setEdit('text')">🔤 Text</button>
+</div>
+
+<div class="filters" id="filterRow">
+  <button class="active" onclick="applyFilter('none',this)">Original</button>
+  <button onclick="applyFilter('grayscale(1)',this)">B&W</button>
+  <button onclick="applyFilter('sepia(1)',this)">Sepia</button>
+  <button onclick="applyFilter('contrast(1.4) saturate(1.5)',this)">Vivid</button>
+  <button onclick="applyFilter('brightness(1.2) saturate(0.5)',this)">Fade</button>
+  <button onclick="applyFilter('hue-rotate(90deg)',this)">Cool</button>
+</div>
+
+<div class="music-row" id="musicRow">
+  <select id="musicSelect">
+    <option value="">🎵 Music Select Pannu da</option>
+    <option value="trending">Trending - Tamil Beat</option>
+    <option value="chill">Chill - LoFi</option>
+    <option value="mass">Mass - Kuthu</option>
+  </select>
+</div>
+
+<div class="story-tools" id="storyTools">
+  <button onclick="addStoryText()">🔤 Text Add</button>
+  <button onclick="addSticker()">😍 Sticker</button>
+  <button onclick="addMusicStory()">🎵 Music</button>
+</div>
+
+<div class="box">
+  <textarea id="caption" placeholder="Caption ezhuthu da... ✨ #pixoro"></textarea>
+  <input type="text" id="location" placeholder="📍 Location Add Pannu da">
+  <input type="text" id="tags" placeholder="👥 People Tag Pannu da">
+</div>
+
+<button class="share-btn" onclick="shareNow()">Share → Pixoro</button>
+
+<script src="js/create.js"></script>
+</body>
+</html>
