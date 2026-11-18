@@ -1,129 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Create - Pixoro</title>
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="css/create.css">
-</head>
-<body>
-
-<div class="top">
-  <a href="index.html">✕ Cancel</a>
-  <b>Create</b>
-  <b style="color:#0095f6;cursor:pointer" onclick="goNext()">Next</b>
-</div>
-
-<div class="tabs">
-  <button id="btn-post" class="active" onclick="showTab('post')">Post</button>
-  <button id="btn-reel" onclick="showTab('reel')">Reels</button>
-  <button id="btn-story" onclick="showTab('story')">Story</button>
-</div>
-
-<div class="preview-box" id="previewBox">
-  <img id="previewImg" style="display:none">
-  <video id="previewVideo" controls loop style="display:none"></video>
-  <div class="skeleton-wrap" id="placeholder">
-    <div class="skeleton sk-big"></div>
-    <div class="skeleton sk-line"></div>
-    <div class="skeleton sk-line2"></div>
-    <p id="placeholderText">Photo Select Pannu da</p>
-  </div>
-  <div id="storyTextOverlay"></div>
-</div>
-
-<div class="select-btns">
-  <label for="fileInput">📁 Gallery</label>
-  <button onclick="document.getElementById('fileInput').click()">📷 Camera</button>
-  <input type="file" id="fileInput" accept="image/*,video/*" hidden onchange="onFile(this)">
-</div>
-
-<div class="edit-bar" id="editBar">
-  <button onclick="setEdit('crop')">✂️ Crop</button>
-  <button onclick="setEdit('filter')" class="active">🎨 Filter</button>
-  <button onclick="setEdit('bright')">☀️ Bright</button>
-  <button onclick="setEdit('text')">🔤 Text</button>
-</div>
-
-<div class="filters" id="filterRow">
-  <button class="active" onclick="applyFilter('none',this)">Original</button>
-  <button onclick="applyFilter('grayscale(1)',this)">B&W</button>
-  <button onclick="applyFilter('sepia(1)',this)">Sepia</button>
-  <button onclick="applyFilter('contrast(1.4) saturate(1.5)',this)">Vivid</button>
-  <button onclick="applyFilter('brightness(1.2) saturate(0.5)',this)">Fade</button>
-  <button onclick="applyFilter('hue-rotate(90deg)',this)">Cool</button>
-</div>
-
-<div class="music-row" id="musicRow">
-  <select id="musicSelect">
-    <option value="">🎵 Music Select Pannu da</option>
-    <option value="trending">Trending - Tamil Beat</option>
-    <option value="chill">Chill - LoFi</option>
-    <option value="mass">Mass - Kuthu</option>
-  </select>
-</div>
-
-<div class="story-tools" id="storyTools">
-  <button onclick="addStoryText()">🔤 Text Add</button>
-  <button onclick="addSticker()">😍 Sticker</button>
-  <button onclick="addMusicStory()">🎵 Music</button>
-</div>
-
-<div class="box">
-  <textarea id="caption" placeholder="Caption ezhuthu da... ✨ #pixoro"></textarea>
-  <input type="text" id="location" placeholder="📍 Location Add Pannu da">
-  <input type="text" id="tags" placeholder="👥 People Tag Pannu da">
-</div>
-
-<button class="share-btn" onclick="goNext()">Share → Pixoro</button>
-
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"><title>Create - Pixoro</title><style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+body{background:#000;color:#fff;height:100dvh;overflow:hidden}
+.top{display:flex;justify-content:space-between;align-items:center;padding:14px;padding-top:max(14px,env(safe-area-inset-top));background:#000;position:relative;z-index:10}
+.top a{color:#fff;text-decoration:none;font-size:15px}
+.top b{font-size:17px}
+.top .next{color:#0095f6;cursor:pointer}
+.tabs{display:flex;justify-content:center;gap:8px;padding:10px;background:#000}
+.tabs button{background:#262626;color:#a8a8a8;border:0;padding:9px 20px;border-radius:20px;font-weight:700;font-size:14px;cursor:pointer}
+.tabs button.active{background:#fff;color:#000}
+.preview{width:100%;height:52dvh;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.preview img,.preview video{width:100%;height:100%;object-fit:cover;display:none}
+.preview .ph{color:#8a8a8a;font-size:15px;text-align:center}
+.mid{padding:12px;background:#000}
+.row2{display:flex;gap:10px}
+.row2 button{flex:1;padding:13px;border:0;border-radius:10px;background:#262626;color:#fff;font-weight:600;font-size:14px;cursor:pointer}
+.filters{display:flex;gap:8px;overflow-x:auto;padding:12px 12px 0;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filters button{background:#262626;color:#fff;border:0;padding:10px 14px;border-radius:20px;white-space:nowrap;cursor:pointer}
+.filters button.active{background:#fff;color:#000}
+.box{padding:12px}
+.box textarea,.box input{width:100%;background:#262626;border:0;border-radius:10px;color:#fff;padding:12px;margin-bottom:8px;outline:none;font-size:14px}
+.share{margin:0 12px 12px;width:calc(100% - 24px);padding:14px;border:0;border-radius:24px;background:#0095f6;color:#fff;font-weight:700;font-size:16px;cursor:pointer}
+.scroll{height:calc(100dvh - 52dvh - 98px);overflow-y:auto}
+</style></head><body>
+<div class="top"><a href="index.html">✕ Cancel</a><b>Create</b><b class="next" onclick="goNext()">Next</b></div>
+<div class="tabs"><button id="t-post" class="active" onclick="setType('post')">Post</button><button id="t-reels" onclick="setType('reels')">Reels</button><button id="t-story" onclick="setType('story')">Story</button></div>
+<div class="preview"><div class="ph" id="ph">📸<br><br>Photo Select Pannu da</div><img id="pImg"><video id="pVid" muted loop autoplay playsinline></video></div>
+<div class="scroll"><div class="mid"><div class="row2"><button onclick="document.getElementById('f1').click()">📁 Gallery</button><button onclick="document.getElementById('f1').click()">📷 Camera</button></div></div>
+<input type="file" id="f1" accept="image/*,video/*" hidden>
+<div class="filters"><button class="active" onclick="setF('none',this)">Original</button><button onclick="setF('grayscale(1)',this)">B&W</button><button onclick="setF('sepia(1)',this)">Sepia</button><button onclick="setF('contrast(1.4) saturate(1.5)',this)">Vivid</button><button onclick="setF('brightness(1.2) saturate(0.5)',this)">Fade</button><button onclick="setF('hue-rotate(90deg)',this)">Cool</button></div>
+<div class="box"><textarea id="cap" placeholder="Caption ezhuthu da... ✨ #pixoro"></textarea><input id="loc" placeholder="📍 Location Add Pannu da"><input id="tags" placeholder="👥 People Tag Pannu da"></div>
+<button class="share" onclick="goNext()">Share → Pixoro</button></div>
 <script src="./pixoro-store.js"></script>
-<script src="js/create.js"></script>
 <script>
-let curType = sessionStorage.getItem('pixoro_type') || 'post';
-function showTab(t){
-  curType = t; sessionStorage.setItem('pixoro_type', t);
-  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
-  document.getElementById('btn-'+(t==='reel'?'reel':'post'))?.classList.add('active');
-  if(t==='reel') document.getElementById('btn-reel').classList.add('active');
-  if(t==='story') document.getElementById('btn-story').classList.add('active');
-  if(t==='post') document.getElementById('btn-post').classList.add('active');
-}
-let _oldOnFile = window.onFile;
-function onFile(input){
-  let f = input.files[0]; if(!f) return;
-  pixoroSave(curType, f);
-  sessionStorage.setItem('pixoro_caption', document.getElementById('caption').value || '');
-  let url = URL.createObjectURL(f);
-  document.getElementById('placeholder').style.display='none';
-  if(f.type.startsWith('video')){
-    let v=document.getElementById('previewVideo'); v.style.display='block'; v.src=url;
-    document.getElementById('previewImg').style.display='none';
-  } else {
-    let im=document.getElementById('previewImg'); im.style.display='block'; im.src=url;
-    document.getElementById('previewVideo').style.display='none';
-  }
-  if(typeof _oldOnFile==='function'){ try{ _oldOnFile(input); }catch(e){} }
-}
-function setEdit(){}
-function applyFilter(f, el){
-  document.getElementById('previewImg').style.filter=f;
-  document.getElementById('previewVideo').style.filter=f;
-  sessionStorage.setItem('pixoro_filter', f);
-  if(el){ document.querySelectorAll('#filterRow button').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
-}
-function addStoryText(){ let t=prompt('Text Eluthu da:'); if(t){ document.getElementById('storyTextOverlay').innerText=t; sessionStorage.setItem('pixoro_text', t); } }
-function addSticker(){ alert('Sticker - Next Update la da!'); }
-function addMusicStory(){ alert('Music - Next Update la da!'); }
-function goNext(){
-  pixoroGet(b=>{
-    if(!b){ alert('Mudhalla Photo Select Pannu da!'); return; }
-    sessionStorage.setItem('pixoro_caption', document.getElementById('caption').value || '');
-    location.href='./create-edit.html';
-  });
-}
-function shareNow(){ goNext(); }
-</script>
-</body>
-</html>
+let curType=sessionStorage.getItem('pixoro_type')||'post';
+function setType(t){curType=t;sessionStorage.setItem('pixoro_type',t);document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));document.getElementById('t-'+t).classList.add('active')}
+setType(curType);
+document.getElementById('f1').addEventListener('change',e=>{
+let f=e.target.files[0];if(!f)return;pixoroSave(curType,f);
+let url=URL.createObjectURL(f);document.getElementById('ph').style.display='none';
+if(f.type.startsWith('video')){let v=document.getElementById('pVid');v.style.display='block';v.src=url;document.getElementById('pImg').style.display='none'}else{let i=document.getElementById('pImg');i.style.display='block';i.src=url;document.getElementById('pVid').style.display='none'}
+});
+function setF(f,el){document.getElementById('pImg').style.filter=f;document.getElementById('pVid').style.filter=f;sessionStorage.setItem('pixoro_filter',f);document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));el.classList.add('active')}
+function goNext(){pixoroGet(b=>{if(!b){alert('Mudhalla Photo Select Pannu da!');return}sessionStorage.setItem('pixoro_caption',document.getElementById('cap').value);location.href='./create-edit.html'})}
+</script></body></html>
