@@ -1,12 +1,11 @@
-// ===== PIXORO FEED - v1023 - OREY PROFILE PHOTO ELLA PAGE KUM + FOLLOW FIX + CIRCLE FIX DA =====
+// ===== PIXORO FEED - v1026 - THANI FILE DA - OREY PROFILE PHOTO + FOLLOW FIX + CIRCLE FIX DA =====
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
-let MY_PFP = ''; // ✅ Orey Photo da - Profile la irukka photo da
+let MY_PFP = '';
 
 function feedClean(u){ if(!u) return ''; return String(u).trim().replaceAll('@','').toLowerCase(); }
 function getSupa(){ return window.supa || (window.getSupa ? window.getSupa() : null); }
 
-// ✅ OREY PHOTO FUNCTION DA - avatar_url mattum thaan da
 window.pixoroGetPfp = function(prof, userId, uname){
   let isMineNow = String(userId)===String(FEED_ME_ID) || feedClean(uname)===feedClean(FEED_ME_RAW);
   if(isMineNow && MY_PFP) return MY_PFP;
@@ -27,7 +26,6 @@ async function getFeed(currentUserId){
     }catch(e){}
     let profMap = {};
     try{
-      // ✅ FIXED DA - avatar_url mattum thaan da
       let r = await s.from('profiles').select('id,username,avatar_url').limit(200);
       (r.data||[]).forEach(p=>{ profMap[String(p.id)] = p; });
     }catch(e){}
@@ -100,7 +98,6 @@ function renderFeedList(){
   box.innerHTML = list.map(p=>{
     let prof = p.profiles || {};
     let uname = feedClean(prof.username || p.username || 'user');
-    // ✅ OREY PHOTO DA - avatar_url mattum thaan da
     let pfp = String(prof?.avatar_url || '').trim();
     if(!pfp && String(p.user_id)===String(FEED_ME_ID) && MY_PFP) pfp = MY_PFP;
     let avatarHtml = pfp
@@ -167,7 +164,6 @@ async function loadFeed(){
   FEED_ME_ID = session.user.id; window.ME_ID = FEED_ME_ID;
   let {data:myProf} = await s.from('profiles').select('*').eq('id', FEED_ME_ID).maybeSingle();
   FEED_ME_RAW = feedClean(myProf?.username || session.user.email.split('@')[0]); window.ME_RAW = FEED_ME_RAW;
-  // ✅ FIXED DA - avatar_url mattum thaan da
   MY_PFP = String(myProf?.avatar_url || '').trim();
   window.MY_PFP = MY_PFP; window.ME_PFP = MY_PFP;
   let navPfp = document.getElementById('navPfp');
@@ -186,10 +182,19 @@ async function loadFeed(){
   renderFeedList();
   if(window.loadStories) window.loadStories();
 }
-// ✅ CORRECT - + Thotta - Direct ah Create ku Pogum da - Choice Sheet Venaam da
+
+// ✅ CORRECT - THANI FILE DA - + Thotta - Direct ah Create ku Pogum da
 function showChoice(){ location.href = './create.html'; }
-function hideChoice(){ let c=document.getElementById('choice'); if(c) c.style.display='none'; }
+function hideChoice(){ let c=document.getElementById('choice'); if(c) c.classList.remove('show'); }
 window.showChoice=showChoice; window.hideChoice=hideChoice;
+
+// ✅ CORRECT - Story + Thotta - Create ku Pogum da - story-upload.html Illa da
+document.addEventListener('click', function(e){
+  let w = e.target.closest('.sAddWrap');
+  if(!w) return;
+  location.href = './create.html';
+});
+
 function sharePost(id){ let u=location.origin+'/index.html?id='+id; if(navigator.share){ navigator.share({title:'Pixoro',url:u}); } else { navigator.clipboard.writeText(u); showToast('Link Copy Aachu da'); } }
 window.sharePost=sharePost;
 function showToast(m){ let t=document.getElementById('toast'); if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',1500); }
