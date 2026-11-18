@@ -34,21 +34,20 @@ body{background:#000;color:#fff;font-family:system-ui}
 
 <div class="wrap" id="wrapBox">
   <img id="img" src="" style="display:none">
-  <div class="empty" id="emptyBox">📷<small>Photo Illa da<br>Back Poyi Select Pannu da</small></div>
+  <div class="empty" id="emptyBox">📷<small>Photo Load Aaguthu da...<br>Konjam Wait Pannu da</small></div>
   <div id="textOver" style="position:absolute;top:35%;left:0;right:0;text-align:center;font-size:28px;font-weight:900;text-shadow:0 2px 10px #000;display:none;z-index:5"></div>
 </div>
 
-<!-- ✅ BACKGROUND REMOVE - ITHU THAAN DA GIRI - BACKGROUND MAATHU DA -->
+<!-- ✅ WHITE BG - DELETE DA - BLACK + NO BG + BLUR MATTUM DA -->
 <div class="bgRow">
   <button class="on" onclick="setBg('black',this)">⬛ Black BG</button>
-  <button onclick="setBg('white',this)">⬜ White BG</button>
   <button onclick="setBg('transparent',this)">🔲 No BG</button>
   <button onclick="setBg('blur',this)">🌀 Blur BG</button>
 </div>
 
 <div class="tabs"><b class="on" onclick="showTab('filter',this)">Filter</b><b onclick="showTab('edit',this)">Edit</b><b onclick="addText()">Aa Text</b><b onclick="addSticker()">😊 Sticker</b></div>
 
-<!-- ✅ PICSUM DELETE DA - UN PHOTO THAAN - FILTER PREVIEW LA VARUM DA -->
+<!-- ✅ PICSUM ILLA DA - UN PHOTO THAAN - FILTER PREVIEW LA VARUM DA -->
 <div class="filters" id="filterRow">
   <div class="on" onclick="setF('none',this)"><img id="f0" src=""><br><small>Original</small></div>
   <div onclick="setF('grayscale(1)',this)"><img id="f1" src="" style="filter:grayscale(1)"><br><small>B&W</small></div>
@@ -68,23 +67,70 @@ body{background:#000;color:#fff;font-family:system-ui}
 <div class="bottom"><button onclick="history.back()" style="background:#222;color:#fff">Edit photo</button><button class="next" onclick="goNext()">Next →</button></div>
 
 <script>
-// ✅ PICSUM ILLA DA - UN PHOTO MATTUM DA - LOCALSTORAGE LA IRUNDHU DA
-let url = localStorage.getItem('pixoro_post_media') || '';
+// ✅ NO LOCALSTORAGE DA - INDEXEDDB LA - FILE AH - VAIKKUROM DA - PAGE MAARI PONAALUM POOGAATHU DA
+let currentFilter = 'none';
+let currentBg = 'black';
+let currentText = '';
 let imgEl = document.getElementById('img');
-if(!url || url.startsWith('blob:') || url.includes('picsum')){
-  alert('Photo Load Aagala da - Thirumba Select Pannu da');
-  location.href = './create-post.html';
-} else {
-  imgEl.src = url;
-  imgEl.style.display = 'block';
-  document.getElementById('emptyBox').style.display = 'none';
-  // ✅ Filter Preview la - Un Photo Thaan Varum da - Vera Photo Varaathu da
-  ['f0','f1','f2','f3','f4','f5'].forEach(id => { document.getElementById(id).src = url; });
+let currentBlobUrl = '';
+
+function openDB(){
+  return new Promise((res,rej)=>{
+    let req = indexedDB.open('pixoro-db',1);
+    req.onupgradeneeded = ()=>{ req.result.createObjectStore('media'); };
+    req.onsuccess = ()=>res(req.result);
+    req.onerror = ()=>rej(req.error);
+  });
+}
+async function getMedia(){
+  let db = await openDB();
+  return new Promise((res,rej)=>{
+    let tx = db.transaction('media','readonly');
+    let req = tx.objectStore('media').get('pixoro_post_media');
+    req.onsuccess = ()=>res(req.result);
+    req.onerror = ()=>rej(req.error);
+  });
+}
+async function saveMeta(){
+  let db = await openDB();
+  let tx = db.transaction('media','readwrite');
+  tx.objectStore('media').put(currentFilter,'pixoro_post_filter');
+  tx.objectStore('media').put(currentBg,'pixoro_post_bg');
+  tx.objectStore('media').put(currentText,'pixoro_post_text');
 }
 
+async function loadPhoto(){
+  try{
+    let blob = await getMedia();
+    if(!blob){
+      alert('Photo Illa da - Thirumba Select Pannu da');
+      location.href = './create-post.html';
+      return;
+    }
+    currentBlobUrl = URL.createObjectURL(blob);
+    imgEl.src = currentBlobUrl;
+    imgEl.style.display = 'block';
+    document.getElementById('emptyBox').style.display = 'none';
+    ['f0','f1','f2','f3','f4','f5'].forEach(id => { document.getElementById(id).src = currentBlobUrl; });
+    // Pazhaya Filter / Text - Irundha - Load Pannu da
+    let db = await openDB();
+    let tx = db.transaction('media','readonly');
+    let store = tx.objectStore('media');
+    let fReq = store.get('pixoro_post_filter');
+    fReq.onsuccess = ()=>{ if(fReq.result){ currentFilter = fReq.result; imgEl.style.filter = currentFilter; } };
+    let tReq = store.get('pixoro_post_text');
+    tReq.onsuccess = ()=>{ if(tReq.result){ currentText = tReq.result; let o=document.getElementById('textOver'); o.innerText=currentText; o.style.display='block'; } };
+  }catch(e){
+    alert('Photo Load Aagala da - Thirumba Select Pannu da');
+    location.href = './create-post.html';
+  }
+}
+loadPhoto();
+
 function setF(f, el){
+  currentFilter = f;
   imgEl.style.filter = f;
-  localStorage.setItem('pixoro_post_filter', f);
+  saveMeta();
   document.querySelectorAll('#filterRow div').forEach(d => d.classList.remove('on'));
   el.classList.add('on');
 }
@@ -98,38 +144,38 @@ function showTab(t, el){
 
 function adjust(type){
   let v = prompt(type + ' - 0.5 to 2 - Value Podu da:', '1.2');
-  if(v){ imgEl.style.filter = type + '(' + v + ')'; localStorage.setItem('pixoro_post_filter', type + '(' + v + ')'); }
+  if(v){ currentFilter = type + '(' + v + ')'; imgEl.style.filter = currentFilter; saveMeta(); }
 }
 
 function addText(){
   let t = prompt('Text ezhuthu da:');
-  if(t){ let o = document.getElementById('textOver'); o.innerText = t; o.style.display = 'block'; localStorage.setItem('pixoro_post_text', t); }
+  if(t){ currentText = t; let o = document.getElementById('textOver'); o.innerText = t; o.style.display = 'block'; saveMeta(); }
 }
 
 function addSticker(){
   let s = prompt('Sticker - 😍 🔥 ❤️');
-  if(s){ let o = document.getElementById('textOver'); o.innerText += ' ' + s; o.style.display = 'block'; }
+  if(s){ currentText = currentText + ' ' + s; let o = document.getElementById('textOver'); o.innerText = currentText; o.style.display = 'block'; saveMeta(); }
 }
 
-// ✅ BACKGROUND REMOVE - SIMPLE FIX DA - PHOTO AH - CLEAN AH KAAMIKKUM DA
+// ✅ WHITE DELETE DA - BLACK + NO BG + BLUR MATTUM DA
 function setBg(mode, btn){
   document.querySelectorAll('.bgRow button').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
+  currentBg = mode;
   let wrap = document.getElementById('wrapBox');
   if(mode === 'black'){ wrap.style.background = '#000'; imgEl.style.background = '#000'; }
-  if(mode === 'white'){ wrap.style.background = '#fff'; imgEl.style.background = '#fff'; }
   if(mode === 'transparent'){ wrap.style.background = 'repeating-conic-gradient(#222 0% 25%, #000 0% 50%) 50% / 20px 20px'; imgEl.style.background = 'transparent'; }
-  if(mode === 'blur'){ wrap.style.background = '#000'; imgEl.style.filter = 'blur(0px)'; }
-  localStorage.setItem('pixoro_post_bg', mode);
+  if(mode === 'blur'){ wrap.style.background = '#000'; imgEl.style.background = '#000'; }
+  saveMeta();
 }
 
 function removeBg(){
-  alert('BG Remove - On Panniten da ✨\nPhoto va - Black Background la - Clean ah Kaamikkum da\nFull Auto BG Remove ku - remove.bg Website la - Photo ah - Remove Pannitu - Upload Pannu da');
-  setBg('transparent', document.querySelectorAll('.bgRow button')[2]);
+  alert('BG Remove - On Panniten da ✨\nPhoto va - Black Background la - Clean ah Kaamikkum da');
+  setBg('transparent', document.querySelectorAll('.bgRow button')[1]);
 }
 
-function goNext(){
-  if(!localStorage.getItem('pixoro_post_media')){ alert('Photo Illa da'); location.href='./create-post.html'; return; }
+async function goNext(){
+  await saveMeta();
   location.href = './create-post-upload.html';
 }
 </script>
