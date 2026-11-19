@@ -18,56 +18,66 @@ body{background:#000;color:#fff;font-family:system-ui;overflow:hidden;touch-acti
 #emptyBox div{font-size:48px;margin-bottom:8px}
 .gridHead{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:14px}
 .gridHead label{background:#222;color:#fff;padding:8px 14px;border-radius:20px;cursor:pointer}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;overflow-y:auto}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:3px;overflow-y:auto}
 .grid .tile{aspect-ratio:1;background:#111;overflow:hidden}
 .grid .tile img,.grid .tile video{width:100%;height:100%;object-fit:cover}
 .gridEmpty{grid-column:1/-1;text-align:center;color:#777;padding:20px;font-size:13px}
 .tabs{position:fixed;bottom:0;left:0;right:0;background:#000;display:flex;justify-content:center;gap:22px;padding:14px;border-top:1px solid #222;z-index:10}
 .tabs span{color:#888;letter-spacing:1px;font-size:14px;cursor:pointer}
 .tabs span.on{color:#fff;font-weight:800}
-/* ✅ FIX 1 - KEEZHA EDIT/NEXT BUTTON - FULL AH REMOVED */
-.editFull{position:fixed;inset:0;background:#000;display:none;z-index:100;touch-action:none}
-.editFull .top2{height:52px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;position:absolute;top:0;left:0;right:0;z-index:20;background:linear-gradient(to bottom,rgba(0,0,0,.7),transparent)}
-/* ✅ FIX 2 - MELLA EDIT BUTTON - ITHA THOTTA THAAN TOOLS VARUM */
-.editFull .top2 .editToggle{background:#fff;color:#000;border:0;padding:8px 16px;border-radius:999px;font-weight:800;font-size:14px;cursor:pointer}
-.editFull .top2 .editToggle.on{background:#0095f6;color:#fff}
-.editFull .top2 .next2{color:#0095f6;font-weight:700}
-.editFull .imgBox{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden;background:#000;touch-action:none}
-.editFull .imgBox img,.editFull .imgBox video{width:100%;height:100%;will-change:transform;touch-action:none}
-.editFull .imgBox.post img,.editFull .imgBox.post video{object-fit:contain}
-.editFull .imgBox.reels img,.editFull .imgBox.reels video,.editFull .imgBox.story img,.editFull .imgBox.story video{object-fit:cover}
-.editFull .hint{position:absolute;bottom:205px;left:0;right:0;text-align:center;color:rgba(255,255,255,.8);font-size:13px;z-index:5;pointer-events:none;display:none}
+.cap{position:fixed;inset:0;background:#161616;display:none;z-index:100;flex-direction:column;touch-action:none}
+.capTop{height:52px;display:flex;justify-content:space-between;align-items:center;padding:0 12px;background:#161616}
+.capTop .left{display:flex;gap:16px;font-size:20px}
+.capTop .mid{background:#222;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700}
+.capTop .expWrap{text-align:right}
+.capTop .exp{background:#0095f6;color:#fff;border:0;padding:8px 16px;border-radius:10px;font-weight:800}
+.capTop .draft{font-size:11px;background:#222;padding:4px 8px;border-radius:6px;margin-top:4px;display:inline-block}
+.capPreview{flex:1;display:grid;place-items:center;overflow:hidden;background:#000;position:relative;min-height:200px}
+.capPreview img,.capPreview video{max-width:100%;max-height:100%;object-fit:contain;will-change:transform}
 #overlayText{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);font-size:36px;font-weight:900;text-shadow:0 2px 10px #000;z-index:7;text-align:center;pointer-events:none;white-space:nowrap}
 #overlaySticker{position:absolute;top:60%;left:50%;transform:translate(-50%,-50%);font-size:60px;z-index:7;pointer-events:none}
-#overlayImg{position:absolute;bottom:220px;right:14px;width:90px;height:120px;object-fit:cover;border-radius:12px;border:0;z-index:7;display:none}
-.swipeHint{position:absolute;bottom:165px;left:0;right:0;text-align:center;z-index:10;pointer-events:none;display:none}
-.swipeHint .arr{font-size:20px;display:block}
-.swipeHint span{font-size:14px;color:#fff;text-shadow:0 1px 5px #000}
-/* ✅ FIX 2 - TOOLS / TIMELINE - VELIYA THERIYATHU - display:none */
-.timeline{position:absolute;bottom:148px;left:12px;right:12px;height:52px;background:#1a1a1a;border-radius:12px;overflow:hidden;display:none;z-index:10}
-.timeline .t{flex:1;background:#222;display:grid;place-items:center;overflow:hidden;border-right:1px solid #000}
-.timeline .t img{width:100%;height:100%;object-fit:cover}
-.tools{position:absolute;bottom:12px;left:12px;right:12px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);border-radius:22px;display:none;justify-content:space-between;padding:12px 6px;z-index:10;overflow-x:auto;gap:2px}
-.tools div{flex:1;min-width:50px;text-align:center;cursor:pointer}
-.tools div b{font-size:22px;display:block;line-height:1}
-.tools div span{font-size:11px;color:#fff}
-.tools div.on b{color:#0095f6}
-.tools div.on span{color:#0095f6}
-.panel{position:absolute;bottom:148px;left:12px;right:12px;background:#1c1c1e;border-radius:18px;padding:14px;z-index:15;display:none}
-.panel h3{font-size:15px;margin-bottom:10px}
-.panel .row{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
-.panel button{background:#2c2c2e;color:#fff;border:0;padding:10px 14px;border-radius:999px;white-space:nowrap}
-.panel button.on{background:#fff;color:#000}
-.panel input{width:100%;accent-color:#0095f6}
-.panel .close{float:right;color:#888}
-.editBar{position:absolute;bottom:70px;left:0;right:0;display:none;gap:8px;padding:0 14px;overflow-x:auto;z-index:10}
-.editBar button{background:rgba(30,30,30,.85);color:#fff;border:0;padding:10px 14px;border-radius:20px;white-space:nowrap}
-.editBar button.on{background:#fff;color:#000}
-.drawBar{position:absolute;bottom:70px;left:0;right:0;display:none;gap:8px;padding:0 14px;overflow-x:auto;z-index:11}
-.drawBar button{border:0;padding:10px 12px;border-radius:20px;background:#222;color:#fff;white-space:nowrap}
-.resetBtn{position:absolute;top:60px;right:14px;z-index:10;background:rgba(0,0,0,.6);color:#fff;border:0;padding:8px 12px;border-radius:999px;font-size:13px;display:none}
-canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;display:none;z-index:6;touch-action:none}
-canvas#drawCanvas.on{display:block}
+#overlayImg{position:absolute;bottom:10px;right:10px;width:80px;height:110px;object-fit:cover;border-radius:8px;border:0;z-index:7;display:none}
+.capTools{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-size:18px}
+.capTools .play{width:36px;height:36px;border-radius:50%;background:#222;border:0;color:#fff;font-size:16px}
+.capTools span{font-size:12px;color:#aaa}
+.capTimeline{padding:0 10px 8px}
+.capTimeline .ruler{display:flex;justify-content:space-between;font-size:10px;color:#888;padding-bottom:4px}
+.capTimeline .clipRow{display:flex;gap:4px;align-items:center}
+.capTimeline .clipRow .clip{flex:1;height:52px;display:flex;overflow:hidden;border-radius:8px;background:#222}
+.capTimeline .clipRow .clip .c{flex:1;overflow:hidden}
+.capTimeline .clipRow .clip .c img{width:100%;height:100%;object-fit:cover}
+.capTimeline .clipRow .clip.sel{outline:2px solid #ffcc00}
+.capTimeline .plus{width:32px;height:52px;background:#fff;color:#000;border-radius:8px;display:grid;place-items:center;font-size:22px}
+.capTimeline .miniRow{display:flex;gap:12px;margin-top:6px;font-size:11px;color:#aaa;align-items:center}
+.capTimeline .miniRow svg{width:18px;height:18px;vertical-align:middle}
+.capRows{display:grid;gap:6px;padding:0 10px 8px}
+.capRows div{background:#222;padding:10px;border-radius:8px;font-size:13px;color:#ddd}
+.capRows div b{margin-right:6px}
+.capBar{display:flex;gap:4px;padding:10px 6px;overflow-x:auto;background:#161616;border-top:1px solid #222}
+.capBar div{flex:1;min-width:56px;text-align:center;cursor:pointer;padding:4px 0}
+.capBar div b{font-size:20px;display:block}
+.capBar div b svg{width:22px;height:22px;display:block;margin:0 auto}
+.capBar div span{font-size:11px;color:#ccc}
+.capBar div.on b{color:#fff}
+.capBar div.on span{color:#fff}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#222;border-radius:18px 18px 0 0;padding:12px 12px 20px;z-index:40;display:none;max-height:55vh;overflow-y:auto}
+.sheet .sHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sheet .sHead b{font-size:15px}
+.sheet .sHead .done{color:#0095f6;font-weight:800}
+.sheet .tabs2{display:flex;gap:14px;overflow-x:auto;padding-bottom:10px;font-size:13px;color:#aaa;white-space:nowrap}
+.sheet .tabs2 span.on{color:#fff;font-weight:700;border-bottom:2px solid #fff;padding-bottom:4px}
+.sheet .search{background:#333;padding:9px 12px;border-radius:999px;font-size:13px;color:#aaa;margin-bottom:10px}
+.sheet .grid2{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sheet .grid2 .it{text-align:center;cursor:pointer}
+.sheet .grid2 .it .thumb{aspect-ratio:1;border-radius:10px;overflow:hidden;background:#444;display:grid;place-items:center;font-size:28px}
+.sheet .grid2 .it .thumb img{width:100%;height:100%;object-fit:cover}
+.sheet .grid2 .it span{font-size:11px;color:#ccc;display:block;margin-top:4px}
+.sheet .grid2 .it.sel .thumb{outline:2px solid #fff}
+.sheet .row{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px}
+.sheet button{background:#333;color:#fff;border:0;padding:10px 14px;border-radius:999px;white-space:nowrap}
+.sheet button.on{background:#fff;color:#000}
+.sheet input{width:100%;accent-color:#fff}
+.sheet .sliderRow{display:flex;justify-content:space-between;font-size:13px;padding:10px 0;border-bottom:1px solid #333}
 .shareBox{display:none;padding:0 14px 90px;overflow-y:auto;height:calc(100vh - 52px);background:#000}
 .shareBox textarea{width:100%;background:transparent;border:0;color:#fff;font-size:16px;outline:none;resize:none;padding:14px 0}
 .shareBox .row{display:flex;justify-content:space-between;padding:16px 0;border-top:1px solid #222}
@@ -76,6 +86,17 @@ canvas#drawCanvas.on{display:block}
 .shareBtn{width:100%;background:#0095f6;color:#fff;border:0;padding:14px;border-radius:10px;font-weight:800;margin-top:14px}
 #status{text-align:center;font-size:13px;color:#ffcc00;padding:10px}
 #file,#file2{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0}
+canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;display:none;z-index:6;touch-action:none}
+canvas#drawCanvas.on{display:block}
+.drawBar{position:absolute;bottom:70px;left:0;right:0;display:none;gap:8px;padding:0 14px;overflow-x:auto;z-index:50}
+.drawBar button{border:0;padding:10px 12px;border-radius:20px;background:#222;color:#fff;white-space:nowrap}
+.resetBtn{position:absolute;top:60px;right:14px;z-index:10;background:rgba(0,0,0,.6);color:#fff;border:0;padding:8px 12px;border-radius:999px;font-size:13px;display:none}
+@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-4px,2px)}75%{transform:translate(4px,-2px)}}
+@keyframes flash{0%,100%{filter:brightness(1)}50%{filter:brightness(2.2)}}
+@keyframes zoomIn{from{transform:scale(1)}to{transform:scale(1.25)}}
+.fx-shake{animation:shake .3s infinite}
+.fx-flash{animation:flash .6s infinite}
+.fx-zoom{animation:zoomIn 1.2s infinite alternate}
 </style>
 </head>
 <body>
@@ -85,59 +106,75 @@ canvas#drawCanvas.on{display:block}
   <img id="prevImg" style="display:none"><video id="prevVid" style="display:none" muted loop playsinline></video>
   <div id="emptyBox"><div>📷</div>Photo Select Pannu da</div>
 </div>
-<!-- ✅ KEEZHA EDIT / NEXT - REMOVED DA - ITHU ILLA -->
 <div id="gridSection">
   <div class="gridHead"><b>Recents ⌄</b><label for="file">Select</label></div>
   <div class="grid" id="grid"><div class="gridEmpty">Select Button ah Thodu da<br>Gallery Open Aagum da</div></div>
 </div>
 <div class="tabs" id="typeTabs"><span onclick="setType('post',this)" class="on">POST</span><span onclick="setType('reels',this)">REEL</span><span onclick="setType('story',this)">STORY</span></div>
 </div>
-
-<div class="editFull" id="step2">
-  <!-- ✅ MELLA EDIT BUTTON - ITHA THOTTA THAAN ULLA TOOLS VARUM -->
-  <div class="top2"><span onclick="goBack()">✕</span><button class="editToggle" id="editToggleBtn" onclick="toggleEditTools()">✏️ Edit</button><span class="next2" onclick="goNext()">Next</span></div>
-  <div class="imgBox post" id="editImgBox">
+<div class="cap" id="step2">
+  <div class="capTop"><div class="left"><span onclick="goBack()">✕</span><span>🔍</span></div><div class="mid" onclick="cycleQuality()">AI UHD ⌄</div><div class="expWrap"><button class="exp" onclick="goNext()">Export</button><br><span class="draft">Export Draft</span></div></div>
+  <div class="capPreview" id="capPreview">
     <img id="editImg" style="display:none"><video id="editVid" style="display:none" muted loop playsinline></video>
     <div id="overlayText"></div><div id="overlaySticker"></div><img id="overlayImg">
     <canvas id="drawCanvas"></canvas>
   </div>
-  <div class="hint" id="hint">🤏 2 Viral ah Vachu Pinch Pannu da - Perusa Aagum da<br>1 Viral ah Vachu Nakathu da</div>
-  <button class="resetBtn" id="resetBtn" onclick="resetZoom()">Reset</button>
-  <div class="panel" id="panelFont"><span class="close" onclick="hidePanel()">✕</span><h3>Aa Font</h3><div class="row"><button onclick="setFont('system-ui',this)" class="on">Default</button><button onclick="setFont('serif',this)">Serif</button><button onclick="setFont('monospace',this)">Mono</button><button onclick="setFont('cursive',this)">Stylish</button></div><button onclick="addText()">+ Text Ezuthu</button></div>
-  <div class="panel" id="panelImage"><span class="close" onclick="hidePanel()">✕</span><h3>Image Overlay</h3><button onclick="document.getElementById('file2').click()">+ Image Select Pannu</button><button onclick="document.getElementById('overlayImg').style.display='none'">Remove</button></div>
-  <div class="panel" id="panelTrim"><span class="close" onclick="hidePanel()">✕</span><h3>✂️ Trim / Cut - Video</h3><p style="font-size:13px;color:#aaa;margin-bottom:8px">Start: <span id="trimTxt">0s - 15s</span></p>Start <input type="range" id="trimStart" min="0" max="15" value="0" oninput="doTrim()"><br>End <input type="range" id="trimEnd" min="0" max="15" value="15" oninput="doTrim()"></div>
-  <div class="panel" id="panelSound"><span class="close" onclick="hidePanel()">✕</span><h3>🔊 Sound</h3><div class="row"><button id="soundBtn" class="on" onclick="toggleSound()">Sound ON 🔊</button><button onclick="setVolume(0.5)">50%</button><button onclick="setVolume(1)">100%</button></div></div>
-  <div class="panel" id="panelSong"><span class="close" onclick="hidePanel()">✕</span><h3>🎵 Song - Trending</h3><div class="row"><button onclick="pickSong('Leo - Naa Ready 🔥',this)">Leo - Naa Ready</button><button onclick="pickSong('Jailer - Hukum 🔥',this)">Jailer - Hukum</button><button onclick="pickSong('Vikram - Pathala 🔥',this)">Vikram</button><button onclick="pickSong('No Song',this)">No Song</button></div><p id="songTxt" style="font-size:13px;color:#ffcc00;margin-top:8px">Song: No Song</p></div>
-  <div class="panel" id="panelText"><span class="close" onclick="hidePanel()">✕</span><h3>T Text</h3><button onclick="addText()">+ Text Add Pannu</button><button onclick="document.getElementById('overlayText').innerText='';text=''">Clear</button></div>
-  <div class="panel" id="panelSticker"><span class="close" onclick="hidePanel()">✕</span><h3>✨ Stickers</h3><div class="row"><button onclick="pickSticker('🔥')">🔥</button><button onclick="pickSticker('❤️')">❤️</button><button onclick="pickSticker('😂')">😂</button><button onclick="pickSticker('👑')">👑</button><button onclick="pickSticker('💯')">💯</button><button onclick="pickSticker('🎉')">🎉</button></div></div>
-  <div class="panel" id="panelEffect"><span class="close" onclick="hidePanel()">✕</span><h3>🪄 Effects / Filter</h3><div class="row"><button onclick="setFilter('none',this)" class="on">Original</button><button onclick="setFilter('grayscale(1)',this)">B&W</button><button onclick="setFilter('sepia(.8)',this)">Sepia</button><button onclick="setFilter('contrast(1.4) saturate(1.6)',this)">Vivid</button><button onclick="setFilter('brightness(1.2)',this)">Fade</button><button onclick="toggleDraw()">✏️ Draw</button></div></div>
-  <div class="panel" id="panelAudio"><span class="close" onclick="hidePanel()">✕</span><h3>🎵 Audio</h3><div class="row"><button onclick="pickSong('Leo - Naa Ready 🔥',this)">Leo</button><button onclick="pickSong('Jailer - Hukum 🔥',this)">Hukum</button><button onclick="toggleSound()">Sound On/Off</button></div></div>
-  <div class="panel" id="panelVoice"><span class="close" onclick="hidePanel()">✕</span><h3>🎙️ Voice</h3><button onclick="alert('Voice Record - Next Update la Varum da')">🎙️ Voice Record</button></div>
-  <div class="panel" id="panelCaption"><span class="close" onclick="hidePanel()">✕</span><h3>CC Captions</h3><button onclick="addText()">+ Caption Text Add Pannu</button></div>
-  <div class="swipeHint" id="swipeHint"><span class="arr">^</span><span>Swipe up to edit</span></div>
-  <div class="timeline" id="timeline"><div class="t"><img id="tl1"></div><div class="t"><img id="tl2"></div><div class="t"><img id="tl3"></div><div class="t"><img id="tl4"></div></div>
-  <div class="tools" id="tools">
-    <div onclick="showPanel('panelAudio',this)"><b>🎵</b><span>Audio</span></div>
-    <div onclick="showPanel('panelText',this)"><b>Aa</b><span>Text</span></div>
-    <div onclick="showPanel('panelVoice',this)"><b>🎙️</b><span>Voice</span></div>
-    <div onclick="showPanel('panelCaption',this)"><b>CC</b><span>Captions</span></div>
-    <div onclick="showPanel('panelSticker',this)"><b>😊</b><span>Stickers</span></div>
-    <div onclick="showPanel('panelFont',this)"><b>Aa</b><span>Font</span></div>
-    <div onclick="showPanel('panelImage',this)"><b>📷</b><span>Image</span></div>
-    <div onclick="showPanel('panelTrim',this)"><b>✂️</b><span>Trim</span></div>
-    <div onclick="showPanel('panelSound',this)"><b>🔊</b><span>Sound</span></div>
-    <div onclick="showPanel('panelSong',this)"><b>🎵</b><span>Song</span></div>
-    <div onclick="showPanel('panelEffect',this)"><b>🪄</b><span>Effects</span></div>
+  <div class="capTools"><span>⛶</span><button class="play" onclick="togglePlay()">▶</button><span>✂️</span><span>↩</span><span>↪</span><span id="playTime">00:00 / 00:05</span></div>
+  <div class="capTimeline">
+    <div class="ruler"><span>00:00</span><span>00:00</span><span>00:02</span></div>
+    <div class="clipRow"><div class="clip sel" id="mainClip" onclick="selectClip()"><div class="c"><img id="cl1"></div><div class="c"><img id="cl2"></div></div><div class="plus" onclick="document.getElementById('file').click()">+</div></div>
+    <div class="miniRow"><span>🔇 Mute clip</span><span>✨ AI clipper <b style="color:#ffcc00">New</b></span><span onclick="openSheet('sheetCover')"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 20 C4 16 8 14 12 14 C16 14 20 16 20 20"/><circle cx="12" cy="9" r="3.5"/><rect x="2.5" y="2.5" width="19" height="19" rx="4"/></svg> Cover</span></div>
   </div>
-  <div class="editBar" id="editBar">
-    <button onclick="setFilter('none',this)" class="on">Original</button>
-    <button onclick="setFilter('grayscale(1)',this)">B&W</button>
-    <button onclick="setFilter('sepia(.8)',this)">Sepia</button>
-    <button onclick="setFilter('contrast(1.4) saturate(1.6)',this)">Vivid</button>
-    <button onclick="setFilter('brightness(1.2)',this)">Fade</button>
-    <button onclick="toggleDraw()">✏️ Draw</button>
-    <button onclick="addText()">Aa Text</button>
+  <div class="capRows"><div onclick="openSheet('sheetAudio')"><b>🎵</b> + Add audio</div><div onclick="openSheet('sheetText')"><b>T</b> + Add text</div></div>
+  <div class="capBar" id="capBar">
+    <div onclick="openSheet('sheetEdit',this)" class="on"><b>✂️</b><span>Edit</span></div>
+    <div onclick="openSheet('sheetAudio',this)"><b>🎵</b><span>Audio</span></div>
+    <div onclick="openSheet('sheetText',this)"><b>T</b><span>Text</span></div>
+    <div onclick="openSheet('sheetEffects',this)"><b>✨</b><span>Effects</span></div>
+    <div onclick="openSheet('sheetOverlay',this)"><b><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2.5" y="2.5" width="19" height="19" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></b><span>Overlay</span></div>
+    <div onclick="openSheet('sheetCaptions',this)"><b>CC</b><span>Captions</span></div>
+    <div onclick="openSheet('sheetFilters',this)"><b>🎞️</b><span>Filters</span></div>
+    <div onclick="openSheet('sheetAdjust',this)"><b>🎚️</b><span>Adjust</span></div>
   </div>
+  <div class="sheet" id="sheetEdit"><div class="sHead"><b>Edit</b><span class="done" onclick="closeSheet()">✓</span></div><div class="row"><button onclick="splitClip()">✂️ Split</button><button onclick="setSpeed()">⏩ Speed</button><button onclick="toggleSound()">🔊 Volume</button><button onclick="deleteClip()">🗑️ Delete</button><button onclick="duplicateClip()">⧉ Duplicate</button><button onclick="openSheet('sheetRatio')">📐 Ratio</button></div><p style="font-size:12px;color:#aaa">Clip ah Thotta - Split / Speed / Volume / Delete - Pannalam da</p></div>
+  <div class="sheet" id="sheetCover"><div class="sHead"><b>Cover</b><span class="done" onclick="closeSheet()">✓</span></div><p style="font-size:13px;color:#ccc">Ithu Thaan Da - Nee Kaetta - Cover Icon Da - Video oda - Cover Photo - ah - Inga - Select Pannalam da</p><div style="display:flex;gap:10px;margin-top:10px"><img id="coverPrev" style="width:80px;height:110px;object-fit:cover;border-radius:10px;background:#444"><button onclick="document.getElementById('file').click()">Change Cover</button></div></div>
+  <div class="sheet" id="sheetAudio"><div class="sHead"><b>Audio</b><span class="done" onclick="closeSheet()">✓</span></div><div class="search">🔍 Search audio / songs</div><div class="row"><button onclick="pickSong('Leo - Naa Ready 🔥',this)" class="on">Leo - Naa Ready</button><button onclick="pickSong('Jailer - Hukum 🔥',this)">Jailer - Hukum</button><button onclick="pickSong('Vikram - Pathala 🔥',this)">Vikram</button><button onclick="pickSong('No Song',this)">No Song</button></div><p id="songTxt" style="font-size:13px;color:#ffcc00">Song: No Song</p><p style="font-size:12px;color:#aaa">Volume</p><input type="range" min="0" max="100" value="80" oninput="setVolume(this.value/100)"></div>
+  <div class="sheet" id="sheetText"><div class="sHead"><b>Text</b><span class="done" onclick="closeSheet()">✓</span></div><div class="row"><button onclick="addText()">A+ Add text</button><button onclick="addText()">Auto Captions</button><button onclick="openSheet('sheetSticker')">Stickers</button><button onclick="toggleDraw()">✏️ Draw</button><button onclick="addText()">Text Templates</button></div><div class="row"><button onclick="setFont('system-ui',this)" class="on">Default</button><button onclick="setFont('serif',this)">Serif</button><button onclick="setFont('monospace',this)">Mono</button><button onclick="setFont('cursive',this)">Stylish</button></div></div>
+  <div class="sheet" id="sheetSticker"><div class="sHead"><b>Stickers</b><span class="done" onclick="closeSheet()">✓</span></div><div class="grid2"><div class="it" onclick="pickSticker('🔥')"><div class="thumb">🔥</div><span>Fire</span></div><div class="it" onclick="pickSticker('❤️')"><div class="thumb">❤️</div><span>Love</span></div><div class="it" onclick="pickSticker('😂')"><div class="thumb">😂</div><span>Laugh</span></div><div class="it" onclick="pickSticker('👑')"><div class="thumb">👑</div><span>King</span></div></div></div>
+  <div class="sheet" id="sheetEffects"><div class="sHead"><b>Effects</b><span class="done" onclick="closeSheet()">✓</span></div><div class="tabs2"><span class="on">Video effects</span><span>Body effects</span><span>Photo effects</span><span>AI effects</span></div><div class="tabs2"><span class="on">Trending</span><span>Classic</span><span>Magic cutout</span><span>NEW</span><span>Party</span><span>Motion</span><span>3D</span><span>Light</span></div><div class="search">🔍 Search video effects</div><div class="grid2" id="effectsGrid">
+    <div class="it" onclick="applyEffect('none',this)"><div class="thumb">🚫</div><span>None</span></div>
+    <div class="it" onclick="applyEffect('shake',this)"><div class="thumb">📳</div><span>Shake</span></div>
+    <div class="it" onclick="applyEffect('zoom',this)"><div class="thumb">🔍</div><span>Diamond Zoom</span></div>
+    <div class="it" onclick="applyEffect('flash',this)"><div class="thumb">⚡</div><span>Black Flash</span></div>
+    <div class="it" onclick="applyEffect('bw',this)"><div class="thumb">⚫</div><span>B&W</span></div>
+    <div class="it" onclick="applyEffect('sepia',this)"><div class="thumb">🟤</div><span>Sepia</span></div>
+    <div class="it" onclick="applyEffect('vivid',this)"><div class="thumb">🌈</div><span>Vivid</span></div>
+    <div class="it" onclick="applyEffect('blur',this)"><div class="thumb">🌫️</div><span>Blur</span></div>
+  </div></div>
+  <div class="sheet" id="sheetOverlay"><div class="sHead"><b>Overlay</b><span class="done" onclick="closeSheet()">✓</span></div><button onclick="document.getElementById('file2').click()">+ Add Overlay Image</button><button onclick="document.getElementById('overlayImg').style.display='none'">Remove Overlay</button></div>
+  <div class="sheet" id="sheetCaptions"><div class="sHead"><b>Captions</b><span class="done" onclick="closeSheet()">✓</span></div><button onclick="addText()">+ Auto Captions</button><button onclick="addText()">+ Add Caption Text</button></div>
+  <div class="sheet" id="sheetFilters"><div class="sHead"><b>Filters</b><span class="done" onclick="closeSheet()">✓</span></div><div class="tabs2"><span class="on">Filters</span><span onclick="openSheet('sheetAdjust')">Adjust</span><span onclick="cycleQuality()">Video quality</span></div><div class="tabs2"><span class="on">Featured</span><span>NEW</span><span>Hits</span><span>Life</span><span>Landscape</span></div><div class="grid2">
+    <div class="it" onclick="setFilter('none',this)"><div class="thumb">🚫</div><span>None</span></div>
+    <div class="it" onclick="setFilter('grayscale(1) contrast(1.2)',this)"><div class="thumb">⬛</div><span>Noir Flash</span></div>
+    <div class="it" onclick="setFilter('sepia(.5) contrast(1.2) brightness(1.1)',this)"><div class="thumb">🎬</div><span>Hollywood</span></div>
+    <div class="it" onclick="setFilter('brightness(1.1) saturate(1.2)',this)"><div class="thumb">✨</div><span>Humble</span></div>
+    <div class="it" onclick="setFilter('sepia(.3) saturate(1.4) contrast(1.1)',this)"><div class="thumb">🌅</div><span>Golden</span></div>
+    <div class="it" onclick="setFilter('brightness(1.15) saturate(1.3) contrast(1.05)',this)"><div class="thumb">💎</div><span>Clear</span></div>
+    <div class="it" onclick="setFilter('brightness(1.2) saturate(1.5)',this)"><div class="thumb">💡</div><span>Glow</span></div>
+    <div class="it" onclick="setFilter('contrast(1.3) saturate(1.4) brightness(1.05)',this)"><div class="thumb">📺</div><span>HD Upscale</span></div>
+    <div class="it" onclick="setFilter('contrast(1.2) saturate(0.8)',this)"><div class="thumb">🌫️</div><span>Cold Fog</span></div>
+    <div class="it" onclick="setFilter('brightness(1.1) saturate(1.1) contrast(0.9)',this)"><div class="thumb">🌸</div><span>Light Pastel</span></div>
+    <div class="it" onclick="setFilter('hue-rotate(20deg) saturate(1.3)',this)"><div class="thumb">🟠</div><span>Orange</span></div>
+    <div class="it" onclick="setFilter('grayscale(.5) sepia(.3)',this)"><div class="thumb">📰</div><span>Newspaper</span></div>
+  </div></div>
+  <div class="sheet" id="sheetAdjust"><div class="sHead"><b>Adjust - Quality</b><span class="done" onclick="closeSheet()">✓</span></div>
+    <div class="sliderRow"><span>Brightness</span><span id="vBright">100%</span></div><input type="range" min="50" max="150" value="100" oninput="doAdjust('brightness',this.value)">
+    <div class="sliderRow"><span>Contrast</span><span id="vContrast">100%</span></div><input type="range" min="50" max="150" value="100" oninput="doAdjust('contrast',this.value)">
+    <div class="sliderRow"><span>Saturation</span><span id="vSat">100%</span></div><input type="range" min="0" max="200" value="100" oninput="doAdjust('saturate',this.value)">
+    <div class="sliderRow"><span>Sharpness</span><span id="vSharp">0</span></div><input type="range" min="0" max="100" value="0" oninput="doAdjust('sharp',this.value)">
+    <div class="sliderRow"><span>Video Quality</span><span id="vQuality">AI UHD</span></div><button onclick="cycleQuality()">AI UHD / HD / 1080p - Change</button>
+  </div>
+  <div class="sheet" id="sheetRatio"><div class="sHead"><b>Ratio</b><span class="done" onclick="closeSheet()">✓</span></div><div class="row"><button onclick="setRatio('original',this)" class="on">Original</button><button onclick="setRatio('9:16',this)">9:16</button><button onclick="setRatio('16:9',this)">16:9</button><button onclick="setRatio('1:1',this)">1:1</button><button onclick="setRatio('4:3',this)">4:3</button><button onclick="setRatio('3:4',this)">3:4</button></div></div>
   <div class="drawBar" id="drawBar">
     <button style="background:#ff2d55;width:28px;height:28px;border-radius:50%;padding:0" onclick="setColor('#ff2d55')"></button>
     <button style="background:#fff;width:28px;height:28px;border-radius:50%;padding:0" onclick="setColor('#ffffff')"></button>
@@ -148,7 +185,6 @@ canvas#drawCanvas.on{display:block}
     <button style="background:#0095f6" onclick="toggleDraw()">✅ Done</button>
   </div>
 </div>
-
 <div class="top" id="top3" style="display:none"><span onclick="goBack()">✕</span><b>New post</b><span></span></div>
 <div class="shareBox" id="step3">
   <div class="shareTop"><img id="shareThumb"><textarea id="caption" rows="3" placeholder="Write a caption..."></textarea></div>
@@ -158,33 +194,41 @@ canvas#drawCanvas.on{display:block}
   <div id="status"></div>
   <button class="shareBtn" id="shareBtn" onclick="sharePost()">Share</button>
 </div>
-
 <input type="file" id="file" accept="image/*,video/*">
 <input type="file" id="file2" accept="image/*">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js?v=1052"></script>
+<script src="js/supabase.js?v=1057"></script>
 <script>
-let step=1,type='post',file=null,url='',kind='image',filter='none',text='',tagged='',loc='',isPrivate=false,song='No Song',fontF='system-ui',trimS=0,trimE=15,soundOn=true,editOpen=false;
+let step=1,type='post',file=null,url='',kind='image',filter='none',text='',tagged='',loc='',isPrivate=false,song='No Song',fontF='system-ui',trimS=0,trimE=15,soundOn=true,playing=false,quality='AI UHD',adj={brightness:100,contrast:100,saturate:100,sharp:0};
 let drawMode=false,drawColor='#ff2d55',eraser=false,hist=[],drawing=false,lastPos=null;
 let dc=document.getElementById('drawCanvas'),dctx=dc.getContext('2d');
 let scale=1,panX=0,panY=0,startDist=0,startScale=1,startX=0,startY=0,startPanX=0,startPanY=0;
 function getSupa(){return window.supa;}
 function setType(t,el){type=t;document.querySelectorAll('#typeTabs span').forEach(s=>s.classList.remove('on'));el.classList.add('on');document.getElementById('topTitle').innerText=t==='post'?'New post':t==='reels'?'New reel':'New story';document.getElementById('previewBox').className='preview '+type;}
-function applyZoom(){let el=kind==='video'?document.getElementById('editVid'):document.getElementById('editImg');el.style.transform='translate('+panX+'px,'+panY+'px) scale('+scale+')';document.getElementById('resetBtn').style.display=scale>1?'block':'none';}
+function applyZoom(){let el=kind==='video'?document.getElementById('editVid'):document.getElementById('editImg');el.style.transform='translate('+panX+'px,'+panY+'px) scale('+scale+')';let r=document.getElementById('resetBtn');if(r)r.style.display=scale>1?'block':'none';}
 function resetZoom(){scale=1;panX=0;panY=0;applyZoom();}
-function setFilter(f,btn){filter=f;document.querySelectorAll('#editBar button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');document.getElementById('editImg').style.filter=f;document.getElementById('editVid').style.filter=f;}
-function toggleEditTools(){editOpen=!editOpen;document.getElementById('tools').style.display=editOpen?'flex':'none';document.getElementById('timeline').style.display=editOpen?'flex':'none';document.getElementById('swipeHint').style.display=editOpen?'block':'none';document.getElementById('hint').style.display=editOpen?'block':'none';document.getElementById('editToggleBtn').classList.toggle('on',editOpen);document.getElementById('editToggleBtn').innerText=editOpen?'✕ Close':'✏️ Edit';if(!editOpen)hidePanel();}
-function closeEditTools(){editOpen=false;document.getElementById('tools').style.display='none';document.getElementById('timeline').style.display='none';document.getElementById('swipeHint').style.display='none';document.getElementById('hint').style.display='none';document.getElementById('editToggleBtn').classList.remove('on');document.getElementById('editToggleBtn').innerText='✏️ Edit';hidePanel();}
-function showPanel(id,el){document.querySelectorAll('.panel').forEach(p=>p.style.display='none');document.getElementById(id).style.display='block';document.querySelectorAll('.tools div').forEach(d=>d.classList.remove('on'));if(el)el.classList.add('on');}
-function hidePanel(){document.querySelectorAll('.panel').forEach(p=>p.style.display='none');document.querySelectorAll('.tools div').forEach(d=>d.classList.remove('on'));}
-function setFont(f,btn){fontF=f;document.querySelectorAll('#panelFont button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');document.getElementById('overlayText').style.fontFamily=f;}
-function addText(){let t=prompt('Text ezhuthu da');if(t){text=t;let o=document.getElementById('overlayText');o.innerText=t;o.style.fontFamily=fontF;}}
-function pickSticker(s){document.getElementById('overlaySticker').innerText=s;}
-function pickSong(s,btn){song=s;let e=document.getElementById('songTxt');if(e)e.innerText='Song: '+s;}
-function toggleSound(){soundOn=!soundOn;let v=document.getElementById('editVid');v.muted=!soundOn;document.getElementById('soundBtn').innerText=soundOn?'Sound ON 🔊':'Sound OFF 🔇';}
+function buildFilter(){return 'brightness('+adj.brightness+'%) contrast('+adj.contrast+'%) saturate('+adj.saturate+'%) '+(filter==='none'?'':filter);}
+function applyAllFilter(){let f=buildFilter();document.getElementById('editImg').style.filter=f;document.getElementById('editVid').style.filter=f;}
+function setFilter(f,btn){filter=f;applyAllFilter();}
+function doAdjust(k,v){adj[k]=+v;document.getElementById('vBright').innerText=adj.brightness+'%';document.getElementById('vContrast').innerText=adj.contrast+'%';document.getElementById('vSat').innerText=adj.saturate+'%';document.getElementById('vSharp').innerText=adj.sharp;applyAllFilter();}
+function cycleQuality(){quality=quality==='AI UHD'?'HD':quality==='HD'?'1080p':'AI UHD';document.getElementById('vQuality').innerText=quality;document.querySelector('.capTop .mid').innerText=quality+' ⌄';}
+function openSheet(id,el){document.querySelectorAll('.sheet').forEach(s=>s.style.display='none');document.getElementById(id).style.display='block';document.querySelectorAll('.capBar div').forEach(d=>d.classList.remove('on'));if(el)el.classList.add('on');}
+function closeSheet(){document.querySelectorAll('.sheet').forEach(s=>s.style.display='none');}
+function applyEffect(e,el){let img=document.getElementById('editImg'),vid=document.getElementById('editVid');[img,vid].forEach(x=>x.classList.remove('fx-shake','fx-flash','fx-zoom'));document.querySelectorAll('#effectsGrid .it').forEach(i=>i.classList.remove('sel'));if(el)el.classList.add('sel');if(e==='shake')[img,vid].forEach(x=>x.classList.add('fx-shake'));if(e==='flash')[img,vid].forEach(x=>x.classList.add('fx-flash'));if(e==='zoom')[img,vid].forEach(x=>x.classList.add('fx-zoom'));if(e==='bw')setFilter('grayscale(1)',null);if(e==='sepia')setFilter('sepia(.8)',null);if(e==='vivid')setFilter('contrast(1.4) saturate(1.6)',null);if(e==='blur')setFilter('blur(4px)',null);if(e==='none'){filter='none';applyAllFilter();}}
+function setFont(f,btn){fontF=f;document.getElementById('overlayText').style.fontFamily=f;}
+function addText(){let t=prompt('Text ezhuthu da');if(t){text=t;let o=document.getElementById('overlayText');o.innerText=t;o.style.fontFamily=fontF;}closeSheet();}
+function pickSticker(s){document.getElementById('overlaySticker').innerText=s;closeSheet();}
+function pickSong(s,btn){song=s;document.getElementById('songTxt').innerText='Song: '+s;}
+function toggleSound(){soundOn=!soundOn;let v=document.getElementById('editVid');v.muted=!soundOn;}
 function setVolume(v){document.getElementById('editVid').volume=v;}
-function doTrim(){trimS=+document.getElementById('trimStart').value;trimE=+document.getElementById('trimEnd').value;if(trimE<=trimS)trimE=trimS+1;document.getElementById('trimTxt').innerText=trimS+'s - '+trimE+'s';let v=document.getElementById('editVid');v.currentTime=trimS;}
-function toggleDraw(){drawMode=!drawMode;dc.classList.toggle('on',drawMode);document.getElementById('drawBar').style.display=drawMode?'flex':'none';document.getElementById('editBar').style.display=drawMode?'none':'flex';if(drawMode){let old=dc.toDataURL();dc.width=window.innerWidth;dc.height=window.innerHeight;let im=new Image();im.onload=()=>dctx.drawImage(im,0,0);im.src=old;}}
+function splitClip(){alert('Split Panniten da - Clip 2 Aayiduchu da');}
+function setSpeed(){let s=prompt('Speed? 0.5x / 1x / 2x','1x');alert('Speed Set: '+s);}
+function deleteClip(){if(confirm('Clip Delete Pannava da?'))alert('Deleted da');}
+function duplicateClip(){alert('Duplicate Panniten da');}
+function setRatio(r,btn){document.querySelectorAll('#sheetRatio button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');alert('Ratio: '+r);}
+function selectClip(){document.getElementById('mainClip').classList.toggle('sel');openSheet('sheetEdit');}
+function togglePlay(){playing=!playing;let v=document.getElementById('editVid');if(kind==='video'){if(playing)v.play();else v.pause();}document.getElementById('playTime').innerText=playing?'00:02 / 00:05':'00:00 / 00:05';document.querySelector('.capTools .play').innerText=playing?'⏸':'▶';}
+function toggleDraw(){drawMode=!drawMode;dc.classList.toggle('on',drawMode);document.getElementById('drawBar').style.display=drawMode?'flex':'none';if(drawMode){let old=dc.toDataURL();dc.width=window.innerWidth;dc.height=window.innerHeight;let im=new Image();im.onload=()=>dctx.drawImage(im,0,0);im.src=old;}}
 function setColor(c){eraser=false;drawColor=c;}
 function setEraser(){eraser=true;}
 function undoDraw(){if(!hist.length)return;let l=hist.pop();let im=new Image();im.onload=()=>{dctx.clearRect(0,0,dc.width,dc.height);dctx.drawImage(im,0,0);};im.src=l;}
@@ -193,13 +237,12 @@ function getPos(e){let r=dc.getBoundingClientRect();return{x:(e.touches?e.touche
 dc.addEventListener('touchstart',e=>{e.preventDefault();hist.push(dc.toDataURL());drawing=true;lastPos=getPos(e);},{passive:false});
 dc.addEventListener('touchmove',e=>{e.preventDefault();if(!drawing)return;let p=getPos(e);dctx.lineCap='round';dctx.lineJoin='round';dctx.globalCompositeOperation=eraser?'destination-out':'source-over';if(!eraser)dctx.strokeStyle=drawColor;dctx.lineWidth=eraser?20:8;dctx.beginPath();dctx.moveTo(lastPos.x,lastPos.y);dctx.lineTo(p.x,p.y);dctx.stroke();lastPos=p;},{passive:false});
 dc.addEventListener('touchend',()=>{drawing=false;dctx.globalCompositeOperation='source-over';});
-let box=document.getElementById('editImgBox');
-box.addEventListener('touchstart',e=>{if(drawMode)return;document.getElementById('hint').style.display='none';if(e.touches.length===2){startDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);startScale=scale;}else if(e.touches.length===1){startX=e.touches[0].clientX;startY=e.touches[0].clientY;startPanX=panX;startPanY=panY;}},{passive:true});
+let box=document.getElementById('capPreview');
+box.addEventListener('touchstart',e=>{if(drawMode)return;if(e.touches.length===2){startDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);startScale=scale;}else if(e.touches.length===1){startX=e.touches[0].clientX;startY=e.touches[0].clientY;startPanX=panX;startPanY=panY;}},{passive:true});
 box.addEventListener('touchmove',e=>{if(drawMode)return;if(e.touches.length===2){e.preventDefault();let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(startDist>0){scale=Math.max(1,Math.min(3,startScale*(d/startDist)));applyZoom();}}else if(e.touches.length===1&&scale>1){e.preventDefault();let maxX=150*(scale-1)+50,maxY=250*(scale-1)+50;panX=Math.max(-maxX,Math.min(maxX,startPanX+(e.touches[0].clientX-startX)));panY=Math.max(-maxY,Math.min(maxY,startPanY+(e.touches[0].clientY-startY)));applyZoom();}},{passive:false});
 box.addEventListener('touchend',e=>{if(e.touches.length<2)startDist=0;},{passive:true});
-box.addEventListener('dblclick',()=>{if(scale>1)resetZoom();else{scale=2;applyZoom();}});
-function openEdit(){if(!file){document.getElementById('file').click();return;}step=2;document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='block';document.getElementById('editImgBox').className='imgBox '+type;closeEditTools();resetZoom();if(kind==='video'){let v=document.getElementById('editVid');v.src=url;v.style.display='block';v.play();document.getElementById('editImg').style.display='none';}else{let p=document.getElementById('editImg');p.src=url;p.style.display='block';document.getElementById('editVid').style.display='none';}}
-function updateTimeline(){if(!url)return;['tl1','tl2','tl3','tl4'].forEach(id=>{document.getElementById(id).src=url;});}
+function openEdit(){if(!file){document.getElementById('file').click();return;}step=2;document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='flex';resetZoom();if(kind==='video'){let v=document.getElementById('editVid');v.src=url;v.style.display='block';v.play();document.getElementById('editImg').style.display='none';}else{let p=document.getElementById('editImg');p.src=url;p.style.display='block';document.getElementById('editVid').style.display='none';}}
+function updateTimeline(){if(!url)return;['cl1','cl2','coverPrev'].forEach(id=>{let e=document.getElementById(id);if(e)e.src=url;});}
 document.getElementById('file').addEventListener('change',function(e){
   let f=e.target.files[0];if(!f)return;file=f;kind=f.type.includes('video')?'video':'image';
   let reader=new FileReader();
@@ -207,25 +250,25 @@ document.getElementById('file').addEventListener('change',function(e){
     if(kind==='video'){let v=document.getElementById('prevVid');v.src=url;v.style.display='block';v.play();document.getElementById('prevImg').style.display='none';}
     else{let p=document.getElementById('prevImg');p.src=url;p.style.display='block';document.getElementById('prevImg').style.filter='none';document.getElementById('prevVid').style.display='none';}
     document.getElementById('grid').innerHTML='<div class="tile">'+(kind==='video'?'<video src="'+url+'" muted></video>':'<img src="'+url+'">')+'</div>';
-    document.getElementById('nextBtn').style.display='block';updateTimeline();
+    document.getElementById('nextBtn').style.display='block';updateTimeline();if(step===2)openEdit();
   };reader.readAsDataURL(f);e.target.value='';
 });
 document.getElementById('file2').addEventListener('change',function(e){
   let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{let o=document.getElementById('overlayImg');o.src=ev.target.result;o.style.display='block';};r.readAsDataURL(f);e.target.value='';
 });
-function goBack(){if(step===3){step=2;document.getElementById('step3').style.display='none';document.getElementById('top3').style.display='none';document.getElementById('step2').style.display='block';}else if(step===2){step=1;document.getElementById('step2').style.display='none';document.getElementById('step1').style.display='block';closeEditTools();}else location.href='./index.html';}
+function goBack(){if(step===3){step=2;document.getElementById('step3').style.display='none';document.getElementById('top3').style.display='none';document.getElementById('step2').style.display='flex';}else if(step===2){step=1;document.getElementById('step2').style.display='none';document.getElementById('step1').style.display='block';closeSheet();}else location.href='./index.html';}
 function goNext(){
   if(!file){document.getElementById('file').click();return;}
-  if(step===1){step=2;document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='block';document.getElementById('editImgBox').className='imgBox '+type;closeEditTools();resetZoom();
+  if(step===1){step=2;document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='flex';resetZoom();
     if(kind==='video'){let v=document.getElementById('editVid');v.src=url;v.style.display='block';v.play();document.getElementById('editImg').style.display='none';}
     else{let p=document.getElementById('editImg');p.src=url;p.style.display='block';document.getElementById('editVid').style.display='none';}
     updateTimeline();return;}
-  if(step===2){step=3;document.getElementById('step2').style.display='none';document.getElementById('step3').style.display='block';document.getElementById('top3').style.display='flex';document.getElementById('shareThumb').src=url;closeEditTools();return;}
+  if(step===2){step=3;document.getElementById('step2').style.display='none';document.getElementById('step3').style.display='block';document.getElementById('top3').style.display='flex';document.getElementById('shareThumb').src=url;closeSheet();return;}
 }
 function tagPeople(){let t=prompt('Username:');if(t){tagged=t;document.getElementById('tagTxt').innerText='@'+t+' ›';}}
 function addLocation(){let l=prompt('Location:');if(l){loc=l;document.getElementById('locTxt').innerText=l+' ›';}}
 function togglePrivate(){isPrivate=!isPrivate;document.getElementById('audTxt').innerText=isPrivate?'Private ›':'Everyone ›';}
-async function bake(){if(kind==='video')return file;return new Promise(res=>{let img=new Image();img.onload=()=>{let W=1080,H=type==='post'?1350:1920;let c=document.createElement('canvas');c.width=W;c.height=H;let ctx=c.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.filter=filter==='none'?'none':filter;let sc;if(type==='post'){sc=Math.min(W/img.width,H/img.height)*scale;}else{sc=Math.max(W/img.width,H/img.height)*scale;}let dw=img.width*sc,dh=img.height*sc;ctx.drawImage(img,(W-dw)/2+panX*(W/400),(H-dh)/2+panY*(H/600),dw,dh);if(text){ctx.filter='none';ctx.font='900 60px '+fontF;ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText(text,W/2,H*0.35);}c.toBlob(b=>res(b||file),'image/jpeg',0.92);};img.src=url;});}
+async function bake(){if(kind==='video')return file;return new Promise(res=>{let img=new Image();img.onload=()=>{let W=1080,H=type==='post'?1350:1920;let c=document.createElement('canvas');c.width=W;c.height=H;let ctx=c.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.filter=buildFilter();let sc;if(type==='post'){sc=Math.min(W/img.width,H/img.height)*scale;}else{sc=Math.max(W/img.width,H/img.height)*scale;}let dw=img.width*sc,dh=img.height*sc;ctx.drawImage(img,(W-dw)/2+panX*(W/400),(H-dh)/2+panY*(H/600),dw,dh);if(text){ctx.filter='none';ctx.font='900 60px '+fontF;ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText(text,W/2,H*0.35);}c.toBlob(b=>res(b||file),'image/jpeg',0.92);};img.src=url;});}
 async function sharePost(){
   let supa=getSupa();if(!supa){alert('Supabase load aagala da');return;}
   let btn=document.getElementById('shareBtn');btn.innerText='Sharing...';btn.disabled=true;let st=document.getElementById('status');st.innerText='Uploading...';
