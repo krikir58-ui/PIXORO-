@@ -9,11 +9,12 @@
 body{background:#000;color:#fff;font-family:system-ui;overflow:hidden;touch-action:none}
 .top{height:52px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;background:#000;position:relative;z-index:50}
 .top .next{color:#0095f6;font-weight:700;display:none;cursor:pointer;font-size:16px}
-.preview{width:100%;background:#111;display:grid;place-items:center;overflow:hidden;position:relative}
+.preview{width:100%;background:#000;display:grid;place-items:center;overflow:hidden;position:relative}
 .preview.post{height:72vw}
+.preview.post img,.preview.post video{width:100%;height:100%;object-fit:contain;background:#000}
 .preview.reels,.preview.story{height:calc(100vh - 52px - 110px - 60px)}
-.preview img,.preview video{width:100%;height:100%;object-fit:cover}
-#emptyBox{color:#888;text-align:center;font-size:14px;position:relative;z-index:2;cursor:pointer}
+.preview.reels img,.preview.reels video,.preview.story img,.preview.story video{width:100%;height:100%;object-fit:cover}
+#emptyBox{color:#888;text-align:center;font-size:14px;z-index:2;cursor:pointer}
 #emptyBox div{font-size:48px;margin-bottom:8px}
 .gridHead{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:14px}
 .gridHead label{background:#222;color:#fff;padding:8px 14px;border-radius:20px;cursor:pointer}
@@ -24,7 +25,6 @@ body{background:#000;color:#fff;font-family:system-ui;overflow:hidden;touch-acti
 .tabs{position:fixed;bottom:0;left:0;right:0;background:#000;display:flex;justify-content:center;gap:22px;padding:14px;border-top:1px solid #222;z-index:10}
 .tabs span{color:#888;letter-spacing:1px;font-size:14px;cursor:pointer}
 .tabs span.on{color:#fff;font-weight:800}
-/* ✅ NEW - POST/REELS PAGE KEELZHA EDIT BUTTON */
 .editOpenBtn{display:none;gap:10px;padding:10px 14px}
 .editOpenBtn button{flex:1;border:0;padding:13px;border-radius:999px;font-weight:700;font-size:15px}
 .editOpenBtn .editMain{background:#fff;color:#000}
@@ -33,24 +33,25 @@ body{background:#000;color:#fff;font-family:system-ui;overflow:hidden;touch-acti
 .editFull .top2{height:52px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;position:absolute;top:0;left:0;right:0;z-index:20;background:linear-gradient(to bottom,rgba(0,0,0,.7),transparent)}
 .editFull .top2 .next2{color:#0095f6;font-weight:700}
 .editFull .imgBox{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden;background:#000;touch-action:none}
-.editFull .imgBox img,.editFull .imgBox video{width:100%;height:100%;object-fit:cover;will-change:transform;touch-action:none}
+.editFull .imgBox img,.editFull .imgBox video{width:100%;height:100%;will-change:transform;touch-action:none}
 .editFull .imgBox.post img,.editFull .imgBox.post video{object-fit:contain}
-.editFull .hint{position:absolute;bottom:205px;left:0;right:0;text-align:center;color:rgba(255,255,255,.7);font-size:13px;z-index:5;pointer-events:none}
-#cropGrid{position:absolute;inset:0;pointer-events:none;display:none;z-index:5}
-#cropGrid .g1{position:absolute;left:33%;top:0;bottom:0;border-left:1px solid rgba(255,255,255,.4)}
-#cropGrid .g2{position:absolute;left:66%;top:0;bottom:0;border-left:1px solid rgba(255,255,255,.4)}
-#cropGrid .g3{position:absolute;top:33%;left:0;right:0;border-top:1px solid rgba(255,255,255,.4)}
-#cropGrid .g4{position:absolute;top:66%;left:0;right:0;border-top:1px solid rgba(255,255,255,.4)}
+.editFull .imgBox.reels img,.editFull .imgBox.reels video,.editFull .imgBox.story img,.editFull .imgBox.story video{object-fit:cover}
+.editFull .hint{position:absolute;bottom:205px;left:0;right:0;text-align:center;color:rgba(255,255,255,.8);font-size:13px;z-index:5;pointer-events:none}
+/* ✅ FRAME REMOVED - cropGrid Full ah Thookiten Da */
 #overlayText{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);font-size:36px;font-weight:900;text-shadow:0 2px 10px #000;z-index:7;text-align:center;pointer-events:none;white-space:nowrap}
 #overlaySticker{position:absolute;top:60%;left:50%;transform:translate(-50%,-50%);font-size:60px;z-index:7;pointer-events:none}
-#overlayImg{position:absolute;bottom:220px;right:14px;width:90px;height:120px;object-fit:cover;border-radius:12px;border:2px solid #fff;z-index:7;display:none}
-/* ✅ NEW - TIMELINE + TOOLS - Photo Mari */
+/* ✅ FRAME REMOVED - border:0 Da - White Border Illa Da */
+#overlayImg{position:absolute;bottom:220px;right:14px;width:90px;height:120px;object-fit:cover;border-radius:12px;border:0;z-index:7;display:none}
+.swipeHint{position:absolute;bottom:165px;left:0;right:0;text-align:center;z-index:10;pointer-events:none}
+.swipeHint .arr{font-size:20px;display:block}
+.swipeHint span{font-size:14px;color:#fff;text-shadow:0 1px 5px #000}
 .timeline{position:absolute;bottom:148px;left:12px;right:12px;height:52px;background:#1a1a1a;border-radius:12px;overflow:hidden;display:flex;z-index:10}
-.timeline .t{flex:1;background:#222;display:grid;place-items:center;font-size:10px;color:#888;border-right:1px solid #000}
-.tools{position:absolute;bottom:12px;left:12px;right:12px;background:#1a1a1a;border-radius:22px;display:flex;justify-content:space-between;padding:12px 6px;z-index:10;overflow-x:auto;gap:2px}
+.timeline .t{flex:1;background:#222;display:grid;place-items:center;overflow:hidden;border-right:1px solid #000}
+.timeline .t img{width:100%;height:100%;object-fit:cover}
+.tools{position:absolute;bottom:12px;left:12px;right:12px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);border-radius:22px;display:flex;justify-content:space-between;padding:12px 6px;z-index:10;overflow-x:auto;gap:2px}
 .tools div{flex:1;min-width:50px;text-align:center;cursor:pointer}
-.tools div b{font-size:22px;display:block}
-.tools div span{font-size:11px;color:#ccc}
+.tools div b{font-size:22px;display:block;line-height:1}
+.tools div span{font-size:11px;color:#fff}
 .tools div.on b{color:#0095f6}
 .tools div.on span{color:#0095f6}
 .panel{position:absolute;bottom:148px;left:12px;right:12px;background:#1c1c1e;border-radius:18px;padding:14px;z-index:15;display:none}
@@ -85,7 +86,6 @@ canvas#drawCanvas.on{display:block}
   <img id="prevImg" style="display:none"><video id="prevVid" style="display:none" muted loop playsinline></video>
   <div id="emptyBox"><div>📷</div>Photo Select Pannu da</div>
 </div>
-<!-- ✅ KEELZHA EDIT OPTION - ITHA THOTTA ULLA EDIT PAGE VARUM -->
 <div class="editOpenBtn" id="editOpenBtn"><button class="editMain" onclick="openEdit()">✏️ Edit</button><button class="nextMain" onclick="goNext()">Next →</button></div>
 <div id="gridSection">
   <div class="gridHead"><b>Recents ⌄</b><label for="file">Select</label></div>
@@ -99,31 +99,35 @@ canvas#drawCanvas.on{display:block}
   <div class="imgBox post" id="editImgBox">
     <img id="editImg" style="display:none"><video id="editVid" style="display:none" muted loop playsinline></video>
     <div id="overlayText"></div><div id="overlaySticker"></div><img id="overlayImg">
-    <div id="cropGrid"><div class="g1"></div><div class="g2"></div><div class="g3"></div><div class="g4"></div></div>
+    <!-- ✅ FRAME REMOVED - cropGrid Div ah Full ah Thookiten Da -->
     <canvas id="drawCanvas"></canvas>
   </div>
   <div class="hint" id="hint">🤏 2 Viral ah Vachu Pinch Pannu da - Perusa Aagum da<br>1 Viral ah Vachu Nakathu da</div>
   <button class="resetBtn" id="resetBtn" onclick="resetZoom()">Reset</button>
-  <!-- ✅ PANELS -->
   <div class="panel" id="panelFont"><span class="close" onclick="hidePanel()">✕</span><h3>Aa Font</h3><div class="row"><button onclick="setFont('system-ui',this)" class="on">Default</button><button onclick="setFont('serif',this)">Serif</button><button onclick="setFont('monospace',this)">Mono</button><button onclick="setFont('cursive',this)">Stylish</button></div><button onclick="addText()">+ Text Ezuthu</button></div>
-  <div class="panel" id="panelImage"><span class="close" onclick="hidePanel()">✕</span><h3>🖼️ Image Overlay</h3><button onclick="document.getElementById('file2').click()">+ Image Select Pannu</button><button onclick="document.getElementById('overlayImg').style.display='none'">Remove</button></div>
+  <div class="panel" id="panelImage"><span class="close" onclick="hidePanel()">✕</span><h3>Image Overlay</h3><button onclick="document.getElementById('file2').click()">+ Image Select Pannu</button><button onclick="document.getElementById('overlayImg').style.display='none'">Remove</button></div>
   <div class="panel" id="panelTrim"><span class="close" onclick="hidePanel()">✕</span><h3>✂️ Trim / Cut - Video</h3><p style="font-size:13px;color:#aaa;margin-bottom:8px">Start: <span id="trimTxt">0s - 15s</span></p>Start <input type="range" id="trimStart" min="0" max="15" value="0" oninput="doTrim()"><br>End <input type="range" id="trimEnd" min="0" max="15" value="15" oninput="doTrim()"></div>
   <div class="panel" id="panelSound"><span class="close" onclick="hidePanel()">✕</span><h3>🔊 Sound</h3><div class="row"><button id="soundBtn" class="on" onclick="toggleSound()">Sound ON 🔊</button><button onclick="setVolume(0.5)">50%</button><button onclick="setVolume(1)">100%</button></div></div>
   <div class="panel" id="panelSong"><span class="close" onclick="hidePanel()">✕</span><h3>🎵 Song - Trending</h3><div class="row"><button onclick="pickSong('Leo - Naa Ready 🔥',this)">Leo - Naa Ready</button><button onclick="pickSong('Jailer - Hukum 🔥',this)">Jailer - Hukum</button><button onclick="pickSong('Vikram - Pathala 🔥',this)">Vikram</button><button onclick="pickSong('No Song',this)">No Song</button></div><p id="songTxt" style="font-size:13px;color:#ffcc00;margin-top:8px">Song: No Song</p></div>
   <div class="panel" id="panelText"><span class="close" onclick="hidePanel()">✕</span><h3>T Text</h3><button onclick="addText()">+ Text Add Pannu</button><button onclick="document.getElementById('overlayText').innerText='';text=''">Clear</button></div>
   <div class="panel" id="panelSticker"><span class="close" onclick="hidePanel()">✕</span><h3>✨ Stickers</h3><div class="row"><button onclick="pickSticker('🔥')">🔥</button><button onclick="pickSticker('❤️')">❤️</button><button onclick="pickSticker('😂')">😂</button><button onclick="pickSticker('👑')">👑</button><button onclick="pickSticker('💯')">💯</button><button onclick="pickSticker('🎉')">🎉</button></div></div>
   <div class="panel" id="panelEffect"><span class="close" onclick="hidePanel()">✕</span><h3>🪄 Effects / Filter</h3><div class="row"><button onclick="setFilter('none',this)" class="on">Original</button><button onclick="setFilter('grayscale(1)',this)">B&W</button><button onclick="setFilter('sepia(.8)',this)">Sepia</button><button onclick="setFilter('contrast(1.4) saturate(1.6)',this)">Vivid</button><button onclick="setFilter('brightness(1.2)',this)">Fade</button><button onclick="toggleDraw()">✏️ Draw</button></div></div>
-  <!-- ✅ TIMELINE -->
-  <div class="timeline" id="timeline"><div class="t">0s</div><div class="t">5s</div><div class="t">10s</div><div class="t">15s</div></div>
-  <!-- ✅ BOTTOM TOOLS - Photo Mari -->
+  <div class="panel" id="panelAudio"><span class="close" onclick="hidePanel()">✕</span><h3>🎵 Audio</h3><div class="row"><button onclick="pickSong('Leo - Naa Ready 🔥',this)">Leo</button><button onclick="pickSong('Jailer - Hukum 🔥',this)">Hukum</button><button onclick="toggleSound()">Sound On/Off</button></div></div>
+  <div class="panel" id="panelVoice"><span class="close" onclick="hidePanel()">✕</span><h3>🎙️ Voice</h3><button onclick="alert('Voice Record - Next Update la Varum da')">🎙️ Voice Record</button></div>
+  <div class="panel" id="panelCaption"><span class="close" onclick="hidePanel()">✕</span><h3>CC Captions</h3><button onclick="addText()">+ Caption Text Add Pannu</button></div>
+  <div class="swipeHint" id="swipeHint"><span class="arr">^</span><span>Swipe up to edit</span></div>
+  <div class="timeline" id="timeline"><div class="t"><img id="tl1"></div><div class="t"><img id="tl2"></div><div class="t"><img id="tl3"></div><div class="t"><img id="tl4"></div></div>
   <div class="tools" id="tools">
+    <div onclick="showPanel('panelAudio',this)"><b>🎵</b><span>Audio</span></div>
+    <div onclick="showPanel('panelText',this)"><b>Aa</b><span>Text</span></div>
+    <div onclick="showPanel('panelVoice',this)"><b>🎙️</b><span>Voice</span></div>
+    <div onclick="showPanel('panelCaption',this)"><b>CC</b><span>Captions</span></div>
+    <div onclick="showPanel('panelSticker',this)"><b>😊</b><span>Stickers</span></div>
     <div onclick="showPanel('panelFont',this)"><b>Aa</b><span>Font</span></div>
-    <div onclick="showPanel('panelImage',this)"><b>🖼️</b><span>Image</span></div>
+    <div onclick="showPanel('panelImage',this)"><b>📷</b><span>Image</span></div>
     <div onclick="showPanel('panelTrim',this)"><b>✂️</b><span>Trim</span></div>
     <div onclick="showPanel('panelSound',this)"><b>🔊</b><span>Sound</span></div>
     <div onclick="showPanel('panelSong',this)"><b>🎵</b><span>Song</span></div>
-    <div onclick="showPanel('panelText',this)"><b>T</b><span>Text</span></div>
-    <div onclick="showPanel('panelSticker',this)"><b>✨</b><span>Stickers</span></div>
     <div onclick="showPanel('panelEffect',this)"><b>🪄</b><span>Effects</span></div>
   </div>
   <div class="editBar" id="editBar">
@@ -159,7 +163,7 @@ canvas#drawCanvas.on{display:block}
 <input type="file" id="file" accept="image/*,video/*">
 <input type="file" id="file2" accept="image/*">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js?v=1046"></script>
+<script src="js/supabase.js?v=1049"></script>
 <script>
 let step=1,type='post',file=null,url='',kind='image',filter='none',text='',tagged='',loc='',isPrivate=false,song='No Song',fontF='system-ui',trimS=0,trimE=15,soundOn=true;
 let drawMode=false,drawColor='#ff2d55',eraser=false,hist=[],drawing=false,lastPos=null;
@@ -169,13 +173,13 @@ function getSupa(){return window.supa;}
 function setType(t,el){type=t;document.querySelectorAll('#typeTabs span').forEach(s=>s.classList.remove('on'));el.classList.add('on');document.getElementById('topTitle').innerText=t==='post'?'New post':t==='reels'?'New reel':'New story';document.getElementById('previewBox').className='preview '+type;}
 function applyZoom(){let el=kind==='video'?document.getElementById('editVid'):document.getElementById('editImg');el.style.transform='translate('+panX+'px,'+panY+'px) scale('+scale+')';document.getElementById('resetBtn').style.display=scale>1?'block':'none';}
 function resetZoom(){scale=1;panX=0;panY=0;applyZoom();}
-function setFilter(f,btn){filter=f;document.querySelectorAll('#editBar button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');document.getElementById('editImg').style.filter=f;document.getElementById('editVid').style.filter=f;document.getElementById('prevImg').style.filter=f;}
+function setFilter(f,btn){filter=f;document.querySelectorAll('#editBar button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');document.getElementById('editImg').style.filter=f;document.getElementById('editVid').style.filter=f;}
 function showPanel(id,el){document.querySelectorAll('.panel').forEach(p=>p.style.display='none');document.getElementById(id).style.display='block';document.querySelectorAll('.tools div').forEach(d=>d.classList.remove('on'));if(el)el.classList.add('on');}
 function hidePanel(){document.querySelectorAll('.panel').forEach(p=>p.style.display='none');document.querySelectorAll('.tools div').forEach(d=>d.classList.remove('on'));}
 function setFont(f,btn){fontF=f;document.querySelectorAll('#panelFont button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');document.getElementById('overlayText').style.fontFamily=f;}
 function addText(){let t=prompt('Text ezhuthu da');if(t){text=t;let o=document.getElementById('overlayText');o.innerText=t;o.style.fontFamily=fontF;}}
 function pickSticker(s){document.getElementById('overlaySticker').innerText=s;}
-function pickSong(s,btn){song=s;document.getElementById('songTxt').innerText='Song: '+s;document.querySelectorAll('#panelSong button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');}
+function pickSong(s,btn){song=s;let e=document.getElementById('songTxt');if(e)e.innerText='Song: '+s;}
 function toggleSound(){soundOn=!soundOn;let v=document.getElementById('editVid');v.muted=!soundOn;document.getElementById('soundBtn').innerText=soundOn?'Sound ON 🔊':'Sound OFF 🔇';}
 function setVolume(v){document.getElementById('editVid').volume=v;}
 function doTrim(){trimS=+document.getElementById('trimStart').value;trimE=+document.getElementById('trimEnd').value;if(trimE<=trimS)trimE=trimS+1;document.getElementById('trimTxt').innerText=trimS+'s - '+trimE+'s';let v=document.getElementById('editVid');v.currentTime=trimS;}
@@ -193,16 +197,16 @@ box.addEventListener('touchstart',e=>{if(drawMode)return;document.getElementById
 box.addEventListener('touchmove',e=>{if(drawMode)return;if(e.touches.length===2){e.preventDefault();let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(startDist>0){scale=Math.max(1,Math.min(3,startScale*(d/startDist)));applyZoom();}}else if(e.touches.length===1&&scale>1){e.preventDefault();let maxX=150*(scale-1)+50,maxY=250*(scale-1)+50;panX=Math.max(-maxX,Math.min(maxX,startPanX+(e.touches[0].clientX-startX)));panY=Math.max(-maxY,Math.min(maxY,startPanY+(e.touches[0].clientY-startY)));applyZoom();}},{passive:false});
 box.addEventListener('touchend',e=>{if(e.touches.length<2)startDist=0;},{passive:true});
 box.addEventListener('dblclick',()=>{if(scale>1)resetZoom();else{scale=2;applyZoom();}});
-// ✅ POST PAGE LA EDIT BUTTON - ITHA THOTTA EDIT PAGE OPEN AAGUM
-function openEdit(){if(!file){document.getElementById('file').click();return;}step=2;document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='block';document.getElementById('editImgBox').className='imgBox '+type;document.getElementById('cropGrid').style.display='block';document.getElementById('hint').style.display='block';resetZoom();if(kind==='video'){let v=document.getElementById('editVid');v.src=url;v.style.display='block';v.play();document.getElementById('editImg').style.display='none';}else{let p=document.getElementById('editImg');p.src=url;p.style.display='block';document.getElementById('editVid').style.display='none';}}
+function openEdit(){if(!file){document.getElementById('file').click();return;}step=2;document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='block';document.getElementById('editImgBox').className='imgBox '+type;resetZoom();if(kind==='video'){let v=document.getElementById('editVid');v.src=url;v.style.display='block';v.play();document.getElementById('editImg').style.display='none';}else{let p=document.getElementById('editImg');p.src=url;p.style.display='block';document.getElementById('editVid').style.display='none';}}
+function updateTimeline(){if(!url)return;['tl1','tl2','tl3','tl4'].forEach(id=>{document.getElementById(id).src=url;});}
 document.getElementById('file').addEventListener('change',function(e){
   let f=e.target.files[0];if(!f)return;file=f;kind=f.type.includes('video')?'video':'image';
   let reader=new FileReader();
   reader.onload=function(ev){url=ev.target.result;document.getElementById('emptyBox').style.display='none';resetZoom();
     if(kind==='video'){let v=document.getElementById('prevVid');v.src=url;v.style.display='block';v.play();document.getElementById('prevImg').style.display='none';}
-    else{let p=document.getElementById('prevImg');p.src=url;p.style.display='block';document.getElementById('prevVid').style.display='none';}
+    else{let p=document.getElementById('prevImg');p.src=url;p.style.display='block';document.getElementById('prevImg').style.filter='none';document.getElementById('prevVid').style.display='none';}
     document.getElementById('grid').innerHTML='<div class="tile">'+(kind==='video'?'<video src="'+url+'" muted></video>':'<img src="'+url+'">')+'</div>';
-    document.getElementById('nextBtn').style.display='block';document.getElementById('editOpenBtn').style.display='flex';
+    document.getElementById('nextBtn').style.display='block';document.getElementById('editOpenBtn').style.display='flex';updateTimeline();
   };reader.readAsDataURL(f);e.target.value='';
 });
 document.getElementById('file2').addEventListener('change',function(e){
@@ -211,10 +215,10 @@ document.getElementById('file2').addEventListener('change',function(e){
 function goBack(){if(step===3){step=2;document.getElementById('step3').style.display='none';document.getElementById('top3').style.display='none';document.getElementById('step2').style.display='block';}else if(step===2){step=1;document.getElementById('step2').style.display='none';document.getElementById('step1').style.display='block';hidePanel();}else location.href='./index.html';}
 function goNext(){
   if(!file){document.getElementById('file').click();return;}
-  if(step===1){step=2;document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='block';document.getElementById('editImgBox').className='imgBox '+type;document.getElementById('cropGrid').style.display='block';document.getElementById('hint').style.display='block';resetZoom();
+  if(step===1){step=2;document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='block';document.getElementById('editImgBox').className='imgBox '+type;document.getElementById('hint').style.display='block';resetZoom();
     if(kind==='video'){let v=document.getElementById('editVid');v.src=url;v.style.display='block';v.play();document.getElementById('editImg').style.display='none';}
     else{let p=document.getElementById('editImg');p.src=url;p.style.display='block';document.getElementById('editVid').style.display='none';}
-    return;}
+    updateTimeline();return;}
   if(step===2){step=3;document.getElementById('step2').style.display='none';document.getElementById('step3').style.display='block';document.getElementById('top3').style.display='flex';document.getElementById('shareThumb').src=url;hidePanel();return;}
 }
 function tagPeople(){let t=prompt('Username:');if(t){tagged=t;document.getElementById('tagTxt').innerText='@'+t+' ›';}}
