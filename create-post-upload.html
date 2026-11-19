@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>New reel - Pixoro - v1048</title>
+<title>New reel - Pixoro - v1051</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#111;color:#fff;font-family:system-ui;padding-bottom:90px}
 .top{display:flex;gap:14px;align-items:center;padding:14px;font-size:22px}
 .top span{cursor:pointer}
-/* ✅ SCREENSHOT MARI - PERIYA COVER DA - 80px ILLA DA */
 .cover{display:grid;place-items:center;padding:6px 0 14px}
 .coverBox{position:relative;width:190px;height:300px;background:#000;border-radius:20px;overflow:hidden}
 .coverBox img,.coverBox video{width:100%;height:100%;object-fit:cover}
@@ -26,33 +25,30 @@ body{background:#111;color:#fff;font-family:system-ui;padding-bottom:90px}
 .share{background:#5b5bff;color:#fff}
 .share:disabled{opacity:.5}
 .previewInfo{padding:0 16px 8px;color:#888;font-size:12px;text-align:center}
+.status{text-align:center;font-size:13px;color:#ffcc00;padding:0 16px 8px;min-height:18px}
 </style>
 </head>
 <body>
 <div class="top"><span onclick="history.back()">←</span><b>New reel</b></div>
-
-<!-- ✅ SCREENSHOT MARI - COVER DA -->
 <div class="cover">
   <div class="coverBox">
     <img id="thumb" src="" style="display:none">
     <video id="thumbVid" src="" style="display:none" muted loop playsinline></video>
     <div id="noThumb" style="width:100%;height:100%;display:grid;place-items:center;text-align:center">
-      <div><div style="font-size:40px">📷</div><div style="color:#888;font-size:12px;margin-top:8px">Photo Illa da</div><button onclick="location.href='./create.html?v=1048'" style="margin-top:10px;background:#fff;color:#000;border:0;padding:10px 16px;border-radius:20px;font-weight:800;position:static;transform:none">📁 Select Photo</button></div>
+      <div><div style="font-size:40px">📷</div><div style="color:#888;font-size:12px;margin-top:8px">Photo Illa da</div><button onclick="location.href='./create.html?v=1051'" style="margin-top:10px;background:#fff;color:#000;border:0;padding:10px 16px;border-radius:20px;font-weight:800;position:static;transform:none">📁 Select Photo</button></div>
     </div>
     <button id="editCoverBtn" onclick="alert('Edit cover - Coming Soon da')">Edit cover</button>
   </div>
 </div>
 <div class="previewInfo" id="previewInfo"></div>
-
+<div class="status" id="status"></div>
 <textarea id="caption" class="caption" rows="2" placeholder="Write a caption and add hashtags..."></textarea>
-
 <div class="chips">
   <button onclick="addHash()"># Hashtags</button>
   <button onclick="addPoll()">☰ Poll</button>
   <button onclick="addPrompt()">⌕ Prompt</button>
   <button onclick="removeBgFinal()">✨ BG Remove</button>
 </div>
-
 <div class="row" onclick="tagPeople()"><span>👤 Tag people</span><span id="tagTxt">›</span></div>
 <div class="row" onclick="addLocation()"><span>📍 Add location</span><span id="locTxt">›</span></div>
 <div class="note">People you share this content with can see the location you tag and view this content on the map.</div>
@@ -60,110 +56,97 @@ body{background:#111;color:#fff;font-family:system-ui;padding-bottom:90px}
 <div class="row" onclick="togglePrivate()"><span>🔒 Audience</span><span id="audTxt">Public ›</span></div>
 <div class="row" onclick="toggleHideFace()"><span>🙈 Face Photo - Home la Vara Koodathu</span><span id="hideFaceTxt">OFF ›</span></div>
 <div class="btns"><button class="save" onclick="saveDraft()">Save draft</button><button class="share" id="shareBtn" onclick="sharePost()">Share</button></div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js?v=1048"></script>
-<script src="js/pixoro-core.js?v=1048"></script>
+<script src="js/supabase.js?v=1051"></script>
+<script src="js/pixoro-core.js?v=1051"></script>
 <script>
-// ✅ UN FILE - LOGIC - ATHE THAAN DA - LOOP MATTUM - FIX DA
-let mediaBlob = null;
-let mediaUrl = '';
-let filter = 'none';
-let bgMode = 'black';
-let hideFace = false;
-let isPrivate = false, tagged = '', loc = '';
-let mediaKind = 'image';
-let mediaType = 'post';
-let audioName = 'Original Audio';
-
+// ✅ UN FILE - LOGIC - ATHE THAAN DA + v1051 FIX MATTUM DA
+let mediaBlob=null, mediaUrl='', filter='none', bgMode='black', hideFace=false, isPrivate=false, tagged='', loc='', mediaKind='image', mediaType='post', audioName='Original Audio';
 function openDB(){ return new Promise((res,rej)=>{ let req=indexedDB.open('pixoro-db',1); req.onupgradeneeded=()=>{ req.result.createObjectStore('media'); }; req.onsuccess=()=>res(req.result); req.onerror=()=>rej(req.error); }); }
 async function getFromDB(key){ let db=await openDB(); return new Promise((res,rej)=>{ let r=db.transaction('media','readonly').objectStore('media').get(key); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
-async function saveToDB(key, val){ let db=await openDB(); let tx=db.transaction('media','readwrite'); tx.objectStore('media').put(val, key); }
-async function deleteFromDB(key){ let db=await openDB(); let tx=db.transaction('media','readwrite'); tx.objectStore('media').delete(key); }
+// ✅ FIX DA - UN FILE LA - saveToDB - la - await Illa da - Ippo - await Irukku da
+async function saveToDB(key, val){ let db=await openDB(); return new Promise((res,rej)=>{ let tx=db.transaction('media','readwrite'); tx.objectStore('media').put(val, key); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
+async function deleteFromDB(key){ let db=await openDB(); return new Promise((res,rej)=>{ let tx=db.transaction('media','readwrite'); tx.objectStore('media').delete(key); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
 async function getAny(newKey, oldKey){ let v=await getFromDB(newKey); if(v!==undefined && v!==null) return v; if(oldKey) return await getFromDB(oldKey); return null; }
-
 async function loadUpload(){
   try{
-    mediaBlob = await getAny('pixoro_create_media', 'pixoro_post_media');
-    filter = await getAny('pixoro_create_filter', 'pixoro_post_filter') || 'none';
-    bgMode = await getAny('pixoro_create_bg', 'pixoro_post_bg') || 'black';
-    let savedText = await getAny('pixoro_create_text', 'pixoro_post_text') || '';
-    let savedDraft = await getFromDB('pixoro_create_draft') || '';
-    mediaKind = await getAny('pixoro_create_kind', null) || 'image';
-    mediaType = await getAny('pixoro_create_type', null) || 'post';
-    if(savedText) document.getElementById('caption').value = savedText;
-    else if(savedDraft) document.getElementById('caption').value = savedDraft;
-    // ✅ LOOP FIX DA - ALERT + REDIRECT ILLA DA - COVER LA YE SELECT BUTTON DA
+    mediaBlob=await getAny('pixoro_create_media', 'pixoro_post_media');
+    filter=await getAny('pixoro_create_filter', 'pixoro_post_filter') || 'none';
+    bgMode=await getAny('pixoro_create_bg', 'pixoro_post_bg') || 'black';
+    let savedText=await getAny('pixoro_create_text', 'pixoro_post_text') || '';
+    let savedDraft=await getFromDB('pixoro_create_draft') || '';
+    mediaKind=await getAny('pixoro_create_kind', null) || 'image';
+    mediaType=await getAny('pixoro_create_type', null) || 'post';
+    audioName=await getAny('pixoro_create_audio', null) || 'Original Audio';
+    document.getElementById('audioTxt').innerText=audioName+' ›';
+    if(savedText) document.getElementById('caption').value=savedText;
+    else if(savedDraft) document.getElementById('caption').value=savedDraft;
     if(!mediaBlob){ document.getElementById('noThumb').style.display='grid'; document.getElementById('editCoverBtn').style.display='none'; document.getElementById('previewInfo').innerText='Photo Select Pannu da - Mela Button ah Thodu da'; return; }
-    mediaUrl = URL.createObjectURL(mediaBlob);
-    if(mediaKind === 'video'){ let v=document.getElementById('thumbVid'); v.src=mediaUrl; v.style.display='block'; v.play(); document.getElementById('thumb').style.display='none'; }
+    mediaUrl=URL.createObjectURL(mediaBlob);
+    if(mediaKind==='video'){ let v=document.getElementById('thumbVid'); v.src=mediaUrl; v.style.display='block'; v.play(); document.getElementById('thumb').style.display='none'; }
     else { let thumb=document.getElementById('thumb'); thumb.src=mediaUrl; thumb.style.display='block'; thumb.style.filter=filter; document.getElementById('thumbVid').style.display='none'; }
     document.getElementById('noThumb').style.display='none';
-    document.getElementById('previewInfo').innerText = 'Type: ' + mediaType + ' | Filter: ' + filter + ' | BG: ' + bgMode;
-    document.querySelector('.top b').innerText = mediaType === 'story' ? 'New story' : mediaType === 'reels' ? 'New reel' : 'New post';
+    // ✅ DRAWING + ZOOM - ALREADY BAKED DA - Edit Page la - Bake Aayiduchu da - Inga - Thirumba Filter Poda Vendaam da
+    document.getElementById('previewInfo').innerText='Type: '+mediaType+' | Filter: '+filter+' (Baked) | BG: '+bgMode+' | Drawing: Baked ✅';
+    document.querySelector('.top b').innerText = mediaType==='story' ? 'New story' : mediaType==='reels' ? 'New reel' : 'New post';
   }catch(e){ document.getElementById('previewInfo').innerText='Photo Load Aagala da - Thirumba Select Pannu da'; }
 }
 loadUpload();
-
-function addHash(){ let c=document.getElementById('caption'); c.value += ' #pixoro #trending '; c.focus(); }
-function addPoll(){ let q=prompt('Poll Question?'); if(q) document.getElementById('caption').value += '\n📊 Poll: ' + q; }
-function addPrompt(){ let p=prompt('Prompt:'); if(p) document.getElementById('caption').value += '\n💬 ' + p; }
+function addHash(){ let c=document.getElementById('caption'); c.value+=' #pixoro #trending '; c.focus(); }
+function addPoll(){ let q=prompt('Poll Question?'); if(q) document.getElementById('caption').value+='\n📊 Poll: '+q; }
+function addPrompt(){ let p=prompt('Prompt:'); if(p) document.getElementById('caption').value+='\n💬 '+p; }
 function tagPeople(){ let t=prompt('Username:'); if(t){ tagged=t; document.getElementById('tagTxt').innerText='@'+t+' ›'; } }
 function addLocation(){ let l=prompt('Location - Dharmapuri / Chennai?'); if(l){ loc=l; document.getElementById('locTxt').innerText=l+' ›'; } }
-function renameAudio(){ let a=prompt('Audio Name:', audioName); if(a){ audioName=a; document.getElementById('audioTxt').innerText=a+' ›'; } }
-function togglePrivate(){ isPrivate=!isPrivate; document.getElementById('audTxt').innerText = isPrivate ? 'Private Share ›' : 'Public ›'; }
-function toggleHideFace(){ hideFace=!hideFace; document.getElementById('hideFaceTxt').innerText = hideFace ? 'ON - Home la Varaathu ›' : 'OFF ›'; alert(hideFace ? 'Face Photo - Home la Varaathu da 🙈 - Profile la Mattum Theriyum da' : 'Face Photo - Home la Varum da'); }
+function renameAudio(){ let a=prompt('Audio Name:', audioName); if(a){ audioName=a; document.getElementById('audioTxt').innerText=a+' ›'; saveToDB('pixoro_create_audio', a); } }
+function togglePrivate(){ isPrivate=!isPrivate; document.getElementById('audTxt').innerText=isPrivate?'Private Share ›':'Public ›'; }
+function toggleHideFace(){ hideFace=!hideFace; document.getElementById('hideFaceTxt').innerText=hideFace?'ON - Home la Varaathu ›':'OFF ›'; alert(hideFace?'Face Photo - Home la Varaathu da 🙈 - Profile la Mattum Theriyum da':'Face Photo - Home la Varum da'); }
 function removeBgFinal(){ alert('BG Remove On da ✨ - Photo va - Clean Background la - Share Pannuren da'); bgMode='transparent'; saveToDB('pixoro_create_bg','transparent'); }
 function saveDraft(){ saveToDB('pixoro_create_draft', document.getElementById('caption').value); alert('Draft Save Aachu da ✅'); }
+// ✅ FIX DA - Edit Page la - Filter + Drawing - Already Baked da - Inga - Thirumba Filter Poda Koodathu da - Illana - Double Aayidum da
 function applyFilterToBlob(blob, filterStr){
   return new Promise((resolve)=>{
     if(!filterStr || filterStr==='none' || mediaKind==='video'){ resolve(blob); return; }
-    let url = URL.createObjectURL(blob);
-    let img = new Image();
-    img.onload = ()=>{ let c=document.createElement('canvas'); c.width=img.width; c.height=img.height; let ctx=c.getContext('2d'); ctx.filter=filterStr; ctx.drawImage(img,0,0); URL.revokeObjectURL(url); c.toBlob((b)=>resolve(b || blob), 'image/jpeg', 0.85); };
-    img.src = url;
+    let url=URL.createObjectURL(blob);
+    let img=new Image();
+    img.onload=()=>{ let c=document.createElement('canvas'); c.width=img.width; c.height=img.height; let ctx=c.getContext('2d'); ctx.filter=filterStr; ctx.drawImage(img,0,0); URL.revokeObjectURL(url); c.toBlob((b)=>resolve(b||blob), 'image/jpeg', 0.85); };
+    img.src=url;
   });
 }
 async function sharePost(){
-  if(!mediaBlob){ alert('Photo Illa da - Mela Select Photo Button ah Thodu da'); location.href='./create.html?v=1048'; return; }
-  let btn = document.getElementById('shareBtn');
-  btn.innerText = 'Sharing...'; btn.disabled = true;
-  let cap = document.getElementById('caption').value || 'Just Pixoro 🔥';
-  if(tagged) cap += ' @' + tagged;
-  if(loc) cap += ' 📍 ' + loc;
+  if(!mediaBlob){ alert('Photo Illa da - Mela Select Photo Button ah Thodu da'); location.href='./create.html?v=1051'; return; }
+  let btn=document.getElementById('shareBtn'); btn.innerText='Sharing...'; btn.disabled=true;
+  let st=document.getElementById('status'); st.innerText='Uploading... Wait Pannu da ⏳';
+  let cap=document.getElementById('caption').value || 'Just Pixoro 🔥';
+  if(tagged) cap+=' @'+tagged;
+  if(loc) cap+=' 📍 '+loc;
   try{
-    let s = window.supabaseClient || window.supa;
+    let s=window.supabaseClient || window.supa;
     if(!s) throw new Error('Supabase connect aagala da - js/supabase.js check pannu da');
-    let {data:{session}} = await s.auth.getSession();
+    let {data:{session}}=await s.auth.getSession();
     if(!session){ alert('Login Pannu da'); location.href='./login.html'; return; }
-    let finalBlob = await applyFilterToBlob(mediaBlob, filter);
-    let folder = mediaType === 'story' ? 'stories' : mediaType === 'reels' ? 'reels' : 'posts';
-    let ext = mediaKind === 'video' ? 'mp4' : 'jpg';
-    let fileName = folder + '/' + session.user.id + '/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.' + ext;
-    let { error: upErr } = await s.storage.from(folder).upload(fileName, finalBlob, {contentType: mediaKind==='video' ? 'video/mp4' : 'image/jpeg', upsert:false});
-    if(upErr) throw upErr;
-    let { data: urlData } = s.storage.from(folder).getPublicUrl(fileName);
-    let publicUrl = urlData.publicUrl;
-    let { error } = await s.from('posts').insert({
-      user_id: session.user.id,
-      username: window.ME_RAW || session.user.email.split('@')[0],
-      media_url: publicUrl,
-      image_url: mediaKind === 'image' ? publicUrl : null,
-      video_url: mediaKind === 'video' ? publicUrl : null,
-      media_type: mediaType,
-      caption: cap,
-      visibility: isPrivate ? 'private_share' : 'public',
-      is_archived: hideFace ? true : false
-    });
-    if(error) throw error;
+    // ✅ Edit la - Bake Aachu - Filter 'none' - nu - Irukkum da - Direct Upload da
+    let finalBlob=await applyFilterToBlob(mediaBlob, filter);
+    let folder=mediaType==='story' ? 'stories' : mediaType==='reels' ? 'reels' : 'posts';
+    let ext=mediaKind==='video' ? 'mp4' : 'jpg';
+    let fileName=folder+'/'+session.user.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
+    st.innerText='Storage ku Upload Aaguthu da...';
+    let {error:upErr}=await s.storage.from(folder).upload(fileName, finalBlob, {contentType: mediaKind==='video' ? 'video/mp4' : 'image/jpeg', upsert:false});
+    if(upErr) throw new Error('Storage Error: '+upErr.message+' - Supabase la '+folder+' Bucket Irukka nu Paaru da');
+    let {data:urlData}=s.storage.from(folder).getPublicUrl(fileName);
+    let publicUrl=urlData.publicUrl;
+    st.innerText='Feed la Save Aaguthu da...';
+    let {error}=await s.from('posts').insert({ user_id: session.user.id, username: window.ME_RAW || session.user.email.split('@')[0], media_url: publicUrl, image_url: mediaKind==='image' ? publicUrl : null, video_url: mediaKind==='video' ? publicUrl : null, media_type: mediaType, caption: cap, visibility: isPrivate ? 'private_share' : 'public', is_archived: hideFace ? true : false });
+    if(error) throw new Error('DB Error: '+error.message);
     await deleteFromDB('pixoro_create_media'); await deleteFromDB('pixoro_create_filter');
     await deleteFromDB('pixoro_create_bg'); await deleteFromDB('pixoro_create_text');
     await deleteFromDB('pixoro_create_draft'); await deleteFromDB('pixoro_create_type');
-    await deleteFromDB('pixoro_create_kind'); await deleteFromDB('pixoro_post_media');
+    await deleteFromDB('pixoro_create_kind'); await deleteFromDB('pixoro_create_audio');
+    await deleteFromDB('pixoro_create_zoom'); await deleteFromDB('pixoro_post_media');
     await deleteFromDB('pixoro_post_filter'); await deleteFromDB('pixoro_post_bg'); await deleteFromDB('pixoro_post_text');
+    st.innerText='Posted da 🎉';
     alert(hideFace ? 'Post Share Aachu da 🔥 - Home la Varaathu da - Profile la Paakalam da' : 'Post Share Aachu da 🔥');
-    location.href = './index.html';
-  }catch(e){ alert('Error da: ' + e.message); btn.innerText = 'Share'; btn.disabled = false; }
+    location.href='./index.html';
+  }catch(e){ document.getElementById('status').innerText='Error: '+e.message; alert('Error da: '+e.message); btn.innerText='Share'; btn.disabled=false; }
 }
 </script>
 </body>
