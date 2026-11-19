@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>New reel - Pixoro</title>
+<title>New reel - Pixoro - v1048</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#111;color:#fff;font-family:system-ui}
+body{background:#111;color:#fff;font-family:system-ui;padding-bottom:90px}
 .top{display:flex;gap:14px;align-items:center;padding:14px;font-size:20px}
 .top span{cursor:pointer}
-/* ✅ CORRECTED - WHITE BLOCK - PHOTO SUTHI - WHITE DA */
 .coverWrap{width:160px;height:230px;margin:14px auto;position:relative;background:#fff;border-radius:20px;overflow:hidden;display:grid;place-items:center;border:2px solid #fff;padding:10px;box-sizing:border-box}
 .coverWrap img,.coverWrap video{width:100%;height:100%;object-fit:contain;background:#fff;border-radius:14px}
 .coverWrap .empty{color:#000;font-size:40px;text-align:center}
@@ -28,28 +27,25 @@ textarea{width:100%;background:transparent;border:0;color:#fff;padding:14px;font
 .save{background:#333;color:#fff}
 .share{background:#4d7cff;color:#fff}
 .share:disabled{opacity:.5}
-.previewInfo{padding:0 16px 6px;color:#888;font-size:12px}
+.previewInfo{padding:0 16px 6px;color:#888;font-size:12px;text-align:center}
 </style>
 </head>
 <body>
 <div class="top"><span onclick="history.back()">←</span><b>New reel</b></div>
-
 <div style="position:relative;text-align:center">
   <div class="coverWrap" id="coverWrap">
     <img id="coverImg" src="" style="display:none">
     <video id="coverVid" src="" style="display:none" muted loop playsinline autoplay></video>
-    <div class="empty" id="coverEmpty">📷<small>Cover Illa da</small></div>
-    <div class="editCover" onclick="document.getElementById('coverFile').click()">Edit cover</div>
+    <div class="empty" id="coverEmpty">📷<small>Cover Illa da</small><br><button onclick="location.href='./create.html?v=1048'" style="margin-top:10px;background:#000;color:#fff;border:0;padding:10px 16px;border-radius:20px;font-weight:800">📁 Select Photo</button></div>
+    <div class="editCover" id="editCoverBtn" onclick="document.getElementById('coverFile').click()">Edit cover</div>
   </div>
 </div>
-
-<div class="bgRow">
+<div class="bgRow" id="bgRow">
   <button class="on" onclick="setCoverBg('white',this)">⬜ White Block</button>
   <button onclick="setCoverBg('black',this)">⬛ Black Block</button>
   <button onclick="setCoverBg('transparent',this)">🔲 BG Remove</button>
   <button onclick="setCoverBg('blur',this)">🌀 Blur BG</button>
 </div>
-
 <input type="file" id="coverFile" accept="image/*" hidden>
 <textarea id="caption" rows="2" placeholder="Write a caption and add hashtags..."></textarea>
 <div class="previewInfo" id="previewInfo"></div>
@@ -67,163 +63,133 @@ textarea{width:100%;background:transparent;border:0;color:#fff;padding:14px;font
 <div class="row" onclick="toggleHideFace()"><span>🙈 Face Photo - Home la Vara Koodathu</span><span id="hideFaceTxt">OFF ›</span></div>
 <div style="height:90px"></div>
 <div class="btns"><button class="save" onclick="saveDraft()">Save draft</button><button class="share" id="shareBtn" onclick="shareReel()">Share</button></div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js"></script>
-<script src="js/pixoro-core.js"></script>
-<script src="js/reels-visibility.js"></script>
+<script src="js/supabase.js?v=1048"></script>
+<script src="js/pixoro-core.js?v=1048"></script>
 <script>
-let media = localStorage.getItem('pixoro_reel_media') || '';
-let type = localStorage.getItem('pixoro_reel_type') || 'image';
-let filter = localStorage.getItem('pixoro_reel_filter') || 'none';
-let bgMode = localStorage.getItem('pixoro_reel_bg') || 'white';
-let hideFace = false;
-let isPrivate = false, tagged = '', loc = '';
-
-if(!media || media.startsWith('blob:') || media.includes('picsum')){
-  alert('Photo / Video Illa da - Thirumba Select Pannu da');
-  location.href = './create-reels.html';
-} else {
-  let cImg = document.getElementById('coverImg');
-  let cVid = document.getElementById('coverVid');
-  if(type === 'video'){ cVid.src = media; cVid.style.display = 'block'; cVid.style.filter = filter; }
-  else { cImg.src = media; cImg.style.display = 'block'; cImg.style.filter = filter; }
-  document.getElementById('coverEmpty').style.display = 'none';
-  document.getElementById('previewInfo').innerText = 'Filter: ' + filter + ' | BG: ' + bgMode + ' | Type: ' + type;
-  applyCoverBg(bgMode);
-  // ✅ BG Button - Correct ah - ON la Irukkanum da
-  document.querySelectorAll('.bgRow button').forEach(b => b.classList.remove('on'));
-  let idx = bgMode==='white'?0:bgMode==='black'?1:bgMode==='transparent'?2:3;
-  document.querySelectorAll('.bgRow button')[idx].classList.add('on');
+// ✅ LOCALSTORAGE BLOB ILLA DA - INDEXEDDB REAL FILE DA
+let mediaBlob=null, mediaKind='image', mediaType='reels', filter='none', bgMode='white', hideFace=false, isPrivate=false, tagged='', loc='', audioName='Original Audio', coverBlob=null;
+function openDB(){ return new Promise((res,rej)=>{ let req=indexedDB.open('pixoro-db',1); req.onupgradeneeded=()=>{ req.result.createObjectStore('media'); }; req.onsuccess=()=>res(req.result); req.onerror=()=>rej(req.error); }); }
+async function getDB(k){ let db=await openDB(); return new Promise((res,rej)=>{ let r=db.transaction('media','readonly').objectStore('media').get(k); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function saveDB(k,v){ let db=await openDB(); return new Promise((res,rej)=>{ let tx=db.transaction('media','readwrite'); tx.objectStore('media').put(v,k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
+async function delDB(k){ let db=await openDB(); let tx=db.transaction('media','readwrite'); tx.objectStore('media').delete(k); }
+async function load(){
+  try{
+    mediaBlob=await getDB('pixoro_create_media');
+    mediaKind=await getDB('pixoro_create_kind') || 'image';
+    mediaType=await getDB('pixoro_create_type') || 'reels';
+    filter=await getDB('pixoro_create_filter') || 'none';
+    bgMode=await getDB('pixoro_create_bg') || 'white';
+    let txt=await getDB('pixoro_create_text') || '';
+    let draft=await getDB('pixoro_create_draft') || '';
+    audioName=await getDB('pixoro_create_audio') || 'Original Audio';
+    if(txt) document.getElementById('caption').value=txt; else if(draft) document.getElementById('caption').value=draft;
+    document.getElementById('audioName').innerText=audioName+' ›';
+    // ✅ LOOP ILLA DA - ALERT ILLA - COVER LA YE SELECT BUTTON DA
+    if(!mediaBlob){ document.getElementById('coverEmpty').style.display='block'; document.getElementById('editCoverBtn').style.display='none'; document.getElementById('previewInfo').innerText='Photo Select Pannu da - Mela Button ah Thodu da'; return; }
+    let url=URL.createObjectURL(mediaBlob);
+    if(mediaKind==='video'){ let v=document.getElementById('coverVid'); v.src=url; v.style.display='block'; v.style.filter=filter; }
+    else { let p=document.getElementById('coverImg'); p.src=url; p.style.display='block'; p.style.filter=filter; }
+    document.getElementById('coverEmpty').style.display='none';
+    document.getElementById('previewInfo').innerText='Filter: '+filter+' | BG: '+bgMode+' | Type: '+mediaType;
+    document.querySelector('.top b').innerText = mediaType==='story' ? 'New story' : mediaType==='reels' ? 'New reel' : 'New post';
+    applyCoverBg(bgMode);
+    document.querySelectorAll('#bgRow button').forEach(b=>b.classList.remove('on'));
+    let idx=bgMode==='white'?0:bgMode==='black'?1:bgMode==='transparent'?2:3;
+    document.querySelectorAll('#bgRow button')[idx].classList.add('on');
+  }catch(e){ document.getElementById('previewInfo').innerText='Photo Load Aagala da - Thirumba Select Pannu da'; }
 }
-
-// ✅ CORRECTED - WHITE BLOCK + BG REMOVE - FULL FIX DA
+load();
 function applyCoverBg(mode){
-  let wrap = document.getElementById('coverWrap');
-  let cImg = document.getElementById('coverImg');
-  let cVid = document.getElementById('coverVid');
-  if(mode === 'white'){
-    wrap.style.background = '#fff';
-    wrap.style.borderColor = '#fff';
-    wrap.style.padding = '10px';
-    cImg.style.background = '#fff';
-    cImg.style.objectFit = 'contain';
-    cVid.style.objectFit = 'contain';
-    cVid.style.background = '#fff';
-  }
-  if(mode === 'black'){
-    wrap.style.background = '#000';
-    wrap.style.borderColor = '#333';
-    wrap.style.padding = '0px';
-    cImg.style.background = '#000';
-    cImg.style.objectFit = 'cover';
-    cVid.style.objectFit = 'cover';
-  }
-  if(mode === 'transparent'){
-    wrap.style.background = 'repeating-conic-gradient(#222 0% 25%, #000 0% 50%) 50% / 20px 20px';
-    wrap.style.borderColor = '#333';
-    wrap.style.padding = '0px';
-    cImg.style.background = 'transparent';
-    cImg.style.objectFit = 'contain';
-    cVid.style.objectFit = 'contain';
-  }
-  if(mode === 'blur'){
-    wrap.style.background = '#000';
-    wrap.style.borderColor = '#333';
-    wrap.style.padding = '0px';
-    cImg.style.background = '#000';
-    cImg.style.objectFit = 'cover';
-    cVid.style.objectFit = 'cover';
-  }
+  let wrap=document.getElementById('coverWrap');
+  let cImg=document.getElementById('coverImg'), cVid=document.getElementById('coverVid');
+  if(mode==='white'){ wrap.style.background='#fff'; wrap.style.borderColor='#fff'; wrap.style.padding='10px'; cImg.style.background='#fff'; cImg.style.objectFit='contain'; cVid.style.objectFit='contain'; cVid.style.background='#fff'; }
+  if(mode==='black'){ wrap.style.background='#000'; wrap.style.borderColor='#333'; wrap.style.padding='0px'; cImg.style.background='#000'; cImg.style.objectFit='cover'; cVid.style.objectFit='cover'; }
+  if(mode==='transparent'){ wrap.style.background='repeating-conic-gradient(#222 0% 25%, #000 0% 50%) 50% / 20px 20px'; wrap.style.borderColor='#333'; wrap.style.padding='0px'; cImg.style.background='transparent'; cImg.style.objectFit='contain'; cVid.style.objectFit='contain'; }
+  if(mode==='blur'){ wrap.style.background='#000'; wrap.style.borderColor='#333'; wrap.style.padding='0px'; cImg.style.background='#000'; cImg.style.objectFit='cover'; cVid.style.objectFit='cover'; }
 }
 function setCoverBg(mode, btn){
-  document.querySelectorAll('.bgRow button').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  bgMode = mode; localStorage.setItem('pixoro_reel_bg', mode);
-  applyCoverBg(mode);
-  if(mode === 'transparent') alert('BG Remove On da ✨ - White Block Remove Aachu da - Photo Mattum Theriyum da');
-  if(mode === 'white') alert('White Block On da ⬜ - Photo Suthi - White Theriyum da');
+  document.querySelectorAll('#bgRow button').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  bgMode=mode; saveDB('pixoro_create_bg', mode); applyCoverBg(mode);
+  if(mode==='transparent') alert('BG Remove On da ✨ - White Block Remove Aachu da - Photo Mattum Theriyum da');
+  if(mode==='white') alert('White Block On da ⬜ - Photo Suthi - White Theriyum da');
 }
-function removeBgFinal(){ setCoverBg('transparent', document.querySelectorAll('.bgRow button')[2]); }
-
-// ✅ COVER - BLOB ILLA - FileReader + White Block Canvas da
-document.getElementById('coverFile').onchange = (e) => {
-  let f = e.target.files[0]; if(!f) return;
-  let reader = new FileReader();
-  reader.onload = function(){
-    let img = new Image();
-    img.onload = function(){
-      let canvas = document.createElement('canvas');
-      let maxW = 720, w = img.width, h = img.height;
-      if(w > maxW){ h = h * maxW / w; w = maxW; }
-      // ✅ WHITE BLOCK - Canvas la - White Border Add Pannu da - Share Panna Kooda - White Block Varum da
-      let pad = 20;
-      canvas.width = w + pad*2; canvas.height = h + pad*2;
-      let ctx = canvas.getContext('2d');
-      if(bgMode === 'black'){ ctx.fillStyle = '#000'; }
-      else if(bgMode === 'transparent'){ ctx.fillStyle = '#000'; }
-      else { ctx.fillStyle = '#fff'; }
-      ctx.fillRect(0,0,canvas.width,canvas.height);
-      ctx.drawImage(img,pad,pad,w,h);
-      let dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      let cImg = document.getElementById('coverImg');
-      cImg.src = dataUrl; cImg.style.display = 'block';
-      document.getElementById('coverVid').style.display = 'none';
-      document.getElementById('coverEmpty').style.display = 'none';
-      localStorage.setItem('pixoro_reel_cover', dataUrl);
-      media = dataUrl; type = 'image';
-    };
-    img.src = reader.result;
-  };
-  reader.readAsDataURL(f);
+function removeBgFinal(){ setCoverBg('transparent', document.querySelectorAll('#bgRow button')[2]); }
+document.getElementById('coverFile').onchange=(e)=>{
+  let f=e.target.files[0]; if(!f) return;
+  coverBlob=f;
+  let url=URL.createObjectURL(f);
+  let cImg=document.getElementById('coverImg'); cImg.src=url; cImg.style.display='block';
+  document.getElementById('coverVid').style.display='none'; document.getElementById('coverEmpty').style.display='none';
 };
-
-function addHash(){ let c=document.getElementById('caption'); c.value += ' #pixoro #trending '; c.focus(); }
-function addPoll(){ let q=prompt('Poll Question?'); if(q){ let c=document.getElementById('caption'); c.value += '\n📊 Poll: ' + q + ' | Yes / No'; } }
-function addPrompt(){ let p=prompt('Prompt ezhuthu da:'); if(p){ let c=document.getElementById('caption'); c.value += '\n💬 ' + p; } }
+function addHash(){ let c=document.getElementById('caption'); c.value+=' #pixoro #trending '; c.focus(); }
+function addPoll(){ let q=prompt('Poll Question?'); if(q) document.getElementById('caption').value+='\n📊 Poll: '+q+' | Yes / No'; }
+function addPrompt(){ let p=prompt('Prompt ezhuthu da:'); if(p) document.getElementById('caption').value+='\n💬 '+p; }
 function tagPeople(){ let t=prompt('Yaara Tag Panna da? username:'); if(t){ tagged=t; document.getElementById('tagTxt').innerText='@'+t+' ›'; } }
 function addLocation(){ let l=prompt('Location - Dharmapuri / Chennai?'); if(l){ loc=l; document.getElementById('locTxt').innerText=l+' ›'; } }
-function renameAudio(){ let a=prompt('Audio Name:', document.getElementById('audioName').innerText); if(a){ document.getElementById('audioName').innerText=a+' ›'; localStorage.setItem('pixoro_reel_audio', a); } }
-function togglePrivate(){ isPrivate=!isPrivate; document.getElementById('audTxt').innerText = isPrivate ? 'Private Share ›' : 'Public ›'; }
-function toggleHideFace(){ hideFace=!hideFace; document.getElementById('hideFaceTxt').innerText = hideFace ? 'ON - Home la Varaathu ›' : 'OFF ›'; }
-function saveDraft(){ localStorage.setItem('pixoro_reel_draft', document.getElementById('caption').value); alert('Draft Save Aachu da ✅'); }
-
-function applyFilterToDataUrl(dataUrl, filterStr){
-  return new Promise((resolve)=>{
-    if(!filterStr || filterStr==='none' || dataUrl.startsWith('data:video')){ resolve(dataUrl); return; }
-    let img = new Image();
-    img.onload = ()=>{
-      let c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
-      let ctx = c.getContext('2d'); ctx.filter = filterStr; ctx.drawImage(img,0,0);
-      resolve(c.toDataURL('image/jpeg', 0.85));
-    };
-    img.onerror = ()=> resolve(dataUrl);
-    img.src = dataUrl;
+function renameAudio(){ let a=prompt('Audio Name:', audioName); if(a){ audioName=a; document.getElementById('audioName').innerText=a+' ›'; saveDB('pixoro_create_audio', a); } }
+function togglePrivate(){ isPrivate=!isPrivate; document.getElementById('audTxt').innerText=isPrivate?'Private Share ›':'Public ›'; }
+function toggleHideFace(){ hideFace=!hideFace; document.getElementById('hideFaceTxt').innerText=hideFace?'ON - Home la Varaathu ›':'OFF ›'; }
+function saveDraft(){ saveDB('pixoro_create_draft', document.getElementById('caption').value); alert('Draft Save Aachu da ✅'); }
+function applyFilter(blob, f){
+  return new Promise((res)=>{
+    if(!f || f==='none' || mediaKind==='video'){ res(blob); return; }
+    let url=URL.createObjectURL(blob);
+    let img=new Image();
+    img.onload=()=>{ let c=document.createElement('canvas'); c.width=img.width; c.height=img.height; let ctx=c.getContext('2d'); ctx.filter=f; ctx.drawImage(img,0,0); URL.revokeObjectURL(url); c.toBlob(b=>res(b||blob),'image/jpeg',0.85); };
+    img.src=url;
   });
 }
-
+function applyWhiteBlock(blob){
+  return new Promise((res)=>{
+    if(bgMode!=='white' || mediaKind==='video'){ res(blob); return; }
+    let url=URL.createObjectURL(blob);
+    let img=new Image();
+    img.onload=()=>{ let pad=20; let c=document.createElement('canvas'); c.width=img.width+pad*2; c.height=img.height+pad*2; let ctx=c.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,c.width,c.height); ctx.drawImage(img,pad,pad); URL.revokeObjectURL(url); c.toBlob(b=>res(b||blob),'image/jpeg',0.85); };
+    img.src=url;
+  });
+}
 async function shareReel(){
-  let btn = document.getElementById('shareBtn');
-  btn.innerText = 'Sharing...'; btn.disabled = true;
-  let cap = document.getElementById('caption').value || 'Just Pixoro 🔥';
-  if(tagged) cap += ' @' + tagged;
-  if(loc) cap += ' 📍 ' + loc;
+  if(!mediaBlob){ alert('Photo Illa da - Mela Select Photo Button ah Thodu da'); location.href='./create.html?v=1048'; return; }
+  let btn=document.getElementById('shareBtn'); btn.innerText='Sharing...'; btn.disabled=true;
+  let cap=document.getElementById('caption').value || 'Just Pixoro 🔥';
+  if(tagged) cap+=' @'+tagged;
+  if(loc) cap+=' 📍 '+loc;
+  if(hideFace) cap+=' #FACE_HIDE';
   try{
-    let s = window.supa;
-    let {data:{session}} = await s.auth.getSession();
+    let s=window.supabaseClient || window.supa;
+    if(!s) throw new Error('Supabase connect aagala da');
+    let {data:{session}}=await s.auth.getSession();
     if(!session){ alert('Login Pannu da'); location.href='./login.html'; return; }
-    let finalMedia = await applyFilterToDataUrl(media, filter);
-    if(hideFace) cap += ' #FACE_HIDE';
-    let cover = localStorage.getItem('pixoro_reel_cover') || finalMedia;
-    let r = await window.uploadReelPixoro(session.user.id, finalMedia, isPrivate, null, cap, cover);
-    if(r && r.error){ alert('Share Fail da: ' + r.error); btn.innerText='Share'; btn.disabled=false; return; }
-    localStorage.removeItem('pixoro_reel_media');
-    localStorage.removeItem('pixoro_reel_filter');
-    localStorage.removeItem('pixoro_reel_bg');
-    localStorage.removeItem('pixoro_reel_cover');
-    alert(hideFace ? 'Reels Share Aachu da 🔥 - Home la Varaathu da' : 'Reels Share Aachu da 🔥');
-    location.href = './reels.html';
-  }catch(e){ alert('Error da: ' + e.message); btn.innerText='Share'; btn.disabled=false; }
+    let finalBlob=await applyFilter(mediaBlob, filter);
+    finalBlob=await applyWhiteBlock(finalBlob);
+    let folder=mediaType==='story'?'stories':mediaType==='reels'?'reels':'posts';
+    let ext=mediaKind==='video'?'mp4':'jpg';
+    let fileName=folder+'/'+session.user.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
+    let {error:upErr}=await s.storage.from(folder).upload(fileName, finalBlob, {contentType: mediaKind==='video'?'video/mp4':'image/jpeg', upsert:false});
+    if(upErr) throw upErr;
+    let {data:urlData}=s.storage.from(folder).getPublicUrl(fileName);
+    let publicUrl=urlData.publicUrl;
+    let {error}=await s.from('posts').insert({
+      user_id: session.user.id,
+      username: window.ME_RAW || session.user.email.split('@')[0],
+      media_url: publicUrl,
+      image_url: mediaKind==='image'?publicUrl:null,
+      video_url: mediaKind==='video'?publicUrl:null,
+      media_type: mediaType,
+      caption: cap,
+      visibility: isPrivate?'private_share':'public',
+      is_archived: hideFace?true:false
+    });
+    if(error) throw error;
+    await delDB('pixoro_create_media'); await delDB('pixoro_create_filter');
+    await delDB('pixoro_create_bg'); await delDB('pixoro_create_text');
+    await delDB('pixoro_create_draft'); await delDB('pixoro_create_type');
+    await delDB('pixoro_create_kind'); await delDB('pixoro_create_audio');
+    alert(hideFace?'Reels Share Aachu da 🔥 - Home la Varaathu da':'Reels Share Aachu da 🔥');
+    location.href='./index.html';
+  }catch(e){ alert('Error da: '+e.message); btn.innerText='Share'; btn.disabled=false; }
 }
 </script>
 </body>
