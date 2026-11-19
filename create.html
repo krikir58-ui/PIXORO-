@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>New post - Pixoro</title>
+<link rel="stylesheet" href="create.css">
+</head>
+<body>
+<div class="top"><span onclick="goBack()">✕</span><b id="topTitle">New post</b><span class="next" id="nextBtn" onclick="goNext()">Next</span></div>
+
+<div id="step12">
+  <div class="preview" id="previewBox">
+    <img id="prevImg" style="display:none">
+    <video id="prevVid" style="display:none" muted loop playsinline></video>
+    <div id="emptyBox"><div>📷</div>Photo Select Pannu da</div>
+    <canvas id="drawCanvas"></canvas>
+    <div id="cropGrid"><div class="g1"></div><div class="g2"></div><div class="g3"></div><div class="g4"></div></div>
+  </div>
+
+  <div class="editBar" id="editBar">
+    <button onclick="setFilter('none',this)" class="on">Original</button>
+    <button onclick="setFilter('grayscale(1)',this)">B&W</button>
+    <button onclick="setFilter('sepia(.8)',this)">Sepia</button>
+    <button onclick="setFilter('contrast(1.4) saturate(1.6)',this)">Vivid</button>
+    <button onclick="setFilter('brightness(1.2)',this)">Fade</button>
+    <button onclick="toggleDraw()">✏️ Draw</button>
+    <button onclick="addText()">Aa Text</button>
+  </div>
+
+  <div class="zoomBar" id="zoomBar"><span>➖</span><input type="range" id="zoomSlider" min="1" max="3" step="0.01" value="1" oninput="setZoom(parseFloat(this.value))"><span>➕</span><button onclick="setZoom(1)">Reset</button></div>
+
+  <div class="drawBar" id="drawBar">
+    <button class="c1" onclick="setColor('#ff2d55')"></button>
+    <button class="c2" onclick="setColor('#ffffff')"></button>
+    <button class="c3" onclick="setColor('#ffcc00')"></button>
+    <button onclick="setEraser()">🧹 Eraser</button>
+    <button onclick="undoDraw()">↩ Undo</button>
+    <button onclick="clearDraw()">Clear</button>
+    <button class="done" onclick="toggleDraw()">✅ Done</button>
+  </div>
+
+  <div id="gridSection">
+    <div class="gridHead"><b>Recents ⌄</b><button onclick="document.getElementById('file').click()">Select</button></div>
+    <div class="grid" id="grid"><div class="gridEmpty">Select Button ah Thodu da<br>Gallery Open Aagum da</div></div>
+  </div>
+
+  <div class="tabs" id="typeTabs"><span onclick="setType('post',this)" class="on">POST</span><span onclick="setType('reels',this)">REEL</span><span onclick="setType('story',this)">STORY</span></div>
+</div>
+
+<div class="shareBox" id="step3">
+  <div class="shareTop"><img id="shareThumb"><textarea id="caption" rows="3" placeholder="Write a caption..."></textarea></div>
+  <div class="row" onclick="tagPeople()"><span>Tag people</span><span id="tagTxt">›</span></div>
+  <div class="row" onclick="addLocation()"><span>Add location</span><span id="locTxt">›</span></div>
+  <div class="row" onclick="togglePrivate()"><span>Audience</span><span id="audTxt">Everyone ›</span></div>
+  <div id="status"></div>
+  <button class="shareBtn" id="shareBtn" onclick="sharePost()">Share</button>
+</div>
+
+<input type="file" id="file" accept="image/*,video/*" hidden>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script src="create.js"></script>
+</body>
+</html>
