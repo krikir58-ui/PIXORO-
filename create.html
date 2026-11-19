@@ -3,127 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>New post - Pixoro</title>
+<title>Pixoro - Create</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a0a;color:#fff;font-family:system-ui;overflow:hidden;touch-action:none}
-.top{height:52px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;background:#000}
-.top .next{color:#0095f6;font-weight:700;display:none;cursor:pointer;font-size:16px}
-.preview{width:100%;background:#000;display:grid;place-items:center;overflow:hidden;position:relative}
-.preview.post{height:72vw}
-.preview.post img,.preview.post video{width:100%;height:100%;object-fit:contain}
-.preview.reels,.preview.story{height:calc(100vh - 52px - 110px - 60px)}
-.preview.reels img,.preview.reels video,.preview.story img,.preview.story video{width:100%;height:100%;object-fit:cover}
-#emptyBox{color:#888;text-align:center;font-size:14px;cursor:pointer}
-.gridHead{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:14px}
-.gridHead label{background:#222;color:#fff;padding:8px 14px;border-radius:20px;cursor:pointer}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:3px;overflow-y:auto}
-.grid .tile{aspect-ratio:1;background:#111;overflow:hidden}
-.grid .tile img,.grid .tile video{width:100%;height:100%;object-fit:cover}
-.gridEmpty{grid-column:1/-1;text-align:center;color:#777;padding:20px;font-size:13px}
-.tabs{position:fixed;bottom:0;left:0;right:0;background:#000;display:flex;justify-content:center;gap:22px;padding:14px;border-top:1px solid #222;z-index:10}
-.tabs span{color:#888;letter-spacing:1px;font-size:14px;cursor:pointer}
-.tabs span.on{color:#fff;font-weight:800}
-.reelSelectTop{display:flex;gap:10px;padding:12px;overflow-x:auto;background:#000}
-.reelSelectTop div{background:#1e1e1e;padding:11px 14px;border-radius:999px;font-size:13px;display:flex;gap:8px;align-items:center;white-space:nowrap;border:1px solid #222}
-.fullPage{position:fixed;inset:0;background:#000;display:none;flex-direction:column;z-index:90}
-.fullPage .fullImg{flex:1;position:relative;overflow:hidden;background:#000}
-.fullPage .fullImg img,.fullPage .fullImg video{width:100%;height:100%;object-fit:cover}
-.fullPage .fullClose{position:absolute;top:14px;left:14px;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.55);display:grid;place-items:center;font-size:20px;z-index:5;cursor:pointer}
-.fullPage .swipe{position:absolute;left:0;right:0;bottom:110px;text-align:center;color:#fff;text-shadow:0 2px 8px #000;cursor:pointer}
-.fullPage .swipe b{font-size:22px;display:block}
-.fullPage .swipe span{font-size:14px;font-weight:600}
-.fullPage .fullTools{display:flex;gap:8px;justify-content:center;padding:10px;background:linear-gradient(transparent,#000)}
-.fullPage .fullTools div{background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:10px 8px;text-align:center;flex:1}
-.fullPage .fullTools div b{font-size:18px;display:block}
-.fullPage .fullTools div span{font-size:11px}
-.fullPage .fullBottom{display:flex;gap:10px;padding:10px 14px 18px;background:#000}
-.fullPage .fullBottom .editBtn{flex:1;background:#222;color:#fff;border:0;padding:13px;border-radius:999px;font-size:14px;font-weight:700}
-.fullPage .fullBottom .nextBtn{flex:1;background:linear-gradient(135deg,#6d5cff,#ff2d55);color:#fff;border:0;padding:13px;border-radius:999px;font-size:14px;font-weight:800}
-.cap{position:fixed;inset:0;background:#0a0a0a;display:none;z-index:100;flex-direction:column}
-.cap.sheetOpen .pixBar{display:none}
-.cap.sheetOpen .capPreview{flex:0 0 auto;height:38vh}
-.capTop{height:52px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;background:#0a0a0a;flex-shrink:0}
-.capTop .left{display:flex;gap:12px;align-items:center;font-size:19px}
-.capTop .brand{font-weight:900;font-size:19px}
-.capTop .brand i{font-style:normal;background:linear-gradient(135deg,#6d5cff,#ff2d55);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.capTop .nextBtn{background:#fff;color:#000;border:0;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:800}
-.capPreview{flex:1;display:flex;justify-content:center;align-items:center;overflow:hidden;background:#0a0a0a;position:relative;padding:12px;min-height:0;transition:height .2s}
-.capPreview .stage{position:relative;overflow:hidden;background:#111;display:grid;place-items:center;flex-shrink:0}
-.capPreview.post .stage{width:100%;max-width:360px;aspect-ratio:4/5;border-radius:16px}
-.capPreview.reels .stage{height:100%;max-height:100%;aspect-ratio:9/16;width:auto;border-radius:18px;border:1px solid #222}
-.capPreview img,.capPreview video{width:100%;height:100%;object-fit:cover;transform:none!important}
-#overlayText,#overlayTextR{position:absolute;top:32%;left:50%;transform:translate(-50%,-50%);font-size:26px;font-weight:900;text-shadow:0 2px 8px #000;z-index:7;text-align:center;pointer-events:none;white-space:nowrap;max-width:90%;overflow:hidden}
-#overlaySticker,#overlayStickerR{position:absolute;top:58%;left:50%;transform:translate(-50%,-50%);z-index:7;pointer-events:none}
-.applied{display:flex;gap:6px;padding:0 12px 8px;flex-wrap:wrap;min-height:28px;flex-shrink:0}
-.applied:empty{display:none}
-.applied .chip{background:#1e1e1e;border:1px solid #333;padding:6px 8px 6px 10px;border-radius:999px;font-size:11px;display:flex;gap:6px;align-items:center}
-.applied .chip b{color:#ff2d55;cursor:pointer;font-size:13px}
-/* ✅ CAPCUT TIMELINE */
-.timelineWrap{background:#0a0a0a;padding:8px 12px 6px;flex-shrink:0;border-top:1px solid #1a1a1a}
-.timelineWrap .tlHead{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#aaa;padding-bottom:6px}
-.timelineWrap .tlHead b{color:#fff;font-size:11px}
-.timeline{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+body{background:#08080f;color:#fff;font-family:system-ui;overflow-x:hidden}
+button,input,textarea{font-family:inherit}
+.ic{width:20px;height:20px;vertical-align:middle}
+.ic-sm{width:16px;height:16px}
+.ic-lg{width:26px;height:26px}
+.gradTxt{background:linear-gradient(135deg,#ff2d95,#6d5cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.page{display:none;min-height:100vh;padding-bottom:90px}
+.page.on{display:block}
+.top{height:56px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;position:sticky;top:0;background:#08080f;z-index:20}
+.top b{font-size:19px}
+.top .back{font-size:22px;cursor:pointer}
+.top .done{background:linear-gradient(135deg,#ff2d95,#6d5cff);border:0;color:#fff;padding:8px 14px;border-radius:999px;font-weight:800;font-size:12px}
+.top .gear{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#1a1a1a}
+.hero{margin:12px;border-radius:22px;overflow:hidden;position:relative;border:1px solid #ff2d95;background:#111}
+.hero img{width:100%;height:220px;object-fit:cover;display:block}
+.hero .overlay{position:absolute;inset:0;background:linear-gradient(transparent,rgba(0,0,0,.7));padding:14px;display:flex;flex-direction:column;justify-content:space-between}
+.hero .script{font-family:cursive;font-size:28px;line-height:1}
+.hero .script i{font-style:normal;color:#ff2d95}
+.createCard{margin:12px;background:#111;border:1px solid #2a1a2e;border-radius:22px;padding:16px}
+.createCard h3{text-align:center;font-size:16px;margin-bottom:12px}
+.opt{display:flex;gap:12px;align-items:center;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:16px;padding:12px;margin-bottom:10px;cursor:pointer}
+.opt .icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#ff2d95,#6d5cff);display:grid;place-items:center;flex-shrink:0}
+.opt .icon.alt{background:#1a1a1a;border:1px solid #ff2d95}
+.opt b{display:block;font-size:14px}
+.opt span{font-size:11px;color:#aaa}
+.opt .arrow{margin-left:auto;font-size:20px;color:#888}
+.tabs2{display:flex;gap:8px;padding:12px;overflow-x:auto}
+.tabs2 span{padding:9px 16px;border-radius:999px;background:#1a1a1a;font-size:13px;white-space:nowrap;cursor:pointer}
+.tabs2 span.on{background:linear-gradient(135deg,#ff2d95,#6d5cff);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:0 4px}
+.grid .tile{aspect-ratio:1;position:relative;border-radius:10px;overflow:hidden;background:#222;cursor:pointer}
+.grid .tile img{width:100%;height:100%;object-fit:cover}
+.grid .tile .tick{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;border:2px solid #fff;display:grid;place-items:center;background:rgba(0,0,0,.4);font-size:12px}
+.grid .tile.sel .tick{background:#ff2d95;border-color:#ff2d95}
+.grid .tile .vid{position:absolute;bottom:6px;left:6px;font-size:10px;background:rgba(0,0,0,.6);padding:2px 6px;border-radius:999px}
+.nextBtn{position:fixed;bottom:84px;right:14px;background:linear-gradient(135deg,#ff2d95,#6d5cff);color:#fff;border:0;padding:12px 18px;border-radius:999px;font-weight:800;z-index:30;display:none}
+.nextBtn.show{display:block}
+.bottomNav{position:fixed;bottom:0;left:0;right:0;background:#0a0a0a;display:flex;justify-content:space-around;padding:10px 0 14px;border-top:1px solid #222;z-index:40}
+.bottomNav div{text-align:center;font-size:10px;color:#888;cursor:pointer}
+.bottomNav div.on{color:#fff}
+.bottomNav div .plus{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#ff2d95,#6d5cff);display:grid;place-items:center;margin:0 auto 2px;color:#fff;font-size:22px}
+.createPreview{margin:12px;border-radius:18px;overflow:hidden;position:relative;background:#111}
+.createPreview img{width:100%;height:320px;object-fit:cover;display:block}
+.createPreview .cropBtn{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.6);border:1px solid #555;color:#fff;padding:6px 10px;border-radius:999px;font-size:12px;display:flex;gap:6px;align-items:center}
+.seg{display:flex;gap:8px;margin:12px}
+.seg button{flex:1;padding:12px;border-radius:999px;border:0;font-weight:700;background:#1a1a1a;color:#fff;display:flex;gap:8px;justify-content:center;align-items:center}
+.seg button.on{background:linear-gradient(135deg,#ff2d95,#6d5cff)}
+.field{margin:0 12px 10px;background:#111;border:1px solid #222;border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center}
+.field input,.field textarea{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:14px;resize:none}
+.field .arrow{color:#888}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin:0 12px 12px}
+.pills span{background:#1a1a1a;padding:8px 12px;border-radius:999px;font-size:12px}
+.pills span.add{background:#222}
+.editPreview{margin:12px;border-radius:18px;overflow:hidden;position:relative;background:#111}
+.editPreview.post img,.editPreview.post video{width:100%;height:360px;object-fit:cover;display:block}
+.editPreview.reels img,.editPreview.reels video{width:100%;height:520px;object-fit:cover;display:block}
+.editPreview .ovText{position:absolute;top:32%;left:50%;transform:translate(-50%,-50%);font-size:26px;font-weight:900;text-shadow:0 2px 8px #000;text-align:center;white-space:nowrap;max-width:90%;overflow:hidden;z-index:5}
+.editPreview .ovStick{position:absolute;top:58%;left:50%;transform:translate(-50%,-50%);z-index:5}
+.editTools{display:flex;gap:8px;padding:0 12px;overflow-x:auto}
+.editTools div{flex:1;min-width:62px;background:#1a1a1a;border-radius:14px;padding:10px 6px;text-align:center;cursor:pointer}
+.editTools div.on{background:linear-gradient(135deg,#ff2d95,#6d5cff)}
+.editTools div span{font-size:10px;display:block;margin-top:4px;color:#ddd}
+.thumbRow{display:flex;gap:8px;padding:12px;overflow-x:auto}
+.thumbRow .th{flex-shrink:0;width:72px;height:72px;border-radius:12px;overflow:hidden;background:#222;position:relative;cursor:pointer;border:2px solid transparent}
+.thumbRow .th.sel{border-color:#ff2d95}
+.thumbRow .th img{width:100%;height:100%;object-fit:cover}
+.thumbRow .add{width:72px;height:72px;border-radius:12px;background:#1a1a1a;border:1px dashed #444;display:grid;place-items:center;font-size:24px;flex-shrink:0;cursor:pointer}
+.timelineWrap{margin:12px;background:#111;border-radius:14px;padding:12px}
+.timelineWrap .tlHead{display:flex;justify-content:space-between;font-size:11px;color:#aaa;padding-bottom:8px}
+.timeline{display:flex;gap:6px;overflow-x:auto}
 .timeline .clip{position:relative;flex-shrink:0;width:72px;height:48px;border-radius:10px;overflow:hidden;background:#222;border:2px solid transparent;cursor:pointer}
-.timeline .clip.sel{border-color:#ff2d55}
-.timeline .clip img,.timeline .clip video{width:100%;height:100%;object-fit:cover}
+.timeline .clip.sel{border-color:#ff2d95}
+.timeline .clip img{width:100%;height:100%;object-fit:cover}
 .timeline .clip .dur{position:absolute;bottom:2px;right:4px;font-size:9px;background:rgba(0,0,0,.6);padding:1px 4px;border-radius:999px}
-.timeline .clip .num{position:absolute;top:2px;left:4px;font-size:9px;background:rgba(0,0,0,.6);padding:1px 4px;border-radius:999px}
-.timeline .addClip{flex-shrink:0;width:48px;height:48px;border-radius:10px;background:#1a1a1a;border:1px dashed #444;display:grid;place-items:center;font-size:20px;cursor:pointer;color:#fff}
-.timeline .clipTools{display:flex;gap:6px;padding:8px 0 2px;overflow-x:auto}
-.timeline .clipTools button{background:#1e1e1e;color:#fff;border:0;padding:7px 10px;border-radius:999px;font-size:11px;white-space:nowrap}
-.timeline .clipTools button.red{color:#ff5a5a;border:1px solid #442222}
-.pixVideoBar{display:none;align-items:center;gap:8px;padding:0 14px 8px;flex-shrink:0}
-.pixVideoBar .play{width:34px;height:34px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;border:0;flex-shrink:0}
-.pixVideoBar .track{flex:1;height:4px;background:#2a2a2a;border-radius:999px;overflow:hidden}
-.pixVideoBar .track .fill{height:100%;width:0%;background:linear-gradient(90deg,#6d5cff,#ff2d55)}
-.pixVideoBar .time{font-size:10px;color:#aaa}
-.cap.mode-video .pixVideoBar{display:flex}
-.pixBar{display:flex;gap:6px;padding:10px 12px 14px;background:#0a0a0a;flex-shrink:0}
-.pixBar div{flex:1;text-align:center;cursor:pointer;padding:8px 4px;border-radius:14px;background:#161616;min-width:62px}
-.pixBar div.on{background:linear-gradient(135deg,#6d5cff,#ff2d55)}
-.pixBar div b{display:block}
-.pixBar div b svg{width:20px;height:20px;display:block;margin:0 auto}
-.pixBar div span{font-size:10px;color:#ddd}
-.ic{width:16px;height:16px;vertical-align:middle}
-.ic-big{width:20px;height:20px;display:block;margin:0 auto}
-.sheet{position:relative;background:#161616;border-radius:20px 20px 0 0;padding:14px;z-index:40;display:none;max-height:52vh;overflow-y:auto;flex-shrink:0}
+.timeline .addClip{flex-shrink:0;width:48px;height:48px;border-radius:10px;background:#1a1a1a;border:1px dashed #444;display:grid;place-items:center;font-size:20px;cursor:pointer}
+.clipTools{display:flex;gap:6px;padding:8px 0 2px;overflow-x:auto}
+.clipTools button{background:#1e1e1e;color:#fff;border:0;padding:7px 10px;border-radius:999px;font-size:11px;white-space:nowrap}
+.clipTools button.red{color:#ff5a5a;border:1px solid #442222}
+.sheet{margin:12px;background:#1a1a1a;border-radius:20px;padding:14px;display:none}
+.sheet.show{display:block}
 .sheet .sHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.sheet .sHead b{font-size:13px}
-.sheet .sHead .done{color:#fff;font-weight:700;background:#222;padding:6px 12px;border-radius:999px;font-size:11px}
+.sheet .sHead .done{background:#222;padding:6px 12px;border-radius:999px;font-size:11px;cursor:pointer}
 .sheet .row{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
-.sheet button{background:#2a2a2a;color:#fff;border:0;padding:8px 12px;border-radius:999px;white-space:nowrap;font-size:12px;display:inline-flex;align-items:center;gap:4px}
+.sheet button{background:#2a2a2a;color:#fff;border:0;padding:8px 12px;border-radius:999px;font-size:12px;white-space:nowrap}
 .sheet button.on{background:#fff;color:#000}
-.sheet button.red{background:#2a2a2a;color:#ff5a5a;border:1px solid #442222}
-.sheet input{width:100%;accent-color:#ff2d55}
+.sheet button.red{color:#ff5a5a;border:1px solid #442222}
+.sheet input{width:100%;accent-color:#ff2d95}
 .sheet .inlineInput{width:100%;background:#2a2a2a;border:0;color:#fff;padding:11px;border-radius:12px;font-size:14px;outline:none;margin-bottom:8px}
 .sheet .sliderRow{display:flex;justify-content:space-between;font-size:12px;padding:10px 0;border-bottom:1px solid #2a2a2a}
 .sheet .miniGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .sheet .miniGrid .it{text-align:center;cursor:pointer}
 .sheet .miniGrid .it .thumb{height:44px;border-radius:10px;background:#2a2a2a;display:grid;place-items:center}
 .sheet .miniGrid .it span{font-size:10px;color:#ccc;display:block;margin-top:4px}
-.sheet .miniGrid .it.sel .thumb{outline:2px solid #ff2d55}
-.shareBox{display:none;padding:0 14px 90px;overflow-y:auto;height:calc(100vh - 52px);background:#000}
-.shareBox textarea{width:100%;background:transparent;border:0;color:#fff;font-size:16px;outline:none;resize:none;padding:14px 0}
-.shareBox .field{padding:14px 0;border-top:1px solid #222;display:flex;justify-content:space-between;align-items:center;gap:10px}
-.shareBox .field .lbl{font-size:14px;display:flex;gap:10px;align-items:center;flex-shrink:0}
-.shareBox .field input{flex:1;background:#1a1a1a;border:0;color:#fff;padding:10px 12px;border-radius:10px;font-size:13px;outline:none;text-align:right}
-.shareBox .field .val{font-size:13px;color:#888}
-.shareBox .pillRow{display:flex;gap:8px;padding:12px 0}
-.shareBox .pillRow span{background:#1e1e1e;padding:9px 12px;border-radius:999px;font-size:12px;display:flex;gap:6px;align-items:center}
-.shareBox .note{font-size:12px;color:#888;padding:8px 0;line-height:1.5}
-.shareBox .future{margin-top:14px;background:#111;border:1px dashed #333;border-radius:14px;padding:12px}
-.shareBox .future b{font-size:12px;color:#ccc}
-.shareBox .future .frow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid #222;font-size:13px;color:#888}
-.shareBox .future .frow .lock{font-size:10px;background:#222;color:#aaa;padding:4px 8px;border-radius:999px}
-.shareTop{display:flex;gap:12px;align-items:flex-start}
-.shareTop img{width:60px;height:60px;object-fit:cover;border-radius:8px;background:#222}
-.shareBtn{width:100%;background:linear-gradient(135deg,#6d5cff,#ff2d55);color:#fff;border:0;padding:13px;border-radius:999px;font-weight:800;margin-top:14px}
-.shareBtn.gray{background:#222;color:#fff}
-#status{text-align:center;font-size:13px;color:#ffcc00;padding:10px}
-#file,#fileMulti{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0}
-canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;display:none;z-index:6;touch-action:none}
-canvas#drawCanvas.on{display:block}
+.sheet .miniGrid .it.sel .thumb{outline:2px solid #ff2d95}
+.uploadTop{display:flex;gap:12px;margin:12px;align-items:flex-start}
+.uploadTop img{width:80px;height:80px;object-fit:cover;border-radius:12px;background:#222}
+.uploadTop textarea{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:15px;resize:none}
+.uploadTop .count{font-size:11px;color:#888;text-align:right}
+.upCover{margin:12px;text-align:center;position:relative}
+.upCover img{width:140px;height:230px;object-fit:cover;border-radius:16px}
+.upCover .editCover{position:absolute;right:18px;bottom:30px;background:rgba(0,0,0,.6);border:1px solid #555;color:#fff;padding:7px 10px;border-radius:999px;font-size:11px}
+.upCover .dur{position:absolute;left:22px;bottom:30px;background:rgba(0,0,0,.6);padding:4px 8px;border-radius:999px;font-size:11px}
+.upCover .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,.5);display:grid;place-items:center}
+.toggleRow{display:flex;justify-content:space-between;align-items:center;padding:14px 12px;border-top:1px solid #222}
+.toggleRow .lbl{display:flex;gap:10px;align-items:center;font-size:14px}
+.switch{width:44px;height:24px;border-radius:999px;background:#333;position:relative;cursor:pointer}
+.switch.on{background:linear-gradient(135deg,#ff2d95,#6d5cff)}
+.switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.switch.on::after{left:22px}
+.shareBtn{margin:12px;width:calc(100% - 24px);background:linear-gradient(135deg,#ff2d95,#6d5cff);color:#fff;border:0;padding:14px;border-radius:999px;font-weight:800;font-size:15px}
+#status{text-align:center;font-size:13px;color:#ffcc00;padding:8px}
+#file,#fileMulti{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 @keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-4px,2px)}75%{transform:translate(4px,-2px)}}
 @keyframes flash{0%,100%{filter:brightness(1)}50%{filter:brightness(2.2)}}
 @keyframes zoomIn{from{transform:scale(1)}to{transform:scale(1.25)}}
@@ -133,140 +127,125 @@ canvas#drawCanvas.on{display:block}
 </style>
 </head>
 <body>
-<div id="step1">
-<div class="top"><span onclick="location.href='./index.html'">✕</span><b id="topTitle">New post</b><span class="next" id="nextBtn" onclick="goNext()">Next</span></div>
-<div id="reelTop" style="display:none"><div class="reelSelectTop"><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4"/></svg> Edits</div><div>Drafts · 2</div><div>Templates</div></div></div>
-<div class="preview post" id="previewBox" onclick="if(!file)document.getElementById('file').click()">
-<img id="prevImg" style="display:none"><video id="prevVid" style="display:none" muted loop playsinline></video>
-<div id="emptyBox"><div><svg class="ic" style="width:44px;height:44px" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5"><rect x="2.5" y="2.5" width="19" height="19" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>Photo Select Pannu da</div>
+<div class="page on" id="pageHome">
+<div class="top"><span style="font-weight:900;font-size:22px"><span class="gradTxt">P</span> Pixoro</span><span style="position:relative"><svg class="ic-lg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 7-3 9-3 9H9s-3-2-3-9z"/><path d="M10 21h4"/></svg><span style="position:absolute;top:-6px;right:-6px;background:#ff2d95;font-size:10px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center">5</span></span></div>
+<div class="hero"><img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800&q=80"><div class="overlay"><div style="font-size:11px;color:#fff">Pixoro</div><div><div class="script">Create<br>Share<br>Connect...<i>♥</i></div></div></div></div>
+<div class="createCard"><h3>✦ Create New ✦</h3>
+<div class="opt" onclick="goCreate('post')"><div class="icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M3 9h18M9 21V9"/></svg></div><div><b>Create Post</b><span>Share your thoughts</span></div><span class="arrow">→</span></div>
+<div class="opt" onclick="goCreate('reels')"><div class="icon alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="4"/><path d="M10 9l5 3-5 3V9z"/></svg></div><div><b>Create Reels</b><span>Show your moments</span></div><span class="arrow">→</span></div>
+<div class="opt" onclick="goCreate('story')"><div class="icon alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#ff2d95" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div><div><b>Create Story</b><span>Let them see your day</span></div><span class="arrow">→</span></div>
 </div>
-<div id="gridSection"><div class="gridHead"><b>Recents ⌄</b><label for="file">Select</label></div><div class="grid" id="grid"><div class="gridEmpty">Select Button ah Thodu da<br>Gallery Open Aagum da</div></div></div>
-<div class="tabs" id="typeTabs"><span onclick="setType('post',this)" class="on">POST</span><span onclick="setType('reels',this)">REEL</span><span onclick="setType('story',this)">STORY</span></div>
 </div>
-<div class="fullPage" id="fullPage">
-<div class="fullImg" onclick="openEditor()"><span class="fullClose" onclick="event.stopPropagation();goBackToSelect()">✕</span><img id="fullImg"><video id="fullVid" style="display:none" muted loop playsinline></video><div class="swipe" onclick="openEditor()"><b>^</b><span>Swipe up to edit</span></div></div>
-<div class="fullTools"><div><b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></b><span>Audio</span></div><div onclick="openEditor()"><b>Aa</b><span>Text</span></div><div><b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3"/></svg></b><span>Voice</span></div><div><b>CC</b><span>Captions</span></div><div><b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></b><span>Stickers</span></div></div>
-<div class="fullBottom"><button class="editBtn" onclick="openEditor()">Edit video</button><button class="nextBtn" onclick="goToUpload()">Next →</button></div>
+<div class="page" id="pageSelect">
+<div class="top"><span class="back" onclick="showPage('pageHome')">←</span><b>Select Media</b><span class="gear"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="12" cy="12" r="3"/><circle cx="17" cy="7" r="1"/></svg></span></div>
+<div class="tabs2"><span class="on" onclick="setMediaTab('photo',this)">Photos</span><span onclick="setMediaTab('video',this)">Videos</span><span onclick="setMediaTab('album',this)">Albums</span></div>
+<div class="grid" id="mediaGrid"></div>
+<button class="nextBtn" id="selectNext" onclick="goCreateStep()">Next →</button>
 </div>
-<!-- ✅ POST EDITOR -->
-<div class="cap" id="postEditor">
-<div class="capTop"><div class="left"><span onclick="goBack()">✕</span><span class="brand">Pix<i>oro</i> <span style="font-size:11px;background:#222;padding:4px 8px;border-radius:999px;color:#aaa">POST</span></span></div><div class="right"><button class="nextBtn" onclick="goToUpload()">Next →</button></div></div>
-<div class="capPreview post"><div class="stage"><img id="editImg" style="display:none"><video id="editVid" style="display:none" muted loop playsinline></video><div id="overlayText"></div><div id="overlaySticker"></div><canvas id="drawCanvas"></canvas></div></div>
-<div class="applied" id="appliedPost"></div>
-<div class="pixBar">
-<div onclick="openSheet('sheetFiltersP',this)"><b><svg class="ic-big" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg></b><span>Filter</span></div>
-<div onclick="openSheet('sheetTextP',this)"><b>T</b><span>Text</span></div>
-<div onclick="openSheet('sheetCropP',this)"><b><svg class="ic-big" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 9V7a2 2 0 0 1 2-2h2M21 15v2a2 2 0 0 1-2 2h-2"/></svg></b><span>Crop</span></div>
-<div onclick="openSheet('sheetAdjustP',this)"><b><svg class="ic-big" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h13M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="19" cy="18" r="2"/></svg></b><span>Adjust</span></div>
-<div onclick="clearAll()"><b>✕</b><span>Clear</span></div>
+<div class="page" id="pageCreate">
+<div class="top"><span class="back" onclick="showPage('pageSelect')">←</span><b>Create Post / Reels</b><span class="gear"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span></div>
+<div class="createPreview"><img id="createImg"><button class="cropBtn" onclick="goEdit()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 9V7a2 2 0 0 1 2-2h2M21 15v2a2 2 0 0 1-2 2h-2"/></svg> Crop</button></div>
+<div class="seg"><button id="segPost" class="on" onclick="setType('post')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/></svg> Post</button><button id="segReels" onclick="setType('reels')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="4"/><path d="M10 9l5 3-5 3V9z"/></svg> Reels</button></div>
+<div class="field"><textarea id="caption1" rows="2" placeholder="Write a caption..." oninput="syncCaption()"></textarea><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></div>
+<div class="pills"><span>#Love ♥</span><span>#Life</span><span>#Moments</span><span class="add">+</span></div>
+<div class="field" onclick="promptLoc()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><input id="loc1" placeholder="Add Location" readonly><span class="arrow">›</span></div>
+<div class="field" onclick="toggleAud()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span style="flex:1;font-size:14px">Audience</span><span id="audTxt1" style="font-size:13px;color:#aaa">Everyone</span><span class="arrow">›</span></div>
+<button class="shareBtn" onclick="goEdit()">Next →</button>
 </div>
-<div class="sheet" id="sheetFiltersP"><div class="sHead"><b>Filter - Post</b><span class="done" onclick="closeSheet()">Done</span></div><div class="miniGrid"><div class="it sel" onclick="setFilter('none',this)"><div class="thumb"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M5 5l14 14"/></svg></div><span>None</span></div><div class="it" onclick="setFilter('grayscale(1) contrast(1.2)',this)"><div class="thumb"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z"/></svg></div><span>Noir</span></div><div class="it" onclick="setFilter('sepia(.5) contrast(1.2)',this)"><div class="thumb"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></div><span>Warm</span></div><div class="it" onclick="setFilter('brightness(1.1) saturate(1.25)',this)"><div class="thumb"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg></div><span>Clear</span></div></div><button class="red" style="width:100%;margin-top:10px" onclick="removeFilter()">✕ Remove Filter</button></div>
-<div class="sheet" id="sheetTextP"><div class="sHead"><b>Text - Post</b><span class="done" onclick="closeSheet()">Done</span></div><input class="inlineInput" id="textInput" placeholder="Text ezhuthu..." autocomplete="off"><div class="row"><button onclick="confirmText()">Add</button><button onclick="setFont('system-ui',this)" class="on">Default</button><button onclick="setFont('serif',this)">Serif</button><button onclick="setFont('cursive',this)">Style</button></div><div class="row"><button onclick="pickSticker('fire')">Fire Sticker</button><button onclick="pickSticker('heart')">Heart Sticker</button><button onclick="pickSticker('laugh')">Laugh Sticker</button></div><button class="red" style="width:100%;margin-top:8px" onclick="removeText()">✕ Remove Text / Sticker</button></div>
-<div class="sheet" id="sheetCropP"><div class="sHead"><b>Crop - Post Only</b><span class="done" onclick="closeSheet()">Done</span></div><div class="row"><button onclick="setCrop('original',this)" class="on">Original</button><button onclick="setCrop('1:1',this)">1:1</button><button onclick="setCrop('4:5',this)">4:5</button><button onclick="setCrop('3:4',this)">3:4</button></div><p style="font-size:11px;color:#888;padding:6px 2px">Crop mattum maarum - POST REELS aagaathu</p><button class="red" style="width:100%;margin-top:8px" onclick="setCrop('original',null)">✕ Reset Crop</button></div>
-<div class="sheet" id="sheetAdjustP"><div class="sHead"><b>Adjust - Post</b><span class="done" onclick="closeSheet()">Done</span></div><div class="sliderRow"><span>Brightness</span><span id="vBright">100%</span></div><input type="range" min="50" max="150" value="100" oninput="doAdjust('brightness',this.value)"><div class="sliderRow"><span>Contrast</span><span id="vContrast">100%</span></div><input type="range" min="50" max="150" value="100" oninput="doAdjust('contrast',this.value)"><div class="sliderRow"><span>Saturation</span><span id="vSat">100%</span></div><input type="range" min="0" max="200" value="100" oninput="doAdjust('saturate',this.value)"><button class="red" style="width:100%;margin-top:8px" onclick="removeAdjust()">✕ Reset Adjust</button></div>
+<div class="page" id="pageEdit">
+<div class="top"><span class="back" onclick="showPage('pageCreate')">←</span><b id="editTitle">Edit Post</b><button class="done" onclick="goUpload()">Done</button></div>
+<div class="editPreview post" id="editPreview"><img id="editImg"><video id="editVid" style="display:none" muted loop playsinline></video><div class="ovText" id="ovText"></div><div class="ovStick" id="ovStick"></div></div>
+<div class="editTools" id="editTools"></div>
+<div id="reelsTimeline" style="display:none"><div class="timelineWrap"><div class="tlHead"><b>Timeline - CapCut Style</b><span id="tlTotal">0 Clips • 0.0s</span></div><div class="timeline" id="timeline"></div><div class="clipTools"><button onclick="openSheet('sheetTrim')">Trim - Cut</button><button onclick="splitClip()">Split</button><button onclick="duplicateClip()">Duplicate</button><button onclick="setSpeed()">Speed</button><button class="red" onclick="deleteClip()">Delete Clip</button></div></div></div>
+<div class="thumbRow" id="thumbRow"></div>
+<div class="sheet" id="sheetText"><div class="sHead"><b>Text</b><span class="done" onclick="closeSheet()">Done</span></div><input class="inlineInput" id="textInput" placeholder="Text ezhuthu..."><div class="row"><button onclick="confirmText()">Add</button><button onclick="setFont('system-ui',this)" class="on">Default</button><button onclick="setFont('serif',this)">Serif</button><button onclick="setFont('cursive',this)">Style</button></div><div class="row"><button onclick="pickSticker('fire')">Fire Sticker</button><button onclick="pickSticker('heart')">Heart Sticker</button><button onclick="pickSticker('laugh')">Laugh Sticker</button></div><button class="red" style="width:100%;margin-top:8px" onclick="removeText()">✕ Remove Text / Sticker</button></div>
+<div class="sheet" id="sheetFilter"><div class="sHead"><b>Filters</b><span class="done" onclick="closeSheet()">Done</span></div><div class="miniGrid" id="filterGrid"></div><button class="red" style="width:100%;margin-top:10px" onclick="removeFilter()">✕ Remove Filter</button></div>
+<div class="sheet" id="sheetEffect"><div class="sHead"><b>Effects</b><span class="done" onclick="closeSheet()">Done</span></div><div class="row"><button onclick="applyEffect('none',this)" class="on">None</button><button onclick="applyEffect('shake',this)">Shake</button><button onclick="applyEffect('zoom',this)">Zoom</button><button onclick="applyEffect('flash',this)">Flash</button></div><button class="red" style="width:100%;margin-top:8px" onclick="removeEffect()">✕ Remove Effect</button></div>
+<div class="sheet" id="sheetMusic"><div class="sHead"><b>Music</b><span class="done" onclick="closeSheet()">Done</span></div><div class="row"><button onclick="pickSong('Leo - Naa Ready',this)" class="on">Leo</button><button onclick="pickSong('Jailer - Hukum',this)">Jailer</button><button onclick="pickSong('Vikram',this)">Vikram</button><button onclick="pickSong('No Song',this)">No Song</button></div><p id="songTxt" style="font-size:12px;color:#ffcc00;padding:6px 2px">Song: No Song</p><p style="font-size:11px;color:#aaa">Volume</p><input type="range" min="0" max="100" value="80" oninput="setVolume(this.value/100)"><button class="red" style="width:100%;margin-top:8px" onclick="removeSong()">✕ Remove Song</button></div>
+<div class="sheet" id="sheetSticker"><div class="sHead"><b>Stickers - Outline SVG</b><span class="done" onclick="closeSheet()">Done</span></div><div class="row"><button onclick="pickSticker('fire')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="#ff6b00" stroke-width="2"><path d="M12 3c1 4-3 5-2 9a5 5 0 0 0 10 0c0-2-1-3-1-3s3 1 2-3c-1-3-4-4-5-7-1 2-3 1-4 4z"/></svg> Fire</button><button onclick="pickSticker('heart')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="#ff2d55" stroke-width="2"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg> Heart</button><button onclick="pickSticker('laugh')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg> Laugh</button></div></div>
+<div class="sheet" id="sheetTrim"><div class="sHead"><b>Trim - Cut Pannu</b><span class="done" onclick="closeSheet()">Done</span></div><div class="sliderRow"><span>Start</span><span id="trimStartTxt">0.0s</span></div><input type="range" id="trimStart" min="0" max="100" value="0" oninput="doTrim()"><div class="sliderRow"><span>End</span><span id="trimEndTxt">3.0s</span></div><input type="range" id="trimEnd" min="0" max="100" value="100" oninput="doTrim()"><button class="red" style="width:100%;margin-top:8px" onclick="resetTrim()">✕ Reset Trim</button></div>
+<div class="sheet" id="sheetAdjust"><div class="sHead"><b>Adjust</b><span class="done" onclick="closeSheet()">Done</span></div><div class="sliderRow"><span>Brightness</span><span id="vBright">100%</span></div><input type="range" min="50" max="150" value="100" oninput="doAdjust('brightness',this.value)"><div class="sliderRow"><span>Contrast</span><span id="vContrast">100%</span></div><input type="range" min="50" max="150" value="100" oninput="doAdjust('contrast',this.value)"><div class="sliderRow"><span>Saturation</span><span id="vSat">100%</span></div><input type="range" min="0" max="200" value="100" oninput="doAdjust('saturate',this.value)"><button class="red" style="width:100%;margin-top:8px" onclick="removeAdjust()">✕ Reset Adjust</button></div>
 </div>
-<!-- ✅ REELS EDITOR - CAPCUT -->
-<div class="cap" id="reelsEditor">
-<div class="capTop"><div class="left"><span onclick="goBack()">✕</span><span class="brand">Pix<i>oro</i> <span style="font-size:11px;background:linear-gradient(135deg,#6d5cff,#ff2d55);padding:4px 8px;border-radius:999px;color:#fff">REELS • CapCut Style</span></span></div><div class="right"><button class="nextBtn" onclick="goToUpload()">Next →</button></div></div>
-<div class="capPreview reels"><div class="stage"><img id="editImgR" style="display:none"><video id="editVidR" style="display:none" muted loop playsinline></video><div id="overlayTextR"></div><div id="overlayStickerR"></div></div></div>
-<div class="applied" id="appliedReels"></div>
-<div class="pixVideoBar" id="pixVideoBar"><button class="play" onclick="togglePlay()" id="floatPlay"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M6 4l14 8-14 8V4z"/></svg></button><div class="track"><div class="fill" id="clipProg"></div></div><span class="time" id="playTime">00:00 / 00:00</span></div>
-<div class="timelineWrap">
-<div class="tlHead"><b>Timeline</b><span id="tlTotal">0 Clips • 0.0s</span></div>
-<div class="timeline" id="timeline"></div>
-<div class="timeline" style="padding-top:6px"><div class="clipTools"><button onclick="openSheet('sheetTrimR',this)">Trim - Cut</button><button onclick="splitClip()">Split</button><button onclick="duplicateClip()">Duplicate</button><button onclick="setSpeedReels()">Speed</button><button class="red" onclick="deleteClip()">Delete Clip</button></div></div>
+<div class="page" id="pageUploadPost">
+<div class="top"><span class="back" onclick="showPage('pageEdit')">←</span><b>Upload Post</b><span></span></div>
+<div class="uploadTop"><img id="upImgPost"><div style="flex:1"><textarea id="captionPost" rows="3" placeholder="Together Forever" oninput="updateCount()"></textarea><div class="count" id="capCount">0/220</div></div><button onclick="document.getElementById('file').click()" style="background:#222;color:#fff;border:0;padding:8px 12px;border-radius:999px;font-size:12px">Change</button></div>
+<div class="pills"><span>#Love</span><span>#Life</span><span>#Pixoro</span><span class="add">+</span></div>
+<div class="field"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><input id="locPost" placeholder="Add Location"><span class="arrow">›</span></div>
+<div class="field"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c1-4 4-5 8-5s7 1 8 5"/></svg><input id="tagPost" placeholder="Tag People"><span class="arrow">›</span></div>
+<div class="field" onclick="toggleAud()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span style="flex:1;font-size:14px">Audience</span><span id="audTxtPost" style="font-size:13px;color:#aaa">Everyone</span><span class="arrow">›</span></div>
+<div class="toggleRow"><span class="lbl"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="4"/><path d="M10 9l5 3-5 3V9z"/></svg> Also Share to Reels</span><div class="switch" onclick="this.classList.toggle('on')"></div></div>
+<div id="status"></div>
+<button class="shareBtn" id="shareBtnPost" onclick="sharePost()">Share Post →</button>
 </div>
-<div class="pixBar">
-<div onclick="openSheet('sheetFiltersR',this)"><b><svg class="ic-big" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg></b><span>Filter</span></div>
-<div onclick="openSheet('sheetTextR',this)"><b>T</b><span>Text</span></div>
-<div onclick="openSheet('sheetAudioR',this)"><b><svg class="ic-big" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></b><span>Song</span></div>
-<div onclick="openSheet('sheetEffectsR',this)"><b><svg class="ic-big" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg></b><span>Effect</span></div>
-<div onclick="clearAll()"><b>✕</b><span>Clear</span></div>
+<div class="page" id="pageUploadReels">
+<div class="top"><span class="back" onclick="showPage('pageEdit')">←</span><b>Upload Reels</b><span></span></div>
+<div class="upCover"><img id="upImgReels"><div class="play"><svg class="ic-lg" viewBox="0 0 24 24" fill="white"><path d="M8 5l11 7-11 7V5z"/></svg></div><span class="dur" id="reelDur">0:30</span><button class="editCover" onclick="document.getElementById('file').click()">Edit Cover</button></div>
+<div class="field"><textarea id="captionReels" rows="2" placeholder="Add a caption..." oninput="syncCaption2()"></textarea><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></div>
+<div class="field"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span style="flex:1;font-size:14px">Add Music</span><span style="font-size:12px;color:#aaa">Popular</span><span class="arrow">›</span></div>
+<div class="field" onclick="toggleAud()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span style="flex:1;font-size:14px">Audience</span><span id="audTxtReels" style="font-size:13px;color:#aaa">Everyone</span><span class="arrow">›</span></div>
+<div class="field"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><input id="locReels" placeholder="Add Location"><span class="arrow">›</span></div>
+<div class="toggleRow"><span class="lbl"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/></svg> Also Share to Post</span><div class="switch" onclick="this.classList.toggle('on')"></div></div>
+<button class="shareBtn" id="shareBtnReels" onclick="sharePost()">Share Reel →</button>
 </div>
-<div class="sheet" id="sheetTrimR"><div class="sHead"><b>Trim - Cut Pannu</b><span class="done" onclick="closeSheet()">Done</span></div><div class="sliderRow"><span>Start</span><span id="trimStartTxt">0.0s</span></div><input type="range" id="trimStart" min="0" max="100" value="0" oninput="doTrim()"><div class="sliderRow"><span>End</span><span id="trimEndTxt">3.0s</span></div><input type="range" id="trimEnd" min="0" max="100" value="100" oninput="doTrim()"><p style="font-size:11px;color:#888;padding:6px 2px">Slider ah izhutha - Photo / Video Cut aayidum. Pudikkala na - Reset ah thodu.</p><button class="red" style="width:100%" onclick="resetTrim()">✕ Reset Trim</button></div>
-<div class="sheet" id="sheetFiltersR"><div class="sHead"><b>Filter - Reels</b><span class="done" onclick="closeSheet()">Done</span></div><div class="miniGrid"><div class="it sel" onclick="setFilter('none',this)"><div class="thumb"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M5 5l14 14"/></svg></div><span>None</span></div><div class="it" onclick="setFilter('grayscale(1) contrast(1.2)',this)"><div class="thumb"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z"/></svg></div><span>Noir</span></div><div class="it" onclick="setFilter('sepia(.5) contrast(1.2)',this)"><div class="thumb"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></div><span>Warm</span></div><div class="it" onclick="setFilter('brightness(1.1) saturate(1.25)',this)"><div class="thumb"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg></div><span>Clear</span></div><div class="it" onclick="setFilter('sepia(.3) saturate(1.4)',this)"><div class="thumb"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><span>Golden</span></div><div class="it" onclick="setFilter('brightness(1.15) saturate(1.35)',this)"><div class="thumb"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.7 1 1.5 1 2.5h6c0-1 .2-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg></div><span>Glow</span></div><div class="it" onclick="setFilter('contrast(1.3) saturate(1.4)',this)"><div class="thumb"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div><span>Mass</span></div></div><button class="red" style="width:100%;margin-top:10px" onclick="removeFilter()">✕ Remove Filter</button></div>
-<div class="sheet" id="sheetTextR"><div class="sHead"><b>Text - Reels</b><span class="done" onclick="closeSheet()">Done</span></div><input class="inlineInput" id="textInputR" placeholder="Text ezhuthu..." autocomplete="off"><div class="row"><button onclick="confirmTextR()">Add</button><button onclick="setFont('system-ui',this)" class="on">Default</button><button onclick="setFont('serif',this)">Serif</button><button onclick="setFont('cursive',this)">Style</button></div><div class="row"><button onclick="pickSticker('fire')">Fire Sticker</button><button onclick="pickSticker('heart')">Heart Sticker</button><button onclick="pickSticker('laugh')">Laugh Sticker</button></div><button class="red" style="width:100%;margin-top:8px" onclick="removeText()">✕ Remove Text / Sticker</button></div>
-<div class="sheet" id="sheetAudioR"><div class="sHead"><b>Song - Reels Only</b><span class="done" onclick="closeSheet()">Done</span></div><div class="row"><button onclick="pickSong('Leo - Naa Ready',this)" class="on">Leo</button><button onclick="pickSong('Jailer - Hukum',this)">Jailer</button><button onclick="pickSong('Vikram',this)">Vikram</button><button onclick="pickSong('No Song',this)">No Song</button></div><p id="songTxt" style="font-size:12px;color:#ffcc00;padding:6px 2px">Song: No Song</p><p style="font-size:11px;color:#aaa">Volume</p><input type="range" min="0" max="100" value="80" oninput="setVolume(this.value/100)"><button class="red" style="width:100%;margin-top:8px" onclick="removeSong()">✕ Remove Song</button></div>
-<div class="sheet" id="sheetEffectsR"><div class="sHead"><b>Effect - Reels</b><span class="done" onclick="closeSheet()">Done</span></div><div class="row"><button onclick="applyEffect('none',this)" class="on">None</button><button onclick="applyEffect('shake',this)">Shake</button><button onclick="applyEffect('zoom',this)">Zoom</button><button onclick="applyEffect('flash',this)">Flash</button></div><button class="red" style="width:100%;margin-top:8px" onclick="removeEffect()">✕ Remove Effect</button></div>
-</div>
-<div class="top" id="top3" style="display:none"><span onclick="goBack()">✕</span><b id="top3Title">New post</b><span></span></div>
-<div class="shareBox" id="step3">
-<div id="uploadCoverWrap" style="display:none;text-align:center"><img id="shareThumbCover" style="width:120px;height:200px;object-fit:cover;border-radius:16px"><div style="margin-top:8px"><button onclick="document.getElementById('file').click()" style="background:#222;color:#fff;border:0;padding:8px 14px;border-radius:999px;font-size:12px">Edit cover</button></div></div>
-<div class="shareTop" id="uploadTop"><img id="shareThumb"><textarea id="caption" rows="3" placeholder="Write a caption..."></textarea></div>
-<div id="uploadFields"></div>
-<div class="future"><b>Future Features - Soon</b><div class="frow"><span>Collab Post</span><span class="lock">Soon</span></div><div class="frow"><span>Schedule Post</span><span class="lock">Soon</span></div><div class="frow"><span>AI Caption</span><span class="lock">Soon</span></div><div class="frow"><span>Poll / Quiz</span><span class="lock">Soon</span></div><div class="frow"><span>Music Library</span><span class="lock">Soon</span></div></div>
-<div id="status"></div><div style="display:flex;gap:10px;margin-top:14px"><button class="shareBtn gray" onclick="saveDraft()">Save draft</button><button class="shareBtn" id="shareBtn" onclick="sharePost()">Share</button></div>
-</div>
+<div class="bottomNav"><div onclick="showPage('pageHome')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8V21H3V11z"/></svg><br>Home</div><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><br>Search</div><div class="on" onclick="showPage('pageHome')"><div class="plus">+</div>Create</div><div onclick="goCreate('reels')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="4"/><path d="M10 9l5 3-5 3V9z"/></svg><br>Reels</div><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c1-4 4-5 8-5s7 1 8 5"/></svg><br>Profile</div></div>
 <input type="file" id="file" accept="image/*,video/*">
 <input type="file" id="fileMulti" accept="image/*,video/*" multiple>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/supabase.js?v=1057"></script>
 <script>
-let step=1,type='post',file=null,url='',kind='image',filter='none',filterName='None',text='',song='No Song',fontF='system-ui',playing=false,adj={brightness:100,contrast:100,saturate:100},effect='none',sticker='',cropRatio='original';
-let tagged='',mention='',loc='',hashtags='',isPrivate=false,audioName='Original Audio';
-let clipDur=0,curTime=0;
-let clips=[],curClip=0,clipSpeed=1;
-function fmt(s){let m=Math.floor(s/60),ss=Math.floor(s%60);return (m<10?'0'+m:m)+':'+(ss<10?'0'+ss:ss);}
-function isVideo(){return kind==='video';}
-function isReels(){return type==='reels'||type==='story';}
-function curEditor(){return isReels()?document.getElementById('reelsEditor'):document.getElementById('postEditor');}
-function curImg(){return isReels()?document.getElementById('editImgR'):document.getElementById('editImg');}
-function curVid(){return isReels()?document.getElementById('editVidR'):document.getElementById('editVid');}
-function curTextEl(){return isReels()?document.getElementById('overlayTextR'):document.getElementById('overlayText');}
-function curStickerEl(){return isReels()?document.getElementById('overlayStickerR'):document.getElementById('overlaySticker');}
-function curApplied(){return isReels()?document.getElementById('appliedReels'):document.getElementById('appliedPost');}
-function applyMode(){document.getElementById('reelTop').style.display=isReels()?'block':'none';document.getElementById('top3Title').innerText=isReels()?'New reel':'New post';updateDurUI();}
-function updateDurUI(){let e=document.getElementById('playTime');if(e)e.innerText=fmt(curTime)+' / '+fmt(clipDur);let f=document.getElementById('clipProg');if(f)f.style.width=(clipDur?curTime/clipDur*100:0)+'%';}
-function renderApplied(){let h='';if(filterName!=='None')h+='<div class="chip">Filter: '+filterName+' <b onclick="removeFilter()">✕</b></div>';if(text)h+='<div class="chip">Text: '+text.slice(0,10)+' <b onclick="removeText()">✕</b></div>';if(sticker)h+='<div class="chip">Sticker <b onclick="removeText()">✕</b></div>';if(song!=='No Song')h+='<div class="chip">Song: '+song+' <b onclick="removeSong()">✕</b></div>';if(effect!=='none')h+='<div class="chip">Effect: '+effect+' <b onclick="removeEffect()">✕</b></div>';let a=curApplied();if(a)a.innerHTML=h;}
-function getSupa(){return window.supa;}
-function setType(t,el){type=t;document.querySelectorAll('#typeTabs span').forEach(s=>s.classList.remove('on'));el.classList.add('on');document.getElementById('topTitle').innerText=t==='post'?'New post':t==='reels'?'New reel':'New story';document.getElementById('previewBox').className='preview '+type;applyMode();}
+let type='post',file=null,url='',kind='image',filter='none',filterName='None',text='',song='No Song',fontF='system-ui',adj={brightness:100,contrast:100,saturate:100},effect='none',sticker='',loc='',aud='Everyone';
+let clips=[],curClip=0,clipSpeed=1,mediaTab='photo';
+let DEMO=['https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600&q=80','https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80','https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80','https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80','https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&q=80','https://images.unsplash.com/photo-1506126279646-a697353d3166?w=600&q=80','https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80','https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&q=80','https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80'];
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
+function goCreate(t){type=t;setType(t);showPage('pageSelect');renderMedia();}
+function setType(t){type=t;document.getElementById('segPost').classList.toggle('on',t==='post');document.getElementById('segReels').classList.toggle('on',t==='reels');document.getElementById('editTitle').innerText=t==='post'?'Edit Post':t==='reels'?'Edit Reels':'Edit Story';let ep=document.getElementById('editPreview');ep.className='editPreview '+(t==='reels'||t==='story'?'reels':'post');document.getElementById('reelsTimeline').style.display=(t==='reels')?'block':'none';renderTools();}
+function setMediaTab(t,el){mediaTab=t;document.querySelectorAll('.tabs2 span').forEach(s=>s.classList.remove('on'));el.classList.add('on');renderMedia();}
+function renderMedia(){let g=document.getElementById('mediaGrid');g.innerHTML=DEMO.map((u,i)=>'<div class="tile '+(url===u?'sel':'')+'" onclick="selectDemo(\''+u+'\',this)"><img src="'+u+'"><span class="tick">'+(url===u?'✓':'')+'</span>'+(mediaTab==='video'?'<span class="vid">0:15</span>':'')+'</div>').join('')+'<div class="tile" onclick="document.getElementById(\'file\').click()" style="display:grid;place-items:center;font-size:28px">+</div>';}
+function selectDemo(u,el){url=u;kind='image';file=null;document.querySelectorAll('.grid .tile').forEach(t=>{t.classList.remove('sel');let tk=t.querySelector('.tick');if(tk)tk.innerText='';});el.classList.add('sel');el.querySelector('.tick').innerText='✓';document.getElementById('createImg').src=u;document.getElementById('editImg').src=u;document.getElementById('selectNext').classList.add('show');}
+function goCreateStep(){if(!url)selectDemo(DEMO[0],document.querySelector('.grid .tile'));document.getElementById('createImg').src=url;showPage('pageCreate');}
+function goEdit(){document.getElementById('editImg').src=url;document.getElementById('upImgPost').src=url;document.getElementById('upImgReels').src=url;showPage('pageEdit');renderTools();renderTimeline();renderThumbs();}
+function goUpload(){if(type==='reels')showPage('pageUploadReels');else showPage('pageUploadPost');document.getElementById('captionPost').value=document.getElementById('caption1').value;document.getElementById('captionReels').value=document.getElementById('caption1').value;updateCount();}
+function syncCaption(){document.getElementById('captionPost').value=document.getElementById('caption1').value;document.getElementById('captionReels').value=document.getElementById('caption1').value;}
+function syncCaption2(){document.getElementById('caption1').value=document.getElementById('captionReels').value;}
+function updateCount(){let v=document.getElementById('captionPost').value;document.getElementById('capCount').innerText=v.length+'/220';}
+function promptLoc(){let l=prompt('Location ezhuthu - Chennai, Tamil Nadu');if(l){loc=l;document.getElementById('loc1').value=l;document.getElementById('locPost').value=l;document.getElementById('locReels').value=l;}}
+function toggleAud(){aud=aud==='Everyone'?'Private':'Everyone';['audTxt1','audTxtPost','audTxtReels'].forEach(id=>{let e=document.getElementById(id);if(e)e.innerText=aud;});}
+function renderTools(){let tools=document.getElementById('editTools');let base='<div onclick="openSheet(\'sheetText\')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M5 20L12 4l7 16M7 15h10"/></svg><span>Text</span></div><div onclick="openSheet(\'sheetSticker\')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg><span>Stickers</span></div><div onclick="openSheet(\'sheetFilter\')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg><span>Filters</span></div><div onclick="openSheet(\'sheetEffect\')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg><span>Effects</span></div><div onclick="openSheet(\'sheetMusic\')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span>Music</span></div>';if(type==='post')tools.innerHTML=base+'<div onclick="openSheet(\'sheetAdjust\')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h13"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/></svg><span>Adjust</span></div>';else tools.innerHTML=base;renderFilterGrid();}
+function renderFilterGrid(){let g=document.getElementById('filterGrid');let arr=[['None','none','M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0-18 0 M5 5l14 14'],['Noir','grayscale(1) contrast(1.2)','M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0-18 0 M12 3a9 9 0 0 1 0 18'],['Warm','sepia(.5) contrast(1.2)','M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0-8 0'],['Clear','brightness(1.1) saturate(1.25)','M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z'],['Golden','sepia(.3) saturate(1.4)','M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0-18 0 M12 7v5l3 2'],['Glow','brightness(1.15) saturate(1.35)','M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.7 1 1.5 1 2.5h6c0-1 .2-1.8 1-2.5A6 6 0 0 0 12 3z'],['Mass','contrast(1.3) saturate(1.4)','M13 2L4 14h6l-1 8 9-12h-6l1-8z']];g.innerHTML=arr.map(a=>'<div class="it '+(filter===a[1]?'sel':'')+'" onclick="setFilter(\''+a[1]+'\',\''+a[0]+'\',this)"><div class="thumb"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="'+a[2]+'"/></svg></div><span>'+a[0]+'</span></div>').join('');}
+function renderThumbs(){let r=document.getElementById('thumbRow');r.innerHTML=DEMO.slice(0,4).map(u=>'<div class="th '+(url===u?'sel':'')+'" onclick="selectDemo(\''+u+'\',this);document.getElementById(\'editImg\').src=\''+u+'\'"><img src="'+u+'"></div>').join('')+'<div class="add" onclick="document.getElementById(\'fileMulti\').click()">+</div>';}
+function openSheet(id){document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('show'));document.getElementById(id).classList.add('show');}
+function closeSheet(){document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('show'));}
 function buildFilter(){return 'brightness('+adj.brightness+'%) contrast('+adj.contrast+'%) saturate('+adj.saturate+'%) '+(filter==='none'?'':filter);}
-function applyAllFilter(){let f=buildFilter();[document.getElementById('editImg'),document.getElementById('editVid'),document.getElementById('editImgR'),document.getElementById('editVidR')].forEach(x=>{if(x)x.style.filter=f;});}
-function setFilter(f,btn){filter=f;filterName=btn?btn.parentElement.querySelector('span').innerText:'Filter';applyAllFilter();renderApplied();closeSheet();}
-function removeFilter(){filter='none';filterName='None';applyAllFilter();renderApplied();closeSheet();}
-function removeEffect(){effect='none';[document.getElementById('editImg'),document.getElementById('editVid'),document.getElementById('editImgR'),document.getElementById('editVidR')].forEach(x=>{if(x)x.classList.remove('fx-shake','fx-flash','fx-zoom');});renderApplied();closeSheet();}
-function removeText(){text='';sticker='';document.getElementById('overlayText').innerText='';document.getElementById('overlaySticker').innerHTML='';document.getElementById('overlayTextR').innerText='';document.getElementById('overlayStickerR').innerHTML='';let i1=document.getElementById('textInput');if(i1)i1.value='';let i2=document.getElementById('textInputR');if(i2)i2.value='';renderApplied();closeSheet();}
-function removeSong(){song='No Song';document.getElementById('songTxt').innerText='Song: No Song';renderApplied();closeSheet();}
-function removeAdjust(){adj={brightness:100,contrast:100,saturate:100};document.getElementById('vBright').innerText='100%';document.getElementById('vContrast').innerText='100%';document.getElementById('vSat').innerText='100%';applyAllFilter();closeSheet();}
-function clearAll(){removeFilter();removeText();removeSong();removeEffect();removeAdjust();renderApplied();}
-function doAdjust(k,v){adj[k]=+v;document.getElementById('vBright').innerText=adj.brightness+'%';document.getElementById('vContrast').innerText=adj.contrast+'%';document.getElementById('vSat').innerText=adj.saturate+'%';applyAllFilter();}
-function openSheet(id,el){let ed=curEditor();ed.classList.add('sheetOpen');document.querySelectorAll('.sheet').forEach(s=>s.style.display='none');document.getElementById(id).style.display='block';if(el){document.querySelectorAll('.pixBar div').forEach(d=>d.classList.remove('on'));el.classList.add('on');}}
-function closeSheet(){document.querySelectorAll('.sheet').forEach(s=>s.style.display='none');document.getElementById('postEditor').classList.remove('sheetOpen');document.getElementById('reelsEditor').classList.remove('sheetOpen');if(document.activeElement)document.activeElement.blur();}
-function applyEffect(e,el){effect=e;[document.getElementById('editImg'),document.getElementById('editVid'),document.getElementById('editImgR'),document.getElementById('editVidR')].forEach(x=>{if(x)x.classList.remove('fx-shake','fx-flash','fx-zoom');});if(e==='shake'){curImg().classList.add('fx-shake');curVid().classList.add('fx-shake');}if(e==='flash'){curImg().classList.add('fx-flash');curVid().classList.add('fx-flash');}if(e==='zoom'){curImg().classList.add('fx-zoom');curVid().classList.add('fx-zoom');}renderApplied();}
-function setFont(f,btn){fontF=f;curTextEl().style.fontFamily=f;}
-function confirmText(){let v=document.getElementById('textInput').value.trim();if(v){text=v;let o=document.getElementById('overlayText');o.innerText=v;o.style.fontFamily=fontF;}renderApplied();closeSheet();}
-function confirmTextR(){let v=document.getElementById('textInputR').value.trim();if(v){text=v;let o=document.getElementById('overlayTextR');o.innerText=v;o.style.fontFamily=fontF;}renderApplied();closeSheet();}
-function pickSticker(k){sticker=k;let el=curStickerEl();if(k==='fire')el.innerHTML='<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ff6b00" stroke-width="1.8"><path d="M12 3c1 4-3 5-2 9a5 5 0 0 0 10 0c0-2-1-3-1-3s3 1 2-3c-1-3-4-4-5-7-1 2-3 1-4 4z"/></svg>';if(k==='heart')el.innerHTML='<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ff2d55" stroke-width="1.8"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg>';if(k==='laugh')el.innerHTML='<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg>';renderApplied();closeSheet();}
-function pickSong(s,btn){song=s;document.getElementById('songTxt').innerText='Song: '+s;renderApplied();}
-function setVolume(v){let vv=document.getElementById('editVidR');if(vv)vv.volume=v;}
-function setCrop(r,btn){cropRatio=r;if(btn){document.querySelectorAll('#sheetCropP button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}let stage=document.querySelector('#postEditor .capPreview .stage');if(stage){if(r==='1:1')stage.style.aspectRatio='1/1';else if(r==='4:5')stage.style.aspectRatio='4/5';else if(r==='3:4')stage.style.aspectRatio='3/4';else stage.style.aspectRatio='4/5';}closeSheet();}
-function renderTimeline(){let tl=document.getElementById('timeline');if(!tl)return;let total=clips.reduce((a,c)=>a+(c.end-c.start),0);document.getElementById('tlTotal').innerText=clips.length+' Clips • '+total.toFixed(1)+'s';let h=clips.map((c,i)=>'<div class="clip '+(i===curClip?'sel':'')+'" onclick="selectClip('+i+')"><img src="'+c.url+'"><span class="num">'+(i+1)+'</span><span class="dur">'+(c.end-c.start).toFixed(1)+'s</span></div>').join('');h+='<div class="addClip" onclick="document.getElementById(\'fileMulti\').click()">+</div>';tl.innerHTML=h;}
-function selectClip(i){curClip=i;let c=clips[i];if(!c)return;showClip(c);renderTimeline();let s=document.getElementById('trimStart');let e=document.getElementById('trimEnd');if(s&&e){s.value=Math.round(c.start/c.full*100);e.value=Math.round(c.end/c.full*100);document.getElementById('trimStartTxt').innerText=c.start.toFixed(1)+'s';document.getElementById('trimEndTxt').innerText=c.end.toFixed(1)+'s';}}
-function showClip(c){let img=document.getElementById('editImgR');let vid=document.getElementById('editVidR');if(c.kind==='video'){vid.src=c.url;vid.style.display='block';img.style.display='none';vid.currentTime=c.start;vid.play();playing=true;vid.playbackRate=clipSpeed;}else{img.src=c.url;img.style.display='block';vid.style.display='none';vid.pause();}url=c.url;kind=c.kind;}
-function addClipFromFile(f){let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let c={url:ev.target.result,kind:k,full:k==='video'?10:3,start:0,end:k==='video'?10:3,file:f};if(k==='video'){let tmp=document.createElement('video');tmp.src=c.url;tmp.onloadedmetadata=()=>{c.full=tmp.duration||10;c.end=Math.min(c.full,10);renderTimeline();};}clips.push(c);curClip=clips.length-1;renderTimeline();showClip(c);};r.readAsDataURL(f);}
-function doTrim(){let c=clips[curClip];if(!c)return;let s=document.getElementById('trimStart');let e=document.getElementById('trimEnd');let ns=c.full*s.value/100;let ne=c.full*e.value/100;if(ne<=ns)ne=ns+0.3;if(ne>c.full)ne=c.full;c.start=ns;c.end=ne;document.getElementById('trimStartTxt').innerText=ns.toFixed(1)+'s';document.getElementById('trimEndTxt').innerText=ne.toFixed(1)+'s';renderTimeline();if(c.kind==='video'){let v=document.getElementById('editVidR');v.currentTime=ns;}}
+function applyFilter(){let f=buildFilter();document.getElementById('editImg').style.filter=f;let v=document.getElementById('editVid');if(v)v.style.filter=f;document.getElementById('createImg').style.filter=f;}
+function setFilter(f,name,el){filter=f;filterName=name;applyFilter();renderFilterGrid();closeSheet();}
+function removeFilter(){filter='none';filterName='None';applyFilter();renderFilterGrid();closeSheet();}
+function doAdjust(k,v){adj[k]=+v;document.getElementById('vBright').innerText=adj.brightness+'%';document.getElementById('vContrast').innerText=adj.contrast+'%';document.getElementById('vSat').innerText=adj.saturate+'%';applyFilter();}
+function removeAdjust(){adj={brightness:100,contrast:100,saturate:100};applyFilter();closeSheet();}
+function confirmText(){let v=document.getElementById('textInput').value.trim();if(v){text=v;let o=document.getElementById('ovText');o.innerText=v;o.style.fontFamily=fontF;}closeSheet();}
+function setFont(f,el){fontF=f;document.getElementById('ovText').style.fontFamily=f;}
+function pickSticker(k){sticker=k;let el=document.getElementById('ovStick');if(k==='fire')el.innerHTML='<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ff6b00" stroke-width="1.8"><path d="M12 3c1 4-3 5-2 9a5 5 0 0 0 10 0c0-2-1-3-1-3s3 1 2-3c-1-3-4-4-5-7-1 2-3 1-4 4z"/></svg>';if(k==='heart')el.innerHTML='<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ff2d55" stroke-width="1.8"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg>';if(k==='laugh')el.innerHTML='<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg>';closeSheet();}
+function removeText(){text='';sticker='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerHTML='';document.getElementById('textInput').value='';closeSheet();}
+function applyEffect(e,el){effect=e;let img=document.getElementById('editImg');img.classList.remove('fx-shake','fx-flash','fx-zoom');if(e==='shake')img.classList.add('fx-shake');if(e==='flash')img.classList.add('fx-flash');if(e==='zoom')img.classList.add('fx-zoom');closeSheet();}
+function removeEffect(){effect='none';document.getElementById('editImg').classList.remove('fx-shake','fx-flash','fx-zoom');closeSheet();}
+function pickSong(s,el){song=s;document.getElementById('songTxt').innerText='Song: '+s;closeSheet();}
+function removeSong(){song='No Song';document.getElementById('songTxt').innerText='Song: No Song';closeSheet();}
+function setVolume(v){let vv=document.getElementById('editVid');if(vv)vv.volume=v;}
+function renderTimeline(){let tl=document.getElementById('timeline');if(!tl)return;if(!clips.length)clips=[{url:url||DEMO[0],kind:'image',full:3,start:0,end:3}];let total=clips.reduce((a,c)=>a+(c.end-c.start),0);document.getElementById('tlTotal').innerText=clips.length+' Clips • '+total.toFixed(1)+'s';tl.innerHTML=clips.map((c,i)=>'<div class="clip '+(i===curClip?'sel':'')+'" onclick="selectClip('+i+')"><img src="'+c.url+'"><span class="dur">'+(c.end-c.start).toFixed(1)+'s</span></div>').join('')+'<div class="addClip" onclick="document.getElementById(\'fileMulti\').click()">+</div>';document.getElementById('reelDur').innerText='0:'+(total<10?'0':'')+Math.round(total);}
+function selectClip(i){curClip=i;let c=clips[i];if(!c)return;document.getElementById('editImg').src=c.url;url=c.url;renderTimeline();let s=document.getElementById('trimStart');let e=document.getElementById('trimEnd');if(s){s.value=Math.round(c.start/c.full*100);e.value=Math.round(c.end/c.full*100);document.getElementById('trimStartTxt').innerText=c.start.toFixed(1)+'s';document.getElementById('trimEndTxt').innerText=c.end.toFixed(1)+'s';}}
+function addClipFromFile(f){let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let c={url:ev.target.result,kind:k,full:k==='video'?10:3,start:0,end:k==='video'?10:3,file:f};clips.push(c);curClip=clips.length-1;renderTimeline();document.getElementById('editImg').src=c.url;url=c.url;};r.readAsDataURL(f);}
+function doTrim(){let c=clips[curClip];if(!c)return;let s=document.getElementById('trimStart');let e=document.getElementById('trimEnd');let ns=c.full*s.value/100;let ne=c.full*e.value/100;if(ne<=ns)ne=ns+0.3;if(ne>c.full)ne=c.full;c.start=ns;c.end=ne;document.getElementById('trimStartTxt').innerText=ns.toFixed(1)+'s';document.getElementById('trimEndTxt').innerText=ne.toFixed(1)+'s';renderTimeline();}
 function resetTrim(){let c=clips[curClip];if(!c)return;c.start=0;c.end=c.full;renderTimeline();selectClip(curClip);}
 function splitClip(){let c=clips[curClip];if(!c)return;let mid=(c.start+c.end)/2;let n={url:c.url,kind:c.kind,full:c.full,start:mid,end:c.end,file:c.file};c.end=mid;clips.splice(curClip+1,0,n);renderTimeline();}
-function deleteClip(){if(clips.length<=1)return;clips.splice(curClip,1);if(curClip>=clips.length)curClip=clips.length-1;renderTimeline();if(clips[curClip])showClip(clips[curClip]);}
+function deleteClip(){if(clips.length<=1)return;clips.splice(curClip,1);if(curClip>=clips.length)curClip=clips.length-1;renderTimeline();if(clips[curClip])document.getElementById('editImg').src=clips[curClip].url;}
 function duplicateClip(){let c=clips[curClip];if(!c)return;let n={url:c.url,kind:c.kind,full:c.full,start:c.start,end:c.end,file:c.file};clips.splice(curClip+1,0,n);renderTimeline();}
-function setSpeedReels(){clipSpeed=clipSpeed===1?2:clipSpeed===2?0.5:1;let v=document.getElementById('editVidR');if(v)v.playbackRate=clipSpeed;}
-function togglePlay(){if(!isVideo())return;let v=document.getElementById('editVidR');playing=!playing;if(playing)v.play();else v.pause();document.getElementById('floatPlay').innerHTML=playing?'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M8 5v14M16 5v14"/></svg>':'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M6 4l14 8-14 8V4z"/></svg>';}
-function showFull(){document.getElementById('step1').style.display='none';let f=document.getElementById('fullPage');f.style.display='flex';applyMode();if(kind==='video'){let v=document.getElementById('fullVid');v.src=url;v.style.display='block';v.play();document.getElementById('fullImg').style.display='none';}else{let p=document.getElementById('fullImg');p.src=url;p.style.display='block';document.getElementById('fullVid').style.display='none';}}
-function openEditor(){document.getElementById('fullPage').style.display='none';step=2;document.getElementById('postEditor').style.display='none';document.getElementById('reelsEditor').style.display='none';let ed=curEditor();ed.style.display='flex';curTime=0;applyMode();if(isReels()){if(clips.length&&clips[curClip])showClip(clips[curClip]);else{let img=document.getElementById('editImgR');let vid=document.getElementById('editVidR');if(kind==='video'){vid.src=url;vid.style.display='block';vid.play();playing=true;img.style.display='none';vid.onloadedmetadata=()=>{clipDur=vid.duration||0;updateDurUI();};vid.ontimeupdate=()=>{curTime=vid.currentTime;updateDurUI();};}else{img.src=url;img.style.display='block';vid.style.display='none';clipDur=0;curTime=0;updateDurUI();}}renderTimeline();}else{let img=document.getElementById('editImg');let vid=document.getElementById('editVid');if(kind==='video'){vid.src=url;vid.style.display='block';vid.play();img.style.display='none';}else{img.src=url;img.style.display='block';vid.style.display='none';}clipDur=0;curTime=0;updateDurUI();}}
-function goBackToSelect(){document.getElementById('fullPage').style.display='none';document.getElementById('step1').style.display='block';}
-function renderUpload(){let box=document.getElementById('uploadFields');let tagRow='<div class="field"><span class="lbl"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c1-4 4-5 8-5s7 1 8 5"/></svg> Tag people</span><input placeholder="@username" value="'+tagged+'" oninput="tagged=this.value"></div>';let mentionRow='<div class="field"><span class="lbl"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5l3 2"/></svg> Mention</span><input placeholder="@friend" value="'+mention+'" oninput="mention=this.value"></div>';let locRow='<div class="field"><span class="lbl"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> Add location</span><input placeholder="Chennai, Tamil Nadu" value="'+loc+'" oninput="loc=this.value"></div>';let audRow='<div class="field" onclick="togglePrivate()"><span class="lbl">Audience</span><span class="val" id="audTxt">'+(isPrivate?'Private ›':'Everyone ›')+'</span></div>';let hashRow='<div class="pillRow"><span># Hashtags</span><span>Poll</span><span>Prompt</span></div><div class="field"><span class="lbl">Hashtags</span><input placeholder="#pixoro #mass" value="'+hashtags+'" oninput="hashtags=this.value"></div>';let audioRow='<div class="field"><span class="lbl"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Rename audio</span><input placeholder="Original Audio" value="'+audioName+'" oninput="audioName=this.value"></div>';let note='<div class="note">People you share this content with can see the location you tag and view this content on the map.</div>';if(isReels()){document.getElementById('uploadCoverWrap').style.display='block';document.getElementById('uploadTop').style.display='none';document.getElementById('shareThumbCover').src=url;document.getElementById('caption').placeholder='Write a caption and add hashtags...';box.innerHTML=hashRow+tagRow+locRow+note+audioRow;}else{document.getElementById('uploadCoverWrap').style.display='none';document.getElementById('uploadTop').style.display='flex';document.getElementById('caption').placeholder='Write a caption...';box.innerHTML=tagRow+mentionRow+locRow+audRow;}}
-function goToUpload(){let v=document.getElementById('editVidR');if(v)v.pause();let v2=document.getElementById('editVid');if(v2)v2.pause();document.getElementById('fullPage').style.display='none';document.getElementById('postEditor').style.display='none';document.getElementById('reelsEditor').style.display='none';step=3;document.getElementById('step3').style.display='block';document.getElementById('top3').style.display='flex';document.getElementById('shareThumb').src=url;renderUpload();closeSheet();}
-function goBack(){if(step===3){step=2;document.getElementById('step3').style.display='none';document.getElementById('top3').style.display='none';openEditor();}else if(step===2){step=1;document.getElementById('postEditor').style.display='none';document.getElementById('reelsEditor').style.display='none';showFull();closeSheet();}else location.href='./index.html';}
-function goNext(){if(!file){document.getElementById('file').click();return;}if(step===1){showFull();return;}if(step===2){goToUpload();return;}}
-function togglePrivate(){isPrivate=!isPrivate;let e=document.getElementById('audTxt');if(e)e.innerText=isPrivate?'Private ›':'Everyone ›';}
-function saveDraft(){let st=document.getElementById('status');if(st)st.innerText='Draft saved';}
-let dc=document.getElementById('drawCanvas');let dctx=dc?dc.getContext('2d'):null;
-document.getElementById('file').addEventListener('change',function(e){let f=e.target.files[0];if(!f)return;file=f;kind=f.type.includes('video')?'video':'image';let reader=new FileReader();reader.onload=function(ev){url=ev.target.result;document.getElementById('emptyBox').style.display='none';clearAll();if(kind==='video'){let v=document.getElementById('prevVid');v.src=url;v.style.display='block';v.play();document.getElementById('prevImg').style.display='none';let tmp=document.createElement('video');tmp.src=url;tmp.onloadedmetadata=()=>{clipDur=tmp.duration||0;updateDurUI();};}else{let p=document.getElementById('prevImg');p.src=url;p.style.display='block';document.getElementById('prevImg').style.filter='none';document.getElementById('prevVid').style.display='none';clipDur=0;curTime=0;updateDurUI();}document.getElementById('grid').innerHTML='<div class="tile">'+(kind==='video'?'<video src="'+url+'" muted></video>':'<img src="'+url+'">')+'</div>';document.getElementById('nextBtn').style.display='block';applyMode();if(isReels()){clips=[{url:url,kind:kind,full:kind==='video'?10:3,start:0,end:kind==='video'?10:3,file:f}];curClip=0;renderTimeline();}if(step===2)openEditor();else showFull();};reader.readAsDataURL(f);e.target.value='';});
+function setSpeed(){clipSpeed=clipSpeed===1?2:clipSpeed===2?0.5:1;}
+function getSupa(){return window.supa;}
+document.getElementById('file').addEventListener('change',function(e){let f=e.target.files[0];if(!f)return;file=f;kind=f.type.includes('video')?'video':'image';let r=new FileReader();r.onload=ev=>{url=ev.target.result;document.getElementById('createImg').src=url;document.getElementById('editImg').src=url;document.getElementById('upImgPost').src=url;document.getElementById('upImgReels').src=url;if(type==='reels'){clips=[{url:url,kind:kind,full:kind==='video'?10:3,start:0,end:kind==='video'?10:3,file:f}];curClip=0;renderTimeline();}showPage('pageCreate');};r.readAsDataURL(f);e.target.value='';});
 document.getElementById('fileMulti').addEventListener('change',function(e){Array.from(e.target.files).forEach(f=>addClipFromFile(f));e.target.value='';});
-async function bake(){if(isReels()&&clips.length){let c=clips[curClip]||clips[0];if(c.kind==='video')return c.file;return new Promise(res=>{let img=new Image();img.onload=()=>{let W=1080,H=1920;let cc=document.createElement('canvas');cc.width=W;cc.height=H;let ctx=cc.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.filter=buildFilter();let sc=Math.max(W/img.width,H/img.height);let dw=img.width*sc,dh=img.height*sc;ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);if(text){ctx.filter='none';ctx.font='900 60px '+fontF;ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText(text,W/2,H*0.35);}cc.toBlob(b=>res(b||c.file),'image/jpeg',0.92);};img.src=c.url;});}if(kind==='video')return file;return new Promise(res=>{let img=new Image();img.onload=()=>{let W=1080,H=1350;let cc=document.createElement('canvas');cc.width=W;cc.height=H;let ctx=cc.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.filter=buildFilter();let sc=Math.min(W/img.width,H/img.height);let dw=img.width*sc,dh=img.height*sc;ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);if(text){ctx.filter='none';ctx.font='900 60px '+fontF;ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText(text,W/2,H*0.35);}cc.toBlob(b=>res(b||file),'image/jpeg',0.92);};img.src=url;});}
-async function sharePost(){let supa=getSupa();if(!supa)return;let btn=document.getElementById('shareBtn');btn.innerText='Sharing...';btn.disabled=true;let st=document.getElementById('status');st.innerText='Uploading...';let cap=document.getElementById('caption').value||'Just Pixoro';if(tagged)cap+=' @'+tagged;if(mention)cap+=' @'+mention;if(loc)cap+=' '+loc;if(hashtags)cap+=' '+hashtags;if(song!=='No Song')cap+=' '+song;try{let {data:{session}}=await supa.auth.getSession();if(!session){location.href='./login.html';return;}let ME_RAW=session.user.email.split('@')[0];let finalBlob=await bake();let folder=type==='story'?'stories':type==='reels'?'reels':'posts';let ext=kind==='video'?'mp4':'jpg';let fn=folder+'/'+session.user.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;let {error:upErr}=await supa.storage.from(folder).upload(fn,finalBlob,{contentType:kind==='video'?'video/mp4':'image/jpeg'});if(upErr)throw new Error('Storage: '+upErr.message);let {data:ud}=supa.storage.from(folder).getPublicUrl(fn);let {error}=await supa.from('posts').insert({user_id:session.user.id,username:ME_RAW,media_url:ud.publicUrl,image_url:kind==='image'?ud.publicUrl:null,video_url:kind==='video'?ud.publicUrl:null,media_type:type,caption:cap});if(error)throw new Error('DB: '+error.message);location.href='./index.html';}catch(e){st.innerText='Error: '+e.message;btn.innerText='Share';btn.disabled=false;}}
+async function bake(){if(kind==='video')return file;return new Promise(res=>{let img=new Image();img.onload=()=>{let W=1080,H=type==='reels'?1920:1350;let cc=document.createElement('canvas');cc.width=W;cc.height=H;let ctx=cc.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.filter=buildFilter();let sc=type==='reels'?Math.max(W/img.width,H/img.height):Math.min(W/img.width,H/img.height);let dw=img.width*sc,dh=img.height*sc;ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);if(text){ctx.filter='none';ctx.font='900 60px '+fontF;ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText(text,W/2,H*0.35);}cc.toBlob(b=>res(b||file),'image/jpeg',0.92);};img.src=url;});}
+async function sharePost(){let supa=getSupa();if(!supa)return;let btn=document.getElementById(type==='reels'?'shareBtnReels':'shareBtnPost');btn.innerText='Sharing...';btn.disabled=true;let st=document.getElementById('status');if(st)st.innerText='Uploading...';let cap=document.getElementById(type==='reels'?'captionReels':'captionPost').value||document.getElementById('caption1').value||'Just Pixoro';let tag=document.getElementById('tagPost')?document.getElementById('tagPost').value:'';let l=document.getElementById('locPost')?document.getElementById('locPost').value:loc;if(tag)cap+=' @'+tag;if(l)cap+=' '+l;if(song!=='No Song')cap+=' '+song;try{let {data:{session}}=await supa.auth.getSession();if(!session){location.href='./login.html';return;}let ME_RAW=session.user.email.split('@')[0];let finalBlob=await bake();let folder=type==='story'?'stories':type==='reels'?'reels':'posts';let ext=kind==='video'?'mp4':'jpg';let fn=folder+'/'+session.user.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;let {error:upErr}=await supa.storage.from(folder).upload(fn,finalBlob,{contentType:kind==='video'?'video/mp4':'image/jpeg'});if(upErr)throw new Error('Storage: '+upErr.message);let {data:ud}=supa.storage.from(folder).getPublicUrl(fn);let {error}=await supa.from('posts').insert({user_id:session.user.id,username:ME_RAW,media_url:ud.publicUrl,image_url:kind==='image'?ud.publicUrl:null,video_url:kind==='video'?ud.publicUrl:null,media_type:type,caption:cap});if(error)throw new Error('DB: '+error.message);location.href='./index.html';}catch(e){if(st)st.innerText='Error: '+e.message;btn.innerText=type==='reels'?'Share Reel →':'Share Post →';btn.disabled=false;}}
 (async()=>{let supa=getSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session)location.href='./login.html';})();
-applyMode();
+renderMedia();renderTools();renderThumbs();
 </script>
 </body>
 </html>
