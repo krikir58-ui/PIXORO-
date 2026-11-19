@@ -3,21 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Edit Reel - Pixoro</title>
+<title>Edit - Pixoro - v1048</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#000;color:#fff;font-family:system-ui}
-/* ✅ IMAGE LA - BLOCK WHITE VENUM DA - WRAP - WHITE DA */
 .wrap{position:relative;height:calc(100vh - 140px);overflow:hidden;background:#fff;display:grid;place-items:center}
-.wrap img,.wrap video{width:100%;height:100%;object-fit:cover;background:#fff}
+.wrap img,.wrap video{width:100%;height:100%;object-fit:contain;background:#fff}
 .wrap .empty{font-size:50px;text-align:center;color:#000}
 .wrap .empty small{display:block;font-size:12px;color:#888;margin-top:6px}
-.close{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.5);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:20px;z-index:5;color:#fff}
+.close{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.5);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:20px;z-index:5;color:#fff;cursor:pointer}
 .swipe{position:absolute;bottom:90px;left:0;right:0;text-align:center;opacity:.9;color:#fff;text-shadow:0 2px 8px #000;z-index:3}
 .tools{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:space-around;padding:0 10px;z-index:4}
 .tools div{background:rgba(0,0,0,.6);padding:10px 14px;border-radius:14px;text-align:center;font-size:12px;cursor:pointer}
 .tools div b{display:block;font-size:22px}
-/* ✅ BG TOGGLE - WHITE BLOCK / BG REMOVE DA */
 .bgRow{display:flex;gap:8px;overflow-x:auto;padding:10px;background:#000}
 .bgRow button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:20px;white-space:nowrap;cursor:pointer}
 .bgRow button.on{background:#fff;color:#000}
@@ -31,12 +29,12 @@ body{background:#000;color:#fff;font-family:system-ui}
 </head>
 <body>
 <div class="wrap" id="wrapBox">
-  <div class="close" onclick="history.back()">✕</div>
+  <div class="close" onclick="location.href='./create.html?v=1048'">✕</div>
   <img id="media" src="" style="display:none">
   <video id="vid" autoplay loop muted playsinline style="display:none"></video>
-  <div class="empty" id="emptyBox" style="display:none">📷<small>Photo Illa da<br>Back Poyi Select Pannu da</small></div>
+  <div class="empty" id="emptyBox" style="display:none">📷<small>Photo Illa da<br>Ingaye Select Pannidu da</small><br><button onclick="document.getElementById('file').click()" style="margin-top:12px;background:#000;color:#fff;border:0;padding:12px 22px;border-radius:20px;font-weight:800">📁 Select Photo</button></div>
   <div id="textOverlay" style="position:absolute;top:40%;left:0;right:0;text-align:center;font-size:28px;font-weight:900;text-shadow:0 2px 10px #000;display:none;z-index:5"></div>
-  <div class="swipe">^<br>Swipe up to edit</div>
+  <div class="swipe" id="swipeTxt" style="display:none">^<br>Swipe up to edit</div>
   <div class="tools">
     <div onclick="addAudio()"><b>🎵</b>Audio</div>
     <div onclick="addText()"><b>Aa</b>Text</div>
@@ -45,16 +43,13 @@ body{background:#000;color:#fff;font-family:system-ui}
     <div onclick="addSticker()"><b>😊</b>Stickers</div>
   </div>
 </div>
-
-<!-- ✅ WHITE BLOCK + BG REMOVE - ITHU THAAN DA GIRI -->
-<div class="bgRow">
+<div class="bgRow" id="bgRow">
   <button class="on" onclick="setBg('white',this)">⬜ White Block</button>
   <button onclick="setBg('black',this)">⬛ Black Block</button>
   <button onclick="setBg('transparent',this)">🔲 BG Remove</button>
   <button onclick="setBg('blur',this)">🌀 Blur BG</button>
 </div>
-
-<div class="filters">
+<div class="filters" id="filterRow">
   <button onclick="setF('none',this)" class="on">Original</button>
   <button onclick="setF('grayscale(1)',this)">B&W</button>
   <button onclick="setF('sepia(.8)',this)">Sepia</button>
@@ -62,62 +57,80 @@ body{background:#000;color:#fff;font-family:system-ui}
   <button onclick="setF('brightness(1.2)',this)">Fade</button>
   <button onclick="setF('contrast(1.2) brightness(1.1) saturate(1.3)',this)">Mass</button>
 </div>
-
-<div class="bottom"><button onclick="history.back()" style="background:#222;color:#fff">Edit video</button><button class="next" onclick="location.href='./create-reels-upload.html'">Next →</button></div>
-
+<div class="bottom"><button onclick="location.href='./create.html?v=1048'" style="background:#222;color:#fff">Edit video</button><button class="next" onclick="goShare()">Next →</button></div>
+<input type="file" id="file" accept="image/*,video/*" hidden>
+<input type="file" id="cameraFile" accept="image/*,video/*" capture="environment" hidden>
 <script>
-// ✅ PICSUM ILLA DA - UN PHOTO MATTUM DA
-let url = localStorage.getItem('pixoro_reel_media') || '';
-let type = localStorage.getItem('pixoro_reel_type') || 'image';
-let img = document.getElementById('media'), vid = document.getElementById('vid');
-
-if(!url || url.startsWith('blob:') || url.includes('picsum')){
-  alert('Photo Load Aagala da - Thirumba Select Pannu da');
-  location.href = './create-reels.html';
-} else if(type === 'video'){
-  img.style.display = 'none';
-  vid.style.display = 'block';
-  vid.src = url;
-} else {
-  img.src = url;
-  img.style.display = 'block';
+// ✅ LOCALSTORAGE BLOB ILLA DA - INDEXEDDB REAL FILE DA
+let currentBlob=null, currentKind='image', currentFilter='none', currentText='', currentBg='white', currentAudio='Original Audio', currentUrl='';
+let img=document.getElementById('media'), vid=document.getElementById('vid');
+function openDB(){ return new Promise((res,rej)=>{ let req=indexedDB.open('pixoro-db',1); req.onupgradeneeded=()=>{ req.result.createObjectStore('media'); }; req.onsuccess=()=>res(req.result); req.onerror=()=>rej(req.error); }); }
+async function getDB(k){ let db=await openDB(); return new Promise((res,rej)=>{ let r=db.transaction('media','readonly').objectStore('media').get(k); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function saveDB(k,v){ let db=await openDB(); return new Promise((res,rej)=>{ let tx=db.transaction('media','readwrite'); tx.objectStore('media').put(v,k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
+function showPhoto(blob, kind){
+  currentBlob=blob; currentKind=kind;
+  if(currentUrl) URL.revokeObjectURL(currentUrl);
+  currentUrl=URL.createObjectURL(blob);
+  document.getElementById('emptyBox').style.display='none';
+  document.getElementById('swipeTxt').style.display='block';
+  if(kind==='video'){ img.style.display='none'; vid.style.display='block'; vid.src=currentUrl; vid.play(); }
+  else { img.src=currentUrl; img.style.display='block'; img.style.filter=currentFilter; vid.style.display='none'; }
+  applyBg(currentBg);
 }
-
-// ✅ BG - LAST PAGE LA - SELECT PANNA - ATHU THAAN - INGA VARUM DA
-let savedBg = localStorage.getItem('pixoro_reel_bg') || 'white';
-applyBg(savedBg);
-document.querySelectorAll('.bgRow button').forEach(b => {
-  if((savedBg==='white' && b.innerText.includes('White')) || (savedBg==='black' && b.innerText.includes('Black')) || (savedBg==='transparent' && b.innerText.includes('Remove'))) b.classList.add('on');
-  else b.classList.remove('on');
-});
-
+function showEmpty(){ document.getElementById('emptyBox').style.display='block'; img.style.display='none'; vid.style.display='none'; document.getElementById('swipeTxt').style.display='none'; }
+async function load(){
+  try{
+    let blob=await getDB('pixoro_create_media');
+    let kind=await getDB('pixoro_create_kind') || 'image';
+    if(!blob){ showEmpty(); return; }
+    currentFilter=await getDB('pixoro_create_filter') || 'none';
+    currentBg=await getDB('pixoro_create_bg') || 'white';
+    currentText=await getDB('pixoro_create_text') || '';
+    currentAudio=await getDB('pixoro_create_audio') || 'Original Audio';
+    showPhoto(blob, kind);
+    if(currentText){ let o=document.getElementById('textOverlay'); o.innerText=currentText; o.style.display='block'; }
+    document.querySelectorAll('#bgRow button').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('#bgRow button').forEach(b=>{ if((currentBg==='white'&&b.innerText.includes('White'))||(currentBg==='black'&&b.innerText.includes('Black'))||(currentBg==='transparent'&&b.innerText.includes('Remove'))||(currentBg==='blur'&&b.innerText.includes('Blur'))) b.classList.add('on'); });
+    document.querySelectorAll('#filterRow button').forEach(b=>b.classList.remove('on'));
+  }catch(e){ showEmpty(); }
+}
+load();
 function applyBg(mode){
-  let wrap = document.getElementById('wrapBox');
-  if(mode === 'white'){ wrap.style.background = '#fff'; img.style.background = '#fff'; vid.style.background = '#fff'; img.style.objectFit = 'contain'; vid.style.objectFit = 'contain'; }
-  if(mode === 'black'){ wrap.style.background = '#000'; img.style.background = '#000'; vid.style.background = '#000'; img.style.objectFit = 'cover'; vid.style.objectFit = 'cover'; }
-  if(mode === 'transparent'){ wrap.style.background = 'repeating-conic-gradient(#222 0% 25%, #000 0% 50%) 50% / 20px 20px'; img.style.background = 'transparent'; img.style.objectFit = 'contain'; }
-  if(mode === 'blur'){ wrap.style.background = '#000'; img.style.objectFit = 'cover'; }
+  let wrap=document.getElementById('wrapBox');
+  if(mode==='white'){ wrap.style.background='#fff'; img.style.background='#fff'; vid.style.background='#fff'; img.style.objectFit='contain'; vid.style.objectFit='contain'; }
+  if(mode==='black'){ wrap.style.background='#000'; img.style.background='#000'; vid.style.background='#000'; img.style.objectFit='cover'; vid.style.objectFit='cover'; }
+  if(mode==='transparent'){ wrap.style.background='repeating-conic-gradient(#222 0% 25%, #000 0% 50%) 50% / 20px 20px'; img.style.background='transparent'; img.style.objectFit='contain'; }
+  if(mode==='blur'){ wrap.style.background='#000'; img.style.objectFit='cover'; }
 }
-
 function setBg(mode, btn){
-  document.querySelectorAll('.bgRow button').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  localStorage.setItem('pixoro_reel_bg', mode);
-  applyBg(mode);
-  if(mode === 'transparent') alert('BG Remove On da ✨ - White Block Remove Aachu da - Photo Mattum Theriyum da');
+  document.querySelectorAll('#bgRow button').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  currentBg=mode; saveDB('pixoro_create_bg', mode); applyBg(mode);
+  if(mode==='transparent') alert('BG Remove On da ✨ - White Block Remove Aachu da - Photo Mattum Theriyum da');
 }
-
 function setF(f, btn){
-  img.style.filter = f; vid.style.filter = f;
-  localStorage.setItem('pixoro_reel_filter', f);
-  document.querySelectorAll('.filters button').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
+  currentFilter=f; img.style.filter=f; vid.style.filter=f; saveDB('pixoro_create_filter', f);
+  document.querySelectorAll('#filterRow button').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
 }
-function addText(){ let t=prompt('Text ezhuthu da:'); if(!t) return; let o=document.getElementById('textOverlay'); o.innerText=t; o.style.display='block'; localStorage.setItem('pixoro_reel_text', t); }
-function addAudio(){ let a=prompt('Audio name? Original Audio / Trending Song'); if(a) localStorage.setItem('pixoro_reel_audio', a); alert('Audio Add Aachu da: ' + (a||'Original Audio')); }
+function addText(){ if(!currentBlob){ alert('Mudalla Photo Select Pannu da'); document.getElementById('file').click(); return; } let t=prompt('Text ezhuthu da:'); if(!t) return; currentText=t; let o=document.getElementById('textOverlay'); o.innerText=t; o.style.display='block'; saveDB('pixoro_create_text', t); }
+function addAudio(){ let a=prompt('Audio name? Original Audio / Trending Song', currentAudio); if(a){ currentAudio=a; saveDB('pixoro_create_audio', a); } alert('Audio Add Aachu da: ' + currentAudio); }
 function addVoice(){ alert('Voice Over - Record Pannu da 🎤 - Next Version la Varum da'); }
-function addCaption(){ let c=prompt('Captions ezhuthu da:'); if(c) localStorage.setItem('pixoro_reel_caption_text', c); }
-function addSticker(){ let s=prompt('Sticker - 😍 🔥 ❤️ - Edhu Venum da?'); if(s){ let o=document.getElementById('textOverlay'); o.innerText += ' ' + s; o.style.display='block'; } }
+function addCaption(){ let c=prompt('Captions ezhuthu da:'); if(c){ currentText=currentText+'\n'+c; saveDB('pixoro_create_text', currentText); } }
+function addSticker(){ if(!currentBlob){ alert('Mudalla Photo Select Pannu da'); document.getElementById('file').click(); return; } let s=prompt('Sticker - 😍 🔥 ❤️ - Edhu Venum da?'); if(s){ let o=document.getElementById('textOverlay'); o.innerText+=' '+s; o.style.display='block'; currentText=o.innerText; saveDB('pixoro_create_text', currentText); } }
+async function handleNewFile(f){ if(!f) return; let kind=f.type.includes('video')?'video':'image'; await saveDB('pixoro_create_media', f); await saveDB('pixoro_create_kind', kind); showPhoto(f, kind); }
+document.getElementById('file').onchange=(e)=>handleNewFile(e.target.files[0]);
+document.getElementById('cameraFile').onchange=(e)=>handleNewFile(e.target.files[0]);
+async function goShare(){
+  if(!currentBlob){ alert('Photo Select Pannu da'); document.getElementById('file').click(); return; }
+  await saveDB('pixoro_create_media', currentBlob);
+  await saveDB('pixoro_create_filter', currentFilter);
+  await saveDB('pixoro_create_text', currentText);
+  await saveDB('pixoro_create_bg', currentBg);
+  await saveDB('pixoro_create_audio', currentAudio);
+  // ✅ CORRECT NEXT DA - create-reels-upload.html ILLA DA
+  location.href='./create-share.html?v=1048';
+}
 </script>
 </body>
 </html>
