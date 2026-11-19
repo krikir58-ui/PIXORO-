@@ -25,20 +25,37 @@ body{background:#000;color:#fff;font-family:system-ui;overflow:hidden;touch-acti
 .tabs{position:fixed;bottom:0;left:0;right:0;background:#000;display:flex;justify-content:center;gap:22px;padding:14px;border-top:1px solid #222;z-index:10}
 .tabs span{color:#888;letter-spacing:1px;font-size:14px;cursor:pointer}
 .tabs span.on{color:#fff;font-weight:800}
+.fullPage{position:fixed;inset:0;background:#000;display:none;flex-direction:column;z-index:90}
+.fullPage .fullImg{flex:1;position:relative;overflow:hidden;background:#000}
+.fullPage .fullImg img,.fullPage .fullImg video{width:100%;height:100%;object-fit:cover}
+.fullPage .fullClose{position:absolute;top:14px;left:14px;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.55);display:grid;place-items:center;font-size:20px;z-index:5;cursor:pointer}
+.fullPage .swipe{position:absolute;left:0;right:0;bottom:140px;text-align:center;z-index:5;color:#fff;text-shadow:0 2px 8px #000;cursor:pointer}
+.fullPage .swipe b{font-size:22px;display:block}
+.fullPage .swipe span{font-size:15px;font-weight:600}
+.fullPage .fullTools{display:flex;gap:8px;justify-content:center;padding:10px 10px 6px;background:linear-gradient(transparent,#000)}
+.fullPage .fullTools div{background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.25);border-radius:14px;padding:10px 8px;text-align:center;flex:1;cursor:pointer}
+.fullPage .fullTools div b{font-size:20px;display:block}
+.fullPage .fullTools div span{font-size:12px}
+.fullPage .fullBottom{display:flex;gap:10px;padding:10px 14px 18px;background:#000}
+.fullPage .fullBottom .editBtn{flex:1;background:#222;color:#fff;border:0;padding:14px;border-radius:999px;font-size:15px;font-weight:700}
+.fullPage .fullBottom .nextBtn{flex:1;background:#6d5cff;color:#fff;border:0;padding:14px;border-radius:999px;font-size:15px;font-weight:800}
 .cap{position:fixed;inset:0;background:#161616;display:none;z-index:100;flex-direction:column;touch-action:none}
-.capTop{height:52px;display:flex;justify-content:space-between;align-items:center;padding:0 12px;background:#161616}
-.capTop .left{display:flex;gap:16px;font-size:20px}
-.capTop .mid{background:#222;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700}
+.capTop{height:52px;display:flex;justify-content:space-between;align-items:center;padding:0 10px;background:#161616;gap:6px}
+.capTop .left{display:flex;gap:12px;font-size:20px;align-items:center}
+.capTop .mid{background:#222;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
 .capTop .expWrap{text-align:right}
-.capTop .exp{background:#0095f6;color:#fff;border:0;padding:8px 16px;border-radius:10px;font-weight:800}
+.capTop .exp{background:#0095f6;color:#fff;border:0;padding:7px 12px;border-radius:10px;font-weight:800;font-size:13px}
 .capTop .draft{font-size:11px;background:#222;padding:4px 8px;border-radius:6px;margin-top:4px;display:inline-block}
+.capTop2{display:flex;gap:6px;padding:6px 10px;background:#161616;border-bottom:1px solid #222;overflow-x:auto}
+.capTop2 button{background:#222;color:#fff;border:0;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.capTop2 button.blue{background:#0095f6}
 .capPreview{flex:1;display:grid;place-items:center;overflow:hidden;background:#000;position:relative;min-height:200px}
 .capPreview img,.capPreview video{max-width:100%;max-height:100%;object-fit:contain;will-change:transform}
 #overlayText{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);font-size:36px;font-weight:900;text-shadow:0 2px 10px #000;z-index:7;text-align:center;pointer-events:none;white-space:nowrap}
 #overlaySticker{position:absolute;top:60%;left:50%;transform:translate(-50%,-50%);font-size:60px;z-index:7;pointer-events:none}
 #overlayImg{position:absolute;bottom:10px;right:10px;width:80px;height:110px;object-fit:cover;border-radius:8px;border:0;z-index:7;display:none}
 .capTools{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-size:18px}
-.capTools .play{width:36px;height:36px;border-radius:50%;background:#222;border:0;color:#fff;font-size:16px}
+.capTools .play{width:36px;height:36px;border-radius:50%;background:#222;border:0;color:#fff;font-size:16px;display:grid;place-items:center}
 .capTools span{font-size:12px;color:#aaa}
 .capTimeline{padding:0 10px 8px}
 .capTimeline .ruler{display:flex;justify-content:space-between;font-size:10px;color:#888;padding-bottom:4px}
@@ -51,12 +68,18 @@ body{background:#000;color:#fff;font-family:system-ui;overflow:hidden;touch-acti
 .capTimeline .miniRow{display:flex;gap:12px;margin-top:6px;font-size:11px;color:#aaa;align-items:center}
 .capTimeline .miniRow svg{width:18px;height:18px;vertical-align:middle}
 .capRows{display:grid;gap:6px;padding:0 10px 8px}
-.capRows div{background:#222;padding:10px;border-radius:8px;font-size:13px;color:#ddd}
-.capRows div b{margin-right:6px}
+.capRows div{background:#222;padding:10px;border-radius:8px;font-size:13px;color:#ddd;display:flex;align-items:center;gap:6px}
+.capRows div b{margin-right:2px}
 .capBar{display:flex;gap:4px;padding:10px 6px;overflow-x:auto;background:#161616;border-top:1px solid #222}
 .capBar div{flex:1;min-width:56px;text-align:center;cursor:pointer;padding:4px 0}
 .capBar div b{font-size:20px;display:block}
 .capBar div b svg{width:22px;height:22px;display:block;margin:0 auto}
+.ic{width:18px;height:18px;vertical-align:middle;flex-shrink:0}
+.ic-big{width:22px;height:22px;display:block;margin:0 auto}
+.skeleton{display:block;width:24px;height:24px;background:#fff;border-radius:6px;margin:0 auto;padding:3px;box-sizing:border-box;overflow:hidden;position:relative}
+.skeleton svg{width:100%;height:100%;display:block}
+.skeleton::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(0,0,0,.08),transparent);animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 .capBar div span{font-size:11px;color:#ccc}
 .capBar div.on b{color:#fff}
 .capBar div.on span{color:#fff}
@@ -66,7 +89,7 @@ body{background:#000;color:#fff;font-family:system-ui;overflow:hidden;touch-acti
 .sheet .sHead .done{color:#0095f6;font-weight:800}
 .sheet .tabs2{display:flex;gap:14px;overflow-x:auto;padding-bottom:10px;font-size:13px;color:#aaa;white-space:nowrap}
 .sheet .tabs2 span.on{color:#fff;font-weight:700;border-bottom:2px solid #fff;padding-bottom:4px}
-.sheet .search{background:#333;padding:9px 12px;border-radius:999px;font-size:13px;color:#aaa;margin-bottom:10px}
+.sheet .search{background:#333;padding:9px 12px;border-radius:999px;font-size:13px;color:#aaa;margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .sheet .grid2{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .sheet .grid2 .it{text-align:center;cursor:pointer}
 .sheet .grid2 .it .thumb{aspect-ratio:1;border-radius:10px;overflow:hidden;background:#444;display:grid;place-items:center;font-size:28px}
@@ -74,7 +97,7 @@ body{background:#000;color:#fff;font-family:system-ui;overflow:hidden;touch-acti
 .sheet .grid2 .it span{font-size:11px;color:#ccc;display:block;margin-top:4px}
 .sheet .grid2 .it.sel .thumb{outline:2px solid #fff}
 .sheet .row{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px}
-.sheet button{background:#333;color:#fff;border:0;padding:10px 14px;border-radius:999px;white-space:nowrap}
+.sheet button{background:#333;color:#fff;border:0;padding:10px 14px;border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
 .sheet button.on{background:#fff;color:#000}
 .sheet input{width:100%;accent-color:#fff}
 .sheet .sliderRow{display:flex;justify-content:space-between;font-size:13px;padding:10px 0;border-bottom:1px solid #333}
@@ -104,7 +127,7 @@ canvas#drawCanvas.on{display:block}
 <div class="top"><span onclick="location.href='./index.html'">✕</span><b id="topTitle">New post</b><span class="next" id="nextBtn" onclick="goNext()">Next</span></div>
 <div class="preview post" id="previewBox" onclick="if(!file)document.getElementById('file').click()">
   <img id="prevImg" style="display:none"><video id="prevVid" style="display:none" muted loop playsinline></video>
-  <div id="emptyBox"><div>📷</div>Photo Select Pannu da</div>
+  <div id="emptyBox"><div><svg class="ic" style="width:48px;height:48px" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5"><rect x="2.5" y="2.5" width="19" height="19" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>Photo Select Pannu da</div>
 </div>
 <div id="gridSection">
   <div class="gridHead"><b>Recents ⌄</b><label for="file">Select</label></div>
@@ -112,60 +135,82 @@ canvas#drawCanvas.on{display:block}
 </div>
 <div class="tabs" id="typeTabs"><span onclick="setType('post',this)" class="on">POST</span><span onclick="setType('reels',this)">REEL</span><span onclick="setType('story',this)">STORY</span></div>
 </div>
+<div class="fullPage" id="fullPage">
+  <div class="fullImg" onclick="openEditor()">
+    <span class="fullClose" onclick="event.stopPropagation();goBackToSelect()">✕</span>
+    <img id="fullImg"><video id="fullVid" style="display:none" muted loop playsinline></video>
+    <div class="swipe" onclick="openEditor()"><b>^</b><span>Swipe up to edit</span></div>
+  </div>
+  <div class="fullTools">
+    <div onclick="openSheetFromFull('sheetAudio')"><b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></b><span>Audio</span></div>
+    <div onclick="addText()"><b>Aa</b><span>Text</span></div>
+    <div onclick="alert('Voice da')"><b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3"/></svg></b><span>Voice</span></div>
+    <div onclick="addText()"><b>CC</b><span>Captions</span></div>
+    <div onclick="openSheetFromFull('sheetSticker')"><b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></b><span>Stickers</span></div>
+  </div>
+  <div class="fullBottom">
+    <button class="editBtn" onclick="openEditor()">Edit video</button>
+    <button class="nextBtn" onclick="goToUpload()">Next →</button>
+  </div>
+</div>
 <div class="cap" id="step2">
-  <div class="capTop"><div class="left"><span onclick="goBack()">✕</span><span>🔍</span></div><div class="mid" onclick="cycleQuality()">AI UHD ⌄</div><div class="expWrap"><button class="exp" onclick="goNext()">Export</button><br><span class="draft">Export Draft</span></div></div>
+  <div class="capTop"><div class="left"><span onclick="goBack()">✕</span><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span></div><div class="mid" onclick="cycleQuality()">AI UHD ⌄</div><div class="expWrap"><button class="exp" onclick="goToUpload()">Export</button><br><span class="draft">Export Draft</span></div></div>
+  <div class="capTop2">
+    <button class="blue" onclick="goToUpload()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg> Export</button>
+    <button onclick="document.getElementById('file').click()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg> Import</button>
+    <button onclick="removeBg()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20M8.5 15.5 20 4M20 4h-3M20 4v3"/></svg> Remove</button>
+    <button onclick="addText()">T Text</button>
+    <button onclick="openSheet('sheetFilters')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg> Filter</button>
+    <button onclick="openSheet('sheetRatio')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 9V7a2 2 0 0 1 2-2h2M21 15v2a2 2 0 0 1-2 2h-2M3 15v2a2 2 0 0 0 2 2h2M21 9V7a2 2 0 0 0-2-2h-2"/></svg> Ratio</button>
+  </div>
   <div class="capPreview" id="capPreview">
     <img id="editImg" style="display:none"><video id="editVid" style="display:none" muted loop playsinline></video>
     <div id="overlayText"></div><div id="overlaySticker"></div><img id="overlayImg">
     <canvas id="drawCanvas"></canvas>
   </div>
-  <div class="capTools"><span>⛶</span><button class="play" onclick="togglePlay()">▶</button><span>✂️</span><span>↩</span><span>↪</span><span id="playTime">00:00 / 00:05</span></div>
+  <div class="capTools"><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></span><button class="play" onclick="togglePlay()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M6 4l14 8-14 8V4z"/></svg></button><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20M8.5 15.5 20 4"/></svg></span><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/></svg></span><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M15 14l5-5-5-5M20 9H10a6 6 0 0 0 0 12h3"/></svg></span><span id="playTime">00:00 / 00:05</span></div>
   <div class="capTimeline">
     <div class="ruler"><span>00:00</span><span>00:00</span><span>00:02</span></div>
     <div class="clipRow"><div class="clip sel" id="mainClip" onclick="selectClip()"><div class="c"><img id="cl1"></div><div class="c"><img id="cl2"></div></div><div class="plus" onclick="document.getElementById('file').click()">+</div></div>
-    <div class="miniRow"><span>🔇 Mute clip</span><span>✨ AI clipper <b style="color:#ffcc00">New</b></span><span onclick="openSheet('sheetCover')"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 20 C4 16 8 14 12 14 C16 14 20 16 20 20"/><circle cx="12" cy="9" r="3.5"/><rect x="2.5" y="2.5" width="19" height="19" rx="4"/></svg> Cover</span></div>
+    <div class="miniRow"><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4V5zM22 9l-6 6M16 9l6 6"/></svg> Mute clip</span><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3zM19 15l.9 2.6L22.5 18.5l-2.6.9L19 22l-.9-2.6-2.6-.9 2.6-.9L19 15z"/></svg> AI clipper <b style="color:#ffcc00">New</b></span><span onclick="openSheet('sheetCover')"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 20 C4 16 8 14 12 14 C16 14 20 16 20 20"/><circle cx="12" cy="9" r="3.5"/><rect x="2.5" y="2.5" width="19" height="19" rx="4"/></svg> Cover</span></div>
   </div>
-  <div class="capRows"><div onclick="openSheet('sheetAudio')"><b>🎵</b> + Add audio</div><div onclick="openSheet('sheetText')"><b>T</b> + Add text</div></div>
+  <div class="capRows"><div onclick="openSheet('sheetAudio')"><b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></b> + Add audio</div><div onclick="openSheet('sheetText')"><b>T</b> + Add text</div></div>
   <div class="capBar" id="capBar">
-    <div onclick="openSheet('sheetEdit',this)" class="on"><b>✂️</b><span>Edit</span></div>
-    <div onclick="openSheet('sheetAudio',this)"><b>🎵</b><span>Audio</span></div>
+    <div onclick="openSheet('sheetEdit',this)" class="on"><b><svg class="ic-big" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20M8.5 15.5 20 4"/></svg></b><span>Edit</span></div>
+    <div onclick="openSheet('sheetAudio',this)"><b><svg class="ic-big" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></b><span>Audio</span></div>
     <div onclick="openSheet('sheetText',this)"><b>T</b><span>Text</span></div>
-    <div onclick="openSheet('sheetEffects',this)"><b>✨</b><span>Effects</span></div>
-    <div onclick="openSheet('sheetOverlay',this)"><b><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2.5" y="2.5" width="19" height="19" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></b><span>Overlay</span></div>
+    <div onclick="openSheet('sheetEffects',this)"><b><svg class="ic-big" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3zM19 15l.9 2.6L22.5 18.5l-2.6.9L19 22l-.9-2.6-2.6-.9 2.6-.9L19 15z"/></svg></b><span>Effects</span></div>
+    <div onclick="openSheet('sheetOverlay',this)"><b><span class="skeleton"><svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><rect x="2.5" y="2.5" width="19" height="19" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span></b><span>Overlay</span></div>
     <div onclick="openSheet('sheetCaptions',this)"><b>CC</b><span>Captions</span></div>
-    <div onclick="openSheet('sheetFilters',this)"><b>🎞️</b><span>Filters</span></div>
-    <div onclick="openSheet('sheetAdjust',this)"><b>🎚️</b><span>Adjust</span></div>
+    <div onclick="openSheet('sheetFilters',this)"><b><svg class="ic-big" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg></b><span>Filters</span></div>
+    <div onclick="openSheet('sheetAdjust',this)"><b><svg class="ic-big" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h13M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="19" cy="18" r="2"/></svg></b><span>Adjust</span></div>
   </div>
-  <div class="sheet" id="sheetEdit"><div class="sHead"><b>Edit</b><span class="done" onclick="closeSheet()">✓</span></div><div class="row"><button onclick="splitClip()">✂️ Split</button><button onclick="setSpeed()">⏩ Speed</button><button onclick="toggleSound()">🔊 Volume</button><button onclick="deleteClip()">🗑️ Delete</button><button onclick="duplicateClip()">⧉ Duplicate</button><button onclick="openSheet('sheetRatio')">📐 Ratio</button></div><p style="font-size:12px;color:#aaa">Clip ah Thotta - Split / Speed / Volume / Delete - Pannalam da</p></div>
-  <div class="sheet" id="sheetCover"><div class="sHead"><b>Cover</b><span class="done" onclick="closeSheet()">✓</span></div><p style="font-size:13px;color:#ccc">Ithu Thaan Da - Nee Kaetta - Cover Icon Da - Video oda - Cover Photo - ah - Inga - Select Pannalam da</p><div style="display:flex;gap:10px;margin-top:10px"><img id="coverPrev" style="width:80px;height:110px;object-fit:cover;border-radius:10px;background:#444"><button onclick="document.getElementById('file').click()">Change Cover</button></div></div>
-  <div class="sheet" id="sheetAudio"><div class="sHead"><b>Audio</b><span class="done" onclick="closeSheet()">✓</span></div><div class="search">🔍 Search audio / songs</div><div class="row"><button onclick="pickSong('Leo - Naa Ready 🔥',this)" class="on">Leo - Naa Ready</button><button onclick="pickSong('Jailer - Hukum 🔥',this)">Jailer - Hukum</button><button onclick="pickSong('Vikram - Pathala 🔥',this)">Vikram</button><button onclick="pickSong('No Song',this)">No Song</button></div><p id="songTxt" style="font-size:13px;color:#ffcc00">Song: No Song</p><p style="font-size:12px;color:#aaa">Volume</p><input type="range" min="0" max="100" value="80" oninput="setVolume(this.value/100)"></div>
-  <div class="sheet" id="sheetText"><div class="sHead"><b>Text</b><span class="done" onclick="closeSheet()">✓</span></div><div class="row"><button onclick="addText()">A+ Add text</button><button onclick="addText()">Auto Captions</button><button onclick="openSheet('sheetSticker')">Stickers</button><button onclick="toggleDraw()">✏️ Draw</button><button onclick="addText()">Text Templates</button></div><div class="row"><button onclick="setFont('system-ui',this)" class="on">Default</button><button onclick="setFont('serif',this)">Serif</button><button onclick="setFont('monospace',this)">Mono</button><button onclick="setFont('cursive',this)">Stylish</button></div></div>
-  <div class="sheet" id="sheetSticker"><div class="sHead"><b>Stickers</b><span class="done" onclick="closeSheet()">✓</span></div><div class="grid2"><div class="it" onclick="pickSticker('🔥')"><div class="thumb">🔥</div><span>Fire</span></div><div class="it" onclick="pickSticker('❤️')"><div class="thumb">❤️</div><span>Love</span></div><div class="it" onclick="pickSticker('😂')"><div class="thumb">😂</div><span>Laugh</span></div><div class="it" onclick="pickSticker('👑')"><div class="thumb">👑</div><span>King</span></div></div></div>
-  <div class="sheet" id="sheetEffects"><div class="sHead"><b>Effects</b><span class="done" onclick="closeSheet()">✓</span></div><div class="tabs2"><span class="on">Video effects</span><span>Body effects</span><span>Photo effects</span><span>AI effects</span></div><div class="tabs2"><span class="on">Trending</span><span>Classic</span><span>Magic cutout</span><span>NEW</span><span>Party</span><span>Motion</span><span>3D</span><span>Light</span></div><div class="search">🔍 Search video effects</div><div class="grid2" id="effectsGrid">
-    <div class="it" onclick="applyEffect('none',this)"><div class="thumb">🚫</div><span>None</span></div>
-    <div class="it" onclick="applyEffect('shake',this)"><div class="thumb">📳</div><span>Shake</span></div>
-    <div class="it" onclick="applyEffect('zoom',this)"><div class="thumb">🔍</div><span>Diamond Zoom</span></div>
-    <div class="it" onclick="applyEffect('flash',this)"><div class="thumb">⚡</div><span>Black Flash</span></div>
-    <div class="it" onclick="applyEffect('bw',this)"><div class="thumb">⚫</div><span>B&W</span></div>
-    <div class="it" onclick="applyEffect('sepia',this)"><div class="thumb">🟤</div><span>Sepia</span></div>
-    <div class="it" onclick="applyEffect('vivid',this)"><div class="thumb">🌈</div><span>Vivid</span></div>
-    <div class="it" onclick="applyEffect('blur',this)"><div class="thumb">🌫️</div><span>Blur</span></div>
+  <div class="sheet" id="sheetEdit"><div class="sHead"><b>Edit</b><span class="done" onclick="closeSheet()">✓</span></div><div class="row"><button onclick="splitClip()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20M8.5 15.5 20 4"/></svg> Split</button><button onclick="setSpeed()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 6l8 6-8 6V6zM14 6l8 6-8 6V6z"/></svg> Speed</button><button onclick="toggleSound()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4V5zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg> Volume</button><button onclick="deleteClip()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg> Delete</button><button onclick="duplicateClip()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Duplicate</button><button onclick="openSheet('sheetRatio')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 9V7a2 2 0 0 1 2-2h2M21 15v2a2 2 0 0 1-2 2h-2"/></svg> Ratio</button></div><p style="font-size:12px;color:#aaa">Clip ah Thotta - Split / Speed / Volume / Delete - Pannalam da</p></div>
+  <div class="sheet" id="sheetCover"><div class="sHead"><b>Cover</b><span class="done" onclick="closeSheet()">✓</span></div><p style="font-size:13px;color:#ccc">Video oda Cover Photo ah Inga Select Pannalam da</p><div style="display:flex;gap:10px;margin-top:10px"><img id="coverPrev" style="width:80px;height:110px;object-fit:cover;border-radius:10px;background:#444"><button onclick="document.getElementById('file').click()">Change Cover</button></div></div>
+  <div class="sheet" id="sheetAudio"><div class="sHead"><b>Audio</b><span class="done" onclick="closeSheet()">✓</span></div><div class="search"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Search audio / songs</div><div class="row"><button onclick="pickSong('Leo - Naa Ready',this)" class="on">Leo - Naa Ready</button><button onclick="pickSong('Jailer - Hukum',this)">Jailer - Hukum</button><button onclick="pickSong('Vikram - Pathala',this)">Vikram</button><button onclick="pickSong('No Song',this)">No Song</button></div><p id="songTxt" style="font-size:13px;color:#ffcc00">Song: No Song</p><p style="font-size:12px;color:#aaa">Volume</p><input type="range" min="0" max="100" value="80" oninput="setVolume(this.value/100)"></div>
+  <div class="sheet" id="sheetText"><div class="sHead"><b>Text</b><span class="done" onclick="closeSheet()">✓</span></div><div class="row"><button onclick="addText()">A+ Add text</button><button onclick="addText()">Auto Captions</button><button onclick="openSheet('sheetSticker')">Stickers</button><button onclick="toggleDraw()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Draw</button><button onclick="addText()">Text Templates</button></div><div class="row"><button onclick="setFont('system-ui',this)" class="on">Default</button><button onclick="setFont('serif',this)">Serif</button><button onclick="setFont('monospace',this)">Mono</button><button onclick="setFont('cursive',this)">Stylish</button></div></div>
+  <div class="sheet" id="sheetSticker"><div class="sHead"><b>Stickers</b><span class="done" onclick="closeSheet()">✓</span></div><div class="grid2"><div class="it" onclick="pickSticker('🔥')"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M12 3c1 4-3 5-2 9a5 5 0 0 0 10 0c0-2-1-3-1-3s3 1 2-3c-1-3-4-4-5-7-1 2-3 1-4 4z"/></svg></div><span>Fire</span></div><div class="it" onclick="pickSticker('❤️')"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg></div><span>Love</span></div><div class="it" onclick="pickSticker('😂')"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></div><span>Laugh</span></div><div class="it" onclick="pickSticker('👑')"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M3 18h18M3 18l-1-9 5 3 5-6 5 6 5-3-1 9z"/></svg></div><span>King</span></div></div></div>
+  <div class="sheet" id="sheetEffects"><div class="sHead"><b>Effects</b><span class="done" onclick="closeSheet()">✓</span></div><div class="tabs2"><span class="on">Video effects</span><span>Body effects</span><span>Photo effects</span><span>AI effects</span></div><div class="tabs2"><span class="on">Trending</span><span>Classic</span><span>Magic cutout</span><span>NEW</span><span>Party</span><span>Motion</span><span>3D</span><span>Light</span></div><div class="search"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Search video effects</div><div class="grid2" id="effectsGrid">
+    <div class="it" onclick="applyEffect('none',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M5 5l14 14"/></svg></div><span>None</span></div>
+    <div class="it" onclick="applyEffect('shake',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 8h4l-2 4h4l-2 4h4M16 8h4l-2 4h4l-2 4"/></svg></div><span>Shake</span></div>
+    <div class="it" onclick="applyEffect('zoom',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg></div><span>Diamond Zoom</span></div>
+    <div class="it" onclick="applyEffect('flash',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div><span>Black Flash</span></div>
+    <div class="it" onclick="applyEffect('bw',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z"/></svg></div><span>B&W</span></div>
+    <div class="it" onclick="applyEffect('sepia',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><span>Sepia</span></div>
+    <div class="it" onclick="applyEffect('vivid',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg></div><span>Vivid</span></div>
+    <div class="it" onclick="applyEffect('blur',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></div><span>Blur</span></div>
   </div></div>
-  <div class="sheet" id="sheetOverlay"><div class="sHead"><b>Overlay</b><span class="done" onclick="closeSheet()">✓</span></div><button onclick="document.getElementById('file2').click()">+ Add Overlay Image</button><button onclick="document.getElementById('overlayImg').style.display='none'">Remove Overlay</button></div>
+  <div class="sheet" id="sheetOverlay"><div class="sHead"><b>Overlay</b><span class="done" onclick="closeSheet()">✓</span></div><button onclick="document.getElementById('file2').click()">+ Add Overlay Image</button><button onclick="document.getElementById('overlayImg').style.display='none'"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M5 5l14 14"/></svg> Remove Overlay</button></div>
   <div class="sheet" id="sheetCaptions"><div class="sHead"><b>Captions</b><span class="done" onclick="closeSheet()">✓</span></div><button onclick="addText()">+ Auto Captions</button><button onclick="addText()">+ Add Caption Text</button></div>
   <div class="sheet" id="sheetFilters"><div class="sHead"><b>Filters</b><span class="done" onclick="closeSheet()">✓</span></div><div class="tabs2"><span class="on">Filters</span><span onclick="openSheet('sheetAdjust')">Adjust</span><span onclick="cycleQuality()">Video quality</span></div><div class="tabs2"><span class="on">Featured</span><span>NEW</span><span>Hits</span><span>Life</span><span>Landscape</span></div><div class="grid2">
-    <div class="it" onclick="setFilter('none',this)"><div class="thumb">🚫</div><span>None</span></div>
-    <div class="it" onclick="setFilter('grayscale(1) contrast(1.2)',this)"><div class="thumb">⬛</div><span>Noir Flash</span></div>
-    <div class="it" onclick="setFilter('sepia(.5) contrast(1.2) brightness(1.1)',this)"><div class="thumb">🎬</div><span>Hollywood</span></div>
-    <div class="it" onclick="setFilter('brightness(1.1) saturate(1.2)',this)"><div class="thumb">✨</div><span>Humble</span></div>
-    <div class="it" onclick="setFilter('sepia(.3) saturate(1.4) contrast(1.1)',this)"><div class="thumb">🌅</div><span>Golden</span></div>
-    <div class="it" onclick="setFilter('brightness(1.15) saturate(1.3) contrast(1.05)',this)"><div class="thumb">💎</div><span>Clear</span></div>
-    <div class="it" onclick="setFilter('brightness(1.2) saturate(1.5)',this)"><div class="thumb">💡</div><span>Glow</span></div>
-    <div class="it" onclick="setFilter('contrast(1.3) saturate(1.4) brightness(1.05)',this)"><div class="thumb">📺</div><span>HD Upscale</span></div>
-    <div class="it" onclick="setFilter('contrast(1.2) saturate(0.8)',this)"><div class="thumb">🌫️</div><span>Cold Fog</span></div>
-    <div class="it" onclick="setFilter('brightness(1.1) saturate(1.1) contrast(0.9)',this)"><div class="thumb">🌸</div><span>Light Pastel</span></div>
-    <div class="it" onclick="setFilter('hue-rotate(20deg) saturate(1.3)',this)"><div class="thumb">🟠</div><span>Orange</span></div>
-    <div class="it" onclick="setFilter('grayscale(.5) sepia(.3)',this)"><div class="thumb">📰</div><span>Newspaper</span></div>
+    <div class="it" onclick="setFilter('none',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M5 5l14 14"/></svg></div><span>None</span></div>
+    <div class="it" onclick="setFilter('grayscale(1) contrast(1.2)',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div><span>Noir Flash</span></div>
+    <div class="it" onclick="setFilter('sepia(.5) contrast(1.2) brightness(1.1)',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/></svg></div><span>Hollywood</span></div>
+    <div class="it" onclick="setFilter('brightness(1.1) saturate(1.2)',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg></div><span>Humble</span></div>
+    <div class="it" onclick="setFilter('sepia(.3) saturate(1.4) contrast(1.1)',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></div><span>Golden</span></div>
+    <div class="it" onclick="setFilter('brightness(1.15) saturate(1.3) contrast(1.05)',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 3l2 6 6 1-4.5 4 1 6-4.5-2.5L7.5 20l1-6L4 10l6-1L12 3z"/></svg></div><span>Clear</span></div>
+    <div class="it" onclick="setFilter('brightness(1.2) saturate(1.5)',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.7 1 1.5 1 2.5h6c0-1 .2-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg></div><span>Glow</span></div>
+    <div class="it" onclick="setFilter('contrast(1.3) saturate(1.4) brightness(1.05)',this)"><div class="thumb"><svg class="ic" style="width:28px;height:28px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M10 9l5 3-5 3V9z"/></svg></div><span>HD Upscale</span></div>
   </div></div>
   <div class="sheet" id="sheetAdjust"><div class="sHead"><b>Adjust - Quality</b><span class="done" onclick="closeSheet()">✓</span></div>
     <div class="sliderRow"><span>Brightness</span><span id="vBright">100%</span></div><input type="range" min="50" max="150" value="100" oninput="doAdjust('brightness',this.value)">
@@ -179,7 +224,7 @@ canvas#drawCanvas.on{display:block}
     <button style="background:#ff2d55;width:28px;height:28px;border-radius:50%;padding:0" onclick="setColor('#ff2d55')"></button>
     <button style="background:#fff;width:28px;height:28px;border-radius:50%;padding:0" onclick="setColor('#ffffff')"></button>
     <button style="background:#ffcc00;width:28px;height:28px;border-radius:50%;padding:0" onclick="setColor('#ffcc00')"></button>
-    <button onclick="setEraser()">🧹 Eraser</button>
+    <button onclick="setEraser()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 20H8L2 12l6-6h12v14zM14 8l-2 2M12 10l-2 2"/></svg> Eraser</button>
     <button onclick="undoDraw()">↩ Undo</button>
     <button onclick="clearDraw()">Clear</button>
     <button style="background:#0095f6" onclick="toggleDraw()">✅ Done</button>
@@ -205,7 +250,7 @@ let dc=document.getElementById('drawCanvas'),dctx=dc.getContext('2d');
 let scale=1,panX=0,panY=0,startDist=0,startScale=1,startX=0,startY=0,startPanX=0,startPanY=0;
 function getSupa(){return window.supa;}
 function setType(t,el){type=t;document.querySelectorAll('#typeTabs span').forEach(s=>s.classList.remove('on'));el.classList.add('on');document.getElementById('topTitle').innerText=t==='post'?'New post':t==='reels'?'New reel':'New story';document.getElementById('previewBox').className='preview '+type;}
-function applyZoom(){let el=kind==='video'?document.getElementById('editVid'):document.getElementById('editImg');el.style.transform='translate('+panX+'px,'+panY+'px) scale('+scale+')';let r=document.getElementById('resetBtn');if(r)r.style.display=scale>1?'block':'none';}
+function applyZoom(){let el=kind==='video'?document.getElementById('editVid'):document.getElementById('editImg');el.style.transform='translate('+panX+'px,'+panY+'px) scale('+scale+')';}
 function resetZoom(){scale=1;panX=0;panY=0;applyZoom();}
 function buildFilter(){return 'brightness('+adj.brightness+'%) contrast('+adj.contrast+'%) saturate('+adj.saturate+'%) '+(filter==='none'?'':filter);}
 function applyAllFilter(){let f=buildFilter();document.getElementById('editImg').style.filter=f;document.getElementById('editVid').style.filter=f;}
@@ -227,7 +272,7 @@ function deleteClip(){if(confirm('Clip Delete Pannava da?'))alert('Deleted da');
 function duplicateClip(){alert('Duplicate Panniten da');}
 function setRatio(r,btn){document.querySelectorAll('#sheetRatio button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');alert('Ratio: '+r);}
 function selectClip(){document.getElementById('mainClip').classList.toggle('sel');openSheet('sheetEdit');}
-function togglePlay(){playing=!playing;let v=document.getElementById('editVid');if(kind==='video'){if(playing)v.play();else v.pause();}document.getElementById('playTime').innerText=playing?'00:02 / 00:05':'00:00 / 00:05';document.querySelector('.capTools .play').innerText=playing?'⏸':'▶';}
+function togglePlay(){playing=!playing;let v=document.getElementById('editVid');if(kind==='video'){if(playing)v.play();else v.pause();}document.getElementById('playTime').innerText=playing?'00:02 / 00:05':'00:00 / 00:05';document.querySelector('.capTools .play').innerHTML=playing?'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 5v14M16 5v14"/></svg>':'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M6 4l14 8-14 8V4z"/></svg>';}
 function toggleDraw(){drawMode=!drawMode;dc.classList.toggle('on',drawMode);document.getElementById('drawBar').style.display=drawMode?'flex':'none';if(drawMode){let old=dc.toDataURL();dc.width=window.innerWidth;dc.height=window.innerHeight;let im=new Image();im.onload=()=>dctx.drawImage(im,0,0);im.src=old;}}
 function setColor(c){eraser=false;drawColor=c;}
 function setEraser(){eraser=true;}
@@ -241,7 +286,13 @@ let box=document.getElementById('capPreview');
 box.addEventListener('touchstart',e=>{if(drawMode)return;if(e.touches.length===2){startDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);startScale=scale;}else if(e.touches.length===1){startX=e.touches[0].clientX;startY=e.touches[0].clientY;startPanX=panX;startPanY=panY;}},{passive:true});
 box.addEventListener('touchmove',e=>{if(drawMode)return;if(e.touches.length===2){e.preventDefault();let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(startDist>0){scale=Math.max(1,Math.min(3,startScale*(d/startDist)));applyZoom();}}else if(e.touches.length===1&&scale>1){e.preventDefault();let maxX=150*(scale-1)+50,maxY=250*(scale-1)+50;panX=Math.max(-maxX,Math.min(maxX,startPanX+(e.touches[0].clientX-startX)));panY=Math.max(-maxY,Math.min(maxY,startPanY+(e.touches[0].clientY-startY)));applyZoom();}},{passive:false});
 box.addEventListener('touchend',e=>{if(e.touches.length<2)startDist=0;},{passive:true});
-function openEdit(){if(!file){document.getElementById('file').click();return;}step=2;document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='flex';resetZoom();if(kind==='video'){let v=document.getElementById('editVid');v.src=url;v.style.display='block';v.play();document.getElementById('editImg').style.display='none';}else{let p=document.getElementById('editImg');p.src=url;p.style.display='block';document.getElementById('editVid').style.display='none';}}
+function showFull(){document.getElementById('step1').style.display='none';let f=document.getElementById('fullPage');f.style.display='flex';if(kind==='video'){let v=document.getElementById('fullVid');v.src=url;v.style.display='block';v.play();document.getElementById('fullImg').style.display='none';}else{let p=document.getElementById('fullImg');p.src=url;p.style.display='block';document.getElementById('fullVid').style.display='none';}}
+function openEditor(){document.getElementById('fullPage').style.display='none';step=2;document.getElementById('step2').style.display='flex';resetZoom();if(kind==='video'){let v=document.getElementById('editVid');v.src=url;v.style.display='block';v.play();document.getElementById('editImg').style.display='none';}else{let p=document.getElementById('editImg');p.src=url;p.style.display='block';document.getElementById('editVid').style.display='none';}updateTimeline();}
+function openSheetFromFull(id){openEditor();setTimeout(()=>openSheet(id),100);}
+function goBackToSelect(){document.getElementById('fullPage').style.display='none';document.getElementById('step1').style.display='block';}
+function goToUpload(){document.getElementById('fullPage').style.display='none';document.getElementById('step2').style.display='none';step=3;document.getElementById('step3').style.display='block';document.getElementById('top3').style.display='flex';document.getElementById('shareThumb').src=url;closeSheet();}
+function removeBg(){if(confirm('Background Remove Pannava da?')){filter='brightness(1.1) saturate(1.2)';applyAllFilter();alert('Background Remove Panniten da');}}
+function openEdit(){showFull();}
 function updateTimeline(){if(!url)return;['cl1','cl2','coverPrev'].forEach(id=>{let e=document.getElementById(id);if(e)e.src=url;});}
 document.getElementById('file').addEventListener('change',function(e){
   let f=e.target.files[0];if(!f)return;file=f;kind=f.type.includes('video')?'video':'image';
@@ -250,20 +301,17 @@ document.getElementById('file').addEventListener('change',function(e){
     if(kind==='video'){let v=document.getElementById('prevVid');v.src=url;v.style.display='block';v.play();document.getElementById('prevImg').style.display='none';}
     else{let p=document.getElementById('prevImg');p.src=url;p.style.display='block';document.getElementById('prevImg').style.filter='none';document.getElementById('prevVid').style.display='none';}
     document.getElementById('grid').innerHTML='<div class="tile">'+(kind==='video'?'<video src="'+url+'" muted></video>':'<img src="'+url+'">')+'</div>';
-    document.getElementById('nextBtn').style.display='block';updateTimeline();if(step===2)openEdit();
+    document.getElementById('nextBtn').style.display='block';updateTimeline();if(step===2)openEditor();else showFull();
   };reader.readAsDataURL(f);e.target.value='';
 });
 document.getElementById('file2').addEventListener('change',function(e){
   let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{let o=document.getElementById('overlayImg');o.src=ev.target.result;o.style.display='block';};r.readAsDataURL(f);e.target.value='';
 });
-function goBack(){if(step===3){step=2;document.getElementById('step3').style.display='none';document.getElementById('top3').style.display='none';document.getElementById('step2').style.display='flex';}else if(step===2){step=1;document.getElementById('step2').style.display='none';document.getElementById('step1').style.display='block';closeSheet();}else location.href='./index.html';}
+function goBack(){if(step===3){step=2;document.getElementById('step3').style.display='none';document.getElementById('top3').style.display='none';document.getElementById('step2').style.display='flex';}else if(step===2){step=1;document.getElementById('step2').style.display='none';showFull();closeSheet();}else location.href='./index.html';}
 function goNext(){
   if(!file){document.getElementById('file').click();return;}
-  if(step===1){step=2;document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='flex';resetZoom();
-    if(kind==='video'){let v=document.getElementById('editVid');v.src=url;v.style.display='block';v.play();document.getElementById('editImg').style.display='none';}
-    else{let p=document.getElementById('editImg');p.src=url;p.style.display='block';document.getElementById('editVid').style.display='none';}
-    updateTimeline();return;}
-  if(step===2){step=3;document.getElementById('step2').style.display='none';document.getElementById('step3').style.display='block';document.getElementById('top3').style.display='flex';document.getElementById('shareThumb').src=url;closeSheet();return;}
+  if(step===1){showFull();return;}
+  if(step===2){goToUpload();return;}
 }
 function tagPeople(){let t=prompt('Username:');if(t){tagged=t;document.getElementById('tagTxt').innerText='@'+t+' ›';}}
 function addLocation(){let l=prompt('Location:');if(l){loc=l;document.getElementById('locTxt').innerText=l+' ›';}}
@@ -272,7 +320,7 @@ async function bake(){if(kind==='video')return file;return new Promise(res=>{let
 async function sharePost(){
   let supa=getSupa();if(!supa){alert('Supabase load aagala da');return;}
   let btn=document.getElementById('shareBtn');btn.innerText='Sharing...';btn.disabled=true;let st=document.getElementById('status');st.innerText='Uploading...';
-  let cap=document.getElementById('caption').value||'Just Pixoro 🔥';if(tagged)cap+=' @'+tagged;if(loc)cap+=' 📍 '+loc;if(song!=='No Song')cap+=' 🎵 '+song;
+  let cap=document.getElementById('caption').value||'Just Pixoro';if(tagged)cap+=' @'+tagged;if(loc)cap+=' '+loc;if(song!=='No Song')cap+=' '+song;
   try{let {data:{session}}=await supa.auth.getSession();if(!session){location.href='./login.html';return;}let ME_RAW=session.user.email.split('@')[0];let finalBlob=await bake();let folder=type==='story'?'stories':type==='reels'?'reels':'posts';let ext=kind==='video'?'mp4':'jpg';let fn=folder+'/'+session.user.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;let {error:upErr}=await supa.storage.from(folder).upload(fn,finalBlob,{contentType:kind==='video'?'video/mp4':'image/jpeg'});if(upErr)throw new Error('Storage: '+upErr.message);let {data:ud}=supa.storage.from(folder).getPublicUrl(fn);let {error}=await supa.from('posts').insert({user_id:session.user.id,username:ME_RAW,media_url:ud.publicUrl,image_url:kind==='image'?ud.publicUrl:null,video_url:kind==='video'?ud.publicUrl:null,media_type:type,caption:cap});if(error)throw new Error('DB: '+error.message);location.href='./index.html';}catch(e){st.innerText='Error: '+e.message;alert('Error: '+e.message);btn.innerText='Share';btn.disabled=false;}
 }
 (async()=>{let supa=getSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session)location.href='./login.html';})();
