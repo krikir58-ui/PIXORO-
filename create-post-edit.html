@@ -3,47 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Edit - Pixoro</title>
+<title>Edit - Pixoro - v1048</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#000;color:#fff;font-family:system-ui}
-.top{display:flex;justify-content:space-between;align-items:center;padding:14px;font-size:20px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:14px;font-size:20px;background:#000}
 .top span{cursor:pointer}
 .top .next{color:#4d7cff;font-weight:700}
-.wrap{position:relative;width:100%;height:62vh;background:#000;overflow:hidden;display:grid;place-items:center}
+.wrap{position:relative;width:100%;height:72vh;background:#000;overflow:hidden;display:grid;place-items:center}
 .wrap img,.wrap video{width:100%;height:100%;object-fit:cover}
-.editTools{position:absolute;bottom:20px;left:0;right:0;display:flex;justify-content:space-around}
-.editTools div{text-align:center;font-size:12px}
-.editTools span{display:grid;place-items:center;width:60px;height:60px;background:#222;border-radius:18px;font-size:26px;margin-bottom:4px}
-.sourceRow{display:flex;gap:10px;padding:12px}
-.sourceRow button{flex:1;padding:14px;border-radius:16px;border:1px solid #333;background:#111;color:#fff;font-weight:700}
-.toolRow{display:flex;gap:8px;padding:0 12px 10px;overflow-x:auto}
-.toolRow button{background:#111;color:#fff;border:1px solid #333;padding:10px 16px;border-radius:30px;white-space:nowrap}
-.filterRow{display:flex;gap:8px;padding:0 12px 12px;overflow-x:auto}
+.tools{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:space-around;padding:0 8px}
+.tools div{text-align:center;font-size:13px}
+.tools span{display:grid;place-items:center;width:56px;height:56px;background:rgba(0,0,0,.6);border-radius:14px;font-size:24px;margin-bottom:4px}
+.bottomBar{background:#000;padding:14px;display:flex;justify-content:space-between;align-items:center}
+.bottomBar button{border:0;border-radius:30px;padding:14px 22px;font-weight:800;font-size:16px}
+.editBtn{background:#222;color:#fff}
+.nextBtn{background:#5b5bff;color:#fff}
+.filterRow{display:flex;gap:8px;padding:8px 12px;overflow-x:auto;background:#000}
 .filterRow button{background:#111;color:#fff;border:1px solid #333;padding:10px 16px;border-radius:30px;white-space:nowrap}
 .filterRow button.on{background:#fff;color:#000}
-.bottom{display:flex;gap:10px;padding:0 16px 16px}
-.bottom button{flex:1;padding:14px;border-radius:20px;border:0;font-weight:800}
-.editBtn{background:#222;color:#fff}
-.nextBtn{background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff}
 </style>
 </head>
 <body>
-<div class="top"><span onclick="history.back()">←</span><b>Edit</b><span class="next" onclick="goShare()">Next</span></div>
+<div class="top"><span onclick="location.href='./create.html?v=1048'">✕</span><b></b><span class="next" onclick="goShare()">Next</span></div>
 <div class="wrap">
   <img id="editImg" src="" style="display:none">
   <video id="editVid" src="" style="display:none" muted loop playsinline autoplay></video>
+  <div id="emptyBox" style="text-align:center;display:none">
+    <div style="font-size:50px">📷</div>
+    <div style="color:#888;font-size:13px;margin-top:8px">Photo Illa da - Ingaye Select Pannidu da</div>
+    <button onclick="document.getElementById('file').click()" style="margin-top:14px;background:#fff;color:#000;border:0;padding:12px 22px;border-radius:20px;font-weight:800">📁 Select Photo</button>
+  </div>
   <div id="textOver" style="position:absolute;top:35%;left:0;right:0;text-align:center;font-size:28px;font-weight:900;text-shadow:0 2px 10px #000;display:none"></div>
-  <div style="position:absolute;bottom:100px;left:0;right:0;text-align:center;font-size:13px">Swipe up to edit</div>
-  <div class="editTools">
+  <div id="swipeTxt" style="position:absolute;bottom:90px;left:0;right:0;text-align:center;font-size:15px;display:none">^<br>Swipe up to edit</div>
+  <div class="tools">
+    <div onclick="alert('Audio - Coming Soon da')"><span>🎵</span>Audio</div>
     <div onclick="addText()"><span>Aa</span>Text</div>
+    <div onclick="alert('Voice - Coming Soon da')"><span>🎙️</span>Voice</div>
+    <div onclick="alert('Captions - Coming Soon da')"><span>CC</span>Captions</div>
     <div onclick="addSticker()"><span>😊</span>Stickers</div>
-    <div onclick="document.getElementById('filterRow').scrollIntoView({behavior:'smooth'})"><span>✨</span>Filter</div>
-    <div onclick="alert('Crop - Coming Soon da')"><span>✂️</span>Crop</div>
   </div>
 </div>
-<div class="sourceRow"><button onclick="location.href='./create.html'">📁 Gallery</button><button onclick="document.getElementById('file').click()">📷 Camera</button></div>
-<div class="toolRow"><button onclick="alert('Crop - Coming Soon da')">✂️ Crop</button><button>🎨 Filter</button><button onclick="adjust('brightness')">☀️ Bright</button><button onclick="addText()">🔤 Text</button></div>
 <div class="filterRow" id="filterRow">
   <button class="on" onclick="setFilter('none',this)">Original</button>
   <button onclick="setFilter('grayscale(1)',this)">B&W</button>
@@ -51,46 +51,49 @@ body{background:#000;color:#fff;font-family:system-ui}
   <button onclick="setFilter('contrast(1.4) saturate(1.6)',this)">Vivid</button>
   <button onclick="setFilter('brightness(1.2)',this)">Fade</button>
 </div>
-<div class="bottom"><button class="editBtn" onclick="alert('Edit - Coming Soon da')">Edit</button><button class="nextBtn" onclick="goShare()">Next →</button></div>
-<input type="file" id="file" accept="image/*,video/*" capture="environment" hidden>
+<div class="bottomBar">
+  <button class="editBtn" onclick="alert('Edit video - Coming Soon da')">Edit video</button>
+  <button class="nextBtn" onclick="goShare()">Next →</button>
+</div>
+<input type="file" id="file" accept="image/*,video/*" hidden>
+<input type="file" id="cameraFile" accept="image/*,video/*" capture="environment" hidden>
 <script>
-let currentFilter='none', currentText='';
-function openDB(){
-  return new Promise((res,rej)=>{
-    let req=indexedDB.open('pixoro-db',1);
-    req.onupgradeneeded=()=>{ req.result.createObjectStore('media'); };
-    req.onsuccess=()=>res(req.result); req.onerror=()=>rej(req.error);
-  });
-}
+let currentFilter='none', currentText='', currentBlob=null, currentKind='image', currentUrl='';
+function openDB(){ return new Promise((res,rej)=>{ let req=indexedDB.open('pixoro-db',1); req.onupgradeneeded=()=>{ req.result.createObjectStore('media'); }; req.onsuccess=()=>res(req.result); req.onerror=()=>rej(req.error); }); }
 async function getDB(k){ let db=await openDB(); return new Promise((res,rej)=>{ let r=db.transaction('media','readonly').objectStore('media').get(k); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
-async function saveDB(k,v){ let db=await openDB(); let tx=db.transaction('media','readwrite'); tx.objectStore('media').put(v,k); }
+// ✅ CORRECT saveDB - WAIT PANNNUM DA
+async function saveDB(k,v){ let db=await openDB(); return new Promise((res,rej)=>{ let tx=db.transaction('media','readwrite'); tx.objectStore('media').put(v,k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
+function showPhoto(blob, kind){
+  currentBlob=blob; currentKind=kind;
+  if(currentUrl) URL.revokeObjectURL(currentUrl);
+  currentUrl=URL.createObjectURL(blob);
+  document.getElementById('emptyBox').style.display='none';
+  document.getElementById('swipeTxt').style.display='block';
+  if(kind==='video'){ let v=document.getElementById('editVid'); v.src=currentUrl; v.style.display='block'; v.play(); document.getElementById('editImg').style.display='none'; }
+  else { let p=document.getElementById('editImg'); p.src=currentUrl; p.style.display='block'; p.style.filter=currentFilter; document.getElementById('editVid').style.display='none'; }
+}
+// ✅ CORRECT - ALERT ILLA - LOOP ILLA DA
+function showEmpty(){ document.getElementById('emptyBox').style.display='block'; document.getElementById('editImg').style.display='none'; document.getElementById('editVid').style.display='none'; document.getElementById('swipeTxt').style.display='none'; }
 async function load(){
-  let blob=await getDB('pixoro_create_media');
-  let kind=await getDB('pixoro_create_kind') || 'image';
-  if(!blob){ alert('Photo Illa da - Thirumba Select Pannu da'); location.href='./create.html'; return; }
-  let url=URL.createObjectURL(blob);
-  if(kind==='video'){ let v=document.getElementById('editVid'); v.src=url; v.style.display='block'; v.play(); }
-  else { let p=document.getElementById('editImg'); p.src=url; p.style.display='block'; }
-  currentFilter=await getDB('pixoro_create_filter') || 'none';
-  document.getElementById('editImg').style.filter=currentFilter;
-  document.getElementById('editVid').style.filter=currentFilter;
-  currentText=await getDB('pixoro_create_text') || '';
-  if(currentText){ let o=document.getElementById('textOver'); o.textContent=currentText; o.style.display='block'; }
+  try{
+    let blob=await getDB('pixoro_create_media');
+    let kind=await getDB('pixoro_create_kind') || 'image';
+    if(!blob){ showEmpty(); return; }
+    showPhoto(blob, kind);
+    currentFilter=await getDB('pixoro_create_filter') || 'none';
+    document.getElementById('editImg').style.filter=currentFilter; document.getElementById('editVid').style.filter=currentFilter;
+    currentText=await getDB('pixoro_create_text') || '';
+    if(currentText){ let o=document.getElementById('textOver'); o.textContent=currentText; o.style.display='block'; }
+  }catch(e){ showEmpty(); }
 }
 load();
-function setFilter(f,btn){
-  currentFilter=f;
-  document.querySelectorAll('#filterRow button').forEach(b=>b.classList.remove('on'));
-  if(btn) btn.classList.add('on');
-  document.getElementById('editImg').style.filter=f;
-  document.getElementById('editVid').style.filter=f;
-  saveDB('pixoro_create_filter', f);
-}
-function adjust(t){ let v=prompt(t+' - 0.5 to 2:','1.2'); if(v){ currentFilter=t+'('+v+')'; setFilter(currentFilter,null); } }
-function addText(){ let t=prompt('Text ezhuthu da'); if(!t) return; currentText=t; let o=document.getElementById('textOver'); o.textContent=t; o.style.display='block'; saveDB('pixoro_create_text',t); }
-function addSticker(){ let s=prompt('Sticker - 😍 🔥 ❤️'); if(!s) return; currentText=currentText+' '+s; let o=document.getElementById('textOver'); o.textContent=currentText; o.style.display='block'; saveDB('pixoro_create_text',currentText); }
-document.getElementById('file').onchange=(e)=>{ let f=e.target.files[0]; if(!f) return; saveDB('pixoro_create_media', f); saveDB('pixoro_create_kind', f.type.includes('video')?'video':'image'); location.reload(); };
-async function goShare(){ await saveDB('pixoro_create_filter', currentFilter); await saveDB('pixoro_create_text', currentText); location.href='./create-share.html'; }
+function setFilter(f,btn){ currentFilter=f; document.querySelectorAll('#filterRow button').forEach(b=>b.classList.remove('on')); if(btn) btn.classList.add('on'); document.getElementById('editImg').style.filter=f; document.getElementById('editVid').style.filter=f; saveDB('pixoro_create_filter', f); }
+function addText(){ if(!currentBlob){ alert('Mudalla Photo Select Pannu da'); document.getElementById('file').click(); return; } let t=prompt('Text ezhuthu da'); if(!t) return; currentText=t; let o=document.getElementById('textOver'); o.textContent=t; o.style.display='block'; saveDB('pixoro_create_text',t); }
+function addSticker(){ if(!currentBlob){ alert('Mudalla Photo Select Pannu da'); document.getElementById('file').click(); return; } let s=prompt('Sticker - 😍 🔥 ❤️'); if(!s) return; currentText=currentText+' '+s; let o=document.getElementById('textOver'); o.textContent=currentText; o.style.display='block'; saveDB('pixoro_create_text',currentText); }
+async function handleNewFile(f){ if(!f) return; let kind=f.type.includes('video')?'video':'image'; await saveDB('pixoro_create_media', f); await saveDB('pixoro_create_kind', kind); showPhoto(f, kind); }
+document.getElementById('file').onchange=(e)=>handleNewFile(e.target.files[0]);
+document.getElementById('cameraFile').onchange=(e)=>handleNewFile(e.target.files[0]);
+async function goShare(){ if(!currentBlob){ alert('Photo Select Pannu da - Gallery ah Thodu da'); document.getElementById('file').click(); return; } await saveDB('pixoro_create_media', currentBlob); await saveDB('pixoro_create_filter', currentFilter); await saveDB('pixoro_create_text', currentText); location.href='./create-share.html?v=1048'; }
 </script>
 </body>
 </html>
