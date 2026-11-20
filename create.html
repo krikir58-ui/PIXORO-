@@ -5,6 +5,21 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>Pixoro - Create</title>
 <link rel="stylesheet" href="css/create.css">
+<style>
+/* ✅ REELS FULL SCREEN - HTML LA YE FIX - CSS FILE AH THODA VENAAM */
+/* Home Preview - Reels na Full Height */
+#galPreview.reels,#galPreview.story,#galPreview.live{aspect-ratio:auto !important;height:calc(100dvh - 215px) !important;width:100%}
+#galPreview.reels .pvStage img,#galPreview.reels .pvStage video{object-fit:cover !important;object-position:center !important}
+/* ✅ EDIT REEL - FULL SCREEN */
+#pageEdit .editWrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#pageEdit .editPreview{flex:1 !important;min-height:0 !important;height:auto !important;width:100% !important;position:relative;background:#000;overflow:hidden}
+#pageEdit .editPreview img,#pageEdit .editPreview video{width:100% !important;height:100% !important;object-fit:cover !important;object-position:center center !important;position:absolute;inset:0}
+/* ✅ REELS NA - TOOLS VIDEO MELA OVERLAY */
+#pageEdit.reelsMode .quickBar{display:none}
+#pageEdit.reelsMode .instaTools{position:absolute;left:0;right:0;bottom:72px;z-index:30;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);padding:14px 10px 6px}
+#pageEdit.reelsMode .instaBottom{position:absolute;left:0;right:0;bottom:0;z-index:31;background:transparent;padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+#pageEdit.reelsMode .editPreview{flex:1}
+</style>
 </head>
 <body>
 <div class="page on" id="pageHome">
@@ -27,9 +42,10 @@
 
 <div class="page" id="pageEdit">
 <div class="top"><span class="back" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b id="editTitle">Edit Photo</b><span class="done" onclick="goUpload()">Next <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0095f6" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
-<div class="editWrap">
+<div class="editWrap" style="position:relative">
 <div class="quickBar" id="quickBar"></div>
-<div class="editPreview" id="editPreview" onclick="tapPreviewPlay(event)"><img id="editImg"><video id="editVid" style="display:none" muted loop playsinline></video>
+<!-- ✅ FULL SCREEN VIDEO - object-fit cover - Makkal Full ah Theriyuvanga -->
+<div class="editPreview" id="editPreview" onclick="tapPreviewPlay(event)"><img id="editImg" style="object-fit:cover"><video id="editVid" style="display:none;object-fit:cover" muted loop playsinline></video>
 <div class="editSound" id="editSound" onclick="toggleSound(event)"><span id="soundOffIconEdit"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg></span><span id="soundOnIconEdit" style="display:none"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span></div>
 <div class="centerPlay" id="centerPlay" onclick="togglePlay(event)"><svg class="ic-lg" id="centerPlayIcon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M8 5l11 7-11 7V5z"/></svg></div><div class="ovText" id="ovText"></div><div class="ovStick" id="ovStick"></div><div class="dragDelete" id="dragDelete"><div class="bin" id="deleteBin"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg></div><span>Drag to delete</span></div></div>
 <div class="instaTools">
@@ -123,5 +139,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/supabase.js"></script>
 <script src="js/create.js"></script>
+<script>
+// ✅ REELS FULL SCREEN - JS LA 3 LINE - ITHA MATTUM ADD PANNU DA
+// setMode la - Reels na - pageEdit ku reelsMode Class Podu
+let _oldSetMode = setMode;
+setMode = function(t){
+  _oldSetMode(t);
+  document.getElementById('pageEdit')?.classList.toggle('reelsMode', t==='reels'||t==='story');
+  document.getElementById('pageHome')?.classList.toggle('reelsMode', t==='reels');
+};
+</script>
 </body>
 </html>
