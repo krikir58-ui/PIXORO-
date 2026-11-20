@@ -6,19 +6,29 @@
 <title>Pixoro - Create</title>
 <link rel="stylesheet" href="css/create.css">
 <style>
-/* ✅ REELS FULL SCREEN - HTML LA YE FIX - CSS FILE AH THODA VENAAM */
-/* Home Preview - Reels na Full Height */
-#galPreview.reels,#galPreview.story,#galPreview.live{aspect-ratio:auto !important;height:calc(100dvh - 215px) !important;width:100%}
-#galPreview.reels .pvStage img,#galPreview.reels .pvStage video{object-fit:cover !important;object-position:center !important}
-/* ✅ EDIT REEL - FULL SCREEN */
-#pageEdit .editWrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
-#pageEdit .editPreview{flex:1 !important;min-height:0 !important;height:auto !important;width:100% !important;position:relative;background:#000;overflow:hidden}
-#pageEdit .editPreview img,#pageEdit .editPreview video{width:100% !important;height:100% !important;object-fit:cover !important;object-position:center center !important;position:absolute;inset:0}
-/* ✅ REELS NA - TOOLS VIDEO MELA OVERLAY */
-#pageEdit.reelsMode .quickBar{display:none}
-#pageEdit.reelsMode .instaTools{position:absolute;left:0;right:0;bottom:72px;z-index:30;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);padding:14px 10px 6px}
-#pageEdit.reelsMode .instaBottom{position:absolute;left:0;right:0;bottom:0;z-index:31;background:transparent;padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
-#pageEdit.reelsMode .editPreview{flex:1}
+/* ✅ 1. GALLERY - NITTA TALL - FULL HEIGHT */
+#galPreview{ height:calc(100dvh - 210px) !important; aspect-ratio:auto !important; width:100% }
+#galPreview .pvStage img,#galPreview .pvStage video{ object-fit:cover !important; object-position:center !important }
+/* ✅ 2. EDIT PAGE - EPPOVUM FULL SCREEN - reelsMode THEVAI ILLA */
+#pageEdit{ position:relative }
+#pageEdit .top{ position:absolute; top:0; left:0; right:0; z-index:50; background:linear-gradient(to bottom,rgba(0,0,0,.85),transparent) }
+#pageEdit .editWrap{ flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative }
+#pageEdit .editPreview{ position:absolute !important; inset:0 !important; width:100% !important; height:100% !important; flex:none !important; min-height:0 !important; background:#000; overflow:hidden; z-index:1; display:block }
+#pageEdit .editPreview img,#pageEdit .editPreview video{ width:100% !important; height:100% !important; object-fit:cover !important; object-position:center center !important; position:absolute; inset:0 }
+/* ✅ 3. MELA OPTION - EDIT VIDEO KULLA - EDIT PAGE LA KAATAATHA */
+#pageEdit .quickBar{ display:none !important }
+/* ✅ 4. KEELA TOOLS - CHINNA SIZE */
+#pageEdit .instaTools{ position:absolute !important; left:0; right:0; bottom:62px !important; z-index:40; background:linear-gradient(to top,rgba(0,0,0,.9),transparent) !important; padding:8px 8px 2px !important; gap:4px !important }
+#pageEdit .instaTools .c{ width:40px !important; height:40px !important; border-radius:12px !important }
+#pageEdit .instaTools .c svg{ width:18px !important; height:18px !important }
+#pageEdit .instaTools span{ font-size:10px !important; margin-top:2px !important }
+#pageEdit .instaTools div{ min-width:52px !important }
+#pageEdit .instaBottom{ position:absolute !important; left:0; right:0; bottom:0 !important; z-index:41; background:transparent !important; padding:8px 10px calc(8px + env(safe-area-inset-bottom)) !important; gap:8px !important }
+#pageEdit .instaBottom .editBtn,#pageEdit .instaBottom .nextBtn2{ padding:10px !important; font-size:13px !important }
+#pageEdit .editSound{ top:66px !important; z-index:50 }
+#pageEdit .editPreview .centerPlay{ z-index:50 }
+/* ✅ SONG BAR - CHINNA */
+#pageHome .sugAudio{ height:28px !important; font-size:11px !important; bottom:8px !important }
 </style>
 </head>
 <body>
@@ -39,18 +49,16 @@
 <div class="grid" id="mediaGridHome"></div>
 </div>
 </div>
-
 <div class="page" id="pageEdit">
 <div class="top"><span class="back" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b id="editTitle">Edit Photo</b><span class="done" onclick="goUpload()">Next <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0095f6" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
 <div class="editWrap" style="position:relative">
 <div class="quickBar" id="quickBar"></div>
-<!-- ✅ FULL SCREEN VIDEO - object-fit cover - Makkal Full ah Theriyuvanga -->
 <div class="editPreview" id="editPreview" onclick="tapPreviewPlay(event)"><img id="editImg" style="object-fit:cover"><video id="editVid" style="display:none;object-fit:cover" muted loop playsinline></video>
 <div class="editSound" id="editSound" onclick="toggleSound(event)"><span id="soundOffIconEdit"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg></span><span id="soundOnIconEdit" style="display:none"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span></div>
 <div class="centerPlay" id="centerPlay" onclick="togglePlay(event)"><svg class="ic-lg" id="centerPlayIcon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M8 5l11 7-11 7V5z"/></svg></div><div class="ovText" id="ovText"></div><div class="ovStick" id="ovStick"></div><div class="dragDelete" id="dragDelete"><div class="bin" id="deleteBin"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg></div><span>Drag to delete</span></div></div>
 <div class="instaTools">
 <div onclick="openFull('pageAudioFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span>Audio</span></div>
-<div onclick="openFull('pageTextFull')"><div class="c"><span style="font-size:20px;font-weight:800">Aa</span></div><span>Text</span></div>
+<div onclick="openFull('pageTextFull')"><div class="c"><span style="font-size:18px;font-weight:800">Aa</span></div><span>Text</span></div>
 <div onclick="openFull('pageVoiceFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg></div><span>Voice</span></div>
 <div onclick="openFull('pageTextFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6"/></svg></div><span>Captions</span></div>
 <div onclick="openFull('pageStickerFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></div><span>Stickers</span></div>
@@ -58,25 +66,21 @@
 <div class="instaBottom"><button class="editBtn" onclick="openFull('pageEditVideoFull')">Edit video</button><button class="nextBtn2" onclick="goUpload()">Next <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
 </div>
 </div>
-
 <div class="fullPage" id="pageAudioFull">
 <div class="fpTop"><span class="x" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b>Audio</b><span class="done" onclick="closeFull()">Done</span></div>
 <div class="fpMini"><img id="auImg"><video id="auVid" style="display:none" muted loop playsinline></video></div>
 <div class="fpBody"><input class="fpSearch" placeholder="Search..." oninput="searchSong(this.value)"><div class="fpTabs"><button class="sel">For you</button><button>Trending</button><button>Saved</button><button>Original audio</button></div><div id="songListFull"></div><p id="songTxt" style="font-size:12px;color:#ffcc00;padding:8px 2px">Song: Trending Audio</p></div>
 </div>
-
 <div class="fullPage" id="pageTextFull">
 <div class="fpTop"><span class="x" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><span></span><span class="done" onclick="confirmTextFull()">Done</span></div>
 <div style="flex:1;position:relative;overflow:hidden;background:#000"><img id="tfImg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0"><video id="tfVid" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0" muted loop playsinline></video><input class="tfInput" id="tfInput" placeholder="Hi" autocomplete="off"></div>
 <div style="background:#111;padding:10px"><div class="tfRow" id="tfFontRow"><button class="sel" onclick="setTFFont('cursive',this)">Signature</button><button onclick="setTFFont('monospace',this)">Editor</button><button onclick="setTFFont('fantasy',this)">Poster</button><button onclick="setTFFont('system-ui',this)">Bubble</button><button onclick="setTFFont('Impact',this)">Strong</button></div><div class="tfRow"><button class="sel" onclick="setTFEffect('none',this)">None</button><button onclick="setTFEffect('shadow',this)">Hard Shadow</button><button onclick="setTFEffect('neon',this)">Neon</button><button onclick="setTFEffect('halo',this)">Halo</button></div><div class="tfColors"><div style="background:#fff" onclick="setTFColor('#fff')"></div><div style="background:#000;border:2px solid #fff" onclick="setTFColor('#000')"></div><div style="background:#ff2d55" onclick="setTFColor('#ff2d55')"></div><div style="background:#ffcc00" onclick="setTFColor('#ffcc00')"></div><div style="background:#00c853" onclick="setTFColor('#00c853')"></div><div style="background:#0095f6" onclick="setTFColor('#0095f6')"></div></div><div style="text-align:center;padding:6px"><button style="background:transparent;color:#ff5a5a;border:0;width:100%;padding:10px;display:flex;gap:6px;align-items:center;justify-content:center" onclick="removeTextFull()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg> Delete Text</button></div></div>
 </div>
-
 <div class="fullPage" id="pageVoiceFull">
 <div class="fpTop"><span class="x" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b>Voice</b><span class="done" onclick="closeFull()">Done</span></div>
 <div class="fpMini"><img id="voImg"><video id="voVid" style="display:none" muted loop playsinline></video></div>
 <div class="fpBody"><div style="display:flex;gap:10px"><button style="flex:1;background:#fff;color:#000;border:0;padding:14px;border-radius:999px;font-weight:800;display:flex;gap:6px;align-items:center;justify-content:center" onclick="startVoice(this)"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg> Record</button><button style="flex:1;background:#222;color:#fff;border:0;padding:14px;border-radius:999px" onclick="stopVoice()">Stop</button></div><p id="voiceTxt" style="font-size:13px;color:#7dffb0;padding:10px 2px">Voice: No Voice</p></div>
 </div>
-
 <div class="fullPage" id="pageStickerFull">
 <div class="fpTop"><span class="x" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b>Stickers</b><span class="done" onclick="closeFull()">Done</span></div>
 <div class="fpBody"><button style="width:100%;background:#fff;color:#000;font-weight:800;padding:13px;border:0;border-radius:999px;display:flex;gap:8px;align-items:center;justify-content:center" onclick="document.getElementById('fileSticker').click()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 18l3-3 2 2 3-4 2 3"/></svg> Gallery la irunthu Sticker Podu</button><p style="font-size:11px;color:#aaa;padding:8px 2px">Ne select panna image - Photo mela Sticker ah ottikum</p><div id="myStickerList"></div><div class="stickGrid">
@@ -90,7 +94,6 @@
 <button onclick="pickSticker('hundred')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00c853" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 8v8M12 8v8M16 8v8"/></svg></button>
 </div><button style="width:100%;margin-top:12px;background:transparent;color:#ff5a5a;border:1px solid #442222;padding:12px;border-radius:999px;display:flex;gap:6px;align-items:center;justify-content:center" onclick="removeText()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg> Remove Sticker</button></div>
 </div>
-
 <div class="fullPage" id="pageEditVideoFull">
 <div class="fpTop"><span class="x" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b>Try Edits</b><span style="cursor:pointer" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
 <div class="fpMini" style="height:240px"><img id="evImg"><video id="evVid" style="display:none" muted loop playsinline></video></div>
@@ -98,18 +101,23 @@
 <span class="soundBtn" onclick="toggleSound(event)" style="width:32px;height:32px"><span id="soundOffIcon2"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg></span><span id="soundOnIcon2" style="display:none"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span></span>
 <input type="range" id="seekBar2" min="0" max="100" value="0" oninput="seekVideo(this.value)"><span id="playTime" style="font-size:12px">0:00 / 0:15</span></div>
 <div class="filmStrip" id="filmStrip"></div>
+<!-- ✅ MELA OPTION ELLAAM - IPPO EDIT VIDEO KULLA -->
+<div style="padding:10px;display:flex;gap:8px;overflow-x:auto">
+<button style="flex:1;background:#fff;color:#000;border:0;padding:11px;border-radius:999px;font-weight:700;white-space:nowrap" onclick="document.getElementById('fileAdd').click()">+ Add Reel</button>
+<button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px;white-space:nowrap" onclick="openFull('pageAudioFull')">Add Song</button>
+<button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="openFull('pageTextFull')">Aa Text</button>
+<button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="openFull('pageStickerFull')">Sticker</button>
+</div>
 <div class="addRow"><button onclick="openFull('pageAudioFull')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Add audio</button><button onclick="openFull('pageTextFull')"><span style="font-weight:800">Aa</span> Add text</button></div>
 <div style="padding:0 12px"><div style="display:flex;justify-content:space-between;font-size:12px;color:#aaa"><span id="clipInfo">1 Clip • 0:15</span><span id="trimInfo">Trim: 0:00 - 0:15</span></div></div>
 <div style="padding:10px"><div style="display:flex;gap:8px"><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px;display:flex;gap:6px;align-items:center;justify-content:center" onclick="cutAtCurrent()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8 8l12 8M8 16L20 8"/></svg> Cut</button><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="splitClip()">Split</button><button style="flex:1;background:#222;color:#ff5a5a;border:0;padding:11px;border-radius:999px;display:flex;gap:6px;align-items:center;justify-content:center" onclick="deleteClip()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg> Delete</button></div></div>
 <div class="instaTools" style="border-top:1px solid #222"><div onclick="openFull('pageAudioFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span>Audio</span></div><div onclick="openFull('pageTextFull')"><div class="c">Aa</div><span>Text</span></div><div onclick="openFull('pageVoiceFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg></div><span>Voice</span></div><div onclick="openFull('pageStickerFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></div><span>Sticker</span></div><div onclick="openFull('pageFilterFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></div><span>Filters</span></div></div>
 <div style="padding:10px;display:flex;gap:8px"><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="setFilter('none')">None</button><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="setFilter('brightness(1.15) saturate(1.5)')">Vivid</button><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="setFilter('grayscale(1)')">B&W</button></div>
 </div>
-
 <div class="fullPage" id="pageFilterFull">
 <div class="fpTop"><span class="x" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b>Filters</b><span class="done" onclick="goBack()">Done</span></div>
 <div class="fpBody"><div style="display:flex;gap:10px;overflow-x:auto" id="filterRowFull"></div><p style="font-size:12px;color:#888;padding:10px 2px">Filter pudikalana - Back thodu - Filter page mattum moodum - Edit page ku varuvai</p></div>
 </div>
-
 <div class="page" id="pageUpload">
 <div class="top"><span class="back" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 5l-7 7 7 7"/></svg></span><b id="uploadTitle">Upload Post</b><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span></div>
 <div class="uploadScroll">
@@ -124,7 +132,6 @@
 <div class="successBox" id="successBox"><span><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="#00c853" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg></span><span>Post uploaded - Server la Save aayiduchu!</span></div>
 </div>
 </div>
-
 <div class="popup" id="draftPopup"><div class="box"><b>Save draft?</b><p>If you go back now, you will lose this draft.</p><button class="red" onclick="startOver()">Start over</button><button onclick="saveDraftAndBack()">Save draft - Server la Save</button><button onclick="closeDraft()">Keep editing</button></div></div>
 <div class="sheetBg" id="sheetBg" onclick="closeCreateSheet()"></div>
 <div class="createSheet" id="createSheet"><div class="bar"></div>
@@ -140,13 +147,34 @@
 <script src="js/supabase.js"></script>
 <script src="js/create.js"></script>
 <script>
-// ✅ REELS FULL SCREEN - JS LA 3 LINE - ITHA MATTUM ADD PANNU DA
-// setMode la - Reels na - pageEdit ku reelsMode Class Podu
-let _oldSetMode = setMode;
-setMode = function(t){
-  _oldSetMode(t);
-  document.getElementById('pageEdit')?.classList.toggle('reelsMode', t==='reels'||t==='story');
-  document.getElementById('pageHome')?.classList.toggle('reelsMode', t==='reels');
+// ✅ + / BACK - VELIYA POGAATHU - HTML LA YE FIX
+let _lock=false;
+function _push(){ try{ history.pushState({pixoro:1},''); }catch(e){} }
+let _origShowPage = showPage;
+showPage = function(id){ _origShowPage(id); if(!_lock) _push(); };
+let _origOpenSheet = openCreateSheet;
+openCreateSheet = function(){ _origOpenSheet(); _push(); };
+let _origGoBack = goBack;
+goBack = function(){
+  let cs=document.getElementById('createSheet');
+  if(cs && cs.classList.contains('show')){ closeCreateSheet(); return; }
+  let cur=document.querySelector('.page.on')?.id;
+  if(cur==='pageHome'){ return; }
+  _origGoBack();
+};
+window.addEventListener('popstate', function(e){ e.preventDefault(); _lock=true; goBack(); setTimeout(()=>{ _lock=false; },100); });
+_push();
+// ✅ REELS SELECT PANNA - ODANE EDIT PAGE KU - 2 TIME GALLERY VARAATHU
+let _origAddClip = addClip;
+addClip = function(f){
+  _origAddClip(f);
+  // Reels / Story na - File Select aana 400ms la Edit ku Pogum
+  setTimeout(()=>{
+    if((typeof type!=='undefined' && (type==='reels'||type==='story')) && typeof url!=='undefined' && url && typeof goEdit==='function'){
+      let cur=document.querySelector('.page.on')?.id;
+      if(cur==='pageHome') goEdit();
+    }
+  }, 500);
 };
 </script>
 </body>
