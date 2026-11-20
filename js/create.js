@@ -29,8 +29,6 @@ function setMode(t){type=t;document.querySelectorAll('#modePill button').forEach
 function setType(t){type=t;let e=document.getElementById('editTitle');if(e)e.innerText=t==='post'?'Edit Photo':t==='reels'?'Edit Reel':'Story Edit';let u=document.getElementById('uploadTitle');if(u)u.innerText=t==='post'?'Upload Post':t==='reels'?'Upload Reel':'Upload Story';renderQuickBar();}
 function clampPan(){let st=document.getElementById('pvStage');if(!st)return;let mx=Math.max(0,(st.clientWidth*(zoom-1))/2),my=Math.max(0,(st.clientHeight*(zoom-1))/2);panX=Math.max(-mx,Math.min(mx,panX));panY=Math.max(-my,Math.min(my,panY));}
 function applyZoom(){clampPan();let el=kind==='video'?document.getElementById('pvVid'):document.getElementById('pvImg');if(el)el.style.transform='translate3d('+panX+'px,'+panY+'px,0) scale('+zoom+')';}
-
-// ✅ REELS SOUND - ICON MAARUM - 3 BUTTON UM ONNA MAARUM
 function updateSoundIcon(){
   let pairs=[['soundOnIcon','soundOffIcon'],['soundOnIconEdit','soundOffIconEdit'],['soundOnIcon2','soundOffIcon2']];
   pairs.forEach(p=>{
@@ -39,33 +37,56 @@ function updateSoundIcon(){
     on.style.display = soundOn ? 'grid' : 'none';
     off.style.display = soundOn ? 'none' : 'grid';
   });
-  // Button Border - ON na Green, OFF na White
-  ['soundBtn','editSound'].forEach(id=>{
-    let b=document.getElementById(id);
-    if(b) b.classList.toggle('on', soundOn);
-  });
   document.querySelectorAll('.soundBtn').forEach(b=>b.classList.toggle('on', soundOn));
   let es=document.getElementById('editSound');
   if(es) es.classList.toggle('on', soundOn);
 }
-
-// ✅ REELS SOUND - ELLA VIDEO KUM SOUND VARUM / STOP AAGUM
 function toggleSound(e){
   if(e) e.stopPropagation();
   soundOn=!soundOn;
   ['pvVid','editVid','evVid','auVid','tfVid','voVid','upVidPost'].forEach(id=>{
-    let v=document.getElementById(id);
-    if(!v) return;
+    let v=document.getElementById(id); if(!v) return;
     v.muted=!soundOn;
-    // Sound ON panna - Video Play Aagitu Irundha - Sound oda Play Aagum
-    if(soundOn && v.src && !v.paused) v.play().catch(()=>{});
-    // Reels Preview la - Sound ON panna - Odane Play pannu
-    if(soundOn && id==='pvVid' && v.src) v.play().catch(()=>{});
+    if(soundOn && v.src) v.play().catch(()=>{});
   });
   updateSoundIcon();
   toast(soundOn?'Sound ON':'Sound OFF');
 }
 
+// ✅ FIX 1 - VIDEO NA PLAY + SOUND KAATU - PHOTO NA MARAI
+function syncEditVideoUI(){
+  let isVid = kind==='video' && !!url;
+  let es=document.getElementById('editSound');
+  let cp=document.getElementById('centerPlay');
+  let ev=document.getElementById('editVid');
+  if(es) es.style.display = isVid ? 'grid' : 'none';
+  if(cp) cp.style.display = isVid ? 'grid' : 'none';
+  if(ev && isVid){ ev.muted=!soundOn; ev.play().catch(()=>{}); }
+  updateSoundIcon();
+}
+// ✅ FIX 2 - VIDEO MELA THOTTA PLAY / PAUSE
+function tapPreviewPlay(e){
+  if(kind!=='video') return;
+  if(e.target.closest('.editSound') || e.target.closest('#ovText') || e.target.closest('#ovStick')) return;
+  togglePlay(e);
+}
+// ✅ FIX 3 - PLAY / PAUSE - ICON UM MAARUM - OUTLINE SVG
+function togglePlay(e){
+  if(e) e.stopPropagation();
+  if(kind!=='video'){ toast('Video select pannu - Photo ku Play Illa'); return; }
+  let v=document.getElementById('editVid');
+  let cp=document.getElementById('centerPlay');
+  let icon=document.getElementById('centerPlayIcon');
+  if(v.paused){
+    v.muted=!soundOn; v.play().catch(()=>{});
+    if(cp) cp.style.display='none';
+    if(icon) icon.innerHTML='<path d="M8 5l11 7-11 7V5z"/>';
+  } else {
+    v.pause();
+    if(cp) cp.style.display='grid';
+    if(icon) icon.innerHTML='<path d="M7 5v14M17 5v14"/>';
+  }
+}
 function updatePreview(){
   let pi=document.getElementById('pvImg'),pv=document.getElementById('pvVid'),pl=document.getElementById('pvPlay');
   if(!url){pi.style.display='none';pv.style.display='none';document.getElementById('pvEmpty').style.display='grid';document.getElementById('pvTop').style.display='none';document.getElementById('cropHint').style.display='none';document.getElementById('sugAudio').style.display='none';if(pl)pl.style.display='none';return;}
@@ -73,10 +94,8 @@ function updatePreview(){
   let h=document.getElementById('cropHint');h.style.display='block';h.classList.remove('hide');clearTimeout(hintTimer);hintTimer=setTimeout(()=>h.classList.add('hide'),2500);
   showMedia(pi,pv,url,kind);applyZoom();
   document.getElementById('sugAudio').style.display=type==='reels'?'flex':'none';
-  if(kind==='video'){
-    pv.muted=!soundOn; // Reels la First Mute la thaan Start Aagum - Instagram Mari
-    pv.currentTime=0; pv.play().catch(()=>{}); pl.style.display='none';
-  }else{pl.style.display='none';try{pv.pause();}catch(e){}}
+  if(kind==='video'){ pv.muted=!soundOn; pv.currentTime=0; pv.play().catch(()=>{}); pl.style.display='none'; }
+  else{pl.style.display='none';try{pv.pause();}catch(e){}}
   updateSoundIcon();
 }
 function togglePreviewPlay(e){
@@ -87,10 +106,10 @@ function togglePreviewPlay(e){
 }
 function showMedia(a,b,s,k){if(!a||!b)return;if(k==='video'){b.src=s;b.style.display='block';a.style.display='none';}else{a.src=s;a.style.display='block';b.style.display='none';try{b.pause();}catch(e){}}}
 function renderMedia(){let list=galleryPhotos.filter(p=>galFilter==='all'||p.kind===galFilter);let html='<div class="galleryBtn" onclick="document.getElementById(\'fileMulti\').click()"><div><b>Gallery la irunthu Photo / Video Add Pannu</b><div style="font-size:11px;color:#aaa">Real Gallery mattum thaan</div></div></div>';html+=list.map(p=>{let i=galleryPhotos.indexOf(p);return '<div class="tile '+(url===p.url?'sel':'')+'" onclick="selectGallery('+i+')">'+(p.kind==='video'?'<video src="'+p.url+'" muted playsinline></video><span class="dur">0:15</span>':'<img src="'+p.url+'">')+'<span class="tick">'+(url===p.url?'✓':'')+'</span></div>';}).join('');let gh=document.getElementById('mediaGridHome');if(gh)gh.innerHTML=html;}
-function selectGallery(i){let p=galleryPhotos[i];if(!p)return;url=p.url;kind=p.kind;file=p.file;zoom=1;panX=0;panY=0;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();}
+function selectGallery(i){let p=galleryPhotos[i];if(!p)return;url=p.url;kind=p.kind;file=p.file;zoom=1;panX=0;panY=0;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI();}
 function setGalTab(f,b){galFilter=f;document.querySelectorAll('.galTabs button').forEach(x=>x.classList.remove('sel'));if(b)b.classList.add('sel');renderMedia();}
 function goSelectNext(){if(!url){document.getElementById('fileMulti').click();return;}goEdit();}
-function goEdit(){if(!url){toast('Gallery la irunthu Photo Add Pannu');return;}showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);showMedia(document.getElementById('upImgPost'),document.getElementById('upVidPost'),url,kind);showPage('pageEdit');renderFilm();setType(type);updateSoundIcon();}
+function goEdit(){if(!url){toast('Gallery la irunthu Photo Add Pannu');return;}showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);showMedia(document.getElementById('upImgPost'),document.getElementById('upVidPost'),url,kind);showPage('pageEdit');renderFilm();setType(type);syncEditVideoUI();}
 function goUpload(){if(!url){toast('Photo illa');return;}showPage('pageUpload');document.getElementById('captionPost').value=captionVal;syncFields();}
 function syncCap(){captionVal=document.getElementById('captionPost').value;}
 function syncFields(){document.getElementById('locVal').innerText=loc||'Add Location';document.getElementById('tagVal').innerText=tag||'Tag People';document.getElementById('musicVal').innerText=song;document.getElementById('audVal').innerText=aud;}
@@ -138,7 +157,7 @@ function pickSticker(k){
     crown:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.5"><path d="M3 17h18M3 17l-1-9 6 4 4-6 4 6 6-4-1 9z"/></svg>',
     love:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ff2d55" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg>',
     star:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.5"><path d="M12 3l2.5 6 6.5.5-5 4.5 1.5 6.5L12 17l-5.5 3.5L8 14 3 9.5 9.5 9z"/></svg>',
-    party:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#a259ff" stroke-width="1.5"><path d="M4 20L20 4M20 4l-3 1 1 3zM7 17l3-3"/></svg>',
+    party:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#a259ff" stroke-width="1.5"><path d="M4 20L20 4M20 4l-3 1 1 3z"/></svg>',
     hundred:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#00c853" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 8v8M12 8v8M16 8v8"/></svg>'
   };
   let el=document.getElementById('ovStick');
@@ -158,13 +177,6 @@ function buildFilter(){return filter==='none'?'brightness('+adj.brightness+'%) c
 function applyFilter(){let f=buildFilter();let ei=document.getElementById('editImg');if(ei)ei.style.filter=f;let ev=document.getElementById('editVid');if(ev)ev.style.filter=f;let up=document.getElementById('upImgPost');if(up)up.style.filter=f;}
 function setFilter(f){prevFilter=f;filter=f;applyFilter();closeFull();toast('Filter Applied');}
 function setupVideo(){let v=document.getElementById('editVid');if(kind==='video'){v.onloadedmetadata=()=>{totalDur=v.duration||15;trimStart=0;trimEnd=totalDur;let p=document.getElementById('playTime');if(p)p.innerText='0:00 / '+fmt(totalDur);updateTrimUI();};v.ontimeupdate=()=>{let p=document.getElementById('playTime');if(p)p.innerText=fmt(v.currentTime)+' / '+fmt(v.duration);};}renderFilm();}
-function togglePlay(){
-  if(kind!=='video'){toast('Video select pannu');return;}
-  let v=document.getElementById('editVid');
-  let cp=document.getElementById('centerPlay');
-  if(v.paused){ v.muted=!soundOn; v.play().catch(()=>{}); if(cp) cp.style.display='none'; }
-  else { v.pause(); if(cp) cp.style.display='grid'; }
-}
 function seekVideo(v){let vid=document.getElementById('editVid');if(kind!=='video'||!vid.duration)return;vid.currentTime=vid.duration*v/100;}
 function renderFilm(){let f=document.getElementById('filmStrip');if(!f||!url)return;let c=Math.max(clips.length,1),h='';for(let i=0;i<6;i++){let cl=clips[i%c]||{url:url,kind:kind};h+='<div>'+(cl.kind==='video'?'<video src="'+cl.url+'" muted playsinline></video>':'<img src="'+cl.url+'">')+'</div>';}f.innerHTML=h;}
 function cutAtCurrent(){let v=document.getElementById('editVid');let ct=kind==='video'?v.currentTime:(trimStart+trimEnd)/2;if(ct<=trimStart+0.3||ct>=trimEnd-0.3){toast('Naduvula Play panni Cut pannu');return;}clips=[{url:url,kind:kind,file:file},{url:url,kind:kind,file:file}];renderFilm();toast('Cut - 2 Clips');}
@@ -172,12 +184,12 @@ function splitClip(){cutAtCurrent();}
 function deleteClip(){if(clips.length>1){clips.splice(0,1);renderFilm();updateTrimUI();toast('Clip Deleted');}else{removeText();toast('Deleted');}}
 function updateTrimUI(){let a=document.getElementById('trimInfo');if(a)a.innerText='Trim: '+fmt(trimStart)+' - '+fmt(trimEnd);let b=document.getElementById('clipInfo');if(b)b.innerText=clips.length+' Clip • '+fmt(trimEnd-trimStart);}
 function isFakeFile(f){let n=(f.name||'').toLowerCase();return n.match(/ai|generated|fake|unsplash|sample|demo|download|midjourney|dalle/)?true:false;}
-function addClip(f){if(!f)return;if(isFakeFile(f)){toast('Fake Photo');return;}let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let c={url:ev.target.result,kind:k,file:f};galleryPhotos.push(c);clips.push({url:c.url,kind:k,file:f});url=c.url;kind=k;file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();if(type==='reels')setupVideo();};r.readAsDataURL(f);}
+function addClip(f){if(!f)return;if(isFakeFile(f)){toast('Fake Photo');return;}let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let c={url:ev.target.result,kind:k,file:f};galleryPhotos.push(c);clips.push({url:c.url,kind:k,file:f});url=c.url;kind=k;file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI();if(type==='reels')setupVideo();};r.readAsDataURL(f);}
 document.getElementById('file')?.addEventListener('change',e=>{addClip(e.target.files[0]);e.target.value='';});
 document.getElementById('fileMulti')?.addEventListener('change',e=>{Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';});
 document.getElementById('fileAdd')?.addEventListener('change',e=>{Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';toast('Reel Added');});
 document.getElementById('fileSticker')?.addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{myStickers.push(ev.target.result);pickMySticker(ev.target.result);renderMyStickers();};r.readAsDataURL(f);e.target.value='';});
-document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{url=ev.target.result;kind=f.type.includes('video')?'video':'image';file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderFilm();};r.readAsDataURL(f);e.target.value='';});
+document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{url=ev.target.result;kind=f.type.includes('video')?'video':'image';file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderFilm();syncEditVideoUI();};r.readAsDataURL(f);e.target.value='';});
 (function(){let pv=document.getElementById('galPreview'),st=document.getElementById('pvStage'),sx=0,sy=0,ox=0,oy=0,drag=false,ld=0;if(!pv)return;pv.addEventListener('touchstart',e=>{if(!url)return;st.classList.add('dragging');if(e.touches.length===1){drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;ox=panX;oy=panY;}if(e.touches.length===2){drag=false;ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}},{passive:true});pv.addEventListener('touchmove',e=>{if(!url)return;if(e.touches.length===1&&drag){panX=ox+(e.touches[0].clientX-sx);panY=oy+(e.touches[0].clientY-sy);applyZoom();}if(e.touches.length===2){let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(ld>0){zoom=Math.max(1,Math.min(3,zoom*(d/ld)));applyZoom();}ld=d;}},{passive:true});pv.addEventListener('touchend',()=>{drag=false;ld=0;st.classList.remove('dragging');});pv.addEventListener('dblclick',()=>{if(!url)return;zoom=zoom===1?2:1;panX=0;panY=0;applyZoom();});})();
 (function(){let pill=document.getElementById('modePill');if(!pill)return;let sx=0,modes=['post','story','reels','live'];pill.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});pill.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40){let cur=modes.indexOf(type);if(dx<0&&cur<3)setMode(modes[cur+1]);if(dx>0&&cur>0)setMode(modes[cur-1]);}},{passive:true});})();
 (function(){function mk(id,isSt){let el=document.getElementById(id);if(!el)return;let sx=0,sy=0,ol=0,ot=0,dr=false,hot=false;el.addEventListener('pointerdown',e=>{if(!el.innerText&&!el.innerHTML)return;dr=true;sx=e.clientX;sy=e.clientY;let r=el.getBoundingClientRect(),p=document.getElementById('editPreview').getBoundingClientRect();ol=(r.left-p.left+r.width/2)/p.width*100;ot=(r.top-p.top+r.height/2)/p.height*100;el.setPointerCapture(e.pointerId);document.getElementById('dragDelete').classList.add('show');e.stopPropagation();});el.addEventListener('pointermove',e=>{if(!dr)return;let p=document.getElementById('editPreview').getBoundingClientRect();let nx=Math.max(5,Math.min(95,ol+(e.clientX-sx)/p.width*100)),ny=Math.max(5,Math.min(95,ot+(e.clientY-sy)/p.height*100));el.style.left=nx+'%';el.style.top=ny+'%';let bin=document.getElementById('deleteBin').getBoundingClientRect();hot=(e.clientX>bin.left-30&&e.clientX<bin.right+30&&e.clientY>bin.top-30&&e.clientY<bin.bottom+30);document.getElementById('dragDelete').classList.toggle('hot',hot);});el.addEventListener('pointerup',()=>{if(!dr)return;dr=false;document.getElementById('dragDelete').classList.remove('show');document.getElementById('dragDelete').classList.remove('hot');if(hot){if(isSt){el.innerHTML='';}else{el.innerText='';text='';}toast('Deleted');}});}mk('ovText',false);mk('ovStick',true);})();
