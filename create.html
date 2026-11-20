@@ -16,7 +16,7 @@ button,input,textarea{font-family:inherit}
 .top{height:56px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;background:#000;position:sticky;top:0;z-index:20}
 .top b{font-size:19px}
 .top .back{font-size:26px;cursor:pointer}
-.top .done{font-size:16px;font-weight:700;cursor:pointer}
+.top .done{font-size:16px;font-weight:700;cursor:pointer;color:#0095f6}
 .createCard{margin:12px;background:#111;border:1px solid #222;border-radius:22px;padding:16px}
 .createCard h3{text-align:center;margin-bottom:12px}
 .opt{display:flex;gap:12px;align-items:center;background:#1a1a1a;border:1px solid #222;border-radius:16px;padding:12px;margin-bottom:10px;cursor:pointer}
@@ -43,7 +43,6 @@ button,input,textarea{font-family:inherit}
 .editPreview .ovText{position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);font-size:26px;font-weight:900;text-shadow:0 2px 8px #000;text-align:center;white-space:nowrap;z-index:5;cursor:grab;touch-action:none}
 .editPreview .ovStick{position:absolute;top:60%;left:50%;transform:translate(-50%,-50%);z-index:5;font-size:64px;cursor:grab;touch-action:none;line-height:1}
 .editPreview .ovStick img{width:90px;height:90px;object-fit:cover;border-radius:14px;border:2px solid #fff;display:block;pointer-events:none}
-.editPreview .dream{position:absolute;top:20%;left:12px;font-family:cursive;font-size:30px;line-height:.9;color:#fff;text-shadow:0 2px 10px #000;z-index:5}
 .editPreview .centerPlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;z-index:6}
 .editPreview .cutMark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;color:#000;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:800;z-index:7;display:none}
 .dragDelete{position:absolute;left:0;right:0;bottom:0;height:100px;background:linear-gradient(to top,rgba(0,0,0,.95),transparent);display:none;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10px;z-index:20;pointer-events:none}
@@ -86,7 +85,6 @@ button,input,textarea{font-family:inherit}
 .sheet .sliderRow{display:flex;justify-content:space-between;font-size:12px;padding:10px 0;border-bottom:1px solid #2a2a2a}
 .stickerGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:6px 0}
 .stickerGrid button{height:64px;font-size:36px;background:#222;border:1px solid #333;border-radius:14px;display:grid;place-items:center}
-.stickerGrid button img{width:52px;height:52px;object-fit:cover;border-radius:10px}
 .myStickerRow{display:flex;gap:8px;overflow-x:auto;padding:6px 0}
 .myStickerRow .mySt{flex-shrink:0;width:72px;height:72px;border-radius:14px;overflow:hidden;border:2px solid #333;cursor:pointer}
 .myStickerRow .mySt img{width:100%;height:100%;object-fit:cover}
@@ -135,9 +133,9 @@ button,input,textarea{font-family:inherit}
 </div>
 <div class="page" id="pageEdit">
 <div class="editWrap">
-<div class="top"><span class="back" onclick="askDraft()">✕</span><b id="editTitle">Edit Photo</b><span class="done" id="editDoneBtn" onclick="goUpload()">Done ✓</span></div>
+<div class="top"><span class="back" onclick="askDraft()">✕</span><b id="editTitle">Edit Photo</b><span class="done" id="editDoneBtn" onclick="goUpload()">Next →</span></div>
 <div class="quickBar" id="quickBar"></div>
-<div class="editPreview" id="editPreview"><img id="editImg"><video id="editVid" style="display:none" muted loop playsinline preload="metadata"></video><div style="position:absolute;top:14px;left:14px;z-index:5;font-size:32px" id="crownIcon">👑</div><div class="dream" id="dreamTxt">Dream<br>Big...</div><div class="centerPlay" id="centerPlay" style="display:none" onclick="togglePlay()"><svg class="ic-lg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 5l11 7-11 7V5z"/></svg></div><div class="ovText" id="ovText"></div><div class="ovStick" id="ovStick"></div><div class="cutMark" id="cutMark">Cut Here</div>
+<div class="editPreview" id="editPreview"><img id="editImg"><video id="editVid" style="display:none" muted loop playsinline preload="metadata"></video><div class="centerPlay" id="centerPlay" style="display:none" onclick="togglePlay()"><svg class="ic-lg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 5l11 7-11 7V5z"/></svg></div><div class="ovText" id="ovText"></div><div class="ovStick" id="ovStick"></div><div class="cutMark" id="cutMark">Cut Here</div>
 <div class="dragDelete" id="dragDelete"><div class="bin" id="deleteBin"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg></div><span>Drag to delete</span></div>
 </div>
 <div class="videoBar" id="videoBar" style="display:none"><div onclick="togglePlay()"><svg class="ic" id="playIcon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 5l11 7-11 7V5z"/></svg></div><input type="range" id="seekBar" min="0" max="100" value="0" oninput="seekVideo(this.value)"><span class="time" id="playTime">0:00 / 0:15</span><span style="font-size:12px;color:#aaa" id="editDur">0:15</span></div>
@@ -158,8 +156,7 @@ button,input,textarea{font-family:inherit}
 </div>
 <div class="filterStrip" id="filterStrip"></div>
 <div class="instaBottom"><button class="editBtn" onclick="openSheet('sheetTrim')">Edit video</button><button class="nextBtn2" onclick="goUpload()">Next →</button></div>
-<div class="sheet" id="sheetText"><div class="sHead"><b>Text</b><span class="done" onclick="closeSheet()">Done</span></div><input class="inlineInput" id="textInput" placeholder="Text ezhuthu - Ne type panna pattern la varum"><div class="row"><button onclick="confirmText()">Add</button><button onclick="setFont('system-ui')">Modern</button><button onclick="setFont('serif')">Classic</button><button onclick="setFont('cursive')">Signature</button></div><div class="row"><button onclick="setTextEffect('none')">None</button><button onclick="setTextEffect('shadow')">Hard Shadow</button><button onclick="setTextEffect('neon')">Neon</button><button onclick="setTextEffect('halo')">Halo</button></div><button class="red" style="width:100%;margin-top:8px" onclick="removeText()">Remove Text - Delete</button></div>
-<!-- ✅ STICKER - AVANGA ENTHA IMAGE VENNALUM PODALAM - GALLERY LA IRUNTHU - STICKER IMAGE MATTUM REAL -->
+<div class="sheet" id="sheetText"><div class="sHead"><b>Text</b><span class="done" onclick="closeSheet()">Done</span></div><input class="inlineInput" id="textInput" placeholder="Text ezhuthu..."><div class="row"><button onclick="confirmText()">Add</button><button onclick="setFont('system-ui')">Modern</button><button onclick="setFont('serif')">Classic</button><button onclick="setFont('cursive')">Signature</button></div><div class="row"><button onclick="setTextEffect('none')">None</button><button onclick="setTextEffect('shadow')">Hard Shadow</button><button onclick="setTextEffect('neon')">Neon</button><button onclick="setTextEffect('halo')">Halo</button></div><button class="red" style="width:100%;margin-top:8px" onclick="removeText()">Remove Text - Delete</button></div>
 <div class="sheet" id="sheetSticker"><div class="sHead"><b>Stickers - Entha Image Vennalum Podalam</b><span class="done" onclick="closeSheet()">Done</span></div>
 <button style="width:100%;background:#fff;color:#000;font-weight:800;padding:12px" onclick="document.getElementById('fileSticker').click()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 18l3-3 2 2 3-4 2 3"/></svg> Gallery la irunthu Entha Image Vennalum Sticker ah Podu</button>
 <p style="font-size:11px;color:#aaa;padding:8px 2px">Ne select panna image - Photo mela Sticker ah ottikum - Drag panni move pannalam - Keela izhutha Delete aayidum</p>
@@ -186,7 +183,7 @@ button,input,textarea{font-family:inherit}
 <div class="uField" onclick="toggleAud()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span style="flex:1;font-size:14px">Privacy</span><span class="val" id="audVal">Everyone</span><span>›</span></div>
 <div id="status"></div>
 <button class="uploadBtn" id="shareBtnPost" onclick="sharePost()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg> Upload Post</button>
-<div class="successBox" id="successBox"><span>✅</span><span>Post uploaded successfully - Server la Save aayiduchu!</span></div>
+<div class="successBox" id="successBox"><span>✅</span><span>Post uploaded - Server la Save aayiduchu!</span></div>
 </div>
 </div>
 <div class="popup" id="draftPopup"><div class="box"><b>Save draft?</b><p>If you go back now, you will lose this draft.</p><button class="red" onclick="startOver()">Start over</button><button onclick="saveDraftAndBack()">Save draft - Server la Save</button><button onclick="closeDraft()">Keep editing</button></div></div>
@@ -200,16 +197,15 @@ button,input,textarea{font-family:inherit}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/supabase.js?v=1057"></script>
 <script>
-/* ✅ NO LOCAL STORAGE - SERVER MATTUM THAAN SAVE AAGUM - localStorage / sessionStorage use pannala */
-let type='post',file=null,url='',kind='image',filter='none',text='',song='Trending Audio',fontF='system-ui',adj={brightness:100,contrast:100,saturate:100},effect='none',loc='Chennai, India',aud='Everyone',tag='@friend_name',adv='Off';
-let clips=[],curClip=0,selClip=-1,galleryPhotos=[],playing=false,trimStart=0,trimEnd=15,totalDur=15,uploading=false,captionVal='',textEffect='none',myStickers=[],stickerImgUrl='';
+let type='post',file=null,url='',kind='image',filter='none',text='',song='Trending Audio',fontF='system-ui',adj={brightness:100,contrast:100,saturate:100},effect='none',loc='Chennai, India',aud='Everyone',tag='@friend_name';
+let clips=[],selClip=-1,galleryPhotos=[],playing=false,trimStart=0,trimEnd=15,totalDur=15,uploading=false,captionVal='',textEffect='none',myStickers=[],stickerImgUrl='';
 function fmt(s){s=Math.max(0,s);let m=Math.floor(s/60),ss=Math.floor(s%60);return m+':'+(ss<10?'0':'')+ss;}
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('show'));}
 function goCreate(t){type=t;setType(t);showPage('pageSelect');renderMedia();}
 function setType(t){
   type=t;
   document.getElementById('editTitle').innerText=t==='post'?'Edit Photo':t==='reels'?'Edit Reel':'Story Edit';
-  document.getElementById('editDoneBtn').innerText=t==='reels'?'Next':'Done ✓';
+  document.getElementById('editDoneBtn').innerText='Next →';
   document.getElementById('uploadTitle').innerText=t==='post'?'Upload Post':t==='reels'?'Upload Reel':'Upload Story';
   document.getElementById('shareBtnPost').innerHTML='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg> '+(t==='post'?'Upload Post':'Upload Reel');
   let ep=document.getElementById('editPreview');ep.className='editPreview '+(t==='reels'||t==='story'?'reels':'');
@@ -219,8 +215,6 @@ function setType(t){
   document.getElementById('clipInfoWrap').style.display=isReels?'flex':'none';
   document.getElementById('filmWrap').style.display=isReels?'block':'none';
   document.getElementById('centerPlay').style.display=isReels?'grid':'none';
-  document.getElementById('crownIcon').style.display=(t==='post')?'block':'none';
-  document.getElementById('dreamTxt').style.display=(t==='post')?'block':'none';
   renderQuickBar();renderFilterStrip();renderFilterRow();
   if(isReels) setupVideo();
 }
@@ -251,14 +245,14 @@ function seekVideo(v){let vid=document.getElementById('editVid');if(kind!=='vide
 function showCutMark(t){let m=document.getElementById('cutMark');m.style.display='block';m.innerText='Cut at '+fmt(t);setTimeout(()=>{m.style.display='none';},800);}
 function renderFilm(){let f=document.getElementById('filmStrip');if(!f||!url) return;let count=Math.max(clips.length,1);let h='';for(let i=0;i<6;i++){let c=clips[i%count]||{url:url,kind:kind};h+='<div class="stripImg '+(selClip===i?'sel':'')+'" onclick="selectClip('+i+',event)">'+(c.kind==='video'?'<video src="'+c.url+'" muted playsinline></video>':'<img src="'+c.url+'">')+'</div>';}f.innerHTML=h;}
 function selectClip(i,e){if(e) e.stopPropagation();selClip=i;document.getElementById('clipActionBar').classList.add('show');renderFilm();let c=clips[i];if(c){url=c.url;kind=c.kind;file=c.file;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);if(kind==='video') setupVideo();}}
-function deleteSelectedClip(){if(clips.length>1){clips.splice(selClip,1);selClip=-1;document.getElementById('clipActionBar').classList.remove('show');renderFilm();updateTrimUI();alert('Clip Deleted da! Instagram mariye!');}else{removeText();alert('Text / Sticker Deleted da!');}}
+function deleteSelectedClip(){if(clips.length>1){clips.splice(selClip,1);selClip=-1;document.getElementById('clipActionBar').classList.remove('show');renderFilm();updateTrimUI();alert('Clip Deleted da!');}else{removeText();alert('Text / Sticker Deleted da!');}}
 function cropSelectedClip(){openSheet('sheetAdjust');}
 function splitSelectedClip(){cutAtCurrent();}
 function replaceSelectedClip(){document.getElementById('fileReplace').click();}
 function updateTrimUI(){document.getElementById('trimInfo').innerText='Trim: '+fmt(trimStart)+' - '+fmt(trimEnd);document.getElementById('clipInfo').innerText=clips.length+' Clip • '+fmt(trimEnd-trimStart);let pctS=totalDur?trimStart/totalDur*100:0; let pctE=totalDur?trimEnd/totalDur*100:100;document.getElementById('handleL').style.left='calc('+pctS+'% - 6px)';document.getElementById('handleR').style.right='calc('+(100-pctE)+'% - 6px)';document.getElementById('trimStartTxt').innerText=fmt(trimStart);document.getElementById('trimEndTxt').innerText=fmt(trimEnd);let ts=document.getElementById('trimStart');let te=document.getElementById('trimEnd');if(ts) ts.value=Math.round(pctS); if(te) te.value=Math.round(pctE);}
 function doTrim(){let s=document.getElementById('trimStart');let e=document.getElementById('trimEnd');let ns=totalDur*s.value/100; let ne=totalDur*e.value/100;if(ne<=ns) ne=ns+0.5; if(ne>totalDur) ne=totalDur;trimStart=ns; trimEnd=ne; updateTrimUI();let vid=document.getElementById('editVid'); if(kind==='video') vid.currentTime=trimStart;}
 function resetTrim(){trimStart=0;trimEnd=totalDur;updateTrimUI();closeSheet();}
-function cutAtCurrent(){let vid=document.getElementById('editVid');let cutTime=kind==='video'?vid.currentTime:(trimStart+trimEnd)/2;if(cutTime<=trimStart+0.3||cutTime>=trimEnd-0.3){alert('Konjam naduvula Play panni Cut pannu da');return;}let left={url:url,kind:kind,full:totalDur,start:trimStart,end:cutTime,file:file};let right={url:url,kind:kind,full:totalDur,start:cutTime,end:trimEnd,file:file};clips=[left,right];selClip=1;trimStart=left.start;trimEnd=left.end;showCutMark(cutTime);updateTrimUI();renderFilm();document.getElementById('clipActionBar').classList.add('show');document.getElementById('clipInfo').innerText='2 Clips • Cut at '+fmt(cutTime);if(kind==='video'){vid.currentTime=cutTime; setPlaying(false);}alert('Cut aayiduchu da! 2 Clips - Instagram mariye!');}
+function cutAtCurrent(){let vid=document.getElementById('editVid');let cutTime=kind==='video'?vid.currentTime:(trimStart+trimEnd)/2;if(cutTime<=trimStart+0.3||cutTime>=trimEnd-0.3){alert('Konjam naduvula Play panni Cut pannu da');return;}let left={url:url,kind:kind,full:totalDur,start:trimStart,end:cutTime,file:file};let right={url:url,kind:kind,full:totalDur,start:cutTime,end:trimEnd,file:file};clips=[left,right];selClip=1;trimStart=left.start;trimEnd=left.end;showCutMark(cutTime);updateTrimUI();renderFilm();document.getElementById('clipActionBar').classList.add('show');document.getElementById('clipInfo').innerText='2 Clips • Cut at '+fmt(cutTime);if(kind==='video'){vid.currentTime=cutTime; setPlaying(false);}alert('Cut aayiduchu da! 2 Clips!');}
 function splitClip(){cutAtCurrent();}
 function duplicateClip(){if(!url) return;clips.push({url:url,kind:kind,full:totalDur,start:trimStart,end:trimEnd,file:file});renderFilm();}
 function deleteClip(){deleteSelectedClip();}
@@ -276,7 +270,6 @@ function confirmText(){let v=document.getElementById('textInput').value.trim();i
 function setFont(f){fontF=f;document.getElementById('ovText').style.fontFamily=f;}
 function setTextEffect(e){textEffect=e;applyTextEffect();}
 function applyTextEffect(){let o=document.getElementById('ovText');if(textEffect==='shadow') o.style.textShadow='4px 4px 0 #000';else if(textEffect==='neon') o.style.textShadow='0 0 10px #fff,0 0 20px #ff2d95';else if(textEffect==='halo') o.style.textShadow='0 0 12px #fff';else o.style.textShadow='0 2px 8px #000';}
-/* ✅ STICKER - AVANGA ENTHA IMAGE VENNALUM - EMOJI + IMAGE */
 function pickSticker(s){let el=document.getElementById('ovStick');el.innerHTML='';el.innerText=s;el.style.left='50%';el.style.top='60%';stickerImgUrl='';closeSheet();}
 function pickMySticker(src){let el=document.getElementById('ovStick');el.innerText='';el.innerHTML='<img src="'+src+'">';el.style.left='50%';el.style.top='60%';stickerImgUrl=src;closeSheet();}
 function renderMyStickers(){let box=document.getElementById('myStickerList');if(!myStickers.length){box.innerHTML='';return;}box.innerHTML='<p style="font-size:12px;color:#aaa;padding:4px 0">Ne Add Panna Stickers:</p><div class="myStickerRow">'+myStickers.map((s,i)=>'<div class="mySt" onclick="pickMySticker(\''+s+'\')"><img src="'+s+'"></div>').join('')+'</div>';}
@@ -296,7 +289,6 @@ document.getElementById('fileMulti').addEventListener('change',function(e){Array
 document.getElementById('fileAdd').addEventListener('change',function(e){Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';alert('Reel Added da!');});
 document.getElementById('fileImage').addEventListener('change',function(e){let f=e.target.files[0];if(!f) return;let r=new FileReader();r.onload=ev=>{document.getElementById('ovStick').innerHTML='<img src="'+ev.target.result+'" style="width:80px;height:80px;object-fit:cover;border-radius:12px;border:2px solid #fff">';stickerImgUrl=ev.target.result;closeSheet();};r.readAsDataURL(f);e.target.value='';});
 document.getElementById('fileReplace').addEventListener('change',function(e){let f=e.target.files[0];if(!f) return;let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let nc={url:ev.target.result,kind:k,full:15,start:0,end:15,file:f};if(selClip>=0 && clips[selClip]) clips[selClip]=nc; else clips.push(nc);url=nc.url;kind=k;file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderFilm();if(type==='reels') setupVideo();alert('Replaced da!');};r.readAsDataURL(f);e.target.value='';});
-/* ✅ STICKER IMAGE - GALLERY LA IRUNTHU ENTHA IMAGE VENNALUM */
 document.getElementById('fileSticker').addEventListener('change',function(e){let f=e.target.files[0];if(!f) return;let r=new FileReader();r.onload=ev=>{myStickers.push(ev.target.result);pickMySticker(ev.target.result);renderMyStickers();};r.readAsDataURL(f);e.target.value='';});
 (function(){let dragging=null;function bind(el,which){el.addEventListener('pointerdown',e=>{dragging=which;el.setPointerCapture(e.pointerId);});el.addEventListener('pointermove',e=>{if(!dragging) return;let wrap=document.getElementById('filmStrip').getBoundingClientRect();let pct=Math.max(0,Math.min(1,(e.clientX-wrap.left)/wrap.width));let t=pct*totalDur;if(dragging==='L'){trimStart=Math.min(t,trimEnd-0.5);}else{trimEnd=Math.max(t,trimStart+0.5);}updateTrimUI();let vid=document.getElementById('editVid');if(kind==='video')vid.currentTime=trimStart;});el.addEventListener('pointerup',()=>{dragging=null;});}bind(document.getElementById('handleL'),'L');bind(document.getElementById('handleR'),'R');})();
 (function(){
@@ -330,14 +322,13 @@ document.getElementById('fileSticker').addEventListener('change',function(e){let
       if(hot){
         if(isSticker){el.innerText='';el.innerHTML='';stickerImgUrl='';}
         else{el.innerText='';text='';document.getElementById('textInput').value='';}
-        alert('Deleted da! Instagram mariye Drag to delete!');
+        alert('Deleted da!');
       }
     });
   }
   makeDraggable('ovText',false);makeDraggable('ovStick',true);
 })();
 function getSupa(){return window.supa;}
-/* ✅ SERVER MATTUM SAVE - NO LOCAL STORAGE */
 async function saveToServer(isDraft){
   let supa=getSupa();if(!supa) return false;
   let {data:{session}}=await supa.auth.getSession();if(!session){location.href='./login.html';return false;}
@@ -352,7 +343,7 @@ async function saveToServer(isDraft){
   let {error}=await supa.from('posts').insert({user_id:session.user.id,username:ME_RAW,media_url:ud.publicUrl,image_url:kind==='image'?ud.publicUrl:null,video_url:kind==='video'?ud.publicUrl:null,media_type:type,caption:cap});if(error) throw new Error(error.message);
   return true;
 }
-async function sharePost(){if(uploading) return; uploading=true;if(!file||!url){alert('Photo Add Pannu da');uploading=false;return;}let btn=document.getElementById('shareBtnPost');btn.innerText='Uploading... Server la Save aaguthu...';btn.disabled=true;try{await saveToServer(false);document.getElementById('successBox').classList.add('show');document.getElementById('status').innerText='Server la Save aayiduchu da! Local la illa da!';btn.innerText='Uploaded';setTimeout(()=>{location.href='./index.html';},1200);}catch(e){document.getElementById('status').innerText='Error: '+e.message;btn.innerText='Upload Post';btn.disabled=false;uploading=false;}}
+async function sharePost(){if(uploading) return; uploading=true;if(!file||!url){alert('Photo Add Pannu da');uploading=false;return;}let btn=document.getElementById('shareBtnPost');btn.innerText='Uploading... Server la Save aaguthu...';btn.disabled=true;try{await saveToServer(false);document.getElementById('successBox').classList.add('show');document.getElementById('status').innerText='Server la Save aayiduchu da!';btn.innerText='Uploaded';setTimeout(()=>{location.href='./index.html';},1200);}catch(e){document.getElementById('status').innerText='Error: '+e.message;btn.innerText='Upload Post';btn.disabled=false;uploading=false;}}
 (async()=>{let supa=getSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session)location.href='./login.html';})();
 showPage('pageHome');renderMedia();renderQuickBar();renderFilterStrip();renderFilterRow();
 </script>
