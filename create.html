@@ -38,9 +38,9 @@ button,input,textarea{font-family:inherit}
 .bottomNav div.on{color:#fff}
 .bottomNav div .plus{width:38px;height:38px;border-radius:12px;background:#fff;color:#000;display:grid;place-items:center;margin:0 auto 2px;font-size:22px;font-weight:800}
 .editWrap{background:#000;min-height:100vh;display:flex;flex-direction:column}
-.editPreview{flex:1;position:relative;background:#000;display:flex;align-items:center;justify-content:center;min-height:420px;overflow:hidden;touch-action:none}
-.editPreview img,.editPreview video{width:100%;height:auto;max-height:100%;object-fit:contain;display:block}
-.editPreview .ovText{position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);font-size:26px;font-weight:900;text-shadow:0 2px 8px #000;text-align:center;white-space:nowrap;z-index:5;cursor:grab;touch-action:none}
+.editPreview{flex:1;position:relative;background:#000;display:flex;align-items:center;justify-content:center;min-height:520px;overflow:hidden;touch-action:none}
+.editPreview img,.editPreview video{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
+.editPreview .ovText{position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);font-size:32px;font-weight:900;text-shadow:0 2px 8px #000;text-align:center;white-space:nowrap;z-index:5;cursor:grab;touch-action:none}
 .editPreview .ovStick{position:absolute;top:60%;left:50%;transform:translate(-50%,-50%);z-index:5;font-size:64px;cursor:grab;touch-action:none;line-height:1}
 .editPreview .ovStick img{width:90px;height:90px;object-fit:cover;border-radius:14px;border:2px solid #fff;display:block;pointer-events:none}
 .editPreview .centerPlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;z-index:6}
@@ -73,6 +73,21 @@ button,input,textarea{font-family:inherit}
 .clipActionBar.show{display:flex}
 .clipActionBar button{flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:11px 4px;border-radius:12px;font-size:12px;display:flex;flex-direction:column;gap:4px;align-items:center}
 .clipActionBar button.del{color:#ff5a5a;border-color:#442222}
+.textFull{position:fixed;inset:0;background:#000;z-index:200;display:none;flex-direction:column}
+.textFull.show{display:flex}
+.textFull .tfTop{height:56px;display:flex;justify-content:space-between;align-items:center;padding:0 14px}
+.textFull .tfTop .x{font-size:26px;cursor:pointer}
+.textFull .tfTop .done{font-weight:700;cursor:pointer;color:#0095f6}
+.textFull .tfPreview{flex:1;position:relative;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center}
+.textFull .tfPreview img,.textFull .tfPreview video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.textFull .tfInput{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);background:transparent;border:0;outline:none;color:#fff;font-size:36px;font-weight:900;text-align:center;width:90%;z-index:5;text-shadow:0 2px 10px #000}
+.textFull .tfInput::placeholder{color:rgba(255,255,255,.8)}
+.textFull .tfTools{background:#111;padding:10px}
+.textFull .tfRow{display:flex;gap:8px;overflow-x:auto;padding:6px 0}
+.textFull .tfRow button{background:#222;color:#fff;border:0;padding:9px 14px;border-radius:999px;font-size:12px;white-space:nowrap}
+.textFull .tfRow button.sel{background:#fff;color:#000}
+.textFull .tfColors{display:flex;gap:8px;overflow-x:auto;padding:6px 0}
+.textFull .tfColors div{width:28px;height:28px;border-radius:50%;flex-shrink:0;border:2px solid #333;cursor:pointer}
 .sheet{margin:0;background:#1a1a1a;border-radius:20px 20px 0 0;padding:14px;display:none}
 .sheet.show{display:block}
 .sheet .sHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
@@ -149,14 +164,13 @@ button,input,textarea{font-family:inherit}
 </div>
 <div class="instaTools" id="instaTools">
 <div onclick="openSheet('sheetMusic')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span>Audio</span></div>
-<div onclick="openSheet('sheetText')"><div class="c"><span style="font-size:20px;font-weight:800">Aa</span></div><span>Text</span></div>
+<div onclick="openTextFull()"><div class="c"><span style="font-size:20px;font-weight:800">Aa</span></div><span>Text</span></div>
 <div onclick="openSheet('sheetVoice')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg></div><span>Voice</span></div>
-<div onclick="openSheet('sheetText')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6"/></svg></div><span>Captions</span></div>
+<div onclick="openTextFull()"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6"/></svg></div><span>Captions</span></div>
 <div onclick="openSheet('sheetSticker')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></div><span>Stickers</span></div>
 </div>
 <div class="filterStrip" id="filterStrip"></div>
 <div class="instaBottom"><button class="editBtn" onclick="openSheet('sheetTrim')">Edit video</button><button class="nextBtn2" onclick="goUpload()">Next →</button></div>
-<div class="sheet" id="sheetText"><div class="sHead"><b>Text</b><span class="done" onclick="closeSheet()">Done</span></div><input class="inlineInput" id="textInput" placeholder="Text ezhuthu..."><div class="row"><button onclick="confirmText()">Add</button><button onclick="setFont('system-ui')">Modern</button><button onclick="setFont('serif')">Classic</button><button onclick="setFont('cursive')">Signature</button></div><div class="row"><button onclick="setTextEffect('none')">None</button><button onclick="setTextEffect('shadow')">Hard Shadow</button><button onclick="setTextEffect('neon')">Neon</button><button onclick="setTextEffect('halo')">Halo</button></div><button class="red" style="width:100%;margin-top:8px" onclick="removeText()">Remove Text - Delete</button></div>
 <div class="sheet" id="sheetSticker"><div class="sHead"><b>Stickers - Entha Image Vennalum Podalam</b><span class="done" onclick="closeSheet()">Done</span></div>
 <button style="width:100%;background:#fff;color:#000;font-weight:800;padding:12px" onclick="document.getElementById('fileSticker').click()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 18l3-3 2 2 3-4 2 3"/></svg> Gallery la irunthu Entha Image Vennalum Sticker ah Podu</button>
 <p style="font-size:11px;color:#aaa;padding:8px 2px">Ne select panna image - Photo mela Sticker ah ottikum - Drag panni move pannalam - Keela izhutha Delete aayidum</p>
@@ -170,6 +184,16 @@ button,input,textarea{font-family:inherit}
 <div class="sheet" id="sheetTrim"><div class="sHead"><b>Edit Video - Cut / Trim</b><span class="done" onclick="closeSheet()">Done</span></div><div class="sliderRow"><span>Start</span><span id="trimStartTxt">0:00</span></div><input type="range" id="trimStart" min="0" max="100" value="0" oninput="doTrim()"><div class="sliderRow"><span>End</span><span id="trimEndTxt">0:15</span></div><input type="range" id="trimEnd" min="0" max="100" value="100" oninput="doTrim()"><div class="row" style="margin-top:10px"><button onclick="cutAtCurrent()">✂️ Cut at Playhead</button><button onclick="splitClip()">Split</button><button onclick="duplicateClip()">Duplicate</button><button class="red" onclick="deleteClip()">Delete Clip</button></div><div class="row" style="margin-top:8px"><button onclick="document.getElementById('fileAdd').click()">+ Add Reel</button><button onclick="resetTrim()">Reset Trim</button></div></div>
 <div class="sheet" id="sheetFilter"><div class="sHead"><b>Filters</b><span class="done" onclick="closeSheet()">Done</span></div><div class="row" id="filterRow"></div><button class="red" style="width:100%;margin-top:8px" onclick="setFilter('none')">None - Normal Photo</button></div>
 <div class="sheet" id="sheetEffect"><div class="sHead"><b>Effects</b><span class="done" onclick="closeSheet()">Done</span></div><div class="row"><button onclick="applyEffect('none')">None</button><button onclick="applyEffect('shake')">Shake</button><button onclick="applyEffect('zoom')">Zoom</button><button onclick="applyEffect('flash')">Flash</button></div></div>
+</div>
+</div>
+<div class="textFull" id="textFull">
+<div class="tfTop"><span class="x" onclick="closeTextFull()">✕</span><span></span><span class="done" onclick="confirmTextFull()">Done</span></div>
+<div class="tfPreview"><img id="tfImg"><video id="tfVid" style="display:none" muted loop playsinline></video><input class="tfInput" id="tfInput" placeholder="Hi" autocomplete="off"></div>
+<div class="tfTools">
+<div class="tfRow" id="tfFontRow"><button class="sel" onclick="setTFFont('system-ui',this)">Modern</button><button onclick="setTFFont('serif',this)">Classic</button><button onclick="setTFFont('cursive',this)">Signature</button><button onclick="setTFFont('monospace',this)">Editor</button><button onclick="setTFFont('fantasy',this)">Poster</button></div>
+<div class="tfRow"><button class="sel" onclick="setTFEffect('none',this)">None</button><button onclick="setTFEffect('shadow',this)">Hard Shadow</button><button onclick="setTFEffect('neon',this)">Neon</button><button onclick="setTFEffect('halo',this)">Halo</button></div>
+<div class="tfColors"><div style="background:#fff" onclick="setTFColor('#fff')"></div><div style="background:#000;border-color:#fff" onclick="setTFColor('#000')"></div><div style="background:#ff2d55" onclick="setTFColor('#ff2d55')"></div><div style="background:#ffcc00" onclick="setTFColor('#ffcc00')"></div><div style="background:#00c853" onclick="setTFColor('#00c853')"></div><div style="background:#0095f6" onclick="setTFColor('#0095f6')"></div><div style="background:#ff6b00" onclick="setTFColor('#ff6b00')"></div><div style="background:#a259ff" onclick="setTFColor('#a259ff')"></div></div>
+<div style="text-align:center;padding:6px"><button style="background:transparent;color:#ff5a5a;border:0;font-size:13px" onclick="removeTextFull()">🗑️ Delete Text</button></div>
 </div>
 </div>
 <div class="page" id="pageUpload">
@@ -198,7 +222,7 @@ button,input,textarea{font-family:inherit}
 <script src="js/supabase.js?v=1057"></script>
 <script>
 let type='post',file=null,url='',kind='image',filter='none',text='',song='Trending Audio',fontF='system-ui',adj={brightness:100,contrast:100,saturate:100},effect='none',loc='Chennai, India',aud='Everyone',tag='@friend_name';
-let clips=[],selClip=-1,galleryPhotos=[],playing=false,trimStart=0,trimEnd=15,totalDur=15,uploading=false,captionVal='',textEffect='none',myStickers=[],stickerImgUrl='';
+let clips=[],selClip=-1,galleryPhotos=[],playing=false,trimStart=0,trimEnd=15,totalDur=15,uploading=false,captionVal='',textEffect='none',myStickers=[],stickerImgUrl='',tfColor='#fff';
 function fmt(s){s=Math.max(0,s);let m=Math.floor(s/60),ss=Math.floor(s%60);return m+':'+(ss<10?'0':'')+ss;}
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('show'));}
 function goCreate(t){type=t;setType(t);showPage('pageSelect');renderMedia();}
@@ -233,7 +257,7 @@ function promptTag(){let t=prompt('Tag People',tag||'@friend_name');if(t!==null)
 function clearTag(){tag='';syncFields();}
 function toggleAud(){aud=aud==='Everyone'?'Private':'Everyone';syncFields();}
 function removeUploadPhoto(){if(!confirm('Photo Remove pannava da?')) return;url='';file=null;clips=[];showPage('pageSelect');renderMedia();}
-function renderQuickBar(){let q=document.getElementById('quickBar');if(!q) return;if(type==='post') q.innerHTML='<button onclick="openSheet(\'sheetImage\')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 18l3-3 2 2 3-4 2 3"/></svg> + Add Photo</button><button onclick="openSheet(\'sheetText\')">Aa Text</button><button onclick="openSheet(\'sheetSticker\')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg> Sticker</button><button onclick="openSheet(\'sheetAdjust\')">Adjust</button>';else q.innerHTML='<button onclick="document.getElementById(\'fileAdd\').click()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> + Add Reel</button><button onclick="openSheet(\'sheetMusic\')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Add Song</button><button onclick="openSheet(\'sheetText\')">Aa Text</button><button onclick="openSheet(\'sheetSticker\')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg> Sticker</button>';}
+function renderQuickBar(){let q=document.getElementById('quickBar');if(!q) return;if(type==='post') q.innerHTML='<button onclick="openSheet(\'sheetImage\')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 18l3-3 2 2 3-4 2 3"/></svg> + Add Photo</button><button onclick="openTextFull()">Aa Text</button><button onclick="openSheet(\'sheetSticker\')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg> Sticker</button><button onclick="openSheet(\'sheetAdjust\')">Adjust</button>';else q.innerHTML='<button onclick="document.getElementById(\'fileAdd\').click()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> + Add Reel</button><button onclick="openSheet(\'sheetMusic\')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Add Song</button><button onclick="openTextFull()">Aa Text</button><button onclick="openSheet(\'sheetSticker\')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg> Sticker</button>';}
 function askDraft(){document.getElementById('draftPopup').classList.add('show');}
 function closeDraft(){document.getElementById('draftPopup').classList.remove('show');}
 function startOver(){document.getElementById('draftPopup').classList.remove('show');resetEdit();showPage('pageSelect');}
@@ -266,14 +290,21 @@ function applyFilter(){let f=buildFilter();document.getElementById('editImg').st
 function setFilter(f){filter=f;if(f==='none'){adj={brightness:100,contrast:100,saturate:100};effect='none';document.getElementById('vBright').innerText='100%';document.getElementById('vContrast').innerText='100%';document.getElementById('vSat').innerText='100%';}applyFilter();closeSheet();}
 function doAdjust(k,v){adj[k]=+v;document.getElementById('vBright').innerText=adj.brightness+'%';document.getElementById('vContrast').innerText=adj.contrast+'%';document.getElementById('vSat').innerText=adj.saturate+'%';applyFilter();}
 function setCrop(r){let ep=document.getElementById('editPreview');if(r==='1:1')ep.style.aspectRatio='1/1';else if(r==='4:5')ep.style.aspectRatio='4/5';else if(r==='9:16')ep.style.aspectRatio='9/16';closeSheet();}
-function confirmText(){let v=document.getElementById('textInput').value.trim();if(v){text=v;let o=document.getElementById('ovText');o.innerText=v;o.style.fontFamily=fontF;applyTextEffect();}closeSheet();}
+function openTextFull(){document.getElementById('textFull').classList.add('show');showMedia(document.getElementById('tfImg'),document.getElementById('tfVid'),url,kind);let inp=document.getElementById('tfInput');inp.value=text;inp.style.fontFamily=fontF;inp.style.color=tfColor;applyTFEffect();setTimeout(()=>inp.focus(),100);}
+function closeTextFull(){document.getElementById('textFull').classList.remove('show');}
+function confirmTextFull(){let v=document.getElementById('tfInput').value.trim();if(v){text=v;let o=document.getElementById('ovText');o.innerText=v;o.style.fontFamily=fontF;o.style.color=tfColor;applyTextEffect();}closeTextFull();}
+function removeTextFull(){text='';document.getElementById('tfInput').value='';document.getElementById('ovText').innerText='';closeTextFull();}
+function setTFFont(f,btn){fontF=f;document.getElementById('tfInput').style.fontFamily=f;document.querySelectorAll('#tfFontRow button').forEach(b=>b.classList.remove('sel'));if(btn)btn.classList.add('sel');}
+function setTFEffect(e,btn){textEffect=e;applyTFEffect();}
+function applyTFEffect(){let inp=document.getElementById('tfInput');if(textEffect==='shadow') inp.style.textShadow='4px 4px 0 #000';else if(textEffect==='neon') inp.style.textShadow='0 0 10px #fff,0 0 20px #ff2d95';else if(textEffect==='halo') inp.style.textShadow='0 0 12px #fff';else inp.style.textShadow='0 2px 10px #000';}
+function setTFColor(c){tfColor=c;document.getElementById('tfInput').style.color=c;}
 function setFont(f){fontF=f;document.getElementById('ovText').style.fontFamily=f;}
 function setTextEffect(e){textEffect=e;applyTextEffect();}
-function applyTextEffect(){let o=document.getElementById('ovText');if(textEffect==='shadow') o.style.textShadow='4px 4px 0 #000';else if(textEffect==='neon') o.style.textShadow='0 0 10px #fff,0 0 20px #ff2d95';else if(textEffect==='halo') o.style.textShadow='0 0 12px #fff';else o.style.textShadow='0 2px 8px #000';}
+function applyTextEffect(){let o=document.getElementById('ovText');if(textEffect==='shadow') o.style.textShadow='4px 4px 0 #000';else if(textEffect==='neon') o.style.textShadow='0 0 10px #fff,0 0 20px #ff2d95';else if(textEffect==='halo') o.style.textShadow='0 0 12px #fff';else o.style.textShadow='0 2px 8px #000';o.style.color=tfColor;}
 function pickSticker(s){let el=document.getElementById('ovStick');el.innerHTML='';el.innerText=s;el.style.left='50%';el.style.top='60%';stickerImgUrl='';closeSheet();}
 function pickMySticker(src){let el=document.getElementById('ovStick');el.innerText='';el.innerHTML='<img src="'+src+'">';el.style.left='50%';el.style.top='60%';stickerImgUrl=src;closeSheet();}
 function renderMyStickers(){let box=document.getElementById('myStickerList');if(!myStickers.length){box.innerHTML='';return;}box.innerHTML='<p style="font-size:12px;color:#aaa;padding:4px 0">Ne Add Panna Stickers:</p><div class="myStickerRow">'+myStickers.map((s,i)=>'<div class="mySt" onclick="pickMySticker(\''+s+'\')"><img src="'+s+'"></div>').join('')+'</div>';}
-function removeText(){text='';stickerImgUrl='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerText='';document.getElementById('ovStick').innerHTML='';document.getElementById('textInput').value='';closeSheet();}
+function removeText(){text='';stickerImgUrl='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerText='';document.getElementById('ovStick').innerHTML='';closeSheet();}
 function pickSong(s){song=s;document.getElementById('songTxt').innerText='Song: '+s;syncFields();closeSheet();}
 function searchSong(q){let list=document.getElementById('songList');if(!q){list.innerHTML='<div class="row"><button onclick="pickSong(\'Leo - Naa Ready\')">Leo</button><button onclick="pickSong(\'Jailer - Hukum\')">Jailer</button><button onclick="pickSong(\'Vikram\')">Vikram</button><button onclick="pickSong(\'Trending Audio\')">Trending</button></div>';return;}list.innerHTML='<div class="row"><button onclick="pickSong(\''+q+'\')">🎵 '+q+'</button></div>';}
 function setVolume(v){let vv=document.getElementById('editVid');if(vv)vv.volume=v;}
@@ -321,7 +352,7 @@ document.getElementById('fileSticker').addEventListener('change',function(e){let
       document.getElementById('dragDelete').classList.remove('hot');
       if(hot){
         if(isSticker){el.innerText='';el.innerHTML='';stickerImgUrl='';}
-        else{el.innerText='';text='';document.getElementById('textInput').value='';}
+        else{el.innerText='';text='';}
         alert('Deleted da!');
       }
     });
@@ -335,7 +366,7 @@ async function saveToServer(isDraft){
   let ME_RAW=session.user.email.split('@')[0];
   let blob;
   if(kind==='video'){blob=file;}
-  else{blob=await new Promise(res=>{let img=new Image();img.onload=()=>{let W=1080,H=type==='reels'?1920:1350;let cc=document.createElement('canvas');cc.width=W;cc.height=H;let ctx=cc.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.filter=buildFilter();let sc=type==='reels'?Math.max(W/img.width,H/img.height):Math.min(W/img.width,H/img.height);let dw=img.width*sc,dh=img.height*sc;ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);if(text){ctx.filter='none';ctx.font='900 60px '+fontF;ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText(text,W/2,H*0.35);}cc.toBlob(b=>res(b||file),'image/jpeg',0.92);};img.src=url;});}
+  else{blob=await new Promise(res=>{let img=new Image();img.onload=()=>{let W=1080,H=type==='reels'?1920:1350;let cc=document.createElement('canvas');cc.width=W;cc.height=H;let ctx=cc.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.filter=buildFilter();let sc=type==='reels'?Math.max(W/img.width,H/img.height):Math.min(W/img.width,H/img.height);let dw=img.width*sc,dh=img.height*sc;ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);if(text){ctx.filter='none';ctx.font='900 60px '+fontF;ctx.textAlign='center';ctx.fillStyle=tfColor;ctx.fillText(text,W/2,H*0.35);}cc.toBlob(b=>res(b||file),'image/jpeg',0.92);};img.src=url;});}
   let folder=type==='story'?'stories':type==='reels'?'reels':'posts';let ext=kind==='video'?'mp4':'jpg';let fn=folder+'/'+session.user.id+'/'+Date.now()+(isDraft?'-draft':'')+'.'+ext;
   let {error:upErr}=await supa.storage.from(folder).upload(fn,blob,{contentType:kind==='video'?'video/mp4':'image/jpeg'});if(upErr) throw new Error(upErr.message);
   let {data:ud}=supa.storage.from(folder).getPublicUrl(fn);
