@@ -1,9 +1,42 @@
 let type='post',file=null,url='',kind='image',filter='none',text='',song='Trending Audio',fontF='system-ui',adj={brightness:100,contrast:100,saturate:100},loc='Chennai, India',aud='Everyone',tag='@friend_name';
-let clips=[],galleryPhotos=[],trimStart=0,trimEnd=15,totalDur=15,uploading=false,captionVal='',textEffect='none',myStickers=[],stickerImgUrl='',tfColor='#fff',galFilter='all',soundOn=false,zoom=1,panX=0,panY=0,hintTimer=null,toastTimer=null;
+let clips=[],galleryPhotos=[],trimStart=0,trimEnd=15,totalDur=15,uploading=false,captionVal='',textEffect='none',myStickers=[],stickerImgUrl='',tfColor='#fff',galFilter='all',soundOn=false,zoom=1,panX=0,panY=0,hintTimer=null,toastTimer=null,prevFilter='none';
 function toast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
 function fmt(s){s=Math.max(0,s);return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');}
 function updateChrome(id){document.body.classList.toggle('hideChrome',id!=='pageHome');}
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');updateChrome(id);closeFullAll();}
+
+// ✅ BACK FIX - ORU PAGE MATTUM MOODUM - FULL VELIYA VARAATHU
+function goBack(){
+  // 1. Full Page Open ah Irundha - Antha Page Mattum Moodu
+  let openFullPage=document.querySelector('.fullPage.show');
+  if(openFullPage){
+    // Filter Page la - Filter Pudikalana - Pazhaya Filter ku Thirumba Po
+    if(openFullPage.id==='pageFilterFull'){
+      filter=prevFilter; applyFilter();
+    }
+    // Text Page la - Type pannama Back Thotta - Text ah Save Pannaathe Moodu
+    if(openFullPage.id==='pageTextFull'){
+      let inp=document.getElementById('tfInput');
+      if(inp) inp.value=text;
+    }
+    closeFull(); return;
+  }
+  // 2. Draft Popup Open ah Irundha - Popup Mattum Moodu
+  let dp=document.getElementById('draftPopup');
+  if(dp && dp.classList.contains('show')){ closeDraft(); return; }
+  // 3. Create Sheet Open ah Irundha - Sheet Mattum Moodu
+  let cs=document.getElementById('createSheet');
+  if(cs && cs.classList.contains('show')){ closeCreateSheet(); return; }
+  // 4. Ippo Enna Page la Irukkom
+  let cur=document.querySelector('.page.on')?.id;
+  if(cur==='pageUpload'){ showPage('pageEdit'); return; }
+  if(cur==='pageEdit'){ askDraft(); return; }
+  if(cur==='pageHome'){ return; }
+  showPage('pageHome');
+}
+// Phone Back Button ku kooda - Itha thaan Vela Seiyum
+window.addEventListener('popstate',function(e){ e.preventDefault(); goBack(); });
+
 function openCreateSheet(){document.getElementById('createSheet')?.classList.add('show');document.getElementById('sheetBg')?.classList.add('show');}
 function closeCreateSheet(){document.getElementById('createSheet')?.classList.remove('show');document.getElementById('sheetBg')?.classList.remove('show');}
 function pickCreate(t){closeCreateSheet();setMode(t);showPage('pageHome');}
@@ -29,33 +62,69 @@ function promptTag(){let t=prompt('Tag People',tag||'@friend_name');if(t!==null)
 function clearTag(){tag='';syncFields();}
 function toggleAud(){aud=aud==='Everyone'?'Private':'Everyone';syncFields();}
 function removeUploadPhoto(){url='';file=null;clips=[];showPage('pageHome');renderMedia();updatePreview();}
-function renderQuickBar(){let q=document.getElementById('quickBar');if(!q)return;if(type==='post')q.innerHTML='<button onclick="openFull(\'pageTextFull\')">Aa Text</button><button onclick="openFull(\'pageStickerFull\')">Sticker</button><button onclick="openFull(\'pageEditVideoFull\')">Adjust</button>';else q.innerHTML='<button onclick="document.getElementById(\'fileAdd\').click()">+ Add Reel</button><button onclick="openFull(\'pageAudioFull\')">Add Song</button><button onclick="openFull(\'pageTextFull\')">Aa Text</button><button onclick="openFull(\'pageStickerFull\')">Sticker</button>';}
+function renderQuickBar(){let q=document.getElementById('quickBar');if(!q)return;if(type==='post')q.innerHTML='<button onclick="openFull(\'pageTextFull\')"><span style="font-weight:800">Aa</span> Text</button><button onclick="openFull(\'pageStickerFull\')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg> Sticker</button><button onclick="openFull(\'pageEditVideoFull\')">Adjust</button>';else q.innerHTML='<button onclick="document.getElementById(\'fileAdd\').click()">+ Add Reel</button><button onclick="openFull(\'pageAudioFull\')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Add Song</button><button onclick="openFull(\'pageTextFull\')"><span style="font-weight:800">Aa</span> Text</button><button onclick="openFull(\'pageStickerFull\')">Sticker</button>';}
 function askDraft(){document.getElementById('draftPopup').classList.add('show');}
 function closeDraft(){document.getElementById('draftPopup').classList.remove('show');}
 function startOver(){closeDraft();resetEdit();showPage('pageHome');}
 function closeFull(){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));}
 function closeFullAll(){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));}
-function openFull(id){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));let e=document.getElementById(id);if(e){void e.offsetWidth;e.classList.add('show');}if(id==='pageAudioFull'){showMedia(document.getElementById('auImg'),document.getElementById('auVid'),url,kind);renderSongs('');}if(id==='pageTextFull'){showMedia(document.getElementById('tfImg'),document.getElementById('tfVid'),url,kind);let inp=document.getElementById('tfInput');if(inp){inp.value=text;inp.style.fontFamily=fontF;inp.style.color=tfColor;setTimeout(()=>inp.focus(),350);}}if(id==='pageVoiceFull'){showMedia(document.getElementById('voImg'),document.getElementById('voVid'),url,kind);}if(id==='pageEditVideoFull'){showMedia(document.getElementById('evImg'),document.getElementById('evVid'),url,kind);renderFilm();}if(id==='pageFilterFull'){renderFilterFull();}}
-function renderSongs(q){let list=[['Leo - Naa Ready','Sai Abhyankkar'],['Jailer - Hukum','Anirudh'],['Vikram','Anirudh'],['Trending Audio','Pixoro'],['Veezha Veera','Anirudh'],['Sheru Bhai','Sai Abhyankkar']];let f=list.filter(x=>!q||x[0].toLowerCase().includes(q.toLowerCase()));let el=document.getElementById('songListFull');if(el)el.innerHTML=f.map(s=>'<div class="songRow" onclick="pickSong(\''+s[0]+'\')"><div class="th">🎵</div><div><b>'+s[0]+'</b><span>'+s[1]+'</span></div></div>').join('');}
+function openFull(id){
+  // Filter Page Open panna - Pazhaya Filter ah Nyabagam Vachu
+  if(id==='pageFilterFull'){ prevFilter=filter; }
+  document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));
+  let e=document.getElementById(id);if(e){void e.offsetWidth;e.classList.add('show');}
+  if(id==='pageAudioFull'){showMedia(document.getElementById('auImg'),document.getElementById('auVid'),url,kind);renderSongs('');}
+  if(id==='pageTextFull'){showMedia(document.getElementById('tfImg'),document.getElementById('tfVid'),url,kind);let inp=document.getElementById('tfInput');if(inp){inp.value=text;inp.style.fontFamily=fontF;inp.style.color=tfColor;setTimeout(()=>inp.focus(),350);}}
+  if(id==='pageVoiceFull'){showMedia(document.getElementById('voImg'),document.getElementById('voVid'),url,kind);}
+  if(id==='pageEditVideoFull'){showMedia(document.getElementById('evImg'),document.getElementById('evVid'),url,kind);renderFilm();}
+  if(id==='pageFilterFull'){renderFilterFull();}
+}
+
+// ✅ SONG LIST - EMOJI ILLA - OUTLINE SVG MATTUM
+function renderSongs(q){
+  let list=[['Leo - Naa Ready','Sai Abhyankkar'],['Jailer - Hukum','Anirudh'],['Vikram','Anirudh'],['Trending Audio','Pixoro'],['Veezha Veera','Anirudh'],['Sheru Bhai','Sai Abhyankkar']];
+  let f=list.filter(x=>!q||x[0].toLowerCase().includes(q.toLowerCase()));
+  let el=document.getElementById('songListFull');
+  if(el) el.innerHTML=f.map(s=>'<div class="songRow" onclick="pickSong(\''+s[0]+'\')"><div class="th"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><div><b>'+s[0]+'</b><span>'+s[1]+'</span></div></div>').join('');
+}
 function pickSong(s){song=s;let st=document.getElementById('songTxt');if(st)st.innerText='Song: '+s;let sg=document.getElementById('sugTxt');if(sg)sg.innerText=s+' - Suggested Audio';syncFields();closeFull();toast('Song Added');}
 function searchSong(q){renderSongs(q);}
 function confirmTextFull(){let v=document.getElementById('tfInput').value.trim();if(v){text=v;let o=document.getElementById('ovText');o.innerText=v;o.style.fontFamily=fontF;o.style.color=tfColor;applyTextEffect();toast('Text Added');}closeFull();}
 function removeTextFull(){text='';document.getElementById('tfInput').value='';document.getElementById('ovText').innerText='';closeFull();}
 function setTFFont(f,b){fontF=f;document.getElementById('tfInput').style.fontFamily=f;document.querySelectorAll('#tfFontRow button').forEach(x=>x.classList.remove('sel'));if(b)b.classList.add('sel');}
-function setTFEffect(e,b){textEffect=e;let inp=document.getElementById('tfInput');if(e==='shadow')inp.style.textShadow='4px 4px 0 #000';else if(e==='neon')inp.style.textShadow='0 0 10px #fff,0 0 20px #ff2d95';else inp.style.textShadow='0 2px 10px #000';}
+function setTFEffect(e,b){textEffect=e;let inp=document.getElementById('tfInput');if(e==='shadow')inp.style.textShadow='4px 4px 0 #000';else if(e==='neon')inp.style.textShadow='0 0 10px #fff,0 0 20px #ff2d95';else if(e==='halo')inp.style.textShadow='0 0 12px #fff';else inp.style.textShadow='0 2px 10px #000';}
 function setTFColor(c){tfColor=c;document.getElementById('tfInput').style.color=c;}
-function applyTextEffect(){let o=document.getElementById('ovText');if(textEffect==='shadow')o.style.textShadow='4px 4px 0 #000';else if(textEffect==='neon')o.style.textShadow='0 0 10px #fff,0 0 20px #ff2d95';else o.style.textShadow='0 2px 8px #000';o.style.color=tfColor;}
-function pickSticker(k){let m={fire:'🔥',heart:'❤️',laugh:'😂',crown:'👑',love:'😍',star:'⭐',party:'🎉'};let el=document.getElementById('ovStick');el.innerHTML='<div style="font-size:56px">'+(m[k]||'⭐')+'</div>';el.style.left='50%';el.style.top='60%';closeFull();toast('Sticker Added');}
+function applyTextEffect(){let o=document.getElementById('ovText');if(textEffect==='shadow')o.style.textShadow='4px 4px 0 #000';else if(textEffect==='neon')o.style.textShadow='0 0 10px #fff,0 0 20px #ff2d95';else if(textEffect==='halo')o.style.textShadow='0 0 12px #fff';else o.style.textShadow='0 2px 8px #000';o.style.color=tfColor;}
+
+// ✅ STICKER - EMOJI ILLA - ELLAAM OUTLINE SVG
+function pickSticker(k){
+  let map={
+    fire:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ff6b00" stroke-width="1.5"><path d="M12 3c1 3-2 4-2 7a4 4 0 0 0 8 0c0-1-.5-2-1-3-.5 1-1 1.5-2 1.5C15 6 14 4 12 3z"/></svg>',
+    heart:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ff2d55" stroke-width="1.5"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg>',
+    laugh:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg>',
+    crown:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.5"><path d="M3 17h18M3 17l-1-9 6 4 4-6 4 6 6-4-1 9z"/></svg>',
+    love:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ff2d55" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg>',
+    star:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.5"><path d="M12 3l2.5 6 6.5.5-5 4.5 1.5 6.5L12 17l-5.5 3.5L8 14 3 9.5 9.5 9z"/></svg>',
+    party:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#a259ff" stroke-width="1.5"><path d="M4 20L20 4M20 4l-3 1 1 3zM7 17l3-3"/></svg>',
+    hundred:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#00c853" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 8v8M12 8v8M16 8v8"/></svg>'
+  };
+  let el=document.getElementById('ovStick');
+  el.innerHTML='<div class="stSvg">'+(map[k]||map.star)+'</div>';
+  el.style.left='50%'; el.style.top='60%'; stickerImgUrl='';
+  closeFull(); toast('Sticker Added');
+}
 function pickMySticker(s){let el=document.getElementById('ovStick');el.innerHTML='<img src="'+s+'">';el.style.left='50%';el.style.top='60%';stickerImgUrl=s;closeFull();}
 function renderMyStickers(){let box=document.getElementById('myStickerList');if(!box)return;box.innerHTML=myStickers.map(s=>'<div style="width:72px;height:72px;border-radius:14px;overflow:hidden;display:inline-block;margin:4px" onclick="pickMySticker(\''+s+'\')"><img src="'+s+'" style="width:100%;height:100%;object-fit:cover"></div>').join('');}
 function removeText(){text='';stickerImgUrl='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerHTML='';closeFull();}
 function startVoice(b){document.getElementById('voiceTxt').innerText='Voice: Recording...';if(b)b.innerText='Recording...';toast('Recording...');}
 function stopVoice(){document.getElementById('voiceTxt').innerText='Voice: Added';toast('Voice Added');}
-function resetEdit(){filter='none';text='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerHTML='';applyFilter();}
-function renderFilterFull(){let r=document.getElementById('filterRowFull');if(r)r.innerHTML=[['None','none'],['Vivid','brightness(1.15) saturate(1.5)'],['Warm','sepia(.45)'],['B&W','grayscale(1)']].map(a=>'<button style="background:#222;color:#fff;border:0;padding:10px 14px;border-radius:999px" onclick="setFilter(\''+a[1]+'\')">'+a[0]+'</button>').join('');}
+function resetEdit(){filter='none';prevFilter='none';text='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerHTML='';applyFilter();}
+function renderFilterFull(){let r=document.getElementById('filterRowFull');if(r)r.innerHTML=[['None','none'],['Vivid','brightness(1.15) saturate(1.5)'],['Warm','sepia(.45)'],['Retro','sepia(.6)'],['B&W','grayscale(1)']].map(a=>'<button style="background:#222;color:#fff;border:0;padding:10px 14px;border-radius:999px" onclick="previewFilter(\''+a[1]+'\')">'+a[0]+'</button>').join('');}
+// Filter Page la - Click panna Odane Apply Aagum - Back Thotta Pazhaya Filter ku Varum
+function previewFilter(f){filter=f;applyFilter();}
 function buildFilter(){return filter==='none'?'brightness('+adj.brightness+'%) contrast('+adj.contrast+'%) saturate('+adj.saturate+'%)':'brightness('+adj.brightness+'%) contrast('+adj.contrast+'%) saturate('+adj.saturate+'%) '+filter;}
-function applyFilter(){let f=buildFilter();let ei=document.getElementById('editImg');if(ei)ei.style.filter=f;let ev=document.getElementById('editVid');if(ev)ev.style.filter=f;}
-function setFilter(f){filter=f;applyFilter();closeFull();toast('Filter Applied');}
+function applyFilter(){let f=buildFilter();let ei=document.getElementById('editImg');if(ei)ei.style.filter=f;let ev=document.getElementById('editVid');if(ev)ev.style.filter=f;let up=document.getElementById('upImgPost');if(up)up.style.filter=f;}
+function setFilter(f){prevFilter=f;filter=f;applyFilter();closeFull();toast('Filter Applied');}
 function setupVideo(){let v=document.getElementById('editVid');if(kind==='video'){v.onloadedmetadata=()=>{totalDur=v.duration||15;trimStart=0;trimEnd=totalDur;let p=document.getElementById('playTime');if(p)p.innerText='0:00 / '+fmt(totalDur);updateTrimUI();};v.ontimeupdate=()=>{let p=document.getElementById('playTime');if(p)p.innerText=fmt(v.currentTime)+' / '+fmt(v.duration);};}renderFilm();}
 function togglePlay(){if(kind!=='video'){toast('Video select pannu');return;}let v=document.getElementById('editVid');if(v.paused)v.play().catch(()=>{});else v.pause();}
 function seekVideo(v){let vid=document.getElementById('editVid');if(kind!=='video'||!vid.duration)return;vid.currentTime=vid.duration*v/100;}
