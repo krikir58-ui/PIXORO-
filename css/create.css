@@ -4,17 +4,30 @@ body{background:#000;color:#fff;font-family:system-ui;overflow:hidden}
 button,input,textarea{font-family:inherit}
 *::-webkit-scrollbar{display:none}
 *{scrollbar-width:none}
-.ic{width:20px;height:20px;vertical-align:middle}
-.ic-sm{width:16px;height:16px}
-.ic-lg{width:26px;height:26px}
+
+/* ✅ OUTLINE SVG - ELLAAM MELA LINE MARI THAAN */
+.ic{width:20px;height:20px;vertical-align:middle;flex-shrink:0}
+.ic-sm{width:16px;height:16px;flex-shrink:0}
+.ic-lg{width:26px;height:26px;flex-shrink:0}
+.ic svg,.ic-sm svg,.ic-lg svg{display:block}
+svg{stroke-linecap:round;stroke-linejoin:round}
+
+/* ✅ BACK BUTTON - TEXT ✕ ILLA - OUTLINE SVG BUTTON */
+.iconBtn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.1);display:grid;place-items:center;cursor:pointer;flex-shrink:0;border:0;color:#fff}
+.iconBtn:active{background:#222}
+.backBtn{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;cursor:pointer;flex-shrink:0}
+.backBtn svg{width:22px;height:22px}
+.backBtn:active{background:#222}
 
 /* FULL SCREEN - ORU PAGE = ORU SCREEN */
-.page{display:none;height:100dvh;background:#000;overflow:hidden;flex-direction:column}
+.page{display:none;height:100dvh;background:#000;overflow:hidden;flex-direction:column;position:relative;z-index:1}
 .page.on{display:flex}
-.top{height:52px;flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:0 14px;background:#000;z-index:20}
-.top b{font-size:17px}
-.top .back{font-size:26px;cursor:pointer}
-.top .done{font-size:15px;font-weight:700;color:#0095f6;cursor:pointer}
+.top{height:52px;flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:0 8px;background:#000;z-index:20}
+.top b{font-size:17px;flex:1;text-align:center}
+.top .back{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;cursor:pointer;flex-shrink:0;font-size:22px;line-height:1}
+.top .back:active{background:#222}
+.top .back svg{width:22px;height:22px}
+.top .done{font-size:15px;font-weight:700;color:#0095f6;cursor:pointer;min-width:52px;text-align:right;padding-right:6px}
 .galScroll{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 
 /* PREVIEW - SCREEN APADIYE - PHOTO MATTUM ADJUST */
@@ -27,21 +40,22 @@ button,input,textarea{font-family:inherit}
 .pvStage img,.pvStage video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;will-change:transform;transform-origin:center center}
 .pvStage.dragging img,.pvStage.dragging video{transition:none!important}
 .pvEmpty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;background:#111;z-index:2}
-.pvEmpty .eBox{width:64px;height:64px;border-radius:50%;background:#222;display:grid;place-items:center;margin:0 auto 10px;font-size:28px}
+.pvEmpty .eBox{width:64px;height:64px;border-radius:50%;background:#222;display:grid;place-items:center;margin:0 auto 10px}
 .pvEmpty b{display:block;font-size:15px}
 .pvEmpty span{font-size:12px;color:#888}
 .galPreview .pvTop{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between;z-index:5;pointer-events:none}
 .galPreview .pvTop>*{pointer-events:auto}
 .galPreview .pvChip{background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.3);padding:6px 10px;border-radius:999px;font-size:11px;display:flex;gap:6px;align-items:center;white-space:nowrap}
-.galPreview .soundBtn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.3);display:grid;place-items:center;flex-shrink:0}
+.galPreview .soundBtn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.3);display:grid;place-items:center;flex-shrink:0;cursor:pointer}
 .galPreview .cropHint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.65);padding:6px 12px;border-radius:999px;font-size:11px;z-index:5;pointer-events:none;white-space:nowrap;transition:opacity .5s}
 .galPreview .cropHint.hide{opacity:0}
-.galPreview .playBig{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;z-index:6}
+.galPreview .playBig{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;z-index:6;cursor:pointer}
 .sugAudio{position:absolute;left:12px;right:12px;bottom:10px;height:32px;display:flex;align-items:center;gap:8px;padding:0 10px;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.2);border-radius:999px;overflow:hidden;white-space:nowrap;font-size:12px;z-index:5}
 .sugAudio .marq{display:inline-block;animation:marq 8s linear infinite}
 @keyframes marq{from{transform:translateX(20%)}to{transform:translateX(-100%)}}
 
 .galTop{height:42px;display:flex;align-items:center;gap:10px;padding:0 14px;background:#000;flex-shrink:0}
+.galTop button{background:#1a1a1a;color:#fff;border:0;padding:6px 12px;border-radius:999px;font-size:12px}
 .galTabs{display:flex;gap:6px;padding:6px 14px;background:#000;flex-shrink:0}
 .galTabs button{background:#1a1a1a;color:#aaa;border:0;padding:7px 14px;border-radius:999px;font-size:12px}
 .galTabs button.sel{background:#fff;color:#000;font-weight:700}
@@ -69,7 +83,7 @@ body.hideChrome .modeWrap{opacity:0;transform:translateY(20px);pointer-events:no
 body.hideChrome .bottomNav{transform:translateY(110%)}
 body.hideChrome .nextBtn{bottom:20px}
 
-/* ✅ MISSING AH IRUNDHUCHU - CREATE SHEET */
+/* CREATE SHEET */
 .createSheet{position:fixed;left:0;right:0;bottom:0;background:#1a1a1a;border-radius:20px 20px 0 0;padding:8px 14px 22px;z-index:400;transform:translateY(110%);opacity:0;visibility:hidden;transition:transform .45s cubic-bezier(.32,.72,0,1),opacity .3s ease,visibility .45s}
 .createSheet.show{transform:translateY(0);opacity:1;visibility:visible}
 .createSheet .bar{width:40px;height:4px;background:#444;border-radius:999px;margin:6px auto 12px}
@@ -90,6 +104,7 @@ body.hideChrome .nextBtn{bottom:20px}
 .editPreview .ovStick{position:absolute;top:60%;left:50%;transform:translate(-50%,-50%);z-index:5;cursor:grab;touch-action:none;line-height:1}
 .editPreview .ovStick img{width:90px;height:90px;object-fit:cover;border-radius:14px;border:2px solid #fff;display:block;pointer-events:none}
 .editPreview .ovStick .stSvg{width:64px;height:64px;display:grid;place-items:center}
+.editPreview .ovStick .stSvg svg{width:56px;height:56px}
 .editPreview .centerPlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;z-index:6}
 .dragDelete{position:absolute;left:0;right:0;bottom:0;height:100px;background:linear-gradient(to top,rgba(0,0,0,.95),transparent);display:none;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10px;z-index:20;pointer-events:none}
 .dragDelete.show{display:flex}
@@ -106,12 +121,16 @@ body.hideChrome .nextBtn{bottom:20px}
 .instaBottom .editBtn{flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:13px;border-radius:999px;font-weight:700}
 .instaBottom .nextBtn2{flex:1;background:#0095f6;color:#fff;border:0;padding:13px;border-radius:999px;font-weight:800}
 
-/* ✅ MISSING AH IRUNDHUCHU - FULL PAGE - AUDIO / TEXT / STICKER / EDIT VIDEO */
-.fullPage{position:fixed;inset:0;background:#000;z-index:150;display:flex;flex-direction:column;transform:translateY(100%);opacity:0;visibility:hidden;transition:transform .45s cubic-bezier(.32,.72,0,1),opacity .35s ease,visibility .45s;will-change:transform}
-.fullPage.show{transform:translateY(0);opacity:1;visibility:visible}
-.fullPage .fpTop{height:56px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;flex-shrink:0}
-.fullPage .fpTop .x{font-size:26px;cursor:pointer}
-.fullPage .fpTop .done{font-weight:700;cursor:pointer;color:#0095f6}
+/* ✅ FULL PAGE - BACK FIX - FULL PAGE MATTUM MOODUM */
+.fullPage{position:fixed;inset:0;background:#000;z-index:150;display:flex;flex-direction:column;transform:translateY(100%);opacity:0;visibility:hidden;transition:transform .45s cubic-bezier(.32,.72,0,1),opacity .35s ease,visibility .45s;will-change:transform;pointer-events:none}
+.fullPage.show{transform:translateY(0);opacity:1;visibility:visible;pointer-events:auto}
+.fullPage .fpTop{height:56px;display:flex;justify-content:space-between;align-items:center;padding:0 8px;flex-shrink:0}
+/* ✅ MUNNADI font-size:26px Text ✕ - IPPO OUTLINE SVG BUTTON */
+.fullPage .fpTop .x{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;cursor:pointer;flex-shrink:0}
+.fullPage .fpTop .x:active{background:#222}
+.fullPage .fpTop .x svg{width:22px;height:22px}
+.fullPage .fpTop b{flex:1;text-align:center;font-size:16px}
+.fullPage .fpTop .done{font-weight:700;cursor:pointer;color:#0095f6;min-width:52px;text-align:right;padding-right:6px}
 .fullPage .fpMini{height:160px;margin:0 14px;border-radius:14px;overflow:hidden;position:relative;background:#111;flex-shrink:0}
 .fullPage .fpMini img,.fullPage .fpMini video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
 .fullPage .fpBody{flex:1;overflow-y:auto;padding:12px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
@@ -122,6 +141,7 @@ body.hideChrome .nextBtn{bottom:20px}
 .fullPage .songRow{display:flex;gap:10px;align-items:center;padding:10px;border-bottom:1px solid #1a1a1a;cursor:pointer}
 .fullPage .songRow .th{width:48px;height:48px;border-radius:10px;background:#222;display:grid;place-items:center;flex-shrink:0;overflow:hidden}
 .fullPage .songRow .th img{width:100%;height:100%;object-fit:cover}
+.fullPage .songRow .th svg{width:22px;height:22px}
 .fullPage .songRow b{display:block;font-size:14px}
 .fullPage .songRow span{font-size:11px;color:#aaa}
 .fullPage .tfInput{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);background:transparent;border:0;outline:none;color:#fff;font-size:36px;font-weight:900;text-align:center;width:90%;z-index:5;text-shadow:0 2px 10px #000}
@@ -137,8 +157,15 @@ body.hideChrome .nextBtn{bottom:20px}
 .fullPage .filmStrip img,.fullPage .filmStrip video{width:100%;height:100%;object-fit:cover}
 .fullPage .addRow{display:flex;gap:10px;padding:8px 12px}
 .fullPage .addRow button{flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:11px;border-radius:10px;display:flex;gap:6px;align-items:center;justify-content:center}
+
+/* ✅ FILTER ROW - FILTER PAGE KU THANIIYA */
+#filterRowFull{display:flex;gap:10px;overflow-x:auto;padding:6px 0}
+#filterRowFull button{flex-shrink:0;background:#222;color:#fff;border:1px solid #333;padding:10px 14px;border-radius:999px;font-size:12px}
+#filterRowFull button.sel{background:#fff;color:#000}
 .stickGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.stickGrid button{height:64px;background:#222;border:1px solid #333;border-radius:14px;display:grid;place-items:center}
+.stickGrid button{height:64px;background:#222;border:1px solid #333;border-radius:14px;display:grid;place-items:center;cursor:pointer}
+.stickGrid button svg{width:28px;height:28px}
+.stickGrid button:active{background:#333}
 
 .toast{position:fixed;left:50%;bottom:130px;transform:translate(-50%,20px);background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;z-index:500;opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;white-space:nowrap}
 .toast.show{opacity:1;transform:translate(-50%,0)}
@@ -154,6 +181,7 @@ body.hideChrome .nextBtn{bottom:20px}
 .uploadBox.reels{aspect-ratio:9/16;max-height:420px}
 .uploadBox img,.uploadBox video{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
 .uploadBox .closeX{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;font-weight:800;z-index:5;cursor:pointer}
+.uploadBox .closeX svg{width:18px;height:18px}
 .uploadBox .change{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.6);border:1px solid #555;color:#fff;padding:8px 12px;border-radius:999px;font-size:12px;z-index:5;cursor:pointer;display:flex;gap:6px;align-items:center}
 .uField{margin:0 12px 10px;background:#1a1a1a;border:1px solid #222;border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center}
 .uField input,.uField textarea{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:14px;resize:none}
