@@ -25,10 +25,44 @@ window.addEventListener('popstate',function(e){ e.preventDefault(); goBack(); })
 function openCreateSheet(){document.getElementById('createSheet')?.classList.add('show');document.getElementById('sheetBg')?.classList.add('show');}
 function closeCreateSheet(){document.getElementById('createSheet')?.classList.remove('show');document.getElementById('sheetBg')?.classList.remove('show');}
 function pickCreate(t){closeCreateSheet();setMode(t);showPage('pageHome');}
-function setMode(t){type=t;document.querySelectorAll('#modePill button').forEach(b=>b.classList.toggle('on',b.dataset.mode===t));let a=document.querySelector('#modePill button.on'),ind=document.getElementById('modeInd');if(a&&ind){ind.style.width=a.offsetWidth+'px';ind.style.transform='translateX('+(a.offsetLeft-4)+'px)';}document.getElementById('homeTitle').innerText=t==='post'?'New post':t==='reels'?'New reel':t==='story'?'New story':'Live';document.getElementById('galPreview').className='galPreview '+t;document.getElementById('pvChipTxt').innerText=t==='post'?'1:1 - Drag to adjust':t==='reels'?'9:16 - Reels':t==='story'?'9:16 - Story':'LIVE - Camera';document.getElementById('sugAudio').style.display=(t==='reels'&&url)?'flex':'none';setType(t);updatePreview();if(t==='live')toast('Live - Go Live');}
+
+// ✅ FIX - REELS FULL SCREEN - reelsMode CLASS - ITHU ILLANA FULL SCREEN VARAATHU
+function setMode(t){
+  type=t;
+  document.querySelectorAll('#modePill button').forEach(b=>b.classList.toggle('on',b.dataset.mode===t));
+  let a=document.querySelector('#modePill button.on'),ind=document.getElementById('modeInd');
+  if(a&&ind){ind.style.width=a.offsetWidth+'px';ind.style.transform='translateX('+(a.offsetLeft-4)+'px)';}
+  document.getElementById('homeTitle').innerText=t==='post'?'New post':t==='reels'?'New reel':t==='story'?'New story':'Live';
+  document.getElementById('galPreview').className='galPreview '+t;
+  document.getElementById('pvChipTxt').innerText=t==='post'?'1:1 - Drag to adjust':t==='reels'?'9:16 - Reels':t==='story'?'9:16 - Story':'LIVE - Camera';
+  document.getElementById('sugAudio').style.display=(t==='reels'&&url)?'flex':'none';
+  // ✅ REELS / STORY NA - EDIT PAGE FULL SCREEN - POST NA NORMAL
+  document.getElementById('pageEdit')?.classList.toggle('reelsMode', t==='reels'||t==='story');
+  document.getElementById('pageHome')?.classList.toggle('reelsMode', t==='reels');
+  setType(t); updatePreview(); fitVideoFullScreen();
+  if(t==='live')toast('Live - Go Live');
+}
 function setType(t){type=t;let e=document.getElementById('editTitle');if(e)e.innerText=t==='post'?'Edit Photo':t==='reels'?'Edit Reel':'Story Edit';let u=document.getElementById('uploadTitle');if(u)u.innerText=t==='post'?'Upload Post':t==='reels'?'Upload Reel':'Upload Story';renderQuickBar();}
 function clampPan(){let st=document.getElementById('pvStage');if(!st)return;let mx=Math.max(0,(st.clientWidth*(zoom-1))/2),my=Math.max(0,(st.clientHeight*(zoom-1))/2);panX=Math.max(-mx,Math.min(mx,panX));panY=Math.max(-my,Math.min(my,panY));}
-function applyZoom(){clampPan();let el=kind==='video'?document.getElementById('pvVid'):document.getElementById('pvImg');if(el)el.style.transform='translate3d('+panX+'px,'+panY+'px,0) scale('+zoom+')';}
+
+// ✅ FIX - ZOOM - PV + EDIT RENDUM VIDEO KUM APPLY AAGUM - THAVUNTHA SIZE
+function applyZoom(){
+  clampPan();
+  let t='translate3d('+panX+'px,'+panY+'px,0) scale('+zoom+')';
+  let pv = kind==='video'?document.getElementById('pvVid'):document.getElementById('pvImg');
+  if(pv) pv.style.transform=t;
+  let ev = kind==='video'?document.getElementById('editVid'):document.getElementById('editImg');
+  if(ev) ev.style.transform=t;
+}
+// ✅ FIX - REELS VIDEO - EPPOVUM FULL SCREEN - ZOOM RESET
+function fitVideoFullScreen(){
+  zoom=1; panX=0; panY=0;
+  ['pvVid','pvImg','editVid','editImg','evVid','evImg'].forEach(id=>{
+    let el=document.getElementById(id); if(!el) return;
+    el.style.objectFit='cover'; el.style.objectPosition='center center';
+    el.style.transform='translate3d(0px,0px,0) scale(1)';
+  });
+}
 function updateSoundIcon(){
   let pairs=[['soundOnIcon','soundOffIcon'],['soundOnIconEdit','soundOffIconEdit'],['soundOnIcon2','soundOffIcon2']];
   pairs.forEach(p=>{
@@ -52,8 +86,6 @@ function toggleSound(e){
   updateSoundIcon();
   toast(soundOn?'Sound ON':'Sound OFF');
 }
-
-// ✅ FIX 1 - VIDEO NA PLAY + SOUND KAATU - PHOTO NA MARAI
 function syncEditVideoUI(){
   let isVid = kind==='video' && !!url;
   let es=document.getElementById('editSound');
@@ -64,28 +96,19 @@ function syncEditVideoUI(){
   if(ev && isVid){ ev.muted=!soundOn; ev.play().catch(()=>{}); }
   updateSoundIcon();
 }
-// ✅ FIX 2 - VIDEO MELA THOTTA PLAY / PAUSE
 function tapPreviewPlay(e){
   if(kind!=='video') return;
   if(e.target.closest('.editSound') || e.target.closest('#ovText') || e.target.closest('#ovStick')) return;
   togglePlay(e);
 }
-// ✅ FIX 3 - PLAY / PAUSE - ICON UM MAARUM - OUTLINE SVG
 function togglePlay(e){
   if(e) e.stopPropagation();
   if(kind!=='video'){ toast('Video select pannu - Photo ku Play Illa'); return; }
   let v=document.getElementById('editVid');
   let cp=document.getElementById('centerPlay');
   let icon=document.getElementById('centerPlayIcon');
-  if(v.paused){
-    v.muted=!soundOn; v.play().catch(()=>{});
-    if(cp) cp.style.display='none';
-    if(icon) icon.innerHTML='<path d="M8 5l11 7-11 7V5z"/>';
-  } else {
-    v.pause();
-    if(cp) cp.style.display='grid';
-    if(icon) icon.innerHTML='<path d="M7 5v14M17 5v14"/>';
-  }
+  if(v.paused){ v.muted=!soundOn; v.play().catch(()=>{}); if(cp) cp.style.display='none'; if(icon) icon.innerHTML='<path d="M8 5l11 7-11 7V5z"/>'; }
+  else { v.pause(); if(cp) cp.style.display='grid'; if(icon) icon.innerHTML='<path d="M7 5v14M17 5v14"/>'; }
 }
 function updatePreview(){
   let pi=document.getElementById('pvImg'),pv=document.getElementById('pvVid'),pl=document.getElementById('pvPlay');
@@ -106,10 +129,10 @@ function togglePreviewPlay(e){
 }
 function showMedia(a,b,s,k){if(!a||!b)return;if(k==='video'){b.src=s;b.style.display='block';a.style.display='none';}else{a.src=s;a.style.display='block';b.style.display='none';try{b.pause();}catch(e){}}}
 function renderMedia(){let list=galleryPhotos.filter(p=>galFilter==='all'||p.kind===galFilter);let html='<div class="galleryBtn" onclick="document.getElementById(\'fileMulti\').click()"><div><b>Gallery la irunthu Photo / Video Add Pannu</b><div style="font-size:11px;color:#aaa">Real Gallery mattum thaan</div></div></div>';html+=list.map(p=>{let i=galleryPhotos.indexOf(p);return '<div class="tile '+(url===p.url?'sel':'')+'" onclick="selectGallery('+i+')">'+(p.kind==='video'?'<video src="'+p.url+'" muted playsinline></video><span class="dur">0:15</span>':'<img src="'+p.url+'">')+'<span class="tick">'+(url===p.url?'✓':'')+'</span></div>';}).join('');let gh=document.getElementById('mediaGridHome');if(gh)gh.innerHTML=html;}
-function selectGallery(i){let p=galleryPhotos[i];if(!p)return;url=p.url;kind=p.kind;file=p.file;zoom=1;panX=0;panY=0;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI();}
+function selectGallery(i){let p=galleryPhotos[i];if(!p)return;url=p.url;kind=p.kind;file=p.file;fitVideoFullScreen();showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI();}
 function setGalTab(f,b){galFilter=f;document.querySelectorAll('.galTabs button').forEach(x=>x.classList.remove('sel'));if(b)b.classList.add('sel');renderMedia();}
 function goSelectNext(){if(!url){document.getElementById('fileMulti').click();return;}goEdit();}
-function goEdit(){if(!url){toast('Gallery la irunthu Photo Add Pannu');return;}showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);showMedia(document.getElementById('upImgPost'),document.getElementById('upVidPost'),url,kind);showPage('pageEdit');renderFilm();setType(type);syncEditVideoUI();}
+function goEdit(){if(!url){toast('Gallery la irunthu Photo Add Pannu');return;}showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);showMedia(document.getElementById('upImgPost'),document.getElementById('upVidPost'),url,kind);showPage('pageEdit');renderFilm();setType(type);fitVideoFullScreen();syncEditVideoUI();}
 function goUpload(){if(!url){toast('Photo illa');return;}showPage('pageUpload');document.getElementById('captionPost').value=captionVal;syncFields();}
 function syncCap(){captionVal=document.getElementById('captionPost').value;}
 function syncFields(){document.getElementById('locVal').innerText=loc||'Add Location';document.getElementById('tagVal').innerText=tag||'Tag People';document.getElementById('musicVal').innerText=song;document.getElementById('audVal').innerText=aud;}
@@ -190,7 +213,7 @@ document.getElementById('fileMulti')?.addEventListener('change',e=>{Array.from(e
 document.getElementById('fileAdd')?.addEventListener('change',e=>{Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';toast('Reel Added');});
 document.getElementById('fileSticker')?.addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{myStickers.push(ev.target.result);pickMySticker(ev.target.result);renderMyStickers();};r.readAsDataURL(f);e.target.value='';});
 document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{url=ev.target.result;kind=f.type.includes('video')?'video':'image';file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderFilm();syncEditVideoUI();};r.readAsDataURL(f);e.target.value='';});
-(function(){let pv=document.getElementById('galPreview'),st=document.getElementById('pvStage'),sx=0,sy=0,ox=0,oy=0,drag=false,ld=0;if(!pv)return;pv.addEventListener('touchstart',e=>{if(!url)return;st.classList.add('dragging');if(e.touches.length===1){drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;ox=panX;oy=panY;}if(e.touches.length===2){drag=false;ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}},{passive:true});pv.addEventListener('touchmove',e=>{if(!url)return;if(e.touches.length===1&&drag){panX=ox+(e.touches[0].clientX-sx);panY=oy+(e.touches[0].clientY-sy);applyZoom();}if(e.touches.length===2){let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(ld>0){zoom=Math.max(1,Math.min(3,zoom*(d/ld)));applyZoom();}ld=d;}},{passive:true});pv.addEventListener('touchend',()=>{drag=false;ld=0;st.classList.remove('dragging');});pv.addEventListener('dblclick',()=>{if(!url)return;zoom=zoom===1?2:1;panX=0;panY=0;applyZoom();});})();
+(function(){let pv=document.getElementById('galPreview'),st=document.getElementById('pvStage'),sx=0,sy=0,ox=0,oy=0,drag=false,ld=0;if(!pv)return;pv.addEventListener('touchstart',e=>{if(!url)return;st.classList.add('dragging');if(e.touches.length===1){drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;ox=panX;oy=panY;}if(e.touches.length===2){drag=false;ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}},{passive:true});pv.addEventListener('touchmove',e=>{if(!url)return;if(e.touches.length===1&&drag){panX=ox+(e.touches[0].clientX-sx);panY=oy+(e.touches[0].clientY-sy);applyZoom();}if(e.touches.length===2){let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(ld>0){zoom=Math.max(1,Math.min(3,zoom*(d/ld)));applyZoom();}ld=d;}},{passive:true});pv.addEventListener('touchend',()=>{drag=false;ld=0;st.classList.remove('dragging');});pv.addEventListener('dblclick',()=>{if(!url)return;fitVideoFullScreen();});})();
 (function(){let pill=document.getElementById('modePill');if(!pill)return;let sx=0,modes=['post','story','reels','live'];pill.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});pill.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40){let cur=modes.indexOf(type);if(dx<0&&cur<3)setMode(modes[cur+1]);if(dx>0&&cur>0)setMode(modes[cur-1]);}},{passive:true});})();
 (function(){function mk(id,isSt){let el=document.getElementById(id);if(!el)return;let sx=0,sy=0,ol=0,ot=0,dr=false,hot=false;el.addEventListener('pointerdown',e=>{if(!el.innerText&&!el.innerHTML)return;dr=true;sx=e.clientX;sy=e.clientY;let r=el.getBoundingClientRect(),p=document.getElementById('editPreview').getBoundingClientRect();ol=(r.left-p.left+r.width/2)/p.width*100;ot=(r.top-p.top+r.height/2)/p.height*100;el.setPointerCapture(e.pointerId);document.getElementById('dragDelete').classList.add('show');e.stopPropagation();});el.addEventListener('pointermove',e=>{if(!dr)return;let p=document.getElementById('editPreview').getBoundingClientRect();let nx=Math.max(5,Math.min(95,ol+(e.clientX-sx)/p.width*100)),ny=Math.max(5,Math.min(95,ot+(e.clientY-sy)/p.height*100));el.style.left=nx+'%';el.style.top=ny+'%';let bin=document.getElementById('deleteBin').getBoundingClientRect();hot=(e.clientX>bin.left-30&&e.clientX<bin.right+30&&e.clientY>bin.top-30&&e.clientY<bin.bottom+30);document.getElementById('dragDelete').classList.toggle('hot',hot);});el.addEventListener('pointerup',()=>{if(!dr)return;dr=false;document.getElementById('dragDelete').classList.remove('show');document.getElementById('dragDelete').classList.remove('hot');if(hot){if(isSt){el.innerHTML='';}else{el.innerText='';text='';}toast('Deleted');}});}mk('ovText',false);mk('ovStick',true);})();
 function getSupa(){return window.supa;}
