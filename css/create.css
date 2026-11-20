@@ -25,11 +25,12 @@ svg{stroke-linecap:round;stroke-linejoin:round}
 .galScroll{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .galPreview{position:relative;background:#000;overflow:hidden;touch-action:none;flex-shrink:0}
 .galPreview.post{aspect-ratio:1/1}
-.galPreview.reels{aspect-ratio:9/12}
-.galPreview.story{aspect-ratio:9/16}
-.galPreview.live{aspect-ratio:9/16}
+/* ✅ REELS FULL SCREEN - CHINNA BOX ILLA - PHONE FULL HEIGHT */
+.galPreview.reels{aspect-ratio:auto !important;height:calc(100dvh - 215px) !important;width:100%}
+.galPreview.story{aspect-ratio:auto !important;height:calc(100dvh - 215px) !important;width:100%}
+.galPreview.live{aspect-ratio:auto !important;height:calc(100dvh - 215px) !important;width:100%}
 .pvStage{position:absolute;inset:0;overflow:hidden}
-.pvStage img,.pvStage video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;will-change:transform;transform-origin:center center}
+.pvStage img,.pvStage video{width:100%;height:100%;object-fit:cover;object-position:center center;position:absolute;inset:0;will-change:transform;transform-origin:center center}
 .pvStage.dragging img,.pvStage.dragging video{transition:none!important}
 .pvEmpty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;background:#111;z-index:2}
 .pvEmpty .eBox{width:64px;height:64px;border-radius:50%;background:#222;display:grid;place-items:center;margin:0 auto 10px}
@@ -91,17 +92,20 @@ body.hideChrome .nextBtn{bottom:20px}
 .createSheet .optRow .arrow{margin-left:auto;font-size:20px;color:#888}
 .sheetBg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:350;opacity:0;visibility:hidden;transition:opacity .3s}
 .sheetBg.show{opacity:1;visibility:visible}
-.editWrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.editPreview{flex:1;position:relative;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none}
-.editPreview img,.editPreview video{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
+.editWrap{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.editPreview{flex:1;position:relative;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none;min-height:0}
+.editPreview img,.editPreview video{width:100%;height:100%;object-fit:cover;object-position:center center;display:block;position:absolute;inset:0}
 .editPreview .ovText{position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);font-size:32px;font-weight:900;text-shadow:0 2px 8px #000;text-align:center;white-space:nowrap;z-index:5;cursor:grab;touch-action:none}
 .editPreview .ovStick{position:absolute;top:60%;left:50%;transform:translate(-50%,-50%);z-index:5;cursor:grab;touch-action:none;line-height:1}
-.editPreview .ovStick img{width:90px;height:90px;object-fit:cover;border-radius:14px;border:2px solid #fff;display:block;pointer-events:none}
+.editPreview .ovStick img{width:90px;height:90px;object-fit:cover;border-radius:14px;border:2px solid #fff;display:block;pointer-events:none;position:relative}
 .editPreview .ovStick .stSvg{width:64px;height:64px;display:grid;place-items:center}
 .editPreview .ovStick .stSvg svg{width:56px;height:56px}
-/* ✅ FIX - CENTER PLAY - PHOTO KU MELA THERIYUM */
+/* ✅ REELS MODE - VIDEO FULL SCREEN - TOOLS VIDEO MELA OVERLAY */
+#pageEdit.reelsMode .quickBar{display:none}
+#pageEdit.reelsMode .editPreview{flex:1;height:auto}
+#pageEdit.reelsMode .instaTools{position:absolute;left:0;right:0;bottom:72px;z-index:30;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);padding:14px 10px 6px}
+#pageEdit.reelsMode .instaBottom{position:absolute;left:0;right:0;bottom:0;z-index:31;background:transparent;padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
 .editPreview .centerPlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:68px;height:68px;border-radius:50%;background:rgba(0,0,0,.55);border:1.5px solid rgba(255,255,255,.6);display:grid;place-items:center;z-index:25;cursor:pointer}
-/* ✅ FIX - EDIT SOUND - TOP RIGHT LA - PHOTO KU MELA */
 .editSound{position:absolute;top:12px;right:12px;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;cursor:pointer;z-index:30}
 .editSound.on{border-color:#00c853;background:rgba(0,200,83,.3)}
 .editSound:active{transform:scale(.95)}
