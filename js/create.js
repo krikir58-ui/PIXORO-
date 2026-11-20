@@ -4,39 +4,24 @@ function toast(m){let t=document.getElementById('toast');if(!t)return;t.innerTex
 function fmt(s){s=Math.max(0,s);return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');}
 function updateChrome(id){document.body.classList.toggle('hideChrome',id!=='pageHome');}
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');updateChrome(id);closeFullAll();}
-
-// ✅ BACK FIX - ORU PAGE MATTUM MOODUM - FULL VELIYA VARAATHU
 function goBack(){
-  // 1. Full Page Open ah Irundha - Antha Page Mattum Moodu
   let openFullPage=document.querySelector('.fullPage.show');
   if(openFullPage){
-    // Filter Page la - Filter Pudikalana - Pazhaya Filter ku Thirumba Po
-    if(openFullPage.id==='pageFilterFull'){
-      filter=prevFilter; applyFilter();
-    }
-    // Text Page la - Type pannama Back Thotta - Text ah Save Pannaathe Moodu
-    if(openFullPage.id==='pageTextFull'){
-      let inp=document.getElementById('tfInput');
-      if(inp) inp.value=text;
-    }
+    if(openFullPage.id==='pageFilterFull'){ filter=prevFilter; applyFilter(); }
+    if(openFullPage.id==='pageTextFull'){ let inp=document.getElementById('tfInput'); if(inp) inp.value=text; }
     closeFull(); return;
   }
-  // 2. Draft Popup Open ah Irundha - Popup Mattum Moodu
   let dp=document.getElementById('draftPopup');
   if(dp && dp.classList.contains('show')){ closeDraft(); return; }
-  // 3. Create Sheet Open ah Irundha - Sheet Mattum Moodu
   let cs=document.getElementById('createSheet');
   if(cs && cs.classList.contains('show')){ closeCreateSheet(); return; }
-  // 4. Ippo Enna Page la Irukkom
   let cur=document.querySelector('.page.on')?.id;
   if(cur==='pageUpload'){ showPage('pageEdit'); return; }
   if(cur==='pageEdit'){ askDraft(); return; }
   if(cur==='pageHome'){ return; }
   showPage('pageHome');
 }
-// Phone Back Button ku kooda - Itha thaan Vela Seiyum
 window.addEventListener('popstate',function(e){ e.preventDefault(); goBack(); });
-
 function openCreateSheet(){document.getElementById('createSheet')?.classList.add('show');document.getElementById('sheetBg')?.classList.add('show');}
 function closeCreateSheet(){document.getElementById('createSheet')?.classList.remove('show');document.getElementById('sheetBg')?.classList.remove('show');}
 function pickCreate(t){closeCreateSheet();setMode(t);showPage('pageHome');}
@@ -44,15 +29,68 @@ function setMode(t){type=t;document.querySelectorAll('#modePill button').forEach
 function setType(t){type=t;let e=document.getElementById('editTitle');if(e)e.innerText=t==='post'?'Edit Photo':t==='reels'?'Edit Reel':'Story Edit';let u=document.getElementById('uploadTitle');if(u)u.innerText=t==='post'?'Upload Post':t==='reels'?'Upload Reel':'Upload Story';renderQuickBar();}
 function clampPan(){let st=document.getElementById('pvStage');if(!st)return;let mx=Math.max(0,(st.clientWidth*(zoom-1))/2),my=Math.max(0,(st.clientHeight*(zoom-1))/2);panX=Math.max(-mx,Math.min(mx,panX));panY=Math.max(-my,Math.min(my,panY));}
 function applyZoom(){clampPan();let el=kind==='video'?document.getElementById('pvVid'):document.getElementById('pvImg');if(el)el.style.transform='translate3d('+panX+'px,'+panY+'px,0) scale('+zoom+')';}
-function updatePreview(){let pi=document.getElementById('pvImg'),pv=document.getElementById('pvVid'),pl=document.getElementById('pvPlay');if(!url){pi.style.display='none';pv.style.display='none';document.getElementById('pvEmpty').style.display='grid';document.getElementById('pvTop').style.display='none';document.getElementById('cropHint').style.display='none';document.getElementById('sugAudio').style.display='none';if(pl)pl.style.display='none';return;}document.getElementById('pvEmpty').style.display='none';document.getElementById('pvTop').style.display='flex';let h=document.getElementById('cropHint');h.style.display='block';h.classList.remove('hide');clearTimeout(hintTimer);hintTimer=setTimeout(()=>h.classList.add('hide'),2500);showMedia(pi,pv,url,kind);applyZoom();document.getElementById('sugAudio').style.display=type==='reels'?'flex':'none';if(kind==='video'){pv.muted=!soundOn;pv.currentTime=0;pv.play().catch(()=>{});pl.style.display='none';}else{pl.style.display='none';try{pv.pause();}catch(e){}}}
-function toggleSound(e){if(e)e.stopPropagation();soundOn=!soundOn;let v=document.getElementById('pvVid');if(v){v.muted=!soundOn;if(soundOn)v.play().catch(()=>{});}toast(soundOn?'Sound ON':'Sound OFF');}
-function togglePreviewPlay(e){if(e)e.stopPropagation();let v=document.getElementById('pvVid');if(!v)return;if(v.paused){v.play();document.getElementById('pvPlay').style.display='none';}else{v.pause();document.getElementById('pvPlay').style.display='grid';}}
+
+// ✅ REELS SOUND - ICON MAARUM - 3 BUTTON UM ONNA MAARUM
+function updateSoundIcon(){
+  let pairs=[['soundOnIcon','soundOffIcon'],['soundOnIconEdit','soundOffIconEdit'],['soundOnIcon2','soundOffIcon2']];
+  pairs.forEach(p=>{
+    let on=document.getElementById(p[0]), off=document.getElementById(p[1]);
+    if(!on||!off) return;
+    on.style.display = soundOn ? 'grid' : 'none';
+    off.style.display = soundOn ? 'none' : 'grid';
+  });
+  // Button Border - ON na Green, OFF na White
+  ['soundBtn','editSound'].forEach(id=>{
+    let b=document.getElementById(id);
+    if(b) b.classList.toggle('on', soundOn);
+  });
+  document.querySelectorAll('.soundBtn').forEach(b=>b.classList.toggle('on', soundOn));
+  let es=document.getElementById('editSound');
+  if(es) es.classList.toggle('on', soundOn);
+}
+
+// ✅ REELS SOUND - ELLA VIDEO KUM SOUND VARUM / STOP AAGUM
+function toggleSound(e){
+  if(e) e.stopPropagation();
+  soundOn=!soundOn;
+  ['pvVid','editVid','evVid','auVid','tfVid','voVid','upVidPost'].forEach(id=>{
+    let v=document.getElementById(id);
+    if(!v) return;
+    v.muted=!soundOn;
+    // Sound ON panna - Video Play Aagitu Irundha - Sound oda Play Aagum
+    if(soundOn && v.src && !v.paused) v.play().catch(()=>{});
+    // Reels Preview la - Sound ON panna - Odane Play pannu
+    if(soundOn && id==='pvVid' && v.src) v.play().catch(()=>{});
+  });
+  updateSoundIcon();
+  toast(soundOn?'Sound ON':'Sound OFF');
+}
+
+function updatePreview(){
+  let pi=document.getElementById('pvImg'),pv=document.getElementById('pvVid'),pl=document.getElementById('pvPlay');
+  if(!url){pi.style.display='none';pv.style.display='none';document.getElementById('pvEmpty').style.display='grid';document.getElementById('pvTop').style.display='none';document.getElementById('cropHint').style.display='none';document.getElementById('sugAudio').style.display='none';if(pl)pl.style.display='none';return;}
+  document.getElementById('pvEmpty').style.display='none';document.getElementById('pvTop').style.display='flex';
+  let h=document.getElementById('cropHint');h.style.display='block';h.classList.remove('hide');clearTimeout(hintTimer);hintTimer=setTimeout(()=>h.classList.add('hide'),2500);
+  showMedia(pi,pv,url,kind);applyZoom();
+  document.getElementById('sugAudio').style.display=type==='reels'?'flex':'none';
+  if(kind==='video'){
+    pv.muted=!soundOn; // Reels la First Mute la thaan Start Aagum - Instagram Mari
+    pv.currentTime=0; pv.play().catch(()=>{}); pl.style.display='none';
+  }else{pl.style.display='none';try{pv.pause();}catch(e){}}
+  updateSoundIcon();
+}
+function togglePreviewPlay(e){
+  if(e) e.stopPropagation();
+  let v=document.getElementById('pvVid'); if(!v) return;
+  if(v.paused){ v.muted=!soundOn; v.play(); document.getElementById('pvPlay').style.display='none'; }
+  else { v.pause(); document.getElementById('pvPlay').style.display='grid'; }
+}
 function showMedia(a,b,s,k){if(!a||!b)return;if(k==='video'){b.src=s;b.style.display='block';a.style.display='none';}else{a.src=s;a.style.display='block';b.style.display='none';try{b.pause();}catch(e){}}}
 function renderMedia(){let list=galleryPhotos.filter(p=>galFilter==='all'||p.kind===galFilter);let html='<div class="galleryBtn" onclick="document.getElementById(\'fileMulti\').click()"><div><b>Gallery la irunthu Photo / Video Add Pannu</b><div style="font-size:11px;color:#aaa">Real Gallery mattum thaan</div></div></div>';html+=list.map(p=>{let i=galleryPhotos.indexOf(p);return '<div class="tile '+(url===p.url?'sel':'')+'" onclick="selectGallery('+i+')">'+(p.kind==='video'?'<video src="'+p.url+'" muted playsinline></video><span class="dur">0:15</span>':'<img src="'+p.url+'">')+'<span class="tick">'+(url===p.url?'✓':'')+'</span></div>';}).join('');let gh=document.getElementById('mediaGridHome');if(gh)gh.innerHTML=html;}
 function selectGallery(i){let p=galleryPhotos[i];if(!p)return;url=p.url;kind=p.kind;file=p.file;zoom=1;panX=0;panY=0;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();}
 function setGalTab(f,b){galFilter=f;document.querySelectorAll('.galTabs button').forEach(x=>x.classList.remove('sel'));if(b)b.classList.add('sel');renderMedia();}
 function goSelectNext(){if(!url){document.getElementById('fileMulti').click();return;}goEdit();}
-function goEdit(){if(!url){toast('Gallery la irunthu Photo Add Pannu');return;}showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);showMedia(document.getElementById('upImgPost'),document.getElementById('upVidPost'),url,kind);showPage('pageEdit');renderFilm();setType(type);}
+function goEdit(){if(!url){toast('Gallery la irunthu Photo Add Pannu');return;}showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);showMedia(document.getElementById('upImgPost'),document.getElementById('upVidPost'),url,kind);showPage('pageEdit');renderFilm();setType(type);updateSoundIcon();}
 function goUpload(){if(!url){toast('Photo illa');return;}showPage('pageUpload');document.getElementById('captionPost').value=captionVal;syncFields();}
 function syncCap(){captionVal=document.getElementById('captionPost').value;}
 function syncFields(){document.getElementById('locVal').innerText=loc||'Add Location';document.getElementById('tagVal').innerText=tag||'Tag People';document.getElementById('musicVal').innerText=song;document.getElementById('audVal').innerText=aud;}
@@ -69,18 +107,15 @@ function startOver(){closeDraft();resetEdit();showPage('pageHome');}
 function closeFull(){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));}
 function closeFullAll(){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));}
 function openFull(id){
-  // Filter Page Open panna - Pazhaya Filter ah Nyabagam Vachu
   if(id==='pageFilterFull'){ prevFilter=filter; }
   document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));
   let e=document.getElementById(id);if(e){void e.offsetWidth;e.classList.add('show');}
   if(id==='pageAudioFull'){showMedia(document.getElementById('auImg'),document.getElementById('auVid'),url,kind);renderSongs('');}
   if(id==='pageTextFull'){showMedia(document.getElementById('tfImg'),document.getElementById('tfVid'),url,kind);let inp=document.getElementById('tfInput');if(inp){inp.value=text;inp.style.fontFamily=fontF;inp.style.color=tfColor;setTimeout(()=>inp.focus(),350);}}
   if(id==='pageVoiceFull'){showMedia(document.getElementById('voImg'),document.getElementById('voVid'),url,kind);}
-  if(id==='pageEditVideoFull'){showMedia(document.getElementById('evImg'),document.getElementById('evVid'),url,kind);renderFilm();}
+  if(id==='pageEditVideoFull'){showMedia(document.getElementById('evImg'),document.getElementById('evVid'),url,kind);renderFilm();updateSoundIcon();}
   if(id==='pageFilterFull'){renderFilterFull();}
 }
-
-// ✅ SONG LIST - EMOJI ILLA - OUTLINE SVG MATTUM
 function renderSongs(q){
   let list=[['Leo - Naa Ready','Sai Abhyankkar'],['Jailer - Hukum','Anirudh'],['Vikram','Anirudh'],['Trending Audio','Pixoro'],['Veezha Veera','Anirudh'],['Sheru Bhai','Sai Abhyankkar']];
   let f=list.filter(x=>!q||x[0].toLowerCase().includes(q.toLowerCase()));
@@ -95,8 +130,6 @@ function setTFFont(f,b){fontF=f;document.getElementById('tfInput').style.fontFam
 function setTFEffect(e,b){textEffect=e;let inp=document.getElementById('tfInput');if(e==='shadow')inp.style.textShadow='4px 4px 0 #000';else if(e==='neon')inp.style.textShadow='0 0 10px #fff,0 0 20px #ff2d95';else if(e==='halo')inp.style.textShadow='0 0 12px #fff';else inp.style.textShadow='0 2px 10px #000';}
 function setTFColor(c){tfColor=c;document.getElementById('tfInput').style.color=c;}
 function applyTextEffect(){let o=document.getElementById('ovText');if(textEffect==='shadow')o.style.textShadow='4px 4px 0 #000';else if(textEffect==='neon')o.style.textShadow='0 0 10px #fff,0 0 20px #ff2d95';else if(textEffect==='halo')o.style.textShadow='0 0 12px #fff';else o.style.textShadow='0 2px 8px #000';o.style.color=tfColor;}
-
-// ✅ STICKER - EMOJI ILLA - ELLAAM OUTLINE SVG
 function pickSticker(k){
   let map={
     fire:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ff6b00" stroke-width="1.5"><path d="M12 3c1 3-2 4-2 7a4 4 0 0 0 8 0c0-1-.5-2-1-3-.5 1-1 1.5-2 1.5C15 6 14 4 12 3z"/></svg>',
@@ -120,13 +153,18 @@ function startVoice(b){document.getElementById('voiceTxt').innerText='Voice: Rec
 function stopVoice(){document.getElementById('voiceTxt').innerText='Voice: Added';toast('Voice Added');}
 function resetEdit(){filter='none';prevFilter='none';text='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerHTML='';applyFilter();}
 function renderFilterFull(){let r=document.getElementById('filterRowFull');if(r)r.innerHTML=[['None','none'],['Vivid','brightness(1.15) saturate(1.5)'],['Warm','sepia(.45)'],['Retro','sepia(.6)'],['B&W','grayscale(1)']].map(a=>'<button style="background:#222;color:#fff;border:0;padding:10px 14px;border-radius:999px" onclick="previewFilter(\''+a[1]+'\')">'+a[0]+'</button>').join('');}
-// Filter Page la - Click panna Odane Apply Aagum - Back Thotta Pazhaya Filter ku Varum
 function previewFilter(f){filter=f;applyFilter();}
 function buildFilter(){return filter==='none'?'brightness('+adj.brightness+'%) contrast('+adj.contrast+'%) saturate('+adj.saturate+'%)':'brightness('+adj.brightness+'%) contrast('+adj.contrast+'%) saturate('+adj.saturate+'%) '+filter;}
 function applyFilter(){let f=buildFilter();let ei=document.getElementById('editImg');if(ei)ei.style.filter=f;let ev=document.getElementById('editVid');if(ev)ev.style.filter=f;let up=document.getElementById('upImgPost');if(up)up.style.filter=f;}
 function setFilter(f){prevFilter=f;filter=f;applyFilter();closeFull();toast('Filter Applied');}
 function setupVideo(){let v=document.getElementById('editVid');if(kind==='video'){v.onloadedmetadata=()=>{totalDur=v.duration||15;trimStart=0;trimEnd=totalDur;let p=document.getElementById('playTime');if(p)p.innerText='0:00 / '+fmt(totalDur);updateTrimUI();};v.ontimeupdate=()=>{let p=document.getElementById('playTime');if(p)p.innerText=fmt(v.currentTime)+' / '+fmt(v.duration);};}renderFilm();}
-function togglePlay(){if(kind!=='video'){toast('Video select pannu');return;}let v=document.getElementById('editVid');if(v.paused)v.play().catch(()=>{});else v.pause();}
+function togglePlay(){
+  if(kind!=='video'){toast('Video select pannu');return;}
+  let v=document.getElementById('editVid');
+  let cp=document.getElementById('centerPlay');
+  if(v.paused){ v.muted=!soundOn; v.play().catch(()=>{}); if(cp) cp.style.display='none'; }
+  else { v.pause(); if(cp) cp.style.display='grid'; }
+}
 function seekVideo(v){let vid=document.getElementById('editVid');if(kind!=='video'||!vid.duration)return;vid.currentTime=vid.duration*v/100;}
 function renderFilm(){let f=document.getElementById('filmStrip');if(!f||!url)return;let c=Math.max(clips.length,1),h='';for(let i=0;i<6;i++){let cl=clips[i%c]||{url:url,kind:kind};h+='<div>'+(cl.kind==='video'?'<video src="'+cl.url+'" muted playsinline></video>':'<img src="'+cl.url+'">')+'</div>';}f.innerHTML=h;}
 function cutAtCurrent(){let v=document.getElementById('editVid');let ct=kind==='video'?v.currentTime:(trimStart+trimEnd)/2;if(ct<=trimStart+0.3||ct>=trimEnd-0.3){toast('Naduvula Play panni Cut pannu');return;}clips=[{url:url,kind:kind,file:file},{url:url,kind:kind,file:file}];renderFilm();toast('Cut - 2 Clips');}
