@@ -3,7 +3,10 @@ let clips=[],galleryPhotos=[],trimStart=0,trimEnd=15,totalDur=15,uploading=false
 function toast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
 function fmt(s){s=Math.max(0,s);return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');}
 function updateChrome(id){document.body.classList.toggle('hideChrome',id!=='pageHome');}
-function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');updateChrome(id);closeFullAll();}
+// ✅ FIX 1 - + / BACK VELIYA POGAATHU - HISTORY LOCK
+let _histLock=false;
+function _pushHist(){ try{ history.pushState({pixoro:1},''); }catch(e){} }
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');updateChrome(id);closeFullAll(); if(!_histLock) _pushHist();}
 function goBack(){
   let openFullPage=document.querySelector('.fullPage.show');
   if(openFullPage){
@@ -18,15 +21,13 @@ function goBack(){
   let cur=document.querySelector('.page.on')?.id;
   if(cur==='pageUpload'){ showPage('pageEdit'); return; }
   if(cur==='pageEdit'){ askDraft(); return; }
-  if(cur==='pageHome'){ return; }
+  if(cur==='pageHome'){ return; } // ✅ Home la Back - Veliya Pogaathu
   showPage('pageHome');
 }
-window.addEventListener('popstate',function(e){ e.preventDefault(); goBack(); });
-function openCreateSheet(){document.getElementById('createSheet')?.classList.add('show');document.getElementById('sheetBg')?.classList.add('show');}
+window.addEventListener('popstate',function(e){ e.preventDefault(); _histLock=true; goBack(); setTimeout(()=>{ _histLock=false; },100); });
+function openCreateSheet(){document.getElementById('createSheet')?.classList.add('show');document.getElementById('sheetBg')?.classList.add('show'); _pushHist();}
 function closeCreateSheet(){document.getElementById('createSheet')?.classList.remove('show');document.getElementById('sheetBg')?.classList.remove('show');}
 function pickCreate(t){closeCreateSheet();setMode(t);showPage('pageHome');}
-
-// ✅ FIX - REELS FULL SCREEN - reelsMode CLASS - ITHU ILLANA FULL SCREEN VARAATHU
 function setMode(t){
   type=t;
   document.querySelectorAll('#modePill button').forEach(b=>b.classList.toggle('on',b.dataset.mode===t));
@@ -36,16 +37,11 @@ function setMode(t){
   document.getElementById('galPreview').className='galPreview '+t;
   document.getElementById('pvChipTxt').innerText=t==='post'?'1:1 - Drag to adjust':t==='reels'?'9:16 - Reels':t==='story'?'9:16 - Story':'LIVE - Camera';
   document.getElementById('sugAudio').style.display=(t==='reels'&&url)?'flex':'none';
-  // ✅ REELS / STORY NA - EDIT PAGE FULL SCREEN - POST NA NORMAL
-  document.getElementById('pageEdit')?.classList.toggle('reelsMode', t==='reels'||t==='story');
-  document.getElementById('pageHome')?.classList.toggle('reelsMode', t==='reels');
   setType(t); updatePreview(); fitVideoFullScreen();
   if(t==='live')toast('Live - Go Live');
 }
 function setType(t){type=t;let e=document.getElementById('editTitle');if(e)e.innerText=t==='post'?'Edit Photo':t==='reels'?'Edit Reel':'Story Edit';let u=document.getElementById('uploadTitle');if(u)u.innerText=t==='post'?'Upload Post':t==='reels'?'Upload Reel':'Upload Story';renderQuickBar();}
 function clampPan(){let st=document.getElementById('pvStage');if(!st)return;let mx=Math.max(0,(st.clientWidth*(zoom-1))/2),my=Math.max(0,(st.clientHeight*(zoom-1))/2);panX=Math.max(-mx,Math.min(mx,panX));panY=Math.max(-my,Math.min(my,panY));}
-
-// ✅ FIX - ZOOM - PV + EDIT RENDUM VIDEO KUM APPLY AAGUM - THAVUNTHA SIZE
 function applyZoom(){
   clampPan();
   let t='translate3d('+panX+'px,'+panY+'px,0) scale('+zoom+')';
@@ -54,7 +50,6 @@ function applyZoom(){
   let ev = kind==='video'?document.getElementById('editVid'):document.getElementById('editImg');
   if(ev) ev.style.transform=t;
 }
-// ✅ FIX - REELS VIDEO - EPPOVUM FULL SCREEN - ZOOM RESET
 function fitVideoFullScreen(){
   zoom=1; panX=0; panY=0;
   ['pvVid','pvImg','editVid','editImg','evVid','evImg'].forEach(id=>{
@@ -129,7 +124,7 @@ function togglePreviewPlay(e){
 }
 function showMedia(a,b,s,k){if(!a||!b)return;if(k==='video'){b.src=s;b.style.display='block';a.style.display='none';}else{a.src=s;a.style.display='block';b.style.display='none';try{b.pause();}catch(e){}}}
 function renderMedia(){let list=galleryPhotos.filter(p=>galFilter==='all'||p.kind===galFilter);let html='<div class="galleryBtn" onclick="document.getElementById(\'fileMulti\').click()"><div><b>Gallery la irunthu Photo / Video Add Pannu</b><div style="font-size:11px;color:#aaa">Real Gallery mattum thaan</div></div></div>';html+=list.map(p=>{let i=galleryPhotos.indexOf(p);return '<div class="tile '+(url===p.url?'sel':'')+'" onclick="selectGallery('+i+')">'+(p.kind==='video'?'<video src="'+p.url+'" muted playsinline></video><span class="dur">0:15</span>':'<img src="'+p.url+'">')+'<span class="tick">'+(url===p.url?'✓':'')+'</span></div>';}).join('');let gh=document.getElementById('mediaGridHome');if(gh)gh.innerHTML=html;}
-function selectGallery(i){let p=galleryPhotos[i];if(!p)return;url=p.url;kind=p.kind;file=p.file;fitVideoFullScreen();showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI();}
+function selectGallery(i){let p=galleryPhotos[i];if(!p)return;url=p.url;kind=p.kind;file=p.file;fitVideoFullScreen();showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI(); if(type==='reels'||type==='story') setTimeout(()=>goEdit(),200);}
 function setGalTab(f,b){galFilter=f;document.querySelectorAll('.galTabs button').forEach(x=>x.classList.remove('sel'));if(b)b.classList.add('sel');renderMedia();}
 function goSelectNext(){if(!url){document.getElementById('fileMulti').click();return;}goEdit();}
 function goEdit(){if(!url){toast('Gallery la irunthu Photo Add Pannu');return;}showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);showMedia(document.getElementById('upImgPost'),document.getElementById('upVidPost'),url,kind);showPage('pageEdit');renderFilm();setType(type);fitVideoFullScreen();syncEditVideoUI();}
@@ -142,7 +137,8 @@ function promptTag(){let t=prompt('Tag People',tag||'@friend_name');if(t!==null)
 function clearTag(){tag='';syncFields();}
 function toggleAud(){aud=aud==='Everyone'?'Private':'Everyone';syncFields();}
 function removeUploadPhoto(){url='';file=null;clips=[];showPage('pageHome');renderMedia();updatePreview();}
-function renderQuickBar(){let q=document.getElementById('quickBar');if(!q)return;if(type==='post')q.innerHTML='<button onclick="openFull(\'pageTextFull\')"><span style="font-weight:800">Aa</span> Text</button><button onclick="openFull(\'pageStickerFull\')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg> Sticker</button><button onclick="openFull(\'pageEditVideoFull\')">Adjust</button>';else q.innerHTML='<button onclick="document.getElementById(\'fileAdd\').click()">+ Add Reel</button><button onclick="openFull(\'pageAudioFull\')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Add Song</button><button onclick="openFull(\'pageTextFull\')"><span style="font-weight:800">Aa</span> Text</button><button onclick="openFull(\'pageStickerFull\')">Sticker</button>';}
+// ✅ FIX 2 - MELA OPTION ELLAAM - EDIT VIDEO KULLA - QUICKBAR EMPTY
+function renderQuickBar(){let q=document.getElementById('quickBar'); if(q) q.innerHTML='';}
 function askDraft(){document.getElementById('draftPopup').classList.add('show');}
 function closeDraft(){document.getElementById('draftPopup').classList.remove('show');}
 function startOver(){closeDraft();resetEdit();showPage('pageHome');}
@@ -207,7 +203,8 @@ function splitClip(){cutAtCurrent();}
 function deleteClip(){if(clips.length>1){clips.splice(0,1);renderFilm();updateTrimUI();toast('Clip Deleted');}else{removeText();toast('Deleted');}}
 function updateTrimUI(){let a=document.getElementById('trimInfo');if(a)a.innerText='Trim: '+fmt(trimStart)+' - '+fmt(trimEnd);let b=document.getElementById('clipInfo');if(b)b.innerText=clips.length+' Clip • '+fmt(trimEnd-trimStart);}
 function isFakeFile(f){let n=(f.name||'').toLowerCase();return n.match(/ai|generated|fake|unsplash|sample|demo|download|midjourney|dalle/)?true:false;}
-function addClip(f){if(!f)return;if(isFakeFile(f)){toast('Fake Photo');return;}let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let c={url:ev.target.result,kind:k,file:f};galleryPhotos.push(c);clips.push({url:c.url,kind:k,file:f});url=c.url;kind=k;file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI();if(type==='reels')setupVideo();};r.readAsDataURL(f);}
+// ✅ FIX 3 - REELS SELECT PANNA ODANE EDIT PAGE - 2 TIME GALLERY VARAATHU
+function addClip(f){if(!f)return;if(isFakeFile(f)){toast('Fake Photo');return;}let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let c={url:ev.target.result,kind:k,file:f};galleryPhotos.push(c);clips.push({url:c.url,kind:k,file:f});url=c.url;kind=k;file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI();if(type==='reels')setupVideo(); if(type==='reels'||type==='story'){ setTimeout(()=>{ let cur=document.querySelector('.page.on')?.id; if(cur==='pageHome') goEdit(); },350); }};r.readAsDataURL(f);}
 document.getElementById('file')?.addEventListener('change',e=>{addClip(e.target.files[0]);e.target.value='';});
 document.getElementById('fileMulti')?.addEventListener('change',e=>{Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';});
 document.getElementById('fileAdd')?.addEventListener('change',e=>{Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';toast('Reel Added');});
@@ -239,4 +236,5 @@ async function startLive(){let supa=getSupa();if(!supa)return;let {data:{session
 async function sharePost(){if(uploading)return;uploading=true;if(!file||!url){toast('Photo Add Pannu');uploading=false;return;}let btn=document.getElementById('shareBtnPost');btn.innerText='Uploading...';btn.disabled=true;try{await saveToServer(false);let sb=document.getElementById('successBox');if(sb)sb.classList.add('show');let st=document.getElementById('status');if(st)st.innerText='Server la Save aayiduchu!';btn.innerText='Uploaded';toast('Uploaded');setTimeout(()=>location.href='./index.html',1200);}catch(e){let st=document.getElementById('status');if(st)st.innerText='Error: '+e.message;btn.innerText='Upload Post';btn.disabled=false;uploading=false;toast('Error - Try Again');}}
 async function saveDraftAndBack(){closeDraft();try{await saveToServer(true);toast('Draft Saved');}catch(e){toast('Draft Error: '+e.message);}showPage('pageHome');}
 (async()=>{let supa=getSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session)location.href='./login.html';})();
+_pushHist();
 showPage('pageHome');renderMedia();renderQuickBar();setMode('post');updatePreview();
