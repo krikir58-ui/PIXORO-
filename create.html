@@ -4,163 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>Pixoro - Create</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;height:100dvh;overscroll-behavior:none}
-body{background:#000;color:#fff;font-family:system-ui;overflow:hidden}
-button,input,textarea{font-family:inherit}
-*::-webkit-scrollbar{display:none}
-*{scrollbar-width:none}
-.ic{width:20px;height:20px;vertical-align:middle}
-.ic-sm{width:16px;height:16px}
-.ic-lg{width:26px;height:26px}
-.page{display:none;height:100dvh;background:#000;overflow:hidden;flex-direction:column}
-.page.on{display:flex}
-.top{height:52px;flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:0 14px;background:#000}
-.top b{font-size:17px}
-.top .back{font-size:26px;cursor:pointer}
-.top .done{font-size:15px;font-weight:700;cursor:pointer;color:#0095f6}
-.galScroll{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-/* ✅ PREVIEW - SCREEN APADIYE - PHOTO MATTUM ADJUST */
-.galPreview{position:relative;background:#000;overflow:hidden;touch-action:none;flex-shrink:0}
-.galPreview.post{aspect-ratio:1/1}
-.galPreview.reels{aspect-ratio:9/12}
-.galPreview.story{aspect-ratio:9/16}
-.galPreview.live{aspect-ratio:9/16}
-.pvStage{position:absolute;inset:0;overflow:hidden;background:#000}
-.pvStage img,.pvStage video{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;will-change:transform;transform-origin:center center}
-.pvStage.dragging img,.pvStage.dragging video{transition:none!important}
-/* ✅ PHOTO ILLANA - BLACK ILLA - PLACEHOLDER */
-.pvEmpty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;background:#111;z-index:2}
-.pvEmpty .eBox{width:64px;height:64px;border-radius:50%;background:#222;display:grid;place-items:center;margin:0 auto 10px}
-.pvEmpty b{display:block;font-size:15px}
-.pvEmpty span{font-size:12px;color:#888}
-.galPreview .pvTop{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between;z-index:5;pointer-events:none}
-.galPreview .pvTop>*{pointer-events:auto}
-.galPreview .pvChip{background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.3);padding:6px 10px;border-radius:999px;font-size:11px;display:flex;gap:6px;align-items:center;white-space:nowrap}
-.galPreview .soundBtn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.3);display:grid;place-items:center;flex-shrink:0}
-.galPreview .cropHint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.65);padding:6px 12px;border-radius:999px;font-size:11px;z-index:5;pointer-events:none;white-space:nowrap;transition:opacity .5s}
-.galPreview .cropHint.hide{opacity:0}
-.galPreview .playBig{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;z-index:6}
-/* ✅ SUGGESTED AUDIO - PREVIEW KULLA KEELA MATTUM - RECENTS MELA OTTIKATHU */
-.sugAudio{position:absolute;left:12px;right:12px;bottom:10px;height:32px;display:flex;align-items:center;gap:8px;padding:0 10px;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.2);border-radius:999px;overflow:hidden;white-space:nowrap;font-size:12px;z-index:5}
-.sugAudio .marq{display:inline-block;animation:marq 8s linear infinite}
-@keyframes marq{from{transform:translateX(20%)}to{transform:translateX(-100%)}}
-.galTop{height:42px;display:flex;align-items:center;gap:10px;padding:0 14px;background:#000;flex-shrink:0}
-.galTabs{display:flex;gap:6px;padding:6px 14px;background:#000;flex-shrink:0}
-.galTabs button{background:#1a1a1a;color:#aaa;border:0;padding:7px 14px;border-radius:999px;font-size:12px}
-.galTabs button.sel{background:#fff;color:#000;font-weight:700}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px}
-.grid .tile{aspect-ratio:1;position:relative;overflow:hidden;background:#222;cursor:pointer}
-.grid .tile img,.grid .tile video{width:100%;height:100%;object-fit:cover}
-.grid .tile .tick{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;border:2px solid #fff;display:grid;place-items:center;background:rgba(0,0,0,.5);font-size:12px}
-.grid .tile.sel .tick{background:#fff;color:#000}
-.grid .tile .dur{position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.6);padding:2px 6px;border-radius:999px;font-size:10px}
-.galleryBtn{grid-column:1/-1;height:110px;background:#111;border:1px dashed #444;display:grid;place-items:center;text-align:center;cursor:pointer;margin:6px}
-.nextBtn{position:fixed;bottom:120px;right:14px;background:#fff;color:#000;border:0;padding:12px 18px;border-radius:999px;font-weight:800;z-index:30;display:none}
-.nextBtn.show{display:block}
-.modeWrap{position:fixed;left:0;right:0;bottom:66px;display:flex;justify-content:center;z-index:45;pointer-events:none;transition:opacity .25s,transform .25s}
-.modePill{pointer-events:auto;display:flex;background:rgba(20,20,20,.95);border:1px solid #333;border-radius:999px;padding:4px;position:relative;overflow:hidden;touch-action:pan-x}
-.modePill .ind{position:absolute;top:4px;bottom:4px;border-radius:999px;background:#fff;transition:transform .35s cubic-bezier(.32,.72,0,1),width .35s cubic-bezier(.32,.72,0,1);z-index:0}
-.modePill button{position:relative;z-index:1;background:transparent;border:0;color:#aaa;padding:8px 14px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
-.modePill button.on{color:#000}
-.bottomNav{position:fixed;bottom:0;left:0;right:0;background:#000;display:flex;justify-content:space-around;padding:10px 0 calc(14px + env(safe-area-inset-bottom));border-top:1px solid #222;z-index:40;transition:transform .25s}
-.bottomNav div{text-align:center;font-size:10px;color:#888;cursor:pointer}
-.bottomNav div.on{color:#fff}
-.bottomNav div .plus{width:38px;height:38px;border-radius:12px;background:#fff;color:#000;display:grid;place-items:center;margin:0 auto 2px;font-size:22px;font-weight:800}
-body.hideChrome .modeWrap{opacity:0;transform:translateY(20px);pointer-events:none}
-body.hideChrome .bottomNav{transform:translateY(110%)}
-body.hideChrome .nextBtn{bottom:20px}
-.createSheet{position:fixed;left:0;right:0;bottom:0;background:#1a1a1a;border-radius:20px 20px 0 0;padding:8px 14px 22px;z-index:400;transform:translateY(110%);opacity:0;visibility:hidden;transition:transform .45s cubic-bezier(.32,.72,0,1),opacity .3s ease,visibility .45s}
-.createSheet.show{transform:translateY(0);opacity:1;visibility:visible}
-.createSheet .bar{width:40px;height:4px;background:#444;border-radius:999px;margin:6px auto 12px}
-.createSheet .optRow{display:flex;gap:12px;align-items:center;padding:12px 6px;border-radius:14px;cursor:pointer}
-.createSheet .optRow .icon{width:48px;height:48px;border-radius:14px;background:#fff;display:grid;place-items:center;flex-shrink:0}
-.createSheet .optRow .icon.alt{background:#222;border:1px solid #333}
-.createSheet .optRow b{display:block;font-size:15px}
-.createSheet .optRow span{font-size:12px;color:#aaa}
-.createSheet .optRow .arrow{margin-left:auto;font-size:20px;color:#888}
-.sheetBg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:350;opacity:0;visibility:hidden;transition:opacity .3s}
-.sheetBg.show{opacity:1;visibility:visible}
-.editWrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.editPreview{flex:1;position:relative;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none}
-.editPreview img,.editPreview video{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
-.editPreview .ovText{position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);font-size:32px;font-weight:900;text-shadow:0 2px 8px #000;text-align:center;white-space:nowrap;z-index:5;cursor:grab;touch-action:none}
-.editPreview .ovStick{position:absolute;top:60%;left:50%;transform:translate(-50%,-50%);z-index:5;cursor:grab;touch-action:none;line-height:1}
-.editPreview .ovStick img{width:90px;height:90px;object-fit:cover;border-radius:14px;border:2px solid #fff;display:block;pointer-events:none}
-.editPreview .ovStick .stSvg{width:64px;height:64px;display:grid;place-items:center}
-.editPreview .centerPlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;z-index:6}
-.dragDelete{position:absolute;left:0;right:0;bottom:0;height:100px;background:linear-gradient(to top,rgba(0,0,0,.95),transparent);display:none;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10px;z-index:20;pointer-events:none}
-.dragDelete.show{display:flex}
-.dragDelete .bin{width:52px;height:52px;border-radius:50%;background:#111;border:1.5px solid #fff;display:grid;place-items:center}
-.dragDelete.hot .bin{background:#ff3b30;border-color:#ff3b30;transform:scale(1.15)}
-.dragDelete span{font-size:12px;margin-top:4px}
-.quickBar{display:flex;gap:8px;padding:10px;overflow-x:auto;background:#000;flex-shrink:0}
-.quickBar button{background:#1a1a1a;color:#fff;border:1px solid #333;padding:9px 13px;border-radius:999px;font-size:12px;white-space:nowrap;display:flex;gap:6px;align-items:center}
-.instaTools{display:flex;gap:6px;padding:10px;overflow-x:auto;background:#000;flex-shrink:0}
-.instaTools div{flex:1;min-width:62px;text-align:center;cursor:pointer}
-.instaTools .c{width:52px;height:52px;border-radius:14px;background:#1a1a1a;display:grid;place-items:center;margin:0 auto}
-.instaTools span{font-size:11px;display:block;margin-top:4px;color:#ddd}
-.instaBottom{display:flex;gap:10px;padding:10px 12px calc(14px + env(safe-area-inset-bottom));background:#000;flex-shrink:0}
-.instaBottom .editBtn{flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:13px;border-radius:999px;font-weight:700}
-.instaBottom .nextBtn2{flex:1;background:#0095f6;color:#fff;border:0;padding:13px;border-radius:999px;font-weight:800}
-.fullPage{position:fixed;inset:0;background:#000;z-index:150;display:flex;flex-direction:column;transform:translateY(100%);opacity:0;visibility:hidden;transition:transform .45s cubic-bezier(.32,.72,0,1),opacity .35s ease,visibility .45s}
-.fullPage.show{transform:translateY(0);opacity:1;visibility:visible}
-.fullPage .fpTop{height:56px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;flex-shrink:0}
-.fullPage .fpTop .x{font-size:26px;cursor:pointer}
-.fullPage .fpTop .done{font-weight:700;cursor:pointer;color:#0095f6}
-.fullPage .fpMini{height:160px;margin:0 14px;border-radius:14px;overflow:hidden;position:relative;background:#111;flex-shrink:0}
-.fullPage .fpMini img,.fullPage .fpMini video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
-.fullPage .fpBody{flex:1;overflow-y:auto;padding:12px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-.fullPage .fpTabs{display:flex;gap:8px;overflow-x:auto;padding:8px 0}
-.fullPage .fpTabs button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:999px;font-size:13px;white-space:nowrap}
-.fullPage .fpTabs button.sel{background:#fff;color:#000}
-.fullPage .fpSearch{width:100%;background:#222;border:0;color:#fff;padding:11px 14px;border-radius:999px;outline:none;margin:6px 0}
-.fullPage .songRow{display:flex;gap:10px;align-items:center;padding:10px;border-bottom:1px solid #1a1a1a;cursor:pointer}
-.fullPage .songRow .th{width:48px;height:48px;border-radius:10px;background:#222;display:grid;place-items:center;flex-shrink:0;overflow:hidden}
-.fullPage .songRow .th img{width:100%;height:100%;object-fit:cover}
-.fullPage .songRow b{display:block;font-size:14px}
-.fullPage .songRow span{font-size:11px;color:#aaa}
-.fullPage .tfInput{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);background:transparent;border:0;outline:none;color:#fff;font-size:36px;font-weight:900;text-align:center;width:90%;z-index:5;text-shadow:0 2px 10px #000}
-.fullPage .tfRow{display:flex;gap:8px;overflow-x:auto;padding:6px 0}
-.fullPage .tfRow button{background:#222;color:#fff;border:0;padding:9px 14px;border-radius:999px;font-size:12px;white-space:nowrap}
-.fullPage .tfRow button.sel{background:#fff;color:#000}
-.fullPage .tfColors{display:flex;gap:8px;overflow-x:auto;padding:6px 0}
-.fullPage .tfColors div{width:28px;height:28px;border-radius:50%;flex-shrink:0;border:2px solid #333;cursor:pointer}
-.fullPage .tlBar{display:flex;gap:10px;align-items:center;padding:8px 12px}
-.fullPage .tlBar input{flex:1;accent-color:#fff}
-.fullPage .filmStrip{display:flex;background:#111;border-radius:10px;overflow:hidden;margin:0 12px}
-.fullPage .filmStrip div{flex:1;height:52px;overflow:hidden}
-.fullPage .filmStrip img,.fullPage .filmStrip video{width:100%;height:100%;object-fit:cover}
-.fullPage .addRow{display:flex;gap:10px;padding:8px 12px}
-.fullPage .addRow button{flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:11px;border-radius:10px;display:flex;gap:6px;align-items:center;justify-content:center}
-.stickGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.stickGrid button{height:64px;background:#222;border:1px solid #333;border-radius:14px;display:grid;place-items:center}
-.toast{position:fixed;left:50%;bottom:130px;transform:translate(-50%,20px);background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;z-index:500;opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;white-space:nowrap}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-.popup{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center;z-index:300}
-.popup.show{display:flex}
-.popup .box{background:#222;width:100%;border-radius:20px 20px 0 0;padding:18px;text-align:center}
-.popup .box b{font-size:17px}
-.popup .box p{font-size:13px;color:#aaa;margin:8px 0 14px}
-.popup .box button{width:100%;background:transparent;border:0;border-top:1px solid #333;color:#fff;padding:14px;font-size:15px}
-.popup .box button.red{color:#ff3b30;font-weight:700}
-.uploadScroll{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-.uploadBox{margin:12px;border-radius:14px;overflow:hidden;position:relative;background:#111;aspect-ratio:4/4.2;flex-shrink:0}
-.uploadBox.reels{aspect-ratio:9/16;max-height:420px}
-.uploadBox img,.uploadBox video{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
-.uploadBox .closeX{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;font-weight:800;z-index:5;cursor:pointer}
-.uploadBox .change{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.6);border:1px solid #555;color:#fff;padding:8px 12px;border-radius:999px;font-size:12px;z-index:5;cursor:pointer;display:flex;gap:6px;align-items:center}
-.uField{margin:0 12px 10px;background:#1a1a1a;border:1px solid #222;border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center}
-.uField input,.uField textarea{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:14px;resize:none}
-.uField .val{font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;max-width:120px;text-overflow:ellipsis}
-.uField .clearX{width:22px;height:22px;border-radius:50%;background:#333;display:grid;place-items:center;font-size:12px;cursor:pointer;flex-shrink:0}
-.uploadBtn{margin:12px;width:calc(100% - 24px);background:#0095f6;color:#fff;border:0;padding:14px;border-radius:999px;font-weight:800;font-size:15px;display:flex;gap:8px;justify-content:center;align-items:center;flex-shrink:0}
-.successBox{margin:0 12px;background:#111;border:1px solid #222;border-radius:999px;padding:11px 14px;display:none;gap:8px;align-items:center;font-size:13px}
-.successBox.show{display:flex}
-#status{text-align:center;font-size:13px;color:#ffcc00;padding:8px}
-#file,#fileMulti,#fileImage,#fileAdd,#fileReplace,#fileSticker{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
-</style>
+<link rel="stylesheet" href="css/create.css">
 </head>
 <body>
 <div class="page on" id="pageHome">
@@ -168,195 +12,61 @@ body.hideChrome .nextBtn{bottom:20px}
 <div class="galScroll">
 <div class="galPreview post" id="galPreview">
 <div class="pvStage" id="pvStage"><img id="pvImg" style="display:none"><video id="pvVid" style="display:none" loop playsinline preload="metadata"></video></div>
-<div class="pvEmpty" id="pvEmpty"><div><div class="eBox"><svg class="ic-lg" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 18l3-3 2 2 3-4 2 3"/></svg></div><b>Photo Select Pannu</b><span>Gallery la irunthu Photo / Video Edu</span></div></div>
-<div class="pvTop" id="pvTop" style="display:none"><span class="pvChip"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 18l3-3 2 2 3-4 2 3"/></svg> <span id="pvChipTxt">1:1 - Drag to adjust</span></span><span class="soundBtn" onclick="toggleSound(event)"><svg class="ic-sm" id="soundIcon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M16 9l6 6M22 9l-6 6"/></svg></span></div>
-<div class="playBig" id="pvPlay" style="display:none" onclick="togglePreviewPlay(event)"><svg class="ic-lg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 5l11 7-11 7V5z"/></svg></div>
+<div class="pvEmpty" id="pvEmpty"><div><div class="eBox">📷</div><b>Photo Select Pannu</b><span>Gallery la irunthu Photo / Video Edu</span></div></div>
+<div class="pvTop" id="pvTop" style="display:none"><span class="pvChip"><span id="pvChipTxt">1:1 - Drag to adjust</span></span><span class="soundBtn" onclick="toggleSound(event)">🔊</span></div>
+<div class="playBig" id="pvPlay" style="display:none" onclick="togglePreviewPlay(event)">▶</div>
 <div class="cropHint" id="cropHint" style="display:none">Pinch to zoom • Drag to move</div>
-<div class="sugAudio" id="sugAudio" style="display:none"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span class="marq"><b id="sugTxt">A.R. Rahman - Vaathi En Peggilam</b> &nbsp;•&nbsp; Suggested Audio</span></div>
+<div class="sugAudio" id="sugAudio" style="display:none"><span class="marq"><b id="sugTxt">A.R. Rahman - Vaathi En Peggilam</b> • Suggested Audio</span></div>
 </div>
-<div class="galTop"><b>Recents</b><span style="font-size:13px;color:#aaa">▼</span><span style="margin-left:auto;font-size:12px;color:#aaa">Drafts</span><button style="background:#222;color:#fff;border:0;padding:6px 12px;border-radius:999px;font-size:12px" onclick="document.getElementById('fileMulti').click()">Select</button></div>
+<div class="galTop"><b>Recents ▼</b><span style="margin-left:auto">Drafts</span><button onclick="document.getElementById('fileMulti').click()">Select</button></div>
 <div class="galTabs"><button class="sel" onclick="setGalTab('all',this)">All</button><button onclick="setGalTab('image',this)">Photos</button><button onclick="setGalTab('video',this)">Videos</button><button onclick="document.getElementById('fileMulti').click()">Camera</button></div>
 <div class="grid" id="mediaGridHome"></div>
 </div>
 </div>
-<div class="page" id="pageSelect">
-<div class="top"><span class="back" onclick="showPage('pageHome')">←</span><b>Select Media</b><span class="done" onclick="goSelectNext()">Next →</span></div>
-<div class="galTop"><b>Recents</b><span>▼</span></div>
-<div class="grid" id="mediaGrid"></div>
-<button class="nextBtn" id="selectNext" onclick="goSelectNext()">Next →</button>
-</div>
+
 <div class="page" id="pageEdit">
-<div class="top"><span class="back" onclick="askDraft()">✕</span><b id="editTitle">Edit Photo</b><span class="done" id="editDoneBtn" onclick="goUpload()">Next →</span></div>
+<div class="top"><span class="back" onclick="askDraft()">✕</span><b id="editTitle">Edit Photo</b><span class="done" onclick="goUpload()">Next →</span></div>
 <div class="editWrap">
 <div class="quickBar" id="quickBar"></div>
-<div class="editPreview" id="editPreview"><img id="editImg"><video id="editVid" style="display:none" muted loop playsinline preload="metadata"></video><div class="centerPlay" id="centerPlay" style="display:none" onclick="togglePlay()"><svg class="ic-lg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 5l11 7-11 7V5z"/></svg></div><div class="ovText" id="ovText"></div><div class="ovStick" id="ovStick"></div>
-<div class="dragDelete" id="dragDelete"><div class="bin" id="deleteBin"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg></div><span>Drag to delete</span></div>
-</div>
+<div class="editPreview" id="editPreview"><img id="editImg"><video id="editVid" style="display:none" muted loop playsinline></video><div class="ovText" id="ovText"></div><div class="ovStick" id="ovStick"></div><div class="dragDelete" id="dragDelete"><div class="bin" id="deleteBin">🗑</div><span>Drag to delete</span></div></div>
 <div class="instaTools">
-<div onclick="openFull('pageAudioFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span>Audio</span></div>
-<div onclick="openFull('pageTextFull')"><div class="c"><span style="font-size:20px;font-weight:800">Aa</span></div><span>Text</span></div>
-<div onclick="openFull('pageVoiceFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg></div><span>Voice</span></div>
-<div onclick="openFull('pageTextFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6"/></svg></div><span>Captions</span></div>
-<div onclick="openFull('pageStickerFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></div><span>Stickers</span></div>
+<div onclick="openFull('pageAudioFull')"><div class="c">🎵</div><span>Audio</span></div>
+<div onclick="openFull('pageTextFull')"><div class="c">Aa</div><span>Text</span></div>
+<div onclick="openFull('pageVoiceFull')"><div class="c">🎤</div><span>Voice</span></div>
+<div onclick="openFull('pageTextFull')"><div class="c">💬</div><span>Captions</span></div>
+<div onclick="openFull('pageStickerFull')"><div class="c">😊</div><span>Stickers</span></div>
 </div>
 <div class="instaBottom"><button class="editBtn" onclick="openFull('pageEditVideoFull')">Edit video</button><button class="nextBtn2" onclick="goUpload()">Next →</button></div>
 </div>
 </div>
-<div class="fullPage" id="pageAudioFull">
-<div class="fpTop"><span class="x" onclick="closeFull()">✕</span><b>Audio</b><span class="done" onclick="closeFull()">Done</span></div>
-<div class="fpMini"><img id="auImg"><video id="auVid" style="display:none" muted loop playsinline></video></div>
-<div class="fpBody"><input class="fpSearch" placeholder="Search..." oninput="searchSong(this.value)"><div class="fpTabs"><button class="sel">For you</button><button>Trending</button><button>Saved</button><button>Original audio</button></div><div id="songListFull"></div><p id="songTxt" style="font-size:12px;color:#ffcc00;padding:8px 2px">Song: Trending Audio</p></div>
-</div>
-<div class="fullPage" id="pageTextFull">
-<div class="fpTop"><span class="x" onclick="closeFull()">✕</span><span></span><span class="done" onclick="confirmTextFull()">Done</span></div>
-<div style="flex:1;position:relative;overflow:hidden;background:#000"><img id="tfImg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0"><video id="tfVid" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0" muted loop playsinline></video><input class="tfInput" id="tfInput" placeholder="Hi" autocomplete="off"></div>
-<div style="background:#111;padding:10px"><div class="tfRow" id="tfFontRow"><button class="sel" onclick="setTFFont('cursive',this)">Signature</button><button onclick="setTFFont('monospace',this)">Editor</button><button onclick="setTFFont('fantasy',this)">Poster</button><button onclick="setTFFont('system-ui',this)">Bubble</button><button onclick="setTFFont('serif',this)">Deco</button><button onclick="setTFFont('Georgia,serif',this)">Squeeze</button><button onclick="setTFFont('Arial',this)">Typewriter</button><button onclick="setTFFont('Impact',this)">Strong</button></div><div class="tfRow"><button class="sel" onclick="setTFEffect('none',this)">None</button><button onclick="setTFEffect('shadow',this)">Hard Shadow</button><button onclick="setTFEffect('neon',this)">Neon</button><button onclick="setTFEffect('halo',this)">Halo</button></div><div class="tfColors"><div style="background:#fff" onclick="setTFColor('#fff')"></div><div style="background:#000;border-color:#fff" onclick="setTFColor('#000')"></div><div style="background:#ff2d55" onclick="setTFColor('#ff2d55')"></div><div style="background:#ffcc00" onclick="setTFColor('#ffcc00')"></div><div style="background:#00c853" onclick="setTFColor('#00c853')"></div><div style="background:#0095f6" onclick="setTFColor('#0095f6')"></div></div><div style="text-align:center;padding:6px"><button style="background:transparent;color:#ff5a5a;border:0;display:flex;gap:6px;align-items:center;justify-content:center;width:100%" onclick="removeTextFull()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg> Delete Text</button></div></div>
-</div>
-<div class="fullPage" id="pageVoiceFull">
-<div class="fpTop"><span class="x" onclick="closeFull()">✕</span><b>Voice</b><span class="done" onclick="closeFull()">Done</span></div>
-<div class="fpMini"><img id="voImg"><video id="voVid" style="display:none" muted loop playsinline></video></div>
-<div class="fpBody"><div style="display:flex;gap:10px"><button style="flex:1;background:#fff;color:#000;border:0;padding:14px;border-radius:999px;font-weight:800;display:flex;gap:6px;align-items:center;justify-content:center" onclick="startVoice(this)"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.8"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg> Record</button><button style="flex:1;background:#222;color:#fff;border:0;padding:14px;border-radius:999px" onclick="stopVoice()">Stop</button></div><p id="voiceTxt" style="font-size:13px;color:#7dffb0;padding:10px 2px">Voice: No Voice</p></div>
-</div>
-<div class="fullPage" id="pageStickerFull">
-<div class="fpTop"><span class="x" onclick="closeFull()">✕</span><b>Stickers</b><span class="done" onclick="closeFull()">Done</span></div>
-<div class="fpBody"><button style="width:100%;background:#fff;color:#000;font-weight:800;padding:13px;border:0;border-radius:999px;display:flex;gap:8px;align-items:center;justify-content:center" onclick="document.getElementById('fileSticker').click()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 18l3-3 2 2 3-4 2 3"/></svg> Gallery la irunthu Sticker Podu</button><p style="font-size:11px;color:#aaa;padding:8px 2px">Ne select panna image - Photo mela Sticker ah ottikum</p><div id="myStickerList"></div><div class="stickGrid"><button onclick="pickSticker('fire')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff6b00" stroke-width="1.8"><path d="M12 3c1 3-2 4-2 7a4 4 0 0 0 8 0c0-1-.5-2-1-3-.5 1-1 1.5-2 1.5C15 6 14 4 12 3z"/></svg></button><button onclick="pickSticker('heart')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff2d55" stroke-width="1.8"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg></button><button onclick="pickSticker('laugh')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></button><button onclick="pickSticker('crown')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.8"><path d="M3 17h18M3 17l-1-9 6 4 4-6 4 6 6-4-1 9z"/></svg></button><button onclick="pickSticker('love')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff2d55" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></button><button onclick="pickSticker('star')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.8"><path d="M12 3l2.5 6 6.5.5-5 4.5 1.5 6.5L12 17l-5.5 3.5L8 14 3 9.5 9.5 9z"/></svg></button><button onclick="pickSticker('party')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a259ff" stroke-width="1.8"><path d="M4 20L20 4M20 4l-3 1 1 3z"/></svg></button><button onclick="pickSticker('hundred')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00c853" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 8v8M12 8v8M16 8v8"/></svg></button></div><button style="width:100%;margin-top:12px;background:transparent;color:#ff5a5a;border:1px solid #442222;padding:12px;border-radius:999px;display:flex;gap:6px;align-items:center;justify-content:center" onclick="removeText()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg> Remove Sticker</button></div>
-</div>
-<div class="fullPage" id="pageEditVideoFull">
-<div class="fpTop"><span class="x" onclick="closeFull()">✕</span><b>Try Edits</b><span style="font-size:22px;cursor:pointer" onclick="closeFull()">→</span></div>
-<div class="fpMini" style="height:240px"><img id="evImg"><video id="evVid" style="display:none" muted loop playsinline></video></div>
-<div class="tlBar"><span onclick="togglePlay()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M8 5l11 7-11 7V5z"/></svg></span><input type="range" id="seekBar2" min="0" max="100" value="0" oninput="seekVideo(this.value)"><span id="playTime" style="font-size:12px">0:00 / 0:15</span></div>
-<div class="filmStrip" id="filmStrip"></div>
-<div class="addRow"><button onclick="openFull('pageAudioFull')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Add audio</button><button onclick="openFull('pageTextFull')"><span style="font-weight:800">Aa</span> Add text</button></div>
-<div style="padding:0 12px"><div style="display:flex;justify-content:space-between;font-size:12px;color:#aaa"><span id="clipInfo">1 Clip • 0:15</span><span id="trimInfo">Trim: 0:00 - 0:15</span></div></div>
-<div style="padding:10px"><div style="display:flex;gap:8px"><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px;display:flex;gap:6px;align-items:center;justify-content:center" onclick="cutAtCurrent()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8 8l12 8M8 16L20 8"/></svg> Cut</button><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="splitClip()">Split</button><button style="flex:1;background:#222;color:#ff5a5a;border:0;padding:11px;border-radius:999px;display:flex;gap:6px;align-items:center;justify-content:center" onclick="deleteClip()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg> Delete</button></div></div>
-<div class="instaTools" style="border-top:1px solid #222"><div onclick="openFull('pageAudioFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span>Audio</span></div><div onclick="openFull('pageTextFull')"><div class="c">Aa</div><span>Text</span></div><div onclick="openFull('pageVoiceFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg></div><span>Voice</span></div><div onclick="openFull('pageStickerFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></div><span>Sticker</span></div><div onclick="openFull('pageFilterFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></div><span>Filters</span></div></div>
-<div style="padding:10px;display:flex;gap:8px"><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="setFilter('none')">None</button><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="setFilter('brightness(1.15) saturate(1.5)')">Zoom</button><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="setFilter('blur(2px)')">Blur</button></div>
-</div>
-<div class="fullPage" id="pageFilterFull">
-<div class="fpTop"><span class="x" onclick="closeFull()">✕</span><b>Filters</b><span class="done" onclick="closeFull()">Done</span></div>
-<div class="fpBody"><div style="display:flex;gap:10px;overflow-x:auto" id="filterRowFull"></div></div>
-</div>
-<div class="toast" id="toast"></div>
+
 <div class="page" id="pageUpload">
-<div class="top"><span class="back" onclick="showPage('pageEdit')">‹</span><b id="uploadTitle">Upload Post</b><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span></div>
+<div class="top"><span class="back" onclick="showPage('pageEdit')">‹</span><b id="uploadTitle">Upload Post</b><span>⚙</span></div>
 <div class="uploadScroll">
-<div class="uploadBox" id="uploadBox"><img id="upImgPost"><video id="upVidPost" style="display:none" muted loop playsinline></video><div class="closeX" onclick="removeUploadPhoto()">✕</div><button class="change" onclick="document.getElementById('file').click()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Change Photo</button></div>
-<div class="uField"><textarea id="captionPost" rows="2" placeholder="Write a caption..." oninput="syncCap()"></textarea><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></div>
-<div class="uField" onclick="promptLoc()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span style="flex:1;font-size:14px">Add Location</span><span class="val" id="locVal">Chennai, India</span><span class="clearX" onclick="event.stopPropagation();clearLoc()">✕</span></div>
-<div class="uField" onclick="promptTag()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c1-4 4-5 8-5s7 1 8 5"/></svg><span style="flex:1;font-size:14px">Tag People</span><span class="val" id="tagVal">@friend_name</span><span class="clearX" onclick="event.stopPropagation();clearTag()">✕</span></div>
-<div class="uField" onclick="openFull('pageAudioFull')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span style="flex:1;font-size:14px">Add Music</span><span class="val" id="musicVal">Trending Audio</span><span>›</span></div>
-<div class="uField" onclick="toggleAud()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span style="flex:1;font-size:14px">Privacy</span><span class="val" id="audVal">Everyone</span><span>›</span></div>
+<div class="uploadBox"><img id="upImgPost"><video id="upVidPost" style="display:none" muted loop playsinline></video><div class="closeX" onclick="removeUploadPhoto()">✕</div><button class="change" onclick="document.getElementById('file').click()">Change Photo</button></div>
+<div class="uField"><textarea id="captionPost" rows="2" placeholder="Write a caption..." oninput="syncCap()"></textarea></div>
+<div class="uField" onclick="promptLoc()"><span style="flex:1">Add Location</span><span class="val" id="locVal">Chennai, India</span></div>
+<div class="uField" onclick="promptTag()"><span style="flex:1">Tag People</span><span class="val" id="tagVal">@friend_name</span></div>
+<div class="uField" onclick="openFull('pageAudioFull')"><span style="flex:1">Add Music</span><span class="val" id="musicVal">Trending Audio</span></div>
+<div class="uField" onclick="toggleAud()"><span style="flex:1">Privacy</span><span class="val" id="audVal">Everyone</span></div>
 <div id="status"></div>
-<button class="uploadBtn" id="shareBtnPost" onclick="sharePost()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg> Upload Post</button>
-<div class="successBox" id="successBox"><span><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="#00c853" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg></span><span>Post uploaded - Server la Save aayiduchu!</span></div>
+<button class="uploadBtn" id="shareBtnPost" onclick="sharePost()">Upload Post</button>
+<div class="successBox" id="successBox"><span>Post uploaded - Server la Save aayiduchu!</span></div>
 </div>
 </div>
-<div class="popup" id="draftPopup"><div class="box"><b>Save draft?</b><p>If you go back now, you will lose this draft.</p><button class="red" onclick="startOver()">Start over</button><button onclick="saveDraftAndBack()">Save draft - Server la Save</button><button onclick="closeDraft()">Keep editing</button></div></div>
-<div class="sheetBg" id="sheetBg" onclick="closeCreateSheet()"></div>
-<div class="createSheet" id="createSheet"><div class="bar"></div>
-<div class="optRow" onclick="pickCreate('post')"><div class="icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M3 9h18M9 21V9"/></svg></div><div><b>Create Post</b><span>Share your thoughts</span></div><span class="arrow">→</span></div>
-<div class="optRow" onclick="pickCreate('reels')"><div class="icon alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="4"/><path d="M10 9l5 3-5 3V9z"/></svg></div><div><b>Create Reels</b><span>Show your moments</span></div><span class="arrow">→</span></div>
-<div class="optRow" onclick="pickCreate('story')"><div class="icon alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></div><div><b>Create Story</b><span>Let them see your day</span></div><span class="arrow">→</span></div>
-</div>
+
 <div class="modeWrap"><div class="modePill" id="modePill"><div class="ind" id="modeInd"></div><button data-mode="post" class="on" onclick="setMode('post')">POST</button><button data-mode="story" onclick="setMode('story')">STORY</button><button data-mode="reels" onclick="setMode('reels')">REEL</button><button data-mode="live" onclick="setMode('live')">LIVE</button></div></div>
-<div class="bottomNav"><div onclick="showPage('pageHome')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8V21H3V11z"/></svg><br>Home</div><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><br>Search</div><div class="on" onclick="openCreateSheet()"><div class="plus">+</div>Create</div><div onclick="setMode('reels');showPage('pageHome')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="4"/><path d="M10 9l5 3-5 3V9z"/></svg><br>Reels</div><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c1-4 4-5 8-5s7 1 8 5"/></svg><br>Profile</div></div>
+<div class="bottomNav"><div onclick="showPage('pageHome')">Home</div><div>Search</div><div class="on" onclick="openCreateSheet()"><div class="plus">+</div>Create</div><div onclick="setMode('reels');showPage('pageHome')">Reels</div><div>Profile</div></div>
+<div class="toast" id="toast"></div>
+<div class="popup" id="draftPopup"><div class="box"><b>Save draft?</b><button class="red" onclick="startOver()">Start over</button><button onclick="saveDraftAndBack()">Save draft</button><button onclick="closeDraft()">Keep editing</button></div></div>
+
 <input type="file" id="file" accept="image/*,video/*">
 <input type="file" id="fileMulti" accept="image/*,video/*" multiple>
-<input type="file" id="fileImage" accept="image/*">
 <input type="file" id="fileAdd" accept="image/*,video/*" multiple>
-<input type="file" id="fileReplace" accept="image/*,video/*">
 <input type="file" id="fileSticker" accept="image/*">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js?v=1057"></script>
-<script>
-let type='post',file=null,url='',kind='image',filter='none',text='',song='Trending Audio',fontF='system-ui',adj={brightness:100,contrast:100,saturate:100},effect='none',loc='Chennai, India',aud='Everyone',tag='@friend_name';
-let clips=[],selClip=-1,galleryPhotos=[],playing=false,trimStart=0,trimEnd=15,totalDur=15,uploading=false,captionVal='',textEffect='none',myStickers=[],stickerImgUrl='',tfColor='#fff',toastTimer=null,galFilter='all',soundOn=false,zoom=1,panX=0,panY=0,hintTimer=null;
-function toast(m){let t=document.getElementById('toast');if(!t) return;t.innerText=m;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
-function fmt(s){s=Math.max(0,s);let m=Math.floor(s/60),ss=Math.floor(s%60);return m+':'+(ss<10?'0':'')+ss;}
-function updateChrome(id){document.body.classList.toggle('hideChrome',id!=='pageHome');}
-function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');updateChrome(id);window.scrollTo(0,0);closeFullAll();closeCreateSheet();}
-function openCreateSheet(){document.getElementById('createSheet').classList.add('show');document.getElementById('sheetBg').classList.add('show');}
-function closeCreateSheet(){document.getElementById('createSheet').classList.remove('show');document.getElementById('sheetBg').classList.remove('show');}
-function pickCreate(t){closeCreateSheet();setMode(t);goCreate(t);}
-function goCreate(t){type=t;setType(t);setMode(t);showPage('pageHome');renderMedia();updatePreview();}
-function setMode(t){type=t;document.querySelectorAll('#modePill button').forEach(b=>b.classList.toggle('on',b.dataset.mode===t));let active=document.querySelector('#modePill button.on');let ind=document.getElementById('modeInd');if(active&&ind){ind.style.width=active.offsetWidth+'px';ind.style.transform='translateX('+(active.offsetLeft-4)+'px)';}document.getElementById('homeTitle').innerText=t==='post'?'New post':t==='reels'?'New reel':t==='story'?'New story':'Live';let pv=document.getElementById('galPreview');pv.className='galPreview '+t;document.getElementById('pvChipTxt').innerText=t==='post'?'1:1 - Drag to adjust':t==='reels'?'9:16 - Reels':t==='story'?'9:16 - Story':'LIVE';document.getElementById('sugAudio').style.display=(t==='reels'&&url)?'flex':'none';document.getElementById('cropHint').style.display=url?'block':'none';setType(t);updatePreview();if(t==='live')toast('Live - Camera');}
-function setType(t){type=t;document.getElementById('editTitle').innerText=t==='post'?'Edit Photo':t==='reels'?'Edit Reel':'Story Edit';document.getElementById('uploadTitle').innerText=t==='post'?'Upload Post':t==='reels'?'Upload Reel':'Upload Story';renderQuickBar();if(type==='reels'||type==='story') setupVideo();}
-function setGalTab(f,btn){galFilter=f;document.querySelectorAll('.galTabs button').forEach(b=>b.classList.remove('sel'));if(btn)btn.classList.add('sel');renderMedia();}
-function isFakeFile(f){let n=(f.name||'').toLowerCase();return n.match(/ai|generated|fake|unsplash|sample|demo|download|midjourney|dalle/)?true:false;}
-function showMedia(imgEl,vidEl,src,k){if(!imgEl||!vidEl) return;if(k==='video'){vidEl.src=src;vidEl.style.display='block';imgEl.style.display='none';}else{imgEl.src=src;imgEl.style.display='block';vidEl.style.display='none';try{vidEl.pause();}catch(e){}}}
-function updatePreview(){let pvImg=document.getElementById('pvImg');let pvVid=document.getElementById('pvVid');let play=document.getElementById('pvPlay');let empty=document.getElementById('pvEmpty');let top=document.getElementById('pvTop');let hint=document.getElementById('cropHint');if(!url){pvImg.style.display='none';pvVid.style.display='none';empty.style.display='grid';top.style.display='none';hint.style.display='none';document.getElementById('sugAudio').style.display='none';if(play)play.style.display='none';return;}empty.style.display='none';top.style.display='flex';hint.style.display='block';hint.classList.remove('hide');clearTimeout(hintTimer);hintTimer=setTimeout(()=>hint.classList.add('hide'),2500);showMedia(pvImg,pvVid,url,kind);applyZoom();document.getElementById('sugAudio').style.display=type==='reels'?'flex':'none';if(kind==='video'){pvVid.muted=!soundOn;pvVid.currentTime=0;if(type==='reels'||type==='post'){pvVid.play().catch(()=>{});if(play)play.style.display='none';}else{if(play)play.style.display='grid';}}else{if(play)play.style.display='none';try{pvVid.pause();}catch(e){}}}
-/* ✅ INSTAGRAM CLAMP - PHOTO EPPOVUM FRAME AH MOODUM - BLACK GAP VARAATHU */
-function clampPan(){let stage=document.getElementById('pvStage');if(!stage) return;let w=stage.clientWidth,h=stage.clientHeight;let maxX=Math.max(0,(w*(zoom-1))/2);let maxY=Math.max(0,(h*(zoom-1))/2);panX=Math.max(-maxX,Math.min(maxX,panX));panY=Math.max(-maxY,Math.min(maxY,panY));}
-function applyZoom(){clampPan();let el=kind==='video'?document.getElementById('pvVid'):document.getElementById('pvImg');if(el)el.style.transform='translate3d('+panX+'px,'+panY+'px,0) scale('+zoom+')';}
-function toggleSound(e){if(e)e.stopPropagation();soundOn=!soundOn;let pvVid=document.getElementById('pvVid');if(pvVid){pvVid.muted=!soundOn;if(soundOn)pvVid.play().catch(()=>{});}document.getElementById('soundIcon').innerHTML=soundOn?'<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15 9a4 4 0 0 1 0 6"/><path d="M18 7a8 8 0 0 1 0 10"/>':'<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M16 9l6 6M22 9l-6 6"/>';toast(soundOn?'Sound ON':'Sound OFF');}
-function togglePreviewPlay(e){if(e)e.stopPropagation();let v=document.getElementById('pvVid');if(!v) return;if(v.paused){v.play().catch(()=>{});document.getElementById('pvPlay').style.display='none';}else{v.pause();document.getElementById('pvPlay').style.display='grid';}}
-function openFull(id){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));let e=document.getElementById(id);if(e){void e.offsetWidth;e.classList.add('show');}if(id==='pageAudioFull'){showMedia(document.getElementById('auImg'),document.getElementById('auVid'),url,kind);renderSongs('');}if(id==='pageTextFull'){showMedia(document.getElementById('tfImg'),document.getElementById('tfVid'),url,kind);let inp=document.getElementById('tfInput');inp.value=text;inp.style.fontFamily=fontF;inp.style.color=tfColor;setTimeout(()=>inp.focus(),350);}if(id==='pageVoiceFull'){showMedia(document.getElementById('voImg'),document.getElementById('voVid'),url,kind);}if(id==='pageEditVideoFull'){showMedia(document.getElementById('evImg'),document.getElementById('evVid'),url,kind);renderFilm();}if(id==='pageFilterFull'){renderFilterFull();}}
-function closeFull(){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));}
-function closeFullAll(){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));}
-function renderMedia(){let list=galleryPhotos.filter(p=>galFilter==='all'||p.kind===galFilter);let html='<div class="galleryBtn" onclick="document.getElementById(\'fileMulti\').click()"><div><b>Gallery la irunthu Photo / Video Add Pannu</b><div style="font-size:11px;color:#aaa">Real Gallery mattum thaan</div></div></div>';html+=list.map((p)=>{let idx=galleryPhotos.indexOf(p);return '<div class="tile '+(url===p.url?'sel':'')+'" onclick="selectGallery('+idx+')">'+(p.kind==='video'?'<video src="'+p.url+'" muted playsinline></video><span class="dur">0:15</span>':'<img src="'+p.url+'">')+'<span class="tick">'+(url===p.url?'✓':'')+'</span></div>';}).join('');let g=document.getElementById('mediaGrid');if(g)g.innerHTML=html;let gh=document.getElementById('mediaGridHome');if(gh)gh.innerHTML=html;}
-function selectGallery(i){let p=galleryPhotos[i];if(!p) return;url=p.url;kind=p.kind;file=p.file;zoom=1;panX=0;panY=0;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);document.getElementById('selectNext').classList.add('show');renderMedia();renderFilm();updatePreview();}
-function goSelectNext(){if(!url){document.getElementById('fileMulti').click();return;}goEdit();}
-function goEdit(){if(!url){toast('Gallery la irunthu Photo Add Pannu');showPage('pageHome');return;}showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);showMedia(document.getElementById('upImgPost'),document.getElementById('upVidPost'),url,kind);showPage('pageEdit');renderFilm();setType(type);}
-function goUpload(){if(!url){toast('Photo illa');return;}showPage('pageUpload');document.getElementById('captionPost').value=captionVal;syncFields();}
-function syncCap(){captionVal=document.getElementById('captionPost').value;}
-function syncFields(){document.getElementById('locVal').innerText=loc||'Add Location';document.getElementById('tagVal').innerText=tag||'Tag People';document.getElementById('musicVal').innerText=song;document.getElementById('audVal').innerText=aud;}
-function promptLoc(){let l=prompt('Location',loc||'Chennai, India');if(l!==null){loc=l;syncFields();}}
-function clearLoc(){loc='';syncFields();}
-function promptTag(){let t=prompt('Tag People',tag||'@friend_name');if(t!==null){tag=t;syncFields();}}
-function clearTag(){tag='';syncFields();}
-function toggleAud(){aud=aud==='Everyone'?'Private':'Everyone';syncFields();}
-function removeUploadPhoto(){url='';file=null;clips=[];showPage('pageHome');renderMedia();updatePreview();toast('Photo Removed');}
-function renderQuickBar(){let q=document.getElementById('quickBar');if(!q) return;if(type==='post') q.innerHTML='<button onclick="openFull(\'pageTextFull\')">Aa Text</button><button onclick="openFull(\'pageStickerFull\')">Sticker</button><button onclick="openFull(\'pageEditVideoFull\')">Adjust</button>';else q.innerHTML='<button onclick="document.getElementById(\'fileAdd\').click()">+ Add Reel</button><button onclick="openFull(\'pageAudioFull\')">Add Song</button><button onclick="openFull(\'pageTextFull\')">Aa Text</button><button onclick="openFull(\'pageStickerFull\')">Sticker</button>';}
-function askDraft(){document.getElementById('draftPopup').classList.add('show');}
-function closeDraft(){document.getElementById('draftPopup').classList.remove('show');}
-function startOver(){document.getElementById('draftPopup').classList.remove('show');resetEdit();showPage('pageHome');}
-async function saveDraftAndBack(){document.getElementById('draftPopup').classList.remove('show');await saveToServer(true);showPage('pageHome');toast('Draft Saved');}
-function setupVideo(){let vid=document.getElementById('editVid');if(kind==='video'){vid.onloadedmetadata=()=>{totalDur=vid.duration||15;trimStart=0;trimEnd=totalDur;document.getElementById('playTime').innerText='0:00 / '+fmt(totalDur);updateTrimUI();};vid.ontimeupdate=()=>{if(!vid.duration) return;let cur=vid.currentTime;document.getElementById('playTime').innerText=fmt(cur)+' / '+fmt(vid.duration);};}else{totalDur=15;trimStart=0;trimEnd=15;document.getElementById('playTime').innerText='0:00 / 0:15';updateTrimUI();}renderFilm();}
-function togglePlay(){if(kind!=='video'){if(type==='reels') toast('Video select pannu');return;}let vid=document.getElementById('editVid');if(vid.paused) vid.play().catch(()=>{});else vid.pause();}
-function seekVideo(v){let vid=document.getElementById('editVid');if(kind!=='video'||!vid.duration) return;vid.currentTime=vid.duration*v/100;}
-function renderFilm(){let f=document.getElementById('filmStrip');if(!f||!url) return;let count=Math.max(clips.length,1);let h='';for(let i=0;i<6;i++){let c=clips[i%count]||{url:url,kind:kind};h+='<div>'+(c.kind==='video'?'<video src="'+c.url+'" muted playsinline></video>':'<img src="'+c.url+'">')+'</div>';}f.innerHTML=h;}
-function deleteSelectedClip(){if(clips.length>1){clips.splice(selClip,1);selClip=-1;renderFilm();updateTrimUI();toast('Clip Deleted');}else{removeText();toast('Deleted');}}
-function cutAtCurrent(){let vid=document.getElementById('editVid');let cutTime=kind==='video'?vid.currentTime:(trimStart+trimEnd)/2;if(cutTime<=trimStart+0.3||cutTime>=trimEnd-0.3){toast('Konjam naduvula Play panni Cut pannu');return;}clips=[{url:url,kind:kind,file:file},{url:url,kind:kind,file:file}];selClip=1;renderFilm();toast('Cut aayiduchu - 2 Clips');}
-function splitClip(){cutAtCurrent();}
-function duplicateClip(){if(!url) return;clips.push({url:url,kind:kind,file:file});renderFilm();toast('Duplicated');}
-function deleteClip(){deleteSelectedClip();}
-function updateTrimUI(){let a=document.getElementById('trimInfo');if(a) a.innerText='Trim: '+fmt(trimStart)+' - '+fmt(trimEnd);let b=document.getElementById('clipInfo');if(b) b.innerText=clips.length+' Clip • '+fmt(trimEnd-trimStart);}
-function renderFilterFull(){let r=document.getElementById('filterRowFull');if(!r) return;r.innerHTML=[['None','none'],['Vivid','brightness(1.15) saturate(1.5)'],['Warm','sepia(.45)'],['Retro','sepia(.6)'],['B&W','grayscale(1)']].map(a=>'<button style="background:#222;color:#fff;border:0;padding:10px 14px;border-radius:999px" onclick="setFilter(\''+a[1]+'\')">'+a[0]+'</button>').join('');}
-function buildFilter(){if(filter==='none') return 'brightness('+adj.brightness+'%) contrast('+adj.contrast+'%) saturate('+adj.saturate+'%)';return 'brightness('+adj.brightness+'%) contrast('+adj.contrast+'%) saturate('+adj.saturate+'%) '+filter;}
-function applyFilter(){let f=buildFilter();document.getElementById('editImg').style.filter=f;let v=document.getElementById('editVid');if(v)v.style.filter=f;document.getElementById('upImgPost').style.filter=f;}
-function setFilter(f){filter=f;applyFilter();closeFull();toast('Filter Applied');}
-function confirmTextFull(){let v=document.getElementById('tfInput').value.trim();if(v){text=v;let o=document.getElementById('ovText');o.innerText=v;o.style.fontFamily=fontF;o.style.color=tfColor;applyTextEffect();toast('Text Added');}closeFull();}
-function removeTextFull(){text='';document.getElementById('tfInput').value='';document.getElementById('ovText').innerText='';closeFull();toast('Text Deleted');}
-function setTFFont(f,btn){fontF=f;document.getElementById('tfInput').style.fontFamily=f;document.querySelectorAll('#tfFontRow button').forEach(b=>b.classList.remove('sel'));if(btn)btn.classList.add('sel');}
-function setTFEffect(e,btn){textEffect=e;let inp=document.getElementById('tfInput');if(e==='shadow') inp.style.textShadow='4px 4px 0 #000';else if(e==='neon') inp.style.textShadow='0 0 10px #fff,0 0 20px #ff2d95';else if(e==='halo') inp.style.textShadow='0 0 12px #fff';else inp.style.textShadow='0 2px 10px #000';}
-function setTFColor(c){tfColor=c;document.getElementById('tfInput').style.color=c;}
-function applyTextEffect(){let o=document.getElementById('ovText');if(textEffect==='shadow') o.style.textShadow='4px 4px 0 #000';else if(textEffect==='neon') o.style.textShadow='0 0 10px #fff,0 0 20px #ff2d95';else if(textEffect==='halo') o.style.textShadow='0 0 12px #fff';else o.style.textShadow='0 2px 8px #000';o.style.color=tfColor;}
-function pickSticker(k){let svgMap={fire:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ff6b00" stroke-width="1.8"><path d="M12 3c1 3-2 4-2 7a4 4 0 0 0 8 0c0-1-.5-2-1-3-.5 1-1 1.5-2 1.5C15 6 14 4 12 3z"/></svg>',heart:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ff2d55" stroke-width="1.8"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg>',laugh:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg>',crown:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.8"><path d="M3 17h18M3 17l-1-9 6 4 4-6 4 6 6-4-1 9z"/></svg>',love:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ff2d55" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg>',star:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.8"><path d="M12 3l2.5 6 6.5.5-5 4.5 1.5 6.5L12 17l-5.5 3.5L8 14 3 9.5 9.5 9z"/></svg>',party:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a259ff" stroke-width="1.8"><path d="M4 20L20 4M20 4l-3 1 1 3z"/></svg>',hundred:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#00c853" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 8v8M12 8v8M16 8v8"/></svg>'};let el=document.getElementById('ovStick');el.innerHTML='<div class="stSvg">'+(svgMap[k]||'')+'</div>';el.style.left='50%';el.style.top='60%';stickerImgUrl='';closeFull();toast('Sticker Added');}
-function pickMySticker(src){let el=document.getElementById('ovStick');el.innerText='';el.innerHTML='<img src="'+src+'">';el.style.left='50%';el.style.top='60%';stickerImgUrl=src;closeFull();}
-function renderMyStickers(){let box=document.getElementById('myStickerList');if(!myStickers.length){box.innerHTML='';return;}box.innerHTML='<div style="display:flex;gap:8px;overflow-x:auto">'+myStickers.map(s=>'<div style="width:72px;height:72px;border-radius:14px;overflow:hidden;border:2px solid #333;flex-shrink:0" onclick="pickMySticker(\''+s+'\')"><img src="'+s+'" style="width:100%;height:100%;object-fit:cover"></div>').join('')+'</div>';}
-function removeText(){text='';stickerImgUrl='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerText='';document.getElementById('ovStick').innerHTML='';closeFull();toast('Deleted');}
-function renderSongs(q){let list=[['Leo - Naa Ready','Sai Abhyankkar'],['Jailer - Hukum','Anirudh'],['Vikram','Anirudh'],['Trending Audio','Pixoro'],['Veezha Veera','Anirudh'],['Sheru Bhai','Sai Abhyankkar']];let f=list.filter(x=>!q||x[0].toLowerCase().includes(q.toLowerCase()));document.getElementById('songListFull').innerHTML=f.map(s=>'<div class="songRow" onclick="pickSong(\''+s[0]+'\')"><div class="th"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><div><b>'+s[0]+'</b><span>'+s[1]+' • 1.3L reels</span></div></div>').join('');}
-function pickSong(s){song=s;document.getElementById('songTxt').innerText='Song: '+s;document.getElementById('sugTxt').innerText=s+' - Suggested Audio';syncFields();closeFull();toast('Song Added');}
-function searchSong(q){renderSongs(q);}
-function startVoice(btn){document.getElementById('voiceTxt').innerText='Voice: Recording...';if(btn)btn.innerText='Recording...';toast('Recording...');}
-function stopVoice(){document.getElementById('voiceTxt').innerText='Voice: Added';toast('Voice Added');}
-function resetEdit(){filter='none';text='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerText='';document.getElementById('ovStick').innerHTML='';}
-function addClip(f){if(isFakeFile(f)){toast('Fake Photo');return;}let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let c={url:ev.target.result,kind:k,file:f};galleryPhotos.push(c);clips.push({url:c.url,kind:k,file:f});url=c.url;kind=k;file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);document.getElementById('selectNext').classList.add('show');renderMedia();renderFilm();updatePreview();if(type==='reels') setupVideo();};r.readAsDataURL(f);}
-function handleFile(f){if(!f) return;addClip(f);showPage('pageHome');}
-document.getElementById('file').addEventListener('change',function(e){handleFile(e.target.files[0]);e.target.value='';});
-document.getElementById('fileMulti').addEventListener('change',function(e){Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';});
-document.getElementById('fileAdd').addEventListener('change',function(e){Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';toast('Reel Added');});
-document.getElementById('fileImage').addEventListener('change',function(e){let f=e.target.files[0];if(!f) return;let r=new FileReader();r.onload=ev=>{document.getElementById('ovStick').innerHTML='<img src="'+ev.target.result+'" style="width:80px;height:80px;object-fit:cover;border-radius:12px;border:2px solid #fff">';stickerImgUrl=ev.target.result;closeFull();};r.readAsDataURL(f);e.target.value='';});
-document.getElementById('fileReplace').addEventListener('change',function(e){let f=e.target.files[0];if(!f) return;let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let nc={url:ev.target.result,kind:k,file:f};if(selClip>=0 && clips[selClip]) clips[selClip]=nc; else clips.push(nc);url=nc.url;kind=k;file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderFilm();toast('Replaced');};r.readAsDataURL(f);e.target.value='';});
-document.getElementById('fileSticker').addEventListener('change',function(e){let f=e.target.files[0];if(!f) return;let r=new FileReader();r.onload=ev=>{myStickers.push(ev.target.result);pickMySticker(ev.target.result);renderMyStickers();};r.readAsDataURL(f);e.target.value='';});
-(function(){let pv=document.getElementById('galPreview');let stage=document.getElementById('pvStage');let sx=0,sy=0,ox=0,oy=0,drag=false,lastDist=0;pv.addEventListener('touchstart',e=>{if(!url) return;stage.classList.add('dragging');if(e.touches.length===1){drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;ox=panX;oy=panY;}if(e.touches.length===2){drag=false;lastDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}}, {passive:true});pv.addEventListener('touchmove',e=>{if(!url) return;if(e.touches.length===1&&drag){panX=ox+(e.touches[0].clientX-sx);panY=oy+(e.touches[0].clientY-sy);applyZoom();}if(e.touches.length===2){let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(lastDist>0){zoom=Math.max(1,Math.min(3,zoom*(d/lastDist)));applyZoom();}lastDist=d;}}, {passive:true});pv.addEventListener('touchend',()=>{drag=false;lastDist=0;stage.classList.remove('dragging');});pv.addEventListener('dblclick',()=>{if(!url) return;zoom=zoom===1?2:1;panX=0;panY=0;applyZoom();});})();
-(function(){let pill=document.getElementById('modePill');let sx=0;let modes=['post','story','reels','live'];pill.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});pill.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40){let cur=modes.indexOf(type);if(dx<0&&cur<3)setMode(modes[cur+1]);if(dx>0&&cur>0)setMode(modes[cur-1]);}}, {passive:true});})();
-(function(){function makeDraggable(id,isSticker){let el=document.getElementById(id);let startX=0,startY=0,origL=0,origT=0,dragging=false,hot=false;el.addEventListener('pointerdown',e=>{if(!el.innerText && !el.innerHTML) return;dragging=true;startX=e.clientX;startY=e.clientY;let rect=el.getBoundingClientRect();let p=document.getElementById('editPreview').getBoundingClientRect();origL=(rect.left-p.left+rect.width/2)/p.width*100;origT=(rect.top-p.top+rect.height/2)/p.height*100;el.setPointerCapture(e.pointerId);document.getElementById('dragDelete').classList.add('show');e.stopPropagation();});el.addEventListener('pointermove',e=>{if(!dragging) return;let p=document.getElementById('editPreview').getBoundingClientRect();let nx=origL+(e.clientX-startX)/p.width*100;let ny=origT+(e.clientY-startY)/p.height*100;nx=Math.max(5,Math.min(95,nx));ny=Math.max(5,Math.min(95,ny));el.style.left=nx+'%';el.style.top=ny+'%';let bin=document.getElementById('deleteBin').getBoundingClientRect();hot=(e.clientX>bin.left-30 && e.clientX<bin.right+30 && e.clientY>bin.top-30 && e.clientY<bin.bottom+30);document.getElementById('dragDelete').classList.toggle('hot',hot);});el.addEventListener('pointerup',e=>{if(!dragging) return;dragging=false;document.getElementById('dragDelete').classList.remove('show');document.getElementById('dragDelete').classList.remove('hot');if(hot){if(isSticker){el.innerText='';el.innerHTML='';stickerImgUrl='';}else{el.innerText='';text='';}toast('Deleted');}});}makeDraggable('ovText',false);makeDraggable('ovStick',true);})();
-function getSupa(){return window.supa;}
-async function saveToServer(isDraft){let supa=getSupa();if(!supa) return false;let {data:{session}}=await supa.auth.getSession();if(!session){location.href='./login.html';return false;}let ME_RAW=session.user.email.split('@')[0];let blob;if(kind==='video'){blob=file;}else{blob=await new Promise(res=>{let img=new Image();img.onload=()=>{let W=1080,H=type==='reels'?1920:1350;let cc=document.createElement('canvas');cc.width=W;cc.height=H;let ctx=cc.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.filter=buildFilter();let sc=type==='reels'?Math.max(W/img.width,H/img.height):Math.min(W/img.width,H/img.height);let dw=img.width*sc,dh=img.height*sc;ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);if(text){ctx.filter='none';ctx.font='900 60px '+fontF;ctx.textAlign='center';ctx.fillStyle=tfColor;ctx.fillText(text,W/2,H*0.35);}cc.toBlob(b=>res(b||file),'image/jpeg',0.92);};img.src=url;});}let folder=type==='story'?'stories':type==='reels'?'reels':'posts';let ext=kind==='video'?'mp4':'jpg';let fn=folder+'/'+session.user.id+'/'+Date.now()+(isDraft?'-draft':'')+'.'+ext;let {error:upErr}=await supa.storage.from(folder).upload(fn,blob,{contentType:kind==='video'?'video/mp4':'image/jpeg'});if(upErr) throw new Error(upErr.message);let {data:ud}=supa.storage.from(folder).getPublicUrl(fn);let cap=captionVal||'Just Pixoro';if(tag)cap+=' '+tag;if(loc)cap+=' '+loc;if(song)cap+=' '+song;let {error}=await supa.from('posts').insert({user_id:session.user.id,username:ME_RAW,media_url:ud.publicUrl,image_url:kind==='image'?ud.publicUrl:null,video_url:kind==='video'?ud.publicUrl:null,media_type:type,caption:cap});if(error) throw new Error(error.message);return true;}
-async function sharePost(){if(uploading) return; uploading=true;if(!file||!url){toast('Photo Add Pannu');uploading=false;return;}let btn=document.getElementById('shareBtnPost');btn.innerText='Uploading...';btn.disabled=true;try{await saveToServer(false);document.getElementById('successBox').classList.add('show');document.getElementById('status').innerText='Server la Save aayiduchu!';btn.innerText='Uploaded';toast('Uploaded');setTimeout(()=>{location.href='./index.html';},1200);}catch(e){document.getElementById('status').innerText='Error: '+e.message;btn.innerText='Upload Post';btn.disabled=false;uploading=false;toast('Error - Try Again');}}
-(async()=>{let supa=getSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session)location.href='./login.html';})();
-showPage('pageHome');renderMedia();renderQuickBar();setMode('post');updatePreview();
-</script>
+<script src="js/supabase.js"></script>
+<script src="js/create.js"></script>
 </body>
 </html>
