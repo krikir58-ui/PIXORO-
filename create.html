@@ -14,32 +14,51 @@ button,input,textarea{font-family:inherit}
 .ic{width:20px;height:20px;vertical-align:middle}
 .ic-sm{width:16px;height:16px}
 .ic-lg{width:26px;height:26px}
-.page{display:none;min-height:100vh;background:#000}
+.page{display:none;min-height:100vh;background:#000;padding-bottom:110px}
 .page.on{display:block}
 .top{height:56px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;background:#000;position:sticky;top:0;z-index:20}
 .top b{font-size:19px}
 .top .back{font-size:26px;cursor:pointer}
 .top .done{font-size:16px;font-weight:700;cursor:pointer;color:#0095f6}
-/* ✅ GALLERY - INSTAGRAM MARI NEAT - CREATE CARD ILLA */
-.galTop{height:52px;display:flex;align-items:center;gap:10px;padding:0 14px;position:sticky;top:56px;background:#000;z-index:15}
-.galTop b{font-size:17px}
-.galTabs{display:flex;gap:6px;padding:6px 14px;position:sticky;top:108px;background:#000;z-index:15}
-.galTabs button{background:#1a1a1a;color:#aaa;border:0;padding:7px 14px;border-radius:999px;font-size:12px;white-space:nowrap}
+/* ✅ MELA PREVIEW - POST ADJUST + REELS PLAY */
+.galPreview{position:relative;background:#111;overflow:hidden;touch-action:none;transition:aspect-ratio .35s ease}
+.galPreview.post{aspect-ratio:1/1}
+.galPreview.reels{aspect-ratio:9/12}
+.galPreview.story{aspect-ratio:9/16}
+.galPreview.live{aspect-ratio:9/16}
+.galPreview img,.galPreview video{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;transition:transform .2s ease;transform-origin:center}
+.galPreview .pvTop{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between;z-index:5}
+.galPreview .pvChip{background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.3);padding:6px 10px;border-radius:999px;font-size:11px;display:flex;gap:6px;align-items:center}
+.galPreview .soundBtn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.3);display:grid;place-items:center}
+.galPreview .cropHint{position:absolute;bottom:10px;left:12px;background:rgba(0,0,0,.6);padding:6px 10px;border-radius:999px;font-size:11px;z-index:5}
+.galPreview .playBig{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;z-index:6}
+.sugAudio{height:34px;display:flex;align-items:center;gap:8px;padding:0 12px;background:#000;overflow:hidden;white-space:nowrap;font-size:12px}
+.sugAudio .marq{display:inline-block;animation:marq 8s linear infinite}
+@keyframes marq{from{transform:translateX(20%)}to{transform:translateX(-100%)}}
+.galTop{height:44px;display:flex;align-items:center;gap:10px;padding:0 14px;background:#000}
+.galTop b{font-size:15px}
+.galTabs{display:flex;gap:6px;padding:6px 14px;background:#000}
+.galTabs button{background:#1a1a1a;color:#aaa;border:0;padding:7px 14px;border-radius:999px;font-size:12px}
 .galTabs button.sel{background:#fff;color:#000;font-weight:700}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px;padding-bottom:80px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px}
 .grid .tile{aspect-ratio:1;position:relative;overflow:hidden;background:#222;cursor:pointer}
 .grid .tile img,.grid .tile video{width:100%;height:100%;object-fit:cover}
 .grid .tile .tick{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;border:2px solid #fff;display:grid;place-items:center;background:rgba(0,0,0,.5);font-size:12px}
 .grid .tile.sel .tick{background:#fff;color:#000}
 .grid .tile .dur{position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.6);padding:2px 6px;border-radius:999px;font-size:10px}
 .galleryBtn{grid-column:1/-1;height:120px;background:#111;border:1px dashed #444;display:grid;place-items:center;text-align:center;cursor:pointer;margin:6px}
-.nextBtn{position:fixed;bottom:84px;right:14px;background:#fff;color:#000;border:0;padding:12px 18px;border-radius:999px;font-weight:800;z-index:30;display:none}
+.nextBtn{position:fixed;bottom:120px;right:14px;background:#fff;color:#000;border:0;padding:12px 18px;border-radius:999px;font-weight:800;z-index:30;display:none}
 .nextBtn.show{display:block}
+/* ✅ KILLA MODE - POST STORY REEL LIVE - MOVE AAGUM */
+.modeWrap{position:fixed;left:0;right:0;bottom:64px;display:flex;justify-content:center;z-index:45;pointer-events:none}
+.modePill{pointer-events:auto;display:flex;background:rgba(20,20,20,.92);border:1px solid #333;border-radius:999px;padding:4px;position:relative;overflow:hidden;touch-action:pan-x}
+.modePill .ind{position:absolute;top:4px;bottom:4px;border-radius:999px;background:#fff;transition:transform .35s cubic-bezier(.32,.72,0,1),width .35s cubic-bezier(.32,.72,0,1);z-index:0}
+.modePill button{position:relative;z-index:1;background:transparent;border:0;color:#aaa;padding:8px 14px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;transition:color .25s}
+.modePill button.on{color:#000}
 .bottomNav{position:fixed;bottom:0;left:0;right:0;background:#000;display:flex;justify-content:space-around;padding:10px 0 14px;border-top:1px solid #222;z-index:40}
 .bottomNav div{text-align:center;font-size:10px;color:#888;cursor:pointer}
 .bottomNav div.on{color:#fff}
 .bottomNav div .plus{width:38px;height:38px;border-radius:12px;background:#fff;color:#000;display:grid;place-items:center;margin:0 auto 2px;font-size:22px;font-weight:800}
-/* ✅ + SHEET - MELLA THIRAKKUM */
 .createSheet{position:fixed;left:0;right:0;bottom:0;background:#1a1a1a;border-radius:20px 20px 0 0;padding:8px 14px 22px;z-index:400;transform:translateY(110%);opacity:0;visibility:hidden;transition:transform .45s cubic-bezier(.32,.72,0,1),opacity .3s ease,visibility .45s}
 .createSheet.show{transform:translateY(0);opacity:1;visibility:visible}
 .createSheet .bar{width:40px;height:4px;background:#444;border-radius:999px;margin:6px auto 12px}
@@ -59,10 +78,9 @@ button,input,textarea{font-family:inherit}
 .editPreview .ovStick img{width:90px;height:90px;object-fit:cover;border-radius:14px;border:2px solid #fff;display:block;pointer-events:none}
 .editPreview .ovStick .stSvg{width:64px;height:64px;display:grid;place-items:center}
 .editPreview .centerPlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;z-index:6}
-.editPreview .cutMark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;color:#000;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:800;z-index:7;display:none}
 .dragDelete{position:absolute;left:0;right:0;bottom:0;height:100px;background:linear-gradient(to top,rgba(0,0,0,.95),transparent);display:none;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10px;z-index:20;pointer-events:none}
 .dragDelete.show{display:flex}
-.dragDelete .bin{width:52px;height:52px;border-radius:50%;background:#111;border:1.5px solid #fff;display:grid;place-items:center;transition:transform .2s ease,background .2s ease}
+.dragDelete .bin{width:52px;height:52px;border-radius:50%;background:#111;border:1.5px solid #fff;display:grid;place-items:center}
 .dragDelete.hot .bin{background:#ff3b30;border-color:#ff3b30;transform:scale(1.15)}
 .dragDelete span{font-size:12px;margin-top:4px}
 .quickBar{display:flex;gap:8px;padding:10px;overflow-x:auto;background:#000;scroll-behavior:smooth}
@@ -106,7 +124,7 @@ button,input,textarea{font-family:inherit}
 .fullPage .addRow button{flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:11px;border-radius:10px;display:flex;gap:6px;align-items:center;justify-content:center}
 .stickGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .stickGrid button{height:64px;background:#222;border:1px solid #333;border-radius:14px;display:grid;place-items:center}
-.toast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,20px);background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;z-index:500;opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:130px;transform:translate(-50%,20px);background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;z-index:500;opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;white-space:nowrap}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .popup{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center;z-index:300}
 .popup.show{display:flex}
@@ -132,17 +150,17 @@ button,input,textarea{font-family:inherit}
 </style>
 </head>
 <body>
-<!-- ✅ FIRST PAGE - INSTAGRAM MARI GALLERY - CREATE CARD ILLA -->
 <div class="page on" id="pageHome">
-<div class="top"><span style="font-weight:900;font-size:22px">Pixoro</span><span><svg class="ic-lg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 7-3 9-3 9H9s-3-2-3-9z"/><path d="M10 21h4"/></svg></span></div>
-<div class="galTop"><span class="back" onclick="showPage('pageHome')">←</span><b>New post</b><span class="done" onclick="goSelectNext()">Next →</span></div>
-<div class="galTabs"><button class="sel" onclick="setGalTab('all',this)">All</button><button onclick="setGalTab('image',this)">Photos</button><button onclick="setGalTab('video',this)">Videos</button><button onclick="setGalTab('image',this)">Camera</button></div>
+<div class="top"><span class="back" onclick="showPage('pageHome')">✕</span><b id="homeTitle">New post</b><span class="done" onclick="goSelectNext()">Next →</span></div>
+<div class="galPreview post" id="galPreview"><img id="pvImg"><video id="pvVid" style="display:none" loop playsinline preload="metadata"></video><div class="pvTop"><span class="pvChip"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 18l3-3 2 2 3-4 2 3"/></svg> <span id="pvChipTxt">1:1 - Drag to adjust</span></span><span class="soundBtn" onclick="toggleSound(event)"><svg class="ic-sm" id="soundIcon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M16 9l6 6M22 9l-6 6"/></svg></span></div><div class="playBig" id="pvPlay" style="display:none" onclick="togglePreviewPlay(event)"><svg class="ic-lg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 5l11 7-11 7V5z"/></svg></div><div class="cropHint" id="cropHint">Pinch to zoom • Drag to move</div></div>
+<div class="sugAudio" id="sugAudio" style="display:none"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span class="marq"><b id="sugTxt">A.R. Rahman - Vaathi En Peggilam</b> &nbsp;•&nbsp; Suggested Audio</span></div>
+<div class="galTop"><b>Recents</b><span style="font-size:13px;color:#aaa">▼</span><span style="margin-left:auto;font-size:12px;color:#aaa">Drafts</span><button style="background:#222;color:#fff;border:0;padding:6px 12px;border-radius:999px;font-size:12px" onclick="document.getElementById('fileMulti').click()">Select</button></div>
+<div class="galTabs"><button class="sel" onclick="setGalTab('all',this)">All</button><button onclick="setGalTab('image',this)">Photos</button><button onclick="setGalTab('video',this)">Videos</button><button onclick="document.getElementById('fileMulti').click()">Camera</button></div>
 <div class="grid" id="mediaGridHome"></div>
 </div>
 <div class="page" id="pageSelect">
-<div class="top"><span class="back" onclick="showPage('pageHome')">←</span><b>Select Media</b><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="12" cy="12" r="3"/><circle cx="17" cy="7" r="1"/></svg></span></div>
-<div class="galTop"><b>Recents</b><span style="font-size:14px;color:#aaa">▼</span></div>
-<div class="galTabs"><button class="sel" onclick="setGalTab('all',this)">All</button><button onclick="setGalTab('image',this)">Photos</button><button onclick="setGalTab('video',this)">Videos</button></div>
+<div class="top"><span class="back" onclick="showPage('pageHome')">←</span><b>Select Media</b><span class="done" onclick="goSelectNext()">Next →</span></div>
+<div class="galTop"><b>Recents</b><span>▼</span></div>
 <div class="grid" id="mediaGrid"></div>
 <button class="nextBtn" id="selectNext" onclick="goSelectNext()">Next →</button>
 </div>
@@ -219,7 +237,8 @@ button,input,textarea{font-family:inherit}
 <div class="optRow" onclick="pickCreate('reels')"><div class="icon alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="4"/><path d="M10 9l5 3-5 3V9z"/></svg></div><div><b>Create Reels</b><span>Show your moments</span></div><span class="arrow">→</span></div>
 <div class="optRow" onclick="pickCreate('story')"><div class="icon alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></div><div><b>Create Story</b><span>Let them see your day</span></div><span class="arrow">→</span></div>
 </div>
-<div class="bottomNav"><div onclick="showPage('pageHome')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8V21H3V11z"/></svg><br>Home</div><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><br>Search</div><div class="on" onclick="openCreateSheet()"><div class="plus">+</div>Create</div><div onclick="pickCreate('reels')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="4"/><path d="M10 9l5 3-5 3V9z"/></svg><br>Reels</div><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c1-4 4-5 8-5s7 1 8 5"/></svg><br>Profile</div></div>
+<div class="modeWrap"><div class="modePill" id="modePill"><div class="ind" id="modeInd"></div><button data-mode="post" class="on" onclick="setMode('post')">POST</button><button data-mode="story" onclick="setMode('story')">STORY</button><button data-mode="reels" onclick="setMode('reels')">REEL</button><button data-mode="live" onclick="setMode('live')">LIVE</button></div></div>
+<div class="bottomNav"><div onclick="showPage('pageHome')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8V21H3V11z"/></svg><br>Home</div><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><br>Search</div><div class="on" onclick="openCreateSheet()"><div class="plus">+</div>Create</div><div onclick="setMode('reels');showPage('pageHome')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="4"/><path d="M10 9l5 3-5 3V9z"/></svg><br>Reels</div><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c1-4 4-5 8-5s7 1 8 5"/></svg><br>Profile</div></div>
 <input type="file" id="file" accept="image/*,video/*">
 <input type="file" id="fileMulti" accept="image/*,video/*" multiple>
 <input type="file" id="fileImage" accept="image/*">
@@ -230,23 +249,28 @@ button,input,textarea{font-family:inherit}
 <script src="js/supabase.js?v=1057"></script>
 <script>
 let type='post',file=null,url='',kind='image',filter='none',text='',song='Trending Audio',fontF='system-ui',adj={brightness:100,contrast:100,saturate:100},effect='none',loc='Chennai, India',aud='Everyone',tag='@friend_name';
-let clips=[],selClip=-1,galleryPhotos=[],playing=false,trimStart=0,trimEnd=15,totalDur=15,uploading=false,captionVal='',textEffect='none',myStickers=[],stickerImgUrl='',tfColor='#fff',toastTimer=null,galFilter='all';
+let clips=[],selClip=-1,galleryPhotos=[],playing=false,trimStart=0,trimEnd=15,totalDur=15,uploading=false,captionVal='',textEffect='none',myStickers=[],stickerImgUrl='',tfColor='#fff',toastTimer=null,galFilter='all',soundOn=false,zoom=1,panX=0,panY=0;
 function toast(m){let t=document.getElementById('toast');if(!t) return;t.innerText=m;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
 function fmt(s){s=Math.max(0,s);let m=Math.floor(s/60),ss=Math.floor(s%60);return m+':'+(ss<10?'0':'')+ss;}
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);closeFullAll();closeCreateSheet();}
 function openCreateSheet(){document.getElementById('createSheet').classList.add('show');document.getElementById('sheetBg').classList.add('show');}
 function closeCreateSheet(){document.getElementById('createSheet').classList.remove('show');document.getElementById('sheetBg').classList.remove('show');}
-function pickCreate(t){closeCreateSheet();goCreate(t);}
-function goCreate(t){type=t;setType(t);showPage('pageSelect');renderMedia();}
-function setType(t){type=t;document.getElementById('editTitle').innerText=t==='post'?'Edit Photo':t==='reels'?'Edit Reel':'Story Edit';document.getElementById('editDoneBtn').innerText='Next →';document.getElementById('uploadTitle').innerText=t==='post'?'Upload Post':t==='reels'?'Upload Reel':'Upload Story';document.getElementById('shareBtnPost').innerHTML='Upload Post';renderQuickBar();if(type==='reels'||type==='story') setupVideo();}
+function pickCreate(t){closeCreateSheet();setMode(t);goCreate(t);}
+function goCreate(t){type=t;setType(t);setMode(t);showPage('pageHome');renderMedia();updatePreview();}
+function setMode(t){type=t;let btns=document.querySelectorAll('#modePill button');btns.forEach(b=>b.classList.toggle('on',b.dataset.mode===t));let active=document.querySelector('#modePill button.on');let ind=document.getElementById('modeInd');if(active&&ind){ind.style.width=active.offsetWidth+'px';ind.style.transform='translateX('+(active.offsetLeft-4)+'px)';}let title=document.getElementById('homeTitle');if(title)title.innerText=t==='post'?'New post':t==='reels'?'New reel':t==='story'?'New story':'Live';let pv=document.getElementById('galPreview');if(pv){pv.className='galPreview '+t;}let chip=document.getElementById('pvChipTxt');if(chip)chip.innerText=t==='post'?'1:1 - Drag to adjust':t==='reels'?'9:16 - Reels - Sound ON':t==='story'?'9:16 - Story':'LIVE - Camera';document.getElementById('sugAudio').style.display=t==='reels'?'flex':'none';document.getElementById('cropHint').style.display=t==='post'?'block':'none';setType(t);updatePreview();if(t==='live')toast('Live - Camera');}
+function setType(t){type=t;let et=document.getElementById('editTitle');if(et)et.innerText=t==='post'?'Edit Photo':t==='reels'?'Edit Reel':'Story Edit';let dn=document.getElementById('editDoneBtn');if(dn)dn.innerText='Next →';let ut=document.getElementById('uploadTitle');if(ut)ut.innerText=t==='post'?'Upload Post':t==='reels'?'Upload Reel':'Upload Story';let sb=document.getElementById('shareBtnPost');if(sb)sb.innerHTML='Upload Post';renderQuickBar();if(type==='reels'||type==='story') setupVideo();}
 function setGalTab(f,btn){galFilter=f;document.querySelectorAll('.galTabs button').forEach(b=>b.classList.remove('sel'));if(btn)btn.classList.add('sel');renderMedia();}
 function isFakeFile(f){let n=(f.name||'').toLowerCase();return n.match(/ai|generated|fake|unsplash|sample|demo|download|midjourney|dalle/)?true:false;}
 function showMedia(imgEl,vidEl,src,k){if(!imgEl||!vidEl) return;if(k==='video'){vidEl.src=src;vidEl.style.display='block';imgEl.style.display='none';}else{imgEl.src=src;imgEl.style.display='block';vidEl.style.display='none';try{vidEl.pause();}catch(e){}}}
+function updatePreview(){let pvImg=document.getElementById('pvImg');let pvVid=document.getElementById('pvVid');let play=document.getElementById('pvPlay');if(!url){if(pvImg)pvImg.src='';if(pvVid)pvVid.src='';if(play)play.style.display='none';return;}showMedia(pvImg,pvVid,url,kind);applyZoom();if(kind==='video'){pvVid.muted=!soundOn;pvVid.currentTime=0;if(type==='reels'||type==='post'){pvVid.play().catch(()=>{});if(play)play.style.display='none';}else{if(play)play.style.display='grid';}}else{if(play)play.style.display='none';try{pvVid.pause();}catch(e){}}}
+function applyZoom(){let el=kind==='video'?document.getElementById('pvVid'):document.getElementById('pvImg');if(el)el.style.transform='translate('+panX+'px,'+panY+'px) scale('+zoom+')';}
+function toggleSound(e){if(e)e.stopPropagation();soundOn=!soundOn;let pvVid=document.getElementById('pvVid');if(pvVid){pvVid.muted=!soundOn;if(soundOn)pvVid.play().catch(()=>{});}document.getElementById('soundIcon').innerHTML=soundOn?'<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15 9a4 4 0 0 1 0 6"/><path d="M18 7a8 8 0 0 1 0 10"/>':'<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M16 9l6 6M22 9l-6 6"/>';toast(soundOn?'Sound ON':'Sound OFF');}
+function togglePreviewPlay(e){if(e)e.stopPropagation();let v=document.getElementById('pvVid');if(!v) return;if(v.paused){v.play().catch(()=>{});document.getElementById('pvPlay').style.display='none';}else{v.pause();document.getElementById('pvPlay').style.display='grid';}}
 function openFull(id){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));let e=document.getElementById(id);if(e){void e.offsetWidth;e.classList.add('show');}if(id==='pageAudioFull'){showMedia(document.getElementById('auImg'),document.getElementById('auVid'),url,kind);renderSongs('');}if(id==='pageTextFull'){showMedia(document.getElementById('tfImg'),document.getElementById('tfVid'),url,kind);let inp=document.getElementById('tfInput');inp.value=text;inp.style.fontFamily=fontF;inp.style.color=tfColor;setTimeout(()=>inp.focus(),350);}if(id==='pageVoiceFull'){showMedia(document.getElementById('voImg'),document.getElementById('voVid'),url,kind);}if(id==='pageEditVideoFull'){showMedia(document.getElementById('evImg'),document.getElementById('evVid'),url,kind);renderFilm();}if(id==='pageFilterFull'){renderFilterFull();}}
 function closeFull(){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));}
 function closeFullAll(){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));}
 function renderMedia(){let list=galleryPhotos.filter(p=>galFilter==='all'||p.kind===galFilter);let html='<div class="galleryBtn" onclick="document.getElementById(\'fileMulti\').click()"><div><b>Gallery la irunthu Photo / Video Add Pannu</b><div style="font-size:11px;color:#aaa">Real Gallery mattum thaan</div></div></div>';html+=list.map((p)=>{let idx=galleryPhotos.indexOf(p);return '<div class="tile '+(url===p.url?'sel':'')+'" onclick="selectGallery('+idx+')">'+(p.kind==='video'?'<video src="'+p.url+'" muted playsinline></video><span class="dur">0:15</span>':'<img src="'+p.url+'">')+'<span class="tick">'+(url===p.url?'✓':'')+'</span></div>';}).join('');let g=document.getElementById('mediaGrid');if(g)g.innerHTML=html;let gh=document.getElementById('mediaGridHome');if(gh)gh.innerHTML=html;}
-function selectGallery(i){let p=galleryPhotos[i];if(!p) return;url=p.url;kind=p.kind;file=p.file;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);document.getElementById('selectNext').classList.add('show');renderMedia();renderFilm();}
+function selectGallery(i){let p=galleryPhotos[i];if(!p) return;url=p.url;kind=p.kind;file=p.file;zoom=1;panX=0;panY=0;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);document.getElementById('selectNext').classList.add('show');renderMedia();renderFilm();updatePreview();if(type==='reels')toast('Reels Preview - Sound ON pannu');}
 function goSelectNext(){if(!url){document.getElementById('fileMulti').click();return;}goEdit();}
 function goEdit(){if(!url){toast('Gallery la irunthu Photo Add Pannu');showPage('pageSelect');return;}showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);showMedia(document.getElementById('upImgPost'),document.getElementById('upVidPost'),url,kind);showPage('pageEdit');renderFilm();setType(type);}
 function goUpload(){if(!url){toast('Photo illa');return;}showPage('pageUpload');document.getElementById('captionPost').value=captionVal;syncFields();}
@@ -288,25 +312,27 @@ function pickMySticker(src){let el=document.getElementById('ovStick');el.innerTe
 function renderMyStickers(){let box=document.getElementById('myStickerList');if(!myStickers.length){box.innerHTML='';return;}box.innerHTML='<div style="display:flex;gap:8px;overflow-x:auto">'+myStickers.map(s=>'<div style="width:72px;height:72px;border-radius:14px;overflow:hidden;border:2px solid #333;flex-shrink:0" onclick="pickMySticker(\''+s+'\')"><img src="'+s+'" style="width:100%;height:100%;object-fit:cover"></div>').join('')+'</div>';}
 function removeText(){text='';stickerImgUrl='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerText='';document.getElementById('ovStick').innerHTML='';closeFull();toast('Deleted');}
 function renderSongs(q){let list=[['Leo - Naa Ready','Sai Abhyankkar'],['Jailer - Hukum','Anirudh'],['Vikram','Anirudh'],['Trending Audio','Pixoro'],['Veezha Veera','Anirudh'],['Sheru Bhai','Sai Abhyankkar']];let f=list.filter(x=>!q||x[0].toLowerCase().includes(q.toLowerCase()));document.getElementById('songListFull').innerHTML=f.map(s=>'<div class="songRow" onclick="pickSong(\''+s[0]+'\')"><div class="th"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><div><b>'+s[0]+'</b><span>'+s[1]+' • 1.3L reels</span></div></div>').join('');}
-function pickSong(s){song=s;document.getElementById('songTxt').innerText='Song: '+s;syncFields();closeFull();toast('Song Added');}
+function pickSong(s){song=s;document.getElementById('songTxt').innerText='Song: '+s;document.getElementById('sugTxt').innerText=s+' - Suggested Audio';syncFields();closeFull();toast('Song Added');}
 function searchSong(q){renderSongs(q);}
 function startVoice(btn){document.getElementById('voiceTxt').innerText='Voice: Recording...';if(btn)btn.innerText='Recording...';toast('Recording...');}
 function stopVoice(){document.getElementById('voiceTxt').innerText='Voice: Added';toast('Voice Added');}
 function resetEdit(){filter='none';text='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerText='';document.getElementById('ovStick').innerHTML='';}
-function addClip(f){if(isFakeFile(f)){toast('Fake Photo');return;}let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let c={url:ev.target.result,kind:k,file:f};galleryPhotos.push(c);clips.push({url:c.url,kind:k,file:f});url=c.url;kind=k;file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);document.getElementById('selectNext').classList.add('show');renderMedia();renderFilm();if(type==='reels') setupVideo();};r.readAsDataURL(f);}
-function handleFile(f){if(!f) return;addClip(f);showPage('pageSelect');}
+function addClip(f){if(isFakeFile(f)){toast('Fake Photo');return;}let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let c={url:ev.target.result,kind:k,file:f};galleryPhotos.push(c);clips.push({url:c.url,kind:k,file:f});url=c.url;kind=k;file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);document.getElementById('selectNext').classList.add('show');renderMedia();renderFilm();updatePreview();if(type==='reels') setupVideo();};r.readAsDataURL(f);}
+function handleFile(f){if(!f) return;addClip(f);showPage('pageHome');}
 document.getElementById('file').addEventListener('change',function(e){handleFile(e.target.files[0]);e.target.value='';});
 document.getElementById('fileMulti').addEventListener('change',function(e){Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';});
 document.getElementById('fileAdd').addEventListener('change',function(e){Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';toast('Reel Added');});
 document.getElementById('fileImage').addEventListener('change',function(e){let f=e.target.files[0];if(!f) return;let r=new FileReader();r.onload=ev=>{document.getElementById('ovStick').innerHTML='<img src="'+ev.target.result+'" style="width:80px;height:80px;object-fit:cover;border-radius:12px;border:2px solid #fff">';stickerImgUrl=ev.target.result;closeFull();};r.readAsDataURL(f);e.target.value='';});
 document.getElementById('fileReplace').addEventListener('change',function(e){let f=e.target.files[0];if(!f) return;let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let nc={url:ev.target.result,kind:k,file:f};if(selClip>=0 && clips[selClip]) clips[selClip]=nc; else clips.push(nc);url=nc.url;kind=k;file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderFilm();toast('Replaced');};r.readAsDataURL(f);e.target.value='';});
 document.getElementById('fileSticker').addEventListener('change',function(e){let f=e.target.files[0];if(!f) return;let r=new FileReader();r.onload=ev=>{myStickers.push(ev.target.result);pickMySticker(ev.target.result);renderMyStickers();};r.readAsDataURL(f);e.target.value='';});
+(function(){let pv=document.getElementById('galPreview');let sx=0,sy=0,ox=0,oy=0,drag=false,lastDist=0;pv.addEventListener('touchstart',e=>{if(e.touches.length===1){drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;ox=panX;oy=panY;}if(e.touches.length===2){drag=false;lastDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}}, {passive:true});pv.addEventListener('touchmove',e=>{if(e.touches.length===1&&drag){panX=ox+(e.touches[0].clientX-sx);panY=oy+(e.touches[0].clientY-sy);panX=Math.max(-80,Math.min(80,panX));panY=Math.max(-80,Math.min(80,panY));applyZoom();}if(e.touches.length===2){let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(lastDist>0){zoom=Math.max(1,Math.min(3,zoom*(d/lastDist)));applyZoom();}lastDist=d;}}, {passive:true});pv.addEventListener('touchend',()=>{drag=false;lastDist=0;});pv.addEventListener('dblclick',()=>{zoom=zoom===1?2:1;panX=0;panY=0;applyZoom();});})();
+(function(){let pill=document.getElementById('modePill');let sx=0;let modes=['post','story','reels','live'];pill.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});pill.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40){let cur=modes.indexOf(type);if(dx<0&&cur<3)setMode(modes[cur+1]);if(dx>0&&cur>0)setMode(modes[cur-1]);}}, {passive:true});})();
 (function(){function makeDraggable(id,isSticker){let el=document.getElementById(id);let startX=0,startY=0,origL=0,origT=0,dragging=false,hot=false;el.addEventListener('pointerdown',e=>{if(!el.innerText && !el.innerHTML) return;dragging=true;startX=e.clientX;startY=e.clientY;let rect=el.getBoundingClientRect();let p=document.getElementById('editPreview').getBoundingClientRect();origL=(rect.left-p.left+rect.width/2)/p.width*100;origT=(rect.top-p.top+rect.height/2)/p.height*100;el.setPointerCapture(e.pointerId);document.getElementById('dragDelete').classList.add('show');e.stopPropagation();});el.addEventListener('pointermove',e=>{if(!dragging) return;let p=document.getElementById('editPreview').getBoundingClientRect();let nx=origL+(e.clientX-startX)/p.width*100;let ny=origT+(e.clientY-startY)/p.height*100;nx=Math.max(5,Math.min(95,nx));ny=Math.max(5,Math.min(95,ny));el.style.left=nx+'%';el.style.top=ny+'%';let bin=document.getElementById('deleteBin').getBoundingClientRect();hot=(e.clientX>bin.left-30 && e.clientX<bin.right+30 && e.clientY>bin.top-30 && e.clientY<bin.bottom+30);document.getElementById('dragDelete').classList.toggle('hot',hot);});el.addEventListener('pointerup',e=>{if(!dragging) return;dragging=false;document.getElementById('dragDelete').classList.remove('show');document.getElementById('dragDelete').classList.remove('hot');if(hot){if(isSticker){el.innerText='';el.innerHTML='';stickerImgUrl='';}else{el.innerText='';text='';}toast('Deleted');}});}makeDraggable('ovText',false);makeDraggable('ovStick',true);})();
 function getSupa(){return window.supa;}
 async function saveToServer(isDraft){let supa=getSupa();if(!supa) return false;let {data:{session}}=await supa.auth.getSession();if(!session){location.href='./login.html';return false;}let ME_RAW=session.user.email.split('@')[0];let blob;if(kind==='video'){blob=file;}else{blob=await new Promise(res=>{let img=new Image();img.onload=()=>{let W=1080,H=type==='reels'?1920:1350;let cc=document.createElement('canvas');cc.width=W;cc.height=H;let ctx=cc.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.filter=buildFilter();let sc=type==='reels'?Math.max(W/img.width,H/img.height):Math.min(W/img.width,H/img.height);let dw=img.width*sc,dh=img.height*sc;ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);if(text){ctx.filter='none';ctx.font='900 60px '+fontF;ctx.textAlign='center';ctx.fillStyle=tfColor;ctx.fillText(text,W/2,H*0.35);}cc.toBlob(b=>res(b||file),'image/jpeg',0.92);};img.src=url;});}let folder=type==='story'?'stories':type==='reels'?'reels':'posts';let ext=kind==='video'?'mp4':'jpg';let fn=folder+'/'+session.user.id+'/'+Date.now()+(isDraft?'-draft':'')+'.'+ext;let {error:upErr}=await supa.storage.from(folder).upload(fn,blob,{contentType:kind==='video'?'video/mp4':'image/jpeg'});if(upErr) throw new Error(upErr.message);let {data:ud}=supa.storage.from(folder).getPublicUrl(fn);let cap=captionVal||'Just Pixoro';if(tag)cap+=' '+tag;if(loc)cap+=' '+loc;if(song)cap+=' '+song;let {error}=await supa.from('posts').insert({user_id:session.user.id,username:ME_RAW,media_url:ud.publicUrl,image_url:kind==='image'?ud.publicUrl:null,video_url:kind==='video'?ud.publicUrl:null,media_type:type,caption:cap});if(error) throw new Error(error.message);return true;}
 async function sharePost(){if(uploading) return; uploading=true;if(!file||!url){toast('Photo Add Pannu');uploading=false;return;}let btn=document.getElementById('shareBtnPost');btn.innerText='Uploading...';btn.disabled=true;try{await saveToServer(false);document.getElementById('successBox').classList.add('show');document.getElementById('status').innerText='Server la Save aayiduchu!';btn.innerText='Uploaded';toast('Uploaded');setTimeout(()=>{location.href='./index.html';},1200);}catch(e){document.getElementById('status').innerText='Error: '+e.message;btn.innerText='Upload Post';btn.disabled=false;uploading=false;toast('Error - Try Again');}}
 (async()=>{let supa=getSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session)location.href='./login.html';})();
-showPage('pageHome');renderMedia();renderQuickBar();
+showPage('pageHome');renderMedia();renderQuickBar();setMode('post');
 </script>
 </body>
 </html>
