@@ -3,14 +3,19 @@ html,body{height:100%;height:100dvh;overscroll-behavior:none}
 body{background:#000;color:#fff;font-family:system-ui;overflow:hidden}
 button,input,textarea{font-family:inherit}
 *::-webkit-scrollbar{display:none}
+*{scrollbar-width:none}
+.ic{width:20px;height:20px;vertical-align:middle}
+.ic-sm{width:16px;height:16px}
+.ic-lg{width:26px;height:26px}
 
 /* FULL SCREEN - ORU PAGE = ORU SCREEN */
 .page{display:none;height:100dvh;background:#000;overflow:hidden;flex-direction:column}
 .page.on{display:flex}
-.top{height:52px;flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:0 14px}
+.top{height:52px;flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:0 14px;background:#000;z-index:20}
 .top b{font-size:17px}
+.top .back{font-size:26px;cursor:pointer}
 .top .done{font-size:15px;font-weight:700;color:#0095f6;cursor:pointer}
-.galScroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.galScroll{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 
 /* PREVIEW - SCREEN APADIYE - PHOTO MATTUM ADJUST */
 .galPreview{position:relative;background:#000;overflow:hidden;touch-action:none;flex-shrink:0}
@@ -19,22 +24,25 @@ button,input,textarea{font-family:inherit}
 .galPreview.story{aspect-ratio:9/16}
 .galPreview.live{aspect-ratio:9/16}
 .pvStage{position:absolute;inset:0;overflow:hidden}
-.pvStage img,.pvStage video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;will-change:transform}
+.pvStage img,.pvStage video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;will-change:transform;transform-origin:center center}
 .pvStage.dragging img,.pvStage.dragging video{transition:none!important}
 .pvEmpty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;background:#111;z-index:2}
 .pvEmpty .eBox{width:64px;height:64px;border-radius:50%;background:#222;display:grid;place-items:center;margin:0 auto 10px;font-size:28px}
-.galPreview .pvTop{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between;z-index:5}
-.galPreview .pvChip{background:rgba(0,0,0,.65);padding:6px 10px;border-radius:999px;font-size:11px;white-space:nowrap}
-.galPreview .soundBtn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.65);display:grid;place-items:center}
-.galPreview .cropHint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.65);padding:6px 12px;border-radius:999px;font-size:11px;z-index:5;white-space:nowrap;transition:opacity .5s}
+.pvEmpty b{display:block;font-size:15px}
+.pvEmpty span{font-size:12px;color:#888}
+.galPreview .pvTop{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between;z-index:5;pointer-events:none}
+.galPreview .pvTop>*{pointer-events:auto}
+.galPreview .pvChip{background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.3);padding:6px 10px;border-radius:999px;font-size:11px;display:flex;gap:6px;align-items:center;white-space:nowrap}
+.galPreview .soundBtn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.3);display:grid;place-items:center;flex-shrink:0}
+.galPreview .cropHint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.65);padding:6px 12px;border-radius:999px;font-size:11px;z-index:5;pointer-events:none;white-space:nowrap;transition:opacity .5s}
 .galPreview .cropHint.hide{opacity:0}
-.galPreview .playBig{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.5);display:grid;place-items:center;z-index:6}
-.sugAudio{position:absolute;left:12px;right:12px;bottom:10px;height:32px;display:flex;align-items:center;padding:0 10px;background:rgba(0,0,0,.65);border-radius:999px;overflow:hidden;white-space:nowrap;font-size:12px;z-index:5}
+.galPreview .playBig{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;z-index:6}
+.sugAudio{position:absolute;left:12px;right:12px;bottom:10px;height:32px;display:flex;align-items:center;gap:8px;padding:0 10px;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.2);border-radius:999px;overflow:hidden;white-space:nowrap;font-size:12px;z-index:5}
 .sugAudio .marq{display:inline-block;animation:marq 8s linear infinite}
 @keyframes marq{from{transform:translateX(20%)}to{transform:translateX(-100%)}}
 
-.galTop{height:42px;display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0}
-.galTabs{display:flex;gap:6px;padding:6px 14px;flex-shrink:0}
+.galTop{height:42px;display:flex;align-items:center;gap:10px;padding:0 14px;background:#000;flex-shrink:0}
+.galTabs{display:flex;gap:6px;padding:6px 14px;background:#000;flex-shrink:0}
 .galTabs button{background:#1a1a1a;color:#aaa;border:0;padding:7px 14px;border-radius:999px;font-size:12px}
 .galTabs button.sel{background:#fff;color:#000;font-weight:700}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px}
@@ -42,43 +50,117 @@ button,input,textarea{font-family:inherit}
 .grid .tile img,.grid .tile video{width:100%;height:100%;object-fit:cover}
 .grid .tile .tick{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;border:2px solid #fff;display:grid;place-items:center;background:rgba(0,0,0,.5);font-size:12px}
 .grid .tile.sel .tick{background:#fff;color:#000}
+.grid .tile .dur{position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.6);padding:2px 6px;border-radius:999px;font-size:10px}
+.galleryBtn{grid-column:1/-1;height:110px;background:#111;border:1px dashed #444;display:grid;place-items:center;text-align:center;cursor:pointer;margin:6px}
+.nextBtn{position:fixed;bottom:120px;right:14px;background:#fff;color:#000;border:0;padding:12px 18px;border-radius:999px;font-weight:800;z-index:30;display:none}
+.nextBtn.show{display:block}
 
 /* KILLA PILL + BOTTOM NAV - HOME LA MATTUM */
 .modeWrap{position:fixed;left:0;right:0;bottom:66px;display:flex;justify-content:center;z-index:45;pointer-events:none;transition:opacity .25s,transform .25s}
-.modePill{pointer-events:auto;display:flex;background:rgba(20,20,20,.95);border:1px solid #333;border-radius:999px;padding:4px;position:relative;overflow:hidden}
-.modePill .ind{position:absolute;top:4px;bottom:4px;border-radius:999px;background:#fff;transition:transform .35s, width .35s}
-.modePill button{position:relative;z-index:1;background:transparent;border:0;color:#aaa;padding:8px 14px;border-radius:999px;font-size:12px;font-weight:700}
+.modePill{pointer-events:auto;display:flex;background:rgba(20,20,20,.95);border:1px solid #333;border-radius:999px;padding:4px;position:relative;overflow:hidden;touch-action:pan-x}
+.modePill .ind{position:absolute;top:4px;bottom:4px;border-radius:999px;background:#fff;transition:transform .35s cubic-bezier(.32,.72,0,1),width .35s cubic-bezier(.32,.72,0,1);z-index:0}
+.modePill button{position:relative;z-index:1;background:transparent;border:0;color:#aaa;padding:8px 14px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
 .modePill button.on{color:#000}
-.bottomNav{position:fixed;bottom:0;left:0;right:0;background:#000;display:flex;justify-content:space-around;padding:10px 0 14px;border-top:1px solid #222;z-index:40;transition:transform .25s}
+.bottomNav{position:fixed;bottom:0;left:0;right:0;background:#000;display:flex;justify-content:space-around;padding:10px 0 calc(14px + env(safe-area-inset-bottom));border-top:1px solid #222;z-index:40;transition:transform .25s}
 .bottomNav div{text-align:center;font-size:10px;color:#888;cursor:pointer}
 .bottomNav div.on{color:#fff}
 .bottomNav .plus{width:38px;height:38px;border-radius:12px;background:#fff;color:#000;display:grid;place-items:center;margin:0 auto 2px;font-size:22px;font-weight:800}
 body.hideChrome .modeWrap{opacity:0;transform:translateY(20px);pointer-events:none}
 body.hideChrome .bottomNav{transform:translateY(110%)}
+body.hideChrome .nextBtn{bottom:20px}
+
+/* ✅ MISSING AH IRUNDHUCHU - CREATE SHEET */
+.createSheet{position:fixed;left:0;right:0;bottom:0;background:#1a1a1a;border-radius:20px 20px 0 0;padding:8px 14px 22px;z-index:400;transform:translateY(110%);opacity:0;visibility:hidden;transition:transform .45s cubic-bezier(.32,.72,0,1),opacity .3s ease,visibility .45s}
+.createSheet.show{transform:translateY(0);opacity:1;visibility:visible}
+.createSheet .bar{width:40px;height:4px;background:#444;border-radius:999px;margin:6px auto 12px}
+.createSheet .optRow{display:flex;gap:12px;align-items:center;padding:12px 6px;border-radius:14px;cursor:pointer}
+.createSheet .optRow .icon{width:48px;height:48px;border-radius:14px;background:#fff;display:grid;place-items:center;flex-shrink:0}
+.createSheet .optRow .icon.alt{background:#222;border:1px solid #333}
+.createSheet .optRow b{display:block;font-size:15px}
+.createSheet .optRow span{font-size:12px;color:#aaa}
+.createSheet .optRow .arrow{margin-left:auto;font-size:20px;color:#888}
+.sheetBg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:350;opacity:0;visibility:hidden;transition:opacity .3s}
+.sheetBg.show{opacity:1;visibility:visible}
 
 /* EDIT + UPLOAD */
 .editWrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.editPreview{flex:1;position:relative;background:#000;overflow:hidden;touch-action:none}
-.editPreview img,.editPreview video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
-.editPreview .ovText{position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);font-size:32px;font-weight:900;text-shadow:0 2px 8px #000;white-space:nowrap;z-index:5}
-.editPreview .ovStick{position:absolute;top:60%;left:50%;transform:translate(-50%,-50%);z-index:5}
-.instaTools{display:flex;gap:6px;padding:10px;overflow-x:auto;flex-shrink:0}
+.editPreview{flex:1;position:relative;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none}
+.editPreview img,.editPreview video{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
+.editPreview .ovText{position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);font-size:32px;font-weight:900;text-shadow:0 2px 8px #000;text-align:center;white-space:nowrap;z-index:5;cursor:grab;touch-action:none}
+.editPreview .ovStick{position:absolute;top:60%;left:50%;transform:translate(-50%,-50%);z-index:5;cursor:grab;touch-action:none;line-height:1}
+.editPreview .ovStick img{width:90px;height:90px;object-fit:cover;border-radius:14px;border:2px solid #fff;display:block;pointer-events:none}
+.editPreview .ovStick .stSvg{width:64px;height:64px;display:grid;place-items:center}
+.editPreview .centerPlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;z-index:6}
+.dragDelete{position:absolute;left:0;right:0;bottom:0;height:100px;background:linear-gradient(to top,rgba(0,0,0,.95),transparent);display:none;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10px;z-index:20;pointer-events:none}
+.dragDelete.show{display:flex}
+.dragDelete .bin{width:52px;height:52px;border-radius:50%;background:#111;border:1.5px solid #fff;display:grid;place-items:center}
+.dragDelete.hot .bin{background:#ff3b30;border-color:#ff3b30;transform:scale(1.15)}
+.dragDelete span{font-size:12px;margin-top:4px}
+.quickBar{display:flex;gap:8px;padding:10px;overflow-x:auto;background:#000;flex-shrink:0}
+.quickBar button{background:#1a1a1a;color:#fff;border:1px solid #333;padding:9px 13px;border-radius:999px;font-size:12px;white-space:nowrap;display:flex;gap:6px;align-items:center}
+.instaTools{display:flex;gap:6px;padding:10px;overflow-x:auto;background:#000;flex-shrink:0}
 .instaTools div{flex:1;min-width:62px;text-align:center;cursor:pointer}
 .instaTools .c{width:52px;height:52px;border-radius:14px;background:#1a1a1a;display:grid;place-items:center;margin:0 auto}
-.instaTools span{font-size:11px;display:block;margin-top:4px}
-.instaBottom{display:flex;gap:10px;padding:10px 12px 14px;flex-shrink:0}
+.instaTools span{font-size:11px;display:block;margin-top:4px;color:#ddd}
+.instaBottom{display:flex;gap:10px;padding:10px 12px calc(14px + env(safe-area-inset-bottom));background:#000;flex-shrink:0}
 .instaBottom .editBtn{flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:13px;border-radius:999px;font-weight:700}
 .instaBottom .nextBtn2{flex:1;background:#0095f6;color:#fff;border:0;padding:13px;border-radius:999px;font-weight:800}
-.uploadScroll{flex:1;overflow-y:auto}
-.uploadBox{margin:12px;border-radius:14px;overflow:hidden;position:relative;background:#111;aspect-ratio:4/4.2}
-.uploadBox img,.uploadBox video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
-.uField{margin:0 12px 10px;background:#1a1a1a;border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center}
-.uField textarea{flex:1;background:transparent;border:0;color:#fff;outline:none;resize:none}
-.uploadBtn{margin:12px;width:calc(100% - 24px);background:#0095f6;color:#fff;border:0;padding:14px;border-radius:999px;font-weight:800}
-.toast{position:fixed;left:50%;bottom:130px;transform:translate(-50%,20px);background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;z-index:500;opacity:0;pointer-events:none;transition:.3s}
+
+/* ✅ MISSING AH IRUNDHUCHU - FULL PAGE - AUDIO / TEXT / STICKER / EDIT VIDEO */
+.fullPage{position:fixed;inset:0;background:#000;z-index:150;display:flex;flex-direction:column;transform:translateY(100%);opacity:0;visibility:hidden;transition:transform .45s cubic-bezier(.32,.72,0,1),opacity .35s ease,visibility .45s;will-change:transform}
+.fullPage.show{transform:translateY(0);opacity:1;visibility:visible}
+.fullPage .fpTop{height:56px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;flex-shrink:0}
+.fullPage .fpTop .x{font-size:26px;cursor:pointer}
+.fullPage .fpTop .done{font-weight:700;cursor:pointer;color:#0095f6}
+.fullPage .fpMini{height:160px;margin:0 14px;border-radius:14px;overflow:hidden;position:relative;background:#111;flex-shrink:0}
+.fullPage .fpMini img,.fullPage .fpMini video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.fullPage .fpBody{flex:1;overflow-y:auto;padding:12px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.fullPage .fpTabs{display:flex;gap:8px;overflow-x:auto;padding:8px 0}
+.fullPage .fpTabs button{background:#222;color:#fff;border:0;padding:8px 14px;border-radius:999px;font-size:13px;white-space:nowrap}
+.fullPage .fpTabs button.sel{background:#fff;color:#000}
+.fullPage .fpSearch{width:100%;background:#222;border:0;color:#fff;padding:11px 14px;border-radius:999px;outline:none;margin:6px 0}
+.fullPage .songRow{display:flex;gap:10px;align-items:center;padding:10px;border-bottom:1px solid #1a1a1a;cursor:pointer}
+.fullPage .songRow .th{width:48px;height:48px;border-radius:10px;background:#222;display:grid;place-items:center;flex-shrink:0;overflow:hidden}
+.fullPage .songRow .th img{width:100%;height:100%;object-fit:cover}
+.fullPage .songRow b{display:block;font-size:14px}
+.fullPage .songRow span{font-size:11px;color:#aaa}
+.fullPage .tfInput{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);background:transparent;border:0;outline:none;color:#fff;font-size:36px;font-weight:900;text-align:center;width:90%;z-index:5;text-shadow:0 2px 10px #000}
+.fullPage .tfRow{display:flex;gap:8px;overflow-x:auto;padding:6px 0}
+.fullPage .tfRow button{background:#222;color:#fff;border:0;padding:9px 14px;border-radius:999px;font-size:12px;white-space:nowrap}
+.fullPage .tfRow button.sel{background:#fff;color:#000}
+.fullPage .tfColors{display:flex;gap:8px;overflow-x:auto;padding:6px 0}
+.fullPage .tfColors div{width:28px;height:28px;border-radius:50%;flex-shrink:0;border:2px solid #333;cursor:pointer}
+.fullPage .tlBar{display:flex;gap:10px;align-items:center;padding:8px 12px}
+.fullPage .tlBar input{flex:1;accent-color:#fff}
+.fullPage .filmStrip{display:flex;background:#111;border-radius:10px;overflow:hidden;margin:0 12px}
+.fullPage .filmStrip div{flex:1;height:52px;overflow:hidden}
+.fullPage .filmStrip img,.fullPage .filmStrip video{width:100%;height:100%;object-fit:cover}
+.fullPage .addRow{display:flex;gap:10px;padding:8px 12px}
+.fullPage .addRow button{flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:11px;border-radius:10px;display:flex;gap:6px;align-items:center;justify-content:center}
+.stickGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stickGrid button{height:64px;background:#222;border:1px solid #333;border-radius:14px;display:grid;place-items:center}
+
+.toast{position:fixed;left:50%;bottom:130px;transform:translate(-50%,20px);background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;z-index:500;opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;white-space:nowrap}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .popup{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center;z-index:300}
 .popup.show{display:flex}
 .popup .box{background:#222;width:100%;border-radius:20px 20px 0 0;padding:18px;text-align:center}
-.popup .box button{width:100%;background:transparent;border:0;border-top:1px solid #333;color:#fff;padding:14px}
-#file,#fileMulti,#fileAdd,#fileSticker{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.popup .box b{font-size:17px}
+.popup .box p{font-size:13px;color:#aaa;margin:8px 0 14px}
+.popup .box button{width:100%;background:transparent;border:0;border-top:1px solid #333;color:#fff;padding:14px;font-size:15px}
+.popup .box button.red{color:#ff3b30;font-weight:700}
+.uploadScroll{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.uploadBox{margin:12px;border-radius:14px;overflow:hidden;position:relative;background:#111;aspect-ratio:4/4.2;flex-shrink:0}
+.uploadBox.reels{aspect-ratio:9/16;max-height:420px}
+.uploadBox img,.uploadBox video{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
+.uploadBox .closeX{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;font-weight:800;z-index:5;cursor:pointer}
+.uploadBox .change{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.6);border:1px solid #555;color:#fff;padding:8px 12px;border-radius:999px;font-size:12px;z-index:5;cursor:pointer;display:flex;gap:6px;align-items:center}
+.uField{margin:0 12px 10px;background:#1a1a1a;border:1px solid #222;border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center}
+.uField input,.uField textarea{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:14px;resize:none}
+.uField .val{font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;max-width:120px;text-overflow:ellipsis}
+.uField .clearX{width:22px;height:22px;border-radius:50%;background:#333;display:grid;place-items:center;font-size:12px;cursor:pointer;flex-shrink:0}
+.uploadBtn{margin:12px;width:calc(100% - 24px);background:#0095f6;color:#fff;border:0;padding:14px;border-radius:999px;font-weight:800;font-size:15px;display:flex;gap:8px;justify-content:center;align-items:center;flex-shrink:0}
+.successBox{margin:0 12px;background:#111;border:1px solid #222;border-radius:999px;padding:11px 14px;display:none;gap:8px;align-items:center;font-size:13px}
+.successBox.show{display:flex}
+#status{text-align:center;font-size:13px;color:#ffcc00;padding:8px}
+#file,#fileMulti,#fileImage,#fileAdd,#fileReplace,#fileSticker{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
