@@ -42,15 +42,21 @@ button,input,textarea{font-family:inherit}
 .editHead .doneBtn{background:#fff;border:0;color:#000;padding:9px 16px;border-radius:999px;font-weight:800;font-size:14px;display:flex;gap:5px;align-items:center}
 .quickBar{display:flex;gap:8px;padding:10px 10px 0;overflow-x:auto}
 .quickBar button{background:#1a1a1a;color:#fff;border:1px solid #333;padding:9px 13px;border-radius:999px;font-size:12px;white-space:nowrap;display:flex;gap:6px;align-items:center}
-.editPreview{margin:12px;border-radius:16px;overflow:hidden;position:relative;background:#111;aspect-ratio:4/5;cursor:pointer}
+.editPreview{margin:12px;border-radius:16px;overflow:hidden;position:relative;background:#111;aspect-ratio:4/5;cursor:pointer;touch-action:none}
 .editPreview.reels{aspect-ratio:9/16;max-height:520px}
 .editPreview img,.editPreview video{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
 .editPreview .dream{position:absolute;top:64px;left:12px;font-family:cursive;font-size:30px;line-height:.9;color:#fff;text-shadow:0 2px 10px #000;z-index:5}
 .editPreview .dur{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.6);padding:6px 10px;border-radius:999px;font-size:13px;font-weight:700;z-index:6;display:flex;gap:6px;align-items:center}
 .editPreview .centerPlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;z-index:6}
-.editPreview .ovText{position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);font-size:26px;font-weight:900;text-shadow:0 2px 8px #000;text-align:center;white-space:nowrap;max-width:90%;overflow:hidden;z-index:5}
-.editPreview .ovStick{position:absolute;top:60%;left:50%;transform:translate(-50%,-50%);z-index:5;font-size:64px;line-height:1}
+.editPreview .ovText{position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);font-size:26px;font-weight:900;text-shadow:0 2px 8px #000;text-align:center;white-space:nowrap;max-width:90%;overflow:hidden;z-index:5;cursor:grab;touch-action:none}
+.editPreview .ovStick{position:absolute;top:60%;left:50%;transform:translate(-50%,-50%);z-index:5;font-size:64px;line-height:1;cursor:grab;touch-action:none}
 .editPreview .cutMark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;color:#000;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:800;z-index:7;display:none}
+/* ✅ VIDEO LA MARI - DRAG TO DELETE */
+.dragDelete{position:absolute;left:0;right:0;bottom:0;height:90px;background:linear-gradient(to top,rgba(0,0,0,.9),transparent);display:none;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10px;z-index:20;pointer-events:none}
+.dragDelete.show{display:flex}
+.dragDelete .bin{width:52px;height:52px;border-radius:50%;background:#111;border:1.5px solid #fff;display:grid;place-items:center;transition:.15s}
+.dragDelete.hot .bin{background:#ff3b30;border-color:#ff3b30;transform:scale(1.15)}
+.dragDelete span{font-size:12px;margin-top:4px}
 .videoBar{display:flex;gap:10px;align-items:center;padding:12px}
 .videoBar .playBtn{width:36px;height:36px;display:grid;place-items:center;flex-shrink:0;cursor:pointer}
 .videoBar input[type=range]{flex:1;accent-color:#fff;height:5px}
@@ -63,9 +69,15 @@ button,input,textarea{font-family:inherit}
 .clipInfo{display:flex;justify-content:space-between;padding:8px 12px 4px;font-size:12px;color:#aaa}
 .filmWrap{margin:0 12px;position:relative}
 .filmStrip{border-radius:12px;overflow:hidden;border:1px solid #333;display:flex;background:#111;position:relative}
-.filmStrip .stripImg{flex:1;height:62px;overflow:hidden}
+.filmStrip .stripImg{flex:1;height:62px;overflow:hidden;position:relative;border:2px solid transparent}
+.filmStrip .stripImg.sel{border-color:#fff}
 .filmStrip .stripImg img,.filmStrip .stripImg video{width:100%;height:100%;object-fit:cover}
 .filmStrip .handle{position:absolute;top:0;bottom:0;width:16px;background:#fff;border-radius:8px;display:grid;place-items:center;color:#000;font-size:12px;z-index:5;cursor:ew-resize;touch-action:none}
+/* ✅ VIDEO LA MARI - DELETE / CROP / SPLIT / REPLACE BAR */
+.clipActionBar{display:none;gap:8px;padding:10px 12px;background:#111;border-top:1px solid #222;border-bottom:1px solid #222}
+.clipActionBar.show{display:flex}
+.clipActionBar button{flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:11px 4px;border-radius:12px;font-size:12px;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center}
+.clipActionBar button.del{color:#ff5a5a;border-color:#442222}
 .addReelRow{display:flex;gap:8px;padding:10px 12px}
 .addReelRow .addBtn{flex:1;background:#1a1a1a;border:1px dashed #444;color:#fff;padding:12px;border-radius:12px;font-weight:700;display:flex;gap:8px;justify-content:center;align-items:center;cursor:pointer}
 .addReelRow .cutBtn{flex:1;background:#fff;border:0;color:#000;padding:12px;border-radius:12px;font-weight:800;display:flex;gap:8px;justify-content:center;align-items:center;cursor:pointer}
@@ -91,7 +103,6 @@ button,input,textarea{font-family:inherit}
 .sheet input{width:100%;accent-color:#fff}
 .sheet .inlineInput{width:100%;background:#2a2a2a;border:0;color:#fff;padding:11px;border-radius:12px;font-size:14px;outline:none;margin-bottom:8px}
 .sheet .sliderRow{display:flex;justify-content:space-between;font-size:12px;padding:10px 0;border-bottom:1px solid #2a2a2a}
-/* ✅ STICKER MATTUM - REAL STICKER - OUTLINE SVG ILLA */
 .stickerGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:6px 0}
 .stickerGrid button{height:64px;font-size:36px;background:#222;border:1px solid #333;border-radius:14px;display:grid;place-items:center}
 .uploadBox{margin:12px;border-radius:16px;overflow:hidden;position:relative;background:#111;aspect-ratio:4/4.2}
@@ -109,7 +120,7 @@ button,input,textarea{font-family:inherit}
 .successBox.show{display:flex}
 .successBox .tick{width:22px;height:22px;border-radius:50%;background:#22c55e;display:grid;place-items:center;flex-shrink:0}
 #status{text-align:center;font-size:13px;color:#ffcc00;padding:8px}
-#file,#fileMulti,#fileImage,#fileAdd{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+#file,#fileMulti,#fileImage,#fileAdd,#fileReplace{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 </style>
 </head>
 <body>
@@ -130,7 +141,10 @@ button,input,textarea{font-family:inherit}
 <div class="editWrap">
 <div class="editHead"><span style="font-size:26px;cursor:pointer" onclick="showPage('pageSelect')">‹</span><b id="editTitle">Edit Photo</b><button class="doneBtn" id="editDoneBtn" onclick="goUpload()">Done <svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></button></div>
 <div class="quickBar" id="quickBar"></div>
-<div class="editPreview" id="editPreview" onclick="togglePlay()"><img id="editImg"><video id="editVid" style="display:none" muted loop playsinline preload="metadata"></video><div style="position:absolute;top:14px;left:14px;z-index:5;font-size:32px" id="crownIcon">👑</div><div class="dream" id="dreamTxt">Dream<br>Big...</div><div class="dur" id="durBadge" style="display:none"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 5l11 7-11 7V5z"/></svg><span id="editDur">0:15</span></div><div class="centerPlay" id="centerPlay" style="display:none"><svg class="ic-lg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 5l11 7-11 7V5z"/></svg></div><div class="ovText" id="ovText"></div><div class="ovStick" id="ovStick"></div><div class="cutMark" id="cutMark">Cut Here</div></div>
+<div class="editPreview" id="editPreview"><img id="editImg"><video id="editVid" style="display:none" muted loop playsinline preload="metadata"></video><div style="position:absolute;top:14px;left:14px;z-index:5;font-size:32px" id="crownIcon">👑</div><div class="dream" id="dreamTxt">Dream<br>Big...</div><div class="dur" id="durBadge" style="display:none"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 5l11 7-11 7V5z"/></svg><span id="editDur">0:15</span></div><div class="centerPlay" id="centerPlay" style="display:none" onclick="togglePlay()"><svg class="ic-lg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 5l11 7-11 7V5z"/></svg></div><div class="ovText" id="ovText"></div><div class="ovStick" id="ovStick"></div><div class="cutMark" id="cutMark">Cut Here</div>
+<!-- ✅ DRAG TO DELETE - VIDEO LA MARI -->
+<div class="dragDelete" id="dragDelete"><div class="bin" id="deleteBin"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg></div><span>Drag to delete</span></div>
+</div>
 <div class="videoBar" id="videoBar" style="display:none"><div class="playBtn" onclick="togglePlay()"><svg class="ic" id="playIcon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 5l11 7-11 7V5z"/></svg></div><input type="range" id="seekBar" min="0" max="100" value="0" oninput="seekVideo(this.value)"><span class="time" id="playTime">0:00 / 0:15</span><div class="playBtn" onclick="toggleFull()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M4 9V4h5M20 15v5h-5M4 4l6 6M20 20l-6-6"/></svg></div></div>
 <div class="toolsRow" id="reelsTools" style="display:none">
 <div onclick="openSheet('sheetTrim')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8 8l12 8M8 16L20 8"/></svg></div><span>Trim</span></div>
@@ -142,13 +156,19 @@ button,input,textarea{font-family:inherit}
 </div>
 <div class="clipInfo" id="clipInfoWrap" style="display:none"><span id="clipInfo">1 Clip • 0:15</span><span id="trimInfo">Trim: 0:00 - 0:15</span></div>
 <div class="filmWrap" id="filmWrap" style="display:none"><div class="filmStrip" id="filmStrip"></div><div class="handle" id="handleL" style="left:0">‹</div><div class="handle" id="handleR" style="right:0">›</div></div>
+<!-- ✅ VIDEO LA MARI - CLIP AH THOTTA - DELETE / CROP / SPLIT / REPLACE -->
+<div class="clipActionBar" id="clipActionBar">
+<button class="del" onclick="deleteSelectedClip()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg>Delete</button>
+<button onclick="cropSelectedClip()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M3 9V7a2 2 0 0 1 2-2h2M21 15v2a2 2 0 0 1-2 2h-2M3 15h18M9 3v18"/></svg>Crop</button>
+<button onclick="splitSelectedClip()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8 8l12 8M8 16L20 8"/></svg>Split</button>
+<button onclick="replaceSelectedClip()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>Replace</button>
+</div>
 <div class="addReelRow" id="addReelRow" style="display:none"><button class="addBtn" onclick="document.getElementById('fileAdd').click()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> Add Reel</button><button class="cutBtn" onclick="cutAtCurrent()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.8"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8 8l12 8M8 16L20 8"/></svg> Cut at Playhead</button></div>
 <div class="editBottom" id="reelsBottom" style="display:none"><button class="draft" onclick="saveDraft()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Save Draft</button><button class="nextB" onclick="goUpload()">Next <svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
 <div class="toolsRow" id="postTools" style="padding:14px 12px"><div onclick="setTool('crop')"><div class="c" id="toolCrop"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M3 9V7a2 2 0 0 1 2-2h2M21 15v2a2 2 0 0 1-2 2h-2M3 15h18M9 3v18"/></svg></div><span>Crop</span></div><div onclick="setTool('filter')"><div class="c on" id="toolFilter"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg></div><span>Filter</span></div><div onclick="setTool('adjust')"><div class="c" id="toolAdjust"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h13"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/></svg></div><span>Adjust</span></div><div onclick="setTool('text')"><div class="c" id="toolText"><span style="font-size:20px;font-weight:800">Aa</span></div><span>Text</span></div><div onclick="setTool('sticker')"><div class="c" id="toolSticker"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></div><span>Sticker</span></div></div>
 <div class="filterStrip" id="filterStrip"></div>
 <div class="applyRow" id="postApply"><button class="reset" onclick="resetEdit()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg> Reset</button><button class="apply" onclick="applyEdit()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Apply</button></div>
 <div class="sheet" id="sheetText"><div class="sHead"><b>Text</b><span class="done" onclick="closeSheet()">Done</span></div><input class="inlineInput" id="textInput" placeholder="Text ezhuthu..."><div class="row"><button onclick="confirmText()">Add</button><button onclick="setFont('system-ui')">Default</button><button onclick="setFont('serif')">Serif</button><button onclick="setFont('cursive')">Style</button></div><button class="red" style="width:100%;margin-top:8px" onclick="removeText()">Remove Text</button></div>
-<!-- ✅ STICKER MATTUM - REAL STICKER - OUTLINE SVG ILLA -->
 <div class="sheet" id="sheetSticker"><div class="sHead"><b>Stickers - Real Sticker</b><span class="done" onclick="closeSheet()">Done</span></div><div class="stickerGrid"><button onclick="pickSticker('🔥')">🔥</button><button onclick="pickSticker('❤️')">❤️</button><button onclick="pickSticker('😂')">😂</button><button onclick="pickSticker('👑')">👑</button><button onclick="pickSticker('😍')">😍</button><button onclick="pickSticker('⭐')">⭐</button><button onclick="pickSticker('🎉')">🎉</button><button onclick="pickSticker('💯')">💯</button></div><button class="red" style="width:100%;margin-top:8px" onclick="removeText()">Remove Sticker</button></div>
 <div class="sheet" id="sheetAdjust"><div class="sHead"><b>Adjust / Crop</b><span class="done" onclick="closeSheet()">Done</span></div><div class="sliderRow"><span>Brightness</span><span id="vBright">100%</span></div><input type="range" min="50" max="150" value="100" oninput="doAdjust('brightness',this.value)"><div class="sliderRow"><span>Contrast</span><span id="vContrast">100%</span></div><input type="range" min="50" max="150" value="100" oninput="doAdjust('contrast',this.value)"><div class="sliderRow"><span>Saturation</span><span id="vSat">100%</span></div><input type="range" min="0" max="200" value="100" oninput="doAdjust('saturate',this.value)"><div class="row" style="margin-top:10px"><button onclick="setCrop('1:1')">1:1</button><button onclick="setCrop('4:5')">4:5</button><button onclick="setCrop('9:16')">9:16</button></div><button class="red" style="width:100%;margin-top:8px" onclick="resetEdit()">Reset - Normal Photo</button></div>
 <div class="sheet" id="sheetMusic"><div class="sHead"><b>Add Music</b><span class="done" onclick="closeSheet()">Done</span></div><div class="row"><button onclick="pickSong('Leo - Naa Ready')"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Leo</button><button onclick="pickSong('Jailer - Hukum')">Jailer</button><button onclick="pickSong('Vikram')">Vikram</button><button onclick="pickSong('Trending Audio')">Trending</button></div><p id="songTxt" style="font-size:12px;color:#ffcc00;padding:6px 2px">Song: Trending Audio</p><p style="font-size:11px;color:#aaa">Volume</p><input type="range" min="0" max="100" value="80" oninput="setVolume(this.value/100)"></div>
@@ -179,11 +199,12 @@ button,input,textarea{font-family:inherit}
 <input type="file" id="fileMulti" accept="image/*,video/*" multiple>
 <input type="file" id="fileImage" accept="image/*">
 <input type="file" id="fileAdd" accept="image/*,video/*" multiple>
+<input type="file" id="fileReplace" accept="image/*,video/*">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/supabase.js?v=1057"></script>
 <script>
 let type='post',file=null,url='',kind='image',filter='none',text='',song='Trending Audio',fontF='system-ui',adj={brightness:100,contrast:100,saturate:100},effect='none',loc='Chennai, India',aud='Everyone',tag='@friend_name',adv='Off';
-let clips=[],curClip=0,galleryPhotos=[],playing=false,trimStart=0,trimEnd=15,totalDur=15,uploading=false,captionVal='';
+let clips=[],curClip=0,selClip=-1,galleryPhotos=[],playing=false,trimStart=0,trimEnd=15,totalDur=15,uploading=false,captionVal='';
 function fmt(s){s=Math.max(0,s);let m=Math.floor(s/60),ss=Math.floor(s%60);return m+':'+(ss<10?'0':'')+ss;}
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('show'));}
 function goCreate(t){type=t;setType(t);showPage('pageSelect');renderMedia();}
@@ -235,14 +256,19 @@ function togglePlay(){if(kind!=='video'){if(type==='reels') alert('Video select 
 function seekVideo(v){let vid=document.getElementById('editVid');if(kind!=='video'||!vid.duration) return;vid.currentTime=vid.duration*v/100;showCutMark(vid.currentTime);}
 function showCutMark(t){let m=document.getElementById('cutMark');m.style.display='block';m.innerText='Cut at '+fmt(t);setTimeout(()=>{m.style.display='none';},800);}
 function toggleFull(){let el=document.getElementById('editPreview');if(document.fullscreenElement) document.exitFullscreen(); else el.requestFullscreen&&el.requestFullscreen();}
-function renderFilm(){let f=document.getElementById('filmStrip');if(!f||!url) return;let h='';for(let i=0;i<6;i++){h+='<div class="stripImg">'+(kind==='video'?'<video src="'+url+'" muted playsinline></video>':'<img src="'+url+'">')+'</div>';}f.innerHTML=h;}
+function renderFilm(){let f=document.getElementById('filmStrip');if(!f||!url) return;let count=Math.max(clips.length,1);let h='';for(let i=0;i<6;i++){let c=clips[i%count]||{url:url,kind:kind};h+='<div class="stripImg '+(selClip===i?'sel':'')+'" onclick="selectClip('+i+',event)">'+(c.kind==='video'?'<video src="'+c.url+'" muted playsinline></video>':'<img src="'+c.url+'">')+'</div>';}f.innerHTML=h;}
+function selectClip(i,e){if(e) e.stopPropagation();selClip=i;document.getElementById('clipActionBar').classList.add('show');renderFilm();let c=clips[i];if(c){url=c.url;kind=c.kind;file=c.file;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);if(kind==='video') setupVideo();}}
+function deleteSelectedClip(){if(selClip<0 && clips.length<=1){alert('Delete panna Clip illa da - Text / Sticker ah Drag panni Delete pannu da');return;}if(clips.length>1){clips.splice(selClip,1);selClip=-1;document.getElementById('clipActionBar').classList.remove('show');renderFilm();updateTrimUI();alert('Clip Deleted da!');}else{removeText();alert('Text / Sticker Deleted da!');}}
+function cropSelectedClip(){openSheet('sheetTrim');}
+function splitSelectedClip(){cutAtCurrent();}
+function replaceSelectedClip(){document.getElementById('fileReplace').click();}
 function updateTrimUI(){document.getElementById('trimInfo').innerText='Trim: '+fmt(trimStart)+' - '+fmt(trimEnd);document.getElementById('clipInfo').innerText=clips.length+' Clip • '+fmt(trimEnd-trimStart);let pctS=totalDur?trimStart/totalDur*100:0; let pctE=totalDur?trimEnd/totalDur*100:100;document.getElementById('handleL').style.left='calc('+pctS+'% - 6px)';document.getElementById('handleR').style.right='calc('+(100-pctE)+'% - 6px)';document.getElementById('trimStartTxt').innerText=fmt(trimStart);document.getElementById('trimEndTxt').innerText=fmt(trimEnd);let ts=document.getElementById('trimStart');let te=document.getElementById('trimEnd');if(ts) ts.value=Math.round(pctS); if(te) te.value=Math.round(pctE);}
 function doTrim(){let s=document.getElementById('trimStart');let e=document.getElementById('trimEnd');let ns=totalDur*s.value/100; let ne=totalDur*e.value/100;if(ne<=ns) ne=ns+0.5; if(ne>totalDur) ne=totalDur;trimStart=ns; trimEnd=ne; updateTrimUI();let vid=document.getElementById('editVid'); if(kind==='video') vid.currentTime=trimStart;}
 function resetTrim(){trimStart=0;trimEnd=totalDur;updateTrimUI();closeSheet();}
-function cutAtCurrent(){let vid=document.getElementById('editVid');let cutTime=kind==='video'?vid.currentTime:(trimStart+trimEnd)/2;if(cutTime<=trimStart+0.3||cutTime>=trimEnd-0.3){alert('Konjam naduvula Play panni Cut pannu da');return;}let left={url:url,kind:kind,full:totalDur,start:trimStart,end:cutTime,file:file};let right={url:url,kind:kind,full:totalDur,start:cutTime,end:trimEnd,file:file};clips=[left,right]; curClip=0; trimStart=left.start; trimEnd=left.end;showCutMark(cutTime); updateTrimUI();document.getElementById('clipInfo').innerText='2 Clips • Cut at '+fmt(cutTime);if(kind==='video'){vid.currentTime=cutTime; setPlaying(false);}alert('Cut aayiduchu da! 2 Clips');}
+function cutAtCurrent(){let vid=document.getElementById('editVid');let cutTime=kind==='video'?vid.currentTime:(trimStart+trimEnd)/2;if(cutTime<=trimStart+0.3||cutTime>=trimEnd-0.3){alert('Konjam naduvula Play panni Cut pannu da');return;}let left={url:url,kind:kind,full:totalDur,start:trimStart,end:cutTime,file:file};let right={url:url,kind:kind,full:totalDur,start:cutTime,end:trimEnd,file:file};clips=[left,right];selClip=1;trimStart=left.start;trimEnd=left.end;showCutMark(cutTime);updateTrimUI();renderFilm();document.getElementById('clipActionBar').classList.add('show');document.getElementById('clipInfo').innerText='2 Clips • Cut at '+fmt(cutTime);if(kind==='video'){vid.currentTime=cutTime; setPlaying(false);}alert('Cut aayiduchu da! 2 Clips - Ippo Delete / Crop / Split / Replace pannalam da!');}
 function splitClip(){cutAtCurrent();}
-function duplicateClip(){if(!url) return;clips.push({url:url,kind:kind,full:totalDur,start:trimStart,end:trimEnd,file:file});document.getElementById('clipInfo').innerText=clips.length+' Clips';}
-function deleteClip(){if(clips.length<=1){alert('1 Clip thaan irukku da');return;}clips.splice(curClip,1);updateTrimUI();}
+function duplicateClip(){if(!url) return;clips.push({url:url,kind:kind,full:totalDur,start:trimStart,end:trimEnd,file:file});document.getElementById('clipInfo').innerText=clips.length+' Clips';renderFilm();}
+function deleteClip(){deleteSelectedClip();}
 function saveDraft(){alert('Draft Saved da');}
 function renderFilterStrip(){let g=document.getElementById('filterStrip');if(!g) return;let arr=[['None','none'],['Vivid','brightness(1.15) saturate(1.5) contrast(1.1)'],['Warm','sepia(.45) saturate(1.3) brightness(1.05)'],['Retro','sepia(.6) contrast(1.05) brightness(.95)'],['B&W','grayscale(1) contrast(1.15)']];g.innerHTML=arr.map(a=>'<div class="f '+(filter===a[1]?'sel':'')+'" onclick="setFilter(\''+a[1]+'\')"><div class="thumb">'+(url?(kind==='video'?'<video src="'+url+'" muted playsinline></video>':'<img src="'+url+'" style="filter:'+a[1]+'">'):'<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 18l3-3 2 2 3-4 2 3"/></svg>')+'</div><span>'+a[0]+'</span></div>').join('');}
 function renderFilterRow(){let r=document.getElementById('filterRow');if(!r) return;let arr=[['None','none'],['Vivid','brightness(1.15) saturate(1.5)'],['Warm','sepia(.45) saturate(1.3)'],['Retro','sepia(.6) contrast(1.05)'],['B&W','grayscale(1) contrast(1.15)']];r.innerHTML=arr.map(a=>'<button onclick="setFilter(\''+a[1]+'\')">'+a[0]+'</button>').join('');}
@@ -254,9 +280,9 @@ function applyFilter(){let f=buildFilter();document.getElementById('editImg').st
 function setFilter(f){filter=f;if(f==='none'){adj={brightness:100,contrast:100,saturate:100};effect='none';document.getElementById('vBright').innerText='100%';document.getElementById('vContrast').innerText='100%';document.getElementById('vSat').innerText='100%';}applyFilter();closeSheet();}
 function doAdjust(k,v){adj[k]=+v;document.getElementById('vBright').innerText=adj.brightness+'%';document.getElementById('vContrast').innerText=adj.contrast+'%';document.getElementById('vSat').innerText=adj.saturate+'%';applyFilter();}
 function setCrop(r){let ep=document.getElementById('editPreview');if(r==='1:1')ep.style.aspectRatio='1/1';else if(r==='4:5')ep.style.aspectRatio='4/5';else if(r==='9:16')ep.style.aspectRatio='9/16';closeSheet();}
-function confirmText(){let v=document.getElementById('textInput').value.trim();if(v){text=v;let o=document.getElementById('ovText');o.innerText=v;o.style.fontFamily=fontF;}closeSheet();}
+function confirmText(){let v=document.getElementById('textInput').value.trim();if(v){text=v;let o=document.getElementById('ovText');o.innerText=v;o.style.fontFamily=fontF;o.style.left='50%';o.style.top='38%';}closeSheet();}
 function setFont(f){fontF=f;document.getElementById('ovText').style.fontFamily=f;}
-function pickSticker(s){document.getElementById('ovStick').innerText=s;closeSheet();}
+function pickSticker(s){let el=document.getElementById('ovStick');el.innerText=s;el.style.left='50%';el.style.top='60%';closeSheet();}
 function removeText(){text='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerText='';document.getElementById('textInput').value='';closeSheet();}
 function pickSong(s){song=s;document.getElementById('songTxt').innerText='Song: '+s;syncFields();closeSheet();}
 function setVolume(v){let vv=document.getElementById('editVid');if(vv)vv.volume=v;}
@@ -265,13 +291,53 @@ function stopVoice(){document.getElementById('voiceTxt').innerText='Voice: Added
 function applyEffect(e){effect=e;let img=document.getElementById('editImg');let vid=document.getElementById('editVid');[img,vid].forEach(x=>{if(x)x.classList.remove('fx-shake','fx-flash','fx-zoom');});if(e==='shake'){img.classList.add('fx-shake');vid.classList.add('fx-shake');}if(e==='flash'){img.classList.add('fx-flash');vid.classList.add('fx-flash');}if(e==='zoom'){img.classList.add('fx-zoom');vid.classList.add('fx-zoom');}closeSheet();}
 function resetEdit(){filter='none';adj={brightness:100,contrast:100,saturate:100};effect='none';text='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerText='';document.getElementById('editImg').style.filter='none';document.getElementById('editVid').style.filter='none';document.getElementById('upImgPost').style.filter='none';renderFilterStrip();closeSheet();}
 function applyEdit(){goUpload();}
-function addClip(f){if(isFakeFile(f)){alert('Fake Photo da');return;}let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let c={url:ev.target.result,kind:k,file:f};galleryPhotos.push(c);if(k==='video')clips.push({url:c.url,kind:k,full:15,start:0,end:15,file:f});url=c.url;kind=k;file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);document.getElementById('selectNext').classList.add('show');renderMedia();renderFilm();renderFilterStrip();if(type==='reels') setupVideo();};r.readAsDataURL(f);}
+function addClip(f){if(isFakeFile(f)){alert('Fake Photo da');return;}let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let c={url:ev.target.result,kind:k,file:f};galleryPhotos.push(c);clips.push({url:c.url,kind:k,full:15,start:0,end:15,file:f});url=c.url;kind=k;file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);document.getElementById('selectNext').classList.add('show');renderMedia();renderFilm();renderFilterStrip();if(type==='reels') setupVideo();};r.readAsDataURL(f);}
 function handleFile(f){if(!f) return;if(isFakeFile(f)){alert('Fake Photo da');return;}addClip(f);showPage('pageSelect');}
 document.getElementById('file').addEventListener('change',function(e){handleFile(e.target.files[0]);e.target.value='';});
 document.getElementById('fileMulti').addEventListener('change',function(e){Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';});
 document.getElementById('fileAdd').addEventListener('change',function(e){Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';alert('Reel Added da!');});
 document.getElementById('fileImage').addEventListener('change',function(e){let f=e.target.files[0];if(!f) return;let r=new FileReader();r.onload=ev=>{document.getElementById('ovStick').innerHTML='<img src="'+ev.target.result+'" style="width:80px;height:80px;object-fit:cover;border-radius:12px;border:2px solid #fff">';closeSheet();};r.readAsDataURL(f);e.target.value='';});
+document.getElementById('fileReplace').addEventListener('change',function(e){let f=e.target.files[0];if(!f) return;let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let nc={url:ev.target.result,kind:k,full:15,start:0,end:15,file:f};if(selClip>=0 && clips[selClip]) clips[selClip]=nc; else clips.push(nc);url=nc.url;kind=k;file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderFilm();if(type==='reels') setupVideo();alert('Replaced da!');};r.readAsDataURL(f);e.target.value='';});
 (function(){let dragging=null;function bind(el,which){el.addEventListener('pointerdown',e=>{dragging=which;el.setPointerCapture(e.pointerId);});el.addEventListener('pointermove',e=>{if(!dragging) return;let wrap=document.getElementById('filmStrip').getBoundingClientRect();let pct=Math.max(0,Math.min(1,(e.clientX-wrap.left)/wrap.width));let t=pct*totalDur;if(dragging==='L'){trimStart=Math.min(t,trimEnd-0.5);}else{trimEnd=Math.max(t,trimStart+0.5);}updateTrimUI();let vid=document.getElementById('editVid');if(kind==='video')vid.currentTime=trimStart;});el.addEventListener('pointerup',()=>{dragging=null;});}bind(document.getElementById('handleL'),'L');bind(document.getElementById('handleR'),'R');})();
+/* ✅ DRAG TO DELETE - TEXT / STICKER AH KEELA IZHUTHA DELETE */
+(function(){
+  function makeDraggable(id,isSticker){
+    let el=document.getElementById(id);let startX=0,startY=0,origL=0,origT=0,dragging=false,hot=false;
+    el.addEventListener('pointerdown',e=>{
+      if(!el.innerText && !el.innerHTML) return;
+      dragging=true;startX=e.clientX;startY=e.clientY;
+      let rect=el.getBoundingClientRect();let p=document.getElementById('editPreview').getBoundingClientRect();
+      origL=(rect.left-p.left+rect.width/2)/p.width*100;origT=(rect.top-p.top+rect.height/2)/p.height*100;
+      el.setPointerCapture(e.pointerId);
+      document.getElementById('dragDelete').classList.add('show');
+      e.stopPropagation();
+    });
+    el.addEventListener('pointermove',e=>{
+      if(!dragging) return;
+      let p=document.getElementById('editPreview').getBoundingClientRect();
+      let nx=origL+(e.clientX-startX)/p.width*100;
+      let ny=origT+(e.clientY-startY)/p.height*100;
+      nx=Math.max(5,Math.min(95,nx));ny=Math.max(5,Math.min(95,ny));
+      el.style.left=nx+'%';el.style.top=ny+'%';
+      let del=document.getElementById('dragDelete');
+      let bin=document.getElementById('deleteBin').getBoundingClientRect();
+      let cx=e.clientX,cy=e.clientY;
+      hot=(cx>bin.left-30 && cx<bin.right+30 && cy>bin.top-30 && cy<bin.bottom+30);
+      del.classList.toggle('hot',hot);
+    });
+    el.addEventListener('pointerup',e=>{
+      if(!dragging) return;dragging=false;
+      document.getElementById('dragDelete').classList.remove('show');
+      document.getElementById('dragDelete').classList.remove('hot');
+      if(hot){
+        if(isSticker){el.innerText='';el.innerHTML='';}
+        else{el.innerText='';text='';document.getElementById('textInput').value='';}
+        alert('Deleted da! Video la mariye Drag to delete aayiduchu da!');
+      }
+    });
+  }
+  makeDraggable('ovText',false);makeDraggable('ovStick',true);
+})();
 function getSupa(){return window.supa;}
 async function sharePost(){if(uploading) return; uploading=true;if(!file||!url){alert('Photo Add Pannu da');uploading=false;return;}let supa=getSupa();if(!supa){uploading=false;return;}let btn=document.getElementById('shareBtnPost');btn.innerText='Uploading...';btn.disabled=true;let cap=document.getElementById('captionPost').value||'Just Pixoro';if(tag)cap+=' '+tag;if(loc)cap+=' '+loc;if(song)cap+=' '+song;try{let {data:{session}}=await supa.auth.getSession();if(!session){location.href='./login.html';return;}let ME_RAW=session.user.email.split('@')[0];let blob;if(kind==='video'){blob=file;}else{blob=await new Promise(res=>{let img=new Image();img.onload=()=>{let W=1080,H=type==='reels'?1920:1350;let cc=document.createElement('canvas');cc.width=W;cc.height=H;let ctx=cc.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.filter=buildFilter();let sc=type==='reels'?Math.max(W/img.width,H/img.height):Math.min(W/img.width,H/img.height);let dw=img.width*sc,dh=img.height*sc;ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);if(text){ctx.filter='none';ctx.font='900 60px '+fontF;ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText(text,W/2,H*0.35);}cc.toBlob(b=>res(b||file),'image/jpeg',0.92);};img.src=url;});}let folder=type==='story'?'stories':type==='reels'?'reels':'posts';let ext=kind==='video'?'mp4':'jpg';let fn=folder+'/'+session.user.id+'/'+Date.now()+'.'+ext;let {error:upErr}=await supa.storage.from(folder).upload(fn,blob,{contentType:kind==='video'?'video/mp4':'image/jpeg'});if(upErr)throw new Error(upErr.message);let {data:ud}=supa.storage.from(folder).getPublicUrl(fn);let {error}=await supa.from('posts').insert({user_id:session.user.id,username:ME_RAW,media_url:ud.publicUrl,image_url:kind==='image'?ud.publicUrl:null,video_url:kind==='video'?ud.publicUrl:null,media_type:type,caption:cap});if(error)throw new Error(error.message);document.getElementById('successBox').classList.add('show');document.getElementById('status').innerText='Post uploaded successfully!';btn.innerText='Uploaded';setTimeout(()=>{location.href='./index.html';},1200);}catch(e){document.getElementById('status').innerText='Error: '+e.message;btn.innerText=type==='post'?'Upload Post':'Upload Reel';btn.disabled=false;uploading=false;}}
 (async()=>{let supa=getSupa();if(!supa)return;let {data:{session}}=await supa.auth.getSession();if(!session)location.href='./login.html';})();
