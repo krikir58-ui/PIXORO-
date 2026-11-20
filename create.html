@@ -13,7 +13,7 @@
 <div class="galPreview post" id="galPreview">
 <div class="pvStage" id="pvStage"><img id="pvImg" style="display:none"><video id="pvVid" style="display:none" loop playsinline preload="metadata"></video></div>
 <div class="pvEmpty" id="pvEmpty"><div><div class="eBox">📷</div><b>Photo Select Pannu</b><span>Gallery la irunthu Photo / Video Edu</span></div></div>
-<div class="pvTop" id="pvTop" style="display:none"><span class="pvChip"><span id="pvChipTxt">1:1 - Drag to adjust</span></span><span class="soundBtn" onclick="toggleSound(event)">🔊</span></div>
+<div class="pvTop" id="pvTop" style="display:none"><span class="pvChip"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 18l3-3 2 2 3-4 2 3"/></svg> <span id="pvChipTxt">1:1 - Drag to adjust</span></span><span class="soundBtn" onclick="toggleSound(event)">🔊</span></div>
 <div class="playBig" id="pvPlay" style="display:none" onclick="togglePreviewPlay(event)">▶</div>
 <div class="cropHint" id="cropHint" style="display:none">Pinch to zoom • Drag to move</div>
 <div class="sugAudio" id="sugAudio" style="display:none"><span class="marq"><b id="sugTxt">A.R. Rahman - Vaathi En Peggilam</b> • Suggested Audio</span></div>
@@ -28,7 +28,7 @@
 <div class="top"><span class="back" onclick="askDraft()">✕</span><b id="editTitle">Edit Photo</b><span class="done" onclick="goUpload()">Next →</span></div>
 <div class="editWrap">
 <div class="quickBar" id="quickBar"></div>
-<div class="editPreview" id="editPreview"><img id="editImg"><video id="editVid" style="display:none" muted loop playsinline></video><div class="ovText" id="ovText"></div><div class="ovStick" id="ovStick"></div><div class="dragDelete" id="dragDelete"><div class="bin" id="deleteBin">🗑</div><span>Drag to delete</span></div></div>
+<div class="editPreview" id="editPreview"><img id="editImg"><video id="editVid" style="display:none" muted loop playsinline></video><div class="centerPlay" id="centerPlay" style="display:none" onclick="togglePlay()">▶</div><div class="ovText" id="ovText"></div><div class="ovStick" id="ovStick"></div><div class="dragDelete" id="dragDelete"><div class="bin" id="deleteBin">🗑</div><span>Drag to delete</span></div></div>
 <div class="instaTools">
 <div onclick="openFull('pageAudioFull')"><div class="c">🎵</div><span>Audio</span></div>
 <div onclick="openFull('pageTextFull')"><div class="c">Aa</div><span>Text</span></div>
@@ -40,29 +40,81 @@
 </div>
 </div>
 
+<!-- ✅ ITHU THAAN MISSING AH IRUNDHUCHU - AUDIO / TEXT / VOICE / STICKER / EDIT VIDEO FULL PAGE -->
+<div class="fullPage" id="pageAudioFull">
+<div class="fpTop"><span class="x" onclick="closeFull()">✕</span><b>Audio</b><span class="done" onclick="closeFull()">Done</span></div>
+<div class="fpMini"><img id="auImg"><video id="auVid" style="display:none" muted loop playsinline></video></div>
+<div class="fpBody"><input class="fpSearch" placeholder="Search..." oninput="searchSong(this.value)"><div class="fpTabs"><button class="sel">For you</button><button>Trending</button><button>Saved</button><button>Original audio</button></div><div id="songListFull"></div><p id="songTxt" style="font-size:12px;color:#ffcc00;padding:8px 2px">Song: Trending Audio</p></div>
+</div>
+
+<div class="fullPage" id="pageTextFull">
+<div class="fpTop"><span class="x" onclick="closeFull()">✕</span><span></span><span class="done" onclick="confirmTextFull()">Done</span></div>
+<div style="flex:1;position:relative;overflow:hidden;background:#000"><img id="tfImg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0"><video id="tfVid" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0" muted loop playsinline></video><input class="tfInput" id="tfInput" placeholder="Hi" autocomplete="off"></div>
+<div style="background:#111;padding:10px"><div class="tfRow" id="tfFontRow"><button class="sel" onclick="setTFFont('cursive',this)">Signature</button><button onclick="setTFFont('monospace',this)">Editor</button><button onclick="setTFFont('fantasy',this)">Poster</button><button onclick="setTFFont('system-ui',this)">Bubble</button><button onclick="setTFFont('Impact',this)">Strong</button></div><div class="tfRow"><button class="sel" onclick="setTFEffect('none',this)">None</button><button onclick="setTFEffect('shadow',this)">Hard Shadow</button><button onclick="setTFEffect('neon',this)">Neon</button><button onclick="setTFEffect('halo',this)">Halo</button></div><div class="tfColors"><div style="background:#fff" onclick="setTFColor('#fff')"></div><div style="background:#000;border:2px solid #fff" onclick="setTFColor('#000')"></div><div style="background:#ff2d55" onclick="setTFColor('#ff2d55')"></div><div style="background:#ffcc00" onclick="setTFColor('#ffcc00')"></div><div style="background:#00c853" onclick="setTFColor('#00c853')"></div><div style="background:#0095f6" onclick="setTFColor('#0095f6')"></div></div><div style="text-align:center;padding:6px"><button style="background:transparent;color:#ff5a5a;border:0;width:100%;padding:10px" onclick="removeTextFull()">Delete Text</button></div></div>
+</div>
+
+<div class="fullPage" id="pageVoiceFull">
+<div class="fpTop"><span class="x" onclick="closeFull()">✕</span><b>Voice</b><span class="done" onclick="closeFull()">Done</span></div>
+<div class="fpMini"><img id="voImg"><video id="voVid" style="display:none" muted loop playsinline></video></div>
+<div class="fpBody"><div style="display:flex;gap:10px"><button style="flex:1;background:#fff;color:#000;border:0;padding:14px;border-radius:999px;font-weight:800" onclick="startVoice(this)">Record</button><button style="flex:1;background:#222;color:#fff;border:0;padding:14px;border-radius:999px" onclick="stopVoice()">Stop</button></div><p id="voiceTxt" style="font-size:13px;color:#7dffb0;padding:10px 2px">Voice: No Voice</p></div>
+</div>
+
+<div class="fullPage" id="pageStickerFull">
+<div class="fpTop"><span class="x" onclick="closeFull()">✕</span><b>Stickers</b><span class="done" onclick="closeFull()">Done</span></div>
+<div class="fpBody"><button style="width:100%;background:#fff;color:#000;font-weight:800;padding:13px;border:0;border-radius:999px" onclick="document.getElementById('fileSticker').click()">Gallery la irunthu Sticker Podu</button><p style="font-size:11px;color:#aaa;padding:8px 2px">Ne select panna image - Photo mela Sticker ah ottikum</p><div id="myStickerList"></div><div class="stickGrid"><button onclick="pickSticker('fire')">🔥</button><button onclick="pickSticker('heart')">❤️</button><button onclick="pickSticker('laugh')">😂</button><button onclick="pickSticker('crown')">👑</button><button onclick="pickSticker('love')">😍</button><button onclick="pickSticker('star')">⭐</button><button onclick="pickSticker('party')">🎉</button><button onclick="pickSticker('hundred')">💯</button></div><button style="width:100%;margin-top:12px;background:transparent;color:#ff5a5a;border:1px solid #442222;padding:12px;border-radius:999px" onclick="removeText()">Remove Sticker</button></div>
+</div>
+
+<div class="fullPage" id="pageEditVideoFull">
+<div class="fpTop"><span class="x" onclick="closeFull()">✕</span><b>Try Edits</b><span style="font-size:22px;cursor:pointer" onclick="closeFull()">→</span></div>
+<div class="fpMini" style="height:240px"><img id="evImg"><video id="evVid" style="display:none" muted loop playsinline></video></div>
+<div class="tlBar"><span onclick="togglePlay()">▶</span><input type="range" id="seekBar2" min="0" max="100" value="0" oninput="seekVideo(this.value)"><span id="playTime" style="font-size:12px">0:00 / 0:15</span></div>
+<div class="filmStrip" id="filmStrip"></div>
+<div class="addRow"><button onclick="openFull('pageAudioFull')">Add audio</button><button onclick="openFull('pageTextFull')">Aa Add text</button></div>
+<div style="padding:0 12px"><div style="display:flex;justify-content:space-between;font-size:12px;color:#aaa"><span id="clipInfo">1 Clip • 0:15</span><span id="trimInfo">Trim: 0:00 - 0:15</span></div></div>
+<div style="padding:10px"><div style="display:flex;gap:8px"><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="cutAtCurrent()">Cut</button><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="splitClip()">Split</button><button style="flex:1;background:#222;color:#ff5a5a;border:0;padding:11px;border-radius:999px" onclick="deleteClip()">Delete</button></div></div>
+<div class="instaTools" style="border-top:1px solid #222"><div onclick="openFull('pageAudioFull')"><div class="c">🎵</div><span>Audio</span></div><div onclick="openFull('pageTextFull')"><div class="c">Aa</div><span>Text</span></div><div onclick="openFull('pageVoiceFull')"><div class="c">🎤</div><span>Voice</span></div><div onclick="openFull('pageStickerFull')"><div class="c">😊</div><span>Sticker</span></div><div onclick="openFull('pageFilterFull')"><div class="c">✨</div><span>Filters</span></div></div>
+<div style="padding:10px;display:flex;gap:8px"><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="setFilter('none')">None</button><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="setFilter('brightness(1.15) saturate(1.5)')">Vivid</button><button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px" onclick="setFilter('grayscale(1)')">B&W</button></div>
+</div>
+
+<div class="fullPage" id="pageFilterFull">
+<div class="fpTop"><span class="x" onclick="closeFull()">✕</span><b>Filters</b><span class="done" onclick="closeFull()">Done</span></div>
+<div class="fpBody"><div style="display:flex;gap:10px;overflow-x:auto" id="filterRowFull"></div></div>
+</div>
+
 <div class="page" id="pageUpload">
 <div class="top"><span class="back" onclick="showPage('pageEdit')">‹</span><b id="uploadTitle">Upload Post</b><span>⚙</span></div>
 <div class="uploadScroll">
 <div class="uploadBox"><img id="upImgPost"><video id="upVidPost" style="display:none" muted loop playsinline></video><div class="closeX" onclick="removeUploadPhoto()">✕</div><button class="change" onclick="document.getElementById('file').click()">Change Photo</button></div>
 <div class="uField"><textarea id="captionPost" rows="2" placeholder="Write a caption..." oninput="syncCap()"></textarea></div>
-<div class="uField" onclick="promptLoc()"><span style="flex:1">Add Location</span><span class="val" id="locVal">Chennai, India</span></div>
-<div class="uField" onclick="promptTag()"><span style="flex:1">Tag People</span><span class="val" id="tagVal">@friend_name</span></div>
-<div class="uField" onclick="openFull('pageAudioFull')"><span style="flex:1">Add Music</span><span class="val" id="musicVal">Trending Audio</span></div>
-<div class="uField" onclick="toggleAud()"><span style="flex:1">Privacy</span><span class="val" id="audVal">Everyone</span></div>
+<div class="uField" onclick="promptLoc()"><span style="flex:1">Add Location</span><span class="val" id="locVal">Chennai, India</span><span class="clearX" onclick="event.stopPropagation();clearLoc()">✕</span></div>
+<div class="uField" onclick="promptTag()"><span style="flex:1">Tag People</span><span class="val" id="tagVal">@friend_name</span><span class="clearX" onclick="event.stopPropagation();clearTag()">✕</span></div>
+<div class="uField" onclick="openFull('pageAudioFull')"><span style="flex:1">Add Music</span><span class="val" id="musicVal">Trending Audio</span><span>›</span></div>
+<div class="uField" onclick="toggleAud()"><span style="flex:1">Privacy</span><span class="val" id="audVal">Everyone</span><span>›</span></div>
 <div id="status"></div>
 <button class="uploadBtn" id="shareBtnPost" onclick="sharePost()">Upload Post</button>
 <div class="successBox" id="successBox"><span>Post uploaded - Server la Save aayiduchu!</span></div>
 </div>
 </div>
 
+<div class="popup" id="draftPopup"><div class="box"><b>Save draft?</b><p>If you go back now, you will lose this draft.</p><button class="red" onclick="startOver()">Start over</button><button onclick="saveDraftAndBack()">Save draft - Server la Save</button><button onclick="closeDraft()">Keep editing</button></div></div>
+
+<!-- ✅ ITHU MISSING AH IRUNDHUCHU - CREATE SHEET -->
+<div class="sheetBg" id="sheetBg" onclick="closeCreateSheet()"></div>
+<div class="createSheet" id="createSheet"><div class="bar"></div>
+<div class="optRow" onclick="pickCreate('post')"><div class="icon">📷</div><div><b>Create Post</b><span>Share your thoughts</span></div><span class="arrow">→</span></div>
+<div class="optRow" onclick="pickCreate('reels')"><div class="icon alt">🎬</div><div><b>Create Reels</b><span>Show your moments</span></div><span class="arrow">→</span></div>
+<div class="optRow" onclick="pickCreate('story')"><div class="icon alt">⭕</div><div><b>Create Story</b><span>Let them see your day</span></div><span class="arrow">→</span></div>
+</div>
+
 <div class="modeWrap"><div class="modePill" id="modePill"><div class="ind" id="modeInd"></div><button data-mode="post" class="on" onclick="setMode('post')">POST</button><button data-mode="story" onclick="setMode('story')">STORY</button><button data-mode="reels" onclick="setMode('reels')">REEL</button><button data-mode="live" onclick="setMode('live')">LIVE</button></div></div>
 <div class="bottomNav"><div onclick="showPage('pageHome')">Home</div><div>Search</div><div class="on" onclick="openCreateSheet()"><div class="plus">+</div>Create</div><div onclick="setMode('reels');showPage('pageHome')">Reels</div><div>Profile</div></div>
 <div class="toast" id="toast"></div>
-<div class="popup" id="draftPopup"><div class="box"><b>Save draft?</b><button class="red" onclick="startOver()">Start over</button><button onclick="saveDraftAndBack()">Save draft</button><button onclick="closeDraft()">Keep editing</button></div></div>
 
 <input type="file" id="file" accept="image/*,video/*">
 <input type="file" id="fileMulti" accept="image/*,video/*" multiple>
+<input type="file" id="fileImage" accept="image/*">
 <input type="file" id="fileAdd" accept="image/*,video/*" multiple>
+<input type="file" id="fileReplace" accept="image/*,video/*">
 <input type="file" id="fileSticker" accept="image/*">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
