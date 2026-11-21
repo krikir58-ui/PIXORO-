@@ -6,22 +6,17 @@
 <title>Pixoro - Create</title>
 <link rel="stylesheet" href="css/create.css">
 <style>
-/* ✅ 1. GALLERY - NITTA TALL */
 #galPreview{ height:calc(100dvh - 210px) !important; aspect-ratio:auto !important; width:100% }
 #galPreview .pvStage img,#galPreview .pvStage video{ object-fit:cover !important; object-position:center !important }
-/* ✅ 2. EDIT PAGE - EPPOVUM FULL SCREEN */
 #pageEdit{ position:relative }
 #pageEdit .top{ position:absolute; top:0; left:0; right:0; z-index:50; background:linear-gradient(to bottom,rgba(0,0,0,.85),transparent) }
 #pageEdit .editWrap{ flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative }
-#pageEdit .editPreview{ position:absolute !important; inset:0 !important; width:100% !important; height:100% !important; flex:none !important; min-height:0 !important; background:#000; overflow:hidden; z-index:1; display:block }
+#pageEdit .editPreview{ position:absolute !important; inset:0 !important; width:100% !important; height:100% !important; flex:none !important; min-height:0 !important; background:#000; overflow:hidden; z-index:1; display:block; touch-action:none !important }
 #pageEdit .editPreview img,#pageEdit .editPreview video{ width:100% !important; height:100% !important; object-fit:cover !important; object-position:center center !important; position:absolute; inset:0 }
-/* ✅ STICKER IMAGE - SVG ILLA - BORDER ILLA */
 #pageEdit .editPreview .ovStick img{ width:90px !important; height:90px !important; object-fit:contain !important; border:0 !important; border-radius:0 !important; background:transparent !important; }
 #pageEdit .editPreview .ovStick .stSvg img{ width:80px; height:80px; object-fit:contain; }
 .stickGrid button img{ width:44px; height:44px; object-fit:contain; }
-/* ✅ 3. MELA OPTION - EDIT VIDEO KULLA */
 #pageEdit .quickBar{ display:none !important }
-/* ✅ 4. KEELA TOOLS - CHINNA - OUTLINE */
 #pageEdit .instaTools{ position:absolute !important; left:0; right:0; bottom:62px !important; z-index:40; background:linear-gradient(to top,rgba(0,0,0,.9),transparent) !important; padding:8px 8px 2px !important; gap:4px !important }
 #pageEdit .instaTools .c{ width:40px !important; height:40px !important; border-radius:12px !important }
 #pageEdit .instaTools .c svg{ width:18px !important; height:18px !important }
@@ -32,24 +27,30 @@
 #pageEdit .editSound{ top:66px !important; z-index:50 }
 #pageEdit .editPreview .centerPlay{ z-index:50 }
 #pageHome .sugAudio{ height:28px !important; font-size:11px !important; bottom:8px !important }
-/* ✅ STORY - NITTA CHINNA SIZE - NADUVULA */
-#pageEdit.storyMode .editPreview{ position:absolute !important; left:50% !important; top:52px !important; transform:translateX(-50%) !important; width:min(100%,420px) !important; height:calc(100dvh - 175px) !important; inset:auto !important; border-radius:18px !important; }
-#pageEdit.storyMode .editPreview img,#pageEdit.storyMode .editPreview video{ border-radius:18px !important; }
+/* ✅ STORY SELECT - VIDEO MARI - PREVIEW ILLA - GRID MATTUM */
+#pageHome.storySelect .galPreview{ display:none !important; }
+#pageHome.storySelect .galTabs{ display:none !important; }
+#pageHome.storySelect .grid .tile{ aspect-ratio:3/4 !important; }
+#pageHome.storySelect .galleryBtn{ display:none !important; }
+#pageHome.storySelect .storyTopRow{ display:flex !important; gap:10px; padding:12px; overflow-x:auto; }
+#pageHome.storySelect .storyTopRow button{ background:#1a1a1a; color:#fff; border:0; padding:0; border-radius:14px; width:76px; height:92px; flex-shrink:0; display:flex; flex-direction:column; gap:6px; align-items:center; justify-content:center; font-size:11px; }
+/* ✅ STORY EDIT - FULL SCREEN - 420px ILLA - ORU SIDE ILLA */
+#pageEdit.storyMode .editPreview{ position:absolute !important; left:0 !important; top:0 !important; transform:none !important; width:100% !important; height:100% !important; inset:0 !important; border-radius:0 !important; }
+#pageEdit.storyMode .editPreview img,#pageEdit.storyMode .editPreview video{ border-radius:0 !important; }
 #pageEdit.storyMode .instaTools{ display:none !important; }
 #pageEdit.storyMode .instaBottom{ display:none !important; }
-.storySide{ position:absolute; right:10px; top:50%; transform:translateY(-50%); display:none; flex-direction:column; gap:10px; z-index:60; }
+.storySide{ position:absolute; right:12px; top:90px; display:none; flex-direction:column; gap:14px; z-index:60; }
 #pageEdit.storyMode .storySide{ display:flex !important; }
-.storySide button{ width:38px; height:38px; border-radius:50%; background:rgba(0,0,0,.6); border:1px solid rgba(255,255,255,.4); color:#fff; display:grid; place-items:center; font-size:16px; font-weight:800; }
+.storySide button{ width:42px; height:42px; border-radius:50%; background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.5); color:#fff; display:grid; place-items:center; font-size:16px; font-weight:800; }
 .storyBottom{ position:absolute; left:0; right:0; bottom:0; display:none; gap:8px; align-items:center; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); z-index:60; background:linear-gradient(to top,rgba(0,0,0,.9),transparent); }
 #pageEdit.storyMode .storyBottom{ display:flex !important; }
 .storyBottom .pill{ flex:1; background:#1a1a1a; border:1px solid #333; color:#fff; padding:10px; border-radius:999px; font-size:12px; font-weight:700; display:flex; gap:6px; align-items:center; justify-content:center; }
 .storyBottom .go{ width:44px; height:44px; border-radius:50%; background:#fff; color:#000; display:grid; place-items:center; font-size:20px; font-weight:800; flex-shrink:0; }
-.storyCap{ position:absolute; left:12px; bottom:70px; right:70px; background:transparent; border:0; color:#fff; font-size:14px; outline:none; z-index:60; display:none; }
+.storyCap{ position:absolute; left:14px; bottom:78px; right:70px; background:transparent; border:0; color:#fff; font-size:14px; outline:none; z-index:60; display:none; }
 #pageEdit.storyMode .storyCap{ display:block !important; }
 #pageEdit.storyMode .storyCap::placeholder{ color:rgba(255,255,255,.7); }
-.storyTopRow{ display:none; gap:8px; padding:8px 12px; overflow-x:auto; }
-.storyTopRow button{ background:#1a1a1a; color:#fff; border:0; padding:8px 12px; border-radius:999px; font-size:11px; white-space:nowrap; display:flex; gap:5px; align-items:center; }
-/* ✅ ELLA SVG YUM OUTLINE - FILL ILLA */
+.storyTopRow{ display:none !important; }
+#pageHome.storySelect .storyTopRow{ display:flex !important; }
 svg{ fill:none !important; }
 </style>
 </head>
@@ -79,7 +80,6 @@ svg{ fill:none !important; }
 <div class="editPreview" id="editPreview" onclick="tapPreviewPlay(event)"><img id="editImg" style="object-fit:cover"><video id="editVid" style="display:none;object-fit:cover" muted loop playsinline></video>
 <div class="editSound" id="editSound" onclick="toggleSound(event)"><span id="soundOffIconEdit"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg></span><span id="soundOnIconEdit" style="display:none"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span></div>
 <div class="centerPlay" id="centerPlay" onclick="togglePlay(event)"><svg class="ic-lg" id="centerPlayIcon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M8 5l11 7-11 7V5z"/></svg></div><div class="ovText" id="ovText"></div><div class="ovStick" id="ovStick"></div><div class="dragDelete" id="dragDelete"><div class="bin" id="deleteBin"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg></div><span>Drag to delete</span></div></div>
-<!-- ✅ STORY SIDE + BOTTOM -->
 <div class="storySide" id="storySide"><button onclick="openFull('pageTextFull')">Aa</button><button onclick="openFull('pageStickerFull')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></button><button onclick="openFull('pageTextFull')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button><button onclick="openFull('pageAudioFull')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></button><button onclick="openFull('pageFilterFull')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></button></div>
 <input class="storyCap" id="storyCap" placeholder="Add a caption..." oninput="captionVal=this.value">
 <div class="storyBottom" id="storyBottom"><button class="pill" onclick="shareStory('story')">Your story</button><button class="pill" onclick="shareStory('close')">Close Friends</button><button class="go" onclick="shareStory('story')">›</button></div>
@@ -111,7 +111,6 @@ svg{ fill:none !important; }
 <div class="fullPage" id="pageStickerFull">
 <div class="fpTop"><span class="x" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b>Stickers</b><span class="done" onclick="closeFull()">Done</span></div>
 <div class="fpBody"><button style="width:100%;background:#fff;color:#000;font-weight:800;padding:13px;border:0;border-radius:999px;display:flex;gap:8px;align-items:center;justify-content:center" onclick="document.getElementById('fileSticker').click()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 18l3-3 2 2 3-4 2 3"/></svg> Gallery la irunthu Sticker Podu</button><p style="font-size:11px;color:#aaa;padding:8px 2px">Ne select panna image - Photo mela Sticker ah ottikum</p><div id="myStickerList"></div>
-<!-- ✅ STICKER - IMAGE - SVG ILLA -->
 <div class="stickGrid">
 <button onclick="pickSticker('fire')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f525.png"></button>
 <button onclick="pickSticker('heart')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2764.png"></button>
@@ -180,7 +179,6 @@ svg{ fill:none !important; }
 <script src="js/supabase.js"></script>
 <script src="js/create.js"></script>
 <script>
-// ✅ + / BACK - VELIYA POGAATHU
 let _lock=false;
 function _push(){ try{ history.pushState({pixoro:1},''); }catch(e){} }
 let _origShowPage = showPage;
@@ -208,19 +206,50 @@ addClip = function(f){
     }
   }, 500);
 };
-// ✅ STORY MODE + STICKER IMAGE - JS OVERRIDE
+// ✅ STORY - PER MODE PHOTO + STORY SELECT - CORRECTED
+let savedByMode={post:null,story:null,reels:null,live:null};
+function saveCurMode(){ try{ savedByMode[type]=url?{url:url,kind:kind,file:file,clips:[...clips]}:null; }catch(e){} }
+function applySavedMode(m){
+  let s=savedByMode[m];
+  if(s){ url=s.url; kind=s.kind; file=s.file; clips=[...s.clips]; }
+  else{ url=''; kind='image'; file=null; clips=[]; zoom=1; panX=0; panY=0; }
+  if(typeof fitVideoFullScreen==='function') fitVideoFullScreen();
+  if(typeof renderMedia==='function') renderMedia();
+  if(typeof updatePreview==='function') updatePreview();
+}
 function toggleStoryUI(){
   let pe=document.getElementById('pageEdit');
   if(pe) pe.classList.toggle('storyMode', type==='story');
+  let ph=document.getElementById('pageHome');
+  if(ph) ph.classList.toggle('storySelect', type==='story');
   let st=document.getElementById('storyTopRow');
   if(st) st.style.display = (type==='story') ? 'flex' : 'none';
   let ht=document.getElementById('homeTitle');
   if(ht && type==='story') ht.innerText='Add to story';
 }
 let _origSetMode2 = setMode;
-setMode = function(t){ _origSetMode2(t); toggleStoryUI(); };
+let _inSetMode=false;
+setMode = function(t){
+  if(_inSetMode){ _origSetMode2(t); toggleStoryUI(); return; }
+  if(type!==t) saveCurMode();
+  _inSetMode=true;
+  _origSetMode2(t);
+  _inSetMode=false;
+  // orig setMode la url maarala - ippo namma saved photo ah podu
+  // orig create.js la savedByMode irundha - athu already handle pannidum - double aagaathu nu check
+  // Safe: savedByMode la irundha mattum apply pannu - illana clear pannu
+  // NOTE: orig create.js pudhu version la savedByMode irundha - inga apply panna kooda same value thaan varum
+  applySavedMode(t);
+  toggleStoryUI();
+};
 let _origSetType2 = setType;
 setType = function(t){ _origSetType2(t); toggleStoryUI(); };
+// ✅ STORY EDIT - PHOTO FULL SCREEN LA PINCH + DRAG
+(function(){ let pv=document.getElementById('editPreview'); if(!pv) return; let sx=0,sy=0,ox=0,oy=0,drag=false,ld=0;
+pv.addEventListener('touchstart',e=>{ if(!url) return; if(e.target.closest('#ovText')||e.target.closest('#ovStick')||e.target.closest('.editSound')||e.target.closest('.centerPlay')||e.target.closest('.storySide')||e.target.closest('.storyBottom')) return; if(e.touches.length===1){drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;ox=panX;oy=panY;} if(e.touches.length===2){drag=false;ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);} },{passive:true});
+pv.addEventListener('touchmove',e=>{ if(!url) return; if(e.target.closest('#ovText')||e.target.closest('#ovStick')) return; if(e.touches.length===1&&drag){panX=ox+(e.touches[0].clientX-sx);panY=oy+(e.touches[0].clientY-sy);applyZoom();} if(e.touches.length===2){let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); if(ld>0){zoom=Math.max(1,Math.min(3,zoom*(d/ld)));applyZoom();} ld=d;} },{passive:true});
+pv.addEventListener('touchend',()=>{drag=false;ld=0;}); pv.addEventListener('dblclick',()=>{ if(!url) return; fitVideoFullScreen(); });
+})();
 // ✅ STICKER - IMAGE
 let _origPickSticker = pickSticker;
 pickSticker = function(k){
