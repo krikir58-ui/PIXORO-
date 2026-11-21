@@ -1,6 +1,26 @@
 let type='post',file=null,url='',kind='image',filter='none',text='',song='Trending Audio',fontF='system-ui',adj={brightness:100,contrast:100,saturate:100},loc='Chennai, India',aud='Everyone',tag='@friend_name';
 let clips=[],galleryPhotos=[],trimStart=0,trimEnd=15,totalDur=15,uploading=false,captionVal='',textEffect='none',myStickers=[],stickerImgUrl='',tfColor='#fff',galFilter='all',soundOn=false,zoom=1,panX=0,panY=0,hintTimer=null,toastTimer=null,prevFilter='none';
 let tfSize=36,tfOpacity=100,tfRotate=0,tfAlign='center',tfBold=false,tfItalic=false,tfBg=false;
+// ✅ REAL STICKER - SUPABASE LA SAVE PANNA LIST
+let activeStickers=[];
+let currentStickerData=null;
+function getStickersForSave(){
+  // ovStick la Irukka Position ah List ku Sync pannu
+  if(activeStickers.length>0){
+    let el=document.getElementById('ovStick');
+    if(el && el.style.left) activeStickers[0].x=parseFloat(el.style.left)||50;
+    if(el && el.style.top) activeStickers[0].y=parseFloat(el.style.top)||55;
+  }
+  let arr=activeStickers.map(s=>({id:s.id,type:s.type,image_url:s.image_url||null,x:s.x||50,y:s.y||55,scale:s.scale||1,rotation:s.rotation||0,data:s.data||{}}));
+  if(text && !arr.find(s=>s.type==='text')){
+    arr.push({id:'tx_'+Date.now(),type:'text',text:text,x:50,y:35,color:tfColor,fontSize:tfSize,data:{text:text,color:tfColor}});
+  }
+  return arr;
+}
+function pushSticker(st){
+  activeStickers=[st]; // Ippo 1 Sticker - Multiple Venum na push nu Maathu
+  currentStickerData=st; stickerImgUrl=st.image_url||'';
+}
 function toast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
 function fmt(s){s=Math.max(0,s);return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');}
 function updateChrome(id){document.body.classList.toggle('hideChrome',id!=='pageHome');}
@@ -32,9 +52,9 @@ let savedByMode={post:null,story:null,reels:null,live:null};
 function saveCurMode(){ savedByMode[type]= url ? {url:url,kind:kind,file:file,clips:[...clips]} : null; }
 function loadMode(m){
   let s=savedByMode[m];
-  if(s){ url=s.url; kind=s.kind; file=s.file; clips=[...s.clips]; }
+  if(s){ url=s.url; kind=s.kind; file=s.file; clips=[...clips]; }
   else{ url=''; kind='image'; file=null; clips=[]; }
-  zoom=1; panX=0; panY=0; text=''; filter='none';
+  zoom=1; panX=0; panY=0; text=''; filter='none'; activeStickers=[]; currentStickerData=null; stickerImgUrl='';
   let o=document.getElementById('ovText'); if(o){ o.innerText=''; o.style.transform='translate(-50%,-50%)'; }
   let st=document.getElementById('ovStick'); if(st) st.innerHTML='';
   applyFilter();
@@ -169,12 +189,10 @@ function closeDraft(){document.getElementById('draftPopup').classList.remove('sh
 function startOver(){closeDraft();resetEdit();showPage('pageHome');}
 function closeFull(){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));}
 function closeFullAll(){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));}
-// ✅ TAP / DELETE - STICKER / TEXT AH THOTTA X VARUM
 function tapSticker(e){ if(e) e.stopPropagation(); let el=document.getElementById('ovStick'); if(!el || !el.innerHTML) return; el.classList.toggle('showDel'); }
 function tapOvText(e){ if(e) e.stopPropagation(); let el=document.getElementById('ovText'); if(!el || !el.innerText) return; el.classList.toggle('showDel'); }
-function deleteSticker(){ let el=document.getElementById('ovStick'); if(!el) return; el.innerHTML=''; el.classList.remove('showDel'); stickerImgUrl=''; toast('Sticker Deleted'); }
+function deleteSticker(){ let el=document.getElementById('ovStick'); if(!el) return; el.innerHTML=''; el.classList.remove('showDel'); stickerImgUrl=''; activeStickers=[]; currentStickerData=null; toast('Sticker Deleted'); }
 function deleteOvText(){ let el=document.getElementById('ovText'); if(!el) return; el.innerHTML=''; el.classList.remove('showDel'); text=''; toast('Text Deleted'); }
-// ✅ REAL STICKER - GIPHY - NEE TYPE PANNA STICKER VARUM
 let GIPHY_KEY='dc6zaTOxFJmzC';
 let giphyCache={};
 async function loadGiphy(q){
@@ -198,24 +216,36 @@ function searchRealSticker(q){ clearTimeout(window._stT); window._stT=setTimeout
 function pickRealSticker(src){
   let el=document.getElementById('ovStick');
   el.innerHTML='<img src="'+src+'" style="width:110px;height:110px;object-fit:contain;border:0;background:transparent"><span class="stDel" onclick="deleteSticker()">×</span>';
-  el.style.left='50%'; el.style.top='55%'; el.classList.add('showDel'); stickerImgUrl=src;
+  el.style.left='50%'; el.style.top='55%'; el.classList.add('showDel');
+  pushSticker({id:'st_'+Date.now(),type:'giphy',image_url:src,x:50,y:55,scale:1,rotation:0,data:{giphy_url:src}});
   closeFull(); toast('Sticker Added - Drag panna Delete Varum');
 }
 function addRealSticker(kind){
-  let el=document.getElementById('ovStick'); let html='';
-  if(kind==='location'){ let v=prompt('Location',loc||'Chennai, India'); if(!v) return; html='<div style="background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-weight:800;font-size:14px">📍 '+v+'</div>'; }
-  if(kind==='mention'){ let v=prompt('Mention','@friend_name'); if(!v) return; html='<div style="background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-weight:800;font-size:14px">'+v+'</div>'; }
-  if(kind==='music'){ html='<div style="background:#111;border:1px solid #333;color:#fff;padding:10px 14px;border-radius:12px;font-size:13px">🎵 '+song+'</div>'; }
-  if(kind==='poll'){ let v=prompt('Poll Question','Like Pannuvingala?'); if(!v) return; html='<div style="background:#fff;color:#000;padding:12px 16px;border-radius:16px;width:200px;text-align:center"><b>'+v+'</b><div style="display:flex;gap:6px;margin-top:8px"><span style="flex:1;background:#0095f6;color:#fff;padding:8px;border-radius:999px">Yes</span><span style="flex:1;background:#eee;padding:8px;border-radius:999px">No</span></div></div>'; }
-  if(kind==='link'){ let v=prompt('Link','https://pixoro.app'); if(!v) return; html='<div style="background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-weight:700;font-size:13px">🔗 '+v+'</div>'; }
-  if(kind==='hashtag'){ let v=prompt('Hashtag','#pixoro'); if(!v) return; html='<div style="background:#fff;color:#0095f6;padding:10px 16px;border-radius:999px;font-weight:800">'+v+'</div>'; }
-  if(kind==='countdown'){ html='<div style="background:#111;border:1px solid #333;color:#fff;padding:12px 16px;border-radius:16px;text-align:center"><b>⏱ Countdown</b><div style="font-size:20px;font-weight:900">24:00:00</div></div>'; }
-  if(kind==='question'){ html='<div style="background:#fff;color:#000;padding:12px 16px;border-radius:16px;width:210px;text-align:center"><b>Ask me a question</b><div style="background:#eee;padding:8px;border-radius:999px;margin-top:8px;font-size:12px;color:#888">Type something...</div></div>'; }
+  let el=document.getElementById('ovStick'); let html=''; let data={}; let stType=kind;
+  if(kind==='location'){ let v=prompt('Location',loc||'Chennai, India'); if(!v) return; html='<div style="background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-weight:800;font-size:14px">📍 '+v+'</div>'; data={location:v}; }
+  if(kind==='mention'){ let v=prompt('Mention','@friend_name'); if(!v) return; html='<div style="background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-weight:800;font-size:14px">'+v+'</div>'; data={mention:v}; }
+  if(kind==='music'){ html='<div style="background:#111;border:1px solid #333;color:#fff;padding:10px 14px;border-radius:12px;font-size:13px">🎵 '+song+'</div>'; data={song:song}; }
+  if(kind==='poll'){ let v=prompt('Poll Question','Like Pannuvingala?'); if(!v) return; html='<div style="background:#fff;color:#000;padding:12px 16px;border-radius:16px;width:200px;text-align:center"><b>'+v+'</b><div style="display:flex;gap:6px;margin-top:8px"><span style="flex:1;background:#0095f6;color:#fff;padding:8px;border-radius:999px">Yes</span><span style="flex:1;background:#eee;padding:8px;border-radius:999px">No</span></div></div>'; data={question:v,options:['Yes','No']}; }
+  if(kind==='link'){ let v=prompt('Link','https://pixoro.app'); if(!v) return; html='<div style="background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-weight:700;font-size:13px">🔗 '+v+'</div>'; data={url:v}; }
+  if(kind==='hashtag'){ let v=prompt('Hashtag','#pixoro'); if(!v) return; html='<div style="background:#fff;color:#0095f6;padding:10px 16px;border-radius:999px;font-weight:800">'+v+'</div>'; data={hashtag:v}; }
+  if(kind==='countdown'){ html='<div style="background:#111;border:1px solid #333;color:#fff;padding:12px 16px;border-radius:16px;text-align:center"><b>⏱ Countdown</b><div style="font-size:20px;font-weight:900">24:00:00</div></div>'; data={ends_at:new Date(Date.now()+24*3600*1000).toISOString()}; }
+  if(kind==='question'){ html='<div style="background:#fff;color:#000;padding:12px 16px;border-radius:16px;width:210px;text-align:center"><b>Ask me a question</b><div style="background:#eee;padding:8px;border-radius:999px;margin-top:8px;font-size:12px;color:#888">Type something...</div></div>'; data={prompt:'Ask me a question'}; }
   if(kind==='photo'){ document.getElementById('fileSticker').click(); return; }
-  if(kind==='avatar'){ html='<div style="background:#a259ff;color:#fff;padding:12px 16px;border-radius:999px;font-weight:800">👤 Your Avatar</div>'; }
+  if(kind==='avatar'){ html='<div style="background:#a259ff;color:#fff;padding:12px 16px;border-radius:999px;font-weight:800">👤 Your Avatar</div>'; data={avatar:true}; }
   if(!html) return;
   el.innerHTML=html+'<span class="stDel" onclick="deleteSticker()">×</span>';
-  el.style.left='50%'; el.style.top='55%'; el.classList.add('showDel'); closeFull();
+  el.style.left='50%'; el.style.top='55%'; el.classList.add('showDel');
+  pushSticker({id:'st_'+Date.now(),type:stType,image_url:null,x:50,y:55,scale:1,rotation:0,data:data});
+  closeFull();
+}
+// ✅ STORY PAAKRA PAYYAN POLL LA VOTE PANNA - ITHU INDEX.HTML LA KOOADA USE PANNA MUDIYUM
+async function votePoll(storyId, stickerId, ans){
+  try{
+    let supa=getSupa(); if(!supa) return;
+    let {data:{session}}=await supa.auth.getSession(); if(!session){ location.href='./login.html'; return; }
+    let {error}=await supa.from('story_sticker_interactions').insert({story_id:storyId,sticker_id:stickerId,sticker_type:'poll',user_id:session.user.id,username:session.user.email.split('@')[0],answer:ans});
+    if(error) toast('Already Voted - '+ans); else toast('Vote Saved - '+ans);
+  }catch(e){ toast('Vote Error'); }
 }
 function openFull(id){
   if(id==='pageFilterFull'){ prevFilter=filter; }
@@ -293,15 +323,16 @@ function pickSticker(k){
   let map={ fire:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f525.png', heart:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2764.png', laugh:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f602.png', crown:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f451.png', love:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f60d.png', star:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2b50.png', party:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f389.png', hundred:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4af.png', cool:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f60e.png', cry:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f622.png', angry:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f621.png', kiss:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f618.png' };
   let el=document.getElementById('ovStick');
   el.innerHTML='<img src="'+(map[k]||map.star)+'" style="width:110px;height:110px;object-fit:contain;border:0;background:transparent"><span class="stDel" onclick="deleteSticker()">×</span>';
-  el.style.left='50%'; el.style.top='60%'; el.classList.add('showDel'); stickerImgUrl=map[k]||'';
+  el.style.left='50%'; el.style.top='60%'; el.classList.add('showDel');
+  pushSticker({id:'st_'+Date.now(),type:'emoji',image_url:map[k]||'',x:50,y:60,scale:1,rotation:0,data:{emoji:k}});
   closeFull(); toast('Sticker Added - Drag panna Delete Varum');
 }
-function pickMySticker(s){let el=document.getElementById('ovStick');el.innerHTML='<img src="'+s+'" style="width:110px;height:110px;object-fit:contain;border:0;background:transparent"><span class="stDel" onclick="deleteSticker()">×</span>';el.style.left='50%';el.style.top='60%';el.classList.add('showDel');stickerImgUrl=s;closeFull();}
+function pickMySticker(s){let el=document.getElementById('ovStick');el.innerHTML='<img src="'+s+'" style="width:110px;height:110px;object-fit:contain;border:0;background:transparent"><span class="stDel" onclick="deleteSticker()">×</span>';el.style.left='50%';el.style.top='60%';el.classList.add('showDel');pushSticker({id:'st_'+Date.now(),type:'gallery',image_url:s,x:50,y:60,scale:1,rotation:0,data:{}});closeFull();}
 function renderMyStickers(){let box=document.getElementById('myStickerList');if(!box)return;box.innerHTML=myStickers.map(s=>'<div style="width:72px;height:72px;border-radius:14px;overflow:hidden;display:inline-block;margin:4px" onclick="pickMySticker(\''+s+'\')"><img src="'+s+'" style="width:100%;height:100%;object-fit:cover"></div>').join('');}
-function removeText(){text='';stickerImgUrl='';document.getElementById('ovText').innerHTML='';document.getElementById('ovStick').innerHTML='';closeFull();}
+function removeText(){text='';stickerImgUrl='';activeStickers=[];currentStickerData=null;document.getElementById('ovText').innerHTML='';document.getElementById('ovStick').innerHTML='';closeFull();}
 function startVoice(b){document.getElementById('voiceTxt').innerText='Voice: Recording...';if(b)b.innerText='Recording...';toast('Recording...');}
 function stopVoice(){document.getElementById('voiceTxt').innerText='Voice: Added';toast('Voice Added');}
-function resetEdit(){filter='none';prevFilter='none';text='';document.getElementById('ovText').innerHTML='';document.getElementById('ovStick').innerHTML='';applyFilter();}
+function resetEdit(){filter='none';prevFilter='none';text='';activeStickers=[];currentStickerData=null;stickerImgUrl='';document.getElementById('ovText').innerHTML='';document.getElementById('ovStick').innerHTML='';applyFilter();}
 function renderFilterFull(){
   let r=document.getElementById('filterRowFull');
   if(r)r.innerHTML=[['None','none'],['Vivid','brightness(1.15) saturate(1.5)'],['Warm','sepia(.45)'],['Retro','sepia(.6)'],['B&W','grayscale(1)'],['Cool','brightness(1.05) hue-rotate(180deg)'],['Golden','sepia(.3) saturate(1.4)']].map(a=>'<button onclick="previewFilter(\''+a[1]+'\')">'+a[0]+'</button>').join('');
@@ -347,6 +378,7 @@ document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.ta
       let p=getXY(e); let pr=document.getElementById('editPreview').getBoundingClientRect();
       let nx=Math.max(5,Math.min(95,ol+(p.x-sx)/pr.width*100)),ny=Math.max(5,Math.min(95,ot+(p.y-sy)/pr.height*100));
       el.style.left=nx+'%'; el.style.top=ny+'%';
+      if(isSt && activeStickers[0]){ activeStickers[0].x=nx; activeStickers[0].y=ny; }
       let bin=document.getElementById('deleteBin'); if(!bin) return;
       let b=bin.getBoundingClientRect();
       hot=(p.x>b.left-40&&p.x<b.right+40&&p.y>b.top-40&&p.y<b.bottom+40);
@@ -355,7 +387,7 @@ document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.ta
     function end(){
       if(!dr) return; dr=false;
       let dd=document.getElementById('dragDelete'); if(dd){ dd.classList.remove('show'); dd.classList.remove('hot'); }
-      if(hot){ if(isSt){ el.innerHTML=''; stickerImgUrl=''; } else { el.innerHTML=''; text=''; } toast('Deleted'); }
+      if(hot){ if(isSt){ el.innerHTML=''; stickerImgUrl=''; activeStickers=[]; currentStickerData=null; } else { el.innerHTML=''; text=''; } toast('Deleted'); }
     }
     el.addEventListener('pointerdown',start);
     el.addEventListener('touchstart',start,{passive:true});
@@ -367,7 +399,6 @@ document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.ta
   mk('ovText',false); mk('ovStick',true);
 })();
 function getSupa(){return window.supa;}
-// ✅ STICKER AH CANVAS LA VARAI - ILLANA UPLOAD LA STICKER KANAMA POYIDUM
 async function drawStickerOnCanvas(ctx,W,H){
   if(!stickerImgUrl) return;
   try{
@@ -390,6 +421,7 @@ async function shareStory(mode){
     let {data:{session}}=await supa.auth.getSession(); if(!session){ location.href='./login.html'; return; }
     let ME=session.user.email.split('@')[0];
     let blob=file;
+    let stickersToSave=getStickersForSave();
     if(kind!=='video'){
       blob=await new Promise(res=>{ let img=new Image(); img.onload=async()=>{ let W=1080,H=1920; let cc=document.createElement('canvas'); cc.width=W; cc.height=H; let ctx=cc.getContext('2d'); ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H); ctx.filter=buildFilter(); let sc=Math.max(W/img.width,H/img.height)*zoom; let dw=img.width*sc,dh=img.height*sc; ctx.drawImage(img,(W-dw)/2+panX*2,(H-dh)/2+panY*2,dw,dh); ctx.filter='none'; if(text){ ctx.font='900 60px '+fontF; ctx.textAlign='center'; ctx.fillStyle=tfColor; ctx.fillText(text,W/2,H*0.35); } await drawStickerOnCanvas(ctx,W,H); cc.toBlob(b=>res(b||file),'image/jpeg',0.92); }; img.src=url; });
     }
@@ -397,9 +429,10 @@ async function shareStory(mode){
     let {error:upErr}=await supa.storage.from('stories').upload(fn,blob,{contentType:kind==='video'?'video/mp4':'image/jpeg'});
     if(upErr) throw new Error('Storage: '+upErr.message);
     let {data:ud}=supa.storage.from('stories').getPublicUrl(fn);
-    let {error}=await supa.from('stories').insert({ user_id:session.user.id, username:ME, media_url:ud.publicUrl, media_type:kind, caption:captionVal||document.getElementById('storyCap')?.value||'', song:song, privacy: mode==='close' ? 'Close Friends' : 'Everyone', expires_at: new Date(Date.now()+24*60*60*1000).toISOString() });
+    // ✅ REAL WORK - STICKERS AH JSON AH SAVE PANNU
+    let {data:inserted,error}=await supa.from('stories').insert({ user_id:session.user.id, username:ME, media_url:ud.publicUrl, media_type:kind, caption:captionVal||document.getElementById('storyCap')?.value||'', song:song, stickers:stickersToSave, privacy: mode==='close' ? 'Close Friends' : 'Everyone', expires_at: new Date(Date.now()+24*60*60*1000).toISOString() }).select().single();
     if(error) throw new Error(error.message);
-    toast('Story Uploaded - Server la Save Aachu!'); uploading=false; setTimeout(()=>location.href='./index.html',1000);
+    toast('Story Uploaded - Sticker Save Aachu!'); uploading=false; setTimeout(()=>location.href='./index.html',1000);
   }catch(e){ uploading=false; toast('Story Error: '+e.message); }
 }
 async function saveToServer(isDraft){
@@ -407,6 +440,7 @@ async function saveToServer(isDraft){
   let {data:{session}}=await supa.auth.getSession(); if(!session){location.href='./login.html';return false;}
   let ME=session.user.email.split('@')[0];
   let blob;
+  let stickersToSave=getStickersForSave();
   if(kind==='video'){blob=file;}
   else{blob=await new Promise(res=>{let img=new Image();img.onload=async()=>{let W=1080,H=type==='reels'?1920:1350;let cc=document.createElement('canvas');cc.width=W;cc.height=H;let ctx=cc.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.filter=buildFilter();let sc=Math.max(W/img.width,H/img.height)*zoom;let dw=img.width*sc,dh=img.height*sc;ctx.drawImage(img,(W-dw)/2+panX*2,(H-dh)/2+panY*2,dw,dh);ctx.filter='none';if(text){ctx.font='900 60px '+fontF;ctx.textAlign='center';ctx.fillStyle=tfColor;ctx.fillText(text,W/2,H*0.35);}await drawStickerOnCanvas(ctx,W,H);cc.toBlob(b=>res(b||file),'image/jpeg',0.92);};img.src=url;});}
   let folder=type==='story'?'stories':type==='reels'?'reels':'posts';
@@ -416,7 +450,7 @@ async function saveToServer(isDraft){
   if(upErr) throw new Error('Storage: '+upErr.message);
   let {data:ud}=supa.storage.from(folder).getPublicUrl(fn);
   if(isDraft){let {error}=await supa.from('drafts').insert({user_id:session.user.id,media_url:ud.publicUrl,media_type:type,caption:captionVal||'',crop_zoom:zoom,crop_x:panX,crop_y:panY});if(error)throw new Error(error.message);return true;}
-  if(type==='story'){let {error}=await supa.from('stories').insert({user_id:session.user.id,username:ME,media_url:ud.publicUrl,media_type:kind,caption:captionVal||'',song:song});if(error)throw new Error(error.message);return true;}
+  if(type==='story'){let {error}=await supa.from('stories').insert({user_id:session.user.id,username:ME,media_url:ud.publicUrl,media_type:kind,caption:captionVal||'',song:song,stickers:stickersToSave});if(error)throw new Error(error.message);return true;}
   let {error}=await supa.from('posts').insert({user_id:session.user.id,username:ME,media_url:ud.publicUrl,image_url:kind==='image'?ud.publicUrl:null,video_url:kind==='video'?ud.publicUrl:null,media_type:type,caption:captionVal||'Just Pixoro',location:loc||'',tagged_users:tag||'',song:song,privacy:aud,crop_zoom:zoom,crop_x:panX,crop_y:panY,is_draft:false});
   if(error)throw new Error(error.message);return true;
 }
