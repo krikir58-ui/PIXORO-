@@ -6,7 +6,6 @@
 <title>Pixoro - Create</title>
 <link rel="stylesheet" href="css/create.css">
 <style>
-/* ✅ ATHEYE MARI NITTA TALL */
 #galPreview{ height:calc(100dvh - 210px) !important; aspect-ratio:auto !important; width:100% }
 #galPreview .pvStage img,#galPreview .pvStage video{ object-fit:cover !important; object-position:center !important }
 #pageEdit{ position:relative }
@@ -18,7 +17,6 @@
 #pageEdit .editPreview .ovStick .stSvg img{ width:80px; height:80px; object-fit:contain; }
 .stickGrid button img{ width:44px; height:44px; object-fit:contain; }
 #pageEdit .quickBar{ display:none !important }
-/* ✅ TOOLS - ATHEYE MARI CHINNA OUTLINE */
 #pageEdit .instaTools{ position:absolute !important; left:0; right:0; bottom:62px !important; z-index:40; background:linear-gradient(to top,rgba(0,0,0,.9),transparent) !important; padding:8px 8px 2px !important; gap:4px !important }
 #pageEdit .instaTools .c{ width:40px !important; height:40px !important; border-radius:12px !important; background:#1a1a1a !important; display:grid; place-items:center; margin:0 auto }
 #pageEdit .instaTools .c svg{ width:18px !important; height:18px !important; stroke:#fff !important; }
@@ -29,17 +27,14 @@
 #pageEdit .editSound{ top:66px !important; z-index:50 }
 #pageEdit .editPreview .centerPlay{ z-index:50 }
 #pageHome .sugAudio{ height:28px !important; font-size:11px !important; bottom:8px !important }
-/* ✅ PHOTO SELECT - MELA TOP ILLA - MODE MATTUM */
 #pageHome .top{ display:none !important; }
 #pageHome .galScroll{ padding-top:6px !important; }
-/* ✅ STORY SELECT - VIDEO MARI */
 #pageHome.storySelect .galPreview{ display:none !important; }
 #pageHome.storySelect .galTabs{ display:none !important; }
 #pageHome.storySelect .grid .tile{ aspect-ratio:3/4 !important; }
 #pageHome.storySelect .galleryBtn{ display:none !important; }
 #pageHome.storySelect .storyTopRow{ display:flex !important; gap:10px; padding:12px; overflow-x:auto; }
 #pageHome.storySelect .storyTopRow button{ background:#1a1a1a; color:#fff; border:0; padding:0; border-radius:14px; width:76px; height:92px; flex-shrink:0; display:flex; flex-direction:column; gap:6px; align-items:center; justify-content:center; font-size:11px; }
-/* ✅ STORY EDIT - FULL SCREEN */
 #pageEdit.storyMode .editPreview{ position:absolute !important; left:0 !important; top:0 !important; transform:none !important; width:100% !important; height:100% !important; inset:0 !important; border-radius:0 !important; }
 #pageEdit.storyMode .editPreview img,#pageEdit.storyMode .editPreview video{ border-radius:0 !important; }
 #pageEdit.storyMode .instaTools{ display:none !important; }
@@ -56,7 +51,6 @@
 #pageEdit.storyMode .storyCap::placeholder{ color:rgba(255,255,255,.7); }
 .storyTopRow{ display:none !important; }
 #pageHome.storySelect .storyTopRow{ display:flex !important; }
-/* ✅ TEXT PANEL - MASS */
 .tfPanel{ background:#111; padding:12px; max-height:52vh; overflow-y:auto; }
 .tfLabel{ font-size:11px; color:#888; padding:10px 2px 4px; letter-spacing:1px; font-weight:700; }
 .tfRow{ display:flex; gap:8px; overflow-x:auto; padding:6px 0; }
@@ -69,10 +63,16 @@
 .tfColors div{ width:30px; height:30px; border-radius:50%; flex-shrink:0; border:2px solid #333; cursor:pointer; }
 .tfColors div.sel{ border:3px solid #fff !important; transform:scale(1.15); }
 #tfInput::placeholder{ color:rgba(255,255,255,.45) !important; }
-/* ✅ STICKER THAVARA ELLAAM OUTLINE SVG - FILL ILLA */
 svg{ fill:none !important; stroke-linecap:round !important; stroke-linejoin:round !important; }
 svg path, svg circle, svg rect, svg line{ fill:none !important; }
 .stickGrid button img, .ovStick img{ fill:none !important; stroke:none !important; }
+/* ✅ DELETE - DRAG PANNA KEELA VARANUM - Z-INDEX FIX */
+#pageEdit .dragDelete,.editPreview .dragDelete{ position:absolute !important; left:0 !important; right:0 !important; bottom:0 !important; height:120px !important; background:linear-gradient(to top,rgba(0,0,0,.95),transparent) !important; display:none !important; flex-direction:column !important; align-items:center !important; justify-content:flex-end !important; padding-bottom:14px !important; z-index:100 !important; pointer-events:none !important; }
+#pageEdit .dragDelete.show,.editPreview .dragDelete.show{ display:flex !important; }
+#pageEdit .dragDelete .bin,.editPreview .dragDelete .bin{ width:60px !important; height:60px !important; border-radius:50% !important; background:#111 !important; border:1.5px solid #fff !important; display:grid !important; place-items:center !important; }
+#pageEdit .dragDelete.hot .bin,.editPreview .dragDelete.hot .bin{ background:#ff3b30 !important; border-color:#ff3b30 !important; transform:scale(1.25) !important; }
+.ovText,.ovStick{ touch-action:none !important; pointer-events:auto !important; }
+.ovStick img{ pointer-events:none !important; }
 </style>
 </head>
 <body>
@@ -95,7 +95,7 @@ svg path, svg circle, svg rect, svg line{ fill:none !important; }
 </div>
 </div>
 <div class="page" id="pageEdit">
-<div class="top"><span class="back" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b id="editTitle">Edit Photo</b><span class="done" onclick="goUpload()">Next <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0095f6" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
+<div class="top"><span class="back" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b id="editTitle">Edit Photo</b><span class="done" onclick="handleStoryNext()">Next <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0095f6" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
 <div class="editWrap" style="position:relative">
 <div class="quickBar" id="quickBar"></div>
 <div class="editPreview" id="editPreview" onclick="tapPreviewPlay(event)"><img id="editImg" style="object-fit:cover"><video id="editVid" style="display:none;object-fit:cover" muted loop playsinline></video>
@@ -112,7 +112,7 @@ svg path, svg circle, svg rect, svg line{ fill:none !important; }
 <div onclick="openFull('pageStickerFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></div><span>Stickers</span></div>
 <div onclick="openFull('pageFilterFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></div><span>Adjust</span></div>
 </div>
-<div class="instaBottom"><button class="editBtn" onclick="openFull('pageEditVideoFull')">Edit video</button><button class="nextBtn2" onclick="goUpload()">Next <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+<div class="instaBottom"><button class="editBtn" onclick="openFull('pageEditVideoFull')">Edit video</button><button class="nextBtn2" onclick="handleStoryNext()">Next <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
 </div>
 </div>
 <div class="fullPage" id="pageAudioFull">
@@ -239,6 +239,54 @@ goBack = function(){
 };
 window.addEventListener('popstate', function(e){ e.preventDefault(); _lock=true; goBack(); setTimeout(()=>{ _lock=false; },100); });
 _push();
+// ✅ STORY KU UPLOAD PAGE VARA KOODATHU - 2ND PHOTO PAGE ILLA
+function handleStoryNext(){
+  if(typeof type!=='undefined' && type==='story'){ if(typeof shareStory==='function') shareStory('story'); return; }
+  if(typeof goUpload==='function') goUpload();
+}
+let _origGoUpload2 = (typeof goUpload!=='undefined') ? goUpload : null;
+goUpload = function(){
+  if(typeof type!=='undefined' && type==='story'){ if(typeof shareStory==='function') shareStory('story'); return; }
+  if(_origGoUpload2) _origGoUpload2();
+};
+// ✅ DRAG DELETE - TOUCH + MOUSE - STICKER / TEXT AH IZHUTHA KEELA DELETE VARUM
+(function(){
+  function setupDrag(id,isSt){
+    let el=document.getElementById(id); if(!el) return;
+    let sx=0,sy=0,ol=0,ot=0,dr=false,hot=false;
+    function getXY(e){ return {x:e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0]?e.touches[0].clientX:0), y:e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0]?e.touches[0].clientY:0)}; }
+    function start(e){
+      if(!el.innerText && !el.innerHTML) return;
+      let p=getXY(e); dr=true; sx=p.x; sy=p.y;
+      let r=el.getBoundingClientRect(),pr=document.getElementById('editPreview').getBoundingClientRect();
+      ol=(r.left-pr.left+r.width/2)/pr.width*100; ot=(r.top-pr.top+r.height/2)/pr.height*100;
+      let dd=document.getElementById('dragDelete'); if(dd) dd.classList.add('show');
+      e.stopPropagation();
+    }
+    function move(e){
+      if(!dr) return;
+      let p=getXY(e); let pr=document.getElementById('editPreview').getBoundingClientRect();
+      let nx=Math.max(5,Math.min(95,ol+(p.x-sx)/pr.width*100)),ny=Math.max(5,Math.min(95,ot+(p.y-sy)/pr.height*100));
+      el.style.left=nx+'%'; el.style.top=ny+'%';
+      let bin=document.getElementById('deleteBin'); if(!bin) return;
+      let b=bin.getBoundingClientRect();
+      hot=(p.x>b.left-40&&p.x<b.right+40&&p.y>b.top-40&&p.y<b.bottom+40);
+      let dd=document.getElementById('dragDelete'); if(dd) dd.classList.toggle('hot',hot);
+    }
+    function end(){
+      if(!dr) return; dr=false;
+      let dd=document.getElementById('dragDelete'); if(dd){ dd.classList.remove('show'); dd.classList.remove('hot'); }
+      if(hot){ if(isSt){ el.innerHTML=''; if(typeof stickerImgUrl!=='undefined') stickerImgUrl=''; } else { el.innerText=''; if(typeof text!=='undefined') text=''; } if(typeof toast==='function') toast('Deleted'); }
+    }
+    el.addEventListener('pointerdown',start);
+    el.addEventListener('touchstart',start,{passive:true});
+    window.addEventListener('pointermove',move);
+    window.addEventListener('touchmove',move,{passive:true});
+    window.addEventListener('pointerup',end);
+    window.addEventListener('touchend',end);
+  }
+  setupDrag('ovText',false); setupDrag('ovStick',true);
+})();
 let _origAddClip = addClip;
 addClip = function(f){
   _origAddClip(f);
@@ -284,7 +332,6 @@ pv.addEventListener('touchstart',e=>{ if(!url) return; if(e.target.closest('#ovT
 pv.addEventListener('touchmove',e=>{ if(!url) return; if(e.target.closest('#ovText')||e.target.closest('#ovStick')) return; if(e.touches.length===1&&drag){panX=ox+(e.touches[0].clientX-sx);panY=oy+(e.touches[0].clientY-sy);applyZoom();} if(e.touches.length===2){let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); if(ld>0){zoom=Math.max(1,Math.min(3,zoom*(d/ld)));applyZoom();} ld=d;} },{passive:true});
 pv.addEventListener('touchend',()=>{drag=false;ld=0;}); pv.addEventListener('dblclick',()=>{ if(!url) return; fitVideoFullScreen(); });
 })();
-// ✅ TEXT - Type... FIX + OUTLINE - setTFAlign ku SVG Check ku - innerText la SVG irundha - sel logic ah maathiten
 let tfSize=36, tfBold=false, tfItalic=false, tfBg=false, tfOpacity=100, tfRotate=0;
 let _origOpenFull2 = openFull;
 openFull = function(id){
