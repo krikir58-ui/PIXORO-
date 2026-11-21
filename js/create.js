@@ -149,11 +149,7 @@ function selectGallery(i){let p=galleryPhotos[i];if(!p)return;url=p.url;kind=p.k
 function setGalTab(f,b){galFilter=f;document.querySelectorAll('.galTabs button').forEach(x=>x.classList.remove('sel'));if(b)b.classList.add('sel');renderMedia();}
 function goSelectNext(){if(!url){document.getElementById('fileMulti').click();return;}goEdit();}
 function goEdit(){if(!url){toast('Gallery la irunthu Photo Add Pannu');return;}showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);showMedia(document.getElementById('upImgPost'),document.getElementById('upVidPost'),url,kind);showPage('pageEdit');renderFilm();setType(type);fitVideoFullScreen();syncEditVideoUI();}
-// ✅ STORY KU UPLOAD PAGE VARA KOODATHU - DIRECT SHARE - 2ND PHOTO PAGE ILLA
-function handleStoryNext(){
-  if(type==='story'){ shareStory('story'); return; }
-  goUpload();
-}
+function handleStoryNext(){ if(type==='story'){ shareStory('story'); return; } goUpload(); }
 function goUpload(){
   if(type==='story'){ shareStory('story'); return; }
   if(!url){toast('Photo illa');return;}
@@ -173,6 +169,54 @@ function closeDraft(){document.getElementById('draftPopup').classList.remove('sh
 function startOver(){closeDraft();resetEdit();showPage('pageHome');}
 function closeFull(){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));}
 function closeFullAll(){document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));}
+// ✅ TAP / DELETE - STICKER / TEXT AH THOTTA X VARUM
+function tapSticker(e){ if(e) e.stopPropagation(); let el=document.getElementById('ovStick'); if(!el || !el.innerHTML) return; el.classList.toggle('showDel'); }
+function tapOvText(e){ if(e) e.stopPropagation(); let el=document.getElementById('ovText'); if(!el || !el.innerText) return; el.classList.toggle('showDel'); }
+function deleteSticker(){ let el=document.getElementById('ovStick'); if(!el) return; el.innerHTML=''; el.classList.remove('showDel'); stickerImgUrl=''; toast('Sticker Deleted'); }
+function deleteOvText(){ let el=document.getElementById('ovText'); if(!el) return; el.innerHTML=''; el.classList.remove('showDel'); text=''; toast('Text Deleted'); }
+// ✅ REAL STICKER - GIPHY - NEE TYPE PANNA STICKER VARUM
+let GIPHY_KEY='dc6zaTOxFJmzC';
+let giphyCache={};
+async function loadGiphy(q){
+  let grid=document.getElementById('giphyGrid'); if(!grid) return;
+  if(!q) q='trending';
+  if(giphyCache[q]){ renderGiphy(giphyCache[q]); return; }
+  try{
+    let url = q==='trending' ? 'https://api.giphy.com/v1/stickers/trending?api_key='+GIPHY_KEY+'&limit=24&rating=g' : 'https://api.giphy.com/v1/stickers/search?api_key='+GIPHY_KEY+'&q='+encodeURIComponent(q)+'&limit=24&rating=g&lang=en';
+    let r=await fetch(url); let j=await r.json(); giphyCache[q]=j.data||[]; renderGiphy(giphyCache[q]);
+  }catch(e){ grid.innerHTML='<p style="grid-column:1/-1;text-align:center;color:#888;font-size:13px">Net Illa - Gallery Sticker Use Pannu</p>'; }
+}
+function renderGiphy(list){
+  let grid=document.getElementById('giphyGrid'); if(!grid) return;
+  grid.innerHTML=list.map(s=>{
+    let src=(s.images && (s.images.fixed_height_small?.url || s.images.original?.url)) || '';
+    if(!src) return '';
+    return '<img src="'+src+'" onclick="pickRealSticker(\''+src+'\')">';
+  }).join('');
+}
+function searchRealSticker(q){ clearTimeout(window._stT); window._stT=setTimeout(()=>loadGiphy(q||'trending'),300); }
+function pickRealSticker(src){
+  let el=document.getElementById('ovStick');
+  el.innerHTML='<img src="'+src+'" style="width:110px;height:110px;object-fit:contain;border:0;background:transparent"><span class="stDel" onclick="deleteSticker()">×</span>';
+  el.style.left='50%'; el.style.top='55%'; el.classList.add('showDel'); stickerImgUrl=src;
+  closeFull(); toast('Sticker Added - Drag panna Delete Varum');
+}
+function addRealSticker(kind){
+  let el=document.getElementById('ovStick'); let html='';
+  if(kind==='location'){ let v=prompt('Location',loc||'Chennai, India'); if(!v) return; html='<div style="background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-weight:800;font-size:14px">📍 '+v+'</div>'; }
+  if(kind==='mention'){ let v=prompt('Mention','@friend_name'); if(!v) return; html='<div style="background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-weight:800;font-size:14px">'+v+'</div>'; }
+  if(kind==='music'){ html='<div style="background:#111;border:1px solid #333;color:#fff;padding:10px 14px;border-radius:12px;font-size:13px">🎵 '+song+'</div>'; }
+  if(kind==='poll'){ let v=prompt('Poll Question','Like Pannuvingala?'); if(!v) return; html='<div style="background:#fff;color:#000;padding:12px 16px;border-radius:16px;width:200px;text-align:center"><b>'+v+'</b><div style="display:flex;gap:6px;margin-top:8px"><span style="flex:1;background:#0095f6;color:#fff;padding:8px;border-radius:999px">Yes</span><span style="flex:1;background:#eee;padding:8px;border-radius:999px">No</span></div></div>'; }
+  if(kind==='link'){ let v=prompt('Link','https://pixoro.app'); if(!v) return; html='<div style="background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-weight:700;font-size:13px">🔗 '+v+'</div>'; }
+  if(kind==='hashtag'){ let v=prompt('Hashtag','#pixoro'); if(!v) return; html='<div style="background:#fff;color:#0095f6;padding:10px 16px;border-radius:999px;font-weight:800">'+v+'</div>'; }
+  if(kind==='countdown'){ html='<div style="background:#111;border:1px solid #333;color:#fff;padding:12px 16px;border-radius:16px;text-align:center"><b>⏱ Countdown</b><div style="font-size:20px;font-weight:900">24:00:00</div></div>'; }
+  if(kind==='question'){ html='<div style="background:#fff;color:#000;padding:12px 16px;border-radius:16px;width:210px;text-align:center"><b>Ask me a question</b><div style="background:#eee;padding:8px;border-radius:999px;margin-top:8px;font-size:12px;color:#888">Type something...</div></div>'; }
+  if(kind==='photo'){ document.getElementById('fileSticker').click(); return; }
+  if(kind==='avatar'){ html='<div style="background:#a259ff;color:#fff;padding:12px 16px;border-radius:999px;font-weight:800">👤 Your Avatar</div>'; }
+  if(!html) return;
+  el.innerHTML=html+'<span class="stDel" onclick="deleteSticker()">×</span>';
+  el.style.left='50%'; el.style.top='55%'; el.classList.add('showDel'); closeFull();
+}
 function openFull(id){
   if(id==='pageFilterFull'){ prevFilter=filter; }
   document.querySelectorAll('.fullPage').forEach(p=>p.classList.remove('show'));
@@ -182,6 +226,7 @@ function openFull(id){
   if(id==='pageVoiceFull'){showMedia(document.getElementById('voImg'),document.getElementById('voVid'),url,kind);}
   if(id==='pageEditVideoFull'){showMedia(document.getElementById('evImg'),document.getElementById('evVid'),url,kind);renderFilm();updateSoundIcon();}
   if(id==='pageFilterFull'){renderFilterFull();}
+  if(id==='pageStickerFull'){ loadGiphy('trending'); let inp=document.getElementById('stickerSearch'); if(inp) inp.value=''; renderMyStickers(); }
 }
 function renderSongs(q){
   let list=[['Leo - Naa Ready','Sai Abhyankkar'],['Jailer - Hukum','Anirudh'],['Vikram','Anirudh'],['Trending Audio','Pixoro'],['Veezha Veera','Anirudh'],['Sheru Bhai','Sai Abhyankkar']];
@@ -195,10 +240,12 @@ function confirmTextFull(){
   let v=document.getElementById('tfInput').value.trim();
   if(!v){ closeFull(); return; }
   text=v; let o=document.getElementById('ovText');
-  o.innerText=v; o.style.fontFamily=fontF; o.style.color=tfColor; o.style.fontSize=tfSize+'px'; o.style.textAlign=tfAlign; o.style.fontStyle=tfItalic?'italic':'normal'; o.style.background=tfBg?'rgba(0,0,0,.6)':'transparent'; o.style.padding=tfBg?'8px 14px':'0'; o.style.borderRadius=tfBg?'12px':'0'; o.style.opacity=tfOpacity/100; o.style.transform='translate(-50%,-50%) rotate('+tfRotate+'deg)';
+  o.innerHTML=''; let sp=document.createElement('span'); sp.innerText=v; o.appendChild(sp);
+  let del=document.createElement('span'); del.className='stDel'; del.innerText='×'; del.onclick=function(e){ e.stopPropagation(); deleteOvText(); }; o.appendChild(del);
+  o.style.fontFamily=fontF; o.style.color=tfColor; o.style.fontSize=tfSize+'px'; o.style.textAlign=tfAlign; o.style.fontStyle=tfItalic?'italic':'normal'; o.style.background=tfBg?'rgba(0,0,0,.6)':'transparent'; o.style.padding=tfBg?'8px 14px':'0'; o.style.borderRadius=tfBg?'12px':'0'; o.style.opacity=tfOpacity/100; o.style.transform='translate(-50%,-50%) rotate('+tfRotate+'deg)';
   applyTextEffect(); toast('Text Added'); closeFull();
 }
-function removeTextFull(){text='';let i=document.getElementById('tfInput');if(i)i.value='';document.getElementById('ovText').innerText='';closeFull();}
+function removeTextFull(){text='';let i=document.getElementById('tfInput');if(i)i.value='';document.getElementById('ovText').innerHTML='';closeFull();}
 function setTFFont(f,b){fontF=f;let inp=document.getElementById('tfInput');if(inp)inp.style.fontFamily=f;document.querySelectorAll('#tfFontRow button').forEach(x=>x.classList.remove('sel'));if(b)b.classList.add('sel');}
 function setTFSize(v){ tfSize=v; let el=document.getElementById('tfSizeVal'); if(el)el.innerText=v+'px'; let i=document.getElementById('tfInput'); if(i) i.style.fontSize=v+'px'; }
 function setTFAlign(a,b){
@@ -245,16 +292,16 @@ function applyTextEffect(){
 function pickSticker(k){
   let map={ fire:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f525.png', heart:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2764.png', laugh:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f602.png', crown:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f451.png', love:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f60d.png', star:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2b50.png', party:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f389.png', hundred:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4af.png', cool:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f60e.png', cry:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f622.png', angry:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f621.png', kiss:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f618.png' };
   let el=document.getElementById('ovStick');
-  el.innerHTML='<img src="'+(map[k]||map.star)+'" style="width:90px;height:90px;object-fit:contain;border:0;background:transparent">';
-  el.style.left='50%'; el.style.top='60%'; stickerImgUrl=map[k]||'';
-  closeFull(); toast('Sticker Added');
+  el.innerHTML='<img src="'+(map[k]||map.star)+'" style="width:110px;height:110px;object-fit:contain;border:0;background:transparent"><span class="stDel" onclick="deleteSticker()">×</span>';
+  el.style.left='50%'; el.style.top='60%'; el.classList.add('showDel'); stickerImgUrl=map[k]||'';
+  closeFull(); toast('Sticker Added - Drag panna Delete Varum');
 }
-function pickMySticker(s){let el=document.getElementById('ovStick');el.innerHTML='<img src="'+s+'" style="width:90px;height:90px;object-fit:contain;border:0;background:transparent">';el.style.left='50%';el.style.top='60%';stickerImgUrl=s;closeFull();}
+function pickMySticker(s){let el=document.getElementById('ovStick');el.innerHTML='<img src="'+s+'" style="width:110px;height:110px;object-fit:contain;border:0;background:transparent"><span class="stDel" onclick="deleteSticker()">×</span>';el.style.left='50%';el.style.top='60%';el.classList.add('showDel');stickerImgUrl=s;closeFull();}
 function renderMyStickers(){let box=document.getElementById('myStickerList');if(!box)return;box.innerHTML=myStickers.map(s=>'<div style="width:72px;height:72px;border-radius:14px;overflow:hidden;display:inline-block;margin:4px" onclick="pickMySticker(\''+s+'\')"><img src="'+s+'" style="width:100%;height:100%;object-fit:cover"></div>').join('');}
-function removeText(){text='';stickerImgUrl='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerHTML='';closeFull();}
+function removeText(){text='';stickerImgUrl='';document.getElementById('ovText').innerHTML='';document.getElementById('ovStick').innerHTML='';closeFull();}
 function startVoice(b){document.getElementById('voiceTxt').innerText='Voice: Recording...';if(b)b.innerText='Recording...';toast('Recording...');}
 function stopVoice(){document.getElementById('voiceTxt').innerText='Voice: Added';toast('Voice Added');}
-function resetEdit(){filter='none';prevFilter='none';text='';document.getElementById('ovText').innerText='';document.getElementById('ovStick').innerHTML='';applyFilter();}
+function resetEdit(){filter='none';prevFilter='none';text='';document.getElementById('ovText').innerHTML='';document.getElementById('ovStick').innerHTML='';applyFilter();}
 function renderFilterFull(){
   let r=document.getElementById('filterRowFull');
   if(r)r.innerHTML=[['None','none'],['Vivid','brightness(1.15) saturate(1.5)'],['Warm','sepia(.45)'],['Retro','sepia(.6)'],['B&W','grayscale(1)'],['Cool','brightness(1.05) hue-rotate(180deg)'],['Golden','sepia(.3) saturate(1.4)']].map(a=>'<button onclick="previewFilter(\''+a[1]+'\')">'+a[0]+'</button>').join('');
@@ -281,13 +328,13 @@ document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.ta
 (function(){let pv=document.getElementById('galPreview'),st=document.getElementById('pvStage'),sx=0,sy=0,ox=0,oy=0,drag=false,ld=0;if(!pv)return;pv.addEventListener('touchstart',e=>{if(!url)return;st.classList.add('dragging');if(e.touches.length===1){drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;ox=panX;oy=panY;}if(e.touches.length===2){drag=false;ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}},{passive:true});pv.addEventListener('touchmove',e=>{if(!url)return;if(e.touches.length===1&&drag){panX=ox+(e.touches[0].clientX-sx);panY=oy+(e.touches[0].clientY-sy);applyZoom();}if(e.touches.length===2){let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(ld>0){zoom=Math.max(1,Math.min(3,zoom*(d/ld)));applyZoom();}ld=d;}},{passive:true});pv.addEventListener('touchend',()=>{drag=false;ld=0;st.classList.remove('dragging');});pv.addEventListener('dblclick',()=>{if(!url)return;fitVideoFullScreen();});})();
 (function(){let pv=document.getElementById('editPreview');if(!pv)return;let sx=0,sy=0,ox=0,oy=0,drag=false,ld=0;pv.addEventListener('touchstart',e=>{if(!url)return;if(e.target.closest('#ovText')||e.target.closest('#ovStick')||e.target.closest('.editSound')||e.target.closest('.centerPlay')||e.target.closest('.storySide')||e.target.closest('.storyBottom'))return;if(e.touches.length===1){drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;ox=panX;oy=panY;}if(e.touches.length===2){drag=false;ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}},{passive:true});pv.addEventListener('touchmove',e=>{if(!url)return;if(e.target.closest('#ovText')||e.target.closest('#ovStick'))return;if(e.touches.length===1&&drag){panX=ox+(e.touches[0].clientX-sx);panY=oy+(e.touches[0].clientY-sy);applyZoom();}if(e.touches.length===2){let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(ld>0){zoom=Math.max(1,Math.min(3,zoom*(d/ld)));applyZoom();}ld=d;}},{passive:true});pv.addEventListener('touchend',()=>{drag=false;ld=0;});pv.addEventListener('dblclick',()=>{if(!url)return;fitVideoFullScreen();});})();
 (function(){let pill=document.getElementById('modePill');if(!pill)return;let sx=0,modes=['post','story','reels','live'];pill.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});pill.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40){let cur=modes.indexOf(type);if(dx<0&&cur<3)setMode(modes[cur+1]);if(dx>0&&cur>0)setMode(modes[cur-1]);}},{passive:true});})();
-// ✅ DRAG DELETE FIX - TOUCH + POINTER + WINDOW MOVE - STICKER / TEXT AH IZHUTHA DELETE VARUM
 (function(){
   function mk(id,isSt){
     let el=document.getElementById(id); if(!el) return;
     let sx=0,sy=0,ol=0,ot=0,dr=false,hot=false;
     function getXY(e){ return {x:(e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0]?e.touches[0].clientX:0)), y:(e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0]?e.touches[0].clientY:0))}; }
     function start(e){
+      if(e.target && e.target.classList && e.target.classList.contains('stDel')) return;
       if(!el.innerText && !el.innerHTML) return;
       let p=getXY(e); dr=true; sx=p.x; sy=p.y;
       let r=el.getBoundingClientRect(),pr=document.getElementById('editPreview').getBoundingClientRect();
@@ -308,7 +355,7 @@ document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.ta
     function end(){
       if(!dr) return; dr=false;
       let dd=document.getElementById('dragDelete'); if(dd){ dd.classList.remove('show'); dd.classList.remove('hot'); }
-      if(hot){ if(isSt){ el.innerHTML=''; stickerImgUrl=''; } else { el.innerText=''; text=''; } toast('Deleted'); }
+      if(hot){ if(isSt){ el.innerHTML=''; stickerImgUrl=''; } else { el.innerHTML=''; text=''; } toast('Deleted'); }
     }
     el.addEventListener('pointerdown',start);
     el.addEventListener('touchstart',start,{passive:true});
@@ -320,6 +367,21 @@ document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.ta
   mk('ovText',false); mk('ovStick',true);
 })();
 function getSupa(){return window.supa;}
+// ✅ STICKER AH CANVAS LA VARAI - ILLANA UPLOAD LA STICKER KANAMA POYIDUM
+async function drawStickerOnCanvas(ctx,W,H){
+  if(!stickerImgUrl) return;
+  try{
+    let el=document.getElementById('ovStick');
+    let leftPct=50, topPct=55;
+    if(el && el.style.left) leftPct=parseFloat(el.style.left)||50;
+    if(el && el.style.top) topPct=parseFloat(el.style.top)||55;
+    await new Promise((res,rej)=>{
+      let s=new Image(); s.crossOrigin='anonymous';
+      s.onload=()=>{ let sw=W*0.22, sh=sw; ctx.drawImage(s, W*leftPct/100 - sw/2, H*topPct/100 - sh/2, sw, sh); res(); };
+      s.onerror=()=>res(); s.src=stickerImgUrl;
+    });
+  }catch(e){}
+}
 async function shareStory(mode){
   if(!url || !file){ toast('Photo / Video Select Pannu'); return; }
   if(uploading) return; uploading=true; toast('Story Uploading...');
@@ -329,7 +391,7 @@ async function shareStory(mode){
     let ME=session.user.email.split('@')[0];
     let blob=file;
     if(kind!=='video'){
-      blob=await new Promise(res=>{ let img=new Image(); img.onload=()=>{ let W=1080,H=1920; let cc=document.createElement('canvas'); cc.width=W; cc.height=H; let ctx=cc.getContext('2d'); ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H); ctx.filter=buildFilter(); let sc=Math.max(W/img.width,H/img.height)*zoom; let dw=img.width*sc,dh=img.height*sc; ctx.drawImage(img,(W-dw)/2+panX*2,(H-dh)/2+panY*2,dw,dh); if(text){ ctx.filter='none'; ctx.font='900 60px '+fontF; ctx.textAlign='center'; ctx.fillStyle=tfColor; ctx.fillText(text,W/2,H*0.35); } cc.toBlob(b=>res(b||file),'image/jpeg',0.92); }; img.src=url; });
+      blob=await new Promise(res=>{ let img=new Image(); img.onload=async()=>{ let W=1080,H=1920; let cc=document.createElement('canvas'); cc.width=W; cc.height=H; let ctx=cc.getContext('2d'); ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H); ctx.filter=buildFilter(); let sc=Math.max(W/img.width,H/img.height)*zoom; let dw=img.width*sc,dh=img.height*sc; ctx.drawImage(img,(W-dw)/2+panX*2,(H-dh)/2+panY*2,dw,dh); ctx.filter='none'; if(text){ ctx.font='900 60px '+fontF; ctx.textAlign='center'; ctx.fillStyle=tfColor; ctx.fillText(text,W/2,H*0.35); } await drawStickerOnCanvas(ctx,W,H); cc.toBlob(b=>res(b||file),'image/jpeg',0.92); }; img.src=url; });
     }
     let ext=kind==='video'?'mp4':'jpg'; let fn='stories/'+session.user.id+'/'+Date.now()+'.'+ext;
     let {error:upErr}=await supa.storage.from('stories').upload(fn,blob,{contentType:kind==='video'?'video/mp4':'image/jpeg'});
@@ -346,7 +408,7 @@ async function saveToServer(isDraft){
   let ME=session.user.email.split('@')[0];
   let blob;
   if(kind==='video'){blob=file;}
-  else{blob=await new Promise(res=>{let img=new Image();img.onload=()=>{let W=1080,H=type==='reels'?1920:1350;let cc=document.createElement('canvas');cc.width=W;cc.height=H;let ctx=cc.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.filter=buildFilter();let sc=Math.max(W/img.width,H/img.height)*zoom;let dw=img.width*sc,dh=img.height*sc;ctx.drawImage(img,(W-dw)/2+panX*2,(H-dh)/2+panY*2,dw,dh);if(text){ctx.filter='none';ctx.font='900 60px '+fontF;ctx.textAlign='center';ctx.fillStyle=tfColor;ctx.fillText(text,W/2,H*0.35);}cc.toBlob(b=>res(b||file),'image/jpeg',0.92);};img.src=url;});}
+  else{blob=await new Promise(res=>{let img=new Image();img.onload=async()=>{let W=1080,H=type==='reels'?1920:1350;let cc=document.createElement('canvas');cc.width=W;cc.height=H;let ctx=cc.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.filter=buildFilter();let sc=Math.max(W/img.width,H/img.height)*zoom;let dw=img.width*sc,dh=img.height*sc;ctx.drawImage(img,(W-dw)/2+panX*2,(H-dh)/2+panY*2,dw,dh);ctx.filter='none';if(text){ctx.font='900 60px '+fontF;ctx.textAlign='center';ctx.fillStyle=tfColor;ctx.fillText(text,W/2,H*0.35);}await drawStickerOnCanvas(ctx,W,H);cc.toBlob(b=>res(b||file),'image/jpeg',0.92);};img.src=url;});}
   let folder=type==='story'?'stories':type==='reels'?'reels':'posts';
   let ext=kind==='video'?'mp4':'jpg';
   let fn=folder+'/'+session.user.id+'/'+Date.now()+(isDraft?'-draft':'')+'.'+ext;
