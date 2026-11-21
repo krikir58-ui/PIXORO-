@@ -27,7 +27,18 @@ window.addEventListener('popstate',function(e){ e.preventDefault(); _histLock=tr
 function openCreateSheet(){document.getElementById('createSheet')?.classList.add('show');document.getElementById('sheetBg')?.classList.add('show'); _pushHist();}
 function closeCreateSheet(){document.getElementById('createSheet')?.classList.remove('show');document.getElementById('sheetBg')?.classList.remove('show');}
 function pickCreate(t){closeCreateSheet();setMode(t);showPage('pageHome');}
-// ✅ STORY - SELECT PAGE MASS + EDIT FULL SCREEN
+// ✅ PER MODE PHOTO - VERA PAGE THOTTA PHOTO MAARAATHU - ITHU THAAN MAIN FIX
+let savedByMode={post:null,story:null,reels:null,live:null};
+function saveCurMode(){ savedByMode[type]= url ? {url:url,kind:kind,file:file,clips:[...clips]} : null; }
+function loadMode(m){
+  let s=savedByMode[m];
+  if(s){ url=s.url; kind=s.kind; file=s.file; clips=[...s.clips]; }
+  else{ url=''; kind='image'; file=null; clips=[]; }
+  zoom=1; panX=0; panY=0; text=''; filter='none';
+  let o=document.getElementById('ovText'); if(o) o.innerText='';
+  let st=document.getElementById('ovStick'); if(st) st.innerHTML='';
+  applyFilter();
+}
 function toggleStoryUI(){
   let pe=document.getElementById('pageEdit');
   if(pe) pe.classList.toggle('storyMode', type==='story');
@@ -39,15 +50,17 @@ function toggleStoryUI(){
   if(ht && type==='story') ht.innerText='Add to story';
 }
 function setMode(t){
+  if(type!==t) saveCurMode();
   type=t;
+  loadMode(t);
   document.querySelectorAll('#modePill button').forEach(b=>b.classList.toggle('on',b.dataset.mode===t));
   let a=document.querySelector('#modePill button.on'),ind=document.getElementById('modeInd');
   if(a&&ind){ind.style.width=a.offsetWidth+'px';ind.style.transform='translateX('+(a.offsetLeft-4)+'px)';}
-  document.getElementById('homeTitle').innerText=t==='post'?'New post':t==='reels'?'New reel':t==='story'?'New story':'Live';
+  document.getElementById('homeTitle').innerText=t==='post'?'New post':t==='reels'?'New reel':t==='story'?'Add to story':'Live';
   document.getElementById('galPreview').className='galPreview '+t;
   document.getElementById('pvChipTxt').innerText=t==='post'?'1:1 - Drag to adjust':t==='reels'?'9:16 - Reels':t==='story'?'9:16 - Story':'LIVE - Camera';
   document.getElementById('sugAudio').style.display=(t==='reels'&&url)?'flex':'none';
-  setType(t); updatePreview(); fitVideoFullScreen(); toggleStoryUI();
+  setType(t); updatePreview(); fitVideoFullScreen(); toggleStoryUI(); renderMedia(); renderFilm();
   if(t==='live')toast('Live - Go Live');
 }
 function setType(t){type=t;let e=document.getElementById('editTitle');if(e)e.innerText=t==='post'?'Edit Photo':t==='reels'?'Edit Reel':'Story Edit';let u=document.getElementById('uploadTitle');if(u)u.innerText=t==='post'?'Upload Post':t==='reels'?'Upload Reel':'Upload Story';renderQuickBar(); toggleStoryUI();}
@@ -133,8 +146,8 @@ function togglePreviewPlay(e){
   else { v.pause(); document.getElementById('pvPlay').style.display='grid'; }
 }
 function showMedia(a,b,s,k){if(!a||!b)return;if(k==='video'){b.src=s;b.style.display='block';a.style.display='none';}else{a.src=s;a.style.display='block';b.style.display='none';try{b.pause();}catch(e){}}}
-function renderMedia(){let list=galleryPhotos.filter(p=>galFilter==='all'||p.kind===galFilter);let html='<div class="galleryBtn" onclick="document.getElementById(\'fileMulti\').click()"><div><b>Gallery la irunthu Photo / Video Add Pannu</b><div style="font-size:11px;color:#aaa">Real Gallery mattum thaan</div></div></div>';html+=list.map(p=>{let i=galleryPhotos.indexOf(p);return '<div class="tile '+(url===p.url?'sel':'')+'" onclick="selectGallery('+i+')">'+(p.kind==='video'?'<video src="'+p.url+'" muted playsinline></video><span class="dur">0:15</span>':'<img src="'+p.url+'">')+'<span class="tick">'+(url===p.url?'✓':'')+'</span></div>';}).join('');let gh=document.getElementById('mediaGridHome');if(gh)gh.innerHTML=html;}
-function selectGallery(i){let p=galleryPhotos[i];if(!p)return;url=p.url;kind=p.kind;file=p.file;fitVideoFullScreen();showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI(); if(type==='reels'||type==='story') setTimeout(()=>goEdit(),200);}
+function renderMedia(){let list=galleryPhotos.filter(p=>galFilter==='all'||p.kind===galFilter);let html='';if(type!=='story'){ html='<div class="galleryBtn" onclick="document.getElementById(\'fileMulti\').click()"><div><b>Gallery la irunthu Photo / Video Add Pannu</b><div style="font-size:11px;color:#aaa">Real Gallery mattum thaan</div></div></div>'; }html+=list.map(p=>{let i=galleryPhotos.indexOf(p);return '<div class="tile '+(url===p.url?'sel':'')+'" onclick="selectGallery('+i+')">'+(p.kind==='video'?'<video src="'+p.url+'" muted playsinline></video><span class="dur">0:15</span>':'<img src="'+p.url+'">')+'<span class="tick">'+(url===p.url?'✓':'')+'</span></div>';}).join('');let gh=document.getElementById('mediaGridHome');if(gh)gh.innerHTML=html;}
+function selectGallery(i){let p=galleryPhotos[i];if(!p)return;url=p.url;kind=p.kind;file=p.file;saveCurMode();fitVideoFullScreen();showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI(); if(type==='reels'||type==='story') setTimeout(()=>goEdit(),200);}
 function setGalTab(f,b){galFilter=f;document.querySelectorAll('.galTabs button').forEach(x=>x.classList.remove('sel'));if(b)b.classList.add('sel');renderMedia();}
 function goSelectNext(){if(!url){document.getElementById('fileMulti').click();return;}goEdit();}
 function goEdit(){if(!url){toast('Gallery la irunthu Photo Add Pannu');return;}showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);showMedia(document.getElementById('upImgPost'),document.getElementById('upVidPost'),url,kind);showPage('pageEdit');renderFilm();setType(type);fitVideoFullScreen();syncEditVideoUI();}
@@ -146,7 +159,7 @@ function clearLoc(){loc='';syncFields();}
 function promptTag(){let t=prompt('Tag People',tag||'@friend_name');if(t!==null){tag=t;syncFields();}}
 function clearTag(){tag='';syncFields();}
 function toggleAud(){aud=aud==='Everyone'?'Private':'Everyone';syncFields();}
-function removeUploadPhoto(){url='';file=null;clips=[];showPage('pageHome');renderMedia();updatePreview();}
+function removeUploadPhoto(){url='';file=null;clips=[];saveCurMode();showPage('pageHome');renderMedia();updatePreview();}
 function renderQuickBar(){let q=document.getElementById('quickBar'); if(q) q.innerHTML='';}
 function askDraft(){document.getElementById('draftPopup').classList.add('show');}
 function closeDraft(){document.getElementById('draftPopup').classList.remove('show');}
@@ -216,18 +229,15 @@ function splitClip(){cutAtCurrent();}
 function deleteClip(){if(clips.length>1){clips.splice(0,1);renderFilm();updateTrimUI();toast('Clip Deleted');}else{removeText();toast('Deleted');}}
 function updateTrimUI(){let a=document.getElementById('trimInfo');if(a)a.innerText='Trim: '+fmt(trimStart)+' - '+fmt(trimEnd);let b=document.getElementById('clipInfo');if(b)b.innerText=clips.length+' Clip • '+fmt(trimEnd-trimStart);}
 function isFakeFile(f){let n=(f.name||'').toLowerCase();return n.match(/ai|generated|fake|unsplash|sample|demo|download|midjourney|dalle/)?true:false;}
-function addClip(f){if(!f)return;if(isFakeFile(f)){toast('Fake Photo');return;}let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let c={url:ev.target.result,kind:k,file:f};galleryPhotos.push(c);clips.push({url:c.url,kind:k,file:f});url=c.url;kind=k;file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI();if(type==='reels')setupVideo(); if(type==='reels'||type==='story'){ setTimeout(()=>{ let cur=document.querySelector('.page.on')?.id; if(cur==='pageHome') goEdit(); },350); }};r.readAsDataURL(f);}
+function addClip(f){if(!f)return;if(isFakeFile(f)){toast('Fake Photo');return;}let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let c={url:ev.target.result,kind:k,file:f};galleryPhotos.push(c);clips.push({url:c.url,kind:k,file:f});url=c.url;kind=k;file=f;saveCurMode();showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI();if(type==='reels')setupVideo(); if(type==='reels'||type==='story'){ setTimeout(()=>{ let cur=document.querySelector('.page.on')?.id; if(cur==='pageHome') goEdit(); },350); }};r.readAsDataURL(f);}
 document.getElementById('file')?.addEventListener('change',e=>{addClip(e.target.files[0]);e.target.value='';});
 document.getElementById('fileMulti')?.addEventListener('change',e=>{Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';});
 document.getElementById('fileAdd')?.addEventListener('change',e=>{Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';toast('Reel Added');});
 document.getElementById('fileSticker')?.addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{myStickers.push(ev.target.result);pickMySticker(ev.target.result);renderMyStickers();};r.readAsDataURL(f);e.target.value='';});
 document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{url=ev.target.result;kind=f.type.includes('video')?'video':'image';file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderFilm();syncEditVideoUI();};r.readAsDataURL(f);e.target.value='';});
-// ✅ GALLERY PREVIEW - PINCH + DRAG
 (function(){let pv=document.getElementById('galPreview'),st=document.getElementById('pvStage'),sx=0,sy=0,ox=0,oy=0,drag=false,ld=0;if(!pv)return;pv.addEventListener('touchstart',e=>{if(!url)return;st.classList.add('dragging');if(e.touches.length===1){drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;ox=panX;oy=panY;}if(e.touches.length===2){drag=false;ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}},{passive:true});pv.addEventListener('touchmove',e=>{if(!url)return;if(e.touches.length===1&&drag){panX=ox+(e.touches[0].clientX-sx);panY=oy+(e.touches[0].clientY-sy);applyZoom();}if(e.touches.length===2){let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(ld>0){zoom=Math.max(1,Math.min(3,zoom*(d/ld)));applyZoom();}ld=d;}},{passive:true});pv.addEventListener('touchend',()=>{drag=false;ld=0;st.classList.remove('dragging');});pv.addEventListener('dblclick',()=>{if(!url)return;fitVideoFullScreen();});})();
-// ✅ STORY EDIT - PHOTO / VIDEO FULL SCREEN LA PINCH + DRAG ADJUST - ITHU THAAN MISSING
 (function(){let pv=document.getElementById('editPreview');if(!pv)return;let sx=0,sy=0,ox=0,oy=0,drag=false,ld=0;pv.addEventListener('touchstart',e=>{if(!url)return;if(e.target.closest('#ovText')||e.target.closest('#ovStick')||e.target.closest('.editSound')||e.target.closest('.centerPlay')||e.target.closest('.storySide')||e.target.closest('.storyBottom'))return;if(e.touches.length===1){drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;ox=panX;oy=panY;}if(e.touches.length===2){drag=false;ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}},{passive:true});pv.addEventListener('touchmove',e=>{if(!url)return;if(e.target.closest('#ovText')||e.target.closest('#ovStick'))return;if(e.touches.length===1&&drag){panX=ox+(e.touches[0].clientX-sx);panY=oy+(e.touches[0].clientY-sy);applyZoom();}if(e.touches.length===2){let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(ld>0){zoom=Math.max(1,Math.min(3,zoom*(d/ld)));applyZoom();}ld=d;}},{passive:true});pv.addEventListener('touchend',()=>{drag=false;ld=0;});pv.addEventListener('dblclick',()=>{if(!url)return;fitVideoFullScreen();});})();
 (function(){let pill=document.getElementById('modePill');if(!pill)return;let sx=0,modes=['post','story','reels','live'];pill.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});pill.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40){let cur=modes.indexOf(type);if(dx<0&&cur<3)setMode(modes[cur+1]);if(dx>0&&cur>0)setMode(modes[cur-1]);}},{passive:true});})();
-// ✅ DELETE - IMAGE KULLA DRAG PANNA - BIN IMAGE KULLA VARUM
 (function(){function mk(id,isSt){let el=document.getElementById(id);if(!el)return;let sx=0,sy=0,ol=0,ot=0,dr=false,hot=false;el.addEventListener('pointerdown',e=>{if(!el.innerText&&!el.innerHTML)return;dr=true;sx=e.clientX;sy=e.clientY;let r=el.getBoundingClientRect(),p=document.getElementById('editPreview').getBoundingClientRect();ol=(r.left-p.left+r.width/2)/p.width*100;ot=(r.top-p.top+r.height/2)/p.height*100;el.setPointerCapture(e.pointerId);document.getElementById('dragDelete').classList.add('show');e.stopPropagation();});el.addEventListener('pointermove',e=>{if(!dr)return;let p=document.getElementById('editPreview').getBoundingClientRect();let nx=Math.max(5,Math.min(95,ol+(e.clientX-sx)/p.width*100)),ny=Math.max(5,Math.min(95,ot+(e.clientY-sy)/p.height*100));el.style.left=nx+'%';el.style.top=ny+'%';let bin=document.getElementById('deleteBin').getBoundingClientRect();hot=(e.clientX>bin.left-30&&e.clientX<bin.right+30&&e.clientY>bin.top-30&&e.clientY<bin.bottom+30);document.getElementById('dragDelete').classList.toggle('hot',hot);});el.addEventListener('pointerup',()=>{if(!dr)return;dr=false;document.getElementById('dragDelete').classList.remove('show');document.getElementById('dragDelete').classList.remove('hot');if(hot){if(isSt){el.innerHTML=''; stickerImgUrl='';}else{el.innerText='';text='';}toast('Deleted');}});}mk('ovText',false);mk('ovStick',true);})();
 function getSupa(){return window.supa;}
 async function shareStory(mode){
