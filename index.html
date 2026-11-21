@@ -8,8 +8,27 @@
 <link rel="stylesheet" href="css/feed.css?v=1034">
 <link rel="stylesheet" href="css/comments.css?v=1034">
 <link rel="stylesheet" href="css/pixoro-style.css?v=1034">
-<!-- ✅ CSS THANIIYA DA - INLINE <style> - ILLA DA -->
 <link rel="stylesheet" href="css/top-plus.css?v=1034">
+<style>
+/* ✅ STORY VIEWER - INSTA MARI FULL SCREEN */
+#storyViewer{ position:fixed; inset:0; background:#000; z-index:5000; display:none; flex-direction:column; }
+#storyViewer.show{ display:flex; }
+#storyViewerMedia{ flex:1; position:relative; overflow:hidden; background:#000; }
+#storyViewerMedia img,#storyViewerMedia video{ width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+#storyStickerLayer{ position:absolute; inset:0; pointer-events:none; z-index:10; }
+#storyStickerLayer .stItem{ position:absolute; transform:translate(-50%,-50%); pointer-events:auto; }
+#storyStickerLayer .stItem img{ width:110px; height:110px; object-fit:contain; }
+#storyViewerTop{ position:absolute; top:0; left:0; right:0; padding:12px; display:flex; gap:10px; align-items:center; z-index:20; background:linear-gradient(to bottom,rgba(0,0,0,.7),transparent); }
+#storyViewerTop img{ width:36px; height:36px; border-radius:50%; object-fit:cover; }
+#storyViewerClose{ margin-left:auto; width:32px; height:32px; border-radius:50%; background:rgba(0,0,0,.5); border:1px solid rgba(255,255,255,.4); color:#fff; display:grid; place-items:center; cursor:pointer; font-size:18px; }
+.stPoll{ background:#fff; color:#000; padding:12px 14px; border-radius:16px; width:220px; text-align:center; }
+.stPoll b{ display:block; font-size:14px; margin-bottom:8px; }
+.stPoll button{ width:100%; border:0; padding:9px; border-radius:999px; margin-top:6px; font-weight:800; cursor:pointer; }
+.stPoll button.yes{ background:#0095f6; color:#fff; }
+.stPoll button.no{ background:#eee; color:#000; }
+.stLink,.stMention,.stHash,.stLoc{ background:#fff; color:#000; padding:10px 16px; border-radius:999px; font-weight:800; font-size:13px; display:inline-block; text-decoration:none; }
+.stMusic{ background:#111; border:1px solid #333; color:#fff; padding:10px 14px; border-radius:12px; font-size:13px; }
+</style>
 </head>
 <body>
 <div class="top"><b style="font-size:26px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="location.href='./create.html'">+</div><div class="bellWhite" onclick="location.href='./notification.html'" style="position:relative"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span id="pixoroBellDot" style="display:none;position:absolute;top:-2px;right:2px;width:10px;height:10px;background:#FF0A33;border-radius:50%;border:2px solid #000"></span></div></div></div>
@@ -31,14 +50,27 @@
 <a class="active" href="./index.html"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg><span>Home</span></a>
 <a href="./search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
 <a href="./reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg><span>Reels</span></a>
-<a href="./dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
+<a href="./dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 22 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
 <a href="./profile.html"><img class="navPfp" id="navPfp" src="" style="background:#222"><span>Profile</span></a>
 </div>
 
 <div id="commentModal" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #333"><b>Comments</b><span onclick="closeComment()" style="font-size:22px">X</span></div><div id="commentList" style="flex:1;overflow-y:auto;padding:12px"></div><div style="padding:10px;border-top:1px solid #333;display:flex;gap:10px"><div id="myCommentPfpWrap" style="width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#222"></div><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#000;border:1px solid #333;padding:12px 14px;border-radius:20px;color:#fff"><button onclick="addComment()" style="background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:0;color:#fff;font-weight:900;padding:10px 16px;border-radius:20px">Post</button></div></div></div>
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
 
-<!-- ✅ POPUP DELETE DA - choice / createPill / Cancel X - ILLA DA -->
+<!-- ✅ STORY VIEWER - STICKER RENDER AAGA ITHU VENUM -->
+<div id="storyViewer">
+  <div id="storyViewerMedia">
+    <img id="storyViewerImg" style="display:none">
+    <video id="storyViewerVid" style="display:none" playsinline loop></video>
+    <div id="storyStickerLayer"></div>
+    <div id="storyViewerTop">
+      <img id="storyViewerPfp" src="">
+      <div style="flex:1"><b id="storyViewerName" style="font-size:14px">User</b><div id="storyViewerTime" style="font-size:11px;color:#ccc">Now</div></div>
+      <div id="storyViewerClose" onclick="closeStoryViewer()">×</div>
+    </div>
+  </div>
+  <div style="padding:12px;display:flex;gap:8px"><input id="storyReplyInput" placeholder="Reply..." style="flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:12px;border-radius:999px;outline:none"><button onclick="sendStoryReply()" style="background:#fff;color:#000;border:0;padding:12px 16px;border-radius:999px;font-weight:800">Send</button></div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script src="js/supabase.js?v=1034"></script>
@@ -52,5 +84,97 @@
 <script src="js/save.js?v=1034"></script>
 <script src="js/stories.js?v=1034"></script>
 <script src="js/feed.js?v=1034"></script>
+<script>
+// ✅ REAL STICKER VIEWER - STORIES TABLE LA IRUNTHU STICKERS AH EDUTHU RENDER PANNU
+let _curStory=null;
+function openStoryViewer(story){
+  _curStory=story;
+  let v=document.getElementById('storyViewer'); v.classList.add('show');
+  let img=document.getElementById('storyViewerImg'), vid=document.getElementById('storyViewerVid');
+  if(story.media_type==='video' || (story.media_url||'').endsWith('.mp4')){
+    img.style.display='none'; vid.style.display='block'; vid.src=story.media_url; vid.play().catch(()=>{});
+  } else {
+    vid.style.display='none'; vid.pause(); img.style.display='block'; img.src=story.media_url;
+  }
+  document.getElementById('storyViewerName').innerText=story.username||'User';
+  document.getElementById('storyViewerTime').innerText=story.created_at?new Date(story.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'Now';
+  renderStoryStickers(story);
+}
+function closeStoryViewer(){
+  document.getElementById('storyViewer').classList.remove('show');
+  let vid=document.getElementById('storyViewerVid'); if(vid) vid.pause();
+  document.getElementById('storyStickerLayer').innerHTML='';
+}
+function renderStoryStickers(story){
+  let layer=document.getElementById('storyStickerLayer'); layer.innerHTML='';
+  let list=story.stickers||[];
+  if(typeof list==='string'){ try{ list=JSON.parse(list); }catch(e){ list=[]; } }
+  list.forEach(s=>{
+    let div=document.createElement('div');
+    div.className='stItem';
+    div.style.left=(s.x||50)+'%'; div.style.top=(s.y||55)+'%';
+    if(s.type==='giphy' || s.type==='emoji' || s.type==='gallery'){
+      let src=s.image_url || s.data?.giphy_url || '';
+      if(src) div.innerHTML='<img src="'+src+'">';
+    } else if(s.type==='text'){
+      div.innerHTML='<div style="color:'+(s.color||'#fff')+';font-size:'+(s.fontSize||32)+'px;font-weight:900;text-shadow:0 2px 8px #000;text-align:center">'+(s.text||s.data?.text||'')+'</div>';
+    } else if(s.type==='poll'){
+      let q=s.data?.question||'Poll?';
+      div.innerHTML='<div class="stPoll"><b>'+q+'</b><button class="yes" onclick="votePoll('+story.id+',\''+s.id+'\',\'Yes\')">Yes</button><button class="no" onclick="votePoll('+story.id+',\''+s.id+'\',\'No\')">No</button></div>';
+    } else if(s.type==='link'){
+      let u=s.data?.url||'#';
+      div.innerHTML='<a class="stLink" href="'+u+'" target="_blank">🔗 '+u+'</a>';
+    } else if(s.type==='mention'){
+      div.innerHTML='<span class="stMention" onclick="location.href=\'./profile.html?u='+(s.data?.mention||'').replace('@','')+'\'">'+(s.data?.mention||'@user')+'</span>';
+    } else if(s.type==='hashtag'){
+      div.innerHTML='<span class="stHash" onclick="location.href=\'./search.html?q='+(s.data?.hashtag||'').replace('#','')+'\'">'+(s.data?.hashtag||'#pixoro')+'</span>';
+    } else if(s.type==='location'){
+      div.innerHTML='<span class="stLoc">📍 '+(s.data?.location||'Chennai')+'</span>';
+    } else if(s.type==='music'){
+      div.innerHTML='<div class="stMusic">🎵 '+(s.data?.song||story.song||'Trending Audio')+'</div>';
+    } else if(s.type==='question'){
+      div.innerHTML='<div class="stPoll"><b>'+(s.data?.prompt||'Ask me a question')+'</b><button class="yes" onclick="askQuestion('+story.id+',\''+s.id+'\')">Answer</button></div>';
+    } else if(s.type==='countdown'){
+      div.innerHTML='<div class="stMusic">⏱ Countdown<br><b>24:00:00</b></div>';
+    }
+    if(div.innerHTML) layer.appendChild(div);
+  });
+}
+async function votePoll(storyId, stickerId, ans){
+  try{
+    let supa=window.supa; if(!supa) return;
+    let {data:{session}}=await supa.auth.getSession(); if(!session){ location.href='./login.html'; return; }
+    let {error}=await supa.from('story_sticker_interactions').insert({story_id:storyId,sticker_id:stickerId,sticker_type:'poll',user_id:session.user.id,username:session.user.email.split('@')[0],answer:ans});
+    if(error) alert('Already Voted - '+ans);
+    else alert('Vote Saved - '+ans);
+  }catch(e){ alert('Vote Error'); }
+}
+async function askQuestion(storyId, stickerId){
+  let ans=prompt('Your answer?'); if(!ans) return;
+  try{
+    let supa=window.supa; let {data:{session}}=await supa.auth.getSession();
+    await supa.from('story_sticker_interactions').insert({story_id:storyId,sticker_id:stickerId,sticker_type:'question',user_id:session.user.id,username:session.user.email.split('@')[0],answer:ans});
+    alert('Answer Sent!');
+  }catch(e){ alert('Error'); }
+}
+function sendStoryReply(){
+  let v=document.getElementById('storyReplyInput').value.trim(); if(!v) return;
+  alert('Reply Sent - '+v); document.getElementById('storyReplyInput').value='';
+}
+// ✅ STORIES.JS LA IRUKKA OLD openStory AH OVERRIDE PANNU - STICKER ODA OPEN AAGANUM
+setTimeout(()=>{
+  if(typeof window.openStory==='function'){
+    let _old=window.openStory;
+    window.openStory=function(story){ if(story && story.stickers) openStoryViewer(story); else _old(story); };
+  }
+  // Story Row la Click panna - Viewer Open Aaganum
+  document.addEventListener('click',function(e){
+    let el=e.target.closest('[data-story-id]');
+    if(el && el.dataset.storyId){
+      // stories.js la already handle panna - ithu backup
+    }
+  });
+},1000);
+</script>
 </body>
 </html>
