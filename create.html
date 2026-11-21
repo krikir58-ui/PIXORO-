@@ -27,14 +27,17 @@
 #pageEdit .editSound{ top:66px !important; z-index:50 }
 #pageEdit .editPreview .centerPlay{ z-index:50 }
 #pageHome .sugAudio{ height:28px !important; font-size:11px !important; bottom:8px !important }
-/* ✅ STORY SELECT - VIDEO MARI - PREVIEW ILLA - GRID MATTUM */
+/* ✅ PHOTO SELECT PAGE - MELA TOP ILLA - MODE MATTUM */
+#pageHome .top{ display:none !important; }
+#pageHome .galScroll{ padding-top:6px !important; }
+/* ✅ STORY SELECT - VIDEO MARI - PREVIEW ILLA */
 #pageHome.storySelect .galPreview{ display:none !important; }
 #pageHome.storySelect .galTabs{ display:none !important; }
 #pageHome.storySelect .grid .tile{ aspect-ratio:3/4 !important; }
 #pageHome.storySelect .galleryBtn{ display:none !important; }
 #pageHome.storySelect .storyTopRow{ display:flex !important; gap:10px; padding:12px; overflow-x:auto; }
 #pageHome.storySelect .storyTopRow button{ background:#1a1a1a; color:#fff; border:0; padding:0; border-radius:14px; width:76px; height:92px; flex-shrink:0; display:flex; flex-direction:column; gap:6px; align-items:center; justify-content:center; font-size:11px; }
-/* ✅ STORY EDIT - FULL SCREEN - 420px ILLA - ORU SIDE ILLA */
+/* ✅ STORY EDIT - FULL SCREEN */
 #pageEdit.storyMode .editPreview{ position:absolute !important; left:0 !important; top:0 !important; transform:none !important; width:100% !important; height:100% !important; inset:0 !important; border-radius:0 !important; }
 #pageEdit.storyMode .editPreview img,#pageEdit.storyMode .editPreview video{ border-radius:0 !important; }
 #pageEdit.storyMode .instaTools{ display:none !important; }
@@ -51,6 +54,19 @@
 #pageEdit.storyMode .storyCap::placeholder{ color:rgba(255,255,255,.7); }
 .storyTopRow{ display:none !important; }
 #pageHome.storySelect .storyTopRow{ display:flex !important; }
+/* ✅ TEXT PANEL - MASS STYLE - VERA MARI */
+.tfPanel{ background:#111; padding:12px; max-height:52vh; overflow-y:auto; }
+.tfLabel{ font-size:11px; color:#888; padding:10px 2px 4px; letter-spacing:1px; font-weight:700; }
+.tfRow{ display:flex; gap:8px; overflow-x:auto; padding:6px 0; }
+.tfRow button{ background:#222; color:#fff; border:0; padding:10px 16px; border-radius:999px; font-size:13px; white-space:nowrap; flex-shrink:0; }
+.tfRow button.sel{ background:#fff !important; color:#000 !important; font-weight:800; }
+.tfIconBtn{ width:44px; height:44px; border-radius:50%; background:#222; color:#fff; border:0; display:grid; place-items:center; font-size:16px; flex-shrink:0; }
+.tfIconBtn.sel{ background:#fff !important; color:#000 !important; }
+.tfSlider{ flex:1; accent-color:#fff; }
+.tfColors{ display:flex; gap:8px; overflow-x:auto; padding:6px 0; }
+.tfColors div{ width:30px; height:30px; border-radius:50%; flex-shrink:0; border:2px solid #333; cursor:pointer; }
+.tfColors div.sel{ border:3px solid #fff !important; transform:scale(1.15); }
+#tfInput::placeholder{ color:rgba(255,255,255,.45) !important; }
 svg{ fill:none !important; }
 </style>
 </head>
@@ -89,6 +105,7 @@ svg{ fill:none !important; }
 <div onclick="openFull('pageVoiceFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg></div><span>Voice</span></div>
 <div onclick="openFull('pageTextFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6"/></svg></div><span>Captions</span></div>
 <div onclick="openFull('pageStickerFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></div><span>Stickers</span></div>
+<div onclick="openFull('pageFilterFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></div><span>Adjust</span></div>
 </div>
 <div class="instaBottom"><button class="editBtn" onclick="openFull('pageEditVideoFull')">Edit video</button><button class="nextBtn2" onclick="goUpload()">Next <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
 </div>
@@ -100,8 +117,24 @@ svg{ fill:none !important; }
 </div>
 <div class="fullPage" id="pageTextFull">
 <div class="fpTop"><span class="x" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><span></span><span class="done" onclick="confirmTextFull()">Done</span></div>
-<div style="flex:1;position:relative;overflow:hidden;background:#000"><img id="tfImg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0"><video id="tfVid" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0" muted loop playsinline></video><input class="tfInput" id="tfInput" placeholder="Hi" autocomplete="off"></div>
-<div style="background:#111;padding:10px"><div class="tfRow" id="tfFontRow"><button class="sel" onclick="setTFFont('cursive',this)">Signature</button><button onclick="setTFFont('monospace',this)">Editor</button><button onclick="setTFFont('fantasy',this)">Poster</button><button onclick="setTFFont('system-ui',this)">Bubble</button><button onclick="setTFFont('Impact',this)">Strong</button></div><div class="tfRow"><button class="sel" onclick="setTFEffect('none',this)">None</button><button onclick="setTFEffect('shadow',this)">Hard Shadow</button><button onclick="setTFEffect('neon',this)">Neon</button><button onclick="setTFEffect('halo',this)">Halo</button></div><div class="tfColors"><div style="background:#fff" onclick="setTFColor('#fff')"></div><div style="background:#000;border:2px solid #fff" onclick="setTFColor('#000')"></div><div style="background:#ff2d55" onclick="setTFColor('#ff2d55')"></div><div style="background:#ffcc00" onclick="setTFColor('#ffcc00')"></div><div style="background:#00c853" onclick="setTFColor('#00c853')"></div><div style="background:#0095f6" onclick="setTFColor('#0095f6')"></div></div><div style="text-align:center;padding:6px"><button style="background:transparent;color:#ff5a5a;border:0;width:100%;padding:10px;display:flex;gap:6px;align-items:center;justify-content:center" onclick="removeTextFull()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg> Delete Text</button></div></div>
+<div style="flex:1;position:relative;overflow:hidden;background:#000"><img id="tfImg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0"><video id="tfVid" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0" muted loop playsinline></video><input class="tfInput" id="tfInput" placeholder="Type..." autocomplete="off"></div>
+<div class="tfPanel">
+<div class="tfLabel">FONT STYLE</div>
+<div class="tfRow" id="tfFontRow"><button class="sel" onclick="setTFFont('cursive',this)">Signature</button><button onclick="setTFFont('Georgia,serif',this)">Serif</button><button onclick="setTFFont('Impact,sans-serif',this)">Strong</button><button onclick="setTFFont('monospace',this)">Editor</button><button onclick="setTFFont('fantasy',this)">Poster</button><button onclick="setTFFont('system-ui',this)">Bubble</button><button onclick="setTFFont('Arial Black,sans-serif',this)">Bold</button></div>
+<div class="tfLabel">SIZE • ALIGN • STYLE</div>
+<div style="display:flex;gap:10px;align-items:center;padding:4px 0"><span style="font-size:12px">A-</span><input type="range" class="tfSlider" id="tfSize" min="20" max="80" value="36" oninput="setTFSize(this.value)"><span style="font-size:18px;font-weight:800">A+</span><span id="tfSizeVal" style="font-size:12px;color:#aaa;width:42px">36px</span></div>
+<div style="display:flex;gap:8px;padding:6px 0"><button class="tfIconBtn" onclick="setTFAlign('left',this)">◀</button><button class="tfIconBtn sel" onclick="setTFAlign('center',this)">▬</button><button class="tfIconBtn" onclick="setTFAlign('right',this)">▶</button><button class="tfIconBtn" id="tfBoldBtn" onclick="toggleTFBold(this)">B</button><button class="tfIconBtn" id="tfItalicBtn" onclick="toggleTFItalic(this)">I</button><button class="tfIconBtn" onclick="toggleTFBg(this)">BG</button></div>
+<div class="tfLabel">OPACITY • ROTATE</div>
+<div style="display:flex;gap:10px;align-items:center;padding:4px 0"><span style="font-size:12px">Opacity</span><input type="range" class="tfSlider" id="tfOpacity" min="30" max="100" value="100" oninput="setTFOpacity(this.value)"><span id="tfOpacityVal" style="font-size:12px;width:38px">100%</span></div>
+<div style="display:flex;gap:10px;align-items:center;padding:4px 0"><span style="font-size:12px">Rotate</span><input type="range" class="tfSlider" id="tfRotate" min="-30" max="30" value="0" oninput="setTFRotate(this.value)"><span id="tfRotateVal" style="font-size:12px;width:38px">0°</span></div>
+<div class="tfLabel">EFFECT</div>
+<div class="tfRow"><button class="sel" onclick="setTFEffect('none',this)">None</button><button onclick="setTFEffect('shadow',this)">Hard Shadow</button><button onclick="setTFEffect('neon',this)">Neon</button><button onclick="setTFEffect('halo',this)">Halo</button><button onclick="setTFEffect('outline',this)">Outline</button><button onclick="setTFEffect('glow',this)">Glow</button><button onclick="setTFEffect('3d',this)">3D</button></div>
+<div class="tfLabel">COLOR</div>
+<div class="tfColors"><div style="background:#fff" onclick="setTFColor('#fff',this)"></div><div style="background:#000;border:2px solid #fff" onclick="setTFColor('#000',this)"></div><div style="background:#ff2d55" onclick="setTFColor('#ff2d55',this)"></div><div style="background:#ffcc00" onclick="setTFColor('#ffcc00',this)"></div><div style="background:#00c853" onclick="setTFColor('#00c853',this)"></div><div style="background:#0095f6" onclick="setTFColor('#0095f6',this)"></div><div style="background:#a259ff" onclick="setTFColor('#a259ff',this)"></div><div style="background:#ff6b00" onclick="setTFColor('#ff6b00',this)"></div></div>
+<div class="tfLabel">ADJUST • FILTER • MORE</div>
+<div class="tfRow"><button onclick="openFull('pageFilterFull')">Filter</button><button onclick="openFull('pageAudioFull')">Music</button><button onclick="openFull('pageStickerFull')">Sticker</button><button onclick="openFull('pageEditVideoFull')">Edit Video</button><button onclick="setFilter('brightness(1.15) saturate(1.5)')">Vivid</button><button onclick="setFilter('grayscale(1)')">B&W</button></div>
+<div style="text-align:center;padding:8px"><button style="background:transparent;color:#ff5a5a;border:0;width:100%;padding:10px;display:flex;gap:6px;align-items:center;justify-content:center" onclick="removeTextFull()">🗑 Delete Text</button></div>
+</div>
 </div>
 <div class="fullPage" id="pageVoiceFull">
 <div class="fpTop"><span class="x" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b>Voice</b><span class="done" onclick="closeFull()">Done</span></div>
@@ -125,7 +158,7 @@ svg{ fill:none !important; }
 <button onclick="pickSticker('angry')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f621.png"></button>
 <button onclick="pickSticker('kiss')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f618.png"></button>
 </div>
-<button style="width:100%;margin-top:12px;background:transparent;color:#ff5a5a;border:1px solid #442222;padding:12px;border-radius:999px;display:flex;gap:6px;align-items:center;justify-content:center" onclick="removeText()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg> Remove Sticker</button></div>
+<button style="width:100%;margin-top:12px;background:transparent;color:#ff5a5a;border:1px solid #442222;padding:12px;border-radius:999px;display:flex;gap:6px;align-items:center;justify-content:center" onclick="removeText()">🗑 Remove Sticker</button></div>
 </div>
 <div class="fullPage" id="pageEditVideoFull">
 <div class="fpTop"><span class="x" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b>Try Edits</b><span style="cursor:pointer" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
@@ -148,7 +181,7 @@ svg{ fill:none !important; }
 </div>
 <div class="fullPage" id="pageFilterFull">
 <div class="fpTop"><span class="x" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b>Filters</b><span class="done" onclick="goBack()">Done</span></div>
-<div class="fpBody"><div style="display:flex;gap:10px;overflow-x:auto" id="filterRowFull"></div><p style="font-size:12px;color:#888;padding:10px 2px">Filter pudikalana - Back thodu - Filter page mattum moodum - Edit page ku varuvai</p></div>
+<div class="fpBody"><div style="display:flex;gap:10px;overflow-x:auto" id="filterRowFull"></div><p style="font-size:12px;color:#888;padding:10px 2px">Filter pudikalana - Back thodu - Filter page mattum moodum - Edit page ku varuvai</p><div class="tfLabel">ADJUST</div><div style="display:flex;gap:10px;align-items:center;padding:6px 0"><span style="font-size:12px;width:80px">Brightness</span><input type="range" class="tfSlider" min="50" max="150" value="100" oninput="adj.brightness=this.value;applyFilter()"></div><div style="display:flex;gap:10px;align-items:center;padding:6px 0"><span style="font-size:12px;width:80px">Contrast</span><input type="range" class="tfSlider" min="50" max="150" value="100" oninput="adj.contrast=this.value;applyFilter()"></div><div style="display:flex;gap:10px;align-items:center;padding:6px 0"><span style="font-size:12px;width:80px">Saturate</span><input type="range" class="tfSlider" min="0" max="200" value="100" oninput="adj.saturate=this.value;applyFilter()"></div></div>
 </div>
 <div class="page" id="pageUpload">
 <div class="top"><span class="back" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 5l-7 7 7 7"/></svg></span><b id="uploadTitle">Upload Post</b><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span></div>
@@ -195,7 +228,6 @@ goBack = function(){
 };
 window.addEventListener('popstate', function(e){ e.preventDefault(); _lock=true; goBack(); setTimeout(()=>{ _lock=false; },100); });
 _push();
-// ✅ REELS / STORY SELECT PANNA ODANE EDIT KU
 let _origAddClip = addClip;
 addClip = function(f){
   _origAddClip(f);
@@ -206,7 +238,6 @@ addClip = function(f){
     }
   }, 500);
 };
-// ✅ STORY - PER MODE PHOTO + STORY SELECT - CORRECTED
 let savedByMode={post:null,story:null,reels:null,live:null};
 function saveCurMode(){ try{ savedByMode[type]=url?{url:url,kind:kind,file:file,clips:[...clips]}:null; }catch(e){} }
 function applySavedMode(m){
@@ -232,25 +263,58 @@ let _inSetMode=false;
 setMode = function(t){
   if(_inSetMode){ _origSetMode2(t); toggleStoryUI(); return; }
   if(type!==t) saveCurMode();
-  _inSetMode=true;
-  _origSetMode2(t);
-  _inSetMode=false;
-  // orig setMode la url maarala - ippo namma saved photo ah podu
-  // orig create.js la savedByMode irundha - athu already handle pannidum - double aagaathu nu check
-  // Safe: savedByMode la irundha mattum apply pannu - illana clear pannu
-  // NOTE: orig create.js pudhu version la savedByMode irundha - inga apply panna kooda same value thaan varum
-  applySavedMode(t);
-  toggleStoryUI();
+  _inSetMode=true; _origSetMode2(t); _inSetMode=false;
+  applySavedMode(t); toggleStoryUI();
 };
 let _origSetType2 = setType;
 setType = function(t){ _origSetType2(t); toggleStoryUI(); };
-// ✅ STORY EDIT - PHOTO FULL SCREEN LA PINCH + DRAG
 (function(){ let pv=document.getElementById('editPreview'); if(!pv) return; let sx=0,sy=0,ox=0,oy=0,drag=false,ld=0;
 pv.addEventListener('touchstart',e=>{ if(!url) return; if(e.target.closest('#ovText')||e.target.closest('#ovStick')||e.target.closest('.editSound')||e.target.closest('.centerPlay')||e.target.closest('.storySide')||e.target.closest('.storyBottom')) return; if(e.touches.length===1){drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;ox=panX;oy=panY;} if(e.touches.length===2){drag=false;ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);} },{passive:true});
 pv.addEventListener('touchmove',e=>{ if(!url) return; if(e.target.closest('#ovText')||e.target.closest('#ovStick')) return; if(e.touches.length===1&&drag){panX=ox+(e.touches[0].clientX-sx);panY=oy+(e.touches[0].clientY-sy);applyZoom();} if(e.touches.length===2){let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); if(ld>0){zoom=Math.max(1,Math.min(3,zoom*(d/ld)));applyZoom();} ld=d;} },{passive:true});
 pv.addEventListener('touchend',()=>{drag=false;ld=0;}); pv.addEventListener('dblclick',()=>{ if(!url) return; fitVideoFullScreen(); });
 })();
-// ✅ STICKER - IMAGE
+// ✅ TEXT - Hi FIX + MASS FEATURES
+let tfSize=36, tfBold=false, tfItalic=false, tfBg=false, tfOpacity=100, tfRotate=0;
+let _origOpenFull2 = openFull;
+openFull = function(id){
+  _origOpenFull2(id);
+  if(id==='pageTextFull'){
+    let inp=document.getElementById('tfInput');
+    if(inp){ inp.value = (typeof text!=='undefined' && text) ? text : ''; inp.placeholder='Type...'; inp.style.fontSize=tfSize+'px'; inp.style.opacity=tfOpacity/100; inp.style.transform='translate(-50%,-50%) rotate('+tfRotate+'deg)'; }
+  }
+};
+function setTFSize(v){ tfSize=v; document.getElementById('tfSizeVal').innerText=v+'px'; let i=document.getElementById('tfInput'); if(i) i.style.fontSize=v+'px'; }
+function setTFAlign(a,b){ document.querySelectorAll('.tfIconBtn').forEach(x=>{ if(['◀','▬','▶'].includes(x.innerText)) x.classList.remove('sel'); }); if(b) b.classList.add('sel'); let i=document.getElementById('tfInput'); if(i) i.style.textAlign=a; }
+function toggleTFBold(b){ tfBold=!tfBold; if(b) b.classList.toggle('sel',tfBold); let i=document.getElementById('tfInput'); if(i) i.style.fontWeight='900'; }
+function toggleTFItalic(b){ tfItalic=!tfItalic; if(b) b.classList.toggle('sel',tfItalic); let i=document.getElementById('tfInput'); if(i) i.style.fontStyle=tfItalic?'italic':'normal'; }
+function toggleTFBg(b){ tfBg=!tfBg; if(b) b.classList.toggle('sel',tfBg); let i=document.getElementById('tfInput'); if(i){ i.style.background=tfBg?'rgba(0,0,0,.6)':'transparent'; i.style.padding=tfBg?'8px 14px':'0'; i.style.borderRadius=tfBg?'12px':'0'; } }
+function setTFOpacity(v){ tfOpacity=v; document.getElementById('tfOpacityVal').innerText=v+'%'; let i=document.getElementById('tfInput'); if(i) i.style.opacity=v/100; }
+function setTFRotate(v){ tfRotate=v; document.getElementById('tfRotateVal').innerText=v+'°'; let i=document.getElementById('tfInput'); if(i) i.style.transform='translate(-50%,-50%) rotate('+v+'deg)'; }
+let _origSetTFEffect2 = setTFEffect;
+setTFEffect = function(e,b){
+  document.querySelectorAll('.tfRow button').forEach(x=>{ if(['None','Hard Shadow','Neon','Halo','Outline','Glow','3D'].includes(x.innerText)) x.classList.remove('sel'); });
+  if(b) b.classList.add('sel');
+  let inp=document.getElementById('tfInput');
+  if(e==='outline') inp.style.textShadow='-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000,2px 2px 0 #000';
+  else if(e==='glow') inp.style.textShadow='0 0 20px '+tfColor+',0 0 40px '+tfColor;
+  else if(e==='3d') inp.style.textShadow='1px 1px 0 #000,2px 2px 0 #000,3px 3px 0 #000,4px 4px 0 #000';
+  else _origSetTFEffect2(e,b);
+  textEffect=e;
+};
+let _origSetTFColor2 = setTFColor;
+setTFColor = function(c,el){ _origSetTFColor2(c); document.querySelectorAll('.tfColors div').forEach(x=>x.classList.remove('sel')); if(el) el.classList.add('sel'); };
+let _origConfirm2 = confirmTextFull;
+confirmTextFull = function(){
+  let v=document.getElementById('tfInput').value.trim();
+  if(!v){ closeFull(); return; }
+  text=v; let o=document.getElementById('ovText');
+  o.innerText=v; o.style.fontFamily=fontF; o.style.color=tfColor; o.style.fontSize=tfSize+'px'; o.style.textAlign=document.getElementById('tfInput').style.textAlign||'center'; o.style.fontStyle=tfItalic?'italic':'normal'; o.style.background=tfBg?'rgba(0,0,0,.6)':'transparent'; o.style.padding=tfBg?'8px 14px':'0'; o.style.borderRadius=tfBg?'12px':'0'; o.style.opacity=tfOpacity/100; o.style.transform='translate(-50%,-50%) rotate('+tfRotate+'deg)';
+  if(textEffect==='outline') o.style.textShadow='-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000,2px 2px 0 #000';
+  else if(textEffect==='glow') o.style.textShadow='0 0 20px '+tfColor+',0 0 40px '+tfColor;
+  else if(textEffect==='3d') o.style.textShadow='1px 1px 0 #000,2px 2px 0 #000,3px 3px 0 #000,4px 4px 0 #000';
+  else if(typeof applyTextEffect==='function') applyTextEffect();
+  toast('Text Added'); closeFull();
+};
 let _origPickSticker = pickSticker;
 pickSticker = function(k){
   let map={ fire:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f525.png', heart:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2764.png', laugh:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f602.png', crown:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f451.png', love:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f60d.png', star:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2b50.png', party:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f389.png', hundred:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4af.png', cool:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f60e.png', cry:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f622.png', angry:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f621.png', kiss:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f618.png' };
@@ -261,7 +325,6 @@ pickSticker = function(k){
   }
   _origPickSticker(k);
 };
-// ✅ STORY SHARE - SERVER SAVE
 async function shareStory(mode){
   if(!url || !file){ toast('Photo / Video Select Pannu'); return; }
   if(typeof uploading!=='undefined' && uploading) return; uploading=true; toast('Story Uploading...');
