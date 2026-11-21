@@ -6,18 +6,22 @@
 <title>Pixoro - Create</title>
 <link rel="stylesheet" href="css/create.css">
 <style>
-/* ✅ 1. GALLERY - NITTA TALL - FULL HEIGHT */
+/* ✅ 1. GALLERY - NITTA TALL */
 #galPreview{ height:calc(100dvh - 210px) !important; aspect-ratio:auto !important; width:100% }
 #galPreview .pvStage img,#galPreview .pvStage video{ object-fit:cover !important; object-position:center !important }
-/* ✅ 2. EDIT PAGE - EPPOVUM FULL SCREEN - reelsMode THEVAI ILLA */
+/* ✅ 2. EDIT PAGE - EPPOVUM FULL SCREEN */
 #pageEdit{ position:relative }
 #pageEdit .top{ position:absolute; top:0; left:0; right:0; z-index:50; background:linear-gradient(to bottom,rgba(0,0,0,.85),transparent) }
 #pageEdit .editWrap{ flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative }
 #pageEdit .editPreview{ position:absolute !important; inset:0 !important; width:100% !important; height:100% !important; flex:none !important; min-height:0 !important; background:#000; overflow:hidden; z-index:1; display:block }
 #pageEdit .editPreview img,#pageEdit .editPreview video{ width:100% !important; height:100% !important; object-fit:cover !important; object-position:center center !important; position:absolute; inset:0 }
-/* ✅ 3. MELA OPTION - EDIT VIDEO KULLA - EDIT PAGE LA KAATAATHA */
+/* ✅ STICKER IMAGE - SVG ILLA - BORDER ILLA */
+#pageEdit .editPreview .ovStick img{ width:90px !important; height:90px !important; object-fit:contain !important; border:0 !important; border-radius:0 !important; background:transparent !important; }
+#pageEdit .editPreview .ovStick .stSvg img{ width:80px; height:80px; object-fit:contain; }
+.stickGrid button img{ width:44px; height:44px; object-fit:contain; }
+/* ✅ 3. MELA OPTION - EDIT VIDEO KULLA */
 #pageEdit .quickBar{ display:none !important }
-/* ✅ 4. KEELA TOOLS - CHINNA SIZE */
+/* ✅ 4. KEELA TOOLS - CHINNA - OUTLINE */
 #pageEdit .instaTools{ position:absolute !important; left:0; right:0; bottom:62px !important; z-index:40; background:linear-gradient(to top,rgba(0,0,0,.9),transparent) !important; padding:8px 8px 2px !important; gap:4px !important }
 #pageEdit .instaTools .c{ width:40px !important; height:40px !important; border-radius:12px !important }
 #pageEdit .instaTools .c svg{ width:18px !important; height:18px !important }
@@ -27,8 +31,26 @@
 #pageEdit .instaBottom .editBtn,#pageEdit .instaBottom .nextBtn2{ padding:10px !important; font-size:13px !important }
 #pageEdit .editSound{ top:66px !important; z-index:50 }
 #pageEdit .editPreview .centerPlay{ z-index:50 }
-/* ✅ SONG BAR - CHINNA */
 #pageHome .sugAudio{ height:28px !important; font-size:11px !important; bottom:8px !important }
+/* ✅ STORY - NITTA CHINNA SIZE - NADUVULA */
+#pageEdit.storyMode .editPreview{ position:absolute !important; left:50% !important; top:52px !important; transform:translateX(-50%) !important; width:min(100%,420px) !important; height:calc(100dvh - 175px) !important; inset:auto !important; border-radius:18px !important; }
+#pageEdit.storyMode .editPreview img,#pageEdit.storyMode .editPreview video{ border-radius:18px !important; }
+#pageEdit.storyMode .instaTools{ display:none !important; }
+#pageEdit.storyMode .instaBottom{ display:none !important; }
+.storySide{ position:absolute; right:10px; top:50%; transform:translateY(-50%); display:none; flex-direction:column; gap:10px; z-index:60; }
+#pageEdit.storyMode .storySide{ display:flex !important; }
+.storySide button{ width:38px; height:38px; border-radius:50%; background:rgba(0,0,0,.6); border:1px solid rgba(255,255,255,.4); color:#fff; display:grid; place-items:center; font-size:16px; font-weight:800; }
+.storyBottom{ position:absolute; left:0; right:0; bottom:0; display:none; gap:8px; align-items:center; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); z-index:60; background:linear-gradient(to top,rgba(0,0,0,.9),transparent); }
+#pageEdit.storyMode .storyBottom{ display:flex !important; }
+.storyBottom .pill{ flex:1; background:#1a1a1a; border:1px solid #333; color:#fff; padding:10px; border-radius:999px; font-size:12px; font-weight:700; display:flex; gap:6px; align-items:center; justify-content:center; }
+.storyBottom .go{ width:44px; height:44px; border-radius:50%; background:#fff; color:#000; display:grid; place-items:center; font-size:20px; font-weight:800; flex-shrink:0; }
+.storyCap{ position:absolute; left:12px; bottom:70px; right:70px; background:transparent; border:0; color:#fff; font-size:14px; outline:none; z-index:60; display:none; }
+#pageEdit.storyMode .storyCap{ display:block !important; }
+#pageEdit.storyMode .storyCap::placeholder{ color:rgba(255,255,255,.7); }
+.storyTopRow{ display:none; gap:8px; padding:8px 12px; overflow-x:auto; }
+.storyTopRow button{ background:#1a1a1a; color:#fff; border:0; padding:8px 12px; border-radius:999px; font-size:11px; white-space:nowrap; display:flex; gap:5px; align-items:center; }
+/* ✅ ELLA SVG YUM OUTLINE - FILL ILLA */
+svg{ fill:none !important; }
 </style>
 </head>
 <body>
@@ -44,6 +66,7 @@
 <div class="cropHint" id="cropHint" style="display:none">Pinch to zoom • Drag to move</div>
 <div class="sugAudio" id="sugAudio" style="display:none"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span class="marq"><b id="sugTxt">A.R. Rahman - Vaathi En Peggilam</b> • Suggested Audio</span></div>
 </div>
+<div class="storyTopRow" id="storyTopRow"><button onclick="openFull('pageFilterFull')">Templates</button><button onclick="openFull('pageStickerFull')">Effects</button><button onclick="openFull('pageAudioFull')">Music</button><button onclick="openFull('pageEditVideoFull')">Collage</button></div>
 <div class="galTop"><b>Recents <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></b><span style="margin-left:auto">Drafts</span><button onclick="document.getElementById('fileMulti').click()">Select</button></div>
 <div class="galTabs"><button class="sel" onclick="setGalTab('all',this)">All</button><button onclick="setGalTab('image',this)">Photos</button><button onclick="setGalTab('video',this)">Videos</button><button onclick="document.getElementById('fileMulti').click()">Camera</button></div>
 <div class="grid" id="mediaGridHome"></div>
@@ -56,6 +79,10 @@
 <div class="editPreview" id="editPreview" onclick="tapPreviewPlay(event)"><img id="editImg" style="object-fit:cover"><video id="editVid" style="display:none;object-fit:cover" muted loop playsinline></video>
 <div class="editSound" id="editSound" onclick="toggleSound(event)"><span id="soundOffIconEdit"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg></span><span id="soundOnIconEdit" style="display:none"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span></div>
 <div class="centerPlay" id="centerPlay" onclick="togglePlay(event)"><svg class="ic-lg" id="centerPlayIcon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M8 5l11 7-11 7V5z"/></svg></div><div class="ovText" id="ovText"></div><div class="ovStick" id="ovStick"></div><div class="dragDelete" id="dragDelete"><div class="bin" id="deleteBin"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg></div><span>Drag to delete</span></div></div>
+<!-- ✅ STORY SIDE + BOTTOM -->
+<div class="storySide" id="storySide"><button onclick="openFull('pageTextFull')">Aa</button><button onclick="openFull('pageStickerFull')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></button><button onclick="openFull('pageTextFull')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button><button onclick="openFull('pageAudioFull')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></button><button onclick="openFull('pageFilterFull')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></button></div>
+<input class="storyCap" id="storyCap" placeholder="Add a caption..." oninput="captionVal=this.value">
+<div class="storyBottom" id="storyBottom"><button class="pill" onclick="shareStory('story')">Your story</button><button class="pill" onclick="shareStory('close')">Close Friends</button><button class="go" onclick="shareStory('story')">›</button></div>
 <div class="instaTools">
 <div onclick="openFull('pageAudioFull')"><div class="c"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span>Audio</span></div>
 <div onclick="openFull('pageTextFull')"><div class="c"><span style="font-size:18px;font-weight:800">Aa</span></div><span>Text</span></div>
@@ -83,16 +110,23 @@
 </div>
 <div class="fullPage" id="pageStickerFull">
 <div class="fpTop"><span class="x" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b>Stickers</b><span class="done" onclick="closeFull()">Done</span></div>
-<div class="fpBody"><button style="width:100%;background:#fff;color:#000;font-weight:800;padding:13px;border:0;border-radius:999px;display:flex;gap:8px;align-items:center;justify-content:center" onclick="document.getElementById('fileSticker').click()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 18l3-3 2 2 3-4 2 3"/></svg> Gallery la irunthu Sticker Podu</button><p style="font-size:11px;color:#aaa;padding:8px 2px">Ne select panna image - Photo mela Sticker ah ottikum</p><div id="myStickerList"></div><div class="stickGrid">
-<button onclick="pickSticker('fire')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff6b00" stroke-width="1.5"><path d="M12 3c1 3-2 4-2 7a4 4 0 0 0 8 0c0-1-.5-2-1-3-.5 1-1 1.5-2 1.5C15 6 14 4 12 3z"/></svg></button>
-<button onclick="pickSticker('heart')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff2d55" stroke-width="1.5"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg></button>
-<button onclick="pickSticker('laugh')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></button>
-<button onclick="pickSticker('crown')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.5"><path d="M3 17h18M3 17l-1-9 6 4 4-6 4 6 6-4-1 9z"/></svg></button>
-<button onclick="pickSticker('love')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff2d55" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg></button>
-<button onclick="pickSticker('star')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="1.5"><path d="M12 3l2.5 6 6.5.5-5 4.5 1.5 6.5L12 17l-5.5 3.5L8 14 3 9.5 9.5 9z"/></svg></button>
-<button onclick="pickSticker('party')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a259ff" stroke-width="1.5"><path d="M4 20L20 4M20 4l-3 1 1 3z"/></svg></button>
-<button onclick="pickSticker('hundred')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00c853" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 8v8M12 8v8M16 8v8"/></svg></button>
-</div><button style="width:100%;margin-top:12px;background:transparent;color:#ff5a5a;border:1px solid #442222;padding:12px;border-radius:999px;display:flex;gap:6px;align-items:center;justify-content:center" onclick="removeText()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg> Remove Sticker</button></div>
+<div class="fpBody"><button style="width:100%;background:#fff;color:#000;font-weight:800;padding:13px;border:0;border-radius:999px;display:flex;gap:8px;align-items:center;justify-content:center" onclick="document.getElementById('fileSticker').click()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 18l3-3 2 2 3-4 2 3"/></svg> Gallery la irunthu Sticker Podu</button><p style="font-size:11px;color:#aaa;padding:8px 2px">Ne select panna image - Photo mela Sticker ah ottikum</p><div id="myStickerList"></div>
+<!-- ✅ STICKER - IMAGE - SVG ILLA -->
+<div class="stickGrid">
+<button onclick="pickSticker('fire')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f525.png"></button>
+<button onclick="pickSticker('heart')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2764.png"></button>
+<button onclick="pickSticker('laugh')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f602.png"></button>
+<button onclick="pickSticker('crown')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f451.png"></button>
+<button onclick="pickSticker('love')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f60d.png"></button>
+<button onclick="pickSticker('star')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2b50.png"></button>
+<button onclick="pickSticker('party')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f389.png"></button>
+<button onclick="pickSticker('hundred')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4af.png"></button>
+<button onclick="pickSticker('cool')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f60e.png"></button>
+<button onclick="pickSticker('cry')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f622.png"></button>
+<button onclick="pickSticker('angry')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f621.png"></button>
+<button onclick="pickSticker('kiss')"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f618.png"></button>
+</div>
+<button style="width:100%;margin-top:12px;background:transparent;color:#ff5a5a;border:1px solid #442222;padding:12px;border-radius:999px;display:flex;gap:6px;align-items:center;justify-content:center" onclick="removeText()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg> Remove Sticker</button></div>
 </div>
 <div class="fullPage" id="pageEditVideoFull">
 <div class="fpTop"><span class="x" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg></span><b>Try Edits</b><span style="cursor:pointer" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
@@ -101,7 +135,6 @@
 <span class="soundBtn" onclick="toggleSound(event)" style="width:32px;height:32px"><span id="soundOffIcon2"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg></span><span id="soundOnIcon2" style="display:none"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span></span>
 <input type="range" id="seekBar2" min="0" max="100" value="0" oninput="seekVideo(this.value)"><span id="playTime" style="font-size:12px">0:00 / 0:15</span></div>
 <div class="filmStrip" id="filmStrip"></div>
-<!-- ✅ MELA OPTION ELLAAM - IPPO EDIT VIDEO KULLA -->
 <div style="padding:10px;display:flex;gap:8px;overflow-x:auto">
 <button style="flex:1;background:#fff;color:#000;border:0;padding:11px;border-radius:999px;font-weight:700;white-space:nowrap" onclick="document.getElementById('fileAdd').click()">+ Add Reel</button>
 <button style="flex:1;background:#222;color:#fff;border:0;padding:11px;border-radius:999px;white-space:nowrap" onclick="openFull('pageAudioFull')">Add Song</button>
@@ -147,7 +180,7 @@
 <script src="js/supabase.js"></script>
 <script src="js/create.js"></script>
 <script>
-// ✅ + / BACK - VELIYA POGAATHU - HTML LA YE FIX
+// ✅ + / BACK - VELIYA POGAATHU
 let _lock=false;
 function _push(){ try{ history.pushState({pixoro:1},''); }catch(e){} }
 let _origShowPage = showPage;
@@ -164,11 +197,10 @@ goBack = function(){
 };
 window.addEventListener('popstate', function(e){ e.preventDefault(); _lock=true; goBack(); setTimeout(()=>{ _lock=false; },100); });
 _push();
-// ✅ REELS SELECT PANNA - ODANE EDIT PAGE KU - 2 TIME GALLERY VARAATHU
+// ✅ REELS / STORY SELECT PANNA ODANE EDIT KU
 let _origAddClip = addClip;
 addClip = function(f){
   _origAddClip(f);
-  // Reels / Story na - File Select aana 400ms la Edit ku Pogum
   setTimeout(()=>{
     if((typeof type!=='undefined' && (type==='reels'||type==='story')) && typeof url!=='undefined' && url && typeof goEdit==='function'){
       let cur=document.querySelector('.page.on')?.id;
@@ -176,6 +208,51 @@ addClip = function(f){
     }
   }, 500);
 };
+// ✅ STORY MODE + STICKER IMAGE - JS OVERRIDE
+function toggleStoryUI(){
+  let pe=document.getElementById('pageEdit');
+  if(pe) pe.classList.toggle('storyMode', type==='story');
+  let st=document.getElementById('storyTopRow');
+  if(st) st.style.display = (type==='story') ? 'flex' : 'none';
+  let ht=document.getElementById('homeTitle');
+  if(ht && type==='story') ht.innerText='Add to story';
+}
+let _origSetMode2 = setMode;
+setMode = function(t){ _origSetMode2(t); toggleStoryUI(); };
+let _origSetType2 = setType;
+setType = function(t){ _origSetType2(t); toggleStoryUI(); };
+// ✅ STICKER - IMAGE
+let _origPickSticker = pickSticker;
+pickSticker = function(k){
+  let map={ fire:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f525.png', heart:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2764.png', laugh:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f602.png', crown:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f451.png', love:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f60d.png', star:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2b50.png', party:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f389.png', hundred:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4af.png', cool:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f60e.png', cry:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f622.png', angry:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f621.png', kiss:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f618.png' };
+  if(map[k]){
+    let el=document.getElementById('ovStick');
+    el.innerHTML='<img src="'+map[k]+'" style="width:90px;height:90px;object-fit:contain;border:0;background:transparent">';
+    el.style.left='50%'; el.style.top='60%'; stickerImgUrl=map[k]; closeFull(); toast('Sticker Added'); return;
+  }
+  _origPickSticker(k);
+};
+// ✅ STORY SHARE - SERVER SAVE
+async function shareStory(mode){
+  if(!url || !file){ toast('Photo / Video Select Pannu'); return; }
+  if(typeof uploading!=='undefined' && uploading) return; uploading=true; toast('Story Uploading...');
+  try{
+    let supa=getSupa(); if(!supa) throw new Error('Supabase connect aagala');
+    let {data:{session}}=await supa.auth.getSession(); if(!session){ location.href='./login.html'; return; }
+    let ME=session.user.email.split('@')[0];
+    let blob=file;
+    if(kind!=='video'){
+      blob=await new Promise(res=>{ let img=new Image(); img.onload=()=>{ let W=1080,H=1920; let cc=document.createElement('canvas'); cc.width=W; cc.height=H; let ctx=cc.getContext('2d'); ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H); ctx.filter=buildFilter(); let sc=Math.max(W/img.width,H/img.height)*zoom; let dw=img.width*sc,dh=img.height*sc; ctx.drawImage(img,(W-dw)/2+panX*2,(H-dh)/2+panY*2,dw,dh); if(text){ ctx.filter='none'; ctx.font='900 60px '+fontF; ctx.textAlign='center'; ctx.fillStyle=tfColor; ctx.fillText(text,W/2,H*0.35); } cc.toBlob(b=>res(b||file),'image/jpeg',0.92); }; img.src=url; });
+    }
+    let ext=kind==='video'?'mp4':'jpg'; let fn='stories/'+session.user.id+'/'+Date.now()+'.'+ext;
+    let {error:upErr}=await supa.storage.from('stories').upload(fn,blob,{contentType:kind==='video'?'video/mp4':'image/jpeg'});
+    if(upErr) throw new Error('Storage: '+upErr.message);
+    let {data:ud}=supa.storage.from('stories').getPublicUrl(fn);
+    let {error}=await supa.from('stories').insert({ user_id:session.user.id, username:ME, media_url:ud.publicUrl, media_type:kind, caption:captionVal||document.getElementById('storyCap')?.value||'', song:song, privacy: mode==='close' ? 'Close Friends' : 'Everyone', expires_at: new Date(Date.now()+24*60*60*1000).toISOString() });
+    if(error) throw new Error(error.message);
+    toast('Story Uploaded - Server la Save Aachu!'); uploading=false; setTimeout(()=>location.href='./index.html',1000);
+  }catch(e){ uploading=false; toast('Story Error: '+e.message); }
+}
 </script>
 </body>
 </html>
