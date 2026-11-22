@@ -20,8 +20,6 @@ window.pixoroGetPfp = function(prof, userId, uname){
   return String(prof?.avatar_url || '').trim();
 };
 
-// ❌ DELETE v1046 - pixoroFixLikePaint INGA ILLA DA - like.js la thaan irukku da
-
 async function getFeed(currentUserId){
   try{
     let s = getSupa(); if(!s) return [];
@@ -106,7 +104,6 @@ function renderFeedList(){
     let isMine = String(p.user_id)===String(FEED_ME_ID) || uname === feedClean(FEED_ME_RAW) || uname === feedClean(window.ME_RAW||'');
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
     let cnt = FEED_COUNTS[String(p.id)] || {like:0,comment:0,share:0};
-    // ✅ v1046 - Feed ku Like Theriyaathu da - Eppovum WHITE thaan da - Like.js thaan Paint Pannum da
     let liked = '';
     let saved = FEED_SAVES.has(String(p.id)) ? 'saved' : '';
     return `<div class="post">
@@ -140,7 +137,8 @@ function renderFeedList(){
   hideMyFollow();
   if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
   hideMyFollow();
-  // ❌ DELETE v1046 - pixoroFixLikePaint() INGA ILLA DA - like.js la MutationObserver Paathukkum da
+  // ✅ FIX - Feed Mudinjathum - Like ah Koopidu da - Observer Illa da - Ithu thaan Thani Code da
+  if(window.pixoroPaintAllLikes) window.pixoroPaintAllLikes();
 }
 
 async function renderFeed(currentUserId){
