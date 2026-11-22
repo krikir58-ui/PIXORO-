@@ -1,11 +1,10 @@
-// ===== PIXORO FEED - v1044 - FINAL - DOUBLE LOAD FIX + LIKE RED FIX DA =====
-// RULE: pixoroFeedTap / showBigHeart - INGA ILLA DA - like.js v1043 la mattum thaan da
+// ===== PIXORO FEED - v1045 - FINAL - CSS ah ADIKKA JS !important DA =====
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
 let FEED_SAVES = new Set();
 let FEED_COUNTS = {};
 let MY_PFP = '';
-let _feedLoading = false; // ✅ FIX 1 - 2 Thadava Load aaga Koodathu da
+let _feedLoading = false;
 window.FEED_LIKES = FEED_LIKES;
 window.FEED_SAVES = FEED_SAVES;
 window.FEED_COUNTS = FEED_COUNTS;
@@ -19,6 +18,28 @@ window.pixoroGetPfp = function(prof, userId, uname){
   if(isMineNow && MY_PFP) return MY_PFP;
   return String(prof?.avatar_url || '').trim();
 };
+
+// ✅ NEW v1045 - ITHU THAAN MAIN FIX DA - CSS !important ah Adikka JS !important da
+function pixoroFixLikePaint(){
+  document.querySelectorAll('[data-like-btn]').forEach(btn=>{
+    let pid = String(btn.getAttribute('data-like-btn'));
+    let cntEl = document.querySelector(`[data-like-count="${pid}"]`);
+    let cnt = cntEl ? (parseInt(cntEl.innerText||'0')||0) : 0;
+    let shouldLike = FEED_LIKES.has(pid) && cnt > 0;
+    btn.classList.toggle('liked', shouldLike);
+    let svg = btn.querySelector('svg');
+    let path = btn.querySelector('path');
+    if(svg){
+      svg.style.setProperty('fill', shouldLike ? '#FF0A33' : 'none', 'important');
+      svg.style.setProperty('stroke', shouldLike ? '#FF0A33' : '#fff', 'important');
+    }
+    if(path){
+      path.style.setProperty('fill', shouldLike ? '#FF0A33' : 'none', 'important');
+      path.style.setProperty('stroke', shouldLike ? '#FF0A33' : '#fff', 'important');
+    }
+  });
+}
+window.pixoroFixLikePaint = pixoroFixLikePaint;
 
 async function getFeed(currentUserId){
   try{
@@ -103,11 +124,8 @@ function renderFeedList(){
       : `<div class="postMedia" onclick="pixoroFeedTap('${p.id}', this, event)"><img class="main" src="${m.url}" loading="lazy" onerror="this.closest('.post').style.display='none'"></div>`;
     let isMine = String(p.user_id)===String(FEED_ME_ID) || uname === feedClean(FEED_ME_RAW) || uname === feedClean(window.ME_RAW||'');
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
-    // ✅ FIX 2 - Count 0 na Kattayam WHITE thaan da - Thanave RED varathu da
     let cnt = FEED_COUNTS[String(p.id)] || {like:0,comment:0,share:0};
     let liked = (FEED_LIKES.has(String(p.id)) && cnt.like > 0) ? 'liked' : '';
-    let likeFill = liked ? '#FF0A33' : 'none';
-    let likeStroke = liked ? '#FF0A33' : '#fff';
     let saved = FEED_SAVES.has(String(p.id)) ? 'saved' : '';
     return `<div class="post">
       <div class="postTop">
@@ -120,7 +138,7 @@ function renderFeedList(){
       ${mediaHtml}
       <div class="actions">
         <div class="left" style="display:flex;gap:14px;align-items:center">
-          <button data-like-btn="${p.id}" class="act ${liked}" onclick="pixoroToggleLike('${p.id}',this)" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke-width:1.8;fill:${likeFill};stroke:${likeStroke}"><path style="fill:${likeFill};stroke:${likeStroke}" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span data-like-count="${p.id}">${cnt.like}</span></button>
+          <button data-like-btn="${p.id}" class="act ${liked}" onclick="pixoroToggleLike('${p.id}',this)" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke-width:1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span data-like-count="${p.id}">${cnt.like}</span></button>
           <button class="act" onclick="openComment('${p.id}')" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span data-comment-count="${p.id}">${cnt.comment}</span></button>
           <button class="act" onclick="sharePost('${p.id}')" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 22 15 22 11 13 2 9 22 2"/></svg><span data-share-count="${p.id}">${cnt.share}</span></button>
         </div>
@@ -140,6 +158,7 @@ function renderFeedList(){
   hideMyFollow();
   if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
   hideMyFollow();
+  pixoroFixLikePaint(); // ✅ FIX v1045 - Render Mudinjathum Odane Paint pannidu da
 }
 
 async function renderFeed(currentUserId){
@@ -155,7 +174,7 @@ async function renderFeed(currentUserId){
 window.renderFeed = renderFeed;
 
 async function loadFeed(){
-  if(_feedLoading) return; // ✅ FIX 1 - Already Load aaguthu na Thirumba Odaathe da
+  if(_feedLoading) return;
   _feedLoading = true;
   try{
     let s = getSupa();
@@ -171,7 +190,6 @@ async function loadFeed(){
     let navPfp = document.getElementById('navPfp'); if(navPfp && MY_PFP) navPfp.src = MY_PFP;
     if(window.pixoroLoadFollowing) window.pixoroLoadFollowing();
     FEED_ALL = await getFeed(FEED_ME_ID);
-    // ✅ FIX 3 - Pazhaya Likes ah Clear pannidu da
     FEED_LIKES = new Set(); FEED_SAVES = new Set();
     try{ let {data:likes} = await s.from('likes').select('post_id').eq('user_id', FEED_ME_ID); FEED_LIKES = new Set((likes||[]).map(x=>String(x.post_id))); }catch(e){}
     try{ let {data:saves} = await s.from('saves').select('post_id').eq('user_id', FEED_ME_ID); FEED_SAVES = new Set((saves||[]).map(x=>String(x.post_id))); }catch(e){}
@@ -193,7 +211,6 @@ document.addEventListener('click', function(e){
   let w = e.target.closest('.sAddWrap'); if(!w) return; location.href = './create.html';
 });
 
-// ✅ FIX 1 - Oru Thadava mattum thaan da
 if(!window._pixoroFeedStarted){
   window._pixoroFeedStarted = true;
   if(document.readyState !== 'loading') loadFeed();
