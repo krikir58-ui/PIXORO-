@@ -64,7 +64,6 @@ window.isGoldUser = isGoldUser; window.goldTickHTML = goldTickHTML; window.getTi
     if(document.body) document.body.classList.add('isHome');
     else document.addEventListener('DOMContentLoaded', ()=>{ if(document.body) document.body.classList.add('isHome'); });
   }
-  // ✅ v1011 CORRECTED - TOP NOTE + CLOSE BTN - THANITHANIYA DA - KALAKKATHU DA
   function addTopNote(){
     if(document.getElementById('pixoroTopNote')) return;
     if(!document.body) return;
@@ -203,36 +202,23 @@ function pixoroReelSetup(videoEl, postId, userId){
       let h = document.createElement('div'); h.innerText='❤️';
       h.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:90px;z-index:99';
       videoEl.parentElement.appendChild(h); setTimeout(()=>h.remove(),600);
-      pixoroLike(postId, userId);
+      // ✅ CORRECTED - Core la Like Illa da - like.js ku Anuppu da
+      if(window.pixoroDoubleTapLike) window.pixoroDoubleTapLike(postId, videoEl.parentElement);
+      else if(window.pixoroToggleLike){ let btn = document.querySelector(`[data-like-btn="${postId}"]`); window.pixoroToggleLike(postId, btn); }
     }
     lastTap = now;
   });
 }
 async function pixoroSendNotification(toUserId, type, postId, message){ return; }
 window.pixoroSendNotification = pixoroSendNotification;
-async function pixoroLike(postId, userId){
-  await pixoroFixMe();
-  if(!pixoroIsUuid(window.ME_ID)) return false;
-  if(!pixoroIsUuid(postId)) return false;
-  let s = pixoroGetSupa(); if(!s) return false;
-  try{
-    let {data:ex} = await s.from('likes').select('id').eq('post_id',postId).eq('user_id',window.ME_ID).maybeSingle();
-    if(ex){ await s.from('likes').delete().eq('id', ex.id); return false; }
-    let {error} = await s.from('likes').insert({post_id:postId, user_id:window.ME_ID});
-    if(error){ console.log('LIKE SERVER FAIL:',error.message); return false; }
-    return true;
-  }catch(e){ return false; }
-}
-async function pixoroToggleLike(postId, btn){
-  let liked = await pixoroLike(postId);
-  if(btn){
-    btn.classList.toggle('liked', !!liked);
-    let countEl = document.querySelector(`[data-like-count="${postId}"]`);
-    if(countEl){ let cur = parseInt(countEl.innerText||'0')||0; countEl.innerText = liked ? cur+1 : Math.max(0, cur-1); }
-  }
-  return liked;
-}
-window.pixoroToggleLike = pixoroToggleLike;
+// ✅ CORRECTED - CORE la LIKE Illa da - like.js thaan Owner da - Inga Like Function ye Illa da
+// Reels / Vera Edathula irunthu pixoroLike nu Koopta - like.js ku Anuppidu da - Overwrite Panna Koodathu da
+window.pixoroLike = function(postId){
+  if(window.pixoroDoubleTapLike) return window.pixoroDoubleTapLike(postId, null);
+  if(window.pixoroToggleLike){ let btn = document.querySelector(`[data-like-btn="${postId}"]`); return window.pixoroToggleLike(postId, btn); }
+  return Promise.resolve(true);
+};
+// ❌ window.pixoroToggleLike INGA ILLA DA - like.js la mattum thaan da
 async function pixoroSave(postId, userId){
   await pixoroFixMe();
   if(!pixoroIsUuid(window.ME_ID) || !pixoroIsUuid(postId)) return;
@@ -248,7 +234,6 @@ async function getPixoroExplore(myId, myFollows){
   let all = await getAllPixoroPosts();
   return (all||[]).filter(p=> String(p.user_id)!==String(myId) && !myFollows.includes(String(p.user_id)));
 }
-// ✅ v1011 CORRECTED - pixoroSavePost - Post + Reels - Visibility ah Use Pannum da - Double Insert Illa da
 async function pixoroSavePost(fileUrl, isReel, caption){
   let s = pixoroGetSupa(); if(!s) return;
   let {data:{session}} = await s.auth.getSession();
@@ -315,7 +300,6 @@ async function pixoroLoadFollowCounts(){
 }
 window.getPixoroFeed = getPixoroFeed;
 window.pixoroReelSetup = pixoroReelSetup;
-window.pixoroLike = pixoroLike;
 window.pixoroSave = pixoroSave;
 window.pixoroOnDMSent = pixoroOnDMSent;
 window.getPixoroExplore = getPixoroExplore;
