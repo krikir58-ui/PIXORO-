@@ -193,7 +193,7 @@ function tapSticker(e){ if(e) e.stopPropagation(); let el=document.getElementByI
 function tapOvText(e){ if(e) e.stopPropagation(); let el=document.getElementById('ovText'); if(!el || !el.innerText) return; el.classList.toggle('showDel'); }
 function deleteSticker(){ let el=document.getElementById('ovStick'); if(!el) return; el.innerHTML=''; el.classList.remove('showDel'); stickerImgUrl=''; activeStickers=[]; currentStickerData=null; toast('Sticker Deleted'); }
 function deleteOvText(){ let el=document.getElementById('ovText'); if(!el) return; el.innerHTML=''; el.classList.remove('showDel'); text=''; toast('Text Deleted'); }
-let GIPHY_KEY='dc6zaTOxFJmzC';
+let GIPHY_KEY='JJ3TmefJhVx2mzFhk07L8rLUGgS5khf8';
 let giphyCache={};
 async function loadGiphy(q){
   let grid=document.getElementById('giphyGrid'); if(!grid) return;
