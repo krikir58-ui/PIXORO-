@@ -191,6 +191,7 @@ function tapSticker(e){ if(e) e.stopPropagation(); let el=document.getElementByI
 function tapOvText(e){ if(e) e.stopPropagation(); let el=document.getElementById('ovText'); if(!el || !el.innerText) return; el.classList.toggle('showDel'); }
 function deleteSticker(){ let el=document.getElementById('ovStick'); if(!el) return; el.innerHTML=''; el.classList.remove('showDel'); stickerImgUrl=''; activeStickers=[]; currentStickerData=null; toast('Sticker Deleted'); }
 function deleteOvText(){ let el=document.getElementById('ovText'); if(!el) return; el.innerHTML=''; el.classList.remove('showDel'); text=''; toast('Text Deleted'); }
+// ✅ CORRECTED - GIPHY KEY POTACHU - ILLANA STICKER VARAATHU
 let GIPHY_KEY='JJ3TmefJhVx2mzFhk07L8rLUGgS5khf8';
 let giphyCache={};
 async function loadGiphy(q){
@@ -213,12 +214,11 @@ function renderGiphy(list){
 function searchRealSticker(q){ clearTimeout(window._stT); window._stT=setTimeout(()=>loadGiphy(q||'trending'),300); }
 function pickRealSticker(src){
   let el=document.getElementById('ovStick');
-  el.innerHTML='<img src="'+src+'" style="width:110px;height:110px;object-fit:contain;border:0;background:transparent"><span class="stDel" onclick="deleteSticker()">×</span>';
+  el.innerHTML='<img src="'+src+'" style="width:90px;height:90px;object-fit:contain;border:0;background:transparent"><span class="stDel" onclick="deleteSticker()">×</span>';
   el.style.left='50%'; el.style.top='55%'; el.classList.add('showDel');
   pushSticker({id:'st_'+Date.now(),type:'giphy',image_url:src,x:50,y:55,scale:1,rotation:0,data:{giphy_url:src}});
   closeFull(); toast('Sticker Added - Drag panna Delete Varum');
 }
-// ✅ CORRECTED - IMAGE THAVIRA ELLAM OUTLINE SVG
 function addRealSticker(kind){
   let el=document.getElementById('ovStick'); let html=''; let data={}; let stType=kind;
   let box = "display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);border:1.5px solid #fff;color:#fff;padding:10px 16px;border-radius:999px;font-weight:700;font-size:14px";
@@ -323,12 +323,12 @@ function applyTextEffect(){
 function pickSticker(k){
   let map={ fire:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f525.png', heart:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2764.png', laugh:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f602.png', crown:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f451.png', love:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f60d.png', star:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2b50.png', party:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f389.png', hundred:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4af.png', cool:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f60e.png', cry:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f622.png', angry:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f621.png', kiss:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f618.png' };
   let el=document.getElementById('ovStick');
-  el.innerHTML='<img src="'+(map[k]||map.star)+'" style="width:110px;height:110px;object-fit:contain;border:0;background:transparent"><span class="stDel" onclick="deleteSticker()">×</span>';
+  el.innerHTML='<img src="'+(map[k]||map.star)+'" style="width:90px;height:90px;object-fit:contain;border:0;background:transparent"><span class="stDel" onclick="deleteSticker()">×</span>';
   el.style.left='50%'; el.style.top='60%'; el.classList.add('showDel');
   pushSticker({id:'st_'+Date.now(),type:'emoji',image_url:map[k]||'',x:50,y:60,scale:1,rotation:0,data:{emoji:k}});
   closeFull(); toast('Sticker Added - Drag panna Delete Varum');
 }
-function pickMySticker(s){let el=document.getElementById('ovStick');el.innerHTML='<img src="'+s+'" style="width:110px;height:110px;object-fit:contain;border:0;background:transparent"><span class="stDel" onclick="deleteSticker()">×</span>';el.style.left='50%';el.style.top='60%';el.classList.add('showDel');pushSticker({id:'st_'+Date.now(),type:'gallery',image_url:s,x:50,y:60,scale:1,rotation:0,data:{}});closeFull();}
+function pickMySticker(s){let el=document.getElementById('ovStick');el.innerHTML='<img src="'+s+'" style="width:90px;height:90px;object-fit:contain;border:0;background:transparent"><span class="stDel" onclick="deleteSticker()">×</span>';el.style.left='50%';el.style.top='60%';el.classList.add('showDel');pushSticker({id:'st_'+Date.now(),type:'gallery',image_url:s,x:50,y:60,scale:1,rotation:0,data:{}});closeFull();}
 function renderMyStickers(){let box=document.getElementById('myStickerList');if(!box)return;box.innerHTML=myStickers.map(s=>'<div style="width:72px;height:72px;border-radius:14px;overflow:hidden;display:inline-block;margin:4px" onclick="pickMySticker(\''+s+'\')"><img src="'+s+'" style="width:100%;height:100%;object-fit:cover"></div>').join('');}
 function removeText(){text='';stickerImgUrl='';activeStickers=[];currentStickerData=null;document.getElementById('ovText').innerHTML='';document.getElementById('ovStick').innerHTML='';closeFull();}
 function startVoice(b){document.getElementById('voiceTxt').innerText='Voice: Recording...';if(b)b.innerText='Recording...';toast('Recording...');}
@@ -382,7 +382,7 @@ document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.ta
       if(isSt && activeStickers[0]){ activeStickers[0].x=nx; activeStickers[0].y=ny; }
       let bin=document.getElementById('deleteBin'); if(!bin) return;
       let b=bin.getBoundingClientRect();
-      hot=(p.x>b.left-40&&p.x<b.right+40&&p.y>b.top-40&&p.y<b.bottom+40);
+      hot=(p.x>b.left&&p.x<b.right&&p.y>b.top&&p.y<b.bottom);
       let dd=document.getElementById('dragDelete'); if(dd) dd.classList.toggle('hot',hot);
     }
     function end(){
