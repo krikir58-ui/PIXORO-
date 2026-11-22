@@ -1,4 +1,4 @@
-/* ===== PIXORO FEED.CSS - v1034 - THANI FILE DA - TOP + BACKGROUND REMOVE DA ===== */
+/* ===== PIXORO FEED.CSS - v1036 - THANI FILE DA - TOP + BACKGROUND REMOVE DA ===== */
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
 html{background:#000}
 body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px;overflow-x:hidden}
@@ -23,13 +23,24 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 .postTop b{font-size:15px!important;font-weight:700!important;cursor:pointer}
 .post img.main{width:100%!important;aspect-ratio:4/5!important;object-fit:cover!important;display:block;border-radius:12px;background:#111;filter:contrast(1.05) saturate(1.05)}
 .post video.main{width:100%!important;aspect-ratio:4/5!important;object-fit:cover!important;display:block;background:#111;border-radius:12px}
+
+/* ✅ FIX 1 - ACTIONS + COUNT - Count theriyanum da */
 .actions{padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
-.left{display:flex!important;gap:12px!important;align-items:center}
-.act{width:28px!important;height:28px!important;cursor:pointer;background:none;border:0;display:inline-flex;align-items:center;justify-content:center}
-.act svg{width:26px!important;height:26px!important;fill:none;stroke:#fff;stroke-width:1.8}
-.act.liked svg{fill:#FF0A33;stroke:#FF0A33;animation:beat .45s ease}
-.act.saved svg{fill:#fff;stroke:#fff}
+.left{display:flex!important;gap:16px!important;align-items:center}
+.act{width:auto!important;height:28px!important;cursor:pointer;background:none;border:0;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;color:#fff!important;font-size:14px!important;font-weight:600!important}
+.act svg{width:26px!important;height:26px!important;fill:none;stroke:#fff;stroke-width:1.8;flex-shrink:0}
+.act span{font-size:14px!important;color:#fff!important;line-height:1}
+.act.liked svg{fill:#FF0A33!important;stroke:#FF0A33!important;animation:beat .45s ease}
+/* ✅ FIX 2 - SAVE GOLD DA - White illa da - Gold thaan da */
+.act.saved svg{fill:#FFD700!important;stroke:#FFD700!important}
 @keyframes beat{0%{transform:scale(1)}30%{transform:scale(1.35)}60%{transform:scale(.95)}100%{transform:scale(1)}}
+
+/* ✅ FIX 3 - DOUBLE TAP HEART + POST MEDIA - feed.js la use pannuren da */
+.postMedia{position:relative!important;overflow:hidden!important;border-radius:12px}
+.bigHeart{position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%) scale(0)!important;width:90px!important;height:90px!important;z-index:10!important;pointer-events:none!important;opacity:0!important}
+.bigHeart svg{width:100%!important;height:100%!important;fill:#fff!important;stroke:#fff!important;stroke-width:1!important;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))!important}
+.bigHeart.show{animation:heartPop .9s ease forwards!important}
+@keyframes heartPop{0%{opacity:0;transform:translate(-50%,-50%) scale(0)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}40%{transform:translate(-50%,-50%) scale(.95)}60%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.1) translateY(-10px)}}
 
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:450px;margin:0 auto;width:100%;height:52px;background:#000;border-top:1px solid #1f1f1f;display:flex;justify-content:space-around;align-items:center;z-index:100}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#8e8e8e;flex:1;transition:0.15s}
@@ -80,7 +91,8 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 .followBtnPost,[data-follow-user]{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.5px solid #fff!important;padding:0 14px!important;border-radius:8px!important;font-size:14px!important;line-height:1!important;font-weight:600!important;white-space:nowrap!important;box-shadow:none!important;height:30px!important;min-width:80px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}
 .followBtnPost.following,[data-follow-user].following{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.5px solid rgba(255,255,255,.6)!important}
 
-#feed{min-height:300px}
+/* ✅ FIX 4 - FEED BOTTOM CUT FIX DA */
+#feed{min-height:300px;padding-bottom:110px!important}
 .skel{height:340px;background:#111;border-radius:20px;margin:10px 8px;animation:sk 1s infinite alternate}
 @keyframes sk{from{opacity:.6}to{opacity:1}}
 
