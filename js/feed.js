@@ -1,5 +1,6 @@
-// ===== PIXORO FEED - v1041 - LIKE RED FIX + DOUBLE TAP HEART FIX DA =====
-// RULE: Ithu Feed mattum da - Like/Comment/Share/Save thani file la irukku da
+// ===== PIXORO FEED - v1043 - LIKE FUNCTION ELLAM LIKE.JS LA MATTUM DA =====
+// RULE: pixoroFeedTap / showBigHeart - INGA ILLA DA - like.js v1043 la mattum thaan da
+//       Inga iruntha - Like.js oda Function ah Adichidum da - Like Work Aagaathu da
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
 let FEED_SAVES = new Set();
@@ -19,52 +20,8 @@ window.pixoroGetPfp = function(prof, userId, uname){
   return String(prof?.avatar_url || '').trim();
 };
 
-// ✅ NEW v1041 - DOUBLE TAP LOGIC DA - Single Tap = Play/Pause, Double Tap = Heart + Like da
-let _lastTapTime = 0, _lastTapId = '';
-window.pixoroFeedTap = function(postId, wrap, event){
-  if(event) event.stopPropagation();
-  let now = Date.now();
-  let isDouble = (now - _lastTapTime < 350 && _lastTapId === String(postId));
-  _lastTapTime = now; _lastTapId = String(postId);
-
-  let video = wrap ? wrap.querySelector('video') : null;
-
-  if(isDouble){
-    // ✅ DOUBLE TAP DA - Periya RED Heart + Like da
-    _lastTapTime = 0;
-    pixoroShowBigHeart(wrap);
-    let likeBtn = document.querySelector(`[data-like-btn="${postId}"]`);
-    if(likeBtn && !likeBtn.classList.contains('liked')){
-      if(window.pixoroToggleLike) window.pixoroToggleLike(postId, likeBtn);
-    }
-    return;
-  }
-  // Single Tap - Video na Play/Pause da - Photo na Onnum illa da
-  if(video){
-    setTimeout(()=>{
-      if(Date.now() - _lastTapTime >= 350){
-        if(video.paused) video.play().catch(()=>{});
-        else video.pause();
-      }
-    }, 350);
-  }
-};
-
-// ✅ NEW v1041 - Periya RED Heart - Naduvula 1 thaan varum da
-function pixoroShowBigHeart(wrap){
-  if(!wrap) return;
-  let old = wrap.querySelector('.bigHeart');
-  if(old) old.remove();
-  let h = document.createElement('div');
-  h.className = 'bigHeart show';
-  // ✅ RED Heart SVG da - White illa da
-  h.innerHTML = `<svg viewBox="0 0 24 24" style="width:90px;height:90px"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
-  h.style.left = '50%'; h.style.top = '50%';
-  h.style.width = '90px'; h.style.height = '90px';
-  wrap.appendChild(h);
-  setTimeout(()=>{ h.remove(); }, 1200);
-}
-window.pixoroShowBigHeart = pixoroShowBigHeart;
+// ❌ DELETE PANNITEN DA - pixoroFeedTap INGA ILLA DA - like.js la thaan irukku da
+// ❌ DELETE PANNITEN DA - pixoroShowBigHeart INGA ILLA DA - like.js la thaan irukku da
 
 async function getFeed(currentUserId){
   try{
@@ -182,7 +139,6 @@ function renderFeedList(){
       : `<div class="postMedia" onclick="pixoroFeedTap('${p.id}', this, event)"><img class="main" src="${m.url}" loading="lazy" onerror="this.closest('.post').style.display='none'"></div>`;
     let isMine = String(p.user_id)===String(FEED_ME_ID) || uname === feedClean(FEED_ME_RAW) || uname === feedClean(window.ME_RAW||'');
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
-    // ✅ FIX v1041 - FEED_LIKES la iruntha mattum liked da - Illana '' thaan da - Red varathu da
     let liked = FEED_LIKES.has(String(p.id)) ? 'liked' : '';
     let saved = FEED_SAVES.has(String(p.id)) ? 'saved' : '';
     let cnt = FEED_COUNTS[String(p.id)] || {like:0,comment:0,share:0};
