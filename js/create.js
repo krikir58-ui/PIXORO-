@@ -50,7 +50,7 @@ let savedByMode={post:null,story:null,reels:null,live:null};
 function saveCurMode(){ savedByMode[type]= url ? {url:url,kind:kind,file:file,clips:[...clips]} : null; }
 function loadMode(m){
   let s=savedByMode[m];
-  if(s){ url=s.url; kind=s.kind; file=s.file; clips=[...clips]; }
+  if(s){ url=s.url; kind=s.kind; file=s.file; clips=[...s.clips]; }
   else{ url=''; kind='image'; file=null; clips=[]; }
   zoom=1; panX=0; panY=0; text=''; filter='none'; activeStickers=[]; currentStickerData=null; stickerImgUrl='';
   let o=document.getElementById('ovText'); if(o){ o.innerText=''; o.style.transform='translate(-50%,-50%)'; }
@@ -191,7 +191,6 @@ function tapSticker(e){ if(e) e.stopPropagation(); let el=document.getElementByI
 function tapOvText(e){ if(e) e.stopPropagation(); let el=document.getElementById('ovText'); if(!el || !el.innerText) return; el.classList.toggle('showDel'); }
 function deleteSticker(){ let el=document.getElementById('ovStick'); if(!el) return; el.innerHTML=''; el.classList.remove('showDel'); stickerImgUrl=''; activeStickers=[]; currentStickerData=null; toast('Sticker Deleted'); }
 function deleteOvText(){ let el=document.getElementById('ovText'); if(!el) return; el.innerHTML=''; el.classList.remove('showDel'); text=''; toast('Text Deleted'); }
-// ✅ CORRECTED - GIPHY KEY POTACHU - ILLANA STICKER VARAATHU
 let GIPHY_KEY='JJ3TmefJhVx2mzFhk07L8rLUGgS5khf8';
 let giphyCache={};
 async function loadGiphy(q){
@@ -364,10 +363,22 @@ document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.ta
   function mk(id,isSt){
     let el=document.getElementById(id); if(!el) return;
     let sx=0,sy=0,ol=0,ot=0,dr=false,hot=false;
+    let d0=0,a0=0,s0=1,r0=0,curScale=1,curRot=0;
     function getXY(e){ return {x:(e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0]?e.touches[0].clientX:0)), y:(e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0]?e.touches[0].clientY:0))}; }
+    function getDist(t){ return Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY); }
+    function getAng(t){ return Math.atan2(t[1].clientY-t[0].clientY, t[1].clientX-t[0].clientX)*180/Math.PI; }
+    function showGuide(nx,ny){
+      let gv=document.getElementById('guideV'),gh=document.getElementById('guideH');
+      if(gv) gv.classList.toggle('show', Math.abs(nx-50)<2);
+      if(gh) gh.classList.toggle('show', Math.abs(ny-50)<2);
+    }
+    function hideGuide(){ let gv=document.getElementById('guideV'),gh=document.getElementById('guideH'); if(gv)gv.classList.remove('show'); if(gh)gh.classList.remove('show'); }
     function start(e){
       if(e.target && e.target.classList && e.target.classList.contains('stDel')) return;
       if(!el.innerText && !el.innerHTML) return;
+      if(e.touches && e.touches.length===2){
+        dr=false; d0=getDist(e.touches); a0=getAng(e.touches); s0=curScale; r0=curRot; return;
+      }
       let p=getXY(e); dr=true; sx=p.x; sy=p.y;
       let r=el.getBoundingClientRect(),pr=document.getElementById('editPreview').getBoundingClientRect();
       ol=(r.left-pr.left+r.width/2)/pr.width*100; ot=(r.top-pr.top+r.height/2)/pr.height*100;
@@ -375,20 +386,36 @@ document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.ta
       if(e.stopPropagation) e.stopPropagation();
     }
     function move(e){
+      if(e.touches && e.touches.length===2){
+        let d=getDist(e.touches), a=getAng(e.touches);
+        if(d0>0){
+          curScale=Math.max(0.3, Math.min(4, s0*(d/d0)));
+          curRot=r0+(a-a0);
+          let img=el.querySelector('img');
+          if(img && isSt){ img.style.width=(90*curScale)+'px'; img.style.height=(90*curScale)+'px'; }
+          el.style.transform='translate(-50%,-50%) rotate('+curRot+'deg)';
+          if(isSt && activeStickers[0]){ activeStickers[0].scale=curScale; activeStickers[0].rotation=curRot; }
+        }
+        return;
+      }
       if(!dr) return;
       let p=getXY(e); let pr=document.getElementById('editPreview').getBoundingClientRect();
-      let nx=Math.max(5,Math.min(95,ol+(p.x-sx)/pr.width*100)),ny=Math.max(5,Math.min(95,ot+(p.y-sy)/pr.height*100));
+      let nx=Math.max(3,Math.min(97,ol+(p.x-sx)/pr.width*100)),ny=Math.max(3,Math.min(97,ot+(p.y-sy)/pr.height*100));
+      if(Math.abs(nx-50)<2) nx=50;
+      if(Math.abs(ny-50)<2) ny=50;
+      showGuide(nx,ny);
       el.style.left=nx+'%'; el.style.top=ny+'%';
       if(isSt && activeStickers[0]){ activeStickers[0].x=nx; activeStickers[0].y=ny; }
-      let bin=document.getElementById('deleteBin'); if(!bin) return;
-      let b=bin.getBoundingClientRect();
-      hot=(p.x>b.left&&p.x<b.right&&p.y>b.top&&p.y<b.bottom);
-      let dd=document.getElementById('dragDelete'); if(dd) dd.classList.toggle('hot',hot);
+      let dd=document.getElementById('dragDelete'); if(!dd) return;
+      let b=dd.getBoundingClientRect();
+      hot=(p.x>b.left-20 && p.x<b.right+20 && p.y>b.top-20 && p.y<b.bottom+20);
+      dd.classList.toggle('hot',hot);
     }
     function end(){
-      if(!dr) return; dr=false;
+      if(!dr && d0===0) return; dr=false; d0=0; hideGuide();
       let dd=document.getElementById('dragDelete'); if(dd){ dd.classList.remove('show'); dd.classList.remove('hot'); }
       if(hot){ if(isSt){ el.innerHTML=''; stickerImgUrl=''; activeStickers=[]; currentStickerData=null; } else { el.innerHTML=''; text=''; } toast('Deleted'); }
+      hot=false;
     }
     el.addEventListener('pointerdown',start);
     el.addEventListener('touchstart',start,{passive:true});
@@ -404,12 +431,16 @@ async function drawStickerOnCanvas(ctx,W,H){
   if(!stickerImgUrl) return;
   try{
     let el=document.getElementById('ovStick');
-    let leftPct=50, topPct=55;
+    let leftPct=50, topPct=55, sc=1, rot=0;
     if(el && el.style.left) leftPct=parseFloat(el.style.left)||50;
     if(el && el.style.top) topPct=parseFloat(el.style.top)||55;
+    if(activeStickers[0]){ sc=activeStickers[0].scale||1; rot=activeStickers[0].rotation||0; }
     await new Promise((res,rej)=>{
       let s=new Image(); s.crossOrigin='anonymous';
-      s.onload=()=>{ let sw=W*0.22, sh=sw; ctx.drawImage(s, W*leftPct/100 - sw/2, H*topPct/100 - sh/2, sw, sh); res(); };
+      s.onload=()=>{
+        let sw=W*0.22*sc, sh=sw;
+        ctx.save(); ctx.translate(W*leftPct/100, H*topPct/100); ctx.rotate(rot*Math.PI/180); ctx.drawImage(s, -sw/2, -sh/2, sw, sh); ctx.restore(); res();
+      };
       s.onerror=()=>res(); s.src=stickerImgUrl;
     });
   }catch(e){}
