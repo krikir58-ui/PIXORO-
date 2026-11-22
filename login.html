@@ -66,11 +66,20 @@ svg{fill:none !important;stroke-linecap:round;stroke-linejoin:round}
 </div>
 <script>
 let supa=window.supa, curEmail='', timerInt, LOGIN_CHECK_DONE=false;
-const firebaseConfig = { apiKey: "PASTE_FIREBASE_API_KEY", authDomain: "PASTE_PROJECT.firebaseapp.com", projectId: "PASTE_PROJECT_ID" };
+// ✅ FIREBASE KEY PASTE PANNITEN DA - pixoro-75927
+const firebaseConfig = {
+  apiKey: "AIzaSyCwOxSyjqp2OoT2PoxSyHojksr5r58vQ10",
+  authDomain: "pixoro-75927.firebaseapp.com",
+  projectId: "pixoro-75927",
+  storageBucket: "pixoro-75927.firebasestorage.app",
+  messagingSenderId: "814840120295",
+  appId: "1:814840120295:web:6c02c613df5a17209bf342",
+  measurementId: "G-H3NR8P270D"
+};
 try{ if(!firebase.apps.length) firebase.initializeApp(firebaseConfig); }catch(e){}
 async function loginToFirebase(){
   try{
-    if(!window.firebase || firebaseConfig.apiKey.includes("PASTE")) return;
+    if(!window.firebase) return;
     let {data, error} = await supa.functions.invoke('smooth-api', {body:{}});
     if(error || !data?.customToken) return;
     await firebase.auth().signInWithCustomToken(data.customToken);
