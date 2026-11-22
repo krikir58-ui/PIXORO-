@@ -1,4 +1,8 @@
-// ===== PIXORO LIKE - v1013 - THANI FILE DA =====
+// ===== PIXORO LIKE - v1014 - THANI FILE DA =====
+// RULE: Double Tap = Like Only + Heart Pop
+//       Button Thotta = Like / Unlike da
+
+// 1. LIKE BUTTON - Thotta Like / Thotta Unlike da
 async function pixoroToggleLike(postId, btn){
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
   if(!window.ME_ID){ let {data:{session}} = await s.auth.getSession(); if(session) window.ME_ID = session.user.id; else return; }
@@ -15,4 +19,45 @@ async function pixoroToggleLike(postId, btn){
     return liked;
   }catch(e){ return false; }
 }
+
+// 2. DOUBLE TAP - Photo va 2 thadava thotta - Like ONLY da, Unlike aagaathu da
+async function pixoroDoubleTapLike(postId, mediaEl){
+  // Heart eppovum kaatu da - Like irunthalum illanalum da
+  showBigHeart(mediaEl);
+
+  let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
+  if(!window.ME_ID){ let {data:{session}} = await s.auth.getSession(); if(session) window.ME_ID = session.user.id; else return; }
+  try{
+    let {data:ex} = await s.from('likes').select('id').eq('post_id',postId).eq('user_id',window.ME_ID).maybeSingle();
+    if(ex){
+      // ✅ Already Like - Unlike PANNAATHE da - Return pannidu da
+      return true;
+    }
+    // Like illa na mattum Like podu da
+    await s.from('likes').insert({post_id:postId, user_id:window.ME_ID});
+    // Button UI + Count update pannu da
+    let btn = document.querySelector(`[data-like-btn="${postId}"]`);
+    if(btn) btn.classList.add('liked');
+    let c = document.querySelector(`[data-like-count="${postId}"]`);
+    if(c){ let cur = parseInt(c.innerText||'0')||0; c.innerText = cur+1; }
+    return true;
+  }catch(e){ return false; }
+}
+
+// 3. BIG HEART - Vanthu Poogum da - Insta Mari da
+function showBigHeart(mediaEl){
+  if(!mediaEl) return;
+  let old = mediaEl.querySelector('.bigHeart');
+  if(old) old.remove();
+  let div = document.createElement('div');
+  div.className = 'bigHeart';
+  div.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  mediaEl.appendChild(div);
+  void div.offsetWidth;
+  div.classList.add('show');
+  setTimeout(()=>div.remove(), 950);
+}
+
 window.pixoroToggleLike = pixoroToggleLike;
+window.pixoroDoubleTapLike = pixoroDoubleTapLike;
+window.showBigHeart = showBigHeart;
