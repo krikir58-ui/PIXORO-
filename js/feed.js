@@ -1,4 +1,4 @@
-// ===== PIXORO FEED - v1036 - THANI FILE DA =====
+// ===== PIXORO FEED - v1039 - THANI FILE DA - SPEED + TOUCH DOUBLE TAP DA =====
 // RULE: Ithu Feed mattum da - Like/Comment/Share/Save thani file la irukku da - Inga duplicate panna koodathu da
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
@@ -131,16 +131,19 @@ function renderFeedList(){
     let avatarHtml = pfp ? `<img src="${pfp}" onerror="this.remove();this.parentElement.querySelector('.avaLetterHome').style.display='grid'">` : '';
     let letterHtml = `<div class="avaLetterHome" style="display:${pfp ? 'none' : 'grid'}">${uname.charAt(0).toUpperCase()}</div>`;
     let m = feedGetMedia(p);
+    // ✅ FIX v1039 - ondblclick illa da - pixoroFeedTap thaan da - Mobile la ithu thaan work aagum da
+    // ✅ Video la thani onclick vendaam da - pixoroFeedTap thaan Play/Pause paakkum da
     let mediaHtml = m.isVid
-      ? `<div class="postMedia" ondblclick="pixoroDoubleTapLike('${p.id}', this)"><video class="main" src="${m.url}" muted playsinline loop preload="metadata" onclick="this.paused?this.play():this.pause()"></video></div>`
-      : `<div class="postMedia" ondblclick="pixoroDoubleTapLike('${p.id}', this)"><img class="main" src="${m.url}" loading="lazy" onerror="this.closest('.post').style.display='none'"></div>`;
+      ? `<div class="postMedia" onclick="pixoroFeedTap('${p.id}', this, event)"><video class="main" src="${m.url}" muted playsinline loop preload="metadata"></video></div>`
+      : `<div class="postMedia" onclick="pixoroFeedTap('${p.id}', this, event)"><img class="main" src="${m.url}" loading="lazy" onerror="this.closest('.post').style.display='none'"></div>`;
     let isMine = String(p.user_id)===String(FEED_ME_ID) || uname === feedClean(FEED_ME_RAW) || uname === feedClean(window.ME_RAW||'');
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
     let liked = FEED_LIKES.has(String(p.id)) ? 'liked' : '';
     let saved = FEED_SAVES.has(String(p.id)) ? 'saved' : '';
     let cnt = FEED_COUNTS[String(p.id)] || {like:0,comment:0,share:0};
-    let likeStyle = liked ? 'stroke:#ff3040;fill:#ff3040' : 'stroke:#fff;fill:none';
-    let saveStyle = saved ? 'stroke:#FFD700;fill:#FFD700' : 'stroke:#fff;fill:none';
+    // ✅ FIX v1039 - Inline fill ah eduthuten da - Class thaan Red/Gold kodukkum da
+    // Pazhaya: let likeStyle = liked ? 'stroke:#ff3040;fill:#ff3040' : ...
+    // Ippo: Style illa da - CSS thaan da
     return `<div class="post">
       <div class="postTop">
         <div style="display:flex;align-items:center;gap:10px">
@@ -151,10 +154,10 @@ function renderFeedList(){
       </div>
       ${mediaHtml}
       <div class="actions"><div class="left" style="display:flex;gap:14px;align-items:center">
-        <button data-like-btn="${p.id}" class="act ${liked}" onclick="pixoroToggleLike('${p.id}',this)" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;${likeStyle};stroke-width:1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span data-like-count="${p.id}">${cnt.like}</span></button>
+        <button data-like-btn="${p.id}" class="act ${liked}" onclick="pixoroToggleLike('${p.id}',this)" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke-width:1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span data-like-count="${p.id}">${cnt.like}</span></button>
         <button class="act" onclick="openComment('${p.id}')" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span data-comment-count="${p.id}">${cnt.comment}</span></button>
         <button class="act" onclick="sharePost('${p.id}')" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 22 15 22 11 13 2 9 22 2"/></svg><span data-share-count="${p.id}">${cnt.share}</span></button>
-        <button data-save-btn="${p.id}" class="act ${saved}" onclick="pixoroToggleSave('${p.id}',this)" style="margin-left:auto;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;${saveStyle};stroke-width:1.8"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        <button data-save-btn="${p.id}" class="act ${saved}" onclick="pixoroToggleSave('${p.id}',this)" style="margin-left:auto;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke-width:1.8"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
       </div></div>
       <div style="padding:0 12px;font-size:14px"><b>${uname}</b> ${p.caption||''}</div>
     </div>`;
