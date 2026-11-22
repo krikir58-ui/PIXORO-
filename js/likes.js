@@ -23,7 +23,6 @@ window.pixoroFeedTap = function(postId, el, ev){
   }, 310);
 };
 
-// ✅ FIX v1046 - setProperty + 'important' - CSS ah Adikka da - Ithu thaan Main Fix da!
 function pixoroPaintLikeBtn(btn, willLike){
   if(!btn) return;
   btn.classList.toggle('liked', willLike);
@@ -39,25 +38,18 @@ function pixoroPaintLikeBtn(btn, willLike){
   }
 }
 
-// ✅ NEW v1046 - Feed Render aana Odane - Ellathayum Paint pannu da
+// ✅ FIX 1 - PaintAll - Count ah Paakkaathe da - Phone la Save pannathu thaan Unmai da
 function pixoroPaintAllLikes(){
+  let saved = JSON.parse(localStorage.getItem('pixoro_likes')||'[]');
   document.querySelectorAll('[data-like-btn]').forEach(btn=>{
     let pid = String(btn.getAttribute('data-like-btn'));
-    let cntEl = document.querySelector(`[data-like-count="${pid}"]`);
-    let cnt = cntEl ? (parseInt(cntEl.innerText||'0')||0) : 0;
-    let likesSet = window.FEED_LIKES || new Set();
-    // Count 0 na - Like illa da - WHITE thaan da
-    let shouldLike = likesSet.has(pid) && cnt > 0;
+    let shouldLike = saved.includes(pid) || (window.FEED_LIKES && window.FEED_LIKES.has(pid));
     pixoroPaintLikeBtn(btn, shouldLike);
   });
 }
 
-// ✅ NEW v1046 - Feed ah Paathutte iru da - Feed Vanthathum Paint pannu da
-if(!window._pixoroLikeWatcher){
-  window._pixoroLikeWatcher = true;
-  let _obs = new MutationObserver(()=>{ pixoroPaintAllLikes(); });
-  _obs.observe(document.body, {childList:true, subtree:true});
-}
+// ❌ FIX 2 - MutationObserver ah FULL AH THOOKITEN DA - Ithu thaan Like ah Kolluthu da
+// Inime Feed Vanthathum - Feed thaan pixoroPaintAllLikes() ah Koopidum da - Observer Illa da
 
 async function pixoroToggleLike(postId, btn){
   let willLike = btn ? !btn.classList.contains('liked') : true;
@@ -65,6 +57,12 @@ async function pixoroToggleLike(postId, btn){
   let c = document.querySelector(`[data-like-count="${postId}"]`);
   if(c){ let cur = parseInt(c.innerText||'0')||0; c.innerText = willLike ? cur+1 : Math.max(0,cur-1); }
   if(window.FEED_LIKES){ willLike ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId)); }
+
+  // ✅ Phone la Save - Refresh pannalum RED ah irukkum da
+  let saved = JSON.parse(localStorage.getItem('pixoro_likes')||'[]');
+  if(willLike){ if(!saved.includes(String(postId))) saved.push(String(postId)); }
+  else { saved = saved.filter(id=>String(id)!==String(postId)); }
+  localStorage.setItem('pixoro_likes', JSON.stringify(saved));
 
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return willLike;
   if(!window.ME_ID){ let {data:{session}} = await s.auth.getSession(); if(session) window.ME_ID = session.user.id; else { location.href='./login.html'; return; } }
@@ -94,6 +92,8 @@ async function pixoroDoubleTapLike(postId, mediaEl){
   let c = document.querySelector(`[data-like-count="${postId}"]`);
   if(c){ let cur = parseInt(c.innerText||'0')||0; c.innerText = cur+1; }
   if(window.FEED_LIKES) window.FEED_LIKES.add(String(postId));
+  let saved = JSON.parse(localStorage.getItem('pixoro_likes')||'[]');
+  if(!saved.includes(String(postId))){ saved.push(String(postId)); localStorage.setItem('pixoro_likes', JSON.stringify(saved)); }
 
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return true;
   if(!window.ME_ID){ let {data:{session}} = await s.auth.getSession(); if(session) window.ME_ID = session.user.id; else return; }
