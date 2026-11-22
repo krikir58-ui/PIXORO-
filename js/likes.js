@@ -1,15 +1,15 @@
-// ===== PIXORO LIKE - v1043 - DB FAIL AANA KOODA RED AH IRUKKUM DA =====
+// ===== PIXORO LIKE - v1046 - THANI CODE DA - FEED AH THODATHE DA =====
 // RULE: pixoroFeedTap - INGA MATTUM THAAN DA - feed.js la itha thodathe da
 //       Double Tap = Like ONLY + 3 RED Hearts da - Unlike aagaathu da
 //       Button Thotta = Like / Unlike da
-//       DB Fail aana kooda UI ah Maatha Koodathu da - Red ah vechidu da!
+//       DB Fail aana kooda RED ah irukkum da!
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 
 window.pixoroFeedTap = function(postId, el, ev){
   if(ev) ev.preventDefault();
   let now = Date.now();
-  if(postId === String(_lastTapId) && (now - _lastTapTime) < 300){
+  if(String(postId) === String(_lastTapId) && (now - _lastTapTime) < 300){
     _lastTapTime = 0;
     if(_singleTapTimer){ clearTimeout(_singleTapTimer); _singleTapTimer = null; }
     pixoroDoubleTapLike(postId, el);
@@ -23,22 +23,44 @@ window.pixoroFeedTap = function(postId, el, ev){
   }, 310);
 };
 
-// ✅ FIX v1043 - Helper - Red / White ah Direct ah Podu da - CSS ah Namba Venaam da
+// ✅ FIX v1046 - setProperty + 'important' - CSS ah Adikka da - Ithu thaan Main Fix da!
 function pixoroPaintLikeBtn(btn, willLike){
   if(!btn) return;
   btn.classList.toggle('liked', willLike);
   let svg = btn.querySelector('svg');
+  let path = btn.querySelector('path');
   if(svg){
-    svg.style.fill = willLike ? '#FF0A33' : 'none';
-    svg.style.stroke = willLike ? '#FF0A33' : '#fff';
-    let p = svg.querySelector('path');
-    if(p){ p.style.fill = willLike ? '#FF0A33' : 'none'; p.style.stroke = willLike ? '#FF0A33' : '#fff'; }
+    svg.style.setProperty('fill', willLike ? '#FF0A33' : 'none', 'important');
+    svg.style.setProperty('stroke', willLike ? '#FF0A33' : '#fff', 'important');
   }
+  if(path){
+    path.style.setProperty('fill', willLike ? '#FF0A33' : 'none', 'important');
+    path.style.setProperty('stroke', willLike ? '#FF0A33' : '#fff', 'important');
+  }
+}
+
+// ✅ NEW v1046 - Feed Render aana Odane - Ellathayum Paint pannu da
+function pixoroPaintAllLikes(){
+  document.querySelectorAll('[data-like-btn]').forEach(btn=>{
+    let pid = String(btn.getAttribute('data-like-btn'));
+    let cntEl = document.querySelector(`[data-like-count="${pid}"]`);
+    let cnt = cntEl ? (parseInt(cntEl.innerText||'0')||0) : 0;
+    let likesSet = window.FEED_LIKES || new Set();
+    // Count 0 na - Like illa da - WHITE thaan da
+    let shouldLike = likesSet.has(pid) && cnt > 0;
+    pixoroPaintLikeBtn(btn, shouldLike);
+  });
+}
+
+// ✅ NEW v1046 - Feed ah Paathutte iru da - Feed Vanthathum Paint pannu da
+if(!window._pixoroLikeWatcher){
+  window._pixoroLikeWatcher = true;
+  let _obs = new MutationObserver(()=>{ pixoroPaintAllLikes(); });
+  _obs.observe(document.body, {childList:true, subtree:true});
 }
 
 async function pixoroToggleLike(postId, btn){
   let willLike = btn ? !btn.classList.contains('liked') : true;
-  // ✅ UI MUNNADI - Odane Red da
   pixoroPaintLikeBtn(btn, willLike);
   let c = document.querySelector(`[data-like-count="${postId}"]`);
   if(c){ let cur = parseInt(c.innerText||'0')||0; c.innerText = willLike ? cur+1 : Math.max(0,cur-1); }
@@ -57,9 +79,7 @@ async function pixoroToggleLike(postId, btn){
     }
     return willLike;
   }catch(e){
-    // ✅ FIX v1043 - DB FAIL AANA KOODA UI AH MAATHAATHE DA - RED AH VECHIDU DA
     console.log('❌ LIKE DB FAIL DA:', e.message);
-    // Thirumba White aakkaathe da - User ku Red ah kaatu da
     return willLike;
   }
 }
@@ -70,7 +90,6 @@ async function pixoroDoubleTapLike(postId, mediaEl){
   if(btn && btn.classList.contains('liked')) return true;
   if(window.FEED_LIKES && window.FEED_LIKES.has(String(postId))) return true;
 
-  // ✅ FIX v1043 - class mattum illa da - Paint um pannu da
   if(btn) pixoroPaintLikeBtn(btn, true);
   let c = document.querySelector(`[data-like-count="${postId}"]`);
   if(c){ let cur = parseInt(c.innerText||'0')||0; c.innerText = cur+1; }
@@ -113,3 +132,4 @@ window.pixoroToggleLike = pixoroToggleLike;
 window.pixoroDoubleTapLike = pixoroDoubleTapLike;
 window.showBigHeart = showBigHeart;
 window.pixoroPaintLikeBtn = pixoroPaintLikeBtn;
+window.pixoroPaintAllLikes = pixoroPaintAllLikes;
