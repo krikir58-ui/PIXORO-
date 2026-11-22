@@ -1,6 +1,9 @@
-// ===== PIXORO FEED - v1026 - THANI FILE DA - OREY PROFILE PHOTO + FOLLOW FIX + CIRCLE FIX DA =====
+// ===== PIXORO FEED - v1027 - THANI FILE DA =====
+// RULE: Ithu Feed mattum da - Like/Comment/Share/Save thani file la irukku da - Inga duplicate panna koodathu da
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
+let FEED_SAVES = new Set();
+let FEED_COUNTS = {}; // {postId: {like:0, comment:0, share:0}}
 let MY_PFP = '';
 
 function feedClean(u){ if(!u) return ''; return String(u).trim().replaceAll('@','').toLowerCase(); }
@@ -56,6 +59,26 @@ async function getFeed(currentUserId){
 }
 window.getFeed = getFeed;
 
+// ✅ COUNTS - Like/Comment/Share Count ellam orey thadava edukku da
+async function loadAllCounts(){
+  let s = getSupa(); if(!s) return;
+  FEED_COUNTS = {};
+  let ids = FEED_ALL.map(p=>String(p.id));
+  if(!ids.length) return;
+  try{
+    let {data:likes} = await s.from('likes').select('post_id').in('post_id', ids);
+    (likes||[]).forEach(x=>{ let k=String(x.post_id); FEED_COUNTS[k]=FEED_COUNTS[k]||{like:0,comment:0,share:0}; FEED_COUNTS[k].like++; });
+  }catch(e){}
+  try{
+    let {data:cmts} = await s.from('comments').select('post_id').in('post_id', ids);
+    (cmts||[]).forEach(x=>{ let k=String(x.post_id); FEED_COUNTS[k]=FEED_COUNTS[k]||{like:0,comment:0,share:0}; FEED_COUNTS[k].comment++; });
+  }catch(e){}
+  try{
+    let {data:shrs} = await s.from('shares').select('post_id').in('post_id', ids);
+    (shrs||[]).forEach(x=>{ let k=String(x.post_id); FEED_COUNTS[k]=FEED_COUNTS[k]||{like:0,comment:0,share:0}; FEED_COUNTS[k].share++; });
+  }catch(e){}
+}
+
 function feedGetMedia(p){
   let url = p.media_url || p.video_url || p.image_url || p.image || '';
   url = String(url||'').trim();
@@ -105,12 +128,17 @@ function renderFeedList(){
       : '';
     let letterHtml = `<div class="avaLetterHome" style="display:${pfp ? 'none' : 'grid'}">${uname.charAt(0).toUpperCase()}</div>`;
     let m = feedGetMedia(p);
+    // ✅ DOUBLE TAP + SAVE + COUNT - Inga thaan connect pannirukku da
     let mediaHtml = m.isVid
-      ? `<video class="main" src="${m.url}" muted playsinline loop preload="metadata" onclick="this.paused?this.play():this.pause()"></video>`
-      : `<img class="main" src="${m.url}" loading="lazy" onerror="this.closest('.post').style.display='none'">`;
+      ? `<div class="postMedia" ondblclick="pixoroDoubleTapLike('${p.id}', this)"><video class="main" src="${m.url}" muted playsinline loop preload="metadata" onclick="this.paused?this.play():this.pause()"></video></div>`
+      : `<div class="postMedia" ondblclick="pixoroDoubleTapLike('${p.id}', this)"><img class="main" src="${m.url}" loading="lazy" onerror="this.closest('.post').style.display='none'"></div>`;
     let isMine = String(p.user_id)===String(FEED_ME_ID) || uname === feedClean(FEED_ME_RAW) || uname === feedClean(window.ME_RAW||'');
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
     let liked = FEED_LIKES.has(String(p.id)) ? 'liked' : '';
+    let saved = FEED_SAVES.has(String(p.id)) ? 'saved' : '';
+    let cnt = FEED_COUNTS[String(p.id)] || {like:0,comment:0,share:0};
+    let likeStyle = liked ? 'stroke:#ff3040;fill:#ff3040' : 'stroke:#fff;fill:none';
+    let saveStyle = saved ? 'stroke:#FFD700;fill:#FFD700' : 'stroke:#fff;fill:none';
     return `<div class="post">
       <div class="postTop">
         <div style="display:flex;align-items:center;gap:10px">
@@ -120,10 +148,11 @@ function renderFeedList(){
         ${!isMine ? `<button data-follow-user="${uname}" class="followBtnPost ${isFollowing?'following':''}" onclick="pixoroToggleFollow('${uname}',this)">${isFollowing?'Following':'Follow'}</button>` : '<span>⋯</span>'}
       </div>
       ${mediaHtml}
-      <div class="actions"><div class="left">
-        <button class="act ${liked}" onclick="pixoroToggleLike('${p.id}',this);this.classList.toggle('liked')"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9C.5 8.5 2.5 5 6 5c2 0 3.5 1 6 3.5C14.5 6 16 5 18 5c3.5 0 5.5 3.5 3.5 7-2.5 4.5-9.5 9-9.5 9z"/></svg></button>
-        <button class="act" onclick="openComment('${p.id}')"><svg viewBox="0 0 24 24"><path d="M21 11.5c0 4-3.8 7.5-9 7.5-1 0-2-.1-2.8-.4L3 20l1.4-4.5C3.5 14.3 3 13 3 11.5 3 7.5 6.8 4 12 4s9 3.5 9 7.5z"/></svg></button>
-        <button class="act" onclick="sharePost('${p.id}')"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+      <div class="actions"><div class="left" style="display:flex;gap:14px;align-items:center">
+        <button data-like-btn="${p.id}" class="act ${liked}" onclick="pixoroToggleLike('${p.id}',this)" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;${likeStyle};stroke-width:1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span data-like-count="${p.id}">${cnt.like}</span></button>
+        <button class="act" onclick="openComment('${p.id}')" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span data-comment-count="${p.id}">${cnt.comment}</span></button>
+        <button class="act" onclick="sharePost('${p.id}')" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 22 15 22 11 13 2 9 22 2"/></svg><span data-share-count="${p.id}">${cnt.share}</span></button>
+        <button data-save-btn="${p.id}" class="act ${saved}" onclick="pixoroToggleSave('${p.id}',this)" style="margin-left:auto;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;${saveStyle};stroke-width:1.8"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
       </div></div>
       <div style="padding:0 12px;font-size:14px"><b>${uname}</b> ${p.caption||''}</div>
     </div>`;
@@ -144,13 +173,14 @@ function renderFeedList(){
 async function renderFeed(currentUserId){
   let box = document.getElementById('feed');
   if(!box) return;
-  box.innerHTML = '<p style="color:#888;text-align:center;padding:20px">Loading da... ⏳</p>';
+  box.innerHTML = '<p style="color:#888;text-align:center;padding:20px">Loading da...</p>';
   if(!currentUserId){
     let s = getSupa();
     if(s){ let {data:{session}} = await s.auth.getSession(); currentUserId = session?.user?.id; }
   }
   if(!currentUserId){ box.innerHTML = '<p style="color:#888;text-align:center">Login pannu da</p>'; return; }
   FEED_ALL = await getFeed(currentUserId);
+  await loadAllCounts();
   renderFeedList();
 }
 window.renderFeed = renderFeed;
@@ -165,7 +195,7 @@ async function loadFeed(){
   let {data:myProf} = await s.from('profiles').select('*').eq('id', FEED_ME_ID).maybeSingle();
   FEED_ME_RAW = feedClean(myProf?.username || session.user.email.split('@')[0]); window.ME_RAW = FEED_ME_RAW;
   MY_PFP = String(myProf?.avatar_url || '').trim();
-  window.MY_PFP = MY_PFP; window.ME_PFP = MY_PFP;
+  window.MY_PFP = MY_PFP; window.ME_PFP = MY_PFP; window.ME_AVATAR = MY_PFP;
   let navPfp = document.getElementById('navPfp');
   if(navPfp && MY_PFP) navPfp.src = MY_PFP;
   if(window.pixoroLoadFollowing) window.pixoroLoadFollowing();
@@ -174,6 +204,11 @@ async function loadFeed(){
     let {data:likes} = await s.from('likes').select('post_id').eq('user_id', FEED_ME_ID);
     FEED_LIKES = new Set((likes||[]).map(x=>String(x.post_id)));
   }catch(e){}
+  try{
+    let {data:saves} = await s.from('saves').select('post_id').eq('user_id', FEED_ME_ID);
+    FEED_SAVES = new Set((saves||[]).map(x=>String(x.post_id)));
+  }catch(e){}
+  await loadAllCounts();
   let pid = new URLSearchParams(location.search).get('id');
   if(pid){
     let single = FEED_ALL.find(p=>String(p.id)===String(pid));
@@ -183,37 +218,19 @@ async function loadFeed(){
   if(window.loadStories) window.loadStories();
 }
 
-// ✅ CORRECT - THANI FILE DA - + Thotta - Direct ah Create ku Pogum da
 function showChoice(){ location.href = './create.html'; }
 function hideChoice(){ let c=document.getElementById('choice'); if(c) c.classList.remove('show'); }
 window.showChoice=showChoice; window.hideChoice=hideChoice;
 
-// ✅ CORRECT - Story + Thotta - Create ku Pogum da - story-upload.html Illa da
 document.addEventListener('click', function(e){
   let w = e.target.closest('.sAddWrap');
   if(!w) return;
   location.href = './create.html';
 });
 
-function sharePost(id){ let u=location.origin+'/index.html?id='+id; if(navigator.share){ navigator.share({title:'Pixoro',url:u}); } else { navigator.clipboard.writeText(u); showToast('Link Copy Aachu da'); } }
-window.sharePost=sharePost;
-function showToast(m){ let t=document.getElementById('toast'); if(!t) return; t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',1500); }
-window.showToast=showToast;
-function openComment(id){ window.CURRENT_COMMENT_POST=id; let m=document.getElementById('commentModal'); if(m) m.style.display='flex'; loadComments(id); }
-function closeComment(){ let m=document.getElementById('commentModal'); if(m) m.style.display='none'; }
-window.openComment=openComment; window.closeComment=closeComment;
-async function loadComments(postId){
-  try{
-    let s=getSupa(); let {data}=await s.from('comments').select('*').eq('post_id',postId).order('created_at',{ascending:true});
-    let box=document.getElementById('commentList'); if(!box) return;
-    box.innerHTML=(data||[]).map(c=>`<div style="padding:8px 0;border-bottom:1px solid #222"><b>${feedClean(c.username||'user')}</b> <span>${c.text||c.content||''}</span></div>`).join('') || '<p style="color:#888">No comments yet da</p>';
-  }catch(e){}
-}
-async function addComment(){
-  let inp=document.getElementById('commentInput'); let txt=inp.value.trim(); if(!txt) return;
-  let s=getSupa(); await s.from('comments').insert({post_id: window.CURRENT_COMMENT_POST, user_id: FEED_ME_ID, username: FEED_ME_RAW, text: txt});
-  inp.value=''; loadComments(window.CURRENT_COMMENT_POST);
-}
-window.addComment=addComment;
+// ✅ DUPLICATE FUNCTIONS ELLAM EDUTHUTEN DA - Thani file thaan use aagum da
+// sharePost -> js/share.js, showToast -> js/share.js
+// openComment/loadComments/addComment -> js/comments.js
+
 if(document.readyState !== 'loading') loadFeed();
 else document.addEventListener('DOMContentLoaded', loadFeed);
