@@ -1,11 +1,9 @@
 let type='post',file=null,url='',kind='image',filter='none',text='',song='Trending Audio',fontF='system-ui',adj={brightness:100,contrast:100,saturate:100},loc='Chennai, India',aud='Everyone',tag='@friend_name';
 let clips=[],galleryPhotos=[],trimStart=0,trimEnd=15,totalDur=15,uploading=false,captionVal='',textEffect='none',myStickers=[],stickerImgUrl='',tfColor='#fff',galFilter='all',soundOn=false,zoom=1,panX=0,panY=0,hintTimer=null,toastTimer=null,prevFilter='none';
 let tfSize=36,tfOpacity=100,tfRotate=0,tfAlign='center',tfBold=false,tfItalic=false,tfBg=false;
-// ✅ REAL STICKER - SUPABASE LA SAVE PANNA LIST
 let activeStickers=[];
 let currentStickerData=null;
 function getStickersForSave(){
-  // ovStick la Irukka Position ah List ku Sync pannu
   if(activeStickers.length>0){
     let el=document.getElementById('ovStick');
     if(el && el.style.left) activeStickers[0].x=parseFloat(el.style.left)||50;
@@ -13,12 +11,12 @@ function getStickersForSave(){
   }
   let arr=activeStickers.map(s=>({id:s.id,type:s.type,image_url:s.image_url||null,x:s.x||50,y:s.y||55,scale:s.scale||1,rotation:s.rotation||0,data:s.data||{}}));
   if(text && !arr.find(s=>s.type==='text')){
-    arr.push({id:'tx_'+Date.now(),type:'text',text:text,x:50,y:35,color:tfColor,fontSize:tfSize,data:{text:text,color:tfColor}});
+    arr.push({id:'tx_'+Date.now(),type:'text',text:text,x:50,y:35,color:tfColor,fontSize:tfSize,data:{text:text,fontFamily:fontF,color:tfColor}});
   }
   return arr;
 }
 function pushSticker(st){
-  activeStickers=[st]; // Ippo 1 Sticker - Multiple Venum na push nu Maathu
+  activeStickers=[st];
   currentStickerData=st; stickerImgUrl=st.image_url||'';
 }
 function toast(m){let t=document.getElementById('toast');if(!t)return;t.innerText=m;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
@@ -220,25 +218,28 @@ function pickRealSticker(src){
   pushSticker({id:'st_'+Date.now(),type:'giphy',image_url:src,x:50,y:55,scale:1,rotation:0,data:{giphy_url:src}});
   closeFull(); toast('Sticker Added - Drag panna Delete Varum');
 }
+// ✅ CORRECTED - IMAGE THAVIRA ELLAM OUTLINE SVG
 function addRealSticker(kind){
   let el=document.getElementById('ovStick'); let html=''; let data={}; let stType=kind;
-  if(kind==='location'){ let v=prompt('Location',loc||'Chennai, India'); if(!v) return; html='<div style="background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-weight:800;font-size:14px">📍 '+v+'</div>'; data={location:v}; }
-  if(kind==='mention'){ let v=prompt('Mention','@friend_name'); if(!v) return; html='<div style="background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-weight:800;font-size:14px">'+v+'</div>'; data={mention:v}; }
-  if(kind==='music'){ html='<div style="background:#111;border:1px solid #333;color:#fff;padding:10px 14px;border-radius:12px;font-size:13px">🎵 '+song+'</div>'; data={song:song}; }
-  if(kind==='poll'){ let v=prompt('Poll Question','Like Pannuvingala?'); if(!v) return; html='<div style="background:#fff;color:#000;padding:12px 16px;border-radius:16px;width:200px;text-align:center"><b>'+v+'</b><div style="display:flex;gap:6px;margin-top:8px"><span style="flex:1;background:#0095f6;color:#fff;padding:8px;border-radius:999px">Yes</span><span style="flex:1;background:#eee;padding:8px;border-radius:999px">No</span></div></div>'; data={question:v,options:['Yes','No']}; }
-  if(kind==='link'){ let v=prompt('Link','https://pixoro.app'); if(!v) return; html='<div style="background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-weight:700;font-size:13px">🔗 '+v+'</div>'; data={url:v}; }
-  if(kind==='hashtag'){ let v=prompt('Hashtag','#pixoro'); if(!v) return; html='<div style="background:#fff;color:#0095f6;padding:10px 16px;border-radius:999px;font-weight:800">'+v+'</div>'; data={hashtag:v}; }
-  if(kind==='countdown'){ html='<div style="background:#111;border:1px solid #333;color:#fff;padding:12px 16px;border-radius:16px;text-align:center"><b>⏱ Countdown</b><div style="font-size:20px;font-weight:900">24:00:00</div></div>'; data={ends_at:new Date(Date.now()+24*3600*1000).toISOString()}; }
-  if(kind==='question'){ html='<div style="background:#fff;color:#000;padding:12px 16px;border-radius:16px;width:210px;text-align:center"><b>Ask me a question</b><div style="background:#eee;padding:8px;border-radius:999px;margin-top:8px;font-size:12px;color:#888">Type something...</div></div>'; data={prompt:'Ask me a question'}; }
+  let box = "display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);border:1.5px solid #fff;color:#fff;padding:10px 16px;border-radius:999px;font-weight:700;font-size:14px";
+  let card = "background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);border:1.5px solid #fff;color:#fff;padding:14px 16px;border-radius:18px;width:210px;text-align:center";
+  let svg = (p)=>'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';
+  if(kind==='location'){ let v=prompt('Location',loc||'Chennai, India'); if(!v) return; html='<div style="'+box+'">'+svg('<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>')+' '+v+'</div>'; data={location:v}; }
+  if(kind==='mention'){ let v=prompt('Mention','@friend_name'); if(!v) return; html='<div style="'+box+'">'+svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/>')+' '+v+'</div>'; data={mention:v}; }
+  if(kind==='music'){ html='<div style="'+box+'">'+svg('<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>')+' '+song+'</div>'; data={song:song}; }
+  if(kind==='poll'){ let v=prompt('Poll Question','Like Pannuvingala?'); if(!v) return; html='<div style="'+card+'"><b>'+v+'</b><div style="display:flex;gap:8px;margin-top:12px"><span style="flex:1;border:1.5px solid #fff;padding:9px;border-radius:999px;font-weight:700">Yes</span><span style="flex:1;border:1.5px solid #fff;padding:9px;border-radius:999px;font-weight:700">No</span></div></div>'; data={question:v,options:['Yes','No']}; }
+  if(kind==='link'){ let v=prompt('Link','https://pixoro.app'); if(!v) return; html='<div style="'+box+'">'+svg('<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>')+' '+v+'</div>'; data={url:v}; }
+  if(kind==='hashtag'){ let v=prompt('Hashtag','#pixoro'); if(!v) return; html='<div style="'+box+'">'+svg('<path d="M9 4 7 20M17 4l-2 16M4 9h17M3 15h17"/>')+' '+v+'</div>'; data={hashtag:v}; }
+  if(kind==='countdown'){ html='<div style="'+card+'"><div style="display:flex;align-items:center;justify-content:center;gap:8px">'+svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')+'<b>Countdown</b></div><div style="font-size:22px;font-weight:900;margin-top:6px;letter-spacing:2px">24 : 00 : 00</div></div>'; data={ends_at:new Date(Date.now()+24*3600*1000).toISOString()}; }
+  if(kind==='question'){ html='<div style="'+card+'"><div style="display:flex;align-items:center;justify-content:center;gap:8px">'+svg('<path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>')+'<b>Ask me a question</b></div><div style="border:1.5px dashed #fff;padding:9px;border-radius:999px;margin-top:12px;font-size:12px;opacity:.8">Type something...</div></div>'; data={prompt:'Ask me a question'}; }
   if(kind==='photo'){ document.getElementById('fileSticker').click(); return; }
-  if(kind==='avatar'){ html='<div style="background:#a259ff;color:#fff;padding:12px 16px;border-radius:999px;font-weight:800">👤 Your Avatar</div>'; data={avatar:true}; }
+  if(kind==='avatar'){ html='<div style="'+box+'">'+svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/>')+' Your Avatar</div>'; data={avatar:true}; }
   if(!html) return;
   el.innerHTML=html+'<span class="stDel" onclick="deleteSticker()">×</span>';
   el.style.left='50%'; el.style.top='55%'; el.classList.add('showDel');
   pushSticker({id:'st_'+Date.now(),type:stType,image_url:null,x:50,y:55,scale:1,rotation:0,data:data});
   closeFull();
 }
-// ✅ STORY PAAKRA PAYYAN POLL LA VOTE PANNA - ITHU INDEX.HTML LA KOOADA USE PANNA MUDIYUM
 async function votePoll(storyId, stickerId, ans){
   try{
     let supa=getSupa(); if(!supa) return;
@@ -429,7 +430,6 @@ async function shareStory(mode){
     let {error:upErr}=await supa.storage.from('stories').upload(fn,blob,{contentType:kind==='video'?'video/mp4':'image/jpeg'});
     if(upErr) throw new Error('Storage: '+upErr.message);
     let {data:ud}=supa.storage.from('stories').getPublicUrl(fn);
-    // ✅ REAL WORK - STICKERS AH JSON AH SAVE PANNU
     let {data:inserted,error}=await supa.from('stories').insert({ user_id:session.user.id, username:ME, media_url:ud.publicUrl, media_type:kind, caption:captionVal||document.getElementById('storyCap')?.value||'', song:song, stickers:stickersToSave, privacy: mode==='close' ? 'Close Friends' : 'Everyone', expires_at: new Date(Date.now()+24*60*60*1000).toISOString() }).select().single();
     if(error) throw new Error(error.message);
     toast('Story Uploaded - Sticker Save Aachu!'); uploading=false; setTimeout(()=>location.href='./index.html',1000);
