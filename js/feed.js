@@ -1,13 +1,18 @@
-// ===== PIXORO FEED - v1027 - THANI FILE DA =====
+// ===== PIXORO FEED - v1036 - THANI FILE DA =====
 // RULE: Ithu Feed mattum da - Like/Comment/Share/Save thani file la irukku da - Inga duplicate panna koodathu da
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
 let FEED_SAVES = new Set();
 let FEED_COUNTS = {}; // {postId: {like:0, comment:0, share:0}}
 let MY_PFP = '';
+// ✅ FIX - Thani file ku theriyanum da - window la podren da
+window.FEED_LIKES = FEED_LIKES;
+window.FEED_SAVES = FEED_SAVES;
+window.FEED_COUNTS = FEED_COUNTS;
 
 function feedClean(u){ if(!u) return ''; return String(u).trim().replaceAll('@','').toLowerCase(); }
 function getSupa(){ return window.supa || (window.getSupa ? window.getSupa() : null); }
+function syncFeedSets(){ window.FEED_LIKES = FEED_LIKES; window.FEED_SAVES = FEED_SAVES; window.FEED_COUNTS = FEED_COUNTS; }
 
 window.pixoroGetPfp = function(prof, userId, uname){
   let isMineNow = String(userId)===String(FEED_ME_ID) || feedClean(uname)===feedClean(FEED_ME_RAW);
@@ -59,7 +64,6 @@ async function getFeed(currentUserId){
 }
 window.getFeed = getFeed;
 
-// ✅ COUNTS - Like/Comment/Share Count ellam orey thadava edukku da
 async function loadAllCounts(){
   let s = getSupa(); if(!s) return;
   FEED_COUNTS = {};
@@ -77,6 +81,7 @@ async function loadAllCounts(){
     let {data:shrs} = await s.from('shares').select('post_id').in('post_id', ids);
     (shrs||[]).forEach(x=>{ let k=String(x.post_id); FEED_COUNTS[k]=FEED_COUNTS[k]||{like:0,comment:0,share:0}; FEED_COUNTS[k].share++; });
   }catch(e){}
+  syncFeedSets();
 }
 
 function feedGetMedia(p){
@@ -123,12 +128,9 @@ function renderFeedList(){
     let uname = feedClean(prof.username || p.username || 'user');
     let pfp = String(prof?.avatar_url || '').trim();
     if(!pfp && String(p.user_id)===String(FEED_ME_ID) && MY_PFP) pfp = MY_PFP;
-    let avatarHtml = pfp
-      ? `<img src="${pfp}" onerror="this.remove();this.parentElement.querySelector('.avaLetterHome').style.display='grid'">`
-      : '';
+    let avatarHtml = pfp ? `<img src="${pfp}" onerror="this.remove();this.parentElement.querySelector('.avaLetterHome').style.display='grid'">` : '';
     let letterHtml = `<div class="avaLetterHome" style="display:${pfp ? 'none' : 'grid'}">${uname.charAt(0).toUpperCase()}</div>`;
     let m = feedGetMedia(p);
-    // ✅ DOUBLE TAP + SAVE + COUNT - Inga thaan connect pannirukku da
     let mediaHtml = m.isVid
       ? `<div class="postMedia" ondblclick="pixoroDoubleTapLike('${p.id}', this)"><video class="main" src="${m.url}" muted playsinline loop preload="metadata" onclick="this.paused?this.play():this.pause()"></video></div>`
       : `<div class="postMedia" ondblclick="pixoroDoubleTapLike('${p.id}', this)"><img class="main" src="${m.url}" loading="lazy" onerror="this.closest('.post').style.display='none'"></div>`;
@@ -208,6 +210,7 @@ async function loadFeed(){
     let {data:saves} = await s.from('saves').select('post_id').eq('user_id', FEED_ME_ID);
     FEED_SAVES = new Set((saves||[]).map(x=>String(x.post_id)));
   }catch(e){}
+  syncFeedSets();
   await loadAllCounts();
   let pid = new URLSearchParams(location.search).get('id');
   if(pid){
@@ -227,10 +230,6 @@ document.addEventListener('click', function(e){
   if(!w) return;
   location.href = './create.html';
 });
-
-// ✅ DUPLICATE FUNCTIONS ELLAM EDUTHUTEN DA - Thani file thaan use aagum da
-// sharePost -> js/share.js, showToast -> js/share.js
-// openComment/loadComments/addComment -> js/comments.js
 
 if(document.readyState !== 'loading') loadFeed();
 else document.addEventListener('DOMContentLoaded', loadFeed);
