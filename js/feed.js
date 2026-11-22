@@ -1,11 +1,10 @@
-// ===== PIXORO FEED - v1040 - THANI FILE DA - SAVE THANI CORNER DA =====
-// RULE: Ithu Feed mattum da - Like/Comment/Share/Save thani file la irukku da - Inga duplicate panna koodathu da
+// ===== PIXORO FEED - v1041 - LIKE RED FIX + DOUBLE TAP HEART FIX DA =====
+// RULE: Ithu Feed mattum da - Like/Comment/Share/Save thani file la irukku da
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
 let FEED_SAVES = new Set();
-let FEED_COUNTS = {}; // {postId: {like:0, comment:0, share:0}}
+let FEED_COUNTS = {};
 let MY_PFP = '';
-// ✅ FIX - Thani file ku theriyanum da - window la podren da
 window.FEED_LIKES = FEED_LIKES;
 window.FEED_SAVES = FEED_SAVES;
 window.FEED_COUNTS = FEED_COUNTS;
@@ -19,6 +18,53 @@ window.pixoroGetPfp = function(prof, userId, uname){
   if(isMineNow && MY_PFP) return MY_PFP;
   return String(prof?.avatar_url || '').trim();
 };
+
+// ✅ NEW v1041 - DOUBLE TAP LOGIC DA - Single Tap = Play/Pause, Double Tap = Heart + Like da
+let _lastTapTime = 0, _lastTapId = '';
+window.pixoroFeedTap = function(postId, wrap, event){
+  if(event) event.stopPropagation();
+  let now = Date.now();
+  let isDouble = (now - _lastTapTime < 350 && _lastTapId === String(postId));
+  _lastTapTime = now; _lastTapId = String(postId);
+
+  let video = wrap ? wrap.querySelector('video') : null;
+
+  if(isDouble){
+    // ✅ DOUBLE TAP DA - Periya RED Heart + Like da
+    _lastTapTime = 0;
+    pixoroShowBigHeart(wrap);
+    let likeBtn = document.querySelector(`[data-like-btn="${postId}"]`);
+    if(likeBtn && !likeBtn.classList.contains('liked')){
+      if(window.pixoroToggleLike) window.pixoroToggleLike(postId, likeBtn);
+    }
+    return;
+  }
+  // Single Tap - Video na Play/Pause da - Photo na Onnum illa da
+  if(video){
+    setTimeout(()=>{
+      if(Date.now() - _lastTapTime >= 350){
+        if(video.paused) video.play().catch(()=>{});
+        else video.pause();
+      }
+    }, 350);
+  }
+};
+
+// ✅ NEW v1041 - Periya RED Heart - Naduvula 1 thaan varum da
+function pixoroShowBigHeart(wrap){
+  if(!wrap) return;
+  let old = wrap.querySelector('.bigHeart');
+  if(old) old.remove();
+  let h = document.createElement('div');
+  h.className = 'bigHeart show';
+  // ✅ RED Heart SVG da - White illa da
+  h.innerHTML = `<svg viewBox="0 0 24 24" style="width:90px;height:90px"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+  h.style.left = '50%'; h.style.top = '50%';
+  h.style.width = '90px'; h.style.height = '90px';
+  wrap.appendChild(h);
+  setTimeout(()=>{ h.remove(); }, 1200);
+}
+window.pixoroShowBigHeart = pixoroShowBigHeart;
 
 async function getFeed(currentUserId){
   try{
@@ -131,17 +177,15 @@ function renderFeedList(){
     let avatarHtml = pfp ? `<img src="${pfp}" onerror="this.remove();this.parentElement.querySelector('.avaLetterHome').style.display='grid'">` : '';
     let letterHtml = `<div class="avaLetterHome" style="display:${pfp ? 'none' : 'grid'}">${uname.charAt(0).toUpperCase()}</div>`;
     let m = feedGetMedia(p);
-    // ✅ FIX v1039 - ondblclick illa da - pixoroFeedTap thaan da - Mobile la ithu thaan work aagum da
-    // ✅ Video la thani onclick vendaam da - pixoroFeedTap thaan Play/Pause paakkum da
     let mediaHtml = m.isVid
       ? `<div class="postMedia" onclick="pixoroFeedTap('${p.id}', this, event)"><video class="main" src="${m.url}" muted playsinline loop preload="metadata"></video></div>`
       : `<div class="postMedia" onclick="pixoroFeedTap('${p.id}', this, event)"><img class="main" src="${m.url}" loading="lazy" onerror="this.closest('.post').style.display='none'"></div>`;
     let isMine = String(p.user_id)===String(FEED_ME_ID) || uname === feedClean(FEED_ME_RAW) || uname === feedClean(window.ME_RAW||'');
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
+    // ✅ FIX v1041 - FEED_LIKES la iruntha mattum liked da - Illana '' thaan da - Red varathu da
     let liked = FEED_LIKES.has(String(p.id)) ? 'liked' : '';
     let saved = FEED_SAVES.has(String(p.id)) ? 'saved' : '';
     let cnt = FEED_COUNTS[String(p.id)] || {like:0,comment:0,share:0};
-    // ✅ FIX v1040 - Inline fill ah eduthuten da - Class thaan Red / White kodukkum da - Gold illa da
     return `<div class="post">
       <div class="postTop">
         <div style="display:flex;align-items:center;gap:10px">
@@ -157,7 +201,6 @@ function renderFeedList(){
           <button class="act" onclick="openComment('${p.id}')" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span data-comment-count="${p.id}">${cnt.comment}</span></button>
           <button class="act" onclick="sharePost('${p.id}')" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 22 15 22 11 13 2 9 22 2"/></svg><span data-share-count="${p.id}">${cnt.share}</span></button>
         </div>
-        <!-- ✅ SAVE - Thani Corner - Valathu da - .left ku Veliya da -->
         <button data-save-btn="${p.id}" class="act ${saved}" onclick="pixoroToggleSave('${p.id}',this)" style="margin-left:auto;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke-width:1.8"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
       </div>
       <div style="padding:0 12px;font-size:14px"><b>${uname}</b> ${p.caption||''}</div>
