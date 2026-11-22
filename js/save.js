@@ -1,23 +1,25 @@
-// ===== PIXORO SAVE - v1039 - THANI FILE DA - SPEED DA =====
-// RULE: Save panna -> Server la Save + Icon Gold aagum da
+// ===== PIXORO SAVE - v1040 - THANI FILE DA - WHITE ONLY DA =====
+// RULE: Save panna -> Server la Save + Icon White aagum da - Gold / Yellow KIDAIYAATHU da
 //       Thirumba thotta -> Unsave aagum da
 //       UI Munnadi - DB Appuram da - Speed da!
+//       Alert / Toast KIDAIYAATHU da - Silent ah Save aagum da
 
 async function pixoroToggleSave(postId, btn){
-  // ✅ SPEED - DB ku munnadiye Odane Gold aakidu da - Wait panna koodathu da
+  // ✅ SPEED - DB ku munnadiye Odane White aakidu da - Wait panna koodathu da
   let willSave = btn ? !btn.classList.contains('saved') : true;
   if(btn){
     btn.classList.toggle('saved', willSave);
     let svg = btn.querySelector('svg');
     if(svg){
-      if(willSave){ svg.style.fill='#FFD700'; svg.style.stroke='#FFD700'; }
+      // ✅ WHITE ONLY DA - Save panna White Fill - Illana White Outline da
+      if(willSave){ svg.style.fill='#fff'; svg.style.stroke='#fff'; }
       else { svg.style.fill='none'; svg.style.stroke='#fff'; }
     }
     if(willSave){ btn.style.transform='scale(1.2)'; setTimeout(()=>btn.style.transform='scale(1)',150); }
   }
-  // ✅ FIX - FEED_SAVES la add pannu da - Illana Refresh panna Gold pogum da
+  // ✅ FIX - FEED_SAVES la add pannu da - Illana Refresh panna White pogum da
   if(window.FEED_SAVES){ willSave ? window.FEED_SAVES.add(String(postId)) : window.FEED_SAVES.delete(String(postId)); }
-  if(window.showToast) window.showToast(willSave ? 'Saved la Pochu da' : 'Saved la irunthu Eduthuten da');
+  // ✅ ALERT REMOVE DA - Toast line ah eduthuten da - Onnum kaataathe da
 
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
   if(!window.ME_ID){
@@ -35,7 +37,7 @@ async function pixoroToggleSave(postId, btn){
       btn.classList.toggle('saved', !willSave);
       let svg = btn.querySelector('svg');
       if(svg){
-        if(!willSave){ svg.style.fill='#FFD700'; svg.style.stroke='#FFD700'; }
+        if(!willSave){ svg.style.fill='#fff'; svg.style.stroke='#fff'; }
         else { svg.style.fill='none'; svg.style.stroke='#fff'; }
       }
     }
@@ -44,7 +46,7 @@ async function pixoroToggleSave(postId, btn){
   }
 }
 
-// ✅ PAGE LOAD AANA - Already Save pannita Post ah Gold ah kaatu da
+// ✅ PAGE LOAD AANA - Already Save pannita Post ah White ah kaatu da
 async function loadSaveState(postId, btn){
   try{
     let s = window.getSupa ? window.getSupa() : window.supa; if(!s || !window.ME_ID || !btn) return;
@@ -52,7 +54,7 @@ async function loadSaveState(postId, btn){
     if(ex){
       btn.classList.add('saved');
       let svg = btn.querySelector('svg');
-      if(svg){ svg.style.fill='#FFD700'; svg.style.stroke='#FFD700'; }
+      if(svg){ svg.style.fill='#fff'; svg.style.stroke='#fff'; }
     }
   }catch(e){}
 }
