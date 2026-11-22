@@ -8,7 +8,7 @@
 body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif!important;display:flex;justify-content:center;padding:20px}
 .box{width:360px;text-align:center}.card{border:1px solid #262626;padding:20px;border-radius:12px;margin-bottom:10px;background:#0a0a0a}
 input{width:100%;padding:12px;margin:6px 0;background:#121212;border:1px solid #333;color:#fff;border-radius:8px;box-sizing:border-box;font-family:inherit;font-size:14px}
-button{width:100%;padding:12px;background:#FFD700;color:#000;border:0;border-radius:10px;font-weight:800;cursor:pointer;margin-top:6px;font-family:inherit}
+button{width:100%;padding:12px;background:#FFD700;color:#000;border:0;border-radius:10px;font-weight:800;cursor:pointer;margin-top:6px;font-family:inherit;display:flex;gap:8px;align-items:center;justify-content:center}
 button:disabled{opacity:0.6}
 .hide{display:none}.logo{font-family:Arial,sans-serif!important;font-weight:900;font-size:38px;color:#FFD700}
 .otp-box{display:flex;gap:8px;justify-content:center;margin:14px 0}
@@ -16,18 +16,23 @@ button:disabled{opacity:0.6}
 .otp-box input:focus{border-color:#FFD700;outline:none}
 #timer{font-size:13px;color:#888;margin-top:8px}
 #pfpWarn{color:#ff3040;font-size:12px;display:none;background:#2a0000;padding:8px;border-radius:6px;border:1px solid #ff3040;margin:8px 0}
+.ic{width:18px;height:18px;flex-shrink:0}
+.ic-lg{width:22px;height:22px;flex-shrink:0}
+svg{fill:none !important;stroke-linecap:round;stroke-linejoin:round}
+.row{display:flex;gap:8px;align-items:center;justify-content:center}
+.row svg{stroke:#FFD700}
 </style></head><body>
 <div class="box">
 <h1 class="logo">Pixoro</h1>
 <div class="card" id="s1">
-<p style="font-size:14px;color:#888">Welcome to Pixoro 👋 - OTP Login - Safe da 🔒</p>
+<div class="row"><svg class="ic" viewBox="0 0 24 24" stroke="#FFD700" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><p style="font-size:14px;color:#888;margin:0">Welcome to Pixoro - OTP Login - Safe da</p></div>
 <input id="email" type="email" placeholder="Email" autocomplete="off">
-<button id="sendBtn" onclick="sendOTP()">Send OTP ➡️</button>
+<button id="sendBtn" onclick="sendOTP()">Send OTP <svg class="ic" viewBox="0 0 24 24" stroke="#000" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
 <p id="msg1" style="color:#ff3040;font-size:13px"></p>
-<p style="font-size:12px;color:#888">OTP thaan Safe da - Password Theva illa da</p>
+<div class="row"><svg class="ic" viewBox="0 0 24 24" stroke="#888" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><p style="font-size:12px;color:#888;margin:0">OTP thaan Safe da - Password Theva illa da</p></div>
 </div>
 <div class="card hide" id="sOTP">
-<p style="font-weight:bold">Enter OTP 🔢</p>
+<div class="row"><svg class="ic-lg" viewBox="0 0 24 24" stroke="#FFD700" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h.01M11 9h.01M15 9h.01M7 13h.01M11 13h.01M15 13h.01M7 17h.01M11 17h.01"/></svg><p style="font-weight:bold;margin:0">Enter OTP</p></div>
 <p id="otpInfo" style="font-size:12px;color:#888"></p>
 <div class="otp-box">
 <input id="o1" maxlength="1" inputmode="numeric" oninput="moveNext(this,'o2')" onkeydown="moveBack(event,this,'')">
@@ -37,30 +42,29 @@ button:disabled{opacity:0.6}
 <input id="o5" maxlength="1" inputmode="numeric" oninput="moveNext(this,'o6')" onkeydown="moveBack(event,this,'o4')">
 <input id="o6" maxlength="1" inputmode="numeric" oninput="checkAuto()" onkeydown="moveBack(event,this,'o5')">
 </div>
-<button onclick="verifyOTP()">Verify OTP ✅</button>
+<button onclick="verifyOTP()">Verify OTP <svg class="ic" viewBox="0 0 24 24" stroke="#000" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></button>
 <p id="timer">Resend in 60s</p>
-<button id="resendBtn" onclick="sendOTP(true)" class="hide" style="background:#262626;color:#FFD700">Resend OTP 🔁</button>
-<button onclick="go('s1')" style="background:#262626;color:#FFD700">Back</button>
+<button id="resendBtn" onclick="sendOTP(true)" class="hide" style="background:#262626;color:#FFD700">Resend OTP <svg class="ic" viewBox="0 0 24 24" stroke="#FFD700" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg></button>
+<button onclick="go('s1')" style="background:#262626;color:#FFD700"><svg class="ic" viewBox="0 0 24 24" stroke="#FFD700" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back</button>
 <p id="msgOTP" style="color:#ff3040;font-size:13px"></p>
 </div>
 <div class="card hide" id="s2">
-<p style="color:#888">Create Profile ✨ - Oru Thadava Mattum da</p>
+<div class="row"><svg class="ic-lg" viewBox="0 0 24 24" stroke="#FFD700" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><p style="color:#888;margin:0">Create Profile - Oru Thadava Mattum da</p></div>
 <input id="newUser" placeholder="New Username" autocomplete="off">
-<button onclick="saveProfile()">Save & Continue 🚀</button>
+<button onclick="saveProfile()">Save & Continue <svg class="ic" viewBox="0 0 24 24" stroke="#000" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
 <p id="msg2" style="color:#ff3040;font-size:13px"></p>
 </div>
 <div class="card hide" id="s3">
-<p style="color:#888">Profile Photo 📸</p>
+<div class="row"><svg class="ic-lg" viewBox="0 0 24 24" stroke="#FFD700" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><p style="color:#888;margin:0">Profile Photo</p></div>
 <img id="pfpPrev" src="https://ui-avatars.com/api/?name=G&background=222&color=fff&size=200" style="width:90px;height:90px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 12px;border:2px solid #FFD700">
 <p id="pfpWarn"></p>
 <input type="file" id="pfpFile" accept="image/png,image/jpg,image/jpeg" onchange="previewPfp(this)" style="border:0">
 <p style="font-size:11px;color:#888">JPG / PNG mattum - 2MB kulla</p>
-<button onclick="savePhoto()">Save Photo ✅</button>
-<button onclick="location.href='index.html'" style="background:#262626;color:#FFD700">Skip >>></button>
+<button onclick="savePhoto()">Save Photo <svg class="ic" viewBox="0 0 24 24" stroke="#000" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></button>
+<button onclick="location.href='index.html'" style="background:#262626;color:#FFD700">Skip <svg class="ic" viewBox="0 0 24 24" stroke="#FFD700" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
 </div>
 </div>
 <script>
-// ✅ OTP THAAN SAFE DA - NO localStorage - NO Password - FULL SERVER DA
 let supa=window.supa, curEmail='', timerInt, LOGIN_CHECK_DONE=false;
 const firebaseConfig = { apiKey: "PASTE_FIREBASE_API_KEY", authDomain: "PASTE_PROJECT.firebaseapp.com", projectId: "PASTE_PROJECT_ID" };
 try{ if(!firebase.apps.length) firebase.initializeApp(firebaseConfig); }catch(e){}
@@ -79,7 +83,7 @@ function moveBack(e,el,prev){if(e.key==='Backspace' && !el.value && prev) docume
 function getOTP(){return ['o1','o2','o3','o4','o5','o6'].map(id=>document.getElementById(id).value).join('')}
 function checkAuto(){if(getOTP().length===6) verifyOTP()}
 function startTimer(){let s=60;document.getElementById('resendBtn').classList.add('hide');clearInterval(timerInt);timerInt=setInterval(()=>{s--;document.getElementById('timer').innerText='Resend in '+s+'s';if(s<=0){clearInterval(timerInt);document.getElementById('timer').innerText='OTP Varala ya?';document.getElementById('resendBtn').classList.remove('hide')}},1000)}
-function showPfpWarn(msg){let w=document.getElementById('pfpWarn'); w.innerText='⚠️ '+msg; w.style.display='block'; document.getElementById('pfpFile').value=''}
+function showPfpWarn(msg){let w=document.getElementById('pfpWarn'); w.innerText=msg; w.style.display='block'; document.getElementById('pfpFile').value=''}
 async function waitSupa(){for(let i=0;i<50;i++){if(window.supa) return window.supa; await new Promise(r=>setTimeout(r,200))} return window.supa}
 async function checkAlreadyLoggedIn(){
   if(LOGIN_CHECK_DONE) return; LOGIN_CHECK_DONE=true;
@@ -96,32 +100,32 @@ async function checkAlreadyLoggedIn(){
 checkAlreadyLoggedIn();
 async function sendOTP(isResend){
   supa = await waitSupa();
-  if(!supa) return showErr('msg1','Supabase Load Aagala da - Refresh Pannu da 🔄');
+  if(!supa) return showErr('msg1','Supabase Load Aagala da - Refresh Pannu da');
   let emailVal = document.getElementById('email').value.trim().toLowerCase();
   curEmail = emailVal || curEmail;
   if(!curEmail.includes('@')) return showErr('msg1','Valid Email Podu da');
   showErr('msg1','');
   let btn = document.getElementById('sendBtn');
-  if(btn){btn.disabled=true; btn.innerText='Sending... ⏳';}
+  if(btn){btn.disabled=true; btn.innerText='Sending...';}
   let {error}=await supa.auth.signInWithOtp({email:curEmail, options:{shouldCreateUser:true, emailRedirectTo: location.origin + '/index.html'}});
-  if(btn){btn.disabled=false; btn.innerText='Send OTP ➡️';}
+  if(btn){btn.disabled=false; btn.innerHTML='Send OTP <svg class="ic" viewBox="0 0 24 24" stroke="#000" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';}
   if(error){
     if(String(error.message||'').toLowerCase().includes('rate limit') || String(error.message||'').includes('429')){
-      return showErr('msg1','OTP Limit da! 1 Mani Neram Wait Pannu da ⏳');
+      return showErr('msg1','OTP Limit da! 1 Mani Neram Wait Pannu da');
     }
     return showErr('msg1',error.message);
   }
-  document.getElementById('otpInfo').innerText='OTP sent to '+curEmail+' - Veliya Pogatha da - Notification la Paaru da 📩';
+  document.getElementById('otpInfo').innerText='OTP sent to '+curEmail+' - Veliya Pogatha da - Notification la Paaru da';
   go('sOTP'); startTimer(); setTimeout(()=>document.getElementById('o1').focus(),100);
 }
 async function verifyOTP(){
   let code=getOTP()
   if(code.length<6) return showErr('msgOTP','6 Digit OTP Podu da')
   if(!curEmail.includes('@')) return showErr('msgOTP','Email Kaanom da - Back poi Thirumba Podu da');
-  showErr('msgOTP','Checking... ⏳');
+  showErr('msgOTP','Checking...');
   let {data,error}=await supa.auth.verifyOtp({email:curEmail, token:code, type:'email'})
   if(error){
-    if(String(error.message||'').toLowerCase().includes('expired')) return showErr('msgOTP','OTP Expired da - Resend Pannu da 🔁');
+    if(String(error.message||'').toLowerCase().includes('expired')) return showErr('msgOTP','OTP Expired da - Resend Pannu da');
     return showErr('msgOTP',error.message)
   }
   await new Promise(r=>setTimeout(r,600));
