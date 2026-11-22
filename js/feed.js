@@ -1,4 +1,5 @@
-// ===== PIXORO FEED - v1045 - FINAL - CSS ah ADIKKA JS !important DA =====
+// ===== PIXORO FEED - v1046 - THANI CODE DA - LIKE AH THODATHE DA =====
+// RULE: Feed mattum thaan da - Like Pathi Onnum Illa da - like.js la mattum thaan da
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
 let FEED_SAVES = new Set();
@@ -19,27 +20,7 @@ window.pixoroGetPfp = function(prof, userId, uname){
   return String(prof?.avatar_url || '').trim();
 };
 
-// ✅ NEW v1045 - ITHU THAAN MAIN FIX DA - CSS !important ah Adikka JS !important da
-function pixoroFixLikePaint(){
-  document.querySelectorAll('[data-like-btn]').forEach(btn=>{
-    let pid = String(btn.getAttribute('data-like-btn'));
-    let cntEl = document.querySelector(`[data-like-count="${pid}"]`);
-    let cnt = cntEl ? (parseInt(cntEl.innerText||'0')||0) : 0;
-    let shouldLike = FEED_LIKES.has(pid) && cnt > 0;
-    btn.classList.toggle('liked', shouldLike);
-    let svg = btn.querySelector('svg');
-    let path = btn.querySelector('path');
-    if(svg){
-      svg.style.setProperty('fill', shouldLike ? '#FF0A33' : 'none', 'important');
-      svg.style.setProperty('stroke', shouldLike ? '#FF0A33' : '#fff', 'important');
-    }
-    if(path){
-      path.style.setProperty('fill', shouldLike ? '#FF0A33' : 'none', 'important');
-      path.style.setProperty('stroke', shouldLike ? '#FF0A33' : '#fff', 'important');
-    }
-  });
-}
-window.pixoroFixLikePaint = pixoroFixLikePaint;
+// ❌ DELETE v1046 - pixoroFixLikePaint INGA ILLA DA - like.js la thaan irukku da
 
 async function getFeed(currentUserId){
   try{
@@ -125,7 +106,8 @@ function renderFeedList(){
     let isMine = String(p.user_id)===String(FEED_ME_ID) || uname === feedClean(FEED_ME_RAW) || uname === feedClean(window.ME_RAW||'');
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
     let cnt = FEED_COUNTS[String(p.id)] || {like:0,comment:0,share:0};
-    let liked = (FEED_LIKES.has(String(p.id)) && cnt.like > 0) ? 'liked' : '';
+    // ✅ v1046 - Feed ku Like Theriyaathu da - Eppovum WHITE thaan da - Like.js thaan Paint Pannum da
+    let liked = '';
     let saved = FEED_SAVES.has(String(p.id)) ? 'saved' : '';
     return `<div class="post">
       <div class="postTop">
@@ -158,7 +140,7 @@ function renderFeedList(){
   hideMyFollow();
   if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
   hideMyFollow();
-  pixoroFixLikePaint(); // ✅ FIX v1045 - Render Mudinjathum Odane Paint pannidu da
+  // ❌ DELETE v1046 - pixoroFixLikePaint() INGA ILLA DA - like.js la MutationObserver Paathukkum da
 }
 
 async function renderFeed(currentUserId){
