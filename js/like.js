@@ -1,4 +1,4 @@
-// ===== PIXORO LIKE - FINAL DA - CORRECTED DA - RED + DANCE + REFRESH DA =====
+// ===== PIXORO LIKE - FINAL DA - NO LOCALSTORAGE - SERVER ONLY + DANCE DA =====
 console.log('✅ LIKE FILE LOADED DA');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
@@ -6,22 +6,12 @@ let _lastLikeAction = 0;
 if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
 if(!window.FEED_COUNTS) window.FEED_COUNTS = {};
 
-// ✅ REFRESH KU - PHONE LA SAVE DA
-function pixoroSaveLocalLikes(){
-  try{ localStorage.setItem('pixoro_my_likes', JSON.stringify([...window.FEED_LIKES])); }catch(e){}
-}
-function pixoroLoadLocalLikes(){
-  try{
-    let a = JSON.parse(localStorage.getItem('pixoro_my_likes')||'[]');
-    a.forEach(id=> window.FEED_LIKES.add(String(id)));
-    pixoroPaintAllLikes();
-  }catch(e){}
-}
+// ❌ LocalStorage ILLA DA - Server la mattum thaan Save da
 
 window.pixoroFeedTap = function(postId, el, ev){
   if(ev) ev.preventDefault();
   let now = Date.now();
-  if(String(postId) === String(_lastTapId) && (now - _lastTapTime) < 300){
+  if(String(postId) === String(_lastTapId) && (now - _lastTapTime) < 400){
     _lastTapTime = 0;
     if(_singleTapTimer){ clearTimeout(_singleTapTimer); _singleTapTimer = null; }
     pixoroDoubleTapLike(postId, el);
@@ -32,7 +22,7 @@ window.pixoroFeedTap = function(postId, el, ev){
   _singleTapTimer = setTimeout(()=>{
     let vid = el ? el.querySelector('video') : null;
     if(vid){ vid.paused ? vid.play().catch(()=>{}) : vid.pause(); }
-  }, 310);
+  }, 420);
 };
 
 (function(){
@@ -73,6 +63,7 @@ function pixoroPaintAllLikes(){
   });
 }
 
+// ✅ SERVER la irunthu mattum Load pannu da - Refresh pannina Red varum da
 async function pixoroLoadMyLikes(){
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
   try{
@@ -83,7 +74,6 @@ async function pixoroLoadMyLikes(){
     if(error) throw error;
     if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
     (data||[]).forEach(r=> window.FEED_LIKES.add(String(r.post_id)));
-    pixoroSaveLocalLikes();
     pixoroPaintAllLikes();
     console.log('✅ MY LIKES LOADED DA:', window.FEED_LIKES.size);
   }catch(e){ console.log('LIKE LOAD FAIL DA:', e.message); }
@@ -110,7 +100,6 @@ async function pixoroToggleLike(postId, btn){
   pixoroPaintLikeBtn(btn, willLike);
   pixoroBumpCount(postId, willLike ? 1 : -1);
   if(window.FEED_LIKES){ willLike ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId)); }
-  pixoroSaveLocalLikes();
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return willLike;
   if(!window.ME_ID){
     try{
@@ -142,7 +131,6 @@ async function pixoroDoubleTapLike(postId, mediaEl){
   if(btn) pixoroPaintLikeBtn(btn, true);
   pixoroBumpCount(postId, 1);
   if(window.FEED_LIKES) window.FEED_LIKES.add(String(postId));
-  pixoroSaveLocalLikes();
   _lastLikeAction = Date.now();
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return true;
   if(!window.ME_ID){
@@ -164,12 +152,19 @@ async function pixoroDoubleTapLike(postId, mediaEl){
 
 function showBigHeart(mediaEl){
   if(!mediaEl) return;
-  mediaEl.querySelectorAll('.bigHeart').forEach(h=>h.remove());
+  let box = null;
+  try{ if(mediaEl.closest) box = mediaEl.closest('.postMedia') || mediaEl.closest('.post'); }catch(e){}
+  if(!box) box = mediaEl.parentElement || mediaEl;
+  if(!box) return;
+  box.querySelectorAll('.bigHeart').forEach(h=>h.remove());
   let div = document.createElement('div');
   div.className = 'bigHeart';
   div.style.width = '80px'; div.style.height = '80px';
+  div.style.position = 'absolute'; div.style.left = '50%'; div.style.top = '50%'; div.style.zIndex = '99';
   div.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
-  mediaEl.appendChild(div);
+  let cs = window.getComputedStyle(box);
+  if(cs.position === 'static') box.style.position = 'relative';
+  box.appendChild(div);
   void div.offsetWidth;
   div.classList.add('show');
   setTimeout(()=>div.remove(), 600);
@@ -195,11 +190,9 @@ window.showBigHeart = showBigHeart;
 window.pixoroPaintLikeBtn = pixoroPaintLikeBtn;
 window.pixoroPaintAllLikes = pixoroPaintAllLikes;
 window.pixoroLoadMyLikes = pixoroLoadMyLikes;
-window.pixoroLoadLocalLikes = pixoroLoadLocalLikes;
 
-// ✅ CORRECTED DA - Feed vantha piragu thaan Red pannum da - Ithu thaan mukkiyam da
+// ✅ Feed vantha piragu Server la irunthu Red pannu da
 function pixoroStartLikeFix(){
-  pixoroLoadLocalLikes();
   pixoroLoadMyLikes();
   if(!window._pixoroLikeObs){
     window._pixoroLikeObs = true;
