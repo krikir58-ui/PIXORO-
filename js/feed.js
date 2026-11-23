@@ -1,7 +1,21 @@
-// ✅ CORRECTED DA - 400ms - Phone la Double Tap ku Time kuduthom da
+// ✅ CORRECTED DA - FINAL - Ithu mattum pothum da
 let _lastTapId = null;
 let _lastTapTime = 0;
 let _singleTapTimer = null;
+
+// Heart CSS ah inga ye potten da - Vera edathula poda vendaam da
+(function(){
+  if(document.getElementById('pixoro-heart-css')) return;
+  let s = document.createElement('style');
+  s.id = 'pixoro-heart-css';
+  s.innerHTML = `
+    .postMedia{ position:relative !important; overflow:hidden !important; }
+    .bigHeart{ position:absolute !important; left:50% !important; top:50% !important; width:80px !important; height:80px !important; z-index:99 !important; pointer-events:none !important; opacity:0 !important; transform:translate(-50%,-50%) scale(0) !important; transition:.2s !important; }
+    .bigHeart.show{ opacity:1 !important; transform:translate(-50%,-50%) scale(1.2) !important; }
+    .bigHeart svg{ width:100% !important; height:100% !important; }
+  `;
+  document.head.appendChild(s);
+})();
 
 window.pixoroFeedTap = function(postId, el, ev){
   if(ev) ev.preventDefault();
@@ -20,7 +34,25 @@ window.pixoroFeedTap = function(postId, el, ev){
   }, 420);
 };
 
-// ✅ CORRECTED DA - Heart ah Photo Box kulla podu da
+// ✅ ITHU THAAN MISS AAGIRUNTHATHU DA - Ithu illa na Double Tap Work aagathu da
+async function pixoroDoubleTapLike(postId, el){
+  let mediaEl = el ? (el.querySelector('img,video') || el) : null;
+  showBigHeart(mediaEl);
+  let btn = document.querySelector(`[data-like-btn="${postId}"]`);
+  if(btn && btn.classList.contains('liked')) return;
+  if(btn) btn.classList.add('liked');
+  let c = document.querySelector(`[data-like-count="${postId}"]`);
+  if(c) c.innerText = (parseInt(c.innerText||'0')+1);
+  let s = window.getSupa ? window.getSupa() : window.supa;
+  if(!s) return;
+  try{
+    let {data:{session}} = await s.auth.getSession();
+    if(!session) return;
+    await s.from('likes').insert({ post_id: postId, user_id: session.user.id });
+  }catch(e){}
+}
+window.pixoroDoubleTapLike = pixoroDoubleTapLike;
+
 function showBigHeart(mediaEl){
   if(!mediaEl) return;
   let box = null;
@@ -30,9 +62,6 @@ function showBigHeart(mediaEl){
   box.querySelectorAll('.bigHeart').forEach(h=>h.remove());
   let div = document.createElement('div');
   div.className = 'bigHeart';
-  div.style.width = '80px'; div.style.height = '80px';
-  div.style.position = 'absolute'; div.style.left = '50%'; div.style.top = '50%'; div.style.transform = 'translate(-50%,-50%)';
-  div.style.zIndex = '99';
   div.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   let cs = window.getComputedStyle(box);
   if(cs.position === 'static') box.style.position = 'relative';
