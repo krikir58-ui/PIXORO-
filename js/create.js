@@ -1,3 +1,4 @@
+// ===== PIXORO CREATE - FULL CORRECT FILE DA - SPEED + FIX DA =====
 let type='post',file=null,url='',kind='image',filter='none',text='',song='Trending Audio',fontF='system-ui',adj={brightness:100,contrast:100,saturate:100},loc='Chennai, India',aud='Everyone',tag='@friend_name';
 let clips=[],galleryPhotos=[],trimStart=0,trimEnd=15,totalDur=15,uploading=false,captionVal='',textEffect='none',myStickers=[],stickerImgUrl='',tfColor='#fff',galFilter='all',soundOn=false,zoom=1,panX=0,panY=0,hintTimer=null,toastTimer=null,prevFilter='none';
 let tfSize=36,tfOpacity=100,tfRotate=0,tfAlign='center',tfBold=false,tfItalic=false,tfBg=false;
@@ -11,7 +12,7 @@ function getStickersForSave(){
   }
   let arr=activeStickers.map(s=>({id:s.id,type:s.type,image_url:s.image_url||null,x:s.x||50,y:s.y||55,scale:s.scale||1,rotation:s.rotation||0,data:s.data||{}}));
   if(text && !arr.find(s=>s.type==='text')){
-    arr.push({id:'tx_'+Date.now(),type:'text',text:text,x:50,y:35,color:tfColor,fontSize:tfSize,data:{text:text,fontFamily:fontF,color:tfColor}});
+    arr.push({id:'tx_'+Date.now(),type:'text',text:text,x:50,y:35,color:tfColor,fontSize:tfSize,data:{text:text,color:tfColor,fontSize:tfSize}});
   }
   return arr;
 }
@@ -157,8 +158,11 @@ function togglePreviewPlay(e){
   else { v.pause(); document.getElementById('pvPlay').style.display='grid'; }
 }
 function showMedia(a,b,s,k){if(!a||!b)return;if(k==='video'){b.src=s;b.style.display='block';a.style.display='none';}else{a.src=s;a.style.display='block';b.style.display='none';try{b.pause();}catch(e){}}}
-function renderMedia(){let list=galleryPhotos.filter(p=>galFilter==='all'||p.kind===galFilter);let html='';if(type!=='story'){ html='<div class="galleryBtn" onclick="document.getElementById(\'fileMulti\').click()"><div><b>Gallery la irunthu Photo / Video Add Pannu</b><div style="font-size:11px;color:#aaa">Real Gallery mattum thaan</div></div></div>'; }html+=list.map(p=>{let i=galleryPhotos.indexOf(p);return '<div class="tile '+(url===p.url?'sel':'')+'" onclick="selectGallery('+i+')">'+(p.kind==='video'?'<video src="'+p.url+'" muted playsinline></video><span class="dur">0:15</span>':'<img src="'+p.url+'">')+'<span class="tick">'+(url===p.url?'✓':'')+'</span></div>';}).join('');let gh=document.getElementById('mediaGridHome');if(gh)gh.innerHTML=html;}
-function selectGallery(i){let p=galleryPhotos[i];if(!p)return;url=p.url;kind=p.kind;file=p.file;saveCurMode();fitVideoFullScreen();showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI(); if(type==='reels'||type==='story') setTimeout(()=>goEdit(),200);}
+
+// ✅ CORRECT - renderMedia - Lazy + 30 mattum da
+function renderMedia(){let list=galleryPhotos.filter(p=>galFilter==='all'||p.kind===galFilter);let html='';if(type!=='story'){ html='<div class="galleryBtn" onclick="document.getElementById(\'fileMulti\').click()"><div><b>Gallery la irunthu Photo / Video Add Pannu</b><div style="font-size:11px;color:#aaa">Real Gallery mattum thaan</div></div></div>'; }html+=list.slice(0,30).map(p=>{let i=galleryPhotos.indexOf(p);return '<div class="tile '+(url===p.url?'sel':'')+'" onclick="selectGallery('+i+')">'+(p.kind==='video'?'<video src="'+p.url+'" muted playsinline preload="metadata"></video><span class="dur">0:15</span>':'<img src="'+p.url+'" loading="lazy">')+'<span class="tick">'+(url===p.url?'✓':'')+'</span></div>';}).join('');let gh=document.getElementById('mediaGridHome');if(gh)gh.innerHTML=html;}
+// ✅ CORRECT - selectGallery - Double render illa da
+function selectGallery(i){let p=galleryPhotos[i];if(!p)return;url=p.url;kind=p.kind;file=p.file;saveCurMode();fitVideoFullScreen();showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();updatePreview();syncEditVideoUI(); if(type==='reels'||type==='story') setTimeout(()=>goEdit(),200);}
 function setGalTab(f,b){galFilter=f;document.querySelectorAll('.galTabs button').forEach(x=>x.classList.remove('sel'));if(b)b.classList.add('sel');renderMedia();}
 function goSelectNext(){if(!url){document.getElementById('fileMulti').click();return;}goEdit();}
 function goEdit(){if(!url){toast('Gallery la irunthu Photo Add Pannu');return;}showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);showMedia(document.getElementById('upImgPost'),document.getElementById('upVidPost'),url,kind);showPage('pageEdit');renderFilm();setType(type);fitVideoFullScreen();syncEditVideoUI();}
@@ -177,7 +181,6 @@ function clearTag(){tag='';syncFields();}
 function toggleAud(){aud=aud==='Everyone'?'Private':'Everyone';syncFields();}
 function removeUploadPhoto(){url='';file=null;clips=[];saveCurMode();showPage('pageHome');renderMedia();updatePreview();}
 function renderQuickBar(){let q=document.getElementById('quickBar'); if(q) q.innerHTML='';}
-// ✅ ALERT REMOVE - Draft popup illa da
 function askDraft(){ showPage('pageHome'); }
 function closeDraft(){}
 function startOver(){resetEdit();showPage('pageHome');}
@@ -203,7 +206,7 @@ function renderGiphy(list){
   grid.innerHTML=list.map(s=>{
     let src=(s.images && (s.images.fixed_height_small?.url || s.images.original?.url)) || '';
     if(!src) return '';
-    return '<img src="'+src+'" onclick="pickRealSticker(\''+src+'\')">';
+    return '<img src="'+src+'" loading="lazy" onclick="pickRealSticker(\''+src+'\')">';
   }).join('');
 }
 function searchRealSticker(q){ clearTimeout(window._stT); window._stT=setTimeout(()=>loadGiphy(q||'trending'),300); }
@@ -284,7 +287,7 @@ function setTFAlign(a,b){
   if(b) b.classList.add('sel');
   let i=document.getElementById('tfInput'); if(i) i.style.textAlign=a;
 }
-function toggleTFBold(b){ tfBold=!tfBold; if(b)b.classList.toggle('sel',tfBold); let i=document.getElementById('tfInput'); if(i) i.style.fontWeight='900'; }
+function toggleTFBold(b){ tfBold=!tfBold; if(b)b.classList.toggle('sel',tfBold); let i=document.getElementById('tfInput'); if(i) i.style.fontWeight=tfBold?'900':'400'; }
 function toggleTFItalic(b){ tfItalic=!tfItalic; if(b)b.classList.toggle('sel',tfItalic); let i=document.getElementById('tfInput'); if(i) i.style.fontStyle=tfItalic?'italic':'normal'; }
 function toggleTFBg(b){ tfBg=!tfBg; if(b)b.classList.toggle('sel',tfBg); let i=document.getElementById('tfInput'); if(i){ i.style.background=tfBg?'rgba(0,0,0,.6)':'transparent'; i.style.padding=tfBg?'8px 14px':'0'; i.style.borderRadius=tfBg?'12px':'0'; } }
 function setTFOpacity(v){ tfOpacity=v; let el=document.getElementById('tfOpacityVal'); if(el)el.innerText=v+'%'; let i=document.getElementById('tfInput'); if(i) i.style.opacity=v/100; }
@@ -324,7 +327,7 @@ function pickSticker(k){
   closeFull(); toast('Sticker Added - Drag panna Delete Varum');
 }
 function pickMySticker(s){let el=document.getElementById('ovStick');el.innerHTML='<img src="'+s+'" style="width:90px;height:90px;object-fit:contain;border:0;background:transparent"><span class="stDel" onclick="deleteSticker()">×</span>';el.style.left='50%';el.style.top='60%';el.classList.add('showDel');pushSticker({id:'st_'+Date.now(),type:'gallery',image_url:s,x:50,y:60,scale:1,rotation:0,data:{}});closeFull();}
-function renderMyStickers(){let box=document.getElementById('myStickerList');if(!box)return;box.innerHTML=myStickers.map(s=>'<div style="width:72px;height:72px;border-radius:14px;overflow:hidden;display:inline-block;margin:4px" onclick="pickMySticker(\''+s+'\')"><img src="'+s+'" style="width:100%;height:100%;object-fit:cover"></div>').join('');}
+function renderMyStickers(){let box=document.getElementById('myStickerList');if(!box)return;box.innerHTML=myStickers.map(s=>'<div style="width:72px;height:72px;border-radius:14px;overflow:hidden;display:inline-block;margin:4px" onclick="pickMySticker(\''+s+'\')"><img src="'+s+'" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div>').join('');}
 function removeText(){text='';stickerImgUrl='';activeStickers=[];currentStickerData=null;document.getElementById('ovText').innerHTML='';document.getElementById('ovStick').innerHTML='';closeFull();}
 function startVoice(b){document.getElementById('voiceTxt').innerText='Voice: Recording...';if(b)b.innerText='Recording...';toast('Recording...');}
 function stopVoice(){document.getElementById('voiceTxt').innerText='Voice: Added';toast('Voice Added');}
@@ -340,21 +343,22 @@ function setFilter(f){prevFilter=f;filter=f;applyFilter();closeFull();toast('Fil
 function setAdj(k,v){ adj[k]=v; applyFilter(); }
 function setupVideo(){let v=document.getElementById('editVid');if(kind==='video'){v.onloadedmetadata=()=>{totalDur=v.duration||15;trimStart=0;trimEnd=totalDur;let p=document.getElementById('playTime');if(p)p.innerText='0:00 / '+fmt(totalDur);updateTrimUI();};v.ontimeupdate=()=>{let p=document.getElementById('playTime');if(p)p.innerText=fmt(v.currentTime)+' / '+fmt(v.duration);};}renderFilm();}
 function seekVideo(v){let vid=document.getElementById('editVid');if(kind!=='video'||!vid.duration)return;vid.currentTime=vid.duration*v/100;}
-function renderFilm(){let f=document.getElementById('filmStrip');if(!f||!url)return;let c=Math.max(clips.length,1),h='';for(let i=0;i<6;i++){let cl=clips[i%c]||{url:url,kind:kind};h+='<div>'+(cl.kind==='video'?'<video src="'+cl.url+'" muted playsinline></video>':'<img src="'+cl.url+'">')+'</div>';}f.innerHTML=h;}
+function renderFilm(){let f=document.getElementById('filmStrip');if(!f||!url)return;let c=Math.max(clips.length,1),h='';for(let i=0;i<6;i++){let cl=clips[i%c]||{url:url,kind:kind};h+='<div>'+(cl.kind==='video'?'<video src="'+cl.url+'" muted playsinline preload="metadata"></video>':'<img src="'+cl.url+'" loading="lazy">')+'</div>';}f.innerHTML=h;}
 function cutAtCurrent(){let v=document.getElementById('editVid');let ct=kind==='video'?v.currentTime:(trimStart+trimEnd)/2;if(ct<=trimStart+0.3||ct>=trimEnd-0.3){toast('Naduvula Play panni Cut pannu');return;}clips=[{url:url,kind:kind,file:file},{url:url,kind:kind,file:file}];renderFilm();toast('Cut - 2 Clips');}
 function splitClip(){cutAtCurrent();}
 function deleteClip(){if(clips.length>1){clips.splice(0,1);renderFilm();updateTrimUI();toast('Clip Deleted');}else{removeText();toast('Deleted');}}
 function updateTrimUI(){let a=document.getElementById('trimInfo');if(a)a.innerText='Trim: '+fmt(trimStart)+' - '+fmt(trimEnd);let b=document.getElementById('clipInfo');if(b)b.innerText=clips.length+' Clip • '+fmt(trimEnd-trimStart);}
 function isFakeFile(f){let n=(f.name||'').toLowerCase();return n.match(/ai|generated|fake|unsplash|sample|demo|download|midjourney|dalle/)?true:false;}
-function addClip(f){if(!f)return;if(isFakeFile(f)){toast('Fake Photo');return;}let r=new FileReader();r.onload=ev=>{let k=f.type.includes('video')?'video':'image';let c={url:ev.target.result,kind:k,file:f};galleryPhotos.push(c);clips.push({url:c.url,kind:k,file:f});url=c.url;kind=k;file=f;saveCurMode();showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI();if(type==='reels')setupVideo(); if(type==='reels'||type==='story'){ setTimeout(()=>{ let cur=document.querySelector('.page.on')?.id; if(cur==='pageHome') goEdit(); },350); }};r.readAsDataURL(f);}
+
+// ✅ CORRECT - addClip - ObjectURL thaan da - DataURL Illa da!
+function addClip(f){if(!f)return;if(isFakeFile(f)){toast('Fake Photo');return;}let k=f.type.includes('video')?'video':'image';let objUrl=URL.createObjectURL(f);let c={url:objUrl,kind:k,file:f};galleryPhotos.push(c);clips.push({url:objUrl,kind:k,file:f});url=objUrl;kind=k;file=f;saveCurMode();showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderMedia();renderFilm();updatePreview();syncEditVideoUI();if(type==='reels')setupVideo(); if(type==='reels'||type==='story'){ setTimeout(()=>{ let cur=document.querySelector('.page.on')?.id; if(cur==='pageHome') goEdit(); },350); }}
 document.getElementById('file')?.addEventListener('change',e=>{addClip(e.target.files[0]);e.target.value='';});
-document.getElementById('fileMulti')?.addEventListener('change',e=>{Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';});
-document.getElementById('fileAdd')?.addEventListener('change',e=>{Array.from(e.target.files).forEach(f=>addClip(f));e.target.value='';toast('Reel Added');});
+document.getElementById('fileMulti')?.addEventListener('change',e=>{Array.from(e.target.files).slice(0,10).forEach(f=>addClip(f));e.target.value='';});
+document.getElementById('fileAdd')?.addEventListener('change',e=>{Array.from(e.target.files).slice(0,10).forEach(f=>addClip(f));e.target.value='';toast('Reel Added');});
 document.getElementById('fileSticker')?.addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{myStickers.push(ev.target.result);pickMySticker(ev.target.result);renderMyStickers();};r.readAsDataURL(f);e.target.value='';});
-document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{url=ev.target.result;kind=f.type.includes('video')?'video':'image';file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderFilm();syncEditVideoUI();};r.readAsDataURL(f);e.target.value='';});
+document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;url=URL.createObjectURL(f);kind=f.type.includes('video')?'video':'image';file=f;showMedia(document.getElementById('editImg'),document.getElementById('editVid'),url,kind);renderFilm();syncEditVideoUI();e.target.value='';});
 (function(){let pv=document.getElementById('galPreview'),st=document.getElementById('pvStage'),sx=0,sy=0,ox=0,oy=0,drag=false,ld=0;if(!pv)return;pv.addEventListener('touchstart',e=>{if(!url)return;st.classList.add('dragging');if(e.touches.length===1){drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;ox=panX;oy=panY;}if(e.touches.length===2){drag=false;ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}},{passive:true});pv.addEventListener('touchmove',e=>{if(!url)return;if(e.touches.length===1&&drag){panX=ox+(e.touches[0].clientX-sx);panY=oy+(e.touches[0].clientY-sy);applyZoom();}if(e.touches.length===2){let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(ld>0){zoom=Math.max(1,Math.min(3,zoom*(d/ld)));applyZoom();}ld=d;}},{passive:true});pv.addEventListener('touchend',()=>{drag=false;ld=0;st.classList.remove('dragging');});pv.addEventListener('dblclick',()=>{if(!url)return;fitVideoFullScreen();});})();
 (function(){let pill=document.getElementById('modePill');if(!pill)return;let sx=0,modes=['post','story','reels','live'];pill.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});pill.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40){let cur=modes.indexOf(type);if(dx<0&&cur<3)setMode(modes[cur+1]);if(dx>0&&cur>0)setMode(modes[cur-1]);}},{passive:true});})();
-// ✅ PIXORO FIX - Photo + Sticker + Text - Onna - Pazhaya mk + editPreview code eduthuten da
 (function(){
   let pv=document.getElementById('editPreview'); if(!pv) return;
   let mode=null, activeEl=null, isSt=false;
@@ -400,7 +404,7 @@ document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.ta
     }
   }, {passive:false});
   pv.addEventListener('touchend', function(e){
-    if(!mode) return; let wasMode=mode, wasEl=activeEl, wasSt=isSt; let hot=wasEl && wasEl.dataset.hot==='1';
+    if(!mode) return; let wasEl=activeEl, wasSt=isSt; let hot=wasEl && wasEl.dataset.hot==='1';
     mode=null; activeEl=null; d0=0; photoDist=0; hideGuide(); let dd=document.getElementById('dragDelete'); if(dd){ dd.classList.remove('show'); dd.classList.remove('hot'); }
     if(wasEl) wasEl.dataset.hot='';
     if(hot && wasEl){ if(wasSt){ wasEl.innerHTML=''; stickerImgUrl=''; activeStickers=[]; currentStickerData=null; } else { wasEl.innerHTML=''; text=''; } toast('Deleted'); }
@@ -409,20 +413,43 @@ document.getElementById('fileReplace')?.addEventListener('change',e=>{let f=e.ta
   pv.addEventListener('dblclick',()=>{ if(!url) return; fitVideoFullScreen(); });
 })();
 function getSupa(){return window.supa;}
+// ✅ CORRECT - Sticker - activeStickers la irunthu Edu da - stickerImgUrl mattum Paakka Koodathu da
 async function drawStickerOnCanvas(ctx,W,H){
-  if(!stickerImgUrl) return;
+  let src = stickerImgUrl || activeStickers[0]?.image_url || '';
+  if(!src) return;
   try{
     let el=document.getElementById('ovStick');
     let leftPct=50, topPct=55, sc=1, rot=0;
     if(el && el.style.left) leftPct=parseFloat(el.style.left)||50;
     if(el && el.style.top) topPct=parseFloat(el.style.top)||55;
     if(activeStickers[0]){ sc=activeStickers[0].scale||1; rot=activeStickers[0].rotation||0; }
-    await new Promise((res,rej)=>{
+    await new Promise((res)=>{
       let s=new Image(); s.crossOrigin='anonymous';
       s.onload=()=>{ let sw=W*0.22*sc, sh=sw; ctx.save(); ctx.translate(W*leftPct/100, H*topPct/100); ctx.rotate(rot*Math.PI/180); ctx.drawImage(s, -sw/2, -sh/2, sw, sh); ctx.restore(); res(); };
-      s.onerror=()=>res(); s.src=stickerImgUrl;
+      s.onerror=()=>res(); s.src=src;
     });
   }catch(e){}
+}
+// ✅ CORRECT - Puthu Helper - Compress da - 0.82 da
+async function makeCompressedBlob(){
+  return await new Promise(res=>{
+    let img = new Image();
+    img.onload = async ()=>{
+      let W=1080, H=(type==='reels'||type==='story') ? 1920 : 1350;
+      let cc = document.createElement('canvas'); cc.width=W; cc.height=H;
+      let ctx = cc.getContext('2d'); ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+      ctx.filter = buildFilter();
+      let sc = Math.max(W/img.width, H/img.height) * zoom;
+      let dw = img.width*sc, dh = img.height*sc;
+      ctx.drawImage(img, (W-dw)/2 + panX*2, (H-dh)/2 + panY*2, dw, dh);
+      ctx.filter='none';
+      if(text){ ctx.font='900 60px '+fontF; ctx.textAlign='center'; ctx.fillStyle=tfColor; ctx.fillText(text, W/2, H*0.35); }
+      await drawStickerOnCanvas(ctx,W,H);
+      cc.toBlob(b=>res(b||file), 'image/jpeg', 0.82);
+    };
+    img.onerror = ()=> res(file);
+    img.src = url;
+  });
 }
 async function shareStory(mode){
   if(!url || !file){ toast('Photo / Video Select Pannu'); return; }
@@ -433,14 +460,12 @@ async function shareStory(mode){
     let ME=session.user.email.split('@')[0];
     let blob=file;
     let stickersToSave=getStickersForSave();
-    if(kind!=='video'){
-      blob=await new Promise(res=>{ let img=new Image(); img.onload=async()=>{ let W=1080,H=1920; let cc=document.createElement('canvas'); cc.width=W; cc.height=H; let ctx=cc.getContext('2d'); ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H); ctx.filter=buildFilter(); let sc=Math.max(W/img.width,H/img.height)*zoom; let dw=img.width*sc,dh=img.height*sc; ctx.drawImage(img,(W-dw)/2+panX*2,(H-dh)/2+panY*2,dw,dh); ctx.filter='none'; if(text){ ctx.font='900 60px '+fontF; ctx.textAlign='center'; ctx.fillStyle=tfColor; ctx.fillText(text,W/2,H*0.35); } await drawStickerOnCanvas(ctx,W,H); cc.toBlob(b=>res(b||file),'image/jpeg',0.92); }; img.src=url; });
-    }
+    if(kind!=='video'){ blob = await makeCompressedBlob(); }
     let ext=kind==='video'?'mp4':'jpg'; let fn='stories/'+session.user.id+'/'+Date.now()+'.'+ext;
     let {error:upErr}=await supa.storage.from('stories').upload(fn,blob,{contentType:kind==='video'?'video/mp4':'image/jpeg'});
     if(upErr) throw new Error('Storage: '+upErr.message);
     let {data:ud}=supa.storage.from('stories').getPublicUrl(fn);
-    let {data:inserted,error}=await supa.from('stories').insert({ user_id:session.user.id, username:ME, media_url:ud.publicUrl, media_type:kind, caption:captionVal||document.getElementById('storyCap')?.value||'', song:song, stickers:stickersToSave, privacy: mode==='close' ? 'Close Friends' : 'Everyone', expires_at: new Date(Date.now()+24*60*60*1000).toISOString() }).select().single();
+    let {data:inserted, error} = await supa.from('stories').insert({ user_id:session.user.id, username:ME, media_url:ud.publicUrl, media_type:kind, caption:captionVal||document.getElementById('storyCap')?.value||'', song:song, stickers:stickersToSave, privacy: mode==='close' ? 'Close Friends' : 'Everyone', expires_at: new Date(Date.now()+24*60*60*1000).toISOString() }).select().single();
     if(error) throw new Error(error.message);
     toast('Story Uploaded - Sticker Save Aachu!'); uploading=false; setTimeout(()=>location.href='./index.html',1000);
   }catch(e){ uploading=false; toast('Story Error: '+e.message); }
@@ -452,7 +477,7 @@ async function saveToServer(isDraft){
   let blob;
   let stickersToSave=getStickersForSave();
   if(kind==='video'){blob=file;}
-  else{blob=await new Promise(res=>{let img=new Image();img.onload=async()=>{let W=1080,H=type==='reels'?1920:1350;let cc=document.createElement('canvas');cc.width=W;cc.height=H;let ctx=cc.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.filter=buildFilter();let sc=Math.max(W/img.width,H/img.height)*zoom;let dw=img.width*sc,dh=img.height*sc;ctx.drawImage(img,(W-dw)/2+panX*2,(H-dh)/2+panY*2,dw,dh);ctx.filter='none';if(text){ctx.font='900 60px '+fontF;ctx.textAlign='center';ctx.fillStyle=tfColor;ctx.fillText(text,W/2,H*0.35);}await drawStickerOnCanvas(ctx,W,H);cc.toBlob(b=>res(b||file),'image/jpeg',0.92);};img.src=url;});}
+  else{blob=await makeCompressedBlob();}
   let folder=type==='story'?'stories':type==='reels'?'reels':'posts';
   let ext=kind==='video'?'mp4':'jpg';
   let fn=folder+'/'+session.user.id+'/'+Date.now()+(isDraft?'-draft':'')+'.'+ext;
