@@ -1,4 +1,4 @@
-// ===== PIXORO LIKE - FINAL CORRECTED DA =====
+// ===== PIXORO LIKE - FINAL CORRECTED DA - DB FIRST DA =====
 console.log('✅ LIKE FILE LOADED DA');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
@@ -85,6 +85,15 @@ function pixoroBumpCount(postId, delta){
   }
 }
 
+// ✅ POSTS TABLE LA COUNT AH UPDATE PANNU DA - Trigger Illana kooda Velai Seiyum da
+async function pixoroSyncPostCount(s, postId, delta){
+  try{
+    let { data: p } = await s.from('posts').select('likes_count').eq('id', postId).single();
+    let cur = (p && p.likes_count) || 0;
+    await s.from('posts').update({ likes_count: Math.max(0, cur + delta) }).eq('id', postId);
+  }catch(e){ console.log('COUNT SYNC FAIL DA:', e.message); }
+}
+
 async function pixoroToggleLike(postId, btn){
   let now = Date.now();
   if(now - _lastLikeAction < 300) return;
@@ -92,9 +101,6 @@ async function pixoroToggleLike(postId, btn){
   if(!btn) btn = document.querySelector(`[data-like-btn="${postId}"]`);
   if(!btn) return;
   let willLike = !btn.classList.contains('liked');
-  pixoroPaintLikeBtn(btn, willLike);
-  pixoroBumpCount(postId, willLike ? 1 : -1);
-  if(window.FEED_LIKES){ willLike ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId)); }
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return willLike;
   if(!window.ME_ID){
     try{
@@ -111,13 +117,14 @@ async function pixoroToggleLike(postId, btn){
       let r = await s.from('likes').delete().eq('post_id',postId).eq('user_id',window.ME_ID);
       if(r.error) throw r.error;
     }
+    // ✅ DB Success da - Ippo thaan UI Maathu da
+    pixoroPaintLikeBtn(btn, willLike);
+    pixoroBumpCount(postId, willLike ? 1 : -1);
+    if(window.FEED_LIKES){ willLike ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId)); }
+    pixoroSyncPostCount(s, postId, willLike ? 1 : -1);
     return willLike;
   }catch(e){
     console.log('❌ LIKE DB FAIL DA:', e.message);
-    // DB Fail na UI ah thirumba maathu da
-    pixoroPaintLikeBtn(btn, !willLike);
-    pixoroBumpCount(postId, willLike ? -1 : 1);
-    if(window.FEED_LIKES){ willLike ? window.FEED_LIKES.delete(String(postId)) : window.FEED_LIKES.add(String(postId)); }
     return !willLike;
   }
 }
@@ -127,9 +134,6 @@ async function pixoroDoubleTapLike(postId, mediaEl){
   let btn = document.querySelector(`[data-like-btn="${postId}"]`);
   if(btn && btn.classList.contains('liked')) return true;
   if(window.FEED_LIKES && window.FEED_LIKES.has(String(postId))) return true;
-  if(btn) pixoroPaintLikeBtn(btn, true);
-  pixoroBumpCount(postId, 1);
-  if(window.FEED_LIKES) window.FEED_LIKES.add(String(postId));
   _lastLikeAction = Date.now();
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return true;
   if(!window.ME_ID){
@@ -142,6 +146,10 @@ async function pixoroDoubleTapLike(postId, mediaEl){
   try{
     let r = await s.from('likes').insert({post_id:postId, user_id:window.ME_ID});
     if(r.error && String(r.error.code) !== '23505') throw r.error;
+    if(btn) pixoroPaintLikeBtn(btn, true);
+    pixoroBumpCount(postId, 1);
+    if(window.FEED_LIKES) window.FEED_LIKES.add(String(postId));
+    pixoroSyncPostCount(s, postId, 1);
     return true;
   }catch(e){
     console.log('❌ DOUBLE TAP DB FAIL DA:', e.message);
@@ -167,7 +175,6 @@ function showBigHeart(mediaEl){
   setTimeout(()=>div.remove(), 600);
 }
 
-// ✅ SINGLE HANDLER MATTUM DA - Double Toggle Varaathu da
 if(!window._pixoroLikeDelegation){
   window._pixoroLikeDelegation = true;
   document.addEventListener('click', function(e){
@@ -192,6 +199,5 @@ if(document.readyState === 'loading'){
 } else {
   pixoroLoadMyLikes();
 }
-// Feed Render aana aprom thirumba paint pannu da
 window.addEventListener('pixoroFeedLoaded', ()=> setTimeout(()=> pixoroPaintAllLikes(), 50));
 setTimeout(()=> pixoroPaintAllLikes(), 1500);
