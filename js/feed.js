@@ -1,4 +1,4 @@
-// ===== PIXORO FEED - v1046 - THANI CODE DA - LIKE AH THODATHE DA =====
+// ===== PIXORO FEED - v1.0 - THANI CODE DA - LIKE AH THODATHE DA =====
 // RULE: Feed mattum thaan da - Like Pathi Onnum Illa da - like.js la mattum thaan da
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
@@ -117,7 +117,7 @@ function renderFeedList(){
       ${mediaHtml}
       <div class="actions">
         <div class="left" style="display:flex;gap:14px;align-items:center">
-          <button data-like-btn="${p.id}" class="act ${liked}" onclick="pixoroToggleLike('${p.id}',this)" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke-width:1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span data-like-count="${p.id}">${cnt.like}</span></button>
+          <button data-like-btn="${p.id}" class="act ${liked}" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke-width:1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span data-like-count="${p.id}">${cnt.like}</span></button>
           <button class="act" onclick="openComment('${p.id}')" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span data-comment-count="${p.id}">${cnt.comment}</span></button>
           <button class="act" onclick="sharePost('${p.id}')" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff"><svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 22 15 22 11 13 2 9 22 2"/></svg><span data-share-count="${p.id}">${cnt.share}</span></button>
         </div>
@@ -137,7 +137,6 @@ function renderFeedList(){
   hideMyFollow();
   if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
   hideMyFollow();
-  // ✅ FIX - Feed Mudinjathum - Like ah Koopidu da - Observer Illa da - Ithu thaan Thani Code da
   if(window.pixoroPaintAllLikes) window.pixoroPaintAllLikes();
 }
 
