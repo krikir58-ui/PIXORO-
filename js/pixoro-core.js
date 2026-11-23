@@ -1,6 +1,5 @@
-// ===== PIXORO CORE - CORRECTED v1011 - TOP NOTE KEELA + CLOSE BTN + SAFE DA - FULL =====
+// ===== PIXORO CORE - v1.0 - TOP NOTE KEELA + CLOSE BTN + SAFE DA - FULL =====
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
-// ✅ UN KEY AH INGA PODU DA - PAZHAYA KEY AH APDIYE VACHIDU DA
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 window.PIXORO_URL = SUPA_URL;
 window.PIXORO_KEY = SUPA_KEY;
@@ -202,23 +201,18 @@ function pixoroReelSetup(videoEl, postId, userId){
       let h = document.createElement('div'); h.innerText='❤️';
       h.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:90px;z-index:99';
       videoEl.parentElement.appendChild(h); setTimeout(()=>h.remove(),600);
-      // ✅ CORRECTED - Core la Like Illa da - like.js ku Anuppu da
-      if(window.pixoroDoubleTapLike) window.pixoroDoubleTapLike(postId, videoEl.parentElement);
-      else if(window.pixoroToggleLike){ let btn = document.querySelector(`[data-like-btn="${postId}"]`); window.pixoroToggleLike(postId, btn); }
+      // ✅ FIX - Core Like ah Thodave Koodathu da - like.js ku Vidru da
+      if(window.pixoroFeedTap) window.pixoroFeedTap(postId, videoEl.parentElement, null);
+      else if(window.pixoroDoubleTapLike) window.pixoroDoubleTapLike(postId, videoEl.parentElement);
     }
     lastTap = now;
   });
 }
 async function pixoroSendNotification(toUserId, type, postId, message){ return; }
 window.pixoroSendNotification = pixoroSendNotification;
-// ✅ CORRECTED - CORE la LIKE Illa da - like.js thaan Owner da - Inga Like Function ye Illa da
-// Reels / Vera Edathula irunthu pixoroLike nu Koopta - like.js ku Anuppidu da - Overwrite Panna Koodathu da
-window.pixoroLike = function(postId){
-  if(window.pixoroDoubleTapLike) return window.pixoroDoubleTapLike(postId, null);
-  if(window.pixoroToggleLike){ let btn = document.querySelector(`[data-like-btn="${postId}"]`); return window.pixoroToggleLike(postId, btn); }
-  return Promise.resolve(true);
-};
-// ❌ window.pixoroToggleLike INGA ILLA DA - like.js la mattum thaan da
+// ✅ FIX - CORE la LIKE Illa da - like.js thaan Owner da
+// window.pixoroLike INGA ILLA DA - Thookiten da
+// window.pixoroToggleLike INGA ILLA DA - Thookiten da
 async function pixoroSave(postId, userId){
   await pixoroFixMe();
   if(!pixoroIsUuid(window.ME_ID) || !pixoroIsUuid(postId)) return;
@@ -440,7 +434,7 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
-console.log('PIXORO CORE v1011 - TOP NOTE KEELA + CLOSE BTN DA');
+console.log('PIXORO CORE v1.0 - TOP NOTE KEELA + CLOSE BTN DA');
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
