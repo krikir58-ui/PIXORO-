@@ -1,8 +1,12 @@
-// follow.js - Public ID vs Private ID + Global Sync - Instagram Mari da
-import { supabase } from './supabase.js'
+// ===== PIXORO FOLLOW - THANI FILE DA =====
+// RULE: Follow = Server la mattum thaan da - LocalStorage la Follow Illa da
+//       Public = Direct Follow da - Private = Request da
+//       Import / Export Illa da - Plain Script da - index.html la <script> nu Load Aagum da
+
+function getFollowSupa(){ return window.getSupa ? window.getSupa() : window.supa; }
 
 // Username vantha ID ah Maathura Function da
-export function resolveFollowUserId(uid){
+function resolveFollowUserId(uid){
   if(!uid) return null;
   uid = String(uid);
   if(uid.includes('-') && uid.length > 20) return uid;
@@ -17,19 +21,18 @@ export function resolveFollowUserId(uid){
 }
 
 // Ella Page layum Button ah Maathura Function da - Follow / Following / Requested
-export function syncAllFollowButtons(targetId, state){
-  // state = 'following' | 'follow' | 'requested'
+function syncAllFollowButtons(targetId, state){
   targetId = String(targetId);
-  let txt = state==='following' ? 'Following ✓' : state==='requested' ? 'Requested' : 'Follow';
+  let txt = state==='following' ? 'Following' : state==='requested' ? 'Requested' : 'Follow';
   document.querySelectorAll('[data-follow-user]').forEach(btn=>{
-    if(String(btn.dataset.followUser)===targetId){
-      btn.innerText = btn.id==='followBtnMain' ? (state==='following' ? 'Following' : state==='requested' ? 'Requested' : 'Follow') : txt;
+    let bid = String(btn.dataset.followUser||'');
+    if(bid===targetId || String(resolveFollowUserId(bid)||bid)===targetId){
+      btn.innerText = btn.id==='followBtnMain' ? txt : txt;
       btn.classList.toggle('following', state==='following');
       btn.classList.toggle('requested', state==='requested');
       btn.dataset.followState = state;
     }
   });
-  // Pazhaya Button kum
   document.querySelectorAll('.followBtnPost, .followBtnPerusa, [id^="followBtn-"]').forEach(btn=>{
     let bid = btn.dataset.followUser;
     if(!bid){
@@ -46,7 +49,7 @@ export function syncAllFollowButtons(targetId, state){
   });
 }
 
-export function broadcastFollow(targetId, state){
+function broadcastFollow(targetId, state){
   targetId = String(targetId);
   syncAllFollowButtons(targetId, state);
   try{
@@ -65,30 +68,26 @@ window.addEventListener('pixoroFollowChanged', (e)=>{
 });
 
 // MAIN - Follow pannumbothu check pannum - Public vs Private da
-export async function followUser(currentUserId, targetUserId){
+async function followUser(currentUserId, targetUserId){
+  let supabase = getFollowSupa(); if(!supabase) return {status:'follow'};
   targetUserId = resolveFollowUserId(targetUserId) || String(targetUserId);
   currentUserId = String(currentUserId);
 
-  // 1. Already Following ah nu Check Pannu da
   let {data: alreadyFollow} = await supabase.from('follows').select('*').eq('follower_id', currentUserId).eq('following_id', targetUserId).maybeSingle();
   if(alreadyFollow) return { status: 'following' };
 
-  // 2. Already Requested ah nu Check Pannu da
   let {data: alreadyReq} = await supabase.from('follow_requests').select('*').eq('from_id', currentUserId).eq('to_id', targetUserId).eq('status','pending').maybeSingle();
   if(alreadyReq) return { status: 'requested' };
 
-  // 3. Target Private ah nu Check Pannu da
   let {data: target} = await supabase.from('profiles').select('is_private_account').eq('id', targetUserId).single();
   let isPrivate = target && target.is_private_account === true;
 
   if(isPrivate){
-    // PRIVATE ID - Request anuppanum da
     let {error} = await supabase.from('follow_requests').insert({ from_id: currentUserId, to_id: targetUserId, status: 'pending' });
     if(error && error.code!=='23505') throw error;
     broadcastFollow(targetUserId, 'requested');
     return { status: 'requested' };
   } else {
-    // PUBLIC ID - Direct follow da
     let {error} = await supabase.from('follows').insert({ follower_id: currentUserId, following_id: targetUserId });
     if(error && error.code!=='23505') throw error;
     if(window.allFollows) window.allFollows.push({follower_id: currentUserId, following_id: targetUserId});
@@ -98,12 +97,23 @@ export async function followUser(currentUserId, targetUserId){
 }
 
 // Unfollow / Cancel Request / Toggle - Ella Page layum Itha than Use Pannanum da
-export async function pixoroToggleFollow(rawId){
+// ✅ FIX - Feed la irunthu (username, btn) nu Varum da - 2 Param ah Yum Vaangiten da
+async function pixoroToggleFollow(rawId, btn){
+  let supabase = getFollowSupa(); if(!supabase) return null;
   let targetId = resolveFollowUserId(rawId) || String(rawId);
-  let me = window.ME_ID || (await supabase.auth.getSession()).data.session?.user?.id;
+  // ✅ Username ah iruntha - Server la irunthu ID ah Edu da
+  if(!targetId.includes('-')){
+    try{
+      let {data:p} = await supabase.from('profiles').select('id').ilike('username', String(rawId).replace('@','')).maybeSingle();
+      if(p) targetId = String(p.id);
+    }catch(e){}
+  }
+  let me = window.ME_ID;
+  if(!me){
+    try{ let {data:{session}} = await supabase.auth.getSession(); me = session?.user?.id; window.ME_ID = me; }catch(e){}
+  }
   if(!targetId || String(targetId)===String(me)) return null;
 
-  // 1. Following ah Irundha - Unfollow Pannu da
   let {data: isF} = await supabase.from('follows').select('*').eq('follower_id', me).eq('following_id', targetId).maybeSingle();
   if(isF){
     await supabase.from('follows').delete().eq('follower_id', me).eq('following_id', targetId);
@@ -112,7 +122,6 @@ export async function pixoroToggleFollow(rawId){
     return { status: 'follow' };
   }
 
-  // 2. Requested ah Irundha - Request ah Cancel Pannu da
   let {data: isR} = await supabase.from('follow_requests').select('*').eq('from_id', me).eq('to_id', targetId).eq('status','pending').maybeSingle();
   if(isR){
     await supabase.from('follow_requests').delete().eq('from_id', me).eq('to_id', targetId);
@@ -120,13 +129,13 @@ export async function pixoroToggleFollow(rawId){
     return { status: 'follow' };
   }
 
-  // 3. Illana - Follow / Request Pannu da
   let res = await followUser(me, targetId);
   return res;
 }
 
 // Private ID request Accept / Decline da
-export async function handleFollowRequest(requestId, action){
+async function handleFollowRequest(requestId, action){
+  let supabase = getFollowSupa(); if(!supabase) return;
   let {data: req} = await supabase.from('follow_requests').select('*').eq('id', requestId).single();
   if(!req) return;
   if(action === 'accept'){
@@ -138,7 +147,6 @@ export async function handleFollowRequest(requestId, action){
   }
 }
 
-// Pazhaya Function Names - HTML la onclick la Use Pannura Function da
 window.resolveFollowUserId = resolveFollowUserId;
 window.syncAllFollowButtons = syncAllFollowButtons;
 window.broadcastFollow = broadcastFollow;
@@ -147,7 +155,7 @@ window.followUser = followUser;
 window.handleFollowRequest = handleFollowRequest;
 
 window.toggleFollow = async function(otherId, btn){
-  let r = await pixoroToggleFollow(otherId);
+  let r = await pixoroToggleFollow(otherId, btn);
   if(!r) return;
   if(window.showToast) showToast(r.status==='following' ? 'Followed da 🔥' : r.status==='requested' ? 'Request Sent da 🔒' : 'Unfollowed da 😴');
   if(window.feedMode==='following' && typeof renderFeed==='function') renderFeed();
@@ -166,4 +174,23 @@ window.toggleFollowMain = async function(){
     fc.innerText = parseInt(fc.innerText||'0')+1;
   }
   if(window.showToast) showToast(r.status==='following' ? 'Followed da 🔥' : r.status==='requested' ? 'Request Sent da 🔒' : 'Unfollowed da 😴');
+};
+
+// ✅ Feed ku - Username la irunthu Following ah nu Check pannu da
+window.pixoroIsFollowing = function(uname){
+  if(!uname) return false;
+  let id = resolveFollowUserId(uname);
+  if(window.allFollows && id) return window.allFollows.some(f=>String(f.following_id)===String(id));
+  return false;
+};
+window.pixoroLoadFollowing = async function(){
+  let supabase = getFollowSupa(); if(!supabase || !window.ME_ID) return;
+  try{
+    let {data} = await supabase.from('follows').select('following_id').eq('follower_id', window.ME_ID);
+    window.allFollows = data||[];
+    if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
+  }catch(e){}
+};
+window.pixoroPaintAllFollowBtns = function(){
+  // Feed Render pannumbothu thaan Paint aagum da - Ithu Extra Sync mattum da
 };
