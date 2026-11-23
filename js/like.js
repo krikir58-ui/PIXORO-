@@ -1,6 +1,6 @@
 // ===== PIXORO LIKE - THANI CODE DA =====
 // RULE: Like = INGA MATTUM THAAN DA
-//       Double Tap = Like ONLY + 3 Hearts da
+//       Double Tap = Like ONLY + 1 Heart Naduvula da
 //       Button = Like / Unlike da
 //       Save = Server la mattum thaan da - LocalStorage Illa da
 //       Alert KIDAIYAATHU da - Silent da!
@@ -36,7 +36,7 @@ window.pixoroFeedTap = function(postId, el, ev){
   s.innerText = `
     [data-like-btn] svg, [data-like-btn] svg path{ fill:none !important; stroke:#fff !important; }
     [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
-    .bigHeart{ position:absolute !important; z-index:99 !important; pointer-events:none !important; opacity:0 !important; transform:translate(-50%,-50%) scale(0) !important; }
+    .bigHeart{ position:absolute !important; left:50% !important; top:50% !important; z-index:99 !important; pointer-events:none !important; opacity:0 !important; transform:translate(-50%,-50%) scale(0) !important; }
     .bigHeart.show{ opacity:1 !important; transform:translate(-50%,-50%) scale(1.1) !important; animation:pixLikeFly 1s ease forwards !important; }
     .bigHeart svg{ width:100% !important; height:100% !important; filter:drop-shadow(0 4px 12px rgba(0,0,0,.5)) !important; }
     @keyframes pixLikeFly{ 0%{opacity:0; transform:translate(-50%,-50%) scale(0)} 20%{opacity:1; transform:translate(-50%,-50%) scale(1.25)} 70%{opacity:1; transform:translate(-50%,-60%) scale(1)} 100%{opacity:0; transform:translate(-50%,-120%) scale(.9)} }
@@ -67,7 +67,6 @@ function pixoroPaintAllLikes(){
   });
 }
 
-// 🔥 FIX - Puthu Set Vendaam da - Same Set la Add mattum da - Clear Panna Koodathu da!
 async function pixoroLoadMyLikes(){
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
   try{
@@ -77,7 +76,6 @@ async function pixoroLoadMyLikes(){
     let {data, error} = await s.from('likes').select('post_id').eq('user_id', window.ME_ID);
     if(error) throw error;
     if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
-    // ✅ Add mattum da - Clear Illa da - Feed.js Set um Same thaan da!
     (data||[]).forEach(r=> window.FEED_LIKES.add(String(r.post_id)));
     pixoroPaintAllLikes();
     console.log('✅ MY LIKES LOADED DA:', window.FEED_LIKES.size);
@@ -101,7 +99,6 @@ async function pixoroSyncRealCount(postId){
 
 // BUTTON = Like / Unlike da!
 async function pixoroToggleLike(postId, btn){
-  // 🔥 FIX - Flicker Stop da - 500ms kulla 2nd Click ah Ignore pannu da!
   let now = Date.now();
   if(now - _lastLikeAction < 500) return;
   _lastLikeAction = now;
@@ -150,7 +147,7 @@ async function pixoroDoubleTapLike(postId, mediaEl){
   if(window.FEED_LIKES && window.FEED_LIKES.has(String(postId))) return true;
   if(btn) pixoroPaintLikeBtn(btn, true);
   if(window.FEED_LIKES) window.FEED_LIKES.add(String(postId));
-  _lastLikeAction = Date.now(); // 🔥 FIX - Click Handler ah Block pannu da - 2 Thadava Toggle Aagathu da!
+  _lastLikeAction = Date.now();
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return true;
   if(!window.ME_ID){
     try{
@@ -177,27 +174,18 @@ async function pixoroDoubleTapLike(postId, mediaEl){
   }
 }
 
+// ✅ FIX - DOUBLE TAP PANNINA - NADUVULA 1 HEART MATTUM DA - 3 HEART ILLA DA!
 function showBigHeart(mediaEl){
   if(!mediaEl) return;
   mediaEl.querySelectorAll('.bigHeart').forEach(h=>h.remove());
-  let spots = [
-    { left:'50%', top:'52%', size:95, delay:0 },
-    { left:'36%', top:'60%', size:60, delay:130 },
-    { left:'65%', top:'58%', size:56, delay:260 },
-  ];
-  spots.forEach((sp)=>{
-    setTimeout(()=>{
-      let div = document.createElement('div');
-      div.className = 'bigHeart';
-      div.style.left = sp.left; div.style.top = sp.top;
-      div.style.width = sp.size + 'px'; div.style.height = sp.size + 'px';
-      div.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
-      mediaEl.appendChild(div);
-      void div.offsetWidth;
-      div.classList.add('show');
-      setTimeout(()=>div.remove(), 1050);
-    }, sp.delay);
-  });
+  let div = document.createElement('div');
+  div.className = 'bigHeart';
+  div.style.width = '95px'; div.style.height = '95px';
+  div.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  mediaEl.appendChild(div);
+  void div.offsetWidth;
+  div.classList.add('show');
+  setTimeout(()=>div.remove(), 1050);
 }
 
 if(!window._pixoroLikeDelegation){
@@ -221,6 +209,5 @@ window.pixoroPaintLikeBtn = pixoroPaintLikeBtn;
 window.pixoroPaintAllLikes = pixoroPaintAllLikes;
 window.pixoroLoadMyLikes = pixoroLoadMyLikes;
 
-// 🔥 FIX - PAGE LOAD AANA ODANE - SERVER LA IRUNTHU LIKE AH EDUTHU VA DA!
-pixoroLoadMyLikes();
-setTimeout(pixoroLoadMyLikes, 1000);
+// ✅ OPEN PANNINA WHITE AH IRUKKANUM DA - AUTO LOAD VENDAAM DA - NE SONNA MARI DA!
+// pixoroLoadMyLikes() - Itha Call Panna Koodathu da - Open pannave Red aayidum da!
