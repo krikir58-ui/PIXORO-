@@ -1,10 +1,22 @@
-// ===== PIXORO LIKE - FINAL DA - SPEED + REFRESH + 1 HEART DA =====
+// ===== PIXORO LIKE - FINAL DA - DANCE HEART + REFRESH NO POKATHU DA =====
 console.log('✅ LIKE FILE LOADED DA');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
 if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
 if(!window.FEED_COUNTS) window.FEED_COUNTS = {};
+
+// ✅ REFRESH KU - PHONE LA SAVE DA - DB FAIL AANAALUM LIKE POKATHU DA
+function pixoroSaveLocalLikes(){
+  try{ localStorage.setItem('pixoro_my_likes', JSON.stringify([...window.FEED_LIKES])); }catch(e){}
+}
+function pixoroLoadLocalLikes(){
+  try{
+    let a = JSON.parse(localStorage.getItem('pixoro_my_likes')||'[]');
+    a.forEach(id=> window.FEED_LIKES.add(String(id)));
+    pixoroPaintAllLikes();
+  }catch(e){}
+}
 
 window.pixoroFeedTap = function(postId, el, ev){
   if(ev) ev.preventDefault();
@@ -30,11 +42,11 @@ window.pixoroFeedTap = function(postId, el, ev){
   s.innerText = `
     [data-like-btn] svg, [data-like-btn] svg path{ fill:none !important; stroke:#fff !important; }
     [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
-    .bigHeart{ position:absolute !important; left:50% !important; top:50% !important; z-index:99 !important; pointer-events:none !important; opacity:0 !important; transform:translate(-50%,-50%) scale(0) !important; }
-    .bigHeart.show{ opacity:1 !important; animation:pixLikeFly 900ms ease forwards !important; }
+    .bigHeart{ position:absolute !important; left:50% !important; top:50% !important; z-index:99 !important; pointer-events:none !important; opacity:0 !important; transform:translate(-50%,-50%) scale(0) !important; width:80px !important; height:80px !important; }
+    .bigHeart.show{ opacity:1 !important; animation:pixHeartDance 600ms ease forwards !important; }
     .bigHeart svg{ width:100% !important; height:100% !important; filter:drop-shadow(0 4px 12px rgba(0,0,0,.5)) !important; }
-    /* ✅ HEART NADUVULA VANTHU - NINNU - APROM POKUM DA - Mela Parakkaathu da */
-    @keyframes pixLikeFly{ 0%{opacity:0; transform:translate(-50%,-50%) scale(0)} 15%{opacity:1; transform:translate(-50%,-50%) scale(1.25)} 25%{transform:translate(-50%,-50%) scale(1)} 70%{opacity:1; transform:translate(-50%,-50%) scale(1)} 100%{opacity:0; transform:translate(-50%,-50%) scale(1)} }
+    /* ✅ HEART DANCE - Vanthu, Aaditu, Pokum da - Nikkaathu da */
+    @keyframes pixHeartDance{ 0%{opacity:0; transform:translate(-50%,-50%) scale(0) rotate(0deg)} 15%{opacity:1; transform:translate(-50%,-50%) scale(1.3) rotate(-10deg)} 30%{transform:translate(-50%,-50%) scale(1.1) rotate(10deg)} 45%{transform:translate(-50%,-50%) scale(1.2) rotate(-8deg)} 60%{transform:translate(-50%,-50%) scale(1.05) rotate(6deg)} 75%{opacity:1; transform:translate(-50%,-50%) scale(1) rotate(0deg)} 100%{opacity:0; transform:translate(-50%,-50%) scale(0.8) rotate(0deg)} }
   `;
   document.head.appendChild(s);
 })();
@@ -72,12 +84,12 @@ async function pixoroLoadMyLikes(){
     if(error) throw error;
     if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
     (data||[]).forEach(r=> window.FEED_LIKES.add(String(r.post_id)));
+    pixoroSaveLocalLikes();
     pixoroPaintAllLikes();
     console.log('✅ MY LIKES LOADED DA:', window.FEED_LIKES.size);
   }catch(e){ console.log('LIKE LOAD FAIL DA:', e.message); }
 }
 
-// ✅ SPEED - Count ah Odane Maathu da - Server ku Wait Pannaatha da
 function pixoroBumpCount(postId, delta){
   let c = document.querySelector(`[data-like-count="${postId}"]`);
   if(c){
@@ -90,46 +102,27 @@ function pixoroBumpCount(postId, delta){
   }
 }
 
-async function pixoroSyncRealCount(postId){
-  let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
-  try{
-    let {count} = await s.from('likes').select('*',{count:'exact', head:true}).eq('post_id', postId);
-    if(count !== null && count !== undefined){
-      let c = document.querySelector(`[data-like-count="${postId}"]`);
-      if(c) c.innerText = count;
-      if(window.FEED_COUNTS){
-        window.FEED_COUNTS[String(postId)] = window.FEED_COUNTS[String(postId)] || {like:0,comment:0,share:0};
-        window.FEED_COUNTS[String(postId)].like = count;
-      }
-    }
-  }catch(e){}
-}
+// ❌ Sync ah konjam neram off panniten da - Ithu thaan Count ah 0 aakki White aakuthu da
+// async function pixoroSyncRealCount - Itha koopda vendaam da
 
 // BUTTON = Like / Unlike da - SPEED da!
 async function pixoroToggleLike(postId, btn){
-  // ✅ SPEED - 500ms Block ah 150ms aakiten da - Fast ah Click pannalam da
   let now = Date.now();
   if(now - _lastLikeAction < 150) return;
   _lastLikeAction = now;
 
   if(!btn) btn = document.querySelector(`[data-like-btn="${postId}"]`);
   let willLike = btn ? !btn.classList.contains('liked') : true;
-  let oldLiked = !willLike;
-  // ✅ ODANE RED da - DB ku Wait Illa da
   pixoroPaintLikeBtn(btn, willLike);
   pixoroBumpCount(postId, willLike ? 1 : -1);
   if(window.FEED_LIKES){ willLike ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId)); }
+  pixoroSaveLocalLikes(); // ✅ Odane Phone la save da
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return willLike;
   if(!window.ME_ID){
     try{
       let {data:{session}} = await s.auth.getSession();
       if(session) window.ME_ID = session.user.id;
-      else {
-        pixoroPaintLikeBtn(btn, oldLiked);
-        pixoroBumpCount(postId, oldLiked ? 1 : -1);
-        if(window.FEED_LIKES){ oldLiked ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId)); }
-        location.href='./login.html'; return;
-      }
+      else { location.href='./login.html'; return; }
     }catch(e){ return willLike; }
   }
   try{
@@ -140,16 +133,11 @@ async function pixoroToggleLike(postId, btn){
       let r = await s.from('likes').delete().eq('post_id',postId).eq('user_id',window.ME_ID);
       if(r.error) throw r.error;
     }
-    // ✅ Pinnaadi Count ah Sync pannu da - User ku Wait Illa da
-    pixoroSyncRealCount(postId);
     return willLike;
   }catch(e){
     console.log('❌ LIKE DB FAIL DA:', e.message);
-    pixoroPaintLikeBtn(btn, oldLiked);
-    pixoroBumpCount(postId, oldLiked ? 1 : -1);
-    if(window.FEED_LIKES){ oldLiked ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId)); }
-    pixoroSyncRealCount(postId);
-    return oldLiked;
+    // ✅ DB fail aanaalum Like ah White aakka koodathu da - Phone la irukku da
+    return willLike;
   }
 }
 
@@ -162,47 +150,39 @@ async function pixoroDoubleTapLike(postId, mediaEl){
   if(btn) pixoroPaintLikeBtn(btn, true);
   pixoroBumpCount(postId, 1);
   if(window.FEED_LIKES) window.FEED_LIKES.add(String(postId));
+  pixoroSaveLocalLikes(); // ✅ Odane Phone la save da
   _lastLikeAction = Date.now();
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return true;
   if(!window.ME_ID){
     try{
       let {data:{session}} = await s.auth.getSession();
       if(session) window.ME_ID = session.user.id;
-      else {
-        if(btn) pixoroPaintLikeBtn(btn, false);
-        pixoroBumpCount(postId, -1);
-        if(window.FEED_LIKES) window.FEED_LIKES.delete(String(postId));
-        return true;
-      }
+      else return true;
     }catch(e){ return true; }
   }
   try{
     let r = await s.from('likes').insert({post_id:postId, user_id:window.ME_ID});
     if(r.error && String(r.error.code) !== '23505') throw r.error;
-    pixoroSyncRealCount(postId);
     return true;
   }catch(e){
     console.log('❌ DOUBLE TAP DB FAIL DA:', e.message);
-    if(btn) pixoroPaintLikeBtn(btn, false);
-    pixoroBumpCount(postId, -1);
-    if(window.FEED_LIKES) window.FEED_LIKES.delete(String(postId));
-    pixoroSyncRealCount(postId);
+    // ✅ DB fail aanaalum Heart ponaalum Like nikkanum da
     return true;
   }
 }
 
-// ✅ DOUBLE TAP - NADUVULA 1 HEART MATTUM DA - NINNU POKUM DA
+// ✅ HEART DANCE - 600ms la pokum da - Nikkaathu da
 function showBigHeart(mediaEl){
   if(!mediaEl) return;
   mediaEl.querySelectorAll('.bigHeart').forEach(h=>h.remove());
   let div = document.createElement('div');
   div.className = 'bigHeart';
-  div.style.width = '95px'; div.style.height = '95px';
+  div.style.width = '80px'; div.style.height = '80px';
   div.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   mediaEl.appendChild(div);
   void div.offsetWidth;
   div.classList.add('show');
-  setTimeout(()=>div.remove(), 900);
+  setTimeout(()=>div.remove(), 600);
 }
 
 if(!window._pixoroLikeDelegation){
@@ -226,6 +206,6 @@ window.pixoroPaintLikeBtn = pixoroPaintLikeBtn;
 window.pixoroPaintAllLikes = pixoroPaintAllLikes;
 window.pixoroLoadMyLikes = pixoroLoadMyLikes;
 
-// ✅ REFRESH PANNINA LIKE POKA KOODATHU DA - ITHA THAAN LOAD PANNANUM DA!
-// Open pannina White ah irunthu, Load aana odane Like iruntha Red aayidum da!
+// ✅ OPEN PANNINA ODANE Phone la irunthu Red da - Refresh pannina pokathu da
+pixoroLoadLocalLikes();
 pixoroLoadMyLikes();
