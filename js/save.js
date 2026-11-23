@@ -1,4 +1,4 @@
-// ===== PIXORO SAVE - v1040 - THANI FILE DA - WHITE ONLY DA =====
+// ===== PIXORO SAVE - THANI FILE DA - WHITE ONLY DA =====
 // RULE: Save panna -> Server la Save + Icon White aagum da - Gold / Yellow KIDAIYAATHU da
 //       Thirumba thotta -> Unsave aagum da
 //       UI Munnadi - DB Appuram da - Speed da!
@@ -17,19 +17,29 @@ async function pixoroToggleSave(postId, btn){
     }
     if(willSave){ btn.style.transform='scale(1.2)'; setTimeout(()=>btn.style.transform='scale(1)',150); }
   }
-  // ✅ FIX - FEED_SAVES la add pannu da - Illana Refresh panna White pogum da
   if(window.FEED_SAVES){ willSave ? window.FEED_SAVES.add(String(postId)) : window.FEED_SAVES.delete(String(postId)); }
-  // ✅ ALERT REMOVE DA - Toast line ah eduthuten da - Onnum kaataathe da
 
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
   if(!window.ME_ID){
     let {data:{session}} = await s.auth.getSession();
     if(session) window.ME_ID = session.user.id;
-    else { location.href='./login.html'; return; }
+    else {
+      // ✅ FIX - Login Illana UI ah Pazhaya Nilamaikku Kondu Va da - White ah Vachitu Poga Koodathu da
+      if(btn) btn.classList.toggle('saved', !willSave);
+      if(window.FEED_SAVES){ willSave ? window.FEED_SAVES.delete(String(postId)) : window.FEED_SAVES.add(String(postId)); }
+      location.href='./login.html'; return;
+    }
   }
   try{
-    if(willSave){ await s.from('saves').insert({post_id:postId, user_id:window.ME_ID}); }
-    else { await s.from('saves').delete().eq('post_id',postId).eq('user_id',window.ME_ID); }
+    if(willSave){
+      let r = await s.from('saves').insert({post_id:postId, user_id:window.ME_ID});
+      // ✅ FIX - Already Save Panniruntha - Duplicate Error 23505 Varum da - Athu Fail Illa da - White ah ve Vachu da!
+      if(r.error && String(r.error.code) !== '23505') throw r.error;
+    }
+    else {
+      let r = await s.from('saves').delete().eq('post_id',postId).eq('user_id',window.ME_ID);
+      if(r.error) throw r.error;
+    }
     return willSave;
   }catch(e){
     // DB fail aana mattum UI ah thirumba maathidu da
