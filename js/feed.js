@@ -15,7 +15,7 @@ function feedClean(u){ if(!u) return ''; return String(u).trim().replaceAll('@',
 function getSupa(){ return window.supa || (window.getSupa ? window.getSupa() : null); }
 function syncFeedSets(){ window.FEED_LIKES = FEED_LIKES; window.FEED_SAVES = FEED_SAVES; window.FEED_COUNTS = FEED_COUNTS; }
 
-// 🔥 FIX - Count ah Mattum Update pannu da - Full Feed ah Render Pannaatha da - Scroll Pogathu da!
+// ✅ FIX - Count ah Mattum Update pannu da - Feed ah Render Pannaatha da - Like Maarathu da!
 function pixoroUpdateCountsOnly(){
   for(let pid in FEED_COUNTS){
     let c = FEED_COUNTS[pid];
@@ -26,7 +26,7 @@ function pixoroUpdateCountsOnly(){
     let shEl = document.querySelector(`[data-share-count="${pid}"]`);
     if(shEl) shEl.innerText = c.share;
   }
-  if(window.pixoroPaintAllLikes) window.pixoroPaintAllLikes();
+  // ❌ pixoroPaintAllLikes ah inga koopda koodathu da - Like ah thirumba White aakidum da!
 }
 window.pixoroUpdateCountsOnly = pixoroUpdateCountsOnly;
 
@@ -36,7 +36,6 @@ window.pixoroGetPfp = function(prof, userId, uname){
   return String(prof?.avatar_url || '').trim();
 };
 
-// ✅ CORRECT - getFeed - Promise.all da - 50 Illa da - 20 Pothum da - Speed da!
 async function getFeed(currentUserId){
   try{
     let s = getSupa(); if(!s) return [];
@@ -72,7 +71,6 @@ async function getFeed(currentUserId){
 }
 window.getFeed = getFeed;
 
-// ✅ CORRECT - loadAllCounts - Promise.all da - 3 Thadava Illa da - 1 Thadava da!
 async function loadAllCounts(){
   let s = getSupa(); if(!s) return;
   for(let k in FEED_COUNTS) delete FEED_COUNTS[k];
@@ -139,6 +137,7 @@ function renderFeedList(){
     let isMine = String(p.user_id)===String(FEED_ME_ID) || uname === feedClean(FEED_ME_RAW) || uname === feedClean(window.ME_RAW||'');
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
     let cnt = FEED_COUNTS[String(p.id)] || {like:0,comment:0,share:0};
+    // ✅ OPEN PANNINA WHITE THAAN DA - FEED_LIKES empty ah irukkum da
     let liked = FEED_LIKES.has(String(p.id)) ? 'liked' : '';
     let saved = FEED_SAVES.has(String(p.id)) ? 'saved' : '';
     return `<div class="post">
@@ -162,7 +161,7 @@ function renderFeedList(){
     </div>`;
   }).join('');
   if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
-  if(window.pixoroPaintAllLikes) window.pixoroPaintAllLikes();
+  // ❌ renderFeedList la pixoroPaintAllLikes koopda koodathu da - White aakidum da
 }
 
 async function renderFeed(currentUserId){
@@ -174,15 +173,12 @@ async function renderFeed(currentUserId){
     if(!currentUserId){ let s = getSupa(); if(s){ let {data:{session}} = await s.auth.getSession(); currentUserId = session?.user?.id; } }
     if(!currentUserId){ box.innerHTML = '<p style="color:#888;text-align:center">Login pannu da</p>'; return; }
     FEED_ALL = await getFeed(currentUserId);
-    // ✅ SPEED - Feed ah Odane Kaatu da - Count Appuram da!
     renderFeedList();
-    // 🔥 FIX - Full Render Illa da - Count mattum da!
     loadAllCounts().then(()=> pixoroUpdateCountsOnly());
   } finally { _feedLoading = false; }
 }
 window.renderFeed = renderFeed;
 
-// ✅ CORRECT - loadFeed - SPEED DA - Await Illa da - Feed Odane Varum da!
 async function loadFeed(){
   if(_feedLoading) return;
   _feedLoading = true;
@@ -194,31 +190,28 @@ async function loadFeed(){
     if(!session){ location.href='login.html'; return; }
     FEED_ME_ID = session.user.id; window.ME_ID = FEED_ME_ID;
 
-    // ✅ Profile ku Wait panna Koodathu da - Pinnaadi Varattum da!
     s.from('profiles').select('*').eq('id', FEED_ME_ID).maybeSingle().then(({data:myProf})=>{
       FEED_ME_RAW = feedClean(myProf?.username || session.user.email.split('@')[0]); window.ME_RAW = FEED_ME_RAW;
       MY_PFP = String(myProf?.avatar_url || '').trim();
       window.MY_PFP = MY_PFP; window.ME_PFP = MY_PFP; window.ME_AVATAR = MY_PFP;
       let navPfp = document.getElementById('navPfp'); if(navPfp && MY_PFP) navPfp.src = MY_PFP;
     });
-    if(window.pixoroLoadFollowing) window.pixoroLoadFollowing(); // ✅ await Illa da!
+    if(window.pixoroLoadFollowing) window.pixoroLoadFollowing();
 
     FEED_ALL = await getFeed(FEED_ME_ID);
 
-    // ✅ Likes / Saves ku Wait panna Koodathu da - Pinnaadi Paint pannu da!
-    // 🔥 FIX - Clear pannitu - Same Set la Add pannu da - Puthu Set Vendaam da!
+    // ✅ OPEN PANNINA WHITE DA - Likes ah Auto Load panni Red aakka koodathu da!
+    // Pazhaya code la inga likes ah load panni paint pannitom - athaan open pannave Red ah irunthuchu da!
     FEED_LIKES.clear(); FEED_SAVES.clear();
-    s.from('likes').select('post_id').eq('user_id', FEED_ME_ID).then(({data})=>{ (data||[]).forEach(x=> FEED_LIKES.add(String(x.post_id))); window.FEED_LIKES = FEED_LIKES; if(window.pixoroPaintAllLikes) window.pixoroPaintAllLikes(); });
+    // Saves mattum load pannu da - Likes vendaam da
     s.from('saves').select('post_id').eq('user_id', FEED_ME_ID).then(({data})=>{ (data||[]).forEach(x=> FEED_SAVES.add(String(x.post_id))); window.FEED_SAVES = FEED_SAVES; });
     syncFeedSets();
 
     let pid = new URLSearchParams(location.search).get('id');
     if(pid){ let single = FEED_ALL.find(p=>String(p.id)===String(pid)); if(single){ FEED_ALL = [single, ...FEED_ALL.filter(p=>String(p.id)!==String(pid))]; let b=document.getElementById('singleBanner'); if(b) b.style.display='block'; } }
 
-    // ✅ Feed ah Odane Kaatu da - Count ku Wait panna Koodathu da!
     renderFeedList();
     if(window.loadStories) window.loadStories();
-    // 🔥 FIX - Full Render Illa da - Count mattum da!
     loadAllCounts().then(()=> pixoroUpdateCountsOnly());
 
   } finally { _feedLoading = false; }
