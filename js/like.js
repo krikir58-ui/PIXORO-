@@ -8,6 +8,8 @@
 console.log('✅ LIKE FILE LOADED DA');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
+if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
+if(!window.FEED_COUNTS) window.FEED_COUNTS = {};
 
 window.pixoroFeedTap = function(postId, el, ev){
   if(ev) ev.preventDefault();
@@ -64,6 +66,21 @@ function pixoroPaintAllLikes(){
   });
 }
 
+// 🔥 FIX - REFRESH PANNALUM POGATHA MARI - SERVER LA IRUNTHU EN LIKE AH EDUTHU VARANUM DA!
+async function pixoroLoadMyLikes(){
+  let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
+  try{
+    let {data:{session}} = await s.auth.getSession();
+    if(!session) return;
+    window.ME_ID = session.user.id;
+    let {data, error} = await s.from('likes').select('post_id').eq('user_id', window.ME_ID);
+    if(error) throw error;
+    window.FEED_LIKES = new Set((data||[]).map(r=>String(r.post_id)));
+    pixoroPaintAllLikes();
+    console.log('✅ MY LIKES LOADED DA:', window.FEED_LIKES.size);
+  }catch(e){ console.log('LIKE LOAD FAIL DA:', e.message); }
+}
+
 async function pixoroSyncRealCount(postId){
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
   try{
@@ -79,6 +96,7 @@ async function pixoroSyncRealCount(postId){
   }catch(e){}
 }
 
+// BUTTON = Like / Unlike da!
 async function pixoroToggleLike(postId, btn){
   if(!btn) btn = document.querySelector(`[data-like-btn="${postId}"]`);
   let willLike = btn ? !btn.classList.contains('liked') : true;
@@ -91,7 +109,6 @@ async function pixoroToggleLike(postId, btn){
       let {data:{session}} = await s.auth.getSession();
       if(session) window.ME_ID = session.user.id;
       else {
-        // ✅ FIX - Login Illana UI ah Pazhaya Nilamaikku Kondu Va da - Red ah Vachitu Poga Koodathu da
         pixoroPaintLikeBtn(btn, oldLiked);
         if(window.FEED_LIKES){ oldLiked ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId)); }
         location.href='./login.html'; return;
@@ -113,11 +130,11 @@ async function pixoroToggleLike(postId, btn){
     pixoroPaintLikeBtn(btn, oldLiked);
     if(window.FEED_LIKES){ oldLiked ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId)); }
     await pixoroSyncRealCount(postId);
-    // ✅ FIX - Alert Thookiten da - Silent da - Console la mattum da
     return oldLiked;
   }
 }
 
+// DOUBLE TAP = Like ONLY da - Unlike Aagathu da!
 async function pixoroDoubleTapLike(postId, mediaEl){
   showBigHeart(mediaEl);
   let btn = document.querySelector(`[data-like-btn="${postId}"]`);
@@ -131,7 +148,6 @@ async function pixoroDoubleTapLike(postId, mediaEl){
       let {data:{session}} = await s.auth.getSession();
       if(session) window.ME_ID = session.user.id;
       else {
-        // ✅ FIX - Login Illana Red ah Vachitu Poga Koodathu da
         if(btn) pixoroPaintLikeBtn(btn, false);
         if(window.FEED_LIKES) window.FEED_LIKES.delete(String(postId));
         return true;
@@ -194,3 +210,8 @@ window.pixoroDoubleTapLike = pixoroDoubleTapLike;
 window.showBigHeart = showBigHeart;
 window.pixoroPaintLikeBtn = pixoroPaintLikeBtn;
 window.pixoroPaintAllLikes = pixoroPaintAllLikes;
+window.pixoroLoadMyLikes = pixoroLoadMyLikes;
+
+// 🔥 FIX - PAGE LOAD AANA ODANE - SERVER LA IRUNTHU LIKE AH EDUTHU VA DA!
+pixoroLoadMyLikes();
+setTimeout(pixoroLoadMyLikes, 1000);
