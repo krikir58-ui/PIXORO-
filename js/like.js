@@ -1,4 +1,4 @@
-// ===== PIXORO LIKE - FINAL DA - DANCE HEART + REFRESH NO POKATHU DA =====
+// ===== PIXORO LIKE - FINAL DA - CORRECTED DA - RED + DANCE + REFRESH DA =====
 console.log('✅ LIKE FILE LOADED DA');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
@@ -6,7 +6,7 @@ let _lastLikeAction = 0;
 if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
 if(!window.FEED_COUNTS) window.FEED_COUNTS = {};
 
-// ✅ REFRESH KU - PHONE LA SAVE DA - DB FAIL AANAALUM LIKE POKATHU DA
+// ✅ REFRESH KU - PHONE LA SAVE DA
 function pixoroSaveLocalLikes(){
   try{ localStorage.setItem('pixoro_my_likes', JSON.stringify([...window.FEED_LIKES])); }catch(e){}
 }
@@ -45,7 +45,6 @@ window.pixoroFeedTap = function(postId, el, ev){
     .bigHeart{ position:absolute !important; left:50% !important; top:50% !important; z-index:99 !important; pointer-events:none !important; opacity:0 !important; transform:translate(-50%,-50%) scale(0) !important; width:80px !important; height:80px !important; }
     .bigHeart.show{ opacity:1 !important; animation:pixHeartDance 600ms ease forwards !important; }
     .bigHeart svg{ width:100% !important; height:100% !important; filter:drop-shadow(0 4px 12px rgba(0,0,0,.5)) !important; }
-    /* ✅ HEART DANCE - Vanthu, Aaditu, Pokum da - Nikkaathu da */
     @keyframes pixHeartDance{ 0%{opacity:0; transform:translate(-50%,-50%) scale(0) rotate(0deg)} 15%{opacity:1; transform:translate(-50%,-50%) scale(1.3) rotate(-10deg)} 30%{transform:translate(-50%,-50%) scale(1.1) rotate(10deg)} 45%{transform:translate(-50%,-50%) scale(1.2) rotate(-8deg)} 60%{transform:translate(-50%,-50%) scale(1.05) rotate(6deg)} 75%{opacity:1; transform:translate(-50%,-50%) scale(1) rotate(0deg)} 100%{opacity:0; transform:translate(-50%,-50%) scale(0.8) rotate(0deg)} }
   `;
   document.head.appendChild(s);
@@ -102,21 +101,16 @@ function pixoroBumpCount(postId, delta){
   }
 }
 
-// ❌ Sync ah konjam neram off panniten da - Ithu thaan Count ah 0 aakki White aakuthu da
-// async function pixoroSyncRealCount - Itha koopda vendaam da
-
-// BUTTON = Like / Unlike da - SPEED da!
 async function pixoroToggleLike(postId, btn){
   let now = Date.now();
   if(now - _lastLikeAction < 150) return;
   _lastLikeAction = now;
-
   if(!btn) btn = document.querySelector(`[data-like-btn="${postId}"]`);
   let willLike = btn ? !btn.classList.contains('liked') : true;
   pixoroPaintLikeBtn(btn, willLike);
   pixoroBumpCount(postId, willLike ? 1 : -1);
   if(window.FEED_LIKES){ willLike ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId)); }
-  pixoroSaveLocalLikes(); // ✅ Odane Phone la save da
+  pixoroSaveLocalLikes();
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return willLike;
   if(!window.ME_ID){
     try{
@@ -136,12 +130,10 @@ async function pixoroToggleLike(postId, btn){
     return willLike;
   }catch(e){
     console.log('❌ LIKE DB FAIL DA:', e.message);
-    // ✅ DB fail aanaalum Like ah White aakka koodathu da - Phone la irukku da
     return willLike;
   }
 }
 
-// DOUBLE TAP = Like ONLY da - Unlike Aagathu da!
 async function pixoroDoubleTapLike(postId, mediaEl){
   showBigHeart(mediaEl);
   let btn = document.querySelector(`[data-like-btn="${postId}"]`);
@@ -150,7 +142,7 @@ async function pixoroDoubleTapLike(postId, mediaEl){
   if(btn) pixoroPaintLikeBtn(btn, true);
   pixoroBumpCount(postId, 1);
   if(window.FEED_LIKES) window.FEED_LIKES.add(String(postId));
-  pixoroSaveLocalLikes(); // ✅ Odane Phone la save da
+  pixoroSaveLocalLikes();
   _lastLikeAction = Date.now();
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return true;
   if(!window.ME_ID){
@@ -166,12 +158,10 @@ async function pixoroDoubleTapLike(postId, mediaEl){
     return true;
   }catch(e){
     console.log('❌ DOUBLE TAP DB FAIL DA:', e.message);
-    // ✅ DB fail aanaalum Heart ponaalum Like nikkanum da
     return true;
   }
 }
 
-// ✅ HEART DANCE - 600ms la pokum da - Nikkaathu da
 function showBigHeart(mediaEl){
   if(!mediaEl) return;
   mediaEl.querySelectorAll('.bigHeart').forEach(h=>h.remove());
@@ -205,7 +195,22 @@ window.showBigHeart = showBigHeart;
 window.pixoroPaintLikeBtn = pixoroPaintLikeBtn;
 window.pixoroPaintAllLikes = pixoroPaintAllLikes;
 window.pixoroLoadMyLikes = pixoroLoadMyLikes;
+window.pixoroLoadLocalLikes = pixoroLoadLocalLikes;
 
-// ✅ OPEN PANNINA ODANE Phone la irunthu Red da - Refresh pannina pokathu da
-pixoroLoadLocalLikes();
-pixoroLoadMyLikes();
+// ✅ CORRECTED DA - Feed vantha piragu thaan Red pannum da - Ithu thaan mukkiyam da
+function pixoroStartLikeFix(){
+  pixoroLoadLocalLikes();
+  pixoroLoadMyLikes();
+  if(!window._pixoroLikeObs){
+    window._pixoroLikeObs = true;
+    let _obs = new MutationObserver(()=> pixoroPaintAllLikes());
+    _obs.observe(document.body, {childList:true, subtree:true});
+  }
+}
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', pixoroStartLikeFix);
+} else {
+  pixoroStartLikeFix();
+}
+setTimeout(()=> pixoroPaintAllLikes(), 1000);
+setTimeout(()=> pixoroPaintAllLikes(), 2500);
