@@ -105,7 +105,6 @@ function renderFeedList(){
     let isMine = String(p.user_id)===String(FEED_ME_ID) || uname === feedClean(FEED_ME_RAW) || uname === feedClean(window.ME_RAW||'');
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
     let cnt = FEED_COUNTS[String(p.id)] || {like:0,comment:0,share:0};
-    // ✅ FIX - Server la Like iruntha - Direct ah liked Class ah Podu da - Paint ku Wait Panna Vendaam da
     let liked = FEED_LIKES.has(String(p.id)) ? 'liked' : '';
     let saved = FEED_SAVES.has(String(p.id)) ? 'saved' : '';
     return `<div class="post">
@@ -145,7 +144,8 @@ function renderFeedList(){
 async function renderFeed(currentUserId){
   if(_feedLoading) return;
   let box = document.getElementById('feed'); if(!box) return;
-  box.innerHTML = '<p style="color:#888;text-align:center;padding:20px">Loading da...</p>';
+  // ✅ Feed Already iruntha - Blank ah Aaka Koodathu da - Pazhaya Feed ah ve Vachu da
+  if(!FEED_ALL.length) box.innerHTML = '<p style="color:#888;text-align:center;padding:20px">Loading da...</p>';
   if(!currentUserId){ let s = getSupa(); if(s){ let {data:{session}} = await s.auth.getSession(); currentUserId = session?.user?.id; } }
   if(!currentUserId){ box.innerHTML = '<p style="color:#888;text-align:center">Login pannu da</p>'; return; }
   FEED_ALL = await getFeed(currentUserId);
@@ -160,7 +160,7 @@ async function loadFeed(){
   try{
     let s = getSupa();
     for(let i=0;i<20 && !s;i++){ await new Promise(r=>setTimeout(r,200)); s = getSupa(); }
-    if(!s){ let b=document.getElementById('feed'); if(b) b.innerHTML='<p style="padding:30px;text-align:center;color:#888">Supabase Connect Aagala da</p>'; return; }
+    if(!s){ let b=document.getElementById('feed'); if(b && !FEED_ALL.length) b.innerHTML='<p style="padding:30px;text-align:center;color:#888">Supabase Connect Aagala da</p>'; return; }
     let {data:{session}} = await s.auth.getSession();
     if(!session){ location.href='login.html'; return; }
     FEED_ME_ID = session.user.id; window.ME_ID = FEED_ME_ID;
@@ -171,17 +171,20 @@ async function loadFeed(){
     let navPfp = document.getElementById('navPfp'); if(navPfp && MY_PFP) navPfp.src = MY_PFP;
     if(window.pixoroLoadFollowing) window.pixoroLoadFollowing();
     FEED_ALL = await getFeed(FEED_ME_ID);
-    // ✅ Server la irunthu mattum thaan da - LocalStorage Illa da
-    FEED_LIKES = new Set(); FEED_SAVES = new Set();
-    try{ let {data:likes} = await s.from('likes').select('post_id').eq('user_id', FEED_ME_ID); FEED_LIKES = new Set((likes||[]).map(x=>String(x.post_id))); }catch(e){}
-    try{ let {data:saves} = await s.from('saves').select('post_id').eq('user_id', FEED_ME_ID); FEED_SAVES = new Set((saves||[]).map(x=>String(x.post_id))); }catch(e){}
+    // ✅ FIX - Puthu Set Create Panna Koodathu da - Pazhaya Set ah Clear Panni Fill pannu da - Like.js ku Same Set thaan Theriyum da
+    FEED_LIKES.clear(); FEED_SAVES.clear();
+    try{ let {data:likes} = await s.from('likes').select('post_id').eq('user_id', FEED_ME_ID); (likes||[]).forEach(x=> FEED_LIKES.add(String(x.post_id))); }catch(e){}
+    try{ let {data:saves} = await s.from('saves').select('post_id').eq('user_id', FEED_ME_ID); (saves||[]).forEach(x=> FEED_SAVES.add(String(x.post_id))); }catch(e){}
     syncFeedSets();
     await loadAllCounts();
     let pid = new URLSearchParams(location.search).get('id');
     if(pid){ let single = FEED_ALL.find(p=>String(p.id)===String(pid)); if(single){ FEED_ALL = [single, ...FEED_ALL.filter(p=>String(p.id)!==String(pid))]; let b=document.getElementById('singleBanner'); if(b) b.style.display='block'; } }
     renderFeedList();
     if(window.loadStories) window.loadStories();
-  } finally { setTimeout(()=>{ _feedLoading = false; }, 2000); }
+  } finally {
+    // ✅ FIX - 2 Sec Lock Thookiten da - Odane Unlock da - Scroll panna Blank Varathu da
+    _feedLoading = false;
+  }
 }
 window.loadFeed = loadFeed;
 
