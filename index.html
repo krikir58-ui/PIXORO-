@@ -8,13 +8,14 @@
 <link rel="stylesheet" href="css/comments.css">
 <link rel="stylesheet" href="css/pixoro-style.css">
 <link rel="stylesheet" href="css/top-plus.css">
-<!-- ✅ FIX - feed.css KADASIYIL THAAN DA - Vera CSS adikka koodathu da -->
+<!-- ✅ FIX - feed.css KADASIYIL THAAN DA -->
 <link rel="stylesheet" href="css/feed.css">
-<!-- ✅ FIX - FINAL OVERRIDE DA - Itha Yaarum Adikka Mudiyathu da -->
+<!-- ✅ FIX - FINAL OVERRIDE DA -->
 <style>
   [data-like-btn]:not(.liked) svg, [data-like-btn]:not(.liked) svg path{ fill:none!important; stroke:#fff!important; }
   [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33!important; stroke:#FF0A33!important; }
-  .bigHeart{ left:50%!important; top:50%!important; width:95px!important; height:95px!important; }
+  .bigHeart{ position:absolute!important; left:50%!important; top:50%!important; width:95px!important; height:95px!important; }
+  #feedError{display:none;text-align:center;padding:20px;color:#ff5ea8;font-weight:700;font-size:14px}
 </style>
 </head>
 <body>
@@ -25,6 +26,7 @@
 <div class="feedTabs"><div class="feedTab active" id="tabForYou" onclick="setFeedMode('foryou')">For You</div><div class="feedTab" id="tabFollowing" onclick="setFeedMode('following')">Following</div><div class="feedTab" id="tabLatest" onclick="setFeedMode('latest')">Latest</div></div>
 <div id="trendBar" class="trendBar" style="display:none"></div>
 <div id="feed"><div class="skel"></div><div class="skel"></div></div>
+<div id="feedError">Feed Load Aagala da - Refresh Pannu da 🔄</div>
 <div id="toast" class="toast"></div>
 
 <div id="miniBox" style="position:fixed;bottom:64px;left:12px;right:12px;max-width:426px;margin:auto;background:#1a0b2e;border:1px solid #a259ff;border-radius:14px;padding:10px;display:none;z-index:2000;align-items:center;gap:10px">
@@ -68,8 +70,19 @@
 <script src="js/share.js"></script>
 <script src="js/save.js"></script>
 <script src="js/stories.js"></script>
-<!-- ✅ FIX - feed.js MUNNADI DA - like.js PINNAADI DA - Set ah Feed thirumba aakka koodathu da -->
+<!-- ✅ FIX - feed.js MUNNADI DA - like.js PINNAADI DA -->
 <script src="js/feed.js"></script>
 <script src="js/like.js"></script>
+<script>
+  // ✅ FIX DA - 8 Sec la Feed varalana Skel ah thookitu Error kaatu da - Black Box nikathu da
+  setTimeout(function(){
+    var f = document.getElementById('feed');
+    if(f && f.querySelector('.skel') && !f.querySelector('.post')){
+      var e = document.getElementById('feedError');
+      if(e) e.style.display = 'block';
+      console.log('❌ FEED STUCK DA - Feed.js Load Aagala da, Console la Red Error paaru da');
+    }
+  }, 8000);
+</script>
 </body>
 </html>
