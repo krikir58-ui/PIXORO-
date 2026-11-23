@@ -17,15 +17,12 @@
       const { data: posts, error } = await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(50);
       if(error) throw error;
       if(!posts || !posts.length){ feed.innerHTML='<p style="color:white;text-align:center;padding:30px">No posts yet</p>'; return; }
-
-      // ✅ Profile Photo edukka da
       let ids = [...new Set(posts.map(p=>p.user_id).filter(Boolean))];
       let profMap = {};
       if(ids.length){
         let { data: profs } = await supa.from('profiles').select('id,username,avatar_url').in('id', ids);
         (profs||[]).forEach(p=> profMap[String(p.id)] = p);
       }
-
       feed.innerHTML = posts.map(post=>{
         const id = String(post.id||'');
         const prof = profMap[String(post.user_id)] || {};
@@ -36,7 +33,6 @@
         const safeMedia = safeURL(media);
         const video = post.media_type==='video' || /\.(mp4|mov|webm)(\?|$)/i.test(media);
         const letter = username.charAt(0).toUpperCase();
-
         return `
         <article class="post" data-post-id="${id}">
           <div class="postTop">
@@ -50,12 +46,23 @@
             ${safeMedia ? (video ? `<video class="main" src="${safeMedia}" muted playsinline loop></video>` : `<img class="main" src="${safeMedia}" loading="lazy">`) : '<p style="padding:25px;color:#aaa">Media unavailable</p>'}
           </div>
           <div class="actions">
-            <div class="left" style="display:flex;gap:14px;align-items:center">
-              <button data-like-btn="${id}" class="act" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff;font-size:17px" onclick="pixoroDoubleTapLike('${id}', this.closest('.post').querySelector('.postMedia'))">♡ <span data-like-count="${id}">${post.likes_count||0}</span></button>
-              <button class="act" style="display:flex;gap:6px;align-items:center;background:none;border:0;color:#fff;font-size:17px" onclick="if(window.openComments) window.openComments('${id}')">💬 <span>0</span></button>
-              <button class="act" style="background:none;border:0;color:#fff;font-size:20px">↗</button>
+            <div class="left">
+              <button data-like-btn="${id}" class="act" onclick="pixoroToggleLike('${id}',this)">
+                <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+                <span data-like-count="${id}">${post.likes_count||0}</span>
+              </button>
+              <button class="act" onclick="if(window.openComments) window.openComments('${id}')">
+                <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                <span data-comment-count="${id}">0</span>
+              </button>
+              <button class="act" onclick="sharePost('${id}')">
+                <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 22 15 22 11 13 2 9 22 2"/></svg>
+                <span data-share-count="${id}">0</span>
+              </button>
             </div>
-            <button data-save-btn="${id}" class="act" style="margin-left:auto;background:none;border:0;color:#fff;font-size:20px" onclick="pixoroToggleSave('${id}',this)">🔖</button>
+            <button data-save-btn="${id}" class="act" onclick="pixoroToggleSave('${id}',this)">
+              <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            </button>
           </div>
           <div style="padding:0 14px 6px;color:white;font-size:14px"><b>${username}</b> ${caption}</div>
         </article>`;
