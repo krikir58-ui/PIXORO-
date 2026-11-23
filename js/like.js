@@ -1,4 +1,4 @@
-// ===== PIXORO LIKE - FINAL DA - SERVER ONLY - NO BLACK SCREEN DA =====
+// ===== PIXORO LIKE - FINAL CORRECTED DA =====
 console.log('✅ LIKE FILE LOADED DA');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
@@ -70,6 +70,7 @@ async function pixoroLoadMyLikes(){
     let {data, error} = await s.from('likes').select('post_id').eq('user_id', window.ME_ID);
     if(error) throw error;
     if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
+    window.FEED_LIKES.clear();
     (data||[]).forEach(r=> window.FEED_LIKES.add(String(r.post_id)));
     pixoroPaintAllLikes();
     console.log('✅ MY LIKES LOADED DA:', window.FEED_LIKES.size);
@@ -82,18 +83,15 @@ function pixoroBumpCount(postId, delta){
     let cur = parseInt(c.innerText||'0',10) || 0;
     c.innerText = Math.max(0, cur + delta);
   }
-  if(window.FEED_COUNTS){
-    window.FEED_COUNTS[String(postId)] = window.FEED_COUNTS[String(postId)] || {like:0,comment:0,share:0};
-    window.FEED_COUNTS[String(postId)].like = Math.max(0, (window.FEED_COUNTS[String(postId)].like||0) + delta);
-  }
 }
 
 async function pixoroToggleLike(postId, btn){
   let now = Date.now();
-  if(now - _lastLikeAction < 150) return;
+  if(now - _lastLikeAction < 300) return;
   _lastLikeAction = now;
   if(!btn) btn = document.querySelector(`[data-like-btn="${postId}"]`);
-  let willLike = btn ? !btn.classList.contains('liked') : true;
+  if(!btn) return;
+  let willLike = !btn.classList.contains('liked');
   pixoroPaintLikeBtn(btn, willLike);
   pixoroBumpCount(postId, willLike ? 1 : -1);
   if(window.FEED_LIKES){ willLike ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId)); }
@@ -116,7 +114,11 @@ async function pixoroToggleLike(postId, btn){
     return willLike;
   }catch(e){
     console.log('❌ LIKE DB FAIL DA:', e.message);
-    return willLike;
+    // DB Fail na UI ah thirumba maathu da
+    pixoroPaintLikeBtn(btn, !willLike);
+    pixoroBumpCount(postId, willLike ? -1 : 1);
+    if(window.FEED_LIKES){ willLike ? window.FEED_LIKES.delete(String(postId)) : window.FEED_LIKES.add(String(postId)); }
+    return !willLike;
   }
 }
 
@@ -156,8 +158,6 @@ function showBigHeart(mediaEl){
   box.querySelectorAll('.bigHeart').forEach(h=>h.remove());
   let div = document.createElement('div');
   div.className = 'bigHeart';
-  div.style.width = '80px'; div.style.height = '80px';
-  div.style.position = 'absolute'; div.style.left = '50%'; div.style.top = '50%'; div.style.zIndex = '99';
   div.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   let cs = window.getComputedStyle(box);
   if(cs.position === 'static') box.style.position = 'relative';
@@ -167,18 +167,17 @@ function showBigHeart(mediaEl){
   setTimeout(()=>div.remove(), 600);
 }
 
+// ✅ SINGLE HANDLER MATTUM DA - Double Toggle Varaathu da
 if(!window._pixoroLikeDelegation){
   window._pixoroLikeDelegation = true;
   document.addEventListener('click', function(e){
     let btn = e.target.closest('[data-like-btn]');
     if(!btn) return;
-    if(e._pixoroLikeHandled) return;
-    e._pixoroLikeHandled = true;
     e.preventDefault();
     e.stopPropagation();
     let pid = String(btn.getAttribute('data-like-btn'));
     pixoroToggleLike(pid, btn);
-  }, true);
+  });
 }
 
 window.pixoroToggleLike = pixoroToggleLike;
@@ -188,11 +187,11 @@ window.pixoroPaintLikeBtn = pixoroPaintLikeBtn;
 window.pixoroPaintAllLikes = pixoroPaintAllLikes;
 window.pixoroLoadMyLikes = pixoroLoadMyLikes;
 
-// ✅ NO OBSERVER DA - Ithu thaan Black Screen ah sari pannum da
-// Feed.js la Render aana odane pixoroPaintAllLikes() koopduvanga da
 if(document.readyState === 'loading'){
   document.addEventListener('DOMContentLoaded', ()=> pixoroLoadMyLikes());
 } else {
   pixoroLoadMyLikes();
 }
+// Feed Render aana aprom thirumba paint pannu da
+window.addEventListener('pixoroFeedLoaded', ()=> setTimeout(()=> pixoroPaintAllLikes(), 50));
 setTimeout(()=> pixoroPaintAllLikes(), 1500);
