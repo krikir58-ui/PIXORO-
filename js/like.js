@@ -1,12 +1,10 @@
-// ===== PIXORO LIKE - FINAL DA - NO LOCALSTORAGE - SERVER ONLY + DANCE DA =====
+// ===== PIXORO LIKE - FINAL DA - SERVER ONLY - NO BLACK SCREEN DA =====
 console.log('✅ LIKE FILE LOADED DA');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
 if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
 if(!window.FEED_COUNTS) window.FEED_COUNTS = {};
-
-// ❌ LocalStorage ILLA DA - Server la mattum thaan Save da
 
 window.pixoroFeedTap = function(postId, el, ev){
   if(ev) ev.preventDefault();
@@ -63,7 +61,6 @@ function pixoroPaintAllLikes(){
   });
 }
 
-// ✅ SERVER la irunthu mattum Load pannu da - Refresh pannina Red varum da
 async function pixoroLoadMyLikes(){
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
   try{
@@ -191,19 +188,11 @@ window.pixoroPaintLikeBtn = pixoroPaintLikeBtn;
 window.pixoroPaintAllLikes = pixoroPaintAllLikes;
 window.pixoroLoadMyLikes = pixoroLoadMyLikes;
 
-// ✅ Feed vantha piragu Server la irunthu Red pannu da
-function pixoroStartLikeFix(){
-  pixoroLoadMyLikes();
-  if(!window._pixoroLikeObs){
-    window._pixoroLikeObs = true;
-    let _obs = new MutationObserver(()=> pixoroPaintAllLikes());
-    _obs.observe(document.body, {childList:true, subtree:true});
-  }
-}
+// ✅ NO OBSERVER DA - Ithu thaan Black Screen ah sari pannum da
+// Feed.js la Render aana odane pixoroPaintAllLikes() koopduvanga da
 if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', pixoroStartLikeFix);
+  document.addEventListener('DOMContentLoaded', ()=> pixoroLoadMyLikes());
 } else {
-  pixoroStartLikeFix();
+  pixoroLoadMyLikes();
 }
-setTimeout(()=> pixoroPaintAllLikes(), 1000);
-setTimeout(()=> pixoroPaintAllLikes(), 2500);
+setTimeout(()=> pixoroPaintAllLikes(), 1500);
