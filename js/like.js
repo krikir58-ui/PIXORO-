@@ -3,6 +3,7 @@
 //       Double Tap = Like ONLY + 3 Hearts da
 //       Button = Like / Unlike da
 //       Save = Server la mattum thaan da - LocalStorage Illa da
+//       Alert KIDAIYAATHU da - Silent da!
 
 console.log('✅ LIKE FILE LOADED DA');
 
@@ -55,7 +56,6 @@ function pixoroPaintLikeBtn(btn, willLike){
   }
 }
 
-// ✅ Server la irunthu mattum thaan da - LocalStorage Paakka Koodathu da
 function pixoroPaintAllLikes(){
   document.querySelectorAll('[data-like-btn]').forEach(btn=>{
     let pid = String(btn.getAttribute('data-like-btn'));
@@ -71,20 +71,33 @@ async function pixoroSyncRealCount(postId){
     if(count !== null && count !== undefined){
       let c = document.querySelector(`[data-like-count="${postId}"]`);
       if(c) c.innerText = count;
+      if(window.FEED_COUNTS){
+        window.FEED_COUNTS[String(postId)] = window.FEED_COUNTS[String(postId)] || {like:0,comment:0,share:0};
+        window.FEED_COUNTS[String(postId)].like = count;
+      }
     }
   }catch(e){}
 }
 
 async function pixoroToggleLike(postId, btn){
-  console.log('❤️ LIKE CLICKED DA:', postId);
   if(!btn) btn = document.querySelector(`[data-like-btn="${postId}"]`);
   let willLike = btn ? !btn.classList.contains('liked') : true;
   let oldLiked = !willLike;
-  // ✅ Optimistic ah Kaatu da - Aana Server Fail na Thookidu da
   pixoroPaintLikeBtn(btn, willLike);
   if(window.FEED_LIKES){ willLike ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId)); }
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return willLike;
-  if(!window.ME_ID){ try{ let {data:{session}} = await s.auth.getSession(); if(session) window.ME_ID = session.user.id; else { location.href='./login.html'; return; } }catch(e){ return willLike; } }
+  if(!window.ME_ID){
+    try{
+      let {data:{session}} = await s.auth.getSession();
+      if(session) window.ME_ID = session.user.id;
+      else {
+        // ✅ FIX - Login Illana UI ah Pazhaya Nilamaikku Kondu Va da - Red ah Vachitu Poga Koodathu da
+        pixoroPaintLikeBtn(btn, oldLiked);
+        if(window.FEED_LIKES){ oldLiked ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId)); }
+        location.href='./login.html'; return;
+      }
+    }catch(e){ return willLike; }
+  }
   try{
     if(willLike){
       let r = await s.from('likes').insert({post_id:postId, user_id:window.ME_ID});
@@ -97,11 +110,10 @@ async function pixoroToggleLike(postId, btn){
     return willLike;
   }catch(e){
     console.log('❌ LIKE DB FAIL DA:', e.message);
-    // ✅ Server la Save Aagala na - UI ah Pazhaya Nilamaikku Kondu Va da - Poi RED Kaatta Koodathu da
     pixoroPaintLikeBtn(btn, oldLiked);
     if(window.FEED_LIKES){ oldLiked ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId)); }
     await pixoroSyncRealCount(postId);
-    alert('Like Save Aagala da - Supabase likes Table la RLS Policy Paaru da!');
+    // ✅ FIX - Alert Thookiten da - Silent da - Console la mattum da
     return oldLiked;
   }
 }
@@ -114,7 +126,18 @@ async function pixoroDoubleTapLike(postId, mediaEl){
   if(btn) pixoroPaintLikeBtn(btn, true);
   if(window.FEED_LIKES) window.FEED_LIKES.add(String(postId));
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return true;
-  if(!window.ME_ID){ try{ let {data:{session}} = await s.auth.getSession(); if(session) window.ME_ID = session.user.id; else return true; }catch(e){ return true; } }
+  if(!window.ME_ID){
+    try{
+      let {data:{session}} = await s.auth.getSession();
+      if(session) window.ME_ID = session.user.id;
+      else {
+        // ✅ FIX - Login Illana Red ah Vachitu Poga Koodathu da
+        if(btn) pixoroPaintLikeBtn(btn, false);
+        if(window.FEED_LIKES) window.FEED_LIKES.delete(String(postId));
+        return true;
+      }
+    }catch(e){ return true; }
+  }
   try{
     let r = await s.from('likes').insert({post_id:postId, user_id:window.ME_ID});
     if(r.error && String(r.error.code) !== '23505') throw r.error;
@@ -124,6 +147,7 @@ async function pixoroDoubleTapLike(postId, mediaEl){
     console.log('❌ DOUBLE TAP DB FAIL DA:', e.message);
     if(btn) pixoroPaintLikeBtn(btn, false);
     if(window.FEED_LIKES) window.FEED_LIKES.delete(String(postId));
+    await pixoroSyncRealCount(postId);
     return true;
   }
 }
