@@ -1,5 +1,6 @@
-// ===== PIXORO FEED - v1.0 - THANI CODE DA - LIKE AH THODATHE DA =====
+// ===== PIXORO FEED - THANI CODE DA - LIKE AH THODATHE DA =====
 // RULE: Feed mattum thaan da - Like Pathi Onnum Illa da - like.js la mattum thaan da
+//       Save = Server la mattum thaan da - LocalStorage Illa da
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
 let FEED_SAVES = new Set();
@@ -104,7 +105,8 @@ function renderFeedList(){
     let isMine = String(p.user_id)===String(FEED_ME_ID) || uname === feedClean(FEED_ME_RAW) || uname === feedClean(window.ME_RAW||'');
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
     let cnt = FEED_COUNTS[String(p.id)] || {like:0,comment:0,share:0};
-    let liked = '';
+    // ✅ FIX - Server la Like iruntha - Direct ah liked Class ah Podu da - Paint ku Wait Panna Vendaam da
+    let liked = FEED_LIKES.has(String(p.id)) ? 'liked' : '';
     let saved = FEED_SAVES.has(String(p.id)) ? 'saved' : '';
     return `<div class="post">
       <div class="postTop">
@@ -169,6 +171,7 @@ async function loadFeed(){
     let navPfp = document.getElementById('navPfp'); if(navPfp && MY_PFP) navPfp.src = MY_PFP;
     if(window.pixoroLoadFollowing) window.pixoroLoadFollowing();
     FEED_ALL = await getFeed(FEED_ME_ID);
+    // ✅ Server la irunthu mattum thaan da - LocalStorage Illa da
     FEED_LIKES = new Set(); FEED_SAVES = new Set();
     try{ let {data:likes} = await s.from('likes').select('post_id').eq('user_id', FEED_ME_ID); FEED_LIKES = new Set((likes||[]).map(x=>String(x.post_id))); }catch(e){}
     try{ let {data:saves} = await s.from('saves').select('post_id').eq('user_id', FEED_ME_ID); FEED_SAVES = new Set((saves||[]).map(x=>String(x.post_id))); }catch(e){}
