@@ -1,49 +1,151 @@
-// ✅ FEED.JS - FINAL DA
 
-async function loadFeed(){
-  let feedList = document.getElementById('feedList');
-  if(!feedList) return;
+/* PIXORO FEED - BLACK SCREEN FIX */
 
-  let s = window.getSupa ? window.getSupa() : window.supa;
-  if(!s) return;
+(function () {
+  'use strict';
 
-  let { data: posts } = await s.from('posts').select('*').order('created_at', { ascending: false });
-  if(!posts || posts.length === 0){
-    feedList.innerHTML = '<p style="text-align:center;padding:20px">Innum Post eh illa da</p>';
-    return;
+  let loading = false;
+
+  function getClient() {
+    if (typeof window.getSupa === 'function') {
+      return window.getSupa();
+    }
+    return window.supa || null;
   }
 
-  feedList.innerHTML = posts.map(p => {
-    let img = p.image_url || p.media_url || p.photo_url || p.url || '';
-    let isVideo = img.endsWith('.mp4') || img.endsWith('.mov') || img.endsWith('.webm') || p.media_type === 'video';
+  async function loadFeed() {
+    const feed = document.getElementById('feed');
+    const errorBox = document.getElementById('feedError');
 
-    return `
-    <div class="post">
-      <div class="post-top">
-        <img src="${p.avatar_url || 'https://via.placeholder.com/32'}">
-        <b>${p.username || 'Pixoro User'}</b>
-      </div>
+    if (!feed || loading) return;
 
-      <div class="postMedia" onclick="pixoroFeedTap('${p.id}', this, event)">
-        ${img ? (isVideo
-          ? `<video src="${img}" muted playsinline loop></video>`
-          : `<img src="${img}">`)
-        : ''}
-      </div>
+    const supa = getClient();
 
-      <div style="padding:10px 12px;display:flex;gap:14px;font-size:22px">
-        <span data-like-btn="${p.id}" onclick="pixoroDoubleTapLike('${p.id}', this.closest('.post').querySelector('.postMedia'))">🤍</span>
-        <span>💬</span>
-        <span>↗️</span>
-      </div>
+    if (!supa) {
+      feed.innerHTML =
+        '<p style="color:#ff5ea8;text-align:center;padding:25px">Database connection not ready</p>';
+      if (errorBox) errorBox.style.display = 'block';
+      return;
+    }
 
-      <div style="padding:0 12px 12px;font-size:14px">
-        <b><span data-like-count="${p.id}">${p.likes_count || 0}</span> likes</b>
-        <div class="post-cap"><b>${p.username || ''}</b> ${p.caption || ''}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
+    loading = true;
 
-document.addEventListener('DOMContentLoaded', loadFeed);
-window.loadFeed = loadFeed;
+    try {
+      const { data: posts, error } = await supa
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      if (!posts || posts.length === 0) {
+        feed.innerHTML =
+          '<p style="color:white;text-align:center;padding:30px">No posts yet</p>';
+        if (errorBox) errorBox.style.display = 'none';
+        return;
+      }
+
+      feed.innerHTML = posts.map(post => {
+        const id = String(post.id || '');
+        const username = escapeHTML(post.username || 'Pixoro User');
+        const caption = escapeHTML(post.caption || '');
+
+        const media =
+          post.image_url ||
+          post.media_url ||
+          post.photo_url ||
+          post.url || '';
+
+        const safeMedia = safeURL(media);
+        const video =
+          post.media_type === 'video' ||
+          /\.(mp4|mov|webm)(\?|$)/i.test(media);
+
+        return `
+          <article class="post" data-post-id="${escapeHTML(id)}">
+
+            <div class="postTop">
+              <b>${username}</b>
+            </div>
+
+            <div class="postMedia">
+              ${
+                safeMedia
+                  ? video
+                    ? `<video class="main" src="${safeMedia}" controls muted playsinline loop></video>`
+                    : `<img class="main" src="${safeMedia}" alt="Post" loading="lazy">`
+                  : '<p style="padding:25px;color:#aaa">Media unavailable</p>'
+              }
+            </div>
+
+            <div class="actions">
+              <div class="left">
+                <button class="act" type="button"
+                  data-like-btn="${escapeHTML(id)}"
+                  aria-label="Like">♡</button>
+
+                <button class="act" type="button"
+                  aria-label="Comment"
+                  onclick="if(window.openComments) window.openComments('${escapeHTML(id)}')">♡</button>
+
+                <button class="act" type="button"
+                  aria-label="Share"
+                  onclick="if(navigator.share) navigator.share({url:location.origin+location.pathname+'?post=${encodeURIComponent(id)}'}).catch(()=>{})">↗</button>
+              </div>
+            </div>
+
+            <div style="padding:0 12px 12px;color:white">
+              <b><span data-like-count="${escapeHTML(id)}">${Number(post.likes_count) || 0}</span> likes</b>
+              <div style="margin-top:6px"><b>${username}</b> ${caption}</div>
+            </div>
+
+          </article>
+        `;
+      }).join('');
+
+      if (errorBox) errorBox.style.display = 'none';
+
+    } catch (err) {
+      console.error('PIXORO FEED ERROR:', err);
+
+      feed.innerHTML =
+        '<p style="color:#ff5ea8;text-align:center;padding:25px">Feed load failed. Check database connection.</p>';
+
+      if (errorBox) errorBox.style.display = 'block';
+
+    } finally {
+      loading = false;
+    }
+  }
+
+  function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[char]);
+  }
+
+  function safeURL(value) {
+    try {
+      const url = new URL(value, location.href);
+      return ['https:', 'http:'].includes(url.protocol)
+        ? escapeHTML(url.href)
+        : '';
+    } catch {
+      return '';
+    }
+  }
+
+  window.loadFeed = loadFeed;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadFeed);
+  } else {
+    loadFeed();
+  }
+
+})();
