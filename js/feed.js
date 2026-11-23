@@ -1,4 +1,8 @@
 // ✅ CORRECTED DA - 400ms - Phone la Double Tap ku Time kuduthom da
+let _lastTapId = null;
+let _lastTapTime = 0;
+let _singleTapTimer = null;
+
 window.pixoroFeedTap = function(postId, el, ev){
   if(ev) ev.preventDefault();
   let now = Date.now();
@@ -27,7 +31,8 @@ function showBigHeart(mediaEl){
   let div = document.createElement('div');
   div.className = 'bigHeart';
   div.style.width = '80px'; div.style.height = '80px';
-  div.style.position = 'absolute'; div.style.left = '50%'; div.style.top = '50%'; div.style.zIndex = '99';
+  div.style.position = 'absolute'; div.style.left = '50%'; div.style.top = '50%'; div.style.transform = 'translate(-50%,-50%)';
+  div.style.zIndex = '99';
   div.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   let cs = window.getComputedStyle(box);
   if(cs.position === 'static') box.style.position = 'relative';
