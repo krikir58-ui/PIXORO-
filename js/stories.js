@@ -1,7 +1,17 @@
-// ===== PIXORO STORY - v1023 - OREY PROFILE PHOTO ELLA PAGE KUM DA =====
+// ===== PIXORO STORY - v1024 - CORRECTED DA =====
 async function loadStories(){
-  let bar = document.getElementById('storyBar'); if(!bar) return;
+  // ✅ CORRECTED DA - storyRow la thaan Podanum da, storyBar la illa da
+  let bar = document.getElementById('storyRow') || document.getElementById('storyBox') || document.getElementById('storyBar');
+  if(!bar) return;
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
+
+  // ✅ ME_ID Illana Edu da
+  if(!window.ME_ID){
+    try{
+      let {data:{session}} = await s.auth.getSession();
+      if(session) window.ME_ID = session.user.id;
+    }catch(e){}
+  }
 
   // ✅ 24hrs ku munnadi story mattum da
   let since = new Date(Date.now() - 24*60*60*1000).toISOString();
@@ -25,7 +35,7 @@ async function loadStories(){
   try{
     const { data: { user } } = await s.auth.getUser();
     if(user){
-      // ✅ FIXED DA - avatar_url mattum thaan da
+      if(!window.ME_ID) window.ME_ID = user.id;
       const { data: prof } = await s.from('profiles').select('avatar_url,username').eq('id', user.id).single();
       if(prof){
         let p = String(prof.avatar_url || '').trim();
@@ -43,7 +53,8 @@ async function loadStories(){
   let myHasStory = !!byUser[String(window.ME_ID)];
 
   // ✅ MY STORY FIRST DA - Pixoro Style Circle + Plus - Orey Photo da
-  let html = `<div class="sItem" onclick="location.href='./story-upload.html'">
+  let myLink = myHasStory ? `./story.html?user=${window.ME_ID}` : './story-upload.html';
+  let html = `<div class="sItem" onclick="location.href='${myLink}'">
     <div class="sAddWrap" style="position:relative">${myImg}${myLetterHtml}<div class="sAddPlus">+</div></div>
     <div class="sName">My Story</div></div>`;
 
@@ -52,10 +63,8 @@ async function loadStories(){
     if(k === String(window.ME_ID)) return;
     let arr = byUser[k]; let first = arr[0];
     let uname = String(first.username || profMap[k]?.username || 'user').replace('@','').toLowerCase();
-    // ✅ FIXED DA - Profiles la irunthu mattum thaan da
     let prof = profMap[k] || {};
     let avatar = String(prof.avatar_url || '').trim();
-    if(k === String(window.ME_ID) && (window.MY_PFP || window.ME_PFP)) avatar = window.MY_PFP || window.ME_PFP;
     let letter = uname.charAt(0).toUpperCase();
     let imgHtml = avatar ? `<img src="${avatar}" onerror="this.remove();this.parentElement.querySelector('.sLetter2').style.display='grid'">` : '';
     let letterHtml = `<div class="sLetter2" style="display:${avatar ? 'none' : 'grid'};width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">${letter}</div>`;
@@ -64,10 +73,17 @@ async function loadStories(){
       <div class="sName">${uname}</div></div>`;
   });
 
-  if(myHasStory){
-    html = html.replace(`onclick="location.href='./story-upload.html'"`, `onclick="location.href='./story.html?user=${window.ME_ID}'"`);
-  }
   bar.innerHTML = html;
   bar.style.display = 'flex';
+  // ✅ Parent ah kooda Kaatu da
+  let outer = document.getElementById('storyBar');
+  if(outer) outer.style.display = 'flex';
+  let box = document.getElementById('storyBox');
+  if(box) box.style.display = 'flex';
 }
 window.loadStories = loadStories;
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', ()=> loadStories());
+} else {
+  loadStories();
+}
