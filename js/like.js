@@ -8,6 +8,7 @@
 console.log('✅ LIKE FILE LOADED DA');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
+let _lastLikeAction = 0;
 if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
 if(!window.FEED_COUNTS) window.FEED_COUNTS = {};
 
@@ -66,7 +67,7 @@ function pixoroPaintAllLikes(){
   });
 }
 
-// 🔥 FIX - REFRESH PANNALUM POGATHA MARI - SERVER LA IRUNTHU EN LIKE AH EDUTHU VARANUM DA!
+// 🔥 FIX - Puthu Set Vendaam da - Same Set la Add mattum da - Clear Panna Koodathu da!
 async function pixoroLoadMyLikes(){
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
   try{
@@ -75,7 +76,9 @@ async function pixoroLoadMyLikes(){
     window.ME_ID = session.user.id;
     let {data, error} = await s.from('likes').select('post_id').eq('user_id', window.ME_ID);
     if(error) throw error;
-    window.FEED_LIKES = new Set((data||[]).map(r=>String(r.post_id)));
+    if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
+    // ✅ Add mattum da - Clear Illa da - Feed.js Set um Same thaan da!
+    (data||[]).forEach(r=> window.FEED_LIKES.add(String(r.post_id)));
     pixoroPaintAllLikes();
     console.log('✅ MY LIKES LOADED DA:', window.FEED_LIKES.size);
   }catch(e){ console.log('LIKE LOAD FAIL DA:', e.message); }
@@ -98,6 +101,11 @@ async function pixoroSyncRealCount(postId){
 
 // BUTTON = Like / Unlike da!
 async function pixoroToggleLike(postId, btn){
+  // 🔥 FIX - Flicker Stop da - 500ms kulla 2nd Click ah Ignore pannu da!
+  let now = Date.now();
+  if(now - _lastLikeAction < 500) return;
+  _lastLikeAction = now;
+
   if(!btn) btn = document.querySelector(`[data-like-btn="${postId}"]`);
   let willLike = btn ? !btn.classList.contains('liked') : true;
   let oldLiked = !willLike;
@@ -142,6 +150,7 @@ async function pixoroDoubleTapLike(postId, mediaEl){
   if(window.FEED_LIKES && window.FEED_LIKES.has(String(postId))) return true;
   if(btn) pixoroPaintLikeBtn(btn, true);
   if(window.FEED_LIKES) window.FEED_LIKES.add(String(postId));
+  _lastLikeAction = Date.now(); // 🔥 FIX - Click Handler ah Block pannu da - 2 Thadava Toggle Aagathu da!
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return true;
   if(!window.ME_ID){
     try{
