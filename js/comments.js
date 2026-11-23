@@ -1,5 +1,6 @@
-// ===== PIXORO COMMENT - v1014 - THANI FILE DA =====
+// ===== PIXORO COMMENT - THANI FILE DA =====
 // RULE: Comment panna -> Server la Save + Count Update aagum da
+//       Save = Server la mattum thaan da - LocalStorage Illa da
 
 function openComment(id){
   window.CURRENT_COMMENT_POST = id;
@@ -27,19 +28,19 @@ async function loadComments(postId){
     let box = document.getElementById('commentList'); if(!box) return;
 
     box.innerHTML = (data||[]).map(c=>{
-      let isMine = window.ME_ID && c.user_id === window.ME_ID;
-      let delBtn = isMine ? `<span onclick="deleteComment(${c.id}, ${postId})" style="color:#888;font-size:11px;cursor:pointer;margin-left:8px">Delete</span>` : '';
+      let isMine = window.ME_ID && String(c.user_id) === String(window.ME_ID);
+      // ✅ FIX - ID ku Quote Potten da - UUID ku Quote Illana Error da!
+      let delBtn = isMine ? `<span onclick="deleteComment('${c.id}', '${postId}')" style="color:#888;font-size:11px;cursor:pointer;margin-left:8px">Delete</span>` : '';
       return `<div style="display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #222">
-        <img src="${window.pixoroGetAvatar ? window.pixoroGetAvatar(c) : (c.avatar_url||'')}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;background:#222" onerror="this.src='https://ui-avatars.com/api/?name=U&background=222&color=fff'">
+        <img src="${escHtml(window.pixoroGetAvatar ? window.pixoroGetAvatar(c) : (c.avatar_url||''))}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;background:#222" onerror="this.src='https://ui-avatars.com/api/?name=U&background=222&color=fff'">
         <div style="flex:1"><b>@${escHtml(String(c.username||'user').replace('@',''))}</b> <span>${escHtml(c.text||c.content||'')}</span><div>${delBtn}</div></div>
       </div>`;
     }).join('') || '<p style="color:#888;text-align:center;padding:20px">No comments yet da - First comment nee podu da!</p>';
 
-    // ✅ COUNT UPDATE - Feed la irukura count ah maathu da
     let cnt = (data||[]).length;
     let cc = document.querySelector(`[data-comment-count="${postId}"]`);
     if(cc) cc.innerText = cnt;
-  }catch(e){}
+  }catch(e){ console.log('Comment Load Fail da:', e.message); }
 }
 
 async function addComment(){
@@ -48,13 +49,11 @@ async function addComment(){
   if(!window.CURRENT_COMMENT_POST) return;
 
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
-  // Login check pannu da
   if(!window.ME_ID){
     let {data:{session}} = await s.auth.getSession();
     if(!session){ location.href='./login.html'; return; }
     window.ME_ID = session.user.id;
   }
-  // Button double click block pannu da
   inp.disabled = true;
   try{
     let {error} = await s.from('comments').insert({
@@ -66,8 +65,9 @@ async function addComment(){
     });
     if(error) throw error;
     inp.value = '';
-    loadComments(window.CURRENT_COMMENT_POST);
+    await loadComments(window.CURRENT_COMMENT_POST);
   }catch(e){
+    console.log('❌ COMMENT DB FAIL DA:', e.message);
     if(window.showToast) showToast('Comment Fail da - Thirumba try pannu da');
   }
   inp.disabled = false;
@@ -82,7 +82,6 @@ async function deleteComment(commentId, postId){
   loadComments(postId);
 }
 
-// Enter adicha Comment post aagum da
 document.addEventListener('DOMContentLoaded', ()=>{
   let inp = document.getElementById('commentInput');
   if(inp) inp.addEventListener('keydown', (e)=>{ if(e.key==='Enter') addComment(); });
