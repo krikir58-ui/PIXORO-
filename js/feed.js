@@ -1,5 +1,6 @@
-// ===== PIXORO FEED - FULL CORRECT FILE DA - SPEED + LIKE FIX DA =====
-// RULE: Feed mattum thaan da - Like Pathi Onnum Illa da - like.js la mattum thaan da
+// ===== PIXORO FEED - FINAL DA - SPEED + REFRESH LIKE NIKKUM DA =====
+// RULE: Feed mattum thaan da - Like = like.js la mattum thaan da
+//       Refresh pannina Like Pokathu da - FEED_LIKES.clear() Koodathu da
 //       Save = Server la mattum thaan da - LocalStorage Illa da
 let FEED_ALL = [], FEED_MODE = 'foryou', FEED_ME_ID = '', FEED_ME_RAW = '';
 let FEED_LIKES = new Set();
@@ -15,7 +16,7 @@ function feedClean(u){ if(!u) return ''; return String(u).trim().replaceAll('@',
 function getSupa(){ return window.supa || (window.getSupa ? window.getSupa() : null); }
 function syncFeedSets(){ window.FEED_LIKES = FEED_LIKES; window.FEED_SAVES = FEED_SAVES; window.FEED_COUNTS = FEED_COUNTS; }
 
-// ✅ FIX - Count ah Mattum Update pannu da - Feed ah Render Pannaatha da - Like Maarathu da!
+// ✅ Count ah Mattum Update pannu da - Feed ah Render Pannaatha da - Like Maarathu da!
 function pixoroUpdateCountsOnly(){
   for(let pid in FEED_COUNTS){
     let c = FEED_COUNTS[pid];
@@ -26,7 +27,7 @@ function pixoroUpdateCountsOnly(){
     let shEl = document.querySelector(`[data-share-count="${pid}"]`);
     if(shEl) shEl.innerText = c.share;
   }
-  // ❌ pixoroPaintAllLikes ah inga koopda koodathu da - Like ah thirumba White aakidum da!
+  // ❌ pixoroPaintAllLikes ah inga koopda koodathu da - Like ah White aakidum da!
 }
 window.pixoroUpdateCountsOnly = pixoroUpdateCountsOnly;
 
@@ -137,8 +138,8 @@ function renderFeedList(){
     let isMine = String(p.user_id)===String(FEED_ME_ID) || uname === feedClean(FEED_ME_RAW) || uname === feedClean(window.ME_RAW||'');
     let isFollowing = window.pixoroIsFollowing ? window.pixoroIsFollowing(uname) : false;
     let cnt = FEED_COUNTS[String(p.id)] || {like:0,comment:0,share:0};
-    // ✅ OPEN PANNINA WHITE THAAN DA - FEED_LIKES empty ah irukkum da
-    let liked = FEED_LIKES.has(String(p.id)) ? 'liked' : '';
+    // ✅ Refresh pannina Like iruntha Red da - Illana White da - FEED_LIKES la irunthu paakkurom da
+    let liked = window.FEED_LIKES && window.FEED_LIKES.has(String(p.id)) ? 'liked' : '';
     let saved = FEED_SAVES.has(String(p.id)) ? 'saved' : '';
     return `<div class="post">
       <div class="postTop">
@@ -161,7 +162,8 @@ function renderFeedList(){
     </div>`;
   }).join('');
   if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
-  // ❌ renderFeedList la pixoroPaintAllLikes koopda koodathu da - White aakidum da
+  // ✅ Render aana odane Like ah Paint pannu da - Refresh pannina Red varanum da
+  if(window.pixoroPaintAllLikes) window.pixoroPaintAllLikes();
 }
 
 async function renderFeed(currentUserId){
@@ -200,10 +202,9 @@ async function loadFeed(){
 
     FEED_ALL = await getFeed(FEED_ME_ID);
 
-    // ✅ OPEN PANNINA WHITE DA - Likes ah Auto Load panni Red aakka koodathu da!
-    // Pazhaya code la inga likes ah load panni paint pannitom - athaan open pannave Red ah irunthuchu da!
-    FEED_LIKES.clear(); FEED_SAVES.clear();
-    // Saves mattum load pannu da - Likes vendaam da
+    // ✅ FINAL FIX - FEED_LIKES.clear() ILLA DA - Refresh pannina Like Pokathu da!
+    // Like.js thaan Likes ah Load pannum da - Feed ah Clear panna koodathu da!
+    FEED_SAVES.clear();
     s.from('saves').select('post_id').eq('user_id', FEED_ME_ID).then(({data})=>{ (data||[]).forEach(x=> FEED_SAVES.add(String(x.post_id))); window.FEED_SAVES = FEED_SAVES; });
     syncFeedSets();
 
