@@ -1,10 +1,41 @@
-// ===== PIXORO SHARE - v1014 - THANI FILE DA =====
-// RULE: Share panna -> Server la Count Save + Link Copy / Share Sheet varum da
+// ===== PIXORO SHARE - THANI FILE DA =====
+// RULE: Share panna -> Share Sheet / Link Copy -> Appuram thaan Server la Count Save da
+//       Cancel panna - Count Illa da
+//       Save = Server la mattum thaan da - LocalStorage Illa da
 
 async function sharePost(id){
   let u = location.origin + '/index.html?id=' + id;
 
-  // ✅ 1. SERVER LA COUNT SAVE PANNU DA
+  // ✅ 1. MUDHAL LA SHARE PANNU DA - Count Appuram thaan da
+  let shared = false;
+
+  if(navigator.share){
+    try{
+      await navigator.share({title:'Pixoro - Paaru da!', text:'Pixoro la Intha Post ah Paaru da!', url:u});
+      shared = true;
+    }catch(e){
+      // User Cancel pannita - Count Panna Koodathu da - Veliya Po da
+      if(e.name === 'AbortError') return;
+      shared = false;
+    }
+  } else {
+    // ✅ Share Sheet illa na - Link Copy pannu da - Copy aana thaan Shared da
+    try{
+      await navigator.clipboard.writeText(u);
+      showToast('Link Copy Aachu da - Friend ku Anuppu da!');
+      shared = true;
+    }catch(e){
+      let tmp = document.createElement('input');
+      tmp.value = u; document.body.appendChild(tmp); tmp.select();
+      document.execCommand('copy'); tmp.remove();
+      showToast('Link Copy Aachu da!');
+      shared = true;
+    }
+  }
+
+  if(!shared) return;
+
+  // ✅ 2. Share Pannathum thaan Server la Count Save pannu da
   try{
     let s = window.getSupa ? window.getSupa() : window.supa;
     if(s){
@@ -13,36 +44,16 @@ async function sharePost(id){
         if(session) window.ME_ID = session.user.id;
       }
       await s.from('shares').insert({ post_id: id, user_id: window.ME_ID || null });
-      // Count update pannu da
+      // ✅ Real Count ah Server la irunthu Edu da - Phone la +1 Panna Koodathu da
       let {count} = await s.from('shares').select('*',{count:'exact',head:true}).eq('post_id',id);
       let sc = document.querySelector(`[data-share-count="${id}"]`);
       if(sc) sc.innerText = count || 0;
     }
-  }catch(e){}
-
-  // ✅ 2. SHARE SHEET - Mobile la WhatsApp / Insta ellam varum da
-  if(navigator.share){
-    try{ await navigator.share({title:'Pixoro - Paaru da!', text:'Pixoro la Intha Post ah Paaru da!', url:u}); return; }catch(e){
-      // User Cancel pannita - Onnum panna vendam da
-      if(e.name === 'AbortError') return;
-    }
-  }
-
-  // ✅ 3. Share Sheet illa na - Link Copy pannidu da
-  try{
-    await navigator.clipboard.writeText(u);
-    showToast('Link Copy Aachu da - Friend ku Anuppu da!');
-  }catch(e){
-    // Clipboard block aana - Prompt la kaatu da
-    let tmp = document.createElement('input');
-    tmp.value = u; document.body.appendChild(tmp); tmp.select();
-    document.execCommand('copy'); tmp.remove();
-    showToast('Link Copy Aachu da!');
-  }
+  }catch(e){ console.log('Share DB Fail da:', e.message); }
 }
 window.sharePost = sharePost;
 
-// ✅ TOAST - Intha file la thaan irukku da - Vera file la iruntha ithu thaan use aagum da
+// ✅ TOAST - Intha file la thaan irukku da
 function showToast(m){
   let t = document.getElementById('toast');
   if(!t){
