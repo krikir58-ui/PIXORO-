@@ -43,11 +43,21 @@ async function sharePost(id){
         let {data:{session}} = await s.auth.getSession();
         if(session) window.ME_ID = session.user.id;
       }
-      await s.from('shares').insert({ post_id: id, user_id: window.ME_ID || null });
+      // ✅ FIX - user_id null ah Anuppa Koodathu da - ME_ID iruntha mattum Anuppu da
+      let payload = { post_id: id };
+      if(window.ME_ID) payload.user_id = window.ME_ID;
+      let r = await s.from('shares').insert(payload);
+      // ✅ FIX - Already Share Panniruntha - Duplicate Error 23505 Varum da - Athu Fail Illa da - Count ah ve Edu da!
+      if(r.error && String(r.error.code) !== '23505') throw r.error;
       // ✅ Real Count ah Server la irunthu Edu da - Phone la +1 Panna Koodathu da
       let {count} = await s.from('shares').select('*',{count:'exact',head:true}).eq('post_id',id);
       let sc = document.querySelector(`[data-share-count="${id}"]`);
       if(sc) sc.innerText = count || 0;
+      // ✅ FEED_COUNTS la yum Update pannu da - Refresh panna kooda Count nikkanum da
+      if(window.FEED_COUNTS){
+        window.FEED_COUNTS[String(id)] = window.FEED_COUNTS[String(id)] || {like:0,comment:0,share:0};
+        window.FEED_COUNTS[String(id)].share = count || 0;
+      }
     }
   }catch(e){ console.log('Share DB Fail da:', e.message); }
 }
