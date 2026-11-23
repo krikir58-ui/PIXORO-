@@ -1,4 +1,3 @@
-// ✅ CORRECTED DA - FINAL - Ithu mattum pothum da
 let _lastTapId = null;
 let _lastTapTime = 0;
 let _singleTapTimer = null;
@@ -38,6 +37,7 @@ async function pixoroDoubleTapLike(postId, el){
 }
 window.pixoroDoubleTapLike = pixoroDoubleTapLike;
 
+// ✅ CORRECTED DA - CSS illa naalum Heart varum da - Inline Style da
 function showBigHeart(mediaEl){
   if(!mediaEl) return;
   let box = null;
@@ -47,11 +47,11 @@ function showBigHeart(mediaEl){
   box.querySelectorAll('.bigHeart').forEach(h=>h.remove());
   let div = document.createElement('div');
   div.className = 'bigHeart';
-  div.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  // CSS ah namba vendaam da - ella Style ah inga ye potten da
+  div.style.cssText = 'position:absolute !important; left:50% !important; top:50% !important; width:80px !important; height:80px !important; z-index:9999 !important; pointer-events:none !important; opacity:1 !important; transform:translate(-50%,-50%) scale(1.2) !important; transition:.2s !important; display:block !important;';
+  div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;display:block"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   let cs = window.getComputedStyle(box);
   if(cs.position === 'static') box.style.position = 'relative';
   box.appendChild(div);
-  void div.offsetWidth;
-  div.classList.add('show');
   setTimeout(()=>div.remove(), 600);
 }
