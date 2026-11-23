@@ -1,4 +1,4 @@
-/* PIXORO FEED - FINAL DA - FOLLOW + LIKE FIX DA */
+/* PIXORO FEED - FINAL CORRECTED DA - NO DOUBLE LIKE DA */
 (function () {
   'use strict';
   let loading = false;
@@ -14,7 +14,6 @@
     if(!supa){ feed.innerHTML='<p style="color:#ff5ea8;text-align:center;padding:25px">Database connection not ready</p>'; return; }
     loading = true;
     try{
-      // ✅ 1. Naan Yaaru nu Therinjikanum da
       let MY_ID = '';
       try{ let { data:{session} } = await supa.auth.getSession(); MY_ID = session?.user?.id || ''; }catch{}
 
@@ -28,7 +27,6 @@
         (profs||[]).forEach(p=> profMap[String(p.id)] = p);
       }
 
-      // ✅ 2. Like Panninatha DB la Check Pannu da - Refresh la Pogathu da
       let likedSet = new Set(), savedSet = new Set();
       if(MY_ID){
         let postIds = posts.map(p=>p.id);
@@ -36,6 +34,9 @@
         (myLikes||[]).forEach(l=> likedSet.add(String(l.post_id)));
         let { data: mySaves } = await supa.from('saves').select('post_id').eq('user_id', MY_ID).in('post_id', postIds);
         (mySaves||[]).forEach(s=> savedSet.add(String(s.post_id)));
+        // like.js ku kooda sollidu da
+        if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
+        likedSet.forEach(id=> window.FEED_LIKES.add(id));
       }
 
       feed.innerHTML = posts.map(post=>{
@@ -48,7 +49,6 @@
         const safeMedia = safeURL(media);
         const video = post.media_type==='video' || /\.(mp4|mov|webm)(\?|$)/i.test(media);
         const letter = username.charAt(0).toUpperCase();
-        // ✅ 3. En Post ah nu Paaru da
         const isMine = MY_ID && String(post.user_id) === String(MY_ID);
         const isLiked = likedSet.has(id) ? ' liked' : '';
         const isSaved = savedSet.has(id) ? ' saved' : '';
@@ -67,7 +67,7 @@
           </div>
           <div class="actions">
             <div class="left">
-              <button data-like-btn="${id}" class="act${isLiked}" onclick="pixoroToggleLike('${id}',this)">
+              <button data-like-btn="${id}" class="act${isLiked}">
                 <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
                 <span data-like-count="${id}">${post.likes_count||0}</span>
               </button>
@@ -87,6 +87,11 @@
           <div style="padding:0 14px 6px;color:white;font-size:14px"><b>${username}</b> ${caption}</div>
         </article>`;
       }).join('');
+
+      // ✅ Like.js ku Feed Ready nu Sollu da
+      window.dispatchEvent(new Event('pixoroFeedLoaded'));
+      if(window.pixoroPaintAllLikes) window.pixoroPaintAllLikes();
+
     }catch(err){
       console.error('PIXORO FEED ERROR:', err);
       feed.innerHTML='<p style="color:#ff5ea8;text-align:center;padding:25px">Feed load failed. Check database connection.</p>';
