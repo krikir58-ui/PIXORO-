@@ -1,10 +1,9 @@
-// ===== PIXORO LIKE - FINAL V7 - HEART BURST TAP FIX DA =====
-console.log('✅ LIKE FILE LOADED DA - V7 HEART BURST TAP FIX');
+// ===== PIXORO LIKE - FINAL V8 - OREY HEART COLOUR SLOW DA =====
+console.log('✅ LIKE FILE LOADED DA - V8 OREY HEART COLOUR SLOW');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
 
-// ✅ MAIN FIX DA - Touch ah eppovum store panni veppom da - Feed la event anuppalana kooda work aagum da
 window._pixLastTouchX = 0; window._pixLastTouchY = 0;
 document.addEventListener('touchstart', function(e){
   if(e.touches && e.touches[0]){ window._pixLastTouchX = e.touches[0].clientX; window._pixLastTouchY = e.touches[0].clientY; }
@@ -25,7 +24,6 @@ function pixoroSaveLocal(){
 }
 
 window.pixoroFeedTap = function(postId, el, ev){
-  // ✅ ev illana kooda stored touch la irundhu edukkurom da
   if(!ev && window._pixLastTouchX){ ev = { clientX: window._pixLastTouchX, clientY: window._pixLastTouchY }; }
   if(ev){
     if(ev.target && ev.target.closest && ev.target.closest('[data-like-btn]')) return;
@@ -54,8 +52,9 @@ window.pixoroFeedTap = function(postId, el, ev){
   document.getElementById('pixoro-like-css-v5')?.remove();
   document.getElementById('pixoro-like-css-v6')?.remove();
   document.getElementById('pixoro-like-css-v7')?.remove();
+  document.getElementById('pixoro-like-css-v8')?.remove();
   let s = document.createElement('style');
-  s.id = 'pixoro-like-css-v7';
+  s.id = 'pixoro-like-css-v8';
   s.innerText = `
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
@@ -178,12 +177,10 @@ async function pixoroDoubleTapLike(postId, mediaEl, ev){
     else if(ev.changedTouches && ev.changedTouches[0]){ tapX = ev.changedTouches[0].clientX; tapY = ev.changedTouches[0].clientY; }
     else { tapX = ev.clientX || 0; tapY = ev.clientY || 0; }
   }
-  // ✅ ev la 0 vandha - stored touch la irundhu edu da - ITHU THAAN MAIN FIX DA
   if(!tapX && !tapY){
     tapX = window._pixLastTouchX || 0;
     tapY = window._pixLastTouchY || 0;
   }
-  console.log('❤️ TAP AT:', tapX, tapY, 'STORED:', window._pixLastTouchX, window._pixLastTouchY);
   showBigHeart(mediaEl, tapX, tapY);
   let btn = document.querySelector(`[data-like-btn="${postId}"]`);
   if(btn && btn.classList.contains('liked')) return true;
@@ -229,67 +226,37 @@ function showBigHeart(mediaEl, tapX, tapY){
     x = Math.max(70, Math.min(r.width-70, tapX - r.left));
     y = Math.max(70, Math.min(r.height-70, tapY - r.top));
   }
-  console.log('❤️ HEART AT INSIDE BOX:', x, y, 'BOX:', r.width, r.height);
 
-  // ✅ 1. PERIYA WHITE HEART
+  // ✅ OREY HEART THAAN DA - VERA HEART EHTHUVUM ILLA DA
   let div = document.createElement('div');
   div.className = 'bigHeart';
-  div.style.cssText = 'position:absolute;z-index:99;pointer-events:none;width:100px;height:100px;left:'+x+'px;top:'+y+'px;opacity:0;';
-  div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))"><path fill="#fff" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  div.style.cssText = 'position:absolute;z-index:99;pointer-events:none;width:110px;height:110px;left:'+x+'px;top:'+y+'px;opacity:0;';
+  div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   box.appendChild(div);
+
+  // ✅ OREY HEART EH COLOUR COLOUR AH MAARUM DA
+  let colors = ['#FF0A33','#FF4D8D','#FF8A00','#FF2E9A','#FFD500','#00E5FF','#7C4DFF','#00FF88','#FF6B6B'];
+  let ci = 0;
+  let path = div.querySelector('path');
+  let colorTimer = setInterval(()=>{
+    ci = (ci+1) % colors.length;
+    if(path) path.setAttribute('fill', colors[ci]);
+  }, 180);
+
+  // ✅ SLOW DANCE DA - 1800ms MELLA POGUM DA
   try{
     div.animate([
       { opacity:0, transform:'translate(-50%,-50%) scale(0) rotate(0deg)' },
       { opacity:1, transform:'translate(-50%,-50%) scale(1.4) rotate(-10deg)' },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1.1) rotate(8deg)' },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1.15) rotate(-5deg)' },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1.15) rotate(8deg)' },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1.25) rotate(-6deg)' },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1.1) rotate(4deg)' },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1.15) rotate(-2deg)' },
       { opacity:1, transform:'translate(-50%,-50%) scale(1) rotate(0deg)' },
       { opacity:0, transform:'translate(-50%,-50%) scale(1.3) rotate(0deg)' }
-    ], { duration:850, easing:'ease-out' }).onfinish = ()=> div.remove();
-  }catch(e){ div.remove(); }
-  setTimeout(()=>div.remove(), 900);
-
-  // ✅ 2. 10 COLOUR HEARTS - PERIYA SIZE DA - KATTAYAMA THERIYUM DA
-  let colors = ['#FF0A33','#FF4D8D','#FF8A00','#FF2E9A','#FFD500','#00E5FF','#7C4DFF','#FF6B6B'];
-  for(let i=0;i<10;i++){
-    let s = document.createElement('div');
-    s.className = 'pixMiniHeart';
-    let col = colors[i % colors.length];
-    let sz = 28 + Math.random()*20;
-    s.style.cssText = 'position:absolute;z-index:98;pointer-events:none;width:'+sz+'px;height:'+sz+'px;left:'+x+'px;top:'+y+'px;opacity:1;';
-    s.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))"><path fill="'+col+'" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
-    box.appendChild(s);
-    let ang = (i/10)*Math.PI*2 + Math.random()*0.4;
-    let dist = 110 + Math.random()*60;
-    let dx = Math.cos(ang)*dist, dy = Math.sin(ang)*dist - 30;
-    try{
-      s.animate([
-        { opacity:1, transform:'translate(-50%,-50%) scale(0) rotate(0deg)' },
-        { opacity:1, transform:'translate(calc(-50% + '+dx+'px), calc(-50% + '+dy+'px)) scale(1.2) rotate('+(Math.random()*50-25)+'deg)' },
-        { opacity:0, transform:'translate(calc(-50% + '+dx+'px), calc(-50% + '+(dy-70)+'px)) scale(0.7) rotate(0deg)' }
-      ], { duration:850, easing:'ease-out', delay:30 }).onfinish = ()=> s.remove();
-    }catch(e){ s.remove(); }
-    setTimeout(()=>s.remove(), 950);
-  }
-
-  // ✅ 3. BURST DOTS
-  for(let i=0;i<10;i++){
-    let d = document.createElement('div');
-    d.className = 'pixBurstDot';
-    let col = colors[i % colors.length];
-    d.style.cssText = 'position:absolute;z-index:97;pointer-events:none;width:8px;height:8px;border-radius:50%;background:'+col+';left:'+x+'px;top:'+y+'px;';
-    box.appendChild(d);
-    let ang = Math.random()*Math.PI*2;
-    let dist = 70 + Math.random()*80;
-    let dx = Math.cos(ang)*dist, dy = Math.sin(ang)*dist;
-    try{
-      d.animate([
-        { opacity:1, transform:'translate(-50%,-50%) scale(1)' },
-        { opacity:0, transform:'translate(calc(-50% + '+dx+'px), calc(-50% + '+dy+'px)) scale(0)' }
-      ], { duration:700, easing:'ease-out' }).onfinish = ()=> d.remove();
-    }catch(e){ d.remove(); }
-    setTimeout(()=>d.remove(), 750);
-  }
+    ], { duration:1800, easing:'ease-in-out' }).onfinish = ()=>{ clearInterval(colorTimer); div.remove(); };
+  }catch(e){ clearInterval(colorTimer); div.remove(); }
+  setTimeout(()=>{ clearInterval(colorTimer); div.remove(); }, 1900);
 }
 
 if(!window._pixoroLikeDelegation){
