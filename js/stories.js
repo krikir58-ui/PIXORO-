@@ -1,76 +1,67 @@
-// ===== PIXORO STORY - v9999 - CORRECTED DA - PHOTO FIX DA =====
+// ===== PIXORO STORY - v9999 - PHOTO SYNC FIX DA =====
 async function loadStories(){
   let bar = document.getElementById('storyRow') || document.getElementById('storyBox') || document.getElementById('storyBar');
   if(!bar) return;
 
+  function getMyPhotoFromPage(){
+    let nav = document.getElementById('navPfp');
+    if(nav && nav.src && nav.src.length > 15 && !nav.src.endsWith('/')) return nav.src;
+    let postImg = document.querySelector('.post .pfpInner img');
+    if(postImg && postImg.src && postImg.src.length > 15) return postImg.src;
+    return window.MY_PFP || window.ME_PFP || '';
+  }
+  function paintMyPhoto(){
+    let photo = getMyPhotoFromPage();
+    if(!photo) return false;
+    let img = document.getElementById('myStoryImg');
+    let letter = document.getElementById('myStoryLetter');
+    if(img){ if(img.src !== photo){ img.src = photo; img.style.display = 'block'; } if(letter) letter.style.display = 'none'; return true; }
+    return false;
+  }
+
   bar.innerHTML = `<div class="sItem" onclick="location.href='./story-upload.html'">
     <div class="sAddWrap" style="position:relative;width:74px;height:74px">
-      <div class="sLetter avaLetterHome" style="display:grid;width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">Y</div>
-      <div class="sAddPlus" style="position:absolute;bottom:2px;right:2px;width:22px;height:22px;background:#0095f6;border:2px solid #000;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff">+</div>
+      <img id="myStoryImg" class="sAddImg" src="" style="width:74px;height:74px;border-radius:50%;object-fit:cover;display:none">
+      <div class="sLetter avaLetterHome" id="myStoryLetter" style="display:grid;width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">G</div>
+      <div class="sAddPlus" style="position:absolute;bottom:2px;right:2px;width:22px;height:22px;background:#0095f6;border:2px solid #000;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff;z-index:10">+</div>
     </div>
     <div class="sName">My Story</div></div>`;
   bar.style.display = 'flex';
 
-  let s = null;
-  for(let i=0;i<20;i++){
-    s = window.getSupa ? window.getSupa() : window.supa;
-    if(s) break;
-    await new Promise(r=> setTimeout(r, 200));
-  }
-  if(!s) return;
+  let tries = 0;
+  let timer = setInterval(function(){ tries++; if(paintMyPhoto() || tries > 25) clearInterval(timer); }, 200);
 
-  if(!window.ME_ID){
-    try{
-      let {data:{session}} = await s.auth.getSession();
-      if(session) window.ME_ID = session.user.id;
-    }catch(e){}
-  }
+  let s = null;
+  for(let i=0;i<20;i++){ s = window.getSupa ? window.getSupa() : window.supa; if(s) break; await new Promise(r=> setTimeout(r, 200)); }
+  if(!s) return;
+  if(!window.ME_ID){ try{ let {data:{session}} = await s.auth.getSession(); if(session) window.ME_ID = session.user.id; }catch(e){} }
 
   let since = new Date(Date.now() - 24*60*60*1000).toISOString();
   let {data} = await s.from('stories').select('*').gte('created_at', since).order('created_at',{ascending:false}).limit(50);
   let list = data || [];
-
   let byUser = {};
   list.forEach(st=>{ let k = String(st.user_id||st.username); if(!byUser[k]) byUser[k] = []; byUser[k].push(st); });
-
   let profMap = {};
-  try{
-    let r = await s.from('profiles').select('id,username,avatar_url').limit(200);
-    (r.data||[]).forEach(p=>{ profMap[String(p.id)] = p; });
-  }catch(e){}
+  try{ let r = await s.from('profiles').select('id,username,avatar_url').limit(200); (r.data||[]).forEach(p=>{ profMap[String(p.id)] = p; }); }catch(e){}
 
-  // ✅ PHOTO FIX DA - Profile + Nav PFP + LocalStorage la irunthu Edu da
-  let myAvatar = window.MY_PFP || window.ME_PFP || '';
-  if(!myAvatar){
-    let nav = document.getElementById('navPfp');
-    if(nav && nav.src && !nav.src.includes('data:') && nav.src.length > 10) myAvatar = nav.src;
-  }
-  if(!myAvatar){
-    try{ myAvatar = localStorage.getItem('pixoro_pfp') || localStorage.getItem('my_pfp') || ''; }catch(e){}
-  }
+  let myAvatar = getMyPhotoFromPage();
   let myName = window.ME_RAW || 'You';
   try{
     const { data: { user } } = await s.auth.getUser();
     if(user){
       if(!window.ME_ID) window.ME_ID = user.id;
       const { data: prof } = await s.from('profiles').select('avatar_url,username').eq('id', user.id).single();
-      if(prof){
-        let p = String(prof.avatar_url || '').trim();
-        if(p) myAvatar = p;
-        if(prof.username) myName = prof.username;
-        window.MY_PFP = myAvatar; window.ME_PFP = myAvatar;
-      }
+      if(prof){ let p = String(prof.avatar_url || '').trim(); if(p) myAvatar = p; if(prof.username) myName = prof.username; window.MY_PFP = myAvatar; window.ME_PFP = myAvatar; }
     }
   }catch(e){}
 
-  let myFirst = String(myName || 'Y').replace('@','').charAt(0).toUpperCase();
-  let myImg = myAvatar ? `<img class="sAddImg" src="${myAvatar}" style="width:74px;height:74px;border-radius:50%;object-fit:cover" onerror="this.remove();this.parentElement.querySelector('.sLetter').style.display='grid'">` : '';
-  let myLetterHtml = `<div class="sLetter avaLetterHome" style="display:${myAvatar ? 'none' : 'grid'};width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">${myFirst}</div>`;
-
+  let myFirst = String(myName || 'G').replace('@','').charAt(0).toUpperCase();
+  let myImg = `<img id="myStoryImg" class="sAddImg" src="${myAvatar}" style="width:74px;height:74px;border-radius:50%;object-fit:cover;display:${myAvatar ? 'block' : 'none'}" onerror="this.remove();document.getElementById('myStoryLetter').style.display='grid'">`;
+  let myLetterHtml = `<div class="sLetter avaLetterHome" id="myStoryLetter" style="display:${myAvatar ? 'none' : 'grid'};width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">${myFirst}</div>`;
   let myHasStory = !!byUser[String(window.ME_ID)];
   let myLink = myHasStory ? `./story.html?user=${window.ME_ID}` : './story-upload.html';
   let html = `<div class="sItem" onclick="location.href='${myLink}'">
-    <div class="sAddWrap" style="position:relative;width:74px;height:74px">${myImg}${myLetterHtml}<div class="sAddPlus" style="position:absolute;bottom:2px;right:2px;width:22px;height:22px;background:#0095f6;border:2px solid #000;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff">+</div></div>
+    <div class="sAddWrap" style="position:relative;width:74px;height:74px">${myImg}${myLetterHtml}<div class="sAddPlus" style="position:absolute;bottom:2px;right:2px;width:22px;height:22px;background:#0095f6;border:2px solid #000;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff;z-index:10">+</div></div>
     <div class="sName">My Story</div></div>`;
 
   Object.keys(byUser).forEach(k=>{
@@ -89,14 +80,9 @@ async function loadStories(){
 
   bar.innerHTML = html;
   bar.style.display = 'flex';
-  let outer = document.getElementById('storyBar');
-  if(outer) outer.style.display = 'flex';
-  let box = document.getElementById('storyBox');
-  if(box) box.style.display = 'flex';
+  paintMyPhoto();
+  let outer = document.getElementById('storyBar'); if(outer) outer.style.display = 'flex';
+  let box = document.getElementById('storyBox'); if(box) box.style.display = 'flex';
 }
 window.loadStories = loadStories;
-if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', ()=> loadStories());
-} else {
-  loadStories();
-}
+if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', ()=> loadStories()); } else { loadStories(); }
