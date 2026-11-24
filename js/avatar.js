@@ -1,51 +1,60 @@
-// ===== PIXORO AVATAR - v1014 - 1 PHOTO = ELLA PAGE KUM - INSTAGRAM SECRET DA =====
+// ===== PIXORO AVATAR - v1015 - FIXED DA =====
 window.PIXORO_AVATAR_MAP = window.PIXORO_AVATAR_MAP || {};
 
 async function pixoroLoadAvatars(){
   let s = window.getSupa ? window.getSupa() : window.supa;
   if(!s) return;
   try{
-    // ✅ FIX 1 DA - avatar_url mattum thaan da - profile_pic/photo_url vendaam da
     let r = await s.from('profiles').select('id,avatar_url').limit(500);
     (r.data||[]).forEach(p=>{
       let url = String(p.avatar_url || '').trim();
       if(url) window.PIXORO_AVATAR_MAP[String(p.id)] = url;
     });
-    // ✅ Circle ellam update pannidu da
-    document.querySelectorAll('[data-avatar-user]').forEach(img=>{
-      let u = img.dataset.avatarUser;
-      let url = window.PIXORO_AVATAR_MAP[String(u)];
-      if(url) img.src = url;
-    });
-    // ✅ Bottom nav Profile photo
-    let nav = document.getElementById('navPfp');
-    if(nav && window.ME_ID && window.PIXORO_AVATAR_MAP[String(window.ME_ID)]) nav.src = window.PIXORO_AVATAR_MAP[String(window.ME_ID)];
-    // ✅ My Story photo - Ithu thaan mukkiyam da
-    let myStory = document.getElementById('myStoryImg');
-    if(myStory && window.ME_ID && window.PIXORO_AVATAR_MAP[String(window.ME_ID)]) myStory.src = window.PIXORO_AVATAR_MAP[String(window.ME_ID)];
+
+    // ✅ FIX DA - ME_ID illa na Auth la irunthu Edu da
+    let myId = window.ME_ID;
+    if(!myId){
+      let {data:{user}} = await s.auth.getUser();
+      if(user) { myId = user.id; window.ME_ID = myId; }
+    }
+    let myPhoto = myId ? window.PIXORO_AVATAR_MAP[String(myId)] : '';
+
+    // ✅ FIX DA - En Photo illa na, Supabase la Thaniya Kelu da
+    if(!myPhoto && myId){
+      let {data} = await s.from('profiles').select('avatar_url').eq('id', myId).single();
+      myPhoto = String(data?.avatar_url || '').trim();
+      if(myPhoto) window.PIXORO_AVATAR_MAP[String(myId)] = myPhoto;
+    }
+
+    if(myPhoto){
+      window.MY_PFP = myPhoto;
+      // Ella Circle um Update pannu da
+      document.querySelectorAll('[data-avatar-user]').forEach(img=>{
+        if(String(img.dataset.avatarUser) === String(myId)) img.src = myPhoto;
+      });
+      let nav = document.getElementById('navPfp');
+      if(nav) nav.src = myPhoto;
+      // ✅ My Story - Ithu thaan Mukkiyam da
+      let myStory = document.getElementById('myStoryImg');
+      if(myStory){
+        myStory.src = myPhoto;
+        myStory.style.display = 'block';
+        // G letter iruntha Maraichidu da
+        let parent = myStory.parentElement;
+        if(parent) parent.classList.remove('no-photo');
+      }
+    }
   }catch(e){ console.log('avatar error', e); }
 }
-window.pixoroLoadAvatars = pixoroLoadAvatars;
 
 window.pixoroGetAvatar = function(p){
-  // ✅ FIX 2 DA - Fake ui-avatars photo vendaam da - Empty na '' thaan da
-  if(!p) return '';
-  if(typeof p === 'string'){
-    return window.PIXORO_AVATAR_MAP[String(p)] || '';
-  }
-  // ✅ FIX 3 DA - ID vachu mattum thaan da - username vendaam da
-  let url = p.avatar_url || window.PIXORO_AVATAR_MAP[String(p.user_id || p.id || '')] || '';
-  return String(url || '').trim();
+  if(!p) return window.MY_PFP || '';
+  if(typeof p === 'string') return window.PIXORO_AVATAR_MAP[String(p)] || window.MY_PFP || '';
+  return String(p.avatar_url || window.PIXORO_AVATAR_MAP[String(p.user_id || p.id || '')] || window.MY_PFP || '').trim();
 };
 
-// ✅ En photo va thaniya edukka - Story / Profile ku da
-window.pixoroGetMyPfp = async function(){
-  let s = window.getSupa ? window.getSupa() : window.supa;
-  if(!s) return '';
-  let {data:{user}} = await s.auth.getUser();
-  if(!user) return '';
-  let {data} = await s.from('profiles').select('avatar_url').eq('id', user.id).single();
-  let photo = String(data?.avatar_url || '').trim();
-  if(photo){ window.PIXORO_AVATAR_MAP[String(user.id)] = photo; window.MY_PFP = photo; }
-  return photo;
-};
+// ✅ FIX DA - Function ah Thanava Koopdu da
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(pixoroLoadAvatars, 500);
+  setTimeout(pixoroLoadAvatars, 2000);
+});
