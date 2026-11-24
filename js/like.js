@@ -1,5 +1,5 @@
-// ===== PIXORO LIKE - FINAL CORRECTED DA - SPEED + DB + LOCAL + INSTA BIG HEART DA =====
-console.log('✅ LIKE FILE LOADED DA');
+// ===== PIXORO LIKE - FINAL CORRECTED DA - SPEED + DB + LOCAL + INSTA BIG HEART DANCE DA =====
+console.log('✅ LIKE FILE LOADED DA - V3 DANCE');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
@@ -35,20 +35,23 @@ window.pixoroFeedTap = function(postId, el, ev){
 };
 
 (function(){
-  if(document.getElementById('pixoro-like-css')) return;
+  // ✅ FIX DA - Pazhaya CSS ah Delete pannama puthu CSS varathu da!
+  document.getElementById('pixoro-like-css')?.remove();
+  document.getElementById('pixoro-like-css-v2')?.remove();
+  document.getElementById('pixoro-like-css-v3')?.remove();
   let s = document.createElement('style');
-  s.id = 'pixoro-like-css';
+  s.id = 'pixoro-like-css-v3';
   s.innerText = `
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
     [data-like-btn] svg{ overflow:visible !important; display:block !important; width:24px !important; height:24px !important; }
     [data-like-btn] svg, [data-like-btn] svg path{ fill:none !important; stroke:#fff !important; }
     [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
-    /* ✅ PIXORO BIG HEART FIX DA - !important eduthuten da - illa na nikum da */
+    /* ✅ BIG HEART - DANCE + POCHU POIDUM DA */
     .bigHeart{ position:absolute !important; left:50% !important; top:50% !important; z-index:99 !important; pointer-events:none !important; opacity:0; transform:translate(-50%,-50%) scale(0); width:90px !important; height:90px !important; }
-    .bigHeart.show{ animation:pixHeartDance 800ms ease forwards !important; }
+    .bigHeart.show{ animation:pixHeartDance 900ms ease forwards !important; }
     .bigHeart svg{ width:100% !important; height:100% !important; filter:drop-shadow(0 4px 12px rgba(0,0,0,.5)) !important; }
-    @keyframes pixHeartDance{ 0%{opacity:0; transform:translate(-50%,-50%) scale(0)} 20%{opacity:1; transform:translate(-50%,-50%) scale(1.2)} 35%{transform:translate(-50%,-50%) scale(0.95)} 50%{transform:translate(-50%,-50%) scale(1.05)} 70%{opacity:1; transform:translate(-50%,-50%) scale(1)} 100%{opacity:0; transform:translate(-50%,-50%) scale(1.1)} }
+    @keyframes pixHeartDance{ 0%{opacity:0; transform:translate(-50%,-50%) scale(0) rotate(0deg)} 15%{opacity:1; transform:translate(-50%,-50%) scale(1.3) rotate(-12deg)} 30%{transform:translate(-50%,-50%) scale(1.1) rotate(10deg)} 45%{transform:translate(-50%,-50%) scale(1.2) rotate(-8deg)} 60%{transform:translate(-50%,-50%) scale(1.05) rotate(6deg)} 75%{opacity:1; transform:translate(-50%,-50%) scale(1) rotate(0deg)} 100%{opacity:0; transform:translate(-50%,-50%) scale(1.2) rotate(0deg)} }
   `;
   document.head.appendChild(s);
 })();
@@ -200,7 +203,7 @@ function showBigHeart(mediaEl){
   box.appendChild(div);
   void div.offsetWidth;
   div.classList.add('show');
-  setTimeout(()=>div.remove(), 800);
+  setTimeout(()=>div.remove(), 900);
 }
 
 if(!window._pixoroLikeDelegation){
