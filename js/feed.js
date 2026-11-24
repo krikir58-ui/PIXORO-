@@ -1,4 +1,4 @@
-/* PIXORO FEED - FINAL CLEAN DA - FEED MATTUM DA - STORY = story.js la thaan da */
+/* PIXORO FEED - FINAL CLEAN DA - CORRECTED DA */
 (function () {
   'use strict';
   let loading = false;
@@ -7,8 +7,64 @@
   function safeURL(v){ try{ let u=new URL(v, location.href); return ['https:','http:'].includes(u.protocol)?escapeHTML(u.href):''; }catch{ return ''; } }
   function feedTime(t){ if(!t) return ''; let d=new Date(t), n=new Date(), diff=Math.floor((n-d)/1000); if(diff<60) return 'Just now'; if(diff<3600) return Math.floor(diff/60)+'m'; if(diff<86400) return Math.floor(diff/3600)+'h'; return d.toLocaleDateString([],{day:'numeric',month:'short'}); }
 
-  // ❌ loadStories() Inga Illa da - Athu js/story.js la thaan irukku da
-  // ❌ Story Click Handler Inga Illa da - story.js la onclick irukku da
+  // ✅ LIKE LOGIC - INGA THAAN DA - VERA FILE LA THEVA ILLA DA
+  let pixoroLastTap = 0;
+  window.pixoroFeedTap = function(postId, el, e){
+    let now = Date.now();
+    if(now - pixoroLastTap < 350){
+      pixoroShowBigHeart(el);
+      window.pixoroToggleLike(postId, null);
+    }
+    pixoroLastTap = now;
+  };
+
+  window.pixoroShowBigHeart = function(el){
+    if(!el) return;
+    let h = document.createElement('div');
+    h.innerHTML = '❤️';
+    h.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:90px;z-index:10;transition:all .3s;pointer-events:none;';
+    el.style.position = 'relative';
+    el.appendChild(h);
+    setTimeout(()=> h.style.transform='translate(-50%,-50%) scale(1.2)', 10);
+    setTimeout(()=> h.remove(), 700);
+  };
+
+  window.pixoroToggleLike = async function(postId, btn){
+    let btnEl = btn || document.querySelector('[data-like-btn="'+postId+'"]');
+    if(!btnEl) return;
+    if(btnEl.dataset.busy === '1') return;
+    btnEl.dataset.busy = '1';
+    setTimeout(()=> btnEl.dataset.busy = '0', 400);
+    let isLiked = btnEl.classList.contains('liked');
+    let countEl = document.querySelector('[data-like-count="'+postId+'"]');
+    let count = parseInt(countEl?.textContent || '0') || 0;
+    btnEl.classList.toggle('liked', !isLiked);
+    if(countEl) countEl.textContent = isLiked ? Math.max(0, count-1) : count+1;
+    if(window.FEED_LIKES){
+      if(isLiked) window.FEED_LIKES.delete(String(postId));
+      else window.FEED_LIKES.add(String(postId));
+    }
+    try{
+      let supa = getClient();
+      if(!supa) return;
+      let { data:{session} } = await supa.auth.getSession();
+      if(!session) return;
+      if(isLiked){
+        await supa.from('likes').delete().eq('post_id', postId).eq('user_id', session.user.id);
+      } else {
+        await supa.from('likes').insert({post_id: postId, user_id: session.user.id});
+      }
+    }catch(err){ console.log(err); }
+  };
+
+  window.pixoroPaintAllLikes = function(){
+    if(!window.FEED_LIKES) return;
+    document.querySelectorAll('[data-like-btn]').forEach(btn=>{
+      let id = btn.getAttribute('data-like-btn');
+      let liked = window.FEED_LIKES.has(String(id));
+      btn.classList.toggle('liked', liked);
+    });
+  };
 
   async function loadFeed(){
     const feed = document.getElementById('feed');
@@ -51,6 +107,9 @@
         const isMine = MY_ID && String(post.user_id) === String(MY_ID);
         const isLiked = likedSet.has(id) ? ' liked' : '';
         const isSaved = savedSet.has(id) ? ' saved' : '';
+        // ✅ FIX DA: DB la likes_count 0 ah irunthalum, Like panni iruntha 1 nu kaatu da - Red+0 varathu da
+        let showCount = post.likes_count || 0;
+        if(likedSet.has(id) && showCount === 0) showCount = 1;
         return `
         <article class="post" data-post-id="${id}">
           <div class="postTop">
@@ -65,9 +124,9 @@
           </div>
           <div class="actions">
             <div class="left">
-              <button data-like-btn="${id}" class="act${isLiked}">
+              <button data-like-btn="${id}" class="act${isLiked}" onclick="event.stopPropagation(); pixoroToggleLike('${id}', this)">
                 <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
-                <span data-like-count="${id}">${post.likes_count||0}</span>
+                <span data-like-count="${id}">${showCount}</span>
               </button>
               <button class="act" onclick="if(window.openComments) window.openComments('${id}')">
                 <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
@@ -93,7 +152,6 @@
     }finally{ loading=false; }
   }
   window.loadFeed = loadFeed;
-  // ✅ init la loadFeed mattum da - loadStories() Vendaam da, story.js thaniya Odum da
   function init(){ loadFeed(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
   else init();
