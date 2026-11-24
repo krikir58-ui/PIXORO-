@@ -1,5 +1,5 @@
-// ===== PIXORO LIKE - FINAL V19 - INSTAGRAM STYLE DA =====
-console.log('✅ LIKE FILE LOADED DA - V19 INSTAGRAM STYLE');
+// ===== PIXORO LIKE - FINAL V20 - 1 TOUCH 1 TIME SLOW THUDIKKU + NADUVULA HEART DA =====
+console.log('✅ LIKE FILE LOADED DA - V20 SLOW 1 TIME');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
@@ -64,8 +64,9 @@ window.pixoroFeedTap = function(postId, el, ev){
   document.getElementById('pixoro-like-css-v17')?.remove();
   document.getElementById('pixoro-like-css-v18')?.remove();
   document.getElementById('pixoro-like-css-v19')?.remove();
+  document.getElementById('pixoro-like-css-v20')?.remove();
   let s = document.createElement('style');
-  s.id = 'pixoro-like-css-v19';
+  s.id = 'pixoro-like-css-v20';
   s.innerText = `
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
@@ -74,27 +75,14 @@ window.pixoroFeedTap = function(postId, el, ev){
     [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
     .bigHeart{ background:transparent !important; background-color:transparent !important; box-shadow:none !important; border:none !important; outline:none !important; }
     .bigHeart svg{ background:transparent !important; background-color:transparent !important; width:100% !important; height:100% !important; }
-    /* ✅ V19 INSTAGRAM - Keezha Heart Pop Thudikku da */
+    /* ✅ V20 - 1 TOUCH 1 TIME SLOW THUDIKKU DA - 0.8s Slow ah Oru Vaati Mattum da */
     @keyframes pixThudikku{
       0%{ transform:scale(1); }
-      30%{ transform:scale(1.5); }
-      50%{ transform:scale(0.9); }
-      70%{ transform:scale(1.3); }
+      40%{ transform:scale(1.35); }
+      70%{ transform:scale(0.95); }
       100%{ transform:scale(1); }
     }
-    [data-like-btn].thudikku svg{ animation:pixThudikku 0.45s ease-in-out !important; }
-    /* ✅ V19 INSTAGRAM - Naduvula Heart Vanthu Thudichu Pogum da - 1 Sec Thaan da */
-    @keyframes pixInstaBig{
-      0%{ transform:translate(-50%,-50%) scale(0); opacity:0; }
-      15%{ transform:translate(-50%,-50%) scale(1.2); opacity:1; }
-      30%{ transform:translate(-50%,-50%) scale(0.95); opacity:1; }
-      45%{ transform:translate(-50%,-50%) scale(1.1); opacity:1; }
-      60%{ transform:translate(-50%,-50%) scale(1); opacity:1; }
-      75%{ transform:translate(-50%,-50%) scale(1.08); opacity:1; }
-      90%{ transform:translate(-50%,-50%) scale(1); opacity:1; }
-      100%{ transform:translate(-50%,-50%) scale(1.1); opacity:0; }
-    }
-    .bigHeart.insta{ animation:pixInstaBig 1s ease-in-out forwards !important; }
+    [data-like-btn].thudikku svg{ animation:pixThudikku 0.8s ease-in-out 1 !important; }
   `;
   document.head.appendChild(s);
 })();
@@ -119,7 +107,7 @@ function pixoroThudikku(btn){
   btn.classList.remove('thudikku');
   void btn.offsetWidth;
   btn.classList.add('thudikku');
-  setTimeout(()=> btn.classList.remove('thudikku'), 500);
+  setTimeout(()=> btn.classList.remove('thudikku'), 850);
 }
 
 function pixoroPaintAllLikes(){
@@ -245,17 +233,35 @@ async function pixoroDoubleTapLike(postId, mediaEl, ev){
   }
 }
 
-// ✅ V19 INSTAGRAM - Naduvula Heart - Orange to Pink Gradient - 1 Sec la Vanthu Pogum da - Rainbow Illa da
+// ✅ V20 FIX - Naduvula Heart - CSS Nambaama JS la ye Kaatum da - 100% Varum da - Instagram Gradient da
 function showBigHeart(mediaEl, tapX, tapY){
+  console.log('❤️ BIG HEART VANTHUDUCHU DA');
   document.querySelectorAll('.bigHeart').forEach(h=>h.remove());
   let cx = window.innerWidth / 2;
   let cy = window.innerHeight / 2;
   let div = document.createElement('div');
-  div.className = 'bigHeart insta';
-  div.style.cssText = 'position:fixed !important;z-index:999999 !important;pointer-events:none !important;width:110px;height:110px;left:'+cx+'px;top:'+cy+'px;opacity:0;transform:translate(-50%,-50%) scale(0);background:transparent !important;box-shadow:none !important;border:none !important;';
-  div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent !important;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45))"><defs><linearGradient id="pixInstaGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF8A00"/><stop offset="50%" stop-color="#FF2E63"/><stop offset="100%" stop-color="#FF00A8"/></linearGradient></defs><path fill="url(#pixInstaGrad)" stroke="url(#pixInstaGrad)" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  div.className = 'bigHeart';
+  div.style.cssText = 'position:fixed !important;z-index:9999999 !important;pointer-events:none !important;width:120px;height:120px;left:'+cx+'px;top:'+cy+'px;opacity:1 !important;transform:translate(-50%,-50%) scale(0.2);background:transparent !important;display:block !important;visibility:visible !important;';
+  div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100% !important;height:100% !important;display:block !important;background:transparent !important;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45))"><defs><linearGradient id="pixInstaGrad'+Date.now()+'" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF8A00"/><stop offset="50%" stop-color="#FF2E63"/><stop offset="100%" stop-color="#FF00A8"/></linearGradient></defs><path fill="#FF2E63" stroke="#FF2E63" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   document.body.appendChild(div);
-  setTimeout(()=>{ div.remove(); }, 1050);
+  let t = 0;
+  let anim = setInterval(()=>{
+    t += 30;
+    let scale = 0.2;
+    if(t < 150) scale = 0.2 + (t / 150) * 1.0;
+    else if(t < 300) scale = 1.2 - ((t - 150) / 150) * 0.25;
+    else if(t < 450) scale = 0.95 + ((t - 300) / 150) * 0.15;
+    else if(t < 600) scale = 1.1 - ((t - 450) / 150) * 0.1;
+    else scale = 1;
+    div.style.transform = 'translate(-50%,-50%) scale('+scale+')';
+    div.style.opacity = '1';
+    if(t >= 900){ clearInterval(anim); }
+  }, 30);
+  setTimeout(()=>{
+    div.style.transition = 'opacity 0.25s';
+    div.style.opacity = '0';
+    setTimeout(()=>{ div.remove(); }, 300);
+  }, 900);
 }
 
 (function(){
