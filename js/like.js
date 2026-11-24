@@ -1,5 +1,5 @@
-// ===== PIXORO LIKE - FINAL V18 - KEEZHA HEART SPEED THUDIKKU + NADUVULA HEART DA =====
-console.log('✅ LIKE FILE LOADED DA - V18 SPEED THUDIKKU');
+// ===== PIXORO LIKE - FINAL V19 - INSTAGRAM STYLE DA =====
+console.log('✅ LIKE FILE LOADED DA - V19 INSTAGRAM STYLE');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
@@ -63,8 +63,9 @@ window.pixoroFeedTap = function(postId, el, ev){
   document.getElementById('pixoro-like-css-v16')?.remove();
   document.getElementById('pixoro-like-css-v17')?.remove();
   document.getElementById('pixoro-like-css-v18')?.remove();
+  document.getElementById('pixoro-like-css-v19')?.remove();
   let s = document.createElement('style');
-  s.id = 'pixoro-like-css-v18';
+  s.id = 'pixoro-like-css-v19';
   s.innerText = `
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
@@ -73,16 +74,27 @@ window.pixoroFeedTap = function(postId, el, ev){
     [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
     .bigHeart{ background:transparent !important; background-color:transparent !important; box-shadow:none !important; border:none !important; outline:none !important; }
     .bigHeart svg{ background:transparent !important; background-color:transparent !important; width:100% !important; height:100% !important; }
-    .bigHeart svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
-    /* ✅ V18 CORRECTED - SPEED THUDIKKU DA - 0.35s la Fast ah 2 Vaati Thudikkum da */
+    /* ✅ V19 INSTAGRAM - Keezha Heart Pop Thudikku da */
     @keyframes pixThudikku{
       0%{ transform:scale(1); }
-      30%{ transform:scale(1.45); }
-      50%{ transform:scale(0.95); }
-      70%{ transform:scale(1.35); }
+      30%{ transform:scale(1.5); }
+      50%{ transform:scale(0.9); }
+      70%{ transform:scale(1.3); }
       100%{ transform:scale(1); }
     }
-    [data-like-btn].thudikku svg{ animation:pixThudikku 0.35s ease-in-out 2 !important; }
+    [data-like-btn].thudikku svg{ animation:pixThudikku 0.45s ease-in-out !important; }
+    /* ✅ V19 INSTAGRAM - Naduvula Heart Vanthu Thudichu Pogum da - 1 Sec Thaan da */
+    @keyframes pixInstaBig{
+      0%{ transform:translate(-50%,-50%) scale(0); opacity:0; }
+      15%{ transform:translate(-50%,-50%) scale(1.2); opacity:1; }
+      30%{ transform:translate(-50%,-50%) scale(0.95); opacity:1; }
+      45%{ transform:translate(-50%,-50%) scale(1.1); opacity:1; }
+      60%{ transform:translate(-50%,-50%) scale(1); opacity:1; }
+      75%{ transform:translate(-50%,-50%) scale(1.08); opacity:1; }
+      90%{ transform:translate(-50%,-50%) scale(1); opacity:1; }
+      100%{ transform:translate(-50%,-50%) scale(1.1); opacity:0; }
+    }
+    .bigHeart.insta{ animation:pixInstaBig 1s ease-in-out forwards !important; }
   `;
   document.head.appendChild(s);
 })();
@@ -107,7 +119,7 @@ function pixoroThudikku(btn){
   btn.classList.remove('thudikku');
   void btn.offsetWidth;
   btn.classList.add('thudikku');
-  setTimeout(()=> btn.classList.remove('thudikku'), 750);
+  setTimeout(()=> btn.classList.remove('thudikku'), 500);
 }
 
 function pixoroPaintAllLikes(){
@@ -156,7 +168,6 @@ async function pixoroSyncPostCount(s, postId, delta){
   }
 }
 
-// ✅ V18 CORRECTED - KEEZHA HEART TOUCH PANNA - NADUVULA HEART VARUM + SPEED AH THUDIKKUM DA
 async function pixoroToggleLike(postId, btn){
   let now = Date.now();
   if(now - _lastLikeAction < 300) return;
@@ -204,7 +215,6 @@ async function pixoroToggleLike(postId, btn){
   }
 }
 
-// ✅ DOUBLE TAP - NADUVULA HEART + KEEZHA HEART SPEED THUDIKKU DA
 async function pixoroDoubleTapLike(postId, mediaEl, ev){
   console.log('❤️ DOUBLE TAP LIKE DA:', postId);
   showBigHeart(mediaEl, 0, 0);
@@ -235,43 +245,17 @@ async function pixoroDoubleTapLike(postId, mediaEl, ev){
   }
 }
 
-// ✅ OREY HEART DA - COLOUR COLOUR - VANTHU POGUM DA
+// ✅ V19 INSTAGRAM - Naduvula Heart - Orange to Pink Gradient - 1 Sec la Vanthu Pogum da - Rainbow Illa da
 function showBigHeart(mediaEl, tapX, tapY){
   document.querySelectorAll('.bigHeart').forEach(h=>h.remove());
   let cx = window.innerWidth / 2;
   let cy = window.innerHeight / 2;
   let div = document.createElement('div');
-  div.className = 'bigHeart';
-  div.style.cssText = 'position:fixed !important;z-index:999999 !important;pointer-events:none !important;width:120px;height:120px;left:'+cx+'px;top:'+cy+'px;opacity:1 !important;transform:translate(-50%,-50%) scale(0.2);background:transparent !important;box-shadow:none !important;border:none !important;';
-  div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent !important;filter:drop-shadow(0 6px 16px rgba(0,0,0,.5))"><path fill="#FF0A33" stroke="#FF0A33" style="fill:#FF0A33 !important;stroke:#FF0A33 !important;" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  div.className = 'bigHeart insta';
+  div.style.cssText = 'position:fixed !important;z-index:999999 !important;pointer-events:none !important;width:110px;height:110px;left:'+cx+'px;top:'+cy+'px;opacity:0;transform:translate(-50%,-50%) scale(0);background:transparent !important;box-shadow:none !important;border:none !important;';
+  div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent !important;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45))"><defs><linearGradient id="pixInstaGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF8A00"/><stop offset="50%" stop-color="#FF2E63"/><stop offset="100%" stop-color="#FF00A8"/></linearGradient></defs><path fill="url(#pixInstaGrad)" stroke="url(#pixInstaGrad)" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   document.body.appendChild(div);
-  let path = div.querySelector('path');
-  let colors = ['#FF0A33','#FF4D8D','#FF8A00','#FF2E9A','#FFD500','#00E5FF','#7C4DFF','#00FF88'];
-  let ci = 0;
-  let colorTimer = setInterval(()=>{
-    ci = (ci+1) % colors.length;
-    if(path){
-      path.setAttribute('fill', colors[ci]);
-      path.setAttribute('stroke', colors[ci]);
-      path.style.setProperty('fill', colors[ci], 'important');
-      path.style.setProperty('stroke', colors[ci], 'important');
-    }
-  }, 280);
-  let t = 0;
-  let anim = setInterval(()=>{
-    t += 30;
-    let scale = 0.2;
-    if(t < 300) scale = 0.2 + (t / 300) * 0.8;
-    else scale = 1;
-    div.style.transform = 'translate(-50%,-50%) scale('+scale+')';
-    if(t >= 2400){ clearInterval(anim); }
-  }, 30);
-  setTimeout(()=>{
-    div.style.transition = 'opacity 0.4s, transform 0.4s';
-    div.style.opacity = '0';
-    div.style.transform = 'translate(-50%,-50%) scale(1.1)';
-    setTimeout(()=>{ clearInterval(colorTimer); clearInterval(anim); div.remove(); }, 450);
-  }, 2400);
+  setTimeout(()=>{ div.remove(); }, 1050);
 }
 
 (function(){
