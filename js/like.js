@@ -1,5 +1,5 @@
-// ===== PIXORO LIKE - FINAL V16 - KEEZHA HEART THUDIKKU + NADUVULA HEART DA =====
-console.log('✅ LIKE FILE LOADED DA - V16 THUDIKKU');
+// ===== PIXORO LIKE - FINAL V17 - DOUBLE TAP MATTUM THUDIKKU DA =====
+console.log('✅ LIKE FILE LOADED DA - V17 DOUBLE TAP MATTUM');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
@@ -61,8 +61,9 @@ window.pixoroFeedTap = function(postId, el, ev){
   document.getElementById('pixoro-like-css-v14')?.remove();
   document.getElementById('pixoro-like-css-v15')?.remove();
   document.getElementById('pixoro-like-css-v16')?.remove();
+  document.getElementById('pixoro-like-css-v17')?.remove();
   let s = document.createElement('style');
-  s.id = 'pixoro-like-css-v16';
+  s.id = 'pixoro-like-css-v17';
   s.innerText = `
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
@@ -72,17 +73,13 @@ window.pixoroFeedTap = function(postId, el, ev){
     .bigHeart{ background:transparent !important; background-color:transparent !important; box-shadow:none !important; border:none !important; outline:none !important; }
     .bigHeart svg{ background:transparent !important; background-color:transparent !important; width:100% !important; height:100% !important; }
     .bigHeart svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
-    /* ✅ THUDIKKU DA - Keezha Heart Beat Aagum da */
+    /* ✅ CORRECTED - LIGHT THUDIKKU DA - 1.2x MATTUM DA - Romba Perusa Illa da */
     @keyframes pixThudikku{
       0%{ transform:scale(1); }
-      25%{ transform:scale(1.5); }
-      40%{ transform:scale(0.9); }
-      60%{ transform:scale(1.3); }
-      80%{ transform:scale(1.05); }
+      50%{ transform:scale(1.2); }
       100%{ transform:scale(1); }
     }
-    [data-like-btn].thudikku svg{ animation:pixThudikku 0.6s ease-in-out !important; }
-    [data-like-btn].thudikku-hold svg{ animation:pixThudikku 0.6s ease-in-out infinite !important; }
+    [data-like-btn].thudikku svg{ animation:pixThudikku 0.5s ease-in-out !important; }
   `;
   document.head.appendChild(s);
 })();
@@ -107,7 +104,7 @@ function pixoroThudikku(btn){
   btn.classList.remove('thudikku');
   void btn.offsetWidth;
   btn.classList.add('thudikku');
-  setTimeout(()=> btn.classList.remove('thudikku'), 650);
+  setTimeout(()=> btn.classList.remove('thudikku'), 550);
 }
 
 function pixoroPaintAllLikes(){
@@ -156,6 +153,7 @@ async function pixoroSyncPostCount(s, postId, delta){
   }
 }
 
+// ✅ CORRECTED - SINGLE TAP - Thudikkaathu da - Naduvula Heart Varathu da - Like Mattum Aagum da
 async function pixoroToggleLike(postId, btn){
   let now = Date.now();
   if(now - _lastLikeAction < 300) return;
@@ -165,11 +163,6 @@ async function pixoroToggleLike(postId, btn){
   let willLike = !btn.classList.contains('liked');
   pixoroPaintLikeBtn(btn, willLike);
   pixoroBumpCount(postId, willLike ? 1 : -1);
-  // ✅ KEEZHA HEART TOUCH PANNA - NADUVULA PERIYA HEART VARUM DA + THUDIKKUM DA
-  if(willLike){
-    showBigHeart(null, 0, 0);
-    pixoroThudikku(btn);
-  }
   if(window.FEED_LIKES){
     willLike ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId));
     pixoroSaveLocal();
@@ -204,6 +197,7 @@ async function pixoroToggleLike(postId, btn){
   }
 }
 
+// ✅ CORRECTED - DOUBLE TAP MATTUM - Keezha Heart Light ah Thudikkum da + Naduvula Heart Vanthu Pogum da
 async function pixoroDoubleTapLike(postId, mediaEl, ev){
   console.log('❤️ DOUBLE TAP LIKE DA:', postId);
   showBigHeart(mediaEl, 0, 0);
@@ -234,14 +228,14 @@ async function pixoroDoubleTapLike(postId, mediaEl, ev){
   }
 }
 
-// ✅ OREY HEART DA - COLOUR COLOUR - ANIMATION ODA VANTHU POGUM DA
+// ✅ OREY HEART DA - COLOUR COLOUR - VANTHU POGUM DA
 function showBigHeart(mediaEl, tapX, tapY){
   document.querySelectorAll('.bigHeart').forEach(h=>h.remove());
   let cx = window.innerWidth / 2;
   let cy = window.innerHeight / 2;
   let div = document.createElement('div');
   div.className = 'bigHeart';
-  div.style.cssText = 'position:fixed !important;z-index:999999 !important;pointer-events:none !important;width:120px;height:120px;left:'+cx+'px;top:'+cy+'px;opacity:1 !important;transform:translate(-50%,-50%) scale(0.2) rotate(0deg);background:transparent !important;box-shadow:none !important;border:none !important;';
+  div.style.cssText = 'position:fixed !important;z-index:999999 !important;pointer-events:none !important;width:120px;height:120px;left:'+cx+'px;top:'+cy+'px;opacity:1 !important;transform:translate(-50%,-50%) scale(0.2);background:transparent !important;box-shadow:none !important;border:none !important;';
   div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent !important;filter:drop-shadow(0 6px 16px rgba(0,0,0,.5))"><path fill="#FF0A33" stroke="#FF0A33" style="fill:#FF0A33 !important;stroke:#FF0A33 !important;" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   document.body.appendChild(div);
   let path = div.querySelector('path');
@@ -260,19 +254,15 @@ function showBigHeart(mediaEl, tapX, tapY){
   let anim = setInterval(()=>{
     t += 30;
     let scale = 0.2;
-    if(t < 300) scale = 0.2 + (t / 300) * 1.05;
-    else if(t < 500) scale = 1.25 - ((t - 300) / 200) * 0.2;
-    else if(t < 700) scale = 1.05 - ((t - 500) / 200) * 0.05;
-    else scale = 1 + Math.sin((t - 700) / 300) * 0.05;
-    let rot = 0;
-    if(t < 500) rot = Math.sin(t / 100) * 6;
-    div.style.transform = 'translate(-50%,-50%) scale('+scale+') rotate('+rot+'deg)';
+    if(t < 300) scale = 0.2 + (t / 300) * 0.8;
+    else scale = 1;
+    div.style.transform = 'translate(-50%,-50%) scale('+scale+')';
     if(t >= 2400){ clearInterval(anim); }
   }, 30);
   setTimeout(()=>{
     div.style.transition = 'opacity 0.4s, transform 0.4s';
     div.style.opacity = '0';
-    div.style.transform = 'translate(-50%,-50%) scale(1.2) rotate(0deg)';
+    div.style.transform = 'translate(-50%,-50%) scale(1.1)';
     setTimeout(()=>{ clearInterval(colorTimer); clearInterval(anim); div.remove(); }, 450);
   }, 2400);
 }
@@ -345,33 +335,6 @@ if(!window._pixoroLikeDelegation){
     pixoroToggleLike(pid, btn);
   });
 }
-
-// ✅ HOLD PANNA THUDIKKU DA - Kai Edukkura Varaikum Thudikkum da
-(function(){
-  if(window._pixHoldThudikku) return;
-  window._pixHoldThudikku = true;
-  let holdTimer = null;
-  document.addEventListener('touchstart', function(e){
-    let btn = e.target.closest ? e.target.closest('[data-like-btn]') : null;
-    if(!btn) return;
-    if(holdTimer) clearTimeout(holdTimer);
-    holdTimer = setTimeout(()=>{ btn.classList.add('thudikku-hold'); }, 400);
-  }, {passive:true});
-  document.addEventListener('touchend', function(e){
-    if(holdTimer){ clearTimeout(holdTimer); holdTimer = null; }
-    document.querySelectorAll('[data-like-btn].thudikku-hold').forEach(b=>b.classList.remove('thudikku-hold'));
-  }, {passive:true});
-  document.addEventListener('mousedown', function(e){
-    let btn = e.target.closest ? e.target.closest('[data-like-btn]') : null;
-    if(!btn) return;
-    if(holdTimer) clearTimeout(holdTimer);
-    holdTimer = setTimeout(()=>{ btn.classList.add('thudikku-hold'); }, 400);
-  }, {passive:true});
-  document.addEventListener('mouseup', function(e){
-    if(holdTimer){ clearTimeout(holdTimer); holdTimer = null; }
-    document.querySelectorAll('[data-like-btn].thudikku-hold').forEach(b=>b.classList.remove('thudikku-hold'));
-  }, {passive:true});
-})();
 
 window.pixoroToggleLike = pixoroToggleLike;
 window.pixoroDoubleTapLike = pixoroDoubleTapLike;
