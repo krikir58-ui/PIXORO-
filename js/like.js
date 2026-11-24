@@ -1,10 +1,9 @@
-// ===== PIXORO LIKE - FINAL CORRECTED DA - SPEED + DB + LOCAL DA =====
+// ===== PIXORO LIKE - FINAL CORRECTED DA - SPEED + DB + LOCAL + INSTA BIG HEART DA =====
 console.log('✅ LIKE FILE LOADED DA');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
 
-// 1. LOCAL LA IRUNTHU FIRST LOAD PANNU DA - REFRESH LA KOODA RED IRUKKUM DA
 try{
   let local = JSON.parse(localStorage.getItem('pixoro_likes') || '[]');
   window.FEED_LIKES = new Set(local.map(String));
@@ -17,7 +16,6 @@ function pixoroSaveLocal(){
 
 window.pixoroFeedTap = function(postId, el, ev){
   if(ev){
-    // ✅ FIX DA - Like button ah thotta inga varatha da!
     if(ev.target && ev.target.closest && ev.target.closest('[data-like-btn]')) return;
     ev.preventDefault();
   }
@@ -41,16 +39,16 @@ window.pixoroFeedTap = function(postId, el, ev){
   let s = document.createElement('style');
   s.id = 'pixoro-like-css';
   s.innerText = `
-    /* ✅ FIX DA - Thodum bothu paathi maraiyathu da */
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
     [data-like-btn] svg{ overflow:visible !important; display:block !important; width:24px !important; height:24px !important; }
     [data-like-btn] svg, [data-like-btn] svg path{ fill:none !important; stroke:#fff !important; }
     [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
-    .bigHeart{ position:absolute !important; left:50% !important; top:50% !important; z-index:99 !important; pointer-events:none !important; opacity:0 !important; transform:translate(-50%,-50%) scale(0) !important; width:80px !important; height:80px !important; }
-    .bigHeart.show{ opacity:1 !important; animation:pixHeartDance 600ms ease forwards !important; }
+    /* ✅ PIXORO BIG HEART FIX DA - !important eduthuten da - illa na nikum da */
+    .bigHeart{ position:absolute !important; left:50% !important; top:50% !important; z-index:99 !important; pointer-events:none !important; opacity:0; transform:translate(-50%,-50%) scale(0); width:90px !important; height:90px !important; }
+    .bigHeart.show{ animation:pixHeartDance 800ms ease forwards !important; }
     .bigHeart svg{ width:100% !important; height:100% !important; filter:drop-shadow(0 4px 12px rgba(0,0,0,.5)) !important; }
-    @keyframes pixHeartDance{ 0%{opacity:0; transform:translate(-50%,-50%) scale(0) rotate(0deg)} 15%{opacity:1; transform:translate(-50%,-50%) scale(1.3) rotate(-10deg)} 30%{transform:translate(-50%,-50%) scale(1.1) rotate(10deg)} 45%{transform:translate(-50%,-50%) scale(1.2) rotate(-8deg)} 60%{transform:translate(-50%,-50%) scale(1.05) rotate(6deg)} 75%{opacity:1; transform:translate(-50%,-50%) scale(1) rotate(0deg)} 100%{opacity:0; transform:translate(-50%,-50%) scale(0.8) rotate(0deg)} }
+    @keyframes pixHeartDance{ 0%{opacity:0; transform:translate(-50%,-50%) scale(0)} 20%{opacity:1; transform:translate(-50%,-50%) scale(1.2)} 35%{transform:translate(-50%,-50%) scale(0.95)} 50%{transform:translate(-50%,-50%) scale(1.05)} 70%{opacity:1; transform:translate(-50%,-50%) scale(1)} 100%{opacity:0; transform:translate(-50%,-50%) scale(1.1)} }
   `;
   document.head.appendChild(s);
 })();
@@ -202,7 +200,7 @@ function showBigHeart(mediaEl){
   box.appendChild(div);
   void div.offsetWidth;
   div.classList.add('show');
-  setTimeout(()=>div.remove(), 600);
+  setTimeout(()=>div.remove(), 800);
 }
 
 if(!window._pixoroLikeDelegation){
