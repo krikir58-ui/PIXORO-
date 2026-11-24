@@ -1,392 +1,440 @@
 
-/* ==========================================
-   PIXORO LIKE V21 - COMPLETE
-   Center Rainbow Heart + Slow Double Pulse
-   Supabase Like / Unlike
-========================================== */
+/* =====================================================
+   PIXORO LIKE SYSTEM V22
+   Double Tap Heart + Rainbow Animation + Supabase Likes
+   Replace the complete old js/like.js with this file.
+===================================================== */
 
 (() => {
   "use strict";
 
-  if (window._PIXORO_LIKE_V21) return;
-  window._PIXORO_LIKE_V21 = true;
+  if (window.PIXORO_LIKE_V22) return;
+  window.PIXORO_LIKE_V22 = true;
 
-  console.log("PIXORO LIKE V21 LOADED ❤️");
+  const supa = window.supa || window.supabaseClient;
+  const TABLE = "likes";
+  const DOUBLE_TAP_DELAY = 280;
 
-  const likes = window.FEED_LIKES instanceof Set
-    ? window.FEED_LIKES : new Set();
+  const busyPosts = new Set();
+  const lastTap = new WeakMap();
 
-  window.FEED_LIKES = likes;
-
-  const locks = new Set();
-  const tapState = new Map();
-  let meId = null;
-
-  try {
-    JSON.parse(localStorage.getItem("pixoro_likes") || "[]")
-      .forEach(id => likes.add(String(id)));
-  } catch(e) {}
-
-  function saveLocal() {
-    try {
-      localStorage.setItem("pixoro_likes", JSON.stringify([...likes]));
-    } catch(e) {}
+  if (!supa) {
+    console.error("PIXORO: Supabase client not found.");
+    return;
   }
 
-  function supa() {
-    return window.getSupa ? window.getSupa() : window.supa;
+  /* ---------- USER ---------- */
+
+  async function getUserId() {
+    if (window.currentUser?.id) return window.currentUser.id;
+
+    const { data, error } = await supa.auth.getUser();
+
+    if (error || !data?.user?.id) return null;
+
+    return data.user.id;
   }
 
-  function findButton(id) {
-    return [...document.querySelectorAll("[data-like-btn]")]
-      .find(b => String(b.getAttribute("data-like-btn")) === String(id));
+  /* ---------- POST HELPERS ---------- */
+
+  function getPostElement(element) {
+    return element.closest(
+      "[data-post-id], .post, .post-card, article, .post-item"
+    );
   }
 
-  function findCount(id) {
-    return [...document.querySelectorAll("[data-like-count]")]
-      .find(c => String(c.getAttribute("data-like-count")) === String(id));
+  function getPostId(element) {
+    const post = getPostElement(element);
+
+    return (
+      element.dataset.postId ||
+      post?.dataset.postId ||
+      post?.dataset.id ||
+      element.closest("[data-post-id]")?.dataset.postId ||
+      null
+    );
   }
 
-  // Animation CSS
-  const css = document.createElement("style");
-  css.id = "pixoro-like-v21-css";
-  css.textContent = `
-    [data-like-btn] {
-      -webkit-tap-highlight-color: transparent !important;
-      touch-action: manipulation;
-      cursor: pointer;
+  function getLikeButton(postId, post) {
+    if (!post) return null;
+
+    return (
+      post.querySelector(`[data-like-btn="${postId}"]`) ||
+      post.querySelector(".like-btn") ||
+      post.querySelector(".like-button") ||
+      post.querySelector('[data-action="like"]')
+    );
+  }
+
+  function getLikeCount(postId, post) {
+    if (!post) return null;
+
+    return (
+      post.querySelector(`[data-like-count="${postId}"]`) ||
+      post.querySelector(".like-count") ||
+      post.querySelector(".likes-count") ||
+      post.querySelector('[data-count="likes"]')
+    );
+  }
+
+  /* ---------- BUTTON DESIGN ---------- */
+
+  function paintLike(postId, liked, post) {
+    const button = getLikeButton(postId, post);
+
+    if (!button) return;
+
+    button.classList.toggle("liked", liked);
+    button.classList.toggle("is-liked", liked);
+    button.setAttribute("aria-pressed", String(liked));
+
+    const icon =
+      button.querySelector("i, svg, span") || button;
+
+    if (icon.tagName === "I") {
+      icon.classList.toggle("active", liked);
     }
 
-    [data-like-btn].liked svg,
-    [data-like-btn].liked svg path {
-      fill: #ff1744 !important;
-      stroke: #ff1744 !important;
+    button.style.color = liked ? "#ff315d" : "";
+  }
+
+  function paintCount(postId, count, post) {
+    const countElement = getLikeCount(postId, post);
+
+    if (countElement) {
+      countElement.textContent = Number(count) || 0;
     }
+  }
 
-    [data-like-btn].pix-heart-pulse svg {
-      animation: pixButtonBeat .9s ease-in-out 1;
-    }
+  /* ---------- RAINBOW HEART CSS ---------- */
 
-    @keyframes pixButtonBeat {
-      0% { transform: scale(1); }
-      35% { transform: scale(1.25); }
-      65% { transform: scale(.94); }
-      100% { transform: scale(1); }
-    }
+  function addHeartStyles() {
+    if (document.getElementById("pixoro-like-v22-css")) return;
 
-    .pix-center-heart {
-      position: fixed !important;
-      width: 120px !important;
-      height: 120px !important;
-      top: 50% !important;
-      left: 50% !important;
-      z-index: 2147483000 !important;
-      pointer-events: none !important;
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      opacity: 0;
-      animation: pixCenterBeat 1.4s ease-in-out forwards;
-      filter: drop-shadow(0 5px 18px rgba(255,0,100,.4));
-    }
+    const style = document.createElement("style");
+    style.id = "pixoro-like-v22-css";
 
-    .pix-center-heart svg {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    @keyframes pixCenterBeat {
-      0% {
-        opacity: 0;
-        transform: translate(-50%,-50%) scale(.2);
+    style.textContent = `
+      .pixoro-big-heart {
+        position: fixed;
+        z-index: 999999;
+        pointer-events: none;
+        font-size: 105px;
+        line-height: 1;
+        background: linear-gradient(
+          45deg,
+          #ff1744,
+          #ff9100,
+          #ffea00,
+          #00e676,
+          #00b0ff,
+          #7c4dff,
+          #ff1744
+        );
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 5px 18px rgba(255, 45, 120, .4));
+        transform: translate(-50%, -50%) scale(.2);
+        animation:
+          pixoroHeartPop 1.05s ease forwards,
+          pixoroRainbow 1.8s linear infinite;
       }
-      15% {
-        opacity: 1;
-        transform: translate(-50%,-50%) scale(1.15);
-      }
-      30% {
-        transform: translate(-50%,-50%) scale(.95);
-      }
-      45% {
-        transform: translate(-50%,-50%) scale(1.12);
-      }
-      60% {
-        transform: translate(-50%,-50%) scale(.96);
-      }
-      75% {
-        transform: translate(-50%,-50%) scale(1.04);
-      }
-      100% {
-        opacity: 0;
-        transform: translate(-50%,-50%) scale(.9);
-      }
-    }
 
-    @media(prefers-reduced-motion:reduce) {
-      .pix-center-heart,
-      [data-like-btn].pix-heart-pulse svg {
-        animation-duration: .01ms !important;
+      @keyframes pixoroHeartPop {
+        0% {
+          transform: translate(-50%, -50%) scale(.2);
+          opacity: 0;
+        }
+        18% {
+          transform: translate(-50%, -50%) scale(1.18);
+          opacity: 1;
+        }
+        32% {
+          transform: translate(-50%, -50%) scale(.92);
+          opacity: 1;
+        }
+        48% {
+          transform: translate(-50%, -50%) scale(1.12);
+          opacity: 1;
+        }
+        65% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(.85);
+          opacity: 0;
+        }
       }
-    }
-  `;
 
-  document.getElementById(css.id)?.remove();
-  document.head.appendChild(css);
+      @keyframes pixoroRainbow {
+        from { background-position: 0% 50%; }
+        to { background-position: 300% 50%; }
+      }
 
-  // Center gradient heart
-  function showBigHeart() {
-    document.querySelectorAll(".pix-center-heart")
-      .forEach(h => h.remove());
+      .like-btn.liked,
+      .like-button.liked,
+      .like-btn.is-liked,
+      .like-button.is-liked {
+        color: #ff315d !important;
+      }
 
-    const id = "pixGradient" + Date.now();
-
-    const heart = document.createElement("div");
-    heart.className = "pix-center-heart";
-
-    heart.innerHTML = `
-      <svg viewBox="0 0 24 24">
-        <defs>
-          <linearGradient id="${id}"
-            x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#ffb000"/>
-            <stop offset="48%" stop-color="#ff315e"/>
-            <stop offset="100%" stop-color="#e000ff"/>
-          </linearGradient>
-        </defs>
-        <path
-          d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"
-          fill="url(#${id})"/>
-      </svg>
+      .pixoro-like-loading {
+        opacity: .65;
+        pointer-events: none;
+      }
     `;
 
+    document.head.appendChild(style);
+  }
+
+  /* ---------- HEART ANIMATION ---------- */
+
+  function showBigHeart(media) {
+    if (!media) return;
+
+    const rect = media.getBoundingClientRect();
+
+    if (!rect.width || !rect.height) return;
+
+    const heart = document.createElement("div");
+
+    heart.className = "pixoro-big-heart";
+    heart.textContent = "♥";
+
+    heart.style.left = `${rect.left + rect.width / 2}px`;
+    heart.style.top = `${rect.top + rect.height / 2}px`;
+
     document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 1500);
+
+    setTimeout(() => heart.remove(), 1150);
   }
 
-  function paintButton(btn, liked) {
-    if (btn) btn.classList.toggle("liked", liked);
-  }
+  /* ---------- DATABASE COUNT ---------- */
 
-  function pulseButton(btn) {
-    if (!btn) return;
+  async function getLikeCountFromDB(postId) {
+    const { count, error } = await supa
+      .from(TABLE)
+      .select("*", { count: "exact", head: true })
+      .eq("post_id", postId);
 
-    btn.classList.remove("pix-heart-pulse");
-    void btn.offsetWidth;
-    btn.classList.add("pix-heart-pulse");
-
-    setTimeout(() => btn.classList.remove("pix-heart-pulse"), 950);
-  }
-
-  function updateCount(id, value) {
-    const el = findCount(id);
-    if (el) el.textContent = Math.max(0, value);
-  }
-
-  async function getSession(s) {
-    const { data, error } = await s.auth.getSession();
-    if (error) throw error;
-    if (!data.session) {
-      location.href = "./login.html";
+    if (error) {
+      console.error("PIXORO like count error:", error);
       return null;
     }
-    meId = data.session.user.id;
-    window.ME_ID = meId;
-    return meId;
+
+    return count ?? 0;
   }
 
-  // Load actual likes from Supabase
-  async function pixoroLoadMyLikes() {
-    const s = supa();
-    if (!s) return;
+  /* ---------- LIKE / UNLIKE ---------- */
 
-    try {
-      const userId = await getSession(s);
-      if (!userId) return;
+  async function toggleLike(postId, post, forceLike = false) {
+    if (!postId || busyPosts.has(postId)) return;
 
-      const { data, error } = await s
-        .from("likes")
-        .select("post_id")
-        .eq("user_id", userId);
+    const userId = await getUserId();
 
-      if (error) throw error;
-
-      likes.clear();
-      (data || []).forEach(row => likes.add(String(row.post_id)));
-
-      saveLocal();
-      pixoroPaintAllLikes();
-
-    } catch(e) {
-      console.error("PIXORO LOAD LIKES:", e.message);
+    if (!userId) {
+      alert("Please login to like this post.");
+      return;
     }
-  }
 
-  function pixoroPaintAllLikes() {
-    document.querySelectorAll("[data-like-btn]").forEach(btn => {
-      const id = String(btn.getAttribute("data-like-btn"));
-      paintButton(btn, likes.has(id));
-    });
-  }
+    busyPosts.add(postId);
 
-  // Get actual count, avoids client-side count drift
-  async function refreshCount(s, id) {
-    const { count, error } = await s
-      .from("likes")
-      .select("*", { count: "exact", head: true })
-      .eq("post_id", id);
+    const button = getLikeButton(postId, post);
 
-    if (!error && count !== null) updateCount(id, count);
-  }
-
-  // Like / Unlike
-  async function pixoroToggleLike(postId, btn) {
-    postId = String(postId);
-
-    if (locks.has(postId)) return false;
-
-    const s = supa();
-    if (!s) return false;
-
-    btn = btn || findButton(postId);
-    if (!btn) return false;
-
-    locks.add(postId);
-
-    const wasLiked = likes.has(postId);
+    button?.classList.add("pixoro-like-loading");
 
     try {
-      const userId = await getSession(s);
-      if (!userId) return false;
+      const { data: existing, error: checkError } = await supa
+        .from(TABLE)
+        .select("id")
+        .eq("post_id", postId)
+        .eq("user_id", userId)
+        .maybeSingle();
 
-      if (wasLiked) {
-        const { error } = await s
-          .from("likes")
-          .delete()
-          .eq("post_id", postId)
-          .eq("user_id", userId);
+      if (checkError) throw checkError;
 
-        if (error) throw error;
+      if (existing) {
+        if (forceLike) {
+          paintLike(postId, true, post);
+        } else {
+          const { error } = await supa
+            .from(TABLE)
+            .delete()
+            .eq("post_id", postId)
+            .eq("user_id", userId);
 
-        likes.delete(postId);
+          if (error) throw error;
 
+          paintLike(postId, false, post);
+        }
       } else {
-        const { error } = await s
-          .from("likes")
+        const { error } = await supa
+          .from(TABLE)
           .insert({
             post_id: postId,
             user_id: userId
           });
 
-        if (error && error.code !== "23505") throw error;
+        if (error) throw error;
 
-        likes.add(postId);
-        pulseButton(btn);
+        paintLike(postId, true, post);
       }
 
-      paintButton(btn, !wasLiked);
-      saveLocal();
+      const count = await getLikeCountFromDB(postId);
 
-      await refreshCount(s, postId);
-      return !wasLiked;
+      if (count !== null) {
+        paintCount(postId, count, post);
+      }
 
-    } catch(e) {
-      console.error("PIXORO LIKE ERROR:", e.message);
-      return wasLiked;
+    } catch (error) {
+      console.error("PIXORO like failed:", error);
+      alert("Like update failed. Please try again.");
     } finally {
-      locks.delete(postId);
+      button?.classList.remove("pixoro-like-loading");
+      busyPosts.delete(postId);
     }
   }
 
-  // Double tap: like only, never unlike
-  async function pixoroDoubleTapLike(postId) {
-    postId = String(postId);
+  /* ---------- DOUBLE TAP MEDIA ---------- */
 
-    showBigHeart();
-
-    if (likes.has(postId)) return true;
-
-    const btn = findButton(postId);
-    if (!btn) return false;
-
-    return await pixoroToggleLike(postId, btn);
+  function findMedia(element) {
+    return element.closest(
+      ".postMedia, .post-media, .post-media-wrap, .post-content, img, video"
+    );
   }
 
-  // Feed double-tap handler
-  window.pixoroFeedTap = function(postId, el, ev) {
-    if (ev?.target?.closest?.(
-      "button, a, input, [data-like-btn]"
+  document.addEventListener("pointerup", async (event) => {
+    if (event.button !== 0) return;
+
+    if (event.target.closest(
+      "button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]"
     )) return;
 
-    if (ev?.cancelable) ev.preventDefault();
+    const media = findMedia(event.target);
+
+    if (!media) return;
+
+    const post = getPostElement(media);
+    const postId = getPostId(media);
+
+    if (!post || !postId) return;
 
     const now = Date.now();
-    const previous = tapState.get(String(postId));
+    const previous = lastTap.get(media);
 
-    if (previous && now - previous.time < 450) {
-      clearTimeout(previous.timer);
-      tapState.delete(String(postId));
-      pixoroDoubleTapLike(postId);
+    const currentTap = {
+      time: now,
+      x: event.clientX,
+      y: event.clientY
+    };
+
+    lastTap.set(media, currentTap);
+
+    if (
+      previous &&
+      now - previous.time <= DOUBLE_TAP_DELAY &&
+      Math.hypot(
+        event.clientX - previous.x,
+        event.clientY - previous.y
+      ) < 45
+    ) {
+      lastTap.delete(media);
+
+      showBigHeart(media);
+
+      // Double tap only likes; it does not unlike.
+      await toggleLike(postId, post, true);
+    }
+  });
+
+  /* ---------- LIKE BUTTON CLICK ---------- */
+
+  document.addEventListener("click", async (event) => {
+    const button = event.target.closest(
+      "[data-like-btn], .like-btn, .like-button, [data-action='like']"
+    );
+
+    if (!button) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const post = getPostElement(button);
+    const postId =
+      button.dataset.likeBtn ||
+      button.dataset.postId ||
+      post?.dataset.postId ||
+      post?.dataset.id;
+
+    if (!postId) {
+      console.warn("PIXORO: Like button has no post ID.", button);
       return;
     }
 
-    const state = {
-      time: now,
-      timer: setTimeout(() => {
-        if (tapState.get(String(postId)) !== state) return;
-
-        tapState.delete(String(postId));
-
-        const video = el?.querySelector?.("video");
-        if (video) {
-          if (video.paused) video.play().catch(() => {});
-          else video.pause();
-        }
-      }, 470)
-    };
-
-    tapState.set(String(postId), state);
-  };
-
-  // Like button click handler
-  if (!window._pixoroLikeV21Click) {
-    window._pixoroLikeV21Click = true;
-
-    document.addEventListener("click", e => {
-      const btn = e.target.closest?.("[data-like-btn]");
-      if (!btn) return;
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      pixoroToggleLike(
-        btn.getAttribute("data-like-btn"),
-        btn
-      );
-    }, true);
-  }
-
-  // Public functions
-  window.pixoroToggleLike = pixoroToggleLike;
-  window.pixoroDoubleTapLike = pixoroDoubleTapLike;
-  window.showBigHeart = showBigHeart;
-  window.pixoroPaintLikeBtn = paintButton;
-  window.pixoroPaintAllLikes = pixoroPaintAllLikes;
-  window.pixoroLoadMyLikes = pixoroLoadMyLikes;
-
-  function init() {
-    pixoroPaintAllLikes();
-    pixoroLoadMyLikes();
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init, { once: true });
-  } else {
-    init();
-  }
-
-  window.addEventListener("pixoroFeedLoaded", () => {
-    setTimeout(pixoroPaintAllLikes, 100);
+    await toggleLike(postId, post, false);
   });
 
+  /* ---------- INITIAL LIKE STATUS ---------- */
+
+  async function loadMyLikes() {
+    const userId = await getUserId();
+
+    if (!userId) return;
+
+    const { data, error } = await supa
+      .from(TABLE)
+      .select("post_id")
+      .eq("user_id", userId);
+
+    if (error) {
+      console.error("PIXORO load likes error:", error);
+      return;
+    }
+
+    document.querySelectorAll(
+      "[data-post-id], .post, .post-card, article, .post-item"
+    ).forEach((post) => {
+      const postId = post.dataset.postId || post.dataset.id;
+      if (!postId) return;
+
+      const liked = (data || []).some(
+        (item) => String(item.post_id) === String(postId)
+      );
+
+      paintLike(postId, liked, post);
+    });
+  }
+
+  /* ---------- PUBLIC FUNCTION ---------- */
+
+  window.pixoroToggleLike = toggleLike;
+
+  window.pixoroFeedTap = function (postId, element) {
+    const media = findMedia(element || document.querySelector(
+      `[data-post-id="${postId}"]`
+    ));
+
+    if (media) showBigHeart(media);
+
+    return toggleLike(postId, getPostElement(element), true);
+  };
+
+  /* ---------- START ---------- */
+
+  addHeartStyles();
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadMyLikes);
+  } else {
+    loadMyLikes();
+  }
+
+  // Load again after login if the page is already open.
+  window.addEventListener("pixoro:login", loadMyLikes);
+
+  console.log("PIXORO Like V22 loaded successfully.");
 })();
