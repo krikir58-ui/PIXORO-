@@ -1,5 +1,5 @@
-// ===== PIXORO LIKE - FINAL V12 - HEART NADUVULA DA =====
-console.log('✅ LIKE FILE LOADED DA - V12 HEART NADUVULA');
+// ===== PIXORO LIKE - FINAL V13 - CORRECT HEART NADUVULA DA =====
+console.log('✅ LIKE FILE LOADED DA - V13 HEART NADUVULA CORRECT');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
@@ -57,8 +57,9 @@ window.pixoroFeedTap = function(postId, el, ev){
   document.getElementById('pixoro-like-css-v10')?.remove();
   document.getElementById('pixoro-like-css-v11')?.remove();
   document.getElementById('pixoro-like-css-v12')?.remove();
+  document.getElementById('pixoro-like-css-v13')?.remove();
   let s = document.createElement('style');
-  s.id = 'pixoro-like-css-v12';
+  s.id = 'pixoro-like-css-v13';
   s.innerText = `
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
@@ -174,18 +175,9 @@ async function pixoroToggleLike(postId, btn){
 }
 
 async function pixoroDoubleTapLike(postId, mediaEl, ev){
-  let tapX = 0, tapY = 0;
-  if(ev){
-    if(ev.touches && ev.touches[0]){ tapX = ev.touches[0].clientX; tapY = ev.touches[0].clientY; }
-    else if(ev.changedTouches && ev.changedTouches[0]){ tapX = ev.changedTouches[0].clientX; tapY = ev.changedTouches[0].clientY; }
-    else { tapX = ev.clientX || 0; tapY = ev.clientY || 0; }
-  }
-  if(!tapX && !tapY){
-    tapX = window._pixLastTouchX || 0;
-    tapY = window._pixLastTouchY || 0;
-  }
-  console.log('❤️ DOUBLE TAP LIKE DA:', postId, tapX, tapY);
-  showBigHeart(mediaEl, tapX, tapY);
+  console.log('❤️ DOUBLE TAP LIKE DA:', postId);
+  // ✅ CORRECT DA - Heart ah Muthalla Kaatu da - Like Aanaalum Aagalaanaalum Heart Varum da
+  showBigHeart(mediaEl, 0, 0);
   let btn = document.querySelector(`[data-like-btn="${postId}"]`);
   if(btn && btn.classList.contains('liked')) return true;
   if(window.FEED_LIKES && window.FEED_LIKES.has(String(postId))) return true;
@@ -212,31 +204,24 @@ async function pixoroDoubleTapLike(postId, mediaEl, ev){
   }
 }
 
+// ✅ CORRECTED HEART DA - V12 la Irundha Thappu Ellam Sari Panniten da
 function showBigHeart(mediaEl, tapX, tapY){
-  if(!mediaEl) return;
   document.querySelectorAll('.bigHeart').forEach(h=>h.remove());
-  // ✅ MAIN FIX DA - Photo / Video oda Naduvula irundhu Edu da - Box kulla Potta Thaan Thappu Varuthu da
-  let target = null;
-  try{
-    if(mediaEl.tagName === 'IMG' || mediaEl.tagName === 'VIDEO') target = mediaEl;
-    else target = mediaEl.querySelector('img, video');
-    if(!target && mediaEl.closest) target = mediaEl.closest('img, video');
-    if(!target) target = mediaEl;
-  }catch(e){ target = mediaEl; }
-  let r = target.getBoundingClientRect();
-  // ✅ NADUVULA THAAN DA - Photo oda Center da - Thotta Edam Illa da
-  let cx = r.left + r.width/2;
-  let cy = r.top + r.height/2;
-  // ✅ Photo theriyalanana - Screen Naduvula Podu da
-  if(!r.width || !r.height){ cx = window.innerWidth/2; cy = window.innerHeight/2; }
+  console.log('❤️ HEART VARANUM DA');
 
-  // ✅ FIXED la Body la Podurom da - Yaaroda Overflow um - Position um Heart ah Maraikka Mudiyathu da
+  // ✅ 1. Photo va Namba Venaam da - Screen Naduvula Podurom da - Miss Aagathu da
+  let cx = window.innerWidth / 2;
+  let cy = window.innerHeight / 2;
+
   let div = document.createElement('div');
   div.className = 'bigHeart';
-  div.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;width:110px;height:110px;left:'+cx+'px;top:'+cy+'px;opacity:0;';
+  // ✅ 2. Opacity 0 la Arambikka Koodathu da - 1 la Arambikkrom da - Theriyanum da
+  // ✅ 3. z-index 999999 - Yaarum Maraikka Mudiyathu da
+  div.style.cssText = 'position:fixed !important;z-index:999999 !important;pointer-events:none !important;width:120px;height:120px;left:'+cx+'px;top:'+cy+'px;opacity:1 !important;transform:translate(-50%,-50%) scale(0.2);';
   div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   document.body.appendChild(div);
 
+  // ✅ 4. Colour Colour - Mella Maarum da
   let colors = ['#FF0A33','#FF4D8D','#FF8A00','#FF2E9A','#FFD500','#00E5FF','#7C4DFF','#00FF88'];
   let ci = 0;
   let path = div.querySelector('path');
@@ -245,18 +230,21 @@ function showBigHeart(mediaEl, tapX, tapY){
     if(path) path.setAttribute('fill', colors[ci]);
   }, 280);
 
-  try{
-    div.animate([
-      { opacity:0, transform:'translate(-50%,-50%) scale(0) rotate(0deg)', offset:0 },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1.25) rotate(-6deg)', offset:0.12 },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1.05) rotate(3deg)', offset:0.20 },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1) rotate(0deg)', offset:0.30 },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1) rotate(0deg)', offset:0.70 },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1.05) rotate(0deg)', offset:0.85 },
-      { opacity:0, transform:'translate(-50%,-50%) scale(1.15) rotate(0deg)', offset:1 }
-    ], { duration:2400, easing:'ease-in-out' }).onfinish = ()=>{ clearInterval(colorTimer); div.remove(); };
-  }catch(e){ clearInterval(colorTimer); div.remove(); }
-  setTimeout(()=>{ clearInterval(colorTimer); div.remove(); }, 2500);
+  // ✅ 5. WAAPI animate() Venaam da - Phone la Fail Aaguthu da - Simple Interval la Scale Pannurom da
+  let scale = 0.2;
+  let grow = setInterval(()=>{
+    scale += 0.15;
+    if(scale >= 1){ scale = 1; clearInterval(grow); }
+    div.style.transform = 'translate(-50%,-50%) scale('+scale+')';
+  }, 30);
+
+  // ✅ 6. 2400ms Ninnu Pogum da - Aprom Mella Maraiyum da
+  setTimeout(()=>{
+    div.style.transition = 'opacity 0.4s, transform 0.4s';
+    div.style.opacity = '0';
+    div.style.transform = 'translate(-50%,-50%) scale(1.2)';
+    setTimeout(()=>{ clearInterval(colorTimer); div.remove(); }, 450);
+  }, 2400);
 }
 
 (function(){
