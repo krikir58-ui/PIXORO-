@@ -1,5 +1,5 @@
-// ===== PIXORO LIKE - FINAL CORRECTED DA - SPEED + DB + LOCAL + INSTA BIG HEART DANCE DA =====
-console.log('✅ LIKE FILE LOADED DA - V3 DANCE');
+// ===== PIXORO LIKE - FINAL V4 - INSTA TAP POSITION HEART DA =====
+console.log('✅ LIKE FILE LOADED DA - V4 TAP POSITION');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
@@ -23,7 +23,8 @@ window.pixoroFeedTap = function(postId, el, ev){
   if(String(postId) === String(_lastTapId) && (now - _lastTapTime) < 400){
     _lastTapTime = 0;
     if(_singleTapTimer){ clearTimeout(_singleTapTimer); _singleTapTimer = null; }
-    pixoroDoubleTapLike(postId, el);
+    // ✅ ENGA THODOMO - ev ah anuppurom da
+    pixoroDoubleTapLike(postId, el, ev);
     return;
   }
   _lastTapTime = now; _lastTapId = String(postId);
@@ -35,20 +36,20 @@ window.pixoroFeedTap = function(postId, el, ev){
 };
 
 (function(){
-  // ✅ FIX DA - Pazhaya CSS ah Delete pannama puthu CSS varathu da!
   document.getElementById('pixoro-like-css')?.remove();
   document.getElementById('pixoro-like-css-v2')?.remove();
   document.getElementById('pixoro-like-css-v3')?.remove();
+  document.getElementById('pixoro-like-css-v4')?.remove();
   let s = document.createElement('style');
-  s.id = 'pixoro-like-css-v3';
+  s.id = 'pixoro-like-css-v4';
   s.innerText = `
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
     [data-like-btn] svg{ overflow:visible !important; display:block !important; width:24px !important; height:24px !important; }
     [data-like-btn] svg, [data-like-btn] svg path{ fill:none !important; stroke:#fff !important; }
     [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
-    /* ✅ BIG HEART - DANCE + POCHU POIDUM DA */
-    .bigHeart{ position:absolute !important; left:50% !important; top:50% !important; z-index:99 !important; pointer-events:none !important; opacity:0; transform:translate(-50%,-50%) scale(0); width:90px !important; height:90px !important; }
+    /* ✅ BIG HEART - left/top la !important illa da - JS la thotta edam vekka mudiyum da */
+    .bigHeart{ position:absolute; z-index:99 !important; pointer-events:none !important; opacity:0; transform:translate(-50%,-50%) scale(0); width:90px !important; height:90px !important; }
     .bigHeart.show{ animation:pixHeartDance 900ms ease forwards !important; }
     .bigHeart svg{ width:100% !important; height:100% !important; filter:drop-shadow(0 4px 12px rgba(0,0,0,.5)) !important; }
     @keyframes pixHeartDance{ 0%{opacity:0; transform:translate(-50%,-50%) scale(0) rotate(0deg)} 15%{opacity:1; transform:translate(-50%,-50%) scale(1.3) rotate(-12deg)} 30%{transform:translate(-50%,-50%) scale(1.1) rotate(10deg)} 45%{transform:translate(-50%,-50%) scale(1.2) rotate(-8deg)} 60%{transform:translate(-50%,-50%) scale(1.05) rotate(6deg)} 75%{opacity:1; transform:translate(-50%,-50%) scale(1) rotate(0deg)} 100%{opacity:0; transform:translate(-50%,-50%) scale(1.2) rotate(0deg)} }
@@ -160,8 +161,16 @@ async function pixoroToggleLike(postId, btn){
   }
 }
 
-async function pixoroDoubleTapLike(postId, mediaEl){
-  showBigHeart(mediaEl);
+async function pixoroDoubleTapLike(postId, mediaEl, ev){
+  // ✅ PIXORO MAARI - Thotta edam edukkurom da
+  let tapX = 0, tapY = 0;
+  if(ev){
+    // Touch la irundha - touches la irundhu edu da
+    if(ev.touches && ev.touches[0]){ tapX = ev.touches[0].clientX; tapY = ev.touches[0].clientY; }
+    else if(ev.changedTouches && ev.changedTouches[0]){ tapX = ev.changedTouches[0].clientX; tapY = ev.changedTouches[0].clientY; }
+    else { tapX = ev.clientX || 0; tapY = ev.clientY || 0; }
+  }
+  showBigHeart(mediaEl, tapX, tapY);
   let btn = document.querySelector(`[data-like-btn="${postId}"]`);
   if(btn && btn.classList.contains('liked')) return true;
   if(window.FEED_LIKES && window.FEED_LIKES.has(String(postId))) return true;
@@ -188,7 +197,7 @@ async function pixoroDoubleTapLike(postId, mediaEl){
   }
 }
 
-function showBigHeart(mediaEl){
+function showBigHeart(mediaEl, tapX, tapY){
   if(!mediaEl) return;
   let box = null;
   try{ if(mediaEl.closest) box = mediaEl.closest('.postMedia') || mediaEl.closest('.post'); }catch(e){}
@@ -197,9 +206,26 @@ function showBigHeart(mediaEl){
   box.querySelectorAll('.bigHeart').forEach(h=>h.remove());
   let div = document.createElement('div');
   div.className = 'bigHeart';
-  div.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  // ✅ PIXORO Double Tap Heart - White da
+  div.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#fff" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   let cs = window.getComputedStyle(box);
   if(cs.position === 'static') box.style.position = 'relative';
+
+  // ✅ PIXORO LOGIC DA - Enga thodromo anga vekkurom da
+  if(tapX && tapY){
+    let r = box.getBoundingClientRect();
+    let x = tapX - r.left;
+    let y = tapY - r.top;
+    // Ooram pona ulla kondu varom da
+    x = Math.max(50, Math.min(r.width - 50, x));
+    y = Math.max(50, Math.min(r.height - 50, y));
+    div.style.left = x + 'px';
+    div.style.top = y + 'px';
+  } else {
+    div.style.left = '50%';
+    div.style.top = '50%';
+  }
+
   box.appendChild(div);
   void div.offsetWidth;
   div.classList.add('show');
