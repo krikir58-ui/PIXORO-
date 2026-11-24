@@ -1,5 +1,5 @@
-// ===== PIXORO LIKE - FINAL V8 - OREY HEART COLOUR SLOW DA =====
-console.log('✅ LIKE FILE LOADED DA - V8 OREY HEART COLOUR SLOW');
+// ===== PIXORO LIKE - FINAL V11 - OREY HEART NINNU POGUM DA =====
+console.log('✅ LIKE FILE LOADED DA - V11 OREY HEART SLOW');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
@@ -30,7 +30,7 @@ window.pixoroFeedTap = function(postId, el, ev){
     if(ev.preventDefault) ev.preventDefault();
   }
   let now = Date.now();
-  if(String(postId) === String(_lastTapId) && (now - _lastTapTime) < 400){
+  if(String(postId) === String(_lastTapId) && (now - _lastTapTime) < 500){
     _lastTapTime = 0;
     if(_singleTapTimer){ clearTimeout(_singleTapTimer); _singleTapTimer = null; }
     pixoroDoubleTapLike(postId, el, ev);
@@ -41,7 +41,7 @@ window.pixoroFeedTap = function(postId, el, ev){
   _singleTapTimer = setTimeout(()=>{
     let vid = el ? el.querySelector('video') : null;
     if(vid){ vid.paused ? vid.play().catch(()=>{}) : vid.pause(); }
-  }, 420);
+  }, 520);
 };
 
 (function(){
@@ -53,8 +53,11 @@ window.pixoroFeedTap = function(postId, el, ev){
   document.getElementById('pixoro-like-css-v6')?.remove();
   document.getElementById('pixoro-like-css-v7')?.remove();
   document.getElementById('pixoro-like-css-v8')?.remove();
+  document.getElementById('pixoro-like-css-v9')?.remove();
+  document.getElementById('pixoro-like-css-v10')?.remove();
+  document.getElementById('pixoro-like-css-v11')?.remove();
   let s = document.createElement('style');
-  s.id = 'pixoro-like-css-v8';
+  s.id = 'pixoro-like-css-v11';
   s.innerText = `
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
@@ -181,6 +184,7 @@ async function pixoroDoubleTapLike(postId, mediaEl, ev){
     tapX = window._pixLastTouchX || 0;
     tapY = window._pixLastTouchY || 0;
   }
+  console.log('❤️ DOUBLE TAP LIKE DA:', postId, tapX, tapY);
   showBigHeart(mediaEl, tapX, tapY);
   let btn = document.querySelector(`[data-like-btn="${postId}"]`);
   if(btn && btn.classList.contains('liked')) return true;
@@ -226,38 +230,88 @@ function showBigHeart(mediaEl, tapX, tapY){
     x = Math.max(70, Math.min(r.width-70, tapX - r.left));
     y = Math.max(70, Math.min(r.height-70, tapY - r.top));
   }
-
-  // ✅ OREY HEART THAAN DA - VERA HEART EHTHUVUM ILLA DA
   let div = document.createElement('div');
   div.className = 'bigHeart';
-  div.style.cssText = 'position:absolute;z-index:99;pointer-events:none;width:110px;height:110px;left:'+x+'px;top:'+y+'px;opacity:0;';
+  div.style.cssText = 'position:absolute;z-index:99;pointer-events:none;width:105px;height:105px;left:'+x+'px;top:'+y+'px;opacity:0;';
   div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   box.appendChild(div);
-
-  // ✅ OREY HEART EH COLOUR COLOUR AH MAARUM DA
-  let colors = ['#FF0A33','#FF4D8D','#FF8A00','#FF2E9A','#FFD500','#00E5FF','#7C4DFF','#00FF88','#FF6B6B'];
+  let colors = ['#FF0A33','#FF4D8D','#FF8A00','#FF2E9A','#FFD500','#00E5FF','#7C4DFF','#00FF88'];
   let ci = 0;
   let path = div.querySelector('path');
   let colorTimer = setInterval(()=>{
     ci = (ci+1) % colors.length;
     if(path) path.setAttribute('fill', colors[ci]);
-  }, 180);
-
-  // ✅ SLOW DANCE DA - 1800ms MELLA POGUM DA
+  }, 280);
   try{
     div.animate([
-      { opacity:0, transform:'translate(-50%,-50%) scale(0) rotate(0deg)' },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1.4) rotate(-10deg)' },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1.15) rotate(8deg)' },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1.25) rotate(-6deg)' },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1.1) rotate(4deg)' },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1.15) rotate(-2deg)' },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1) rotate(0deg)' },
-      { opacity:0, transform:'translate(-50%,-50%) scale(1.3) rotate(0deg)' }
-    ], { duration:1800, easing:'ease-in-out' }).onfinish = ()=>{ clearInterval(colorTimer); div.remove(); };
+      { opacity:0, transform:'translate(-50%,-50%) scale(0) rotate(0deg)', offset:0 },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1.25) rotate(-6deg)', offset:0.12 },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1.05) rotate(3deg)', offset:0.20 },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1) rotate(0deg)', offset:0.30 },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1) rotate(0deg)', offset:0.70 },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1.05) rotate(0deg)', offset:0.85 },
+      { opacity:0, transform:'translate(-50%,-50%) scale(1.15) rotate(0deg)', offset:1 }
+    ], { duration:2400, easing:'ease-in-out' }).onfinish = ()=>{ clearInterval(colorTimer); div.remove(); };
   }catch(e){ clearInterval(colorTimer); div.remove(); }
-  setTimeout(()=>{ clearInterval(colorTimer); div.remove(); }, 1900);
+  setTimeout(()=>{ clearInterval(colorTimer); div.remove(); }, 2500);
 }
+
+(function(){
+  if(window._pixAutoDoubleTap) return;
+  window._pixAutoDoubleTap = true;
+  let _autoLast = 0, _autoId = '';
+  function findPostInfo(startEl){
+    if(!startEl) return null;
+    let el = startEl;
+    for(let i=0;i<6 && el;i++){
+      if(el.querySelector){
+        let btn = el.querySelector('[data-like-btn]');
+        if(btn && el !== document.body && el !== document.getElementById('feed')){
+          let media = el.classList && (el.classList.contains('postMedia') || el.classList.contains('post')) ? el : null;
+          if(media) return { postId: String(btn.getAttribute('data-like-btn')), mediaEl: media };
+        }
+      }
+      el = el.parentElement;
+    }
+    let p = startEl.closest ? startEl.closest('.post, article, [class*="post"]') : null;
+    if(p){
+      let btn = p.querySelector('[data-like-btn]');
+      if(btn) return { postId: String(btn.getAttribute('data-like-btn')), mediaEl: p.querySelector('.postMedia') || p };
+    }
+    return null;
+  }
+  document.addEventListener('touchend', function(e){
+    if(!e.target || !e.target.closest) return;
+    if(e.target.closest('[data-like-btn]')) return;
+    if(e.target.closest('a, button, input')) return;
+    let media = e.target.closest('img, video');
+    if(!media) media = e.target.closest('.postMedia, .post');
+    if(!media) return;
+    let info = findPostInfo(media);
+    if(!info) return;
+    let now = Date.now();
+    if(info.postId === _autoId && (now - _autoLast) < 500){
+      _autoLast = 0; _autoId = '';
+      let tx = window._pixLastTouchX || 0, ty = window._pixLastTouchY || 0;
+      if(e.changedTouches && e.changedTouches[0]){ tx = e.changedTouches[0].clientX; ty = e.changedTouches[0].clientY; }
+      console.log('❤️ AUTO DOUBLE TAP DA:', info.postId);
+      pixoroDoubleTapLike(info.postId, info.mediaEl, { clientX: tx, clientY: ty });
+      _lastTapTime = 0; _lastTapId = '';
+    } else {
+      _autoLast = now; _autoId = info.postId;
+    }
+  }, {passive:true});
+  document.addEventListener('dblclick', function(e){
+    if(!e.target || !e.target.closest) return;
+    if(e.target.closest('[data-like-btn]')) return;
+    let media = e.target.closest('img, video, .postMedia');
+    if(!media) return;
+    let info = findPostInfo(media);
+    if(!info) return;
+    pixoroDoubleTapLike(info.postId, info.mediaEl, e);
+    _lastTapTime = 0; _lastTapId = '';
+  });
+})();
 
 if(!window._pixoroLikeDelegation){
   window._pixoroLikeDelegation = true;
