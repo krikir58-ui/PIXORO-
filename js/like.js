@@ -16,7 +16,11 @@ function pixoroSaveLocal(){
 }
 
 window.pixoroFeedTap = function(postId, el, ev){
-  if(ev) ev.preventDefault();
+  if(ev){
+    // ✅ FIX DA - Like button ah thotta inga varatha da!
+    if(ev.target && ev.target.closest && ev.target.closest('[data-like-btn]')) return;
+    ev.preventDefault();
+  }
   let now = Date.now();
   if(String(postId) === String(_lastTapId) && (now - _lastTapTime) < 400){
     _lastTapTime = 0;
@@ -37,6 +41,10 @@ window.pixoroFeedTap = function(postId, el, ev){
   let s = document.createElement('style');
   s.id = 'pixoro-like-css';
   s.innerText = `
+    /* ✅ FIX DA - Thodum bothu paathi maraiyathu da */
+    [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
+    [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
+    [data-like-btn] svg{ overflow:visible !important; display:block !important; width:24px !important; height:24px !important; }
     [data-like-btn] svg, [data-like-btn] svg path{ fill:none !important; stroke:#fff !important; }
     [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
     .bigHeart{ position:absolute !important; left:50% !important; top:50% !important; z-index:99 !important; pointer-events:none !important; opacity:0 !important; transform:translate(-50%,-50%) scale(0) !important; width:80px !important; height:80px !important; }
@@ -97,7 +105,6 @@ function pixoroBumpCount(postId, delta){
 
 async function pixoroSyncPostCount(s, postId, delta){
   try{
-    // RPC iruntha athu use pannu da - illana pazhaya method da
     let r = await s.rpc('increment_likes', {p_id: postId, p_delta: delta});
     if(r.error) throw r.error;
   }catch(e){
@@ -116,15 +123,12 @@ async function pixoroToggleLike(postId, btn){
   if(!btn) btn = document.querySelector(`[data-like-btn="${postId}"]`);
   if(!btn) return;
   let willLike = !btn.classList.contains('liked');
-
-  // ✅ SPEED - UDANEY UI MAATHU DA - SERVER KU WAIT PANNA VENDAAM DA
   pixoroPaintLikeBtn(btn, willLike);
   pixoroBumpCount(postId, willLike ? 1 : -1);
   if(window.FEED_LIKES){
     willLike ? window.FEED_LIKES.add(String(postId)) : window.FEED_LIKES.delete(String(postId));
     pixoroSaveLocal();
   }
-
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return willLike;
   if(!window.ME_ID){
     try{
@@ -145,7 +149,6 @@ async function pixoroToggleLike(postId, btn){
     return willLike;
   }catch(e){
     console.log('❌ LIKE DB FAIL DA:', e.message);
-    // Server fail aana - UI ah thumba maathu da
     pixoroPaintLikeBtn(btn, !willLike);
     pixoroBumpCount(postId, willLike ? -1 : 1);
     if(window.FEED_LIKES){
@@ -162,12 +165,9 @@ async function pixoroDoubleTapLike(postId, mediaEl){
   if(btn && btn.classList.contains('liked')) return true;
   if(window.FEED_LIKES && window.FEED_LIKES.has(String(postId))) return true;
   _lastLikeAction = Date.now();
-
-  // ✅ SPEED - UDANEY UI
   if(btn) pixoroPaintLikeBtn(btn, true);
   pixoroBumpCount(postId, 1);
   if(window.FEED_LIKES){ window.FEED_LIKES.add(String(postId)); pixoroSaveLocal(); }
-
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return true;
   if(!window.ME_ID){
     try{
@@ -224,7 +224,6 @@ window.pixoroPaintLikeBtn = pixoroPaintLikeBtn;
 window.pixoroPaintAllLikes = pixoroPaintAllLikes;
 window.pixoroLoadMyLikes = pixoroLoadMyLikes;
 
-// ✅ FEED LOAD AANA APROM THUMBA PAINT PANNU DA - ITHU THAAN MUKKIYAM DA
 function pixoroInitLikes(){
   pixoroPaintAllLikes();
   pixoroLoadMyLikes();
