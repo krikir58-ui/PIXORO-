@@ -201,7 +201,6 @@ function pixoroReelSetup(videoEl, postId, userId){
       let h = document.createElement('div'); h.innerText='❤️';
       h.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:90px;z-index:99';
       videoEl.parentElement.appendChild(h); setTimeout(()=>h.remove(),600);
-      // ✅ FIX - Core Like ah Thodave Koodathu da - like.js ku Vidru da
       if(window.pixoroFeedTap) window.pixoroFeedTap(postId, videoEl.parentElement, null);
       else if(window.pixoroDoubleTapLike) window.pixoroDoubleTapLike(postId, videoEl.parentElement);
     }
@@ -210,9 +209,6 @@ function pixoroReelSetup(videoEl, postId, userId){
 }
 async function pixoroSendNotification(toUserId, type, postId, message){ return; }
 window.pixoroSendNotification = pixoroSendNotification;
-// ✅ FIX - CORE la LIKE Illa da - like.js thaan Owner da
-// window.pixoroLike INGA ILLA DA - Thookiten da
-// window.pixoroToggleLike INGA ILLA DA - Thookiten da
 async function pixoroSave(postId, userId){
   await pixoroFixMe();
   if(!pixoroIsUuid(window.ME_ID) || !pixoroIsUuid(postId)) return;
@@ -516,3 +512,42 @@ async function pixoroCheckBell(){
 window.pixoroCheckBell = pixoroCheckBell;
 setInterval(pixoroCheckBell, 15000);
 setTimeout(pixoroCheckBell, 3000);
+// ===== PIXORO CORE - PHOTO SYNC - CORRECTED DA - DB LA IRUNTHU EDU DA =====
+window.MY_PFP = window.MY_PFP || '';
+async function syncMyPhotoEverywhere(){
+  let photo = window.MY_PFP || window.ME_PFP || '';
+  if(!photo){
+    let nav = document.getElementById('navPfp');
+    if(nav && nav.src && nav.src.length > 20 && !nav.src.includes('ui-avatars')) photo = nav.src;
+  }
+  if(!photo){
+    let postImg = document.querySelector('.post .pfpInner img');
+    if(postImg && postImg.src && postImg.src.length > 20 && !postImg.src.includes('ui-avatars')) photo = postImg.src;
+  }
+  // ✅ CORRECT DA - Page la Illana DB ku Poyi Edu da
+  if(!photo){
+    try{
+      let s = pixoroGetSupa();
+      if(s){
+        let {data:{session}} = await s.auth.getSession();
+        let uid = window.ME_ID || session?.user?.id;
+        if(uid){
+          window.ME_ID = uid;
+          let {data:prof} = await s.from('profiles').select('avatar_url').eq('id', uid).maybeSingle();
+          if(prof && prof.avatar_url && String(prof.avatar_url).length > 20) photo = String(prof.avatar_url);
+        }
+      }
+    }catch(e){}
+  }
+  if(!photo) return;
+  window.MY_PFP = photo; window.ME_PFP = photo;
+  document.querySelectorAll('.myPfp, #navPfp, #myStoryImg, #myCommentPfpWrap img, #storyViewerPfp').forEach(function(img){
+    if(img && img.tagName === 'IMG' && img.src !== photo){ img.src = photo; img.style.display = 'block'; }
+  });
+  // ✅ CORRECT DA - My Story Letter mattum Hide da - Extra }); Illa da - i Illa da
+  let myLetter = document.getElementById('myStoryLetter');
+  if(myLetter) myLetter.style.display = 'none';
+}
+window.syncMyPhotoEverywhere = syncMyPhotoEverywhere;
+setInterval(syncMyPhotoEverywhere, 2000);
+if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', syncMyPhotoEverywhere); } else { syncMyPhotoEverywhere(); }
