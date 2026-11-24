@@ -1,4 +1,4 @@
-/* PIXORO FEED - FINAL CORRECTED DA - NO DOUBLE LIKE DA */
+/* PIXORO FEED - FINAL CORRECTED DA - NO DOUBLE LIKE DA - NO BLOCK DA */
 (function () {
   'use strict';
   let loading = false;
@@ -6,6 +6,18 @@
   function escapeHTML(v){ return String(v||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function safeURL(v){ try{ let u=new URL(v, location.href); return ['https:','http:'].includes(u.protocol)?escapeHTML(u.href):''; }catch{ return ''; } }
   function feedTime(t){ if(!t) return ''; let d=new Date(t), n=new Date(), diff=Math.floor((n-d)/1000); if(diff<60) return 'Just now'; if(diff<3600) return Math.floor(diff/60)+'m'; if(diff<86400) return Math.floor(diff/3600)+'h'; return d.toLocaleDateString([],{day:'numeric',month:'short'}); }
+
+  /* ✅ BLOCK REMOVE - Story Click Block Aaga Kudathu da */
+  function unblockStories(){
+    const bar = document.getElementById('storyBar');
+    if(bar){ bar.style.pointerEvents='auto'; bar.style.zIndex='10'; bar.style.position='relative'; }
+    document.querySelectorAll('.sItem, .sRing, .sAddWrap, .sAddImg').forEach(el=>{
+      el.style.pointerEvents='auto'; el.style.cursor='pointer';
+    });
+    // ✅ Mela irukura Overlay / Top Note Block pannama Paathuko da
+    const note = document.getElementById('pixoroTopNote');
+    if(note) note.style.pointerEvents='none';
+  }
 
   /* ✅ STORY - Thotta Direct Page ku Poku da - Box Illa da */
   async function loadStories(){
@@ -17,24 +29,26 @@
       let MY_ID = '';
       try{ let { data:{session} } = await supa.auth.getSession(); MY_ID = session?.user?.id || ''; }catch{}
 
-      // ✅ My Story - First la da
-      let myPfp = '';
+      let myPfp = '', myHasStory = false;
       if(MY_ID){
         let { data: me } = await supa.from('profiles').select('avatar_url,username').eq('id', MY_ID).maybeSingle();
         myPfp = me?.avatar_url || '';
       }
 
-      // ✅ Stories - Latest 30 da
       let { data: stories } = await supa.from('stories').select('*').order('created_at',{ascending:false}).limit(30);
       stories = stories || [];
 
-      // ✅ Same User oda Story ah Oru Circle ah Group pannu da
+      // ✅ Enakku Story irukka nu Paaru da - Iruntha View, Illana Add da
+      if(MY_ID) myHasStory = stories.some(s=> String(s.user_id)===String(MY_ID));
+
       let seenUser = new Set();
       let items = stories.filter(s=>{
         if(seenUser.has(String(s.user_id))) return false;
         seenUser.add(String(s.user_id));
         return true;
       });
+      // ✅ En Story ah List la Double Vara Kudathu da
+      items = items.filter(s=> String(s.user_id)!==String(MY_ID));
 
       let ids = [...new Set(items.map(s=>s.user_id).filter(Boolean))];
       let profMap = {};
@@ -44,7 +58,7 @@
       }
 
       let html = `
-        <div class="sItem" data-story-user="me">
+        <div class="sItem" data-story-user="me" data-has-story="${myHasStory ? '1':'0'}">
           <div class="sAddWrap">
             ${myPfp ? `<img class="sAddImg" src="${safeURL(myPfp)}">` : `<div class="sAddImg" style="display:grid;place-items:center;font-size:22px;font-weight:900">+</div>`}
             <div class="sAddPlus">+</div>
@@ -70,22 +84,28 @@
       if(row) row.innerHTML = html;
       else bar.innerHTML = html;
 
-      // ✅ CLICK - Box Illa da - Direct Story Page ku Poku da
-      document.querySelectorAll('.sItem').forEach(item=>{
-        item.onclick = ()=>{
-          const uid = item.dataset.storyUser;
-          if(uid === 'me'){
-            // My Story - Add Story Page ku Poku da
-            window.location.href = '/add-story.html';
-            return;
-          }
-          // Vera User Story - Full Page ku Poku da
-          window.location.href = '/story.html?user=' + encodeURIComponent(uid);
-        };
-      });
+      unblockStories();
 
     }catch(e){ console.error('STORY LOAD ERROR:', e); }
   }
+
+  /* ✅ CLICK - Delegation da - Vera Handler Block panna Mudiyathu da */
+  document.addEventListener('click', (e)=>{
+    const item = e.target.closest('.sItem');
+    if(!item) return;
+    e.preventDefault(); e.stopPropagation();
+    const uid = item.dataset.storyUser;
+    if(uid === 'me'){
+      // ✅ Story iruntha Paaru da, illana Add pannu da - Block Illa da
+      if(item.dataset.hasStory === '1'){
+        window.location.href = '/story.html?user=me';
+      } else {
+        window.location.href = '/add-story.html';
+      }
+      return;
+    }
+    window.location.href = '/story.html?user=' + encodeURIComponent(uid);
+  }, true);
 
   async function loadFeed(){
     const feed = document.getElementById('feed');
@@ -96,7 +116,6 @@
     try{
       let MY_ID = '';
       try{ let { data:{session} } = await supa.auth.getSession(); MY_ID = session?.user?.id || ''; }catch{}
-
       const { data: posts, error } = await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(50);
       if(error) throw error;
       if(!posts || !posts.length){ feed.innerHTML='<p style="color:white;text-align:center;padding:30px">No posts yet</p>'; return; }
@@ -106,7 +125,6 @@
         let { data: profs } = await supa.from('profiles').select('id,username,avatar_url').in('id', ids);
         (profs||[]).forEach(p=> profMap[String(p.id)] = p);
       }
-
       let likedSet = new Set(), savedSet = new Set();
       if(MY_ID){
         let postIds = posts.map(p=>p.id);
@@ -117,7 +135,6 @@
         if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
         likedSet.forEach(id=> window.FEED_LIKES.add(id));
       }
-
       feed.innerHTML = posts.map(post=>{
         const id = String(post.id||'');
         const prof = profMap[String(post.user_id)] || {};
@@ -131,7 +148,6 @@
         const isMine = MY_ID && String(post.user_id) === String(MY_ID);
         const isLiked = likedSet.has(id) ? ' liked' : '';
         const isSaved = savedSet.has(id) ? ' saved' : '';
-
         return `
         <article class="post" data-post-id="${id}">
           <div class="postTop">
@@ -166,10 +182,8 @@
           <div style="padding:0 14px 6px;color:white;font-size:14px"><b>${username}</b> ${caption}</div>
         </article>`;
       }).join('');
-
       window.dispatchEvent(new Event('pixoroFeedLoaded'));
       if(window.pixoroPaintAllLikes) window.pixoroPaintAllLikes();
-
     }catch(err){
       console.error('PIXORO FEED ERROR:', err);
       feed.innerHTML='<p style="color:#ff5ea8;text-align:center;padding:25px">Feed load failed. Check database connection.</p>';
@@ -177,10 +191,7 @@
   }
   window.loadFeed = loadFeed;
   window.loadStories = loadStories;
-  function init(){
-    loadStories();
-    loadFeed();
-  }
+  function init(){ loadStories(); loadFeed(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
