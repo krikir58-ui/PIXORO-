@@ -8,49 +8,33 @@
 <link rel="stylesheet" href="css/comments.css">
 <link rel="stylesheet" href="css/pixoro-style.css">
 <link rel="stylesheet" href="css/top-plus.css">
-<!-- ✅ FIX - feed.css KADASIYIL THAAN DA -->
-<link rel="stylesheet" href="css/feed.css">
-<!-- ✅ FIX - FINAL OVERRIDE DA -->
-<style>
-  /* ✅ STORY BAR FIX DA - Story Circle Theriyum da */
-  #storyBar, #storyBox, .storyBar{ display:flex !important; gap:14px !important; overflow-x:auto !important; padding:12px !important; background:#000 !important; border-bottom:1px solid #222 !important; scrollbar-width:none !important; }
-  #storyBar::-webkit-scrollbar, #storyBox::-webkit-scrollbar{ display:none !important; }
-  #storyRow, .story-row{ display:flex !important; gap:12px !important; }
-  /* ✅ BLOCK FIX DA - Story Click Block Aaga Kudathu da */
-  .sItem, .sRing, .sAddWrap{ pointer-events:auto !important; cursor:pointer !important; position:relative !important; z-index:10 !important; }
-  #storyBar, #storyBox, #storyRow{ pointer-events:auto !important; }
-  /* ✅ STORY VIEWER - Default la Maraikanum da - Illana Full Page ah Block pannum da */
-  #storyViewer{ display:none !important; }
-  #storyViewer.open{ display:flex !important; }
-  /* ✅ TOP BAR FIX DA */
-  .top{ display:flex !important; justify-content:space-between !important; align-items:center !important; padding:12px 16px !important; background:#000 !important; border-bottom:1px solid #222 !important; position:sticky !important; top:0 !important; z-index:100 !important; }
-  .bellWhite svg{ width:24px !important; height:24px !important; fill:none !important; stroke:#fff !important; stroke-width:1.8 !important; }
-  /* ✅ LIKE FIX DA */
-  [data-like-btn]:not(.liked) svg, [data-like-btn]:not(.liked) svg path{ fill:none!important; stroke:#fff!important; }
-  [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33!important; stroke:#FF0A33!important; }
-  .bigHeart{ position:absolute!important; left:50%!important; top:50%!important; width:95px!important; height:95px!important; }
-  /* ✅ LIKE BOX FIX DA */
-  .actions .act{ outline:none !important; box-shadow:none !important; -webkit-tap-highlight-color:transparent !important; }
-  .actions .act:focus, .actions .act:active{ background:transparent !important; outline:none !important; }
-  #feedError{display:none;text-align:center;padding:20px;color:#ff5ea8;font-weight:700;font-size:14px}
-</style>
+<link rel="stylesheet" href="css/feed.css?v=9999">
 </head>
 <body>
-<div class="top"><b style="font-size:26px;font-weight:900;background:linear-gradient(90deg,#ff5ea8,#a259ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Pixoro</b><div style="display:flex;gap:8px;align-items:center"><div class="topPlus" onclick="location.href='./create.html'">+</div><div class="bellWhite" onclick="location.href='./notification.html'" style="position:relative"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span id="pixoroBellDot" style="display:none;position:absolute;top:-2px;right:2px;width:10px;height:10px;background:#FF0A33;border-radius:50%;border:2px solid #000"></span></div></div></div>
+<div class="top"><b>Pixoro</b><div><div class="topPlus" onclick="location.href='./create.html'">+</div><div class="bellWhite" onclick="location.href='./notification.html'"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span id="pixoroBellDot"></span></div></div></div>
 
-<div id="singleBanner" class="singleBanner" style="display:none">Single Post View - <span onclick="location.href='./index.html'" style="text-decoration:underline;cursor:pointer">Back to Feed</span></div>
-<!-- ✅ CORRECTED DA - storyBox ID Add Panniten da -->
-<div class="storyBar" id="storyBar"><div id="storyBox"><div id="storyRow" class="story-row" style="display:flex;gap:12px;overflow-x:auto;padding:10px 12px"></div></div></div>
+<div id="singleBanner" class="singleBanner">Single Post View - <span onclick="location.href='./index.html'">Back to Feed</span></div>
+
+<div class="storyBar" id="storyBar"><div id="storyBox"><div id="storyRow" class="story-row">
+  <div class="sItem" onclick="location.href='./story-upload.html'">
+    <div class="sAddWrap">
+      <div class="sLetter">G</div>
+      <div class="sAddPlus">+</div>
+    </div>
+    <div class="sName">My Story</div>
+  </div>
+</div></div></div>
+
 <div class="feedTabs"><div class="feedTab active" id="tabForYou" onclick="setFeedMode('foryou')">For You</div><div class="feedTab" id="tabFollowing" onclick="setFeedMode('following')">Following</div><div class="feedTab" id="tabLatest" onclick="setFeedMode('latest')">Latest</div></div>
-<div id="trendBar" class="trendBar" style="display:none"></div>
+<div id="trendBar" class="trendBar"></div>
 <div id="feed"><div class="skel"></div><div class="skel"></div></div>
-<div id="feedError">Feed Load Aagala da - Refresh Pannu da 🔄</div>
+<div id="feedError">Feed Load Aagala da - Refresh Pannu da</div>
 <div id="toast" class="toast"></div>
 
-<div id="miniBox" style="position:fixed;bottom:64px;left:12px;right:12px;max-width:426px;margin:auto;background:#1a0b2e;border:1px solid #a259ff;border-radius:14px;padding:10px;display:none;z-index:2000;align-items:center;gap:10px">
-<img id="miniImg" style="width:44px;height:60px;object-fit:cover;border-radius:8px">
-<div style="flex:1"><div style="font-weight:700;font-size:13px">Uploading Reel... <span id="miniPct">0%</span></div><div style="font-size:11px;color:#aaa" id="miniTxt">Mella Upload Aaguthu da - Feed Paakalam da</div><div style="height:6px;background:#333;border-radius:20px;overflow:hidden;margin-top:6px"><div id="miniFill" style="height:100%;width:0%;background:linear-gradient(90deg,#7b2fff,#ff2dcc);transition:.3s"></div></div></div>
-<span onclick="document.getElementById('miniBox').style.display='none'" style="cursor:pointer">X</span>
+<div id="miniBox">
+<img id="miniImg">
+<div><div>Uploading Reel... <span id="miniPct">0%</span></div><div id="miniTxt">Mella Upload Aaguthu da - Feed Paakalam da</div><div><div id="miniFill"></div></div></div>
+<span onclick="document.getElementById('miniBox').style.display='none'">X</span>
 </div>
 
 <div class="bottom-nav">
@@ -58,24 +42,24 @@
 <a href="./search.html"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg><span>Search</span></a>
 <a href="./reels.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8l6 4-6 4V8z"/></svg><span>Reels</span></a>
 <a href="./dm.html"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 22 15 22 11 13 2 9 22 2"/></svg><span>DM</span></a>
-<a href="./profile.html"><img class="navPfp" id="navPfp" src="" style="background:#222"><span>Profile</span></a>
+<a href="./profile.html"><img class="navPfp" id="navPfp" src=""><span>Profile</span></a>
 </div>
 
-<div id="commentModal" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:flex-end;justify-content:center"><div style="background:#121212;width:100%;max-width:450px;border-radius:20px 20px 0 0;max-height:85vh;display:flex;flex-direction:column;border:1px solid #333"><div style="padding:14px;display:flex;justify-content:space-between;border-bottom:1px solid #333"><b>Comments</b><span onclick="closeComment()" style="font-size:22px">X</span></div><div id="commentList" style="flex:1;overflow-y:auto;padding:12px"></div><div style="padding:10px;border-top:1px solid #333;display:flex;gap:10px"><div id="myCommentPfpWrap" style="width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#222"></div><input id="commentInput" placeholder="Add comment..." style="flex:1;background:#000;border:1px solid #333;padding:12px 14px;border-radius:20px;color:#fff"><button onclick="addComment()" style="background:linear-gradient(90deg,#ff5ea8,#ff7a00);border:0;color:#fff;font-weight:900;padding:10px 16px;border-radius:20px">Post</button></div></div></div>
+<div id="commentModal"><div><div><b>Comments</b><span onclick="closeComment()">X</span></div><div id="commentList"></div><div><div id="myCommentPfpWrap"></div><input id="commentInput" placeholder="Add comment..."><button onclick="addComment()">Post</button></div></div></div>
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
 
 <div id="storyViewer">
   <div id="storyViewerMedia">
-    <img id="storyViewerImg" style="display:none">
-    <video id="storyViewerVid" style="display:none" playsinline loop></video>
+    <img id="storyViewerImg">
+    <video id="storyViewerVid" playsinline loop></video>
     <div id="storyStickerLayer"></div>
     <div id="storyViewerTop">
       <img id="storyViewerPfp" src="">
-      <div style="flex:1"><b id="storyViewerName" style="font-size:14px">User</b><div id="storyViewerTime" style="font-size:11px;color:#ccc">Now</div></div>
+      <div><b id="storyViewerName">User</b><div id="storyViewerTime">Now</div></div>
       <div id="storyViewerClose" onclick="closeStoryViewer()">×</div>
     </div>
   </div>
-  <div style="padding:12px;display:flex;gap:8px"><input id="storyReplyInput" placeholder="Reply..." style="flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:12px;border-radius:999px;outline:none"><button onclick="sendStoryReply()" style="background:#fff;color:#000;border:0;padding:12px 16px;border-radius:999px;font-weight:800">Send</button></div>
+  <div><input id="storyReplyInput" placeholder="Reply..."><button onclick="sendStoryReply()">Send</button></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
@@ -87,21 +71,8 @@
 <script src="js/comments.js"></script>
 <script src="js/share.js"></script>
 <script src="js/save.js"></script>
-<!-- ✅ CORRECTED DA - stories.js Illa da, story.js thaan da -->
 <script src="js/story.js?v=9999"></script>
-<!-- ✅ CORRECTED DA - feed.js ku Version Pottuten da - Cache Block Pogum da -->
 <script src="js/feed.js?v=9999"></script>
 <script src="js/like.js"></script>
-<script>
-  // ✅ FIX DA - 8 Sec la Feed varalana Skel ah thookitu Error kaatu da - Black Box nikathu da
-  setTimeout(function(){
-    var f = document.getElementById('feed');
-    if(f && f.querySelector('.skel') && !f.querySelector('.post')){
-      var e = document.getElementById('feedError');
-      if(e) e.style.display = 'block';
-      console.log('❌ FEED STUCK DA - Feed.js Load Aagala da, Console la Red Error paaru da');
-    }
-  }, 8000);
-</script>
 </body>
 </html>
