@@ -1,4 +1,4 @@
-// ===== PIXORO STORY - v1003 - CORRECTED DA - G PROBLEM FIXED DA =====
+// ===== PIXORO STORY - v1004 - PINK CIRCLE + G FULL FIX DA =====
 async function loadStories(){
   let bar = document.getElementById('storyRow') || document.getElementById('storyBox') || document.getElementById('storyBar');
   if(!bar) return;
@@ -13,7 +13,6 @@ async function loadStories(){
     return true;
   }
 
-  // ✅ FIX 1 DA - navPfp la irunthu Edukka Koodathu da - Athulayum G thaan irukkum da
   function getMyPhotoFromPage(){
     if(isRealPhoto(window.MY_PFP)) return window.MY_PFP;
     if(isRealPhoto(window.ME_PFP)) return window.ME_PFP;
@@ -40,11 +39,11 @@ async function loadStories(){
     return true;
   }
 
-  // ✅ FIX 2 DA - First la G venaam da - Empty va Vechirom da
+  // ✅ FIX DA - First Placeholder kum Absolute + overflow:hidden da - Ithu thaan Pink Circle ku Kaaranam da
   bar.innerHTML = `<div class="sItem" onclick="location.href='./story-upload.html'">
-    <div class="sAddWrap" style="position:relative;width:74px;height:74px">
-      <img id="myStoryImg" class="sAddImg" src="" style="width:74px;height:74px;border-radius:50%;object-fit:cover;display:none">
-      <div class="sLetter avaLetterHome" id="myStoryLetter" style="display:none;width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">G</div>
+    <div class="sAddWrap" style="position:relative;width:74px;height:74px;overflow:hidden">
+      <img id="myStoryImg" class="sAddImg" src="" style="position:absolute;top:0;left:0;width:74px;height:74px;border-radius:50%;object-fit:cover;display:none">
+      <div class="sLetter avaLetterHome" id="myStoryLetter" style="position:absolute;top:0;left:0;display:none;width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">G</div>
       <div class="sAddPlus" style="position:absolute;bottom:2px;right:2px;width:22px;height:22px;background:#0095f6;border:2px solid #000;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff;z-index:10">+</div>
     </div>
     <div class="sName">My Story</div></div>`;
@@ -82,13 +81,13 @@ async function loadStories(){
   }catch(e){}
 
   let myFirst = String(myName || 'G').replace('@','').charAt(0).toUpperCase();
-  // ✅ FIX 3 DA - Avatar iruntha Letter ah Kaata Koodathu da
-  let myImg = `<img id="myStoryImg" class="sAddImg" src="${myAvatar}" style="width:74px;height:74px;border-radius:50%;object-fit:cover;display:${isRealPhoto(myAvatar) ? 'block' : 'none'}" onerror="this.style.display='none';let l=document.getElementById('myStoryLetter');if(l)l.style.display='grid'">`;
-  let myLetterHtml = `<div class="sLetter avaLetterHome" id="myStoryLetter" style="display:${isRealPhoto(myAvatar) ? 'none' : 'grid'};width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">${myFirst}</div>`;
+  // ✅ FIX DA - My Story Photo + Letter Rendum Same Edathula da - Onnu Mela Onnu da
+  let myImg = `<img id="myStoryImg" class="sAddImg" src="${myAvatar}" style="position:absolute;top:0;left:0;width:74px;height:74px;border-radius:50%;object-fit:cover;display:${isRealPhoto(myAvatar) ? 'block' : 'none'}" onerror="this.style.display='none';let l=document.getElementById('myStoryLetter');if(l)l.style.display='grid'">`;
+  let myLetterHtml = `<div class="sLetter avaLetterHome" id="myStoryLetter" style="position:absolute;top:0;left:0;display:${isRealPhoto(myAvatar) ? 'none' : 'grid'};width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">${myFirst}</div>`;
   let myHasStory = !!byUser[String(window.ME_ID)];
   let myLink = myHasStory ? `./story.html?user=${window.ME_ID}` : './story-upload.html';
   let html = `<div class="sItem" onclick="location.href='${myLink}'">
-    <div class="sAddWrap" style="position:relative;width:74px;height:74px">${myImg}${myLetterHtml}<div class="sAddPlus" style="position:absolute;bottom:2px;right:2px;width:22px;height:22px;background:#0095f6;border:2px solid #000;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff;z-index:10">+</div></div>
+    <div class="sAddWrap" style="position:relative;width:74px;height:74px;overflow:hidden">${myImg}${myLetterHtml}<div class="sAddPlus" style="position:absolute;bottom:2px;right:2px;width:22px;height:22px;background:#0095f6;border:2px solid #000;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff;z-index:10">+</div></div>
     <div class="sName">My Story</div></div>`;
 
   Object.keys(byUser).forEach(k=>{
@@ -98,10 +97,11 @@ async function loadStories(){
     let prof = profMap[k] || {};
     let avatar = String(prof.avatar_url || '').trim();
     let letter = uname.charAt(0).toUpperCase();
-    let imgHtml = isRealPhoto(avatar) ? `<img src="${avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.remove();this.parentElement.querySelector('.sLetter2').style.display='grid'">` : '';
-    let letterHtml = `<div class="sLetter2" style="display:${isRealPhoto(avatar) ? 'none' : 'grid'};width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">${letter}</div>`;
+    // ✅ FIX DA - Mathavanga Story kum Same Fix da - Photo + Letter Overlap Aagum da
+    let imgHtml = isRealPhoto(avatar) ? `<img src="${avatar}" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.remove();this.parentElement.querySelector('.sLetter2').style.display='grid'">` : '';
+    let letterHtml = `<div class="sLetter2" style="position:absolute;top:0;left:0;display:${isRealPhoto(avatar) ? 'none' : 'grid'};width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">${letter}</div>`;
     html += `<div class="sItem" onclick="location.href='./story.html?user=${first.user_id}'">
-      <div class="sRing" style="width:74px;height:74px;padding:3px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00)"><div class="sRingInner" style="position:relative;width:100%;height:100%;border-radius:50%;background:#000;padding:2px">${imgHtml}${letterHtml}</div></div>
+      <div class="sRing" style="width:74px;height:74px;padding:3px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00)"><div class="sRingInner" style="position:relative;width:100%;height:100%;border-radius:50%;background:#000;padding:2px;overflow:hidden">${imgHtml}${letterHtml}</div></div>
       <div class="sName">${uname}</div></div>`;
   });
 
@@ -109,14 +109,12 @@ async function loadStories(){
   bar.style.display = 'flex';
   paintMyPhoto();
 
-  // ✅ FIX 4 DA - Kadasiyila Supabase la irunthu Direct ah Sync pannu da
   setTimeout(async () => {
     try{
       let {data:{user}} = await s.auth.getUser();
       if(!user) return;
       let {data: prof} = await s.from('profiles').select('avatar_url').eq('id', user.id).single();
       let p = String(prof?.avatar_url || '').trim();
-      console.log('MY AVATAR CHECK DA:', p);
       if(isRealPhoto(p)){
         window.MY_PFP = p;
         let img = document.getElementById('myStoryImg');
