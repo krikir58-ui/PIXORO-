@@ -1,5 +1,5 @@
-// ===== PIXORO LIKE - FINAL V13 - CORRECT HEART NADUVULA DA =====
-console.log('✅ LIKE FILE LOADED DA - V13 HEART NADUVULA CORRECT');
+// ===== PIXORO LIKE - FINAL V14 - VELLA ILLA - RED HEART MATTUM DA =====
+console.log('✅ LIKE FILE LOADED DA - V14 VELLA ILLA');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
@@ -58,14 +58,19 @@ window.pixoroFeedTap = function(postId, el, ev){
   document.getElementById('pixoro-like-css-v11')?.remove();
   document.getElementById('pixoro-like-css-v12')?.remove();
   document.getElementById('pixoro-like-css-v13')?.remove();
+  document.getElementById('pixoro-like-css-v14')?.remove();
   let s = document.createElement('style');
-  s.id = 'pixoro-like-css-v13';
+  s.id = 'pixoro-like-css-v14';
   s.innerText = `
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
     [data-like-btn] svg{ overflow:visible !important; display:block !important; width:24px !important; height:24px !important; }
     [data-like-btn] svg, [data-like-btn] svg path{ fill:none !important; stroke:#fff !important; }
     [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
+    /* ✅ VELLA FIX DA - Periya Heart ku Pinnadi Vella Box Varathu da */
+    .bigHeart{ background:transparent !important; background-color:transparent !important; box-shadow:none !important; border:none !important; outline:none !important; }
+    .bigHeart svg{ background:transparent !important; background-color:transparent !important; width:100% !important; height:100% !important; }
+    .bigHeart svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
   `;
   document.head.appendChild(s);
 })();
@@ -176,7 +181,6 @@ async function pixoroToggleLike(postId, btn){
 
 async function pixoroDoubleTapLike(postId, mediaEl, ev){
   console.log('❤️ DOUBLE TAP LIKE DA:', postId);
-  // ✅ CORRECT DA - Heart ah Muthalla Kaatu da - Like Aanaalum Aagalaanaalum Heart Varum da
   showBigHeart(mediaEl, 0, 0);
   let btn = document.querySelector(`[data-like-btn="${postId}"]`);
   if(btn && btn.classList.contains('liked')) return true;
@@ -204,41 +208,35 @@ async function pixoroDoubleTapLike(postId, mediaEl, ev){
   }
 }
 
-// ✅ CORRECTED HEART DA - V12 la Irundha Thappu Ellam Sari Panniten da
 function showBigHeart(mediaEl, tapX, tapY){
   document.querySelectorAll('.bigHeart').forEach(h=>h.remove());
-  console.log('❤️ HEART VARANUM DA');
-
-  // ✅ 1. Photo va Namba Venaam da - Screen Naduvula Podurom da - Miss Aagathu da
   let cx = window.innerWidth / 2;
   let cy = window.innerHeight / 2;
-
   let div = document.createElement('div');
   div.className = 'bigHeart';
-  // ✅ 2. Opacity 0 la Arambikka Koodathu da - 1 la Arambikkrom da - Theriyanum da
-  // ✅ 3. z-index 999999 - Yaarum Maraikka Mudiyathu da
-  div.style.cssText = 'position:fixed !important;z-index:999999 !important;pointer-events:none !important;width:120px;height:120px;left:'+cx+'px;top:'+cy+'px;opacity:1 !important;transform:translate(-50%,-50%) scale(0.2);';
-  div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  // ✅ VELLA FIX - background transparent + border illa da
+  div.style.cssText = 'position:fixed !important;z-index:999999 !important;pointer-events:none !important;width:120px;height:120px;left:'+cx+'px;top:'+cy+'px;opacity:1 !important;transform:translate(-50%,-50%) scale(0.2);background:transparent !important;background-color:transparent !important;box-shadow:none !important;border:none !important;';
+  // ✅ Path la ye fill ah Force Pannurom da - Site oda Vella CSS Adikka Mudiyathu da
+  div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent !important;background-color:transparent !important;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))"><path fill="#FF0A33" stroke="#FF0A33" style="fill:#FF0A33 !important;stroke:#FF0A33 !important;" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   document.body.appendChild(div);
-
-  // ✅ 4. Colour Colour - Mella Maarum da
   let colors = ['#FF0A33','#FF4D8D','#FF8A00','#FF2E9A','#FFD500','#00E5FF','#7C4DFF','#00FF88'];
   let ci = 0;
   let path = div.querySelector('path');
   let colorTimer = setInterval(()=>{
     ci = (ci+1) % colors.length;
-    if(path) path.setAttribute('fill', colors[ci]);
+    if(path){
+      path.setAttribute('fill', colors[ci]);
+      path.setAttribute('stroke', colors[ci]);
+      path.style.setProperty('fill', colors[ci], 'important');
+      path.style.setProperty('stroke', colors[ci], 'important');
+    }
   }, 280);
-
-  // ✅ 5. WAAPI animate() Venaam da - Phone la Fail Aaguthu da - Simple Interval la Scale Pannurom da
   let scale = 0.2;
   let grow = setInterval(()=>{
     scale += 0.15;
     if(scale >= 1){ scale = 1; clearInterval(grow); }
     div.style.transform = 'translate(-50%,-50%) scale('+scale+')';
   }, 30);
-
-  // ✅ 6. 2400ms Ninnu Pogum da - Aprom Mella Maraiyum da
   setTimeout(()=>{
     div.style.transition = 'opacity 0.4s, transform 0.4s';
     div.style.opacity = '0';
