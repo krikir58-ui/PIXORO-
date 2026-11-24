@@ -1,5 +1,5 @@
-// ===== PIXORO LIKE - FINAL V14 - VELLA ILLA - RED HEART MATTUM DA =====
-console.log('✅ LIKE FILE LOADED DA - V14 VELLA ILLA');
+// ===== PIXORO LIKE - FINAL V15 - OREY HEART COLOUR COLOUR ANIMATION DA =====
+console.log('✅ LIKE FILE LOADED DA - V15 OREY HEART COLOUR');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
@@ -59,15 +59,15 @@ window.pixoroFeedTap = function(postId, el, ev){
   document.getElementById('pixoro-like-css-v12')?.remove();
   document.getElementById('pixoro-like-css-v13')?.remove();
   document.getElementById('pixoro-like-css-v14')?.remove();
+  document.getElementById('pixoro-like-css-v15')?.remove();
   let s = document.createElement('style');
-  s.id = 'pixoro-like-css-v14';
+  s.id = 'pixoro-like-css-v15';
   s.innerText = `
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
     [data-like-btn] svg{ overflow:visible !important; display:block !important; width:24px !important; height:24px !important; }
     [data-like-btn] svg, [data-like-btn] svg path{ fill:none !important; stroke:#fff !important; }
     [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
-    /* ✅ VELLA FIX DA - Periya Heart ku Pinnadi Vella Box Varathu da */
     .bigHeart{ background:transparent !important; background-color:transparent !important; box-shadow:none !important; border:none !important; outline:none !important; }
     .bigHeart svg{ background:transparent !important; background-color:transparent !important; width:100% !important; height:100% !important; }
     .bigHeart svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
@@ -208,20 +208,21 @@ async function pixoroDoubleTapLike(postId, mediaEl, ev){
   }
 }
 
+// ✅ OREY HEART DA - COLOUR COLOUR - ANIMATION ODA VANTHU POGUM DA
 function showBigHeart(mediaEl, tapX, tapY){
   document.querySelectorAll('.bigHeart').forEach(h=>h.remove());
   let cx = window.innerWidth / 2;
   let cy = window.innerHeight / 2;
   let div = document.createElement('div');
   div.className = 'bigHeart';
-  // ✅ VELLA FIX - background transparent + border illa da
-  div.style.cssText = 'position:fixed !important;z-index:999999 !important;pointer-events:none !important;width:120px;height:120px;left:'+cx+'px;top:'+cy+'px;opacity:1 !important;transform:translate(-50%,-50%) scale(0.2);background:transparent !important;background-color:transparent !important;box-shadow:none !important;border:none !important;';
-  // ✅ Path la ye fill ah Force Pannurom da - Site oda Vella CSS Adikka Mudiyathu da
-  div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent !important;background-color:transparent !important;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))"><path fill="#FF0A33" stroke="#FF0A33" style="fill:#FF0A33 !important;stroke:#FF0A33 !important;" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  div.style.cssText = 'position:fixed !important;z-index:999999 !important;pointer-events:none !important;width:120px;height:120px;left:'+cx+'px;top:'+cy+'px;opacity:1 !important;transform:translate(-50%,-50%) scale(0.2) rotate(0deg);background:transparent !important;box-shadow:none !important;border:none !important;';
+  div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent !important;filter:drop-shadow(0 6px 16px rgba(0,0,0,.5))"><path fill="#FF0A33" stroke="#FF0A33" style="fill:#FF0A33 !important;stroke:#FF0A33 !important;" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   document.body.appendChild(div);
+  let path = div.querySelector('path');
+
+  // ✅ COLOUR COLOUR - Orey Heart Thaan Colour Maarum da
   let colors = ['#FF0A33','#FF4D8D','#FF8A00','#FF2E9A','#FFD500','#00E5FF','#7C4DFF','#00FF88'];
   let ci = 0;
-  let path = div.querySelector('path');
   let colorTimer = setInterval(()=>{
     ci = (ci+1) % colors.length;
     if(path){
@@ -231,17 +232,28 @@ function showBigHeart(mediaEl, tapX, tapY){
       path.style.setProperty('stroke', colors[ci], 'important');
     }
   }, 280);
-  let scale = 0.2;
-  let grow = setInterval(()=>{
-    scale += 0.15;
-    if(scale >= 1){ scale = 1; clearInterval(grow); }
-    div.style.transform = 'translate(-50%,-50%) scale('+scale+')';
+
+  // ✅ ANIMATION - Chinna Vanthu Perusaagi - Light ah Aadum da
+  let t = 0;
+  let anim = setInterval(()=>{
+    t += 30;
+    let scale = 0.2;
+    if(t < 300) scale = 0.2 + (t / 300) * 1.05;
+    else if(t < 500) scale = 1.25 - ((t - 300) / 200) * 0.2;
+    else if(t < 700) scale = 1.05 - ((t - 500) / 200) * 0.05;
+    else scale = 1 + Math.sin((t - 700) / 300) * 0.05;
+    let rot = 0;
+    if(t < 500) rot = Math.sin(t / 100) * 6;
+    div.style.transform = 'translate(-50%,-50%) scale('+scale+') rotate('+rot+'deg)';
+    if(t >= 2400){ clearInterval(anim); }
   }, 30);
+
+  // ✅ VANTHU POGUM DA - 2400ms Ninnu Mella Maraiyum da
   setTimeout(()=>{
     div.style.transition = 'opacity 0.4s, transform 0.4s';
     div.style.opacity = '0';
-    div.style.transform = 'translate(-50%,-50%) scale(1.2)';
-    setTimeout(()=>{ clearInterval(colorTimer); div.remove(); }, 450);
+    div.style.transform = 'translate(-50%,-50%) scale(1.2) rotate(0deg)';
+    setTimeout(()=>{ clearInterval(colorTimer); clearInterval(anim); div.remove(); }, 450);
   }, 2400);
 }
 
