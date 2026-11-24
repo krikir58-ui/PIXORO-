@@ -55,7 +55,7 @@
         <article class="post" data-post-id="${id}">
           <div class="postTop">
             <div style="display:flex;align-items:center;gap:10px">
-              <div class="pfpRing"><div class="pfpInner">${pfp ? `<img src="${pfp}" onerror="this.remove()">` : `<div class="avaLetterHome">${letter}</div>`}</div></div>
+              <div class="pfpRing"><div class="pfpInner">${pfp ? `<img src="${pfp}" onerror="this.remove()">` : `<div class="avaLetterHome" style="width:32px!important;height:32px!important;font-size:14px!important;position:absolute!important;top:0!important;left:0!important">${letter}</div>`}</div></div>
               <div><b>${username}</b><div style="font-size:11px;color:#888">${feedTime(post.created_at)}</div></div>
             </div>
             ${isMine ? `<span style="font-size:22px;color:#fff;cursor:pointer">⋯</span>` : `<button class="followBtnPost" onclick="pixoroToggleFollow('${username}',this)">Follow</button>`}
