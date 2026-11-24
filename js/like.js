@@ -1,8 +1,18 @@
-// ===== PIXORO LIKE - FINAL V6 - HEART BURST DA =====
-console.log('✅ LIKE FILE LOADED DA - V6 HEART BURST');
+// ===== PIXORO LIKE - FINAL V7 - HEART BURST TAP FIX DA =====
+console.log('✅ LIKE FILE LOADED DA - V7 HEART BURST TAP FIX');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
+
+// ✅ MAIN FIX DA - Touch ah eppovum store panni veppom da - Feed la event anuppalana kooda work aagum da
+window._pixLastTouchX = 0; window._pixLastTouchY = 0;
+document.addEventListener('touchstart', function(e){
+  if(e.touches && e.touches[0]){ window._pixLastTouchX = e.touches[0].clientX; window._pixLastTouchY = e.touches[0].clientY; }
+}, {passive:true});
+document.addEventListener('touchend', function(e){
+  if(e.changedTouches && e.changedTouches[0]){ window._pixLastTouchX = e.changedTouches[0].clientX; window._pixLastTouchY = e.changedTouches[0].clientY; }
+}, {passive:true});
+document.addEventListener('mousedown', function(e){ window._pixLastTouchX = e.clientX; window._pixLastTouchY = e.clientY; }, {passive:true});
 
 try{
   let local = JSON.parse(localStorage.getItem('pixoro_likes') || '[]');
@@ -15,9 +25,11 @@ function pixoroSaveLocal(){
 }
 
 window.pixoroFeedTap = function(postId, el, ev){
+  // ✅ ev illana kooda stored touch la irundhu edukkurom da
+  if(!ev && window._pixLastTouchX){ ev = { clientX: window._pixLastTouchX, clientY: window._pixLastTouchY }; }
   if(ev){
     if(ev.target && ev.target.closest && ev.target.closest('[data-like-btn]')) return;
-    ev.preventDefault();
+    if(ev.preventDefault) ev.preventDefault();
   }
   let now = Date.now();
   if(String(postId) === String(_lastTapId) && (now - _lastTapTime) < 400){
@@ -41,14 +53,16 @@ window.pixoroFeedTap = function(postId, el, ev){
   document.getElementById('pixoro-like-css-v4')?.remove();
   document.getElementById('pixoro-like-css-v5')?.remove();
   document.getElementById('pixoro-like-css-v6')?.remove();
+  document.getElementById('pixoro-like-css-v7')?.remove();
   let s = document.createElement('style');
-  s.id = 'pixoro-like-css-v6';
+  s.id = 'pixoro-like-css-v7';
   s.innerText = `
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
     [data-like-btn] svg{ overflow:visible !important; display:block !important; width:24px !important; height:24px !important; }
     [data-like-btn] svg, [data-like-btn] svg path{ fill:none !important; stroke:#fff !important; }
     [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
+    .postMedia{ overflow:visible !important; }
   `;
   document.head.appendChild(s);
 })();
@@ -164,6 +178,12 @@ async function pixoroDoubleTapLike(postId, mediaEl, ev){
     else if(ev.changedTouches && ev.changedTouches[0]){ tapX = ev.changedTouches[0].clientX; tapY = ev.changedTouches[0].clientY; }
     else { tapX = ev.clientX || 0; tapY = ev.clientY || 0; }
   }
+  // ✅ ev la 0 vandha - stored touch la irundhu edu da - ITHU THAAN MAIN FIX DA
+  if(!tapX && !tapY){
+    tapX = window._pixLastTouchX || 0;
+    tapY = window._pixLastTouchY || 0;
+  }
+  console.log('❤️ TAP AT:', tapX, tapY, 'STORED:', window._pixLastTouchX, window._pixLastTouchY);
   showBigHeart(mediaEl, tapX, tapY);
   let btn = document.querySelector(`[data-like-btn="${postId}"]`);
   if(btn && btn.classList.contains('liked')) return true;
@@ -202,14 +222,16 @@ function showBigHeart(mediaEl, tapX, tapY){
   box.querySelectorAll('.pixBurstDot').forEach(h=>h.remove());
   let cs = window.getComputedStyle(box);
   if(cs.position === 'static') box.style.position = 'relative';
+  box.style.overflow = 'visible';
   let r = box.getBoundingClientRect();
   let x = r.width/2, y = r.height/2;
   if(tapX && tapY){
     x = Math.max(70, Math.min(r.width-70, tapX - r.left));
     y = Math.max(70, Math.min(r.height-70, tapY - r.top));
   }
+  console.log('❤️ HEART AT INSIDE BOX:', x, y, 'BOX:', r.width, r.height);
 
-  // ✅ 1. HEART BURST - PERIYA WHITE HEART
+  // ✅ 1. PERIYA WHITE HEART
   let div = document.createElement('div');
   div.className = 'bigHeart';
   div.style.cssText = 'position:absolute;z-index:99;pointer-events:none;width:100px;height:100px;left:'+x+'px;top:'+y+'px;opacity:0;';
@@ -227,18 +249,18 @@ function showBigHeart(mediaEl, tapX, tapY){
   }catch(e){ div.remove(); }
   setTimeout(()=>div.remove(), 900);
 
-  // ✅ 2. HEART BURST - 10 COLOUR HEARTS VEDIYUM DA
+  // ✅ 2. 10 COLOUR HEARTS - PERIYA SIZE DA - KATTAYAMA THERIYUM DA
   let colors = ['#FF0A33','#FF4D8D','#FF8A00','#FF2E9A','#FFD500','#00E5FF','#7C4DFF','#FF6B6B'];
   for(let i=0;i<10;i++){
     let s = document.createElement('div');
     s.className = 'pixMiniHeart';
     let col = colors[i % colors.length];
-    let sz = 18 + Math.random()*18;
+    let sz = 28 + Math.random()*20;
     s.style.cssText = 'position:absolute;z-index:98;pointer-events:none;width:'+sz+'px;height:'+sz+'px;left:'+x+'px;top:'+y+'px;opacity:1;';
-    s.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%"><path fill="'+col+'" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+    s.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))"><path fill="'+col+'" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
     box.appendChild(s);
     let ang = (i/10)*Math.PI*2 + Math.random()*0.4;
-    let dist = 100 + Math.random()*60;
+    let dist = 110 + Math.random()*60;
     let dx = Math.cos(ang)*dist, dy = Math.sin(ang)*dist - 30;
     try{
       s.animate([
@@ -250,15 +272,15 @@ function showBigHeart(mediaEl, tapX, tapY){
     setTimeout(()=>s.remove(), 950);
   }
 
-  // ✅ 3. BURST DOTS - Chinna chinna dots vedikkum da
-  for(let i=0;i<8;i++){
+  // ✅ 3. BURST DOTS
+  for(let i=0;i<10;i++){
     let d = document.createElement('div');
     d.className = 'pixBurstDot';
     let col = colors[i % colors.length];
-    d.style.cssText = 'position:absolute;z-index:97;pointer-events:none;width:6px;height:6px;border-radius:50%;background:'+col+';left:'+x+'px;top:'+y+'px;';
+    d.style.cssText = 'position:absolute;z-index:97;pointer-events:none;width:8px;height:8px;border-radius:50%;background:'+col+';left:'+x+'px;top:'+y+'px;';
     box.appendChild(d);
     let ang = Math.random()*Math.PI*2;
-    let dist = 60 + Math.random()*70;
+    let dist = 70 + Math.random()*80;
     let dx = Math.cos(ang)*dist, dy = Math.sin(ang)*dist;
     try{
       d.animate([
