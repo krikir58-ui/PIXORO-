@@ -1,4 +1,4 @@
-/* PIXORO FEED - FINAL CLEAN DA - CORRECTED DA */
+/* PIXORO FEED - OPTIMISTIC LIKE DA - FIRST LOCAL, PINNADI SERVER DA */
 (function () {
   'use strict';
   let loading = false;
@@ -7,7 +7,16 @@
   function safeURL(v){ try{ let u=new URL(v, location.href); return ['https:','http:'].includes(u.protocol)?escapeHTML(u.href):''; }catch{ return ''; } }
   function feedTime(t){ if(!t) return ''; let d=new Date(t), n=new Date(), diff=Math.floor((n-d)/1000); if(diff<60) return 'Just now'; if(diff<3600) return Math.floor(diff/60)+'m'; if(diff<86400) return Math.floor(diff/3600)+'h'; return d.toLocaleDateString([],{day:'numeric',month:'short'}); }
 
-  // ✅ LIKE LOGIC - INGA THAAN DA - VERA FILE LA THEVA ILLA DA
+  // ✅ 1. LOCAL LIKES - SPEED KU DA
+  if(!window.FEED_LIKES){
+    try{ window.FEED_LIKES = new Set(JSON.parse(localStorage.getItem('pixoro_likes_v2')||'[]')); }
+    catch{ window.FEED_LIKES = new Set(); }
+  }
+  function saveLocal(){
+    try{ localStorage.setItem('pixoro_likes_v2', JSON.stringify([...window.FEED_LIKES])); }catch{}
+  }
+
+  // ✅ 2. DOUBLE TAP
   let pixoroLastTap = 0;
   window.pixoroFeedTap = function(postId, el, e){
     let now = Date.now();
@@ -29,40 +38,44 @@
     setTimeout(()=> h.remove(), 700);
   };
 
-  window.pixoroToggleLike = async function(postId, btn){
+  // ✅ 3. OPTIMISTIC LIKE - FIRST LOCAL, PINNADI SILENT SERVER DA
+  window.pixoroToggleLike = function(postId, btn){
     let btnEl = btn || document.querySelector('[data-like-btn="'+postId+'"]');
     if(!btnEl) return;
     if(btnEl.dataset.busy === '1') return;
     btnEl.dataset.busy = '1';
-    setTimeout(()=> btnEl.dataset.busy = '0', 400);
+    setTimeout(()=> btnEl.dataset.busy = '0', 350);
+
     let isLiked = btnEl.classList.contains('liked');
     let countEl = document.querySelector('[data-like-count="'+postId+'"]');
     let count = parseInt(countEl?.textContent || '0') || 0;
+
+    // FIRST - UDANEY LOCAL LA MAATHU DA - 0ms SPEED DA
     btnEl.classList.toggle('liked', !isLiked);
     if(countEl) countEl.textContent = isLiked ? Math.max(0, count-1) : count+1;
-    if(window.FEED_LIKES){
-      if(isLiked) window.FEED_LIKES.delete(String(postId));
-      else window.FEED_LIKES.add(String(postId));
-    }
-    try{
-      let supa = getClient();
-      if(!supa) return;
-      let { data:{session} } = await supa.auth.getSession();
-      if(!session) return;
-      if(isLiked){
-        await supa.from('likes').delete().eq('post_id', postId).eq('user_id', session.user.id);
-      } else {
-        await supa.from('likes').insert({post_id: postId, user_id: session.user.id});
-      }
-    }catch(err){ console.log(err); }
+    if(!isLiked) window.FEED_LIKES.add(String(postId));
+    else window.FEED_LIKES.delete(String(postId));
+    saveLocal();
+
+    // PINNADI - SILENT AH SERVER KU ANUPU DA - WAIT PANNA VENDAAM DA
+    (async ()=>{
+      try{
+        let supa = getClient(); if(!supa) return;
+        let { data:{session} } = await supa.auth.getSession();
+        if(!session) return;
+        if(isLiked){
+          await supa.from('likes').delete().eq('post_id', postId).eq('user_id', session.user.id);
+        } else {
+          await supa.from('likes').insert({post_id: postId, user_id: session.user.id});
+        }
+      }catch(e){ console.log(e); }
+    })();
   };
 
   window.pixoroPaintAllLikes = function(){
-    if(!window.FEED_LIKES) return;
     document.querySelectorAll('[data-like-btn]').forEach(btn=>{
       let id = btn.getAttribute('data-like-btn');
-      let liked = window.FEED_LIKES.has(String(id));
-      btn.classList.toggle('liked', liked);
+      btn.classList.toggle('liked', window.FEED_LIKES.has(String(id)));
     });
   };
 
@@ -91,8 +104,12 @@
         (myLikes||[]).forEach(l=> likedSet.add(String(l.post_id)));
         let { data: mySaves } = await supa.from('saves').select('post_id').eq('user_id', MY_ID).in('post_id', postIds);
         (mySaves||[]).forEach(s=> savedSet.add(String(s.post_id)));
-        if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
+        // ✅ SERVER THAAN FINAL DA - LOCAL AH SERVER ODA SYNC PANNU DA
+        // Server la iruntha mattum Local la vechu - Stale Red varathu da
         likedSet.forEach(id=> window.FEED_LIKES.add(id));
+        // Local la irunthu Server la illana - Athu innum save aagala nu artham - Server ku silent ah push pannu da
+        // Aana ippo UI ku - Server + Local rendum serthu kaatu da
+        saveLocal();
       }
       feed.innerHTML = posts.map(post=>{
         const id = String(post.id||'');
@@ -105,11 +122,18 @@
         const video = post.media_type==='video' || /\.(mp4|mov|webm)(\?|$)/i.test(media);
         const letter = username.charAt(0).toUpperCase();
         const isMine = MY_ID && String(post.user_id) === String(MY_ID);
-        const isLiked = likedSet.has(id) ? ' liked' : '';
+        // ✅ LIKE CHECK - LOCAL + SERVER RENDUM PAARU DA
+        const isLikedNow = likedSet.has(id) || window.FEED_LIKES.has(id);
+        const isLiked = isLikedNow ? ' liked' : '';
         const isSaved = savedSet.has(id) ? ' saved' : '';
-        // ✅ FIX DA: DB la likes_count 0 ah irunthalum, Like panni iruntha 1 nu kaatu da - Red+0 varathu da
-        let showCount = post.likes_count || 0;
-        if(likedSet.has(id) && showCount === 0) showCount = 1;
+        // ✅ COUNT FIX DA - Red na Count 0 varave koodathu da
+        let baseCount = parseInt(post.likes_count || 0) || 0;
+        let showCount = baseCount;
+        if(isLikedNow && showCount === 0) showCount = 1;
+        // Vera aalunga Like panni iruntha - Server count + Namba like = Correct count da
+        // Namba like server la already iruntha double count aagathu da - likedSet la iruntha base la already irukku nu vaichuko da
+        // So: Local mattum iruntha (server la illa) na +1 pannu da
+        if(window.FEED_LIKES.has(id) && !likedSet.has(id) && baseCount > 0) showCount = baseCount + 1;
         return `
         <article class="post" data-post-id="${id}">
           <div class="postTop">
