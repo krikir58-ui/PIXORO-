@@ -1,28 +1,28 @@
 /* =====================================================
-   PIXORO LIKE SYSTEM V27 - SPEED FIX
-   First Local Save - Odane UI - Apram Server Save Silent ah
+   PIXORO LIKE SYSTEM V28 - PIXORO STYLE COLOUR
+   Naduvula Heart - White Illa da - Pixoro Gradient da
+   V27 Speed Logic Apdiye da - Local Muthalla, Server Apram Silent ah
 ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V27) return;
-  window.PIXORO_LIKE_V27 = true;
+  if (window.PIXORO_LIKE_V28) return;
+  window.PIXORO_LIKE_V28 = true;
   window.PIXORO_LIKE_V22 = true;
   window.PIXORO_LIKE_V23 = true;
   window.PIXORO_LIKE_V24 = true;
   window.PIXORO_LIKE_V25 = true;
   window.PIXORO_LIKE_V26 = true;
+  window.PIXORO_LIKE_V27 = true;
 
   const supa = window.supa || window.supabaseClient;
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 280;
 
   const lastTap = new WeakMap();
-  // ✅ Server ku Already Poguthu nu Track Panna Mattum da - UI ah Block Panna Maatom da
   const serverQueue = new Set();
 
-  // ✅ Local Likes - Page Open Aana Odane LocalStorage la Irundhu Edu da
   try{
     let local = JSON.parse(localStorage.getItem('pixoro_likes') || '[]');
     window.FEED_LIKES = new Set(local.map(String));
@@ -119,9 +119,9 @@
   }
 
   function addHeartStyles() {
-    if (document.getElementById("pixoro-like-v27-css")) return;
+    if (document.getElementById("pixoro-like-v28-css")) return;
     const style = document.createElement("style");
-    style.id = "pixoro-like-v27-css";
+    style.id = "pixoro-like-v28-css";
     style.textContent = `
       @keyframes pixThudikku{
         0%{ transform:scale(1); }
@@ -159,7 +159,9 @@
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
     heart.style.cssText = 'position:absolute !important;z-index:99 !important;pointer-events:none !important;left:'+cx+'px !important;top:'+cy+'px !important;width:56px !important;height:56px !important;opacity:1 !important;transform:translate(-50%,-50%) scale(0.2);background:transparent !important;display:block !important;';
-    heart.innerHTML = '<svg viewBox="0 0 24 24" style="width:100% !important;height:100% !important;display:block !important;filter:drop-shadow(0 8px 20px rgba(0,0,0,.5))"><path fill="#ffffff" stroke="#ffffff" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+    // ✅ V28 FIX - Naduvula Heart White Illa da - Pixoro Gradient da
+    // Pink #FF2E63 -> Red #FF0A33 -> Purple #A855F7 + White Border da
+    heart.innerHTML = '<svg viewBox="0 0 24 24" style="width:100% !important;height:100% !important;display:block !important;filter:drop-shadow(0 8px 20px rgba(255,10,51,.55))"><defs><linearGradient id="pixoroGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF2E63"/><stop offset="50%" stop-color="#FF0A33"/><stop offset="100%" stop-color="#A855F7"/></linearGradient></defs><path fill="url(#pixoroGrad)" stroke="#ffffff" stroke-width="1.2" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
     container.appendChild(heart);
     let t = 0;
     let anim = setInterval(()=>{
@@ -181,7 +183,6 @@
     }, 750);
   }
 
-  // ✅ SERVER SAVE - Background la Silent ah - UI ah Wait Panna Vaikka Maatom da
   async function pixoroServerSave(postId, willLike){
     let key = postId + ':' + (willLike ? '1' : '0');
     if(serverQueue.has(key)) return;
@@ -196,48 +197,39 @@
         let r = await supa.from(TABLE).delete().eq("post_id", postId).eq("user_id", userId);
         if(r.error) throw r.error;
       }
-      // ✅ Count ah Kooda Background la Thaan Sync Pannurom da - UI ah Thodala da
       try{
         let { count } = await supa.from(TABLE).select("*", { count: "exact", head: true }).eq("post_id", postId);
         if(count !== null && count !== undefined){
           window.FEED_COUNTS[String(postId)] = count;
           pixoroSaveLocal();
-          // ✅ Server Count Vantha Thaan UI Count ah Update Pannu da - User Tap Pannathukku Apram Thaan da
           let post = document.querySelector(`[data-post-id="${postId}"]`) || document.querySelector('.post');
           if(post) paintCount(postId, count, post);
         }
       }catch(e){}
     }catch(e){
       console.log('LIKE SERVER SILENT FAIL DA - LOCAL LA IRUKKU DA:', e.message);
-      // ✅ Server Fail Aana Kooda Local Like Apdiye Irukkum da - UI Maaraathu da
     } finally {
       serverQueue.delete(key);
     }
   }
 
-  // ✅ V27 SPEED - Toggle Like - await Illa da - Odane Local da
   function toggleLike(postId, post, forceLike = false) {
     if (!postId) return false;
-    // ✅ 1. FIRST - Local Check - Odane da
     let isLiked = window.FEED_LIKES.has(String(postId));
     let willLike = forceLike ? true : !isLiked;
-    // ✅ Already Like Aachu na Double Tap la Marubadi Like Panna Venaam da - Heart Mattum Kaatum da
     if(forceLike && isLiked){
       paintLike(postId, true, post);
       return true;
     }
-    // ✅ 2. SECOND - Odane UI + Local Save - 0ms la da - Server ku Wait Panna Maatom da
     paintLike(postId, willLike, post);
     if(willLike) window.FEED_LIKES.add(String(postId));
     else window.FEED_LIKES.delete(String(postId));
-    // Count - Local la Odane +1 / -1 da
     let cEl = getLikeCount(postId, post);
     let cur = cEl ? (parseInt(cEl.textContent || '0', 10) || 0) : (window.FEED_COUNTS[String(postId)] || 0);
     let newCount = Math.max(0, cur + (willLike ? 1 : -1));
     window.FEED_COUNTS[String(postId)] = newCount;
     paintCount(postId, newCount, post);
     pixoroSaveLocal();
-    // ✅ 3. THIRD - Apram Server Save - Background la Silent ah - await Illa da
     pixoroServerSave(postId, willLike);
     return willLike;
   }
@@ -264,7 +256,6 @@
       showBigHeart(media, event.clientX, event.clientY);
       const btn = getLikeButton(postId, post);
       if(btn) pixoroThudikku(btn);
-      // ✅ Double Tap Kooda Speed da - await Illa da
       toggleLike(postId, post, true);
     }
   });
@@ -278,14 +269,12 @@
     const postId = button.dataset.likeBtn || button.dataset.postId || post?.dataset.postId || post?.dataset.id;
     if (!postId) return;
     pixoroThudikku(button);
-    // ✅ Single Touch Kooda Speed da - await Illa da
     toggleLike(postId, post, false);
   });
 
   async function loadMyLikes() {
     const userId = await getUserId();
     if (!userId){
-      // ✅ Login Illa na Kooda Local Likes ah Kaatu da - Speed da
       document.querySelectorAll("[data-post-id], .post, .post-card, article, .post-item").forEach((post) => {
         const postId = post.dataset.postId || post.dataset.id;
         if (!postId) return;
@@ -294,7 +283,6 @@
       });
       return;
     }
-    // ✅ Server Likes ah Background la Edu - UI ah Block Panna Maatom da - Local ah Muthalla Kaatu da
     document.querySelectorAll("[data-post-id], .post, .post-card, article, .post-item").forEach((post) => {
       const postId = post.dataset.postId || post.dataset.id;
       if (!postId) return;
@@ -332,5 +320,5 @@
     loadMyLikes();
   }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO Like V27 SPEED loaded successfully.");
+  console.log("PIXORO Like V28 loaded successfully.");
 })();
