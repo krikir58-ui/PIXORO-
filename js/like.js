@@ -1,5 +1,5 @@
-// ===== PIXORO LIKE - FINAL V4 - INSTA TAP POSITION HEART DA =====
-console.log('✅ LIKE FILE LOADED DA - V4 TAP POSITION');
+// ===== PIXORO LIKE - FINAL V5 - JS DANCE + COLOUR HEARTS DA =====
+console.log('✅ LIKE FILE LOADED DA - V5 JS DANCE');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
@@ -23,7 +23,6 @@ window.pixoroFeedTap = function(postId, el, ev){
   if(String(postId) === String(_lastTapId) && (now - _lastTapTime) < 400){
     _lastTapTime = 0;
     if(_singleTapTimer){ clearTimeout(_singleTapTimer); _singleTapTimer = null; }
-    // ✅ ENGA THODOMO - ev ah anuppurom da
     pixoroDoubleTapLike(postId, el, ev);
     return;
   }
@@ -40,19 +39,15 @@ window.pixoroFeedTap = function(postId, el, ev){
   document.getElementById('pixoro-like-css-v2')?.remove();
   document.getElementById('pixoro-like-css-v3')?.remove();
   document.getElementById('pixoro-like-css-v4')?.remove();
+  document.getElementById('pixoro-like-css-v5')?.remove();
   let s = document.createElement('style');
-  s.id = 'pixoro-like-css-v4';
+  s.id = 'pixoro-like-css-v5';
   s.innerText = `
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
     [data-like-btn] svg{ overflow:visible !important; display:block !important; width:24px !important; height:24px !important; }
     [data-like-btn] svg, [data-like-btn] svg path{ fill:none !important; stroke:#fff !important; }
     [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
-    /* ✅ BIG HEART - left/top la !important illa da - JS la thotta edam vekka mudiyum da */
-    .bigHeart{ position:absolute; z-index:99 !important; pointer-events:none !important; opacity:0; transform:translate(-50%,-50%) scale(0); width:90px !important; height:90px !important; }
-    .bigHeart.show{ animation:pixHeartDance 900ms ease forwards !important; }
-    .bigHeart svg{ width:100% !important; height:100% !important; filter:drop-shadow(0 4px 12px rgba(0,0,0,.5)) !important; }
-    @keyframes pixHeartDance{ 0%{opacity:0; transform:translate(-50%,-50%) scale(0) rotate(0deg)} 15%{opacity:1; transform:translate(-50%,-50%) scale(1.3) rotate(-12deg)} 30%{transform:translate(-50%,-50%) scale(1.1) rotate(10deg)} 45%{transform:translate(-50%,-50%) scale(1.2) rotate(-8deg)} 60%{transform:translate(-50%,-50%) scale(1.05) rotate(6deg)} 75%{opacity:1; transform:translate(-50%,-50%) scale(1) rotate(0deg)} 100%{opacity:0; transform:translate(-50%,-50%) scale(1.2) rotate(0deg)} }
   `;
   document.head.appendChild(s);
 })();
@@ -162,10 +157,8 @@ async function pixoroToggleLike(postId, btn){
 }
 
 async function pixoroDoubleTapLike(postId, mediaEl, ev){
-  // ✅ PIXORO MAARI - Thotta edam edukkurom da
   let tapX = 0, tapY = 0;
   if(ev){
-    // Touch la irundha - touches la irundhu edu da
     if(ev.touches && ev.touches[0]){ tapX = ev.touches[0].clientX; tapY = ev.touches[0].clientY; }
     else if(ev.changedTouches && ev.changedTouches[0]){ tapX = ev.changedTouches[0].clientX; tapY = ev.changedTouches[0].clientY; }
     else { tapX = ev.clientX || 0; tapY = ev.clientY || 0; }
@@ -204,32 +197,56 @@ function showBigHeart(mediaEl, tapX, tapY){
   if(!box) box = mediaEl.parentElement || mediaEl;
   if(!box) return;
   box.querySelectorAll('.bigHeart').forEach(h=>h.remove());
-  let div = document.createElement('div');
-  div.className = 'bigHeart';
-  // ✅ PIXORO Double Tap Heart - White da
-  div.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#fff" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  box.querySelectorAll('.pixMiniHeart').forEach(h=>h.remove());
   let cs = window.getComputedStyle(box);
   if(cs.position === 'static') box.style.position = 'relative';
-
-  // ✅ PIXORO LOGIC DA - Enga thodromo anga vekkurom da
+  let r = box.getBoundingClientRect();
+  let x = r.width/2, y = r.height/2;
   if(tapX && tapY){
-    let r = box.getBoundingClientRect();
-    let x = tapX - r.left;
-    let y = tapY - r.top;
-    // Ooram pona ulla kondu varom da
-    x = Math.max(50, Math.min(r.width - 50, x));
-    y = Math.max(50, Math.min(r.height - 50, y));
-    div.style.left = x + 'px';
-    div.style.top = y + 'px';
-  } else {
-    div.style.left = '50%';
-    div.style.top = '50%';
+    x = Math.max(60, Math.min(r.width-60, tapX - r.left));
+    y = Math.max(60, Math.min(r.height-60, tapY - r.top));
   }
 
+  // ✅ 1. PERIYA WHITE HEART - JS DANCE DA - CSS vendaam da
+  let div = document.createElement('div');
+  div.className = 'bigHeart';
+  div.style.cssText = 'position:absolute;z-index:99;pointer-events:none;width:90px;height:90px;left:'+x+'px;top:'+y+'px;opacity:0;';
+  div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))"><path fill="#fff" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   box.appendChild(div);
-  void div.offsetWidth;
-  div.classList.add('show');
-  setTimeout(()=>div.remove(), 900);
+  try{
+    div.animate([
+      { opacity:0, transform:'translate(-50%,-50%) scale(0) rotate(0deg)' },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1.3) rotate(-12deg)' },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1.1) rotate(10deg)' },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1.2) rotate(-8deg)' },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1.05) rotate(6deg)' },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1) rotate(0deg)' },
+      { opacity:0, transform:'translate(-50%,-50%) scale(1.2) rotate(0deg)' }
+    ], { duration:900, easing:'ease-out' }).onfinish = ()=> div.remove();
+  }catch(e){ div.remove(); }
+  setTimeout(()=> div.remove(), 1000);
+
+  // ✅ 2. COLOUR COLOUR CHINNA HEARTS - Thotta edathula irundhu parakkum da
+  let colors = ['#FF0A33','#FF4D8D','#FF8A00','#FF2E9A','#FFD500','#00E5FF','#7C4DFF'];
+  for(let i=0;i<7;i++){
+    let s = document.createElement('div');
+    s.className = 'pixMiniHeart';
+    let col = colors[i % colors.length];
+    s.style.cssText = 'position:absolute;z-index:98;pointer-events:none;width:26px;height:26px;left:'+x+'px;top:'+y+'px;opacity:1;';
+    s.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%"><path fill="'+col+'" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+    box.appendChild(s);
+    let ang = (i/7)*Math.PI*2;
+    let dist = 90 + Math.random()*40;
+    let dx = Math.cos(ang)*dist, dy = Math.sin(ang)*dist - 40;
+    try{
+      s.animate([
+        { opacity:1, transform:'translate(-50%,-50%) scale(0.5) rotate(0deg)' },
+        { opacity:1, transform:'translate(calc(-50% + '+dx+'px), calc(-50% + '+dy+'px)) scale(1.1) rotate('+(Math.random()*40-20)+'deg)' },
+        { opacity:0, transform:'translate(calc(-50% + '+dx+'px), calc(-50% + '+(dy-60)+'px)) scale(0.8) rotate(0deg)' }
+      ], { duration:900, easing:'ease-out', delay:50 }).onfinish = ()=> s.remove();
+    }catch(e){ s.remove(); }
+    setTimeout(()=> s.remove(), 1000);
+  }
 }
 
 if(!window._pixoroLikeDelegation){
