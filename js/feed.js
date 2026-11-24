@@ -7,19 +7,16 @@
   function safeURL(v){ try{ let u=new URL(v, location.href); return ['https:','http:'].includes(u.protocol)?escapeHTML(u.href):''; }catch{ return ''; } }
   function feedTime(t){ if(!t) return ''; let d=new Date(t), n=new Date(), diff=Math.floor((n-d)/1000); if(diff<60) return 'Just now'; if(diff<3600) return Math.floor(diff/60)+'m'; if(diff<86400) return Math.floor(diff/3600)+'h'; return d.toLocaleDateString([],{day:'numeric',month:'short'}); }
 
-  /* ✅ BLOCK REMOVE - Story Click Block Aaga Kudathu da */
   function unblockStories(){
     const bar = document.getElementById('storyBar');
     if(bar){ bar.style.pointerEvents='auto'; bar.style.zIndex='10'; bar.style.position='relative'; }
     document.querySelectorAll('.sItem, .sRing, .sAddWrap, .sAddImg').forEach(el=>{
       el.style.pointerEvents='auto'; el.style.cursor='pointer';
     });
-    // ✅ Mela irukura Overlay / Top Note Block pannama Paathuko da
     const note = document.getElementById('pixoroTopNote');
     if(note) note.style.pointerEvents='none';
   }
 
-  /* ✅ STORY - Thotta Direct Page ku Poku da - Box Illa da */
   async function loadStories(){
     const bar = document.getElementById('storyBar') || document.getElementById('storyBox');
     if(!bar) return;
@@ -37,8 +34,6 @@
 
       let { data: stories } = await supa.from('stories').select('*').order('created_at',{ascending:false}).limit(30);
       stories = stories || [];
-
-      // ✅ Enakku Story irukka nu Paaru da - Iruntha View, Illana Add da
       if(MY_ID) myHasStory = stories.some(s=> String(s.user_id)===String(MY_ID));
 
       let seenUser = new Set();
@@ -47,7 +42,6 @@
         seenUser.add(String(s.user_id));
         return true;
       });
-      // ✅ En Story ah List la Double Vara Kudathu da
       items = items.filter(s=> String(s.user_id)!==String(MY_ID));
 
       let ids = [...new Set(items.map(s=>s.user_id).filter(Boolean))];
@@ -57,8 +51,9 @@
         (profs||[]).forEach(p=> profMap[String(p.id)] = p);
       }
 
+      // ✅ FIX DA - "me" Illa da, Real MY_ID ah Vachiten da
       let html = `
-        <div class="sItem" data-story-user="me" data-has-story="${myHasStory ? '1':'0'}">
+        <div class="sItem" data-story-user="${escapeHTML(MY_ID)}" data-is-me="1" data-has-story="${myHasStory ? '1':'0'}">
           <div class="sAddWrap">
             ${myPfp ? `<img class="sAddImg" src="${safeURL(myPfp)}">` : `<div class="sAddImg" style="display:grid;place-items:center;font-size:22px;font-weight:900">+</div>`}
             <div class="sAddPlus">+</div>
@@ -69,10 +64,11 @@
       html += items.map(s=>{
         const prof = profMap[String(s.user_id)] || {};
         const name = escapeHTML(prof.username || 'User');
-        const pfp = prof.avatar_url || s.media_url || '';
+        // ✅ FIX DA - Circle la Avatar mattum da, Story Photo Illa da
+        const pfp = prof.avatar_url || '';
         const letter = name.charAt(0).toUpperCase();
         return `
-        <div class="sItem" data-story-user="${escapeHTML(String(s.user_id))}">
+        <div class="sItem" data-story-user="${escapeHTML(String(s.user_id))}" data-is-me="0">
           <div class="sRing"><div class="sRingInner">
             ${pfp ? `<img src="${safeURL(pfp)}" onerror="this.remove()">` : `<div style="width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);display:grid;place-items:center;font-weight:900">${letter}</div>`}
           </div></div>
@@ -83,27 +79,23 @@
       let row = document.getElementById('storyRow') || document.getElementById('storyBox');
       if(row) row.innerHTML = html;
       else bar.innerHTML = html;
-
       unblockStories();
-
     }catch(e){ console.error('STORY LOAD ERROR:', e); }
   }
 
-  /* ✅ CLICK - Delegation da - Vera Handler Block panna Mudiyathu da */
+  /* ✅ CLICK - Real ID ah Anuppu da - me nu Anuppa Kudathu da */
   document.addEventListener('click', (e)=>{
     const item = e.target.closest('.sItem');
     if(!item) return;
     e.preventDefault(); e.stopPropagation();
     const uid = item.dataset.storyUser;
-    if(uid === 'me'){
-      // ✅ Story iruntha Paaru da, illana Add pannu da - Block Illa da
-      if(item.dataset.hasStory === '1'){
-        window.location.href = '/story.html?user=me';
-      } else {
-        window.location.href = '/add-story.html';
-      }
+    const isMe = item.dataset.isMe === '1';
+    if(!uid){ window.location.href = '/add-story.html'; return; }
+    if(isMe && item.dataset.hasStory !== '1'){
+      window.location.href = '/add-story.html';
       return;
     }
+    // ✅ En Story aanaalum, Vera User Story aanaalum Real ID oda Poku da
     window.location.href = '/story.html?user=' + encodeURIComponent(uid);
   }, true);
 
