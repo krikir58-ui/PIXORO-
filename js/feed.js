@@ -1,4 +1,4 @@
-/* PIXORO FEED - FINAL CORRECTED DA - NO DOUBLE LIKE DA - NO BLOCK DA */
+/* PIXORO FEED - FINAL CLEAN DA - FEED MATTUM DA - STORY = story.js la thaan da */
 (function () {
   'use strict';
   let loading = false;
@@ -7,97 +7,8 @@
   function safeURL(v){ try{ let u=new URL(v, location.href); return ['https:','http:'].includes(u.protocol)?escapeHTML(u.href):''; }catch{ return ''; } }
   function feedTime(t){ if(!t) return ''; let d=new Date(t), n=new Date(), diff=Math.floor((n-d)/1000); if(diff<60) return 'Just now'; if(diff<3600) return Math.floor(diff/60)+'m'; if(diff<86400) return Math.floor(diff/3600)+'h'; return d.toLocaleDateString([],{day:'numeric',month:'short'}); }
 
-  function unblockStories(){
-    const bar = document.getElementById('storyBar');
-    if(bar){ bar.style.pointerEvents='auto'; bar.style.zIndex='10'; bar.style.position='relative'; }
-    document.querySelectorAll('.sItem, .sRing, .sAddWrap, .sAddImg').forEach(el=>{
-      el.style.pointerEvents='auto'; el.style.cursor='pointer';
-    });
-    const note = document.getElementById('pixoroTopNote');
-    if(note) note.style.pointerEvents='none';
-  }
-
-  async function loadStories(){
-    const bar = document.getElementById('storyBar') || document.getElementById('storyBox');
-    if(!bar) return;
-    const supa = getClient();
-    if(!supa) return;
-    try{
-      let MY_ID = '';
-      try{ let { data:{session} } = await supa.auth.getSession(); MY_ID = session?.user?.id || ''; }catch{}
-
-      let myPfp = '', myHasStory = false;
-      if(MY_ID){
-        let { data: me } = await supa.from('profiles').select('avatar_url,username').eq('id', MY_ID).maybeSingle();
-        myPfp = me?.avatar_url || '';
-      }
-
-      let { data: stories } = await supa.from('stories').select('*').order('created_at',{ascending:false}).limit(30);
-      stories = stories || [];
-      if(MY_ID) myHasStory = stories.some(s=> String(s.user_id)===String(MY_ID));
-
-      let seenUser = new Set();
-      let items = stories.filter(s=>{
-        if(seenUser.has(String(s.user_id))) return false;
-        seenUser.add(String(s.user_id));
-        return true;
-      });
-      items = items.filter(s=> String(s.user_id)!==String(MY_ID));
-
-      let ids = [...new Set(items.map(s=>s.user_id).filter(Boolean))];
-      let profMap = {};
-      if(ids.length){
-        let { data: profs } = await supa.from('profiles').select('id,username,avatar_url').in('id', ids);
-        (profs||[]).forEach(p=> profMap[String(p.id)] = p);
-      }
-
-      // ✅ FIX DA - "me" Illa da, Real MY_ID ah Vachiten da
-      let html = `
-        <div class="sItem" data-story-user="${escapeHTML(MY_ID)}" data-is-me="1" data-has-story="${myHasStory ? '1':'0'}">
-          <div class="sAddWrap">
-            ${myPfp ? `<img class="sAddImg" src="${safeURL(myPfp)}">` : `<div class="sAddImg" style="display:grid;place-items:center;font-size:22px;font-weight:900">+</div>`}
-            <div class="sAddPlus">+</div>
-          </div>
-          <div class="sName">My Story</div>
-        </div>`;
-
-      html += items.map(s=>{
-        const prof = profMap[String(s.user_id)] || {};
-        const name = escapeHTML(prof.username || 'User');
-        // ✅ FIX DA - Circle la Avatar mattum da, Story Photo Illa da
-        const pfp = prof.avatar_url || '';
-        const letter = name.charAt(0).toUpperCase();
-        return `
-        <div class="sItem" data-story-user="${escapeHTML(String(s.user_id))}" data-is-me="0">
-          <div class="sRing"><div class="sRingInner">
-            ${pfp ? `<img src="${safeURL(pfp)}" onerror="this.remove()">` : `<div style="width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);display:grid;place-items:center;font-weight:900">${letter}</div>`}
-          </div></div>
-          <div class="sName">${name}</div>
-        </div>`;
-      }).join('');
-
-      let row = document.getElementById('storyRow') || document.getElementById('storyBox');
-      if(row) row.innerHTML = html;
-      else bar.innerHTML = html;
-      unblockStories();
-    }catch(e){ console.error('STORY LOAD ERROR:', e); }
-  }
-
-  /* ✅ CLICK - Real ID ah Anuppu da - me nu Anuppa Kudathu da */
-  document.addEventListener('click', (e)=>{
-    const item = e.target.closest('.sItem');
-    if(!item) return;
-    e.preventDefault(); e.stopPropagation();
-    const uid = item.dataset.storyUser;
-    const isMe = item.dataset.isMe === '1';
-    if(!uid){ window.location.href = '/add-story.html'; return; }
-    if(isMe && item.dataset.hasStory !== '1'){
-      window.location.href = '/add-story.html';
-      return;
-    }
-    // ✅ En Story aanaalum, Vera User Story aanaalum Real ID oda Poku da
-    window.location.href = '/story.html?user=' + encodeURIComponent(uid);
-  }, true);
+  // ❌ loadStories() Inga Illa da - Athu js/story.js la thaan irukku da
+  // ❌ Story Click Handler Inga Illa da - story.js la onclick irukku da
 
   async function loadFeed(){
     const feed = document.getElementById('feed');
@@ -182,8 +93,8 @@
     }finally{ loading=false; }
   }
   window.loadFeed = loadFeed;
-  window.loadStories = loadStories;
-  function init(){ loadStories(); loadFeed(); }
+  // ✅ init la loadFeed mattum da - loadStories() Vendaam da, story.js thaniya Odum da
+  function init(){ loadFeed(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
