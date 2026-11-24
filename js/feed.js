@@ -7,6 +7,86 @@
   function safeURL(v){ try{ let u=new URL(v, location.href); return ['https:','http:'].includes(u.protocol)?escapeHTML(u.href):''; }catch{ return ''; } }
   function feedTime(t){ if(!t) return ''; let d=new Date(t), n=new Date(), diff=Math.floor((n-d)/1000); if(diff<60) return 'Just now'; if(diff<3600) return Math.floor(diff/60)+'m'; if(diff<86400) return Math.floor(diff/3600)+'h'; return d.toLocaleDateString([],{day:'numeric',month:'short'}); }
 
+  /* ✅ STORY - Thotta Direct Page ku Poku da - Box Illa da */
+  async function loadStories(){
+    const bar = document.getElementById('storyBar') || document.getElementById('storyBox');
+    if(!bar) return;
+    const supa = getClient();
+    if(!supa) return;
+    try{
+      let MY_ID = '';
+      try{ let { data:{session} } = await supa.auth.getSession(); MY_ID = session?.user?.id || ''; }catch{}
+
+      // ✅ My Story - First la da
+      let myPfp = '';
+      if(MY_ID){
+        let { data: me } = await supa.from('profiles').select('avatar_url,username').eq('id', MY_ID).maybeSingle();
+        myPfp = me?.avatar_url || '';
+      }
+
+      // ✅ Stories - Latest 30 da
+      let { data: stories } = await supa.from('stories').select('*').order('created_at',{ascending:false}).limit(30);
+      stories = stories || [];
+
+      // ✅ Same User oda Story ah Oru Circle ah Group pannu da
+      let seenUser = new Set();
+      let items = stories.filter(s=>{
+        if(seenUser.has(String(s.user_id))) return false;
+        seenUser.add(String(s.user_id));
+        return true;
+      });
+
+      let ids = [...new Set(items.map(s=>s.user_id).filter(Boolean))];
+      let profMap = {};
+      if(ids.length){
+        let { data: profs } = await supa.from('profiles').select('id,username,avatar_url').in('id', ids);
+        (profs||[]).forEach(p=> profMap[String(p.id)] = p);
+      }
+
+      let html = `
+        <div class="sItem" data-story-user="me">
+          <div class="sAddWrap">
+            ${myPfp ? `<img class="sAddImg" src="${safeURL(myPfp)}">` : `<div class="sAddImg" style="display:grid;place-items:center;font-size:22px;font-weight:900">+</div>`}
+            <div class="sAddPlus">+</div>
+          </div>
+          <div class="sName">My Story</div>
+        </div>`;
+
+      html += items.map(s=>{
+        const prof = profMap[String(s.user_id)] || {};
+        const name = escapeHTML(prof.username || 'User');
+        const pfp = prof.avatar_url || s.media_url || '';
+        const letter = name.charAt(0).toUpperCase();
+        return `
+        <div class="sItem" data-story-user="${escapeHTML(String(s.user_id))}">
+          <div class="sRing"><div class="sRingInner">
+            ${pfp ? `<img src="${safeURL(pfp)}" onerror="this.remove()">` : `<div style="width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);display:grid;place-items:center;font-weight:900">${letter}</div>`}
+          </div></div>
+          <div class="sName">${name}</div>
+        </div>`;
+      }).join('');
+
+      let row = document.getElementById('storyRow') || document.getElementById('storyBox');
+      if(row) row.innerHTML = html;
+      else bar.innerHTML = html;
+
+      // ✅ CLICK - Box Illa da - Direct Story Page ku Poku da
+      document.querySelectorAll('.sItem').forEach(item=>{
+        item.onclick = ()=>{
+          const uid = item.dataset.storyUser;
+          if(uid === 'me'){
+            // My Story - Add Story Page ku Poku da
+            window.location.href = '/add-story.html';
+            return;
+          }
+          // Vera User Story - Full Page ku Poku da
+          window.location.href = '/story.html?user=' + encodeURIComponent(uid);
+        };
+      });
+
+    }catch(e){ console.error('STORY LOAD ERROR:', e); }
+  }
+
   async function loadFeed(){
     const feed = document.getElementById('feed');
     if(!feed || loading) return;
@@ -34,7 +114,6 @@
         (myLikes||[]).forEach(l=> likedSet.add(String(l.post_id)));
         let { data: mySaves } = await supa.from('saves').select('post_id').eq('user_id', MY_ID).in('post_id', postIds);
         (mySaves||[]).forEach(s=> savedSet.add(String(s.post_id)));
-        // like.js ku kooda sollidu da
         if(!window.FEED_LIKES) window.FEED_LIKES = new Set();
         likedSet.forEach(id=> window.FEED_LIKES.add(id));
       }
@@ -88,7 +167,6 @@
         </article>`;
       }).join('');
 
-      // ✅ Like.js ku Feed Ready nu Sollu da
       window.dispatchEvent(new Event('pixoroFeedLoaded'));
       if(window.pixoroPaintAllLikes) window.pixoroPaintAllLikes();
 
@@ -98,6 +176,11 @@
     }finally{ loading=false; }
   }
   window.loadFeed = loadFeed;
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', loadFeed);
-  else loadFeed();
+  window.loadStories = loadStories;
+  function init(){
+    loadStories();
+    loadFeed();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
