@@ -1,14 +1,24 @@
-// ===== PIXORO STORY - v9999 - PHOTO SYNC FIX DA =====
+// ===== PIXORO STORY - v1002 - PHOTO SYNC FIX DA - CORE + STORY SAME VERSION DA =====
 async function loadStories(){
   let bar = document.getElementById('storyRow') || document.getElementById('storyBox') || document.getElementById('storyBar');
   if(!bar) return;
 
+  function isRealPhoto(u){
+    if(!u) return false;
+    u = String(u);
+    if(u.length < 20) return false;
+    if(u.includes('ui-avatars')) return false;
+    if(u.endsWith('/')) return false;
+    return true;
+  }
   function getMyPhotoFromPage(){
     let nav = document.getElementById('navPfp');
-    if(nav && nav.src && nav.src.length > 15 && !nav.src.endsWith('/')) return nav.src;
+    if(nav && isRealPhoto(nav.src)) return nav.src;
     let postImg = document.querySelector('.post .pfpInner img');
-    if(postImg && postImg.src && postImg.src.length > 15) return postImg.src;
-    return window.MY_PFP || window.ME_PFP || '';
+    if(postImg && isRealPhoto(postImg.src)) return postImg.src;
+    if(isRealPhoto(window.MY_PFP)) return window.MY_PFP;
+    if(isRealPhoto(window.ME_PFP)) return window.ME_PFP;
+    return '';
   }
   function paintMyPhoto(){
     let photo = getMyPhotoFromPage();
@@ -51,13 +61,13 @@ async function loadStories(){
     if(user){
       if(!window.ME_ID) window.ME_ID = user.id;
       const { data: prof } = await s.from('profiles').select('avatar_url,username').eq('id', user.id).single();
-      if(prof){ let p = String(prof.avatar_url || '').trim(); if(p) myAvatar = p; if(prof.username) myName = prof.username; window.MY_PFP = myAvatar; window.ME_PFP = myAvatar; }
+      if(prof){ let p = String(prof.avatar_url || '').trim(); if(isRealPhoto(p)) myAvatar = p; if(prof.username) myName = prof.username; window.MY_PFP = myAvatar; window.ME_PFP = myAvatar; }
     }
   }catch(e){}
 
   let myFirst = String(myName || 'G').replace('@','').charAt(0).toUpperCase();
-  let myImg = `<img id="myStoryImg" class="sAddImg" src="${myAvatar}" style="width:74px;height:74px;border-radius:50%;object-fit:cover;display:${myAvatar ? 'block' : 'none'}" onerror="this.remove();document.getElementById('myStoryLetter').style.display='grid'">`;
-  let myLetterHtml = `<div class="sLetter avaLetterHome" id="myStoryLetter" style="display:${myAvatar ? 'none' : 'grid'};width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">${myFirst}</div>`;
+  let myImg = `<img id="myStoryImg" class="sAddImg" src="${myAvatar}" style="width:74px;height:74px;border-radius:50%;object-fit:cover;display:${isRealPhoto(myAvatar) ? 'block' : 'none'}" onerror="this.style.display='none';let l=document.getElementById('myStoryLetter');if(l)l.style.display='grid'">`;
+  let myLetterHtml = `<div class="sLetter avaLetterHome" id="myStoryLetter" style="display:${isRealPhoto(myAvatar) ? 'none' : 'grid'};width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">${myFirst}</div>`;
   let myHasStory = !!byUser[String(window.ME_ID)];
   let myLink = myHasStory ? `./story.html?user=${window.ME_ID}` : './story-upload.html';
   let html = `<div class="sItem" onclick="location.href='${myLink}'">
@@ -71,8 +81,8 @@ async function loadStories(){
     let prof = profMap[k] || {};
     let avatar = String(prof.avatar_url || '').trim();
     let letter = uname.charAt(0).toUpperCase();
-    let imgHtml = avatar ? `<img src="${avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.remove();this.parentElement.querySelector('.sLetter2').style.display='grid'">` : '';
-    let letterHtml = `<div class="sLetter2" style="display:${avatar ? 'none' : 'grid'};width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">${letter}</div>`;
+    let imgHtml = isRealPhoto(avatar) ? `<img src="${avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.remove();this.parentElement.querySelector('.sLetter2').style.display='grid'">` : '';
+    let letterHtml = `<div class="sLetter2" style="display:${isRealPhoto(avatar) ? 'none' : 'grid'};width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);place-items:center;font-weight:900;font-size:22px;color:#fff">${letter}</div>`;
     html += `<div class="sItem" onclick="location.href='./story.html?user=${first.user_id}'">
       <div class="sRing" style="width:74px;height:74px;padding:3px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00)"><div class="sRingInner" style="position:relative;width:100%;height:100%;border-radius:50%;background:#000;padding:2px">${imgHtml}${letterHtml}</div></div>
       <div class="sName">${uname}</div></div>`;
