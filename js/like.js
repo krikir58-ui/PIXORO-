@@ -1,5 +1,5 @@
-// ===== PIXORO LIKE - FINAL V5 - JS DANCE + COLOUR HEARTS DA =====
-console.log('✅ LIKE FILE LOADED DA - V5 JS DANCE');
+// ===== PIXORO LIKE - FINAL V6 - HEART BURST DA =====
+console.log('✅ LIKE FILE LOADED DA - V6 HEART BURST');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
@@ -40,8 +40,9 @@ window.pixoroFeedTap = function(postId, el, ev){
   document.getElementById('pixoro-like-css-v3')?.remove();
   document.getElementById('pixoro-like-css-v4')?.remove();
   document.getElementById('pixoro-like-css-v5')?.remove();
+  document.getElementById('pixoro-like-css-v6')?.remove();
   let s = document.createElement('style');
-  s.id = 'pixoro-like-css-v5';
+  s.id = 'pixoro-like-css-v6';
   s.innerText = `
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
@@ -198,54 +199,74 @@ function showBigHeart(mediaEl, tapX, tapY){
   if(!box) return;
   box.querySelectorAll('.bigHeart').forEach(h=>h.remove());
   box.querySelectorAll('.pixMiniHeart').forEach(h=>h.remove());
+  box.querySelectorAll('.pixBurstDot').forEach(h=>h.remove());
   let cs = window.getComputedStyle(box);
   if(cs.position === 'static') box.style.position = 'relative';
   let r = box.getBoundingClientRect();
   let x = r.width/2, y = r.height/2;
   if(tapX && tapY){
-    x = Math.max(60, Math.min(r.width-60, tapX - r.left));
-    y = Math.max(60, Math.min(r.height-60, tapY - r.top));
+    x = Math.max(70, Math.min(r.width-70, tapX - r.left));
+    y = Math.max(70, Math.min(r.height-70, tapY - r.top));
   }
 
-  // ✅ 1. PERIYA WHITE HEART - JS DANCE DA - CSS vendaam da
+  // ✅ 1. HEART BURST - PERIYA WHITE HEART
   let div = document.createElement('div');
   div.className = 'bigHeart';
-  div.style.cssText = 'position:absolute;z-index:99;pointer-events:none;width:90px;height:90px;left:'+x+'px;top:'+y+'px;opacity:0;';
-  div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))"><path fill="#fff" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  div.style.cssText = 'position:absolute;z-index:99;pointer-events:none;width:100px;height:100px;left:'+x+'px;top:'+y+'px;opacity:0;';
+  div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))"><path fill="#fff" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   box.appendChild(div);
   try{
     div.animate([
       { opacity:0, transform:'translate(-50%,-50%) scale(0) rotate(0deg)' },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1.3) rotate(-12deg)' },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1.1) rotate(10deg)' },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1.2) rotate(-8deg)' },
-      { opacity:1, transform:'translate(-50%,-50%) scale(1.05) rotate(6deg)' },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1.4) rotate(-10deg)' },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1.1) rotate(8deg)' },
+      { opacity:1, transform:'translate(-50%,-50%) scale(1.15) rotate(-5deg)' },
       { opacity:1, transform:'translate(-50%,-50%) scale(1) rotate(0deg)' },
-      { opacity:0, transform:'translate(-50%,-50%) scale(1.2) rotate(0deg)' }
-    ], { duration:900, easing:'ease-out' }).onfinish = ()=> div.remove();
+      { opacity:0, transform:'translate(-50%,-50%) scale(1.3) rotate(0deg)' }
+    ], { duration:850, easing:'ease-out' }).onfinish = ()=> div.remove();
   }catch(e){ div.remove(); }
-  setTimeout(()=> div.remove(), 1000);
+  setTimeout(()=>div.remove(), 900);
 
-  // ✅ 2. COLOUR COLOUR CHINNA HEARTS - Thotta edathula irundhu parakkum da
-  let colors = ['#FF0A33','#FF4D8D','#FF8A00','#FF2E9A','#FFD500','#00E5FF','#7C4DFF'];
-  for(let i=0;i<7;i++){
+  // ✅ 2. HEART BURST - 10 COLOUR HEARTS VEDIYUM DA
+  let colors = ['#FF0A33','#FF4D8D','#FF8A00','#FF2E9A','#FFD500','#00E5FF','#7C4DFF','#FF6B6B'];
+  for(let i=0;i<10;i++){
     let s = document.createElement('div');
     s.className = 'pixMiniHeart';
     let col = colors[i % colors.length];
-    s.style.cssText = 'position:absolute;z-index:98;pointer-events:none;width:26px;height:26px;left:'+x+'px;top:'+y+'px;opacity:1;';
+    let sz = 18 + Math.random()*18;
+    s.style.cssText = 'position:absolute;z-index:98;pointer-events:none;width:'+sz+'px;height:'+sz+'px;left:'+x+'px;top:'+y+'px;opacity:1;';
     s.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%"><path fill="'+col+'" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
     box.appendChild(s);
-    let ang = (i/7)*Math.PI*2;
-    let dist = 90 + Math.random()*40;
-    let dx = Math.cos(ang)*dist, dy = Math.sin(ang)*dist - 40;
+    let ang = (i/10)*Math.PI*2 + Math.random()*0.4;
+    let dist = 100 + Math.random()*60;
+    let dx = Math.cos(ang)*dist, dy = Math.sin(ang)*dist - 30;
     try{
       s.animate([
-        { opacity:1, transform:'translate(-50%,-50%) scale(0.5) rotate(0deg)' },
-        { opacity:1, transform:'translate(calc(-50% + '+dx+'px), calc(-50% + '+dy+'px)) scale(1.1) rotate('+(Math.random()*40-20)+'deg)' },
-        { opacity:0, transform:'translate(calc(-50% + '+dx+'px), calc(-50% + '+(dy-60)+'px)) scale(0.8) rotate(0deg)' }
-      ], { duration:900, easing:'ease-out', delay:50 }).onfinish = ()=> s.remove();
+        { opacity:1, transform:'translate(-50%,-50%) scale(0) rotate(0deg)' },
+        { opacity:1, transform:'translate(calc(-50% + '+dx+'px), calc(-50% + '+dy+'px)) scale(1.2) rotate('+(Math.random()*50-25)+'deg)' },
+        { opacity:0, transform:'translate(calc(-50% + '+dx+'px), calc(-50% + '+(dy-70)+'px)) scale(0.7) rotate(0deg)' }
+      ], { duration:850, easing:'ease-out', delay:30 }).onfinish = ()=> s.remove();
     }catch(e){ s.remove(); }
-    setTimeout(()=> s.remove(), 1000);
+    setTimeout(()=>s.remove(), 950);
+  }
+
+  // ✅ 3. BURST DOTS - Chinna chinna dots vedikkum da
+  for(let i=0;i<8;i++){
+    let d = document.createElement('div');
+    d.className = 'pixBurstDot';
+    let col = colors[i % colors.length];
+    d.style.cssText = 'position:absolute;z-index:97;pointer-events:none;width:6px;height:6px;border-radius:50%;background:'+col+';left:'+x+'px;top:'+y+'px;';
+    box.appendChild(d);
+    let ang = Math.random()*Math.PI*2;
+    let dist = 60 + Math.random()*70;
+    let dx = Math.cos(ang)*dist, dy = Math.sin(ang)*dist;
+    try{
+      d.animate([
+        { opacity:1, transform:'translate(-50%,-50%) scale(1)' },
+        { opacity:0, transform:'translate(calc(-50% + '+dx+'px), calc(-50% + '+dy+'px)) scale(0)' }
+      ], { duration:700, easing:'ease-out' }).onfinish = ()=> d.remove();
+    }catch(e){ d.remove(); }
+    setTimeout(()=>d.remove(), 750);
   }
 }
 
