@@ -1,14 +1,13 @@
 /* =====================================================
-   PIXORO LIKE SYSTEM V23 - FIXED
-   Single = Slow Thudikku Mattum / Double = Safe Area White Heart
-   ChatGPT V22 la Irundha Thappu Fix Panniten da
+   PIXORO LIKE SYSTEM V24 - FIXED
+   Keezha Heart Full Colour + Touch Edathula Irundhu Chinna White Heart
 ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V23) return;
-  window.PIXORO_LIKE_V23 = true;
+  if (window.PIXORO_LIKE_V24) return;
+  window.PIXORO_LIKE_V24 = true;
 
   const supa = window.supa || window.supabaseClient;
   const TABLE = "likes";
@@ -78,11 +77,18 @@
     button.classList.toggle("liked", liked);
     button.classList.toggle("is-liked", liked);
     button.setAttribute("aria-pressed", String(liked));
+    // ✅ V24 FIX 1 - Keezha Heart Full Colour da - Faded Illa da
+    button.style.opacity = "1";
+    button.style.color = liked ? "#FF0A33" : "";
     const icon = button.querySelector("i, svg, span") || button;
     if (icon.tagName === "I") {
       icon.classList.toggle("active", liked);
+      icon.style.opacity = "1";
     }
-    button.style.color = liked ? "#ff315d" : "";
+    const svg = button.querySelector("svg");
+    const path = button.querySelector("path");
+    if(svg){ svg.style.opacity = "1"; svg.style.setProperty('fill', liked ? '#FF0A33' : 'none', 'important'); }
+    if(path){ path.style.setProperty('fill', liked ? '#FF0A33' : 'none', 'important'); path.style.setProperty('stroke', liked ? '#FF0A33' : '#fff', 'important'); }
   }
 
   function paintCount(postId, count, post) {
@@ -104,9 +110,9 @@
   /* ---------- HEART CSS - SAFE + WHITE + SLOW THUDIKKU ---------- */
 
   function addHeartStyles() {
-    if (document.getElementById("pixoro-like-v23-css")) return;
+    if (document.getElementById("pixoro-like-v24-css")) return;
     const style = document.createElement("style");
-    style.id = "pixoro-like-v23-css";
+    style.id = "pixoro-like-v24-css";
     style.textContent = `
       /* ✅ Keezha Heart Slow Thudikku da */
       @keyframes pixThudikku{
@@ -117,21 +123,23 @@
       }
       [data-like-btn].thudikku svg, .like-btn.thudikku svg, .like-button.thudikku svg,
       [data-like-btn].thudikku i, .like-btn.thudikku i{ animation:pixThudikku 0.8s ease-in-out 1 !important; }
-      .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked { color: #ff315d !important; }
-      .pixoro-like-loading { opacity: .65; pointer-events: none; }
+      .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked { color: #FF0A33 !important; opacity:1 !important; }
+      /* ✅ V24 FIX - Loading la Faded Aaga Koodathu da */
+      .pixoro-like-loading { opacity: 1 !important; pointer-events: auto !important; }
+      [data-like-btn], .like-btn, .like-button { opacity:1 !important; }
       /* ✅ SAFE AREA - Photo Container ku Veliya Heart Pogaathu da */
       .postMedia, .post-media, .post-media-wrap, .post-content, .post, .post-card { position:relative !important; }
     `;
     document.head.appendChild(style);
   }
 
-  /* ---------- HEART ANIMATION - SAFE AREA + WHITE HEART ---------- */
+  /* ---------- HEART ANIMATION - TOUCH EDATHULA + CHINNA SIZE ---------- */
 
-  function showBigHeart(media) {
+  // ✅ V24 FIX 2 + 3 - showBigHeart(media, tapX, tapY) - Touch Edathula + 68px Chinna da
+  function showBigHeart(media, tapX, tapY) {
     if (!media) return;
     document.querySelectorAll('.pixoro-big-heart').forEach(h=>h.remove());
 
-    // ✅ FIX - Photo oda Container ah Kandupidichu - Athukulla Thaan Heart da
     let container = media.closest ? (media.closest('.postMedia') || media.closest('.post-media') || media.closest('.post-media-wrap') || media.closest('.post') || media.closest('.post-card') || media.closest('article')) : null;
     if(!container) container = media;
     if(!container) return;
@@ -140,11 +148,21 @@
     if(cs.position === 'static') container.style.position = 'relative';
     container.style.overflow = 'hidden';
 
+    // ✅ Touch Edam Kanakku da - Naduvula Illa da
+    let rect = container.getBoundingClientRect();
+    let cx = rect.width / 2;
+    let cy = rect.height / 2;
+    if(typeof tapX === 'number' && typeof tapY === 'number' && tapX > 0 && tapY > 0){
+      cx = tapX - rect.left;
+      cy = tapY - rect.top;
+      cx = Math.max(40, Math.min(rect.width - 40, cx));
+      cy = Math.max(40, Math.min(rect.height - 40, cy));
+    }
+
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
-    // ✅ FIX - position:absolute + Photo kulla - fixed Illa da - Scroll Panna Kooda Photo Kooda Pogum da
-    heart.style.cssText = 'position:absolute !important;z-index:99 !important;pointer-events:none !important;left:50% !important;top:50% !important;width:100px !important;height:100px !important;opacity:1 !important;transform:translate(-50%,-50%) scale(0.2);background:transparent !important;display:block !important;';
-    // ✅ FIX - pixoro Mari White Heart da - Rainbow / Green Illa da
+    // ✅ Size Chinna - 100px -> 68px da
+    heart.style.cssText = 'position:absolute !important;z-index:99 !important;pointer-events:none !important;left:'+cx+'px !important;top:'+cy+'px !important;width:68px !important;height:68px !important;opacity:1 !important;transform:translate(-50%,-50%) scale(0.2);background:transparent !important;display:block !important;';
     heart.innerHTML = '<svg viewBox="0 0 24 24" style="width:100% !important;height:100% !important;display:block !important;filter:drop-shadow(0 8px 20px rgba(0,0,0,.5))"><path fill="#ffffff" stroke="#ffffff" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
     container.appendChild(heart);
 
@@ -226,7 +244,6 @@
         paintCount(postId, count, post);
       }
     } catch (error) {
-      // ✅ FIX - Alert Delete Panniten da - Like Failed na Kooda UI ah Maatha Maatom da - Silent ah Log Mattum da
       console.error("PIXORO like failed - SILENT:", error);
     } finally {
       button?.classList.remove("pixoro-like-loading");
@@ -262,8 +279,8 @@
       Math.hypot(event.clientX - previous.x, event.clientY - previous.y) < 45
     ) {
       lastTap.delete(media);
-      // ✅ DOUBLE CLICK MATTUM - Naduvula Heart Varum da
-      showBigHeart(media);
+      // ✅ DOUBLE CLICK MATTUM - Touch Panra Edathula Heart Varum da
+      showBigHeart(media, event.clientX, event.clientY);
       const btn = getLikeButton(postId, post);
       if(btn) pixoroThudikku(btn);
       await toggleLike(postId, post, true);
@@ -339,5 +356,5 @@
     loadMyLikes();
   }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO Like V23 loaded successfully.");
+  console.log("PIXORO Like V24 loaded successfully.");
 })();
