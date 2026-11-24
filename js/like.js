@@ -1,5 +1,5 @@
-// ===== PIXORO LIKE - FINAL V11 - OREY HEART NINNU POGUM DA =====
-console.log('✅ LIKE FILE LOADED DA - V11 OREY HEART SLOW');
+// ===== PIXORO LIKE - FINAL V12 - HEART NADUVULA DA =====
+console.log('✅ LIKE FILE LOADED DA - V12 HEART NADUVULA');
 
 let _lastTapTime = 0, _lastTapId = '', _singleTapTimer = null;
 let _lastLikeAction = 0;
@@ -56,15 +56,15 @@ window.pixoroFeedTap = function(postId, el, ev){
   document.getElementById('pixoro-like-css-v9')?.remove();
   document.getElementById('pixoro-like-css-v10')?.remove();
   document.getElementById('pixoro-like-css-v11')?.remove();
+  document.getElementById('pixoro-like-css-v12')?.remove();
   let s = document.createElement('style');
-  s.id = 'pixoro-like-css-v11';
+  s.id = 'pixoro-like-css-v12';
   s.innerText = `
     [data-like-btn]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; user-select:none !important; -webkit-user-select:none !important; background:transparent !important; border:none !important; outline:none !important; cursor:pointer !important; }
     [data-like-btn]:active{ opacity:1 !important; transform:none !important; background:transparent !important; }
     [data-like-btn] svg{ overflow:visible !important; display:block !important; width:24px !important; height:24px !important; }
     [data-like-btn] svg, [data-like-btn] svg path{ fill:none !important; stroke:#fff !important; }
     [data-like-btn].liked svg, [data-like-btn].liked svg path{ fill:#FF0A33 !important; stroke:#FF0A33 !important; }
-    .postMedia{ overflow:visible !important; }
   `;
   document.head.appendChild(s);
 })();
@@ -214,27 +214,29 @@ async function pixoroDoubleTapLike(postId, mediaEl, ev){
 
 function showBigHeart(mediaEl, tapX, tapY){
   if(!mediaEl) return;
-  let box = null;
-  try{ if(mediaEl.closest) box = mediaEl.closest('.postMedia') || mediaEl.closest('.post'); }catch(e){}
-  if(!box) box = mediaEl.parentElement || mediaEl;
-  if(!box) return;
-  box.querySelectorAll('.bigHeart').forEach(h=>h.remove());
-  box.querySelectorAll('.pixMiniHeart').forEach(h=>h.remove());
-  box.querySelectorAll('.pixBurstDot').forEach(h=>h.remove());
-  let cs = window.getComputedStyle(box);
-  if(cs.position === 'static') box.style.position = 'relative';
-  box.style.overflow = 'visible';
-  let r = box.getBoundingClientRect();
-  let x = r.width/2, y = r.height/2;
-  if(tapX && tapY){
-    x = Math.max(70, Math.min(r.width-70, tapX - r.left));
-    y = Math.max(70, Math.min(r.height-70, tapY - r.top));
-  }
+  document.querySelectorAll('.bigHeart').forEach(h=>h.remove());
+  // ✅ MAIN FIX DA - Photo / Video oda Naduvula irundhu Edu da - Box kulla Potta Thaan Thappu Varuthu da
+  let target = null;
+  try{
+    if(mediaEl.tagName === 'IMG' || mediaEl.tagName === 'VIDEO') target = mediaEl;
+    else target = mediaEl.querySelector('img, video');
+    if(!target && mediaEl.closest) target = mediaEl.closest('img, video');
+    if(!target) target = mediaEl;
+  }catch(e){ target = mediaEl; }
+  let r = target.getBoundingClientRect();
+  // ✅ NADUVULA THAAN DA - Photo oda Center da - Thotta Edam Illa da
+  let cx = r.left + r.width/2;
+  let cy = r.top + r.height/2;
+  // ✅ Photo theriyalanana - Screen Naduvula Podu da
+  if(!r.width || !r.height){ cx = window.innerWidth/2; cy = window.innerHeight/2; }
+
+  // ✅ FIXED la Body la Podurom da - Yaaroda Overflow um - Position um Heart ah Maraikka Mudiyathu da
   let div = document.createElement('div');
   div.className = 'bigHeart';
-  div.style.cssText = 'position:absolute;z-index:99;pointer-events:none;width:105px;height:105px;left:'+x+'px;top:'+y+'px;opacity:0;';
+  div.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;width:110px;height:110px;left:'+cx+'px;top:'+cy+'px;opacity:0;';
   div.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))"><path fill="#FF0A33" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
-  box.appendChild(div);
+  document.body.appendChild(div);
+
   let colors = ['#FF0A33','#FF4D8D','#FF8A00','#FF2E9A','#FFD500','#00E5FF','#7C4DFF','#00FF88'];
   let ci = 0;
   let path = div.querySelector('path');
@@ -242,6 +244,7 @@ function showBigHeart(mediaEl, tapX, tapY){
     ci = (ci+1) % colors.length;
     if(path) path.setAttribute('fill', colors[ci]);
   }, 280);
+
   try{
     div.animate([
       { opacity:0, transform:'translate(-50%,-50%) scale(0) rotate(0deg)', offset:0 },
