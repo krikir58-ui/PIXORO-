@@ -1,12 +1,12 @@
 /* =====================================================
-   PIXORO LIKE SYSTEM V36 - TAP POINT FIX
-   Enga Double Click Pannuromo Anga Thaan Heart Varum da - Mela Poyi Marayum da
+   PIXORO LIKE SYSTEM V37 - FINAL - PIXORO REAL METHOD
+   touchstart Double Tap da - Heart Eppovum Naduvula da
 ===================================================== */
 
 (() => {
   "use strict";
-
-  if (window.PIXORO_LIKE_V36) return;
+  if (window.PIXORO_LIKE_V37) return;
+  window.PIXORO_LIKE_V37 = true;
   window.PIXORO_LIKE_V36 = true;
   window.PIXORO_LIKE_V35 = true;
   window.PIXORO_LIKE_V34 = true;
@@ -18,7 +18,7 @@
 
   const supa = window.supa || window.supabaseClient;
   const TABLE = "likes";
-  const DOUBLE_TAP_DELAY = 280;
+  const DOUBLE_TAP_DELAY = 300;
 
   const lastTap = new WeakMap();
   const serverQueue = new Set();
@@ -147,9 +147,9 @@
   }
 
   function addHeartStyles() {
-    if (document.getElementById("pixoro-like-v36-css")) return;
+    if (document.getElementById("pixoro-like-v37-css")) return;
     const style = document.createElement("style");
-    style.id = "pixoro-like-v36-css";
+    style.id = "pixoro-like-v37-css";
     style.textContent = `
       @keyframes pixThudikku{
         0%{ transform:scale(1); }
@@ -157,6 +157,8 @@
         70%{ transform:scale(0.98); }
         100%{ transform:scale(1); }
       }
+      /* ✅ V37 - Double Tap Zoom Block da - Ithu Illana 2nd Tap Zoom Aayidum da */
+      .postMedia, .post-media, .post-media-wrap, .post-content img, .post-content video, .post img, .post video { touch-action: manipulation !important; -webkit-tap-highlight-color: transparent !important; user-select:none !important; -webkit-user-select:none !important; }
       [data-like-btn], .like-btn, .like-button { overflow: visible !important; }
       [data-like-btn] svg, .like-btn svg, .like-button svg, [data-like-btn] i, .like-btn i { overflow: visible !important; transform-origin: center center !important; }
       [data-like-btn].thudikku, .like-btn.thudikku, .like-button.thudikku { animation:none !important; transform:none !important; }
@@ -172,8 +174,8 @@
     document.head.appendChild(style);
   }
 
-  // ✅ V36 MAIN FIX - Instagram Mari - Tap Panna Edathula Ye Heart da - Mela Poyi Marayum da
-  function showBigHeart(media, tapX, tapY) {
+  // ✅ V37 -PIXORO Real Heart - Eppovum Naduvula da - Tap Edam Theva Illa da
+  function showBigHeart(media) {
     if (!media) return;
     document.querySelectorAll('.pixoro-big-heart').forEach(h=>h.remove());
     let container = media.closest ? (media.closest('.postMedia') || media.closest('.post-media') || media.closest('.post-media-wrap') || media.closest('.post') || media.closest('.post-card') || media.closest('article')) : null;
@@ -182,38 +184,27 @@
     let cs = window.getComputedStyle(container);
     if(cs.position === 'static') container.style.position = 'relative';
     container.style.overflow = 'hidden';
-    let rect = container.getBoundingClientRect();
-    // ✅ Tap Panna Exact Edam da - Naduvula Illa da - X + Y Rendum Tap Edam da
-    let cx = rect.width / 2;
-    let cy = rect.height / 2;
-    if(typeof tapX === 'number' && tapX > 0 && typeof tapY === 'number' && tapY > 0){
-      cx = tapX - rect.left;
-      cy = tapY - rect.top;
-      cx = Math.max(55, Math.min(rect.width - 55, cx));
-      cy = Math.max(55, Math.min(rect.height - 55, cy));
-    }
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
-    heart.style.cssText = 'position:absolute !important;z-index:99 !important;pointer-events:none !important;left:'+cx+'px !important;top:'+cy+'px !important;width:92px !important;height:92px !important;opacity:0 !important;transform:translate(-50%,-50%) scale(0);background:transparent !important;display:block !important;';
-    heart.innerHTML = '<svg viewBox="0 0 24 24" style="width:100% !important;height:100% !important;display:block !important;filter:drop-shadow(0 10px 22px rgba(255,10,51,.55))"><defs><linearGradient id="pixoroGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF2E63"/><stop offset="50%" stop-color="#FF0A33"/><stop offset="100%" stop-color="#A855F7"/></linearGradient></defs><path fill="url(#pixoroGrad)" stroke="#ffffff" stroke-width="1.2" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+    heart.style.cssText = 'position:absolute !important;z-index:999 !important;pointer-events:none !important;left:50% !important;top:50% !important;width:110px !important;height:110px !important;opacity:0 !important;transform:translate(-50%,-50%) scale(0);background:transparent !important;display:block !important;';
+    heart.innerHTML = '<svg viewBox="0 0 24 24" style="width:100% !important;height:100% !important;display:block !important;filter:drop-shadow(0 10px 22px rgba(0,0,0,.5))"><path fill="#ffffff" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
     container.appendChild(heart);
-    // ✅ Instagram Dance - Tap Edathula Pop Aagi - Mela Poyi Marayum da - Keezha Pogaathu da
+    console.log("PIXORO HEART SHOW DA");
     try{
       let anim = heart.animate([
         { transform: 'translate(-50%,-50%) scale(0)', opacity: 0, offset: 0 },
-        { transform: 'translate(-50%,-50%) scale(1.25)', opacity: 1, offset: 0.18 },
-        { transform: 'translate(-50%,-50%) scale(0.92)', opacity: 1, offset: 0.30 },
-        { transform: 'translate(-50%,-50%) scale(1.05)', opacity: 1, offset: 0.42 },
-        { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: 0.55 },
-        { transform: 'translate(-52%,-85px) scale(1.02)', opacity: 1, offset: 0.70 },
-        { transform: 'translate(-48%,-130px) scale(0.98)', opacity: 0.85, offset: 0.85 },
-        { transform: 'translate(-50%,-170px) scale(0.85)', opacity: 0, offset: 1 }
-      ], { duration: 1000, easing: 'cubic-bezier(.2,.8,.3,1.2)', fill: 'forwards' });
+        { transform: 'translate(-50%,-50%) scale(1.3)', opacity: 1, offset: 0.25 },
+        { transform: 'translate(-50%,-50%) scale(0.9)', opacity: 1, offset: 0.40 },
+        { transform: 'translate(-50%,-50%) scale(1.05)', opacity: 1, offset: 0.55 },
+        { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: 0.70 },
+        { transform: 'translate(-50%,-50%) scale(1.1)', opacity: 0.9, offset: 0.85 },
+        { transform: 'translate(-50%,-50%) scale(1.15)', opacity: 0, offset: 1 }
+      ], { duration: 900, easing: 'ease-out', fill: 'forwards' });
       anim.onfinish = ()=>{ heart.remove(); };
     }catch(e){
-      setTimeout(()=>{ heart.remove(); }, 1000);
+      setTimeout(()=>{ heart.remove(); }, 900);
     }
-    setTimeout(()=>{ try{ heart.remove(); }catch(e){} }, 1200);
+    setTimeout(()=>{ try{ heart.remove(); }catch(e){} }, 1100);
   }
 
   async function pixoroServerSave(postId, willLike){
@@ -279,8 +270,15 @@
     return element.closest(".postMedia, .post-media, .post-media-wrap, .post-content, img, video");
   }
 
-  document.addEventListener("pointerup", (event) => {
-    if (event.button !== 0) return;
+  function handleDoubleTap(media, postId, post){
+    showBigHeart(media);
+    const btn = getLikeButton(postId, post);
+    if(btn) pixoroThudikku(btn);
+    toggleLike(postId, post, true);
+  }
+
+  // ✅ V37 MAIN - Instagram Method - touchstart la Double Tap da - pointerup Illa da
+  document.addEventListener("touchstart", (event) => {
     if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
     const media = findMedia(event.target);
     if (!media) return;
@@ -288,16 +286,23 @@
     const postId = getPostId(media);
     if (!post || !postId) return;
     const now = Date.now();
-    const previous = lastTap.get(media);
-    const currentTap = { time: now, x: event.clientX, y: event.clientY };
-    lastTap.set(media, currentTap);
-    if (previous && now - previous.time <= DOUBLE_TAP_DELAY && Math.hypot(event.clientX - previous.x, event.clientY - previous.y) < 45) {
+    const prev = lastTap.get(media);
+    lastTap.set(media, { time: now });
+    if (prev && now - prev.time <= DOUBLE_TAP_DELAY) {
       lastTap.delete(media);
-      showBigHeart(media, event.clientX, event.clientY);
-      const btn = getLikeButton(postId, post);
-      if(btn) pixoroThudikku(btn);
-      toggleLike(postId, post, true);
+      handleDoubleTap(media, postId, post);
     }
+  }, { passive: true });
+
+  // ✅ Laptop ku - dblclick da
+  document.addEventListener("dblclick", (event) => {
+    if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
+    const media = findMedia(event.target);
+    if (!media) return;
+    const post = getPostElement(media);
+    const postId = getPostId(media);
+    if (!post || !postId) return;
+    handleDoubleTap(media, postId, post);
   });
 
   document.addEventListener("click", (event) => {
@@ -351,5 +356,5 @@
     startWatchman();
   }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO Like V36 loaded successfully.");
+  console.log("PIXORO Like V37 loaded successfully.");
 })();
