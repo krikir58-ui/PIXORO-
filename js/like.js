@@ -1,7 +1,8 @@
 /* =====================================================
    PIXORO LIKE SYSTEM V39 + INSTAGRAM FLOATING HEARTS
-   Video Mariye - Thotta Edathula Gradient Heart Parakkum
-   Photo Thotta Like Varathu - Like Button Mattum Like
+   Single Tap = Gradient Heart Mattum - Like Illa
+   Double Click = Like Agum + Heart Varum
+   Like Button = Like Agum
 ===================================================== */
 
 (() => {
@@ -162,8 +163,7 @@
   }
 
   // =========================================
-  // ✅ CORRECT 1 - VIDEO MARI GRADIENT HEART DA
-  // Pazhaya Heart ah Delete Pannala da
+  // ✅ VIDEO MARI GRADIENT HEART DA
   // =========================================
 
   const HEART_GRADIENTS = [
@@ -178,7 +178,6 @@
 
   function showTapHeart(x, y) {
     if (!x || !y) return;
-    // ❌ Delete Line ah Remove Panniten da - Ippo Pazhaya Heart Maraikathu da
     const pair = HEART_GRADIENTS[colorIndex % HEART_GRADIENTS.length];
     colorIndex++;
     const gid = 'g' + Date.now() + Math.floor(Math.random()*9999);
@@ -309,18 +308,22 @@
   }
 
   // =========================================
-  // ✅ CORRECT 2 - DOUBLE TAP la Extra Heart Illa da
+  // ✅ CORRECT ONLY - DOUBLE TAP = LIKE AGUM DA
+  // Single Tap la Like Illa da - Itha Mattum Maathinen da
   // =========================================
 
-  function handleDoubleTap(media, postId, post) {
+  function handleDoubleTap(media, postId, post, x, y) {
     blockClickUntil = Date.now() + 700;
-    // ❌ Naduvula Extra Heart ah Remove Panniten da
-    // touchstart la Already OREY Heart Vanthuchu da - Pothum da
-    // Like Illa da - Mass Dance Illa da
+    buttonAnimation(post);
+    // ✅ Double Click Panna Like Agum da - Force Like da - Unlike Agathu da
+    toggleLike(postId, post, true);
+    // Mobile la touchstart la Already Heart Vanthuchu da - Inga Extra Heart Vendaam da
+    // Laptop la dblclick ku Mattum Heart Venam da
+    if (x && y) showTapHeart(x, y);
   }
 
   // =========================================
-  // MOBILE TOUCH
+  // MOBILE TOUCH - Single Tap = Heart Mattum, Like Illa
   // =========================================
 
   document.addEventListener("touchstart", event => {
@@ -333,17 +336,18 @@
     const now = Date.now();
     const previous = lastTap.get(media);
     lastTap.set(media, { time: now });
+    // ✅ 1 Touch ku 1 Gradient Heart da - Like Illa da
     const touch = event.touches && event.touches[0];
     if (touch) showTapHeart(touch.clientX, touch.clientY);
     if (previous && now - previous.time <= DOUBLE_TAP_DELAY) {
       lastTap.delete(media);
       lastTouchTime = now;
-      handleDoubleTap(media, postId, post);
+      handleDoubleTap(media, postId, post, 0, 0);
     }
   }, { passive: true });
 
   // =========================================
-  // LAPTOP DOUBLE CLICK
+  // LAPTOP DOUBLE CLICK - Double Click = Like Agum da
   // =========================================
 
   document.addEventListener("dblclick", event => {
@@ -355,11 +359,11 @@
     const postId = getPostId(media);
     if (!post || !postId) return;
     event.preventDefault();
-    handleDoubleTap(media, postId, post);
+    handleDoubleTap(media, postId, post, event.clientX, event.clientY);
   });
 
   // =========================================
-  // LAPTOP SINGLE CLICK
+  // LAPTOP SINGLE CLICK - Single Click = Heart Mattum, Like Illa
   // =========================================
 
   document.addEventListener("click", event => {
@@ -373,7 +377,7 @@
   }, true);
 
   // =========================================
-  // NORMAL LIKE BUTTON CLICK - Ithu Mattum Thaan Like Varum da ✅
+  // NORMAL LIKE BUTTON CLICK - Like Button Mattum Like da ✅
   // =========================================
 
   document.addEventListener("click", event => {
