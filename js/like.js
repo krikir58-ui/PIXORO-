@@ -1,12 +1,13 @@
 /* =====================================================
-   PIXORO LIKE SYSTEM V35 - JS DANCE FIX
-   CSS Block Pannalum Dance Aadum da - element.animate() da
+   PIXORO LIKE SYSTEM V36 - TAP POINT FIX
+   Enga Double Click Pannuromo Anga Thaan Heart Varum da - Mela Poyi Marayum da
 ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V35) return;
+  if (window.PIXORO_LIKE_V36) return;
+  window.PIXORO_LIKE_V36 = true;
   window.PIXORO_LIKE_V35 = true;
   window.PIXORO_LIKE_V34 = true;
   window.PIXORO_LIKE_V33 = true;
@@ -146,9 +147,9 @@
   }
 
   function addHeartStyles() {
-    if (document.getElementById("pixoro-like-v35-css")) return;
+    if (document.getElementById("pixoro-like-v36-css")) return;
     const style = document.createElement("style");
-    style.id = "pixoro-like-v35-css";
+    style.id = "pixoro-like-v36-css";
     style.textContent = `
       @keyframes pixThudikku{
         0%{ transform:scale(1); }
@@ -171,7 +172,7 @@
     document.head.appendChild(style);
   }
 
-  // ✅ V35 MAIN FIX - JS animate() da - CSS Block Pannalum Dance Aadum da
+  // ✅ V36 MAIN FIX - Instagram Mari - Tap Panna Edathula Ye Heart da - Mela Poyi Marayum da
   function showBigHeart(media, tapX, tapY) {
     if (!media) return;
     document.querySelectorAll('.pixoro-big-heart').forEach(h=>h.remove());
@@ -182,35 +183,37 @@
     if(cs.position === 'static') container.style.position = 'relative';
     container.style.overflow = 'hidden';
     let rect = container.getBoundingClientRect();
+    // ✅ Tap Panna Exact Edam da - Naduvula Illa da - X + Y Rendum Tap Edam da
     let cx = rect.width / 2;
-    if(typeof tapX === 'number' && tapX > 0){
+    let cy = rect.height / 2;
+    if(typeof tapX === 'number' && tapX > 0 && typeof tapY === 'number' && tapY > 0){
       cx = tapX - rect.left;
+      cy = tapY - rect.top;
       cx = Math.max(55, Math.min(rect.width - 55, cx));
+      cy = Math.max(55, Math.min(rect.height - 55, cy));
     }
-    let cy = rect.height * 0.55;
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
-    heart.style.cssText = 'position:absolute !important;z-index:99 !important;pointer-events:none !important;left:'+cx+'px !important;top:'+cy+'px !important;width:92px !important;height:92px !important;opacity:0 !important;transform:translate(-50%, 90px) scale(0);background:transparent !important;display:block !important;';
+    heart.style.cssText = 'position:absolute !important;z-index:99 !important;pointer-events:none !important;left:'+cx+'px !important;top:'+cy+'px !important;width:92px !important;height:92px !important;opacity:0 !important;transform:translate(-50%,-50%) scale(0);background:transparent !important;display:block !important;';
     heart.innerHTML = '<svg viewBox="0 0 24 24" style="width:100% !important;height:100% !important;display:block !important;filter:drop-shadow(0 10px 22px rgba(255,10,51,.55))"><defs><linearGradient id="pixoroGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF2E63"/><stop offset="50%" stop-color="#FF0A33"/><stop offset="100%" stop-color="#A855F7"/></linearGradient></defs><path fill="url(#pixoroGrad)" stroke="#ffffff" stroke-width="1.2" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
     container.appendChild(heart);
-    // ✅ JS Dance - Keezha Irundhu Mela Vanthu Aadi Thirumba Keezha Pogum da
+    // ✅ Instagram Dance - Tap Edathula Pop Aagi - Mela Poyi Marayum da - Keezha Pogaathu da
     try{
       let anim = heart.animate([
-        { transform: 'translate(-50%, 90px) scale(0)', opacity: 0, offset: 0 },
-        { transform: 'translate(-50%, 30px) scale(0.6)', opacity: 1, offset: 0.15 },
-        { transform: 'translate(-50%, -10px) scale(1.18)', opacity: 1, offset: 0.30 },
-        { transform: 'translate(-50%, 0px) scale(0.94)', opacity: 1, offset: 0.40 },
-        { transform: 'translate(-50%, -8px) scale(1.06)', opacity: 1, offset: 0.50 },
-        { transform: 'translate(-50%, 0px) scale(1)', opacity: 1, offset: 0.60 },
-        { transform: 'translate(-50%, 0px) scale(1)', opacity: 1, offset: 0.75 },
-        { transform: 'translate(-50%, 45px) scale(0.92)', opacity: 0.8, offset: 0.88 },
-        { transform: 'translate(-50%, 90px) scale(0.6)', opacity: 0, offset: 1 }
-      ], { duration: 1100, easing: 'cubic-bezier(.2,.8,.3,1.2)', fill: 'forwards' });
+        { transform: 'translate(-50%,-50%) scale(0)', opacity: 0, offset: 0 },
+        { transform: 'translate(-50%,-50%) scale(1.25)', opacity: 1, offset: 0.18 },
+        { transform: 'translate(-50%,-50%) scale(0.92)', opacity: 1, offset: 0.30 },
+        { transform: 'translate(-50%,-50%) scale(1.05)', opacity: 1, offset: 0.42 },
+        { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: 0.55 },
+        { transform: 'translate(-52%,-85px) scale(1.02)', opacity: 1, offset: 0.70 },
+        { transform: 'translate(-48%,-130px) scale(0.98)', opacity: 0.85, offset: 0.85 },
+        { transform: 'translate(-50%,-170px) scale(0.85)', opacity: 0, offset: 1 }
+      ], { duration: 1000, easing: 'cubic-bezier(.2,.8,.3,1.2)', fill: 'forwards' });
       anim.onfinish = ()=>{ heart.remove(); };
     }catch(e){
-      setTimeout(()=>{ heart.remove(); }, 1100);
+      setTimeout(()=>{ heart.remove(); }, 1000);
     }
-    setTimeout(()=>{ try{ heart.remove(); }catch(e){} }, 1300);
+    setTimeout(()=>{ try{ heart.remove(); }catch(e){} }, 1200);
   }
 
   async function pixoroServerSave(postId, willLike){
@@ -348,5 +351,5 @@
     startWatchman();
   }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO Like V35 loaded successfully.");
+  console.log("PIXORO Like V36 loaded successfully.");
 })();
