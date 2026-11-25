@@ -1,6 +1,6 @@
 /* =====================================================
-   PIXORO LIKE SYSTEM V39 + FLOATING HEARTS
-   Double Tap Like + Tap Floating Hearts
+   PIXORO LIKE SYSTEM V39 + INSTAGRAM FLOATING HEARTS
+   Instagram Double Tap Like + Tap Floating Hearts
    Mobile + Desktop + Supabase
    Single Like System
 ===================================================== */
@@ -238,16 +238,23 @@
   }
 
   // =========================================
-  // ✅ ADD ONLY - INSTAGRAM TAP FLOATING HEART
+  // ✅ CORRECT ONLY - OREY CHINNA COLOUR HEART DA
   // =========================================
 
   const HEART_COLORS = ['#FF0A33','#FF5EA8','#FF8A00','#FFD600','#FF3DF0','#A259FF','#00D2FF','#FF2E63','#FF6B6B','#00FF88'];
+  let colorIndex = 0; // ✅ ADD ONLY - Colour Colour ah Maarum da
 
   function showTapHeart(x, y) {
     if (!x || !y) return;
-    const c = HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)];
-    const size = 34 + Math.random() * 22;
-    const drift = (Math.random() * 70 - 35);
+
+    // ✅ CORRECT ONLY - Pazhaya Heart Irundha Delete Pannidu da - OREY Heart Thaan Varum da
+    document.querySelectorAll('.pixoro-tap-heart, .pixoro-big-heart').forEach(h => h.remove());
+
+    // ✅ CORRECT ONLY - Colour Colour ah Maarum da
+    const c = HEART_COLORS[colorIndex % HEART_COLORS.length];
+    colorIndex++;
+
+    const size = 42; // ✅ CORRECT ONLY - Chinna Heart da - 42px Mattum da
     const heart = document.createElement("div");
     heart.className = "pixoro-tap-heart";
     heart.style.cssText = `
@@ -259,27 +266,25 @@
       width:${size}px;
       height:${size}px;
       opacity:1;
-      transform:translate(-50%,-50%) scale(0) rotate(${(Math.random()*30-15)}deg);
+      transform:translate(-50%,-50%) scale(0);
     `;
     heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))"><path fill="${c}" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
     document.body.appendChild(heart);
     try {
       const a = heart.animate([
-        { transform:'translate(-50%,-50%) scale(0) rotate(-15deg)', opacity:1, offset:0 },
-        { transform:'translate(-50%,-50%) scale(1.35) rotate(12deg)', opacity:1, offset:.25 },
-        { transform:'translate(calc(-50% + '+(drift*0.4)+'px), -80px) scale(1.15) rotate(-12deg)', opacity:1, offset:.45 },
-        { transform:'translate(calc(-50% + '+drift+'px), -160px) scale(1) rotate(10deg)', opacity:.95, offset:.7 },
-        { transform:'translate(calc(-50% + '+(drift*1.3)+'px), -240px) scale(1.1) rotate(-8deg)', opacity:.6, offset:.88 },
-        { transform:'translate(calc(-50% + '+(drift*1.4)+'px), -270px) scale(.9) rotate(0deg)', opacity:0, offset:1 }
-      ], { duration: 1150, easing: 'ease-out' });
+        { transform:'translate(-50%,-50%) scale(0) rotate(0deg)', opacity:1, offset:0 },
+        { transform:'translate(-50%,-50%) scale(1.25) rotate(10deg)', opacity:1, offset:.3 },
+        { transform:'translate(-50%,-50%) scale(1) rotate(-8deg)', opacity:1, offset:.6 },
+        { transform:'translate(-50%,-40%) scale(1.1) rotate(5deg)', opacity:1, offset:.8 },
+        { transform:'translate(-50%,-50%) scale(1) rotate(0deg)', opacity:0, offset:1 }
+      ], { duration: 900, easing: 'ease-out' });
       a.onfinish = () => heart.remove();
-    } catch(e) { setTimeout(()=>heart.remove(), 1150); }
-    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1300);
+    } catch(e) { setTimeout(()=>heart.remove(), 900); }
+    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1000);
   }
 
   // =========================================
-  // ✅ ADD ONLY - MASS DANCE - WHITE HEART AH VIDA COLOUR HEARTS DA
-  // Pazhaya showBigHeart ah Koopdala da - Itha Kooda Add Panniten da
+  // PAZHAYA MASS DANCE CODE SAME DA - USE PANNALA DA
   // =========================================
 
   function showMassDance(media) {
@@ -288,8 +293,6 @@
     if (!rect.width || !rect.height) return;
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
-
-    // Naduvula Periya COLOUR Heart Dance da - White Illa da
     const mainColor = HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)];
     const main = document.createElement("div");
     main.className = "pixoro-big-heart";
@@ -308,8 +311,6 @@
       a.onfinish = () => main.remove();
     } catch(e) { setTimeout(()=>main.remove(), 1100); }
     setTimeout(()=>{ try{main.remove()}catch(e){} }, 1300);
-
-    // Suththi 10 Colour Hearts Mass ah Dance Aadi Parakkum da
     for (let i = 0; i < 10; i++) {
       const c = HEART_COLORS[i % HEART_COLORS.length];
       const angle = (i / 10) * Math.PI * 2 + Math.random() * 0.5;
@@ -496,20 +497,20 @@
   }
 
   // =========================================
-  // DOUBLE TAP
+  // ✅ CORRECT ONLY - DOUBLE TAP - Photo Thotta Like Varathu da
   // =========================================
 
   function handleDoubleTap(media, postId, post) {
     blockClickUntil = Date.now() + 700;
 
-    // ✅ ADD ONLY - White Heart ku Pathila Mass Dance Colour Hearts da
-    showMassDance(media);
-    // showBigHeart(media); // Pazhaya White Heart - Ippo Use Pannala da
-
-    buttonAnimation(post);
-
-    // Force Like only. Never Unlike on double tap.
-    toggleLike(postId, post, true);
+    // ✅ CORRECT - OREY Chinna Colour Heart Mattum da - Mass Dance Illa da, Like Illa da
+    if (media) {
+      const r = media.getBoundingClientRect();
+      showTapHeart(r.left + r.width / 2, r.top + r.height / 2);
+    }
+    // showMassDance(media); // ❌ Nariya Heart Varathu - Ippo Koopdala da
+    // toggleLike(postId, post, true); // ❌ Photo Thotta Like Varathu - Ippo Remove da
+    // buttonAnimation(post); // Pazhaya Code Same - Theva Illa da
   }
 
   // =========================================
@@ -593,7 +594,7 @@
   }, true);
 
   // =========================================
-  // NORMAL LIKE BUTTON CLICK
+  // NORMAL LIKE BUTTON CLICK - Ithu Mattum Thaan Like Varum da ✅
   // =========================================
 
   document.addEventListener("click", event => {
@@ -774,7 +775,7 @@
   window.pixoroPaintAllLikes = paintAll;
   window.showBigHeart = showBigHeart;
   window.pixoroTapHeart = showTapHeart;
-  window.pixoroMassDance = showMassDance; // ✅ ADD ONLY
+  window.pixoroMassDance = showMassDance;
 
   // =========================================
   // START
