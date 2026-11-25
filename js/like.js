@@ -1,8 +1,8 @@
 /* =====================================================
    PIXORO LIKE SYSTEM V39
    Single Tap Photo = Onnum Illa
-   Double Tap = Naduvula Periya Heart + Like
-   Like Button = Heart Mattum Thudikkum + Like
+   Double Tap = Naduvula Chinna Heart + Like
+   Like Button = Killa Irundhu Heart + Heart Thudikkum
 ===================================================== */
 
 (() => {
@@ -126,9 +126,8 @@
   }
 
   // =========================================
-  // ✅ CORRECT MATTUM - DANCE HEART DA
-  // OREY Heart - Dance Adum - Pathi Maraithu Pogum
-  // White Pathulla Colour Colour da
+  // ✅ CORRECT 1 - NADUVULA HEART CHINNA SIZE DA
+  // 130 -> 85 da - Dance Adum - Pathi Maraithu Pogum - Thirumba Varathu da
   // =========================================
 
   function showBigHeart(media) {
@@ -145,8 +144,8 @@
       pointer-events:none;
       left:${rect.left + rect.width / 2}px;
       top:${rect.top + rect.height / 2}px;
-      width:130px;
-      height:130px;
+      width:85px;
+      height:85px;
       opacity:0;
       transform:translate(-50%,-50%) scale(0) rotate(0deg);
     `;
@@ -188,8 +187,53 @@
   function showMassDance(media) { return; }
 
   // =========================================
-  // ✅ BUTTON ANIMATION - Heart Mattum Thudikkum da
-  // Number / Button Full ah Thudikkathu da
+  // ✅ CORRECT 2 - KILLA IRUNDHU HEART PARAKKUM DA
+  // =========================================
+
+  function showButtonHeart(button) {
+    if (!button) return;
+    const r = button.getBoundingClientRect();
+    const gid = 'pixoroBtn' + Date.now();
+    const heart = document.createElement("div");
+    heart.className = "pixoro-big-heart";
+    heart.style.cssText = `
+      position:fixed;
+      z-index:999999;
+      pointer-events:none;
+      left:${r.left + r.width / 2}px;
+      top:${r.top}px;
+      width:42px;
+      height:42px;
+      opacity:0;
+      transform:translate(-50%,-50%) scale(0);
+    `;
+    heart.innerHTML = `
+      <svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))">
+        <defs>
+          <linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FF0A33"/>
+            <stop offset="50%" stop-color="#FF3DF0"/>
+            <stop offset="100%" stop-color="#FF8A00"/>
+          </linearGradient>
+        </defs>
+        <path fill="url(#${gid})" stroke="#fff" stroke-width="1.2"
+          d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>
+      </svg>
+    `;
+    document.body.appendChild(heart);
+    const a = heart.animate([
+      { transform: "translate(-50%,-50%) scale(0)", opacity: 0, offset: 0 },
+      { transform: "translate(-50%,-50%) scale(1.2)", opacity: 1, offset: 0.25 },
+      { transform: "translate(-50%,-90%) scale(1)", opacity: 1, offset: 0.6 },
+      { transform: "translate(-50%,-180%) scale(0.9)", opacity: 0, offset: 1 }
+    ], { duration: 700, easing: "ease-out", fill: "forwards" });
+    a.onfinish = () => heart.remove();
+    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 800);
+  }
+
+  // =========================================
+  // ✅ CORRECT 3 - KILLA HEART THUDIKKUM POTHU MARAIKATHU DA
+  // Opacity Full 1 Thaan da - Scale Mattum da
   // =========================================
 
   function buttonAnimation(post) {
@@ -197,11 +241,14 @@
     if (!button) return;
     const icon = button.querySelector("svg, i");
     if (!icon) return;
+    icon.style.opacity = "1";
     icon.classList.remove("pixoro-thudikku");
     void icon.offsetWidth;
     icon.classList.add("pixoro-thudikku");
     setTimeout(() => {
       icon.classList.remove("pixoro-thudikku");
+      icon.style.opacity = "1";
+      icon.style.transform = "scale(1)";
     }, 350);
   }
 
@@ -281,7 +328,7 @@
   }
 
   // =========================================
-  // ✅ DOUBLE TAP MATTUM LIKE + PERIYA HEART
+  // ✅ DOUBLE TAP MATTUM LIKE + CHINNA HEART
   // =========================================
 
   function handleDoubleTap(media, postId, post) {
@@ -339,7 +386,7 @@
   }, true);
 
   // =========================================
-  // NORMAL LIKE BUTTON CLICK
+  // NORMAL LIKE BUTTON CLICK - Killa Heart Parakkum da
   // =========================================
 
   document.addEventListener("click", event => {
@@ -359,7 +406,8 @@
     const post = getPost(button);
     const postId = getPostId(button);
     if (!post || !postId) return;
-    // ✅ Like Button la Floating Heart Illa da - Heart Icon Mattum Thudikkum da
+    // ✅ Killa Button la Irundhu Heart Mela Parakkum da
+    showButtonHeart(button);
     buttonAnimation(post);
     toggleLike(postId, post, false);
   }, true);
@@ -415,8 +463,7 @@
   }
 
   // =========================================
-  // CSS - ✅ CORRECT MATTUM ADD PANNITEN DA
-  // Pazhaya CSS Same da + 3 Line Add da
+  // CSS - Heart Thudikkum Pothu Opacity Maraikathu da
   // =========================================
 
   function addStyles() {
@@ -424,14 +471,14 @@
     const style = document.createElement("style");
     style.id = "pixoro-v39-css";
     style.textContent = `
-      .pixoro-thudikku { animation: pixoroButtonPop .35s ease; display:inline-block; transform-box: fill-box; transform-origin: center; }
+      .pixoro-thudikku { animation: pixoroButtonPop .35s ease; display:inline-block; transform-box: fill-box; transform-origin: center; opacity:1 !important; }
       @keyframes pixoroButtonPop {
-        0% { transform:scale(1); }
-        40% { transform:scale(1.3); }
-        100% { transform:scale(1); }
+        0% { transform:scale(1); opacity:1; }
+        40% { transform:scale(1.3); opacity:1; }
+        100% { transform:scale(1); opacity:1; }
       }
       .like-btn, .like-button { transform:none !important; animation:none !important; }
-      .like-btn svg, .like-button svg { transform-origin: center !important; flex-shrink: 0 !important; }
+      .like-btn svg, .like-button svg { transform-origin: center !important; flex-shrink: 0 !important; opacity:1 !important; }
       .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked { color:#FF3040 !important; }
       .like-btn.liked svg, .like-button.liked svg { fill:#FF3040 !important; }
       .pixoro-big-heart { pointer-events:none !important; }
