@@ -1,7 +1,6 @@
-
 /* =====================================================
-   PIXORO LIKE SYSTEM V39
-   Instagram Double Tap Like
+   PIXORO LIKE SYSTEM V39 + INSTAGRAM FLOATING HEARTS
+   Instagram Double Tap Like + Tap Floating Hearts
    Mobile + Desktop + Supabase
    Single Like System
 ===================================================== */
@@ -239,6 +238,45 @@
   }
 
   // =========================================
+  // ✅ NEW ONLY - INSTAGRAM TAP FLOATING HEART - VIDEO LA IRUKKURATHU DA
+  // Thotta Edathula Heart Vanthu Mela Paranthu Pogum da
+  // =========================================
+
+  const HEART_COLORS = ['#FF0A33','#FF5EA8','#FF8A00','#FFD600','#FF3DF0','#A259FF','#00D2FF','#FF2E63'];
+
+  function showTapHeart(x, y) {
+    if (!x || !y) return;
+    const c = HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)];
+    const size = 34 + Math.random() * 22;
+    const drift = (Math.random() * 70 - 35);
+    const heart = document.createElement("div");
+    heart.className = "pixoro-tap-heart";
+    heart.style.cssText = `
+      position:fixed;
+      z-index:999999;
+      pointer-events:none;
+      left:${x}px;
+      top:${y}px;
+      width:${size}px;
+      height:${size}px;
+      opacity:1;
+      transform:translate(-50%,-50%) scale(0) rotate(${(Math.random()*30-15)}deg);
+    `;
+    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))"><path fill="${c}" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+    document.body.appendChild(heart);
+    try {
+      const a = heart.animate([
+        { transform:'translate(-50%,-50%) scale(0) rotate(0deg)', opacity:1, offset:0 },
+        { transform:'translate(calc(-50% + '+(drift*0.3)+'px), -70%) scale(1.15) rotate(8deg)', opacity:1, offset:.3 },
+        { transform:'translate(calc(-50% + '+drift+'px), -160px) scale(1) rotate(-8deg)', opacity:.9, offset:.7 },
+        { transform:'translate(calc(-50% + '+(drift*1.4)+'px), -230px) scale(.9) rotate(0deg)', opacity:0, offset:1 }
+      ], { duration: 950, easing: 'ease-out' });
+      a.onfinish = () => heart.remove();
+    } catch(e) { setTimeout(()=>heart.remove(), 950); }
+    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1100);
+  }
+
+  // =========================================
   // BUTTON ANIMATION
   // =========================================
 
@@ -431,6 +469,10 @@
 
     lastTap.set(media, { time: now });
 
+    // ✅ NEW ONLY - Thotta Edathula Heart Parakkum da
+    const touch = event.touches && event.touches[0];
+    if (touch) showTapHeart(touch.clientX, touch.clientY);
+
     if (
       previous &&
       now - previous.time <= DOUBLE_TAP_DELAY
@@ -471,6 +513,20 @@
   });
 
   // =========================================
+  // LAPTOP SINGLE CLICK - ✅ NEW ONLY - Thotta Edathula Heart da
+  // =========================================
+
+  document.addEventListener("click", event => {
+    const btnCheck = event.target.closest("[data-like-btn], .like-btn, .like-button, [data-action='like']");
+    if (!btnCheck && Date.now() >= blockClickUntil) {
+      const mediaOnly = findMedia(event.target);
+      if (mediaOnly && !event.target.closest("button, a, input, textarea, select")) {
+        showTapHeart(event.clientX, event.clientY);
+      }
+    }
+  }, true);
+
+  // =========================================
   // NORMAL LIKE BUTTON CLICK
   // =========================================
 
@@ -501,6 +557,10 @@
     const postId = getPostId(button);
 
     if (!post || !postId) return;
+
+    // ✅ NEW ONLY - Like Button Mela Irundhu Heart Parakkum da
+    const r = button.getBoundingClientRect();
+    showTapHeart(r.left + r.width / 2, r.top - 10);
 
     buttonAnimation(post);
 
@@ -647,6 +707,7 @@
   window.pixoroToggleLike = toggleLike;
   window.pixoroPaintAllLikes = paintAll;
   window.showBigHeart = showBigHeart;
+  window.pixoroTapHeart = showTapHeart; // ✅ NEW ONLY
 
   // =========================================
   // START
