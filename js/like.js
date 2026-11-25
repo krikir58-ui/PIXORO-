@@ -1,21 +1,18 @@
 /* =====================================================
-   PIXORO LIKE SYSTEM V30 - REFRESH FIX + THUDIKKU FIX
-   Refresh Panna Red Pogaathu da - Thudikku Pothu Heart Maraayaathu da
+   PIXORO LIKE SYSTEM V33 - FINAL FIX
+   V30 + Watchman + Button Capture Fix da
+   Double Click Mari Button Click um Red Varum da
 ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V30) return;
+  if (window.PIXORO_LIKE_V33) return;
+  window.PIXORO_LIKE_V33 = true;
   window.PIXORO_LIKE_V30 = true;
-  window.PIXORO_LIKE_V22 = true;
-  window.PIXORO_LIKE_V23 = true;
-  window.PIXORO_LIKE_V24 = true;
-  window.PIXORO_LIKE_V25 = true;
-  window.PIXORO_LIKE_V26 = true;
-  window.PIXORO_LIKE_V27 = true;
-  window.PIXORO_LIKE_V28 = true;
   window.PIXORO_LIKE_V29 = true;
+  window.PIXORO_LIKE_V28 = true;
+  window.PIXORO_LIKE_V27 = true;
 
   const supa = window.supa || window.supabaseClient;
   const TABLE = "likes";
@@ -23,6 +20,7 @@
 
   const lastTap = new WeakMap();
   const serverQueue = new Set();
+  const lastToggleAt = new Map();
 
   try{
     let local = JSON.parse(localStorage.getItem('pixoro_likes') || '[]');
@@ -85,23 +83,31 @@
     );
   }
 
+  // ✅ V33 FIX - Paint Full Force da - i, svg, path Ellam Red da
   function paintLike(postId, liked, post) {
     const button = getLikeButton(postId, post);
     if (!button) return;
     button.classList.toggle("liked", liked);
     button.classList.toggle("is-liked", liked);
     button.setAttribute("aria-pressed", String(liked));
+    button.setAttribute("data-liked", liked ? "1" : "0");
     button.style.opacity = "1";
-    button.style.color = liked ? "#FF0A33" : "";
-    const icon = button.querySelector("i, svg, span") || button;
-    if (icon.tagName === "I") {
-      icon.classList.toggle("active", liked);
-      icon.style.opacity = "1";
-    }
-    const svg = button.querySelector("svg");
-    const path = button.querySelector("path");
-    if(svg){ svg.style.opacity = "1"; svg.style.setProperty('fill', liked ? '#FF0A33' : 'none', 'important'); }
-    if(path){ path.style.setProperty('fill', liked ? '#FF0A33' : 'none', 'important'); path.style.setProperty('stroke', liked ? '#FF0A33' : '#fff', 'important'); }
+    button.style.setProperty('color', liked ? '#FF0A33' : '#ffffff', 'important');
+    button.querySelectorAll("i, svg, path, span").forEach((el)=>{
+      el.style.setProperty('opacity', '1', 'important');
+      if(el.tagName === "I"){
+        el.classList.toggle("active", liked);
+        el.style.setProperty('color', liked ? '#FF0A33' : '#ffffff', 'important');
+      }
+      if(el.tagName === "SVG"){
+        el.style.setProperty('fill', liked ? '#FF0A33' : 'none', 'important');
+        el.style.setProperty('color', liked ? '#FF0A33' : '#ffffff', 'important');
+      }
+      if(el.tagName === "PATH"){
+        el.style.setProperty('fill', liked ? '#FF0A33' : 'none', 'important');
+        el.style.setProperty('stroke', liked ? '#FF0A33' : '#ffffff', 'important');
+      }
+    });
   }
 
   function paintCount(postId, count, post) {
@@ -109,6 +115,26 @@
     if (countElement) {
       countElement.textContent = Number(count) || 0;
     }
+  }
+
+  function pixoroPaintAll(){
+    document.querySelectorAll("[data-post-id], .post, .post-card, article, .post-item").forEach((post) => {
+      const postId = post.dataset.postId || post.dataset.id;
+      if (!postId) return;
+      let liked = window.FEED_LIKES.has(String(postId));
+      paintLike(postId, liked, post);
+      if(liked){
+        let saved = window.FEED_COUNTS[String(postId)];
+        if(saved === undefined || Number(saved) < 1){
+          window.FEED_COUNTS[String(postId)] = 1;
+          pixoroSaveLocal();
+          saved = 1;
+        }
+        paintCount(postId, saved, post);
+      } else if(window.FEED_COUNTS[String(postId)] !== undefined){
+        paintCount(postId, window.FEED_COUNTS[String(postId)], post);
+      }
+    });
   }
 
   function pixoroThudikku(btn){
@@ -120,9 +146,9 @@
   }
 
   function addHeartStyles() {
-    if (document.getElementById("pixoro-like-v30-css")) return;
+    if (document.getElementById("pixoro-like-v33-css")) return;
     const style = document.createElement("style");
-    style.id = "pixoro-like-v30-css";
+    style.id = "pixoro-like-v33-css";
     style.textContent = `
       @keyframes pixThudikku{
         0%{ transform:scale(1); }
@@ -130,11 +156,12 @@
         70%{ transform:scale(0.95); }
         100%{ transform:scale(1); }
       }
-      /* ✅ V30 FIX - Thudikku Pothu Heart Maraayaathu da */
       [data-like-btn], .like-btn, .like-button { overflow: visible !important; }
       [data-like-btn] svg, .like-btn svg, .like-button svg, [data-like-btn] i, .like-btn i { overflow: visible !important; transform-origin: center center !important; }
       [data-like-btn].thudikku, .like-btn.thudikku, .like-button.thudikku { animation:pixThudikku 0.8s ease-in-out 1 !important; transform-origin:center center !important; overflow:visible !important; }
-      .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked { color: #FF0A33 !important; opacity:1 !important; }
+      .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked,
+      .like-btn.liked i, .like-button.liked i, .like-btn.liked svg, .like-button.liked svg,
+      .like-btn.liked path, .like-button.liked path { color: #FF0A33 !important; fill: #FF0A33 !important; stroke: #FF0A33 !important; opacity:1 !important; }
       [data-like-btn], .like-btn, .like-button { opacity:1 !important; }
       .postMedia, .post-media, .post-media-wrap, .post-content, .post, .post-card { position:relative !important; }
     `;
@@ -190,17 +217,12 @@
     serverQueue.add(key);
     try{
       const userId = await getUserId();
-      if(!userId){
-        console.log('PIXORO LIKE - LOGIN ILLA DA - SERVER KU POGALA DA');
-        return;
-      }
+      if(!userId) return;
       if(willLike){
         let r = await supa.from(TABLE).insert({ post_id: postId, user_id: userId });
         if(r.error){
           console.log('PIXORO LIKE SERVER ERROR DA:', r.error.message, r.error.code);
           if(String(r.error.code) !== '23505') throw r.error;
-        } else {
-          console.log('PIXORO LIKE SERVER SAVE OK DA:', postId);
         }
       } else {
         let r = await supa.from(TABLE).delete().eq("post_id", postId).eq("user_id", userId);
@@ -215,10 +237,20 @@
 
   function toggleLike(postId, post, forceLike = false) {
     if (!postId) return false;
+    // ✅ 300ms Lock - 1,0 nu Maraathu da
+    let nowMs = Date.now();
+    let lastMs = lastToggleAt.get(String(postId)) || 0;
+    if(!forceLike && nowMs - lastMs < 300) return window.FEED_LIKES.has(String(postId));
+    lastToggleAt.set(String(postId), nowMs);
     let isLiked = window.FEED_LIKES.has(String(postId));
     let willLike = forceLike ? true : !isLiked;
     if(forceLike && isLiked){
       paintLike(postId, true, post);
+      if(window.FEED_COUNTS[String(postId)] === undefined || Number(window.FEED_COUNTS[String(postId)]) < 1){
+        window.FEED_COUNTS[String(postId)] = 1;
+        pixoroSaveLocal();
+      }
+      paintCount(postId, window.FEED_COUNTS[String(postId)], post);
       return true;
     }
     paintLike(postId, willLike, post);
@@ -264,64 +296,58 @@
     }
   });
 
+  // ✅ V33 MAIN FIX - Capture Phase da - Feed Handler ku Munnadi Namma Handler da
   document.addEventListener("click", (event) => {
     const button = event.target.closest("[data-like-btn], .like-btn, .like-button, [data-action='like']");
     if (!button) return;
     event.preventDefault();
     event.stopPropagation();
+    event.stopImmediatePropagation();
     const post = getPostElement(button);
     const postId = button.dataset.likeBtn || button.dataset.postId || post?.dataset.postId || post?.dataset.id;
     if (!postId) return;
     pixoroThudikku(button);
     toggleLike(postId, post, false);
-  });
+  }, true); // ✅ true = Capture da
 
   async function loadMyLikes() {
     const userId = await getUserId();
-    // ✅ Muthalla Local ah Kaatu da - Refresh Panna Kooda Red Pogaathu da
-    document.querySelectorAll("[data-post-id], .post, .post-card, article, .post-item").forEach((post) => {
-      const postId = post.dataset.postId || post.dataset.id;
-      if (!postId) return;
-      paintLike(postId, window.FEED_LIKES.has(String(postId)), post);
-      if(window.FEED_COUNTS[String(postId)] !== undefined) paintCount(postId, window.FEED_COUNTS[String(postId)], post);
-    });
+    pixoroPaintAll();
     if (!userId) return;
     try{
       const { data, error } = await supa.from(TABLE).select("post_id").eq("user_id", userId);
-      if (error){
-        console.log('PIXORO LOAD LIKES ERROR DA - LOCAL AH VECHUKREN DA:', error.message);
-        return;
-      }
-      // ✅ V30 MAIN FIX - FEED_LIKES.clear() Delete Panniten da - Athaan Refresh Panna Red Poguthu da
-      // Server + Local MERGE da - Local ah Azhikka Koodathu da
+      if (error) return;
       (data || []).forEach(item => window.FEED_LIKES.add(String(item.post_id)));
       pixoroSaveLocal();
-      document.querySelectorAll("[data-post-id], .post, .post-card, article, .post-item").forEach((post) => {
-        const postId = post.dataset.postId || post.dataset.id;
-        if (!postId) return;
-        paintLike(postId, window.FEED_LIKES.has(String(postId)), post);
-        if(window.FEED_COUNTS[String(postId)] !== undefined) paintCount(postId, window.FEED_COUNTS[String(postId)], post);
-      });
+      pixoroPaintAll();
     }catch(e){}
+  }
+
+  // ✅ V33 WATCHMAN - Feed Re-Render Pannalum Like ah Kaapathu da
+  function startWatchman(){
+    if(window.PIXORO_WATCHMAN_ON) return;
+    window.PIXORO_WATCHMAN_ON = true;
+    let timer = null;
+    let obs = new MutationObserver(()=>{
+      if(timer) clearTimeout(timer);
+      timer = setTimeout(()=> pixoroPaintAll(), 100);
+    });
+    obs.observe(document.body, { childList: true, subtree: true, characterData: true });
+    setInterval(()=> pixoroPaintAll(), 1000);
   }
 
   window.pixoroToggleLike = toggleLike;
   window.pixoroFeedTap = function (postId, element, ev) { return false; };
   window.showBigHeart = showBigHeart;
-  window.pixoroPaintAllLikes = function(){
-    document.querySelectorAll("[data-post-id], .post, .post-card, article, .post-item").forEach((post) => {
-      const postId = post.dataset.postId || post.dataset.id;
-      if (!postId) return;
-      paintLike(postId, window.FEED_LIKES.has(String(postId)), post);
-    });
-  };
+  window.pixoroPaintAllLikes = pixoroPaintAll;
 
   addHeartStyles();
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", loadMyLikes);
+    document.addEventListener("DOMContentLoaded", ()=>{ loadMyLikes(); startWatchman(); });
   } else {
     loadMyLikes();
+    startWatchman();
   }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO Like V30 loaded successfully.");
+  console.log("PIXORO Like V33 loaded successfully.");
 })();
