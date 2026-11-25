@@ -1,8 +1,7 @@
 /* =====================================================
-   PIXORO LIKE SYSTEM V39
-   Single Tap Photo = Onnum Illa
-   Double Tap = Touch Panna Edathula Irundhu Heart Killa Poi Maraiyum
-   Like Button = Killa Irundhu Heart + Heart Thudikkum
+   PIXORO LIKE SYSTEM V39 - FINAL
+   Double Tap = Touch Panna Edathula Irundhu Heart Thudikku + Killa Poi Maraiyum
+   Like Button = Box Illa - Heart Mattum Thudikkum
 ===================================================== */
 
 (() => {
@@ -15,7 +14,7 @@
   const TABLE = "likes";
 
   const DOUBLE_TAP_DELAY = 320;
-  const HEART_DURATION = 1000;
+  const HEART_DURATION = 1100;
 
   const lastTap = new WeakMap();
   const lastToggleAt = new Map();
@@ -94,7 +93,7 @@
   }
 
   // =========================================
-  // LIKE UI - Number Perusa Agathu da
+  // LIKE UI - Number Perusa Agathu da - Box Illa da
   // =========================================
 
   function paintLike(post, liked) {
@@ -105,6 +104,10 @@
     button.setAttribute("aria-pressed", String(liked));
     button.dataset.liked = liked ? "true" : "false";
     button.style.setProperty("color", liked ? "#FF3040" : "", "important");
+    button.style.setProperty("background", "transparent", "important");
+    button.style.setProperty("border", "none", "important");
+    button.style.setProperty("box-shadow", "none", "important");
+    button.style.setProperty("outline", "none", "important");
     button.querySelectorAll("svg, i, path").forEach(el => {
       if (el.tagName === "SVG" || el.tagName === "PATH") {
         el.style.setProperty("fill", liked ? "#FF3040" : "none", "important");
@@ -126,8 +129,8 @@
   }
 
   // =========================================
-  // ✅ CORRECT - TOUCH PANNA EDATHULA IRUNDHU HEART
-  // Dance Illa da - Mella Killa Poi Maraithu Pogum da - Size 62 da
+  // ✅ CORRECT 1 - TOUCH PANNA EDATHULA IRUNDHU HEART
+  // Thudikku + Mella Killa Poi Maraiyum da - Size 62 da
   // =========================================
 
   function showBigHeart(media, touchX, touchY) {
@@ -135,8 +138,8 @@
     const rect = media.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
     document.querySelectorAll('.pixoro-big-heart, .pixoro-tap-heart').forEach(h => h.remove());
-    const startX = (typeof touchX === 'number' ? touchX : rect.left + rect.width / 2);
-    const startY = (typeof touchY === 'number' ? touchY : rect.top + rect.height / 2);
+    const startX = (typeof touchX === 'number' && touchX > 0 ? touchX : rect.left + rect.width / 2);
+    const startY = (typeof touchY === 'number' && touchY > 0 ? touchY : rect.top + rect.height / 2);
     const gid = 'pixoroGrad' + Date.now();
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
@@ -150,9 +153,12 @@
       height:62px;
       opacity:0;
       transform:translate(-50%,-50%) scale(0);
+      background:transparent !important;
+      border:none !important;
+      box-shadow:none !important;
     `;
     heart.innerHTML = `
-      <svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45))">
+      <svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45))">
         <defs>
           <linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#FF0A33"/>
@@ -173,13 +179,15 @@
     document.body.appendChild(heart);
     const animation = heart.animate([
       { transform: "translate(-50%,-50%) scale(0)", opacity: 0, offset: 0 },
-      { transform: "translate(-50%,-50%) scale(1.2)", opacity: 1, offset: 0.25 },
-      { transform: "translate(-50%,-30%) scale(1.05)", opacity: 1, offset: 0.5 },
-      { transform: "translate(-50%,20%) scale(1)", opacity: 0.5, offset: 0.8 },
-      { transform: "translate(-50%,70%) scale(0.9)", opacity: 0, offset: 1 }
+      { transform: "translate(-50%,-50%) scale(1.35)", opacity: 1, offset: 0.18 },
+      { transform: "translate(-50%,-50%) scale(1.0)", opacity: 1, offset: 0.30 },
+      { transform: "translate(-50%,-20%) scale(1.25)", opacity: 1, offset: 0.45 },
+      { transform: "translate(-50%,10%) scale(1.05)", opacity: 1, offset: 0.60 },
+      { transform: "translate(-50%,50%) scale(1.15)", opacity: 0.6, offset: 0.80 },
+      { transform: "translate(-50%,85%) scale(0.9)", opacity: 0, offset: 1 }
     ], { duration: HEART_DURATION, easing: "ease-out", fill: "forwards" });
     animation.onfinish = () => heart.remove();
-    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1100);
+    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1200);
   }
 
   // ✅ Display Touch Heart Full ah Remove da
@@ -206,9 +214,11 @@
       height:42px;
       opacity:0;
       transform:translate(-50%,-50%) scale(0);
+      background:transparent !important;
+      border:none !important;
     `;
     heart.innerHTML = `
-      <svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))">
+      <svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))">
         <defs>
           <linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#FF0A33"/>
@@ -232,8 +242,7 @@
   }
 
   // =========================================
-  // ✅ CORRECT 3 - KILLA HEART THUDIKKUM POTHU MARAIKATHU DA
-  // Opacity Full 1 Thaan da - Scale Mattum da
+  // ✅ CORRECT 3 - KILLA HEART - Box Illa - Thudikkum Pothu Maraikathu da
   // =========================================
 
   function buttonAnimation(post) {
@@ -242,6 +251,9 @@
     const icon = button.querySelector("svg, i");
     if (!icon) return;
     icon.style.opacity = "1";
+    icon.style.background = "transparent";
+    icon.style.border = "none";
+    icon.style.boxShadow = "none";
     icon.classList.remove("pixoro-thudikku");
     void icon.offsetWidth;
     icon.classList.add("pixoro-thudikku");
@@ -249,7 +261,7 @@
       icon.classList.remove("pixoro-thudikku");
       icon.style.opacity = "1";
       icon.style.transform = "scale(1)";
-    }, 350);
+    }, 380);
   }
 
   // =========================================
@@ -354,7 +366,6 @@
     const touchX = event.touches && event.touches[0] ? event.touches[0].clientX : null;
     const touchY = event.touches && event.touches[0] ? event.touches[0].clientY : null;
     lastTap.set(media, { time: now, x: touchX, y: touchY });
-    // ✅ Single Tap la Heart Illa da
     if (previous && now - previous.time <= DOUBLE_TAP_DELAY) {
       lastTap.delete(media);
       lastTouchTime = now;
@@ -383,7 +394,6 @@
   // =========================================
 
   document.addEventListener("click", event => {
-    // ✅ Photo Click la Heart Illa da
     return;
   }, true);
 
@@ -408,7 +418,6 @@
     const post = getPost(button);
     const postId = getPostId(button);
     if (!post || !postId) return;
-    // ✅ Killa Button la Irundhu Heart Mela Parakkum da
     showButtonHeart(button);
     buttonAnimation(post);
     toggleLike(postId, post, false);
@@ -465,7 +474,7 @@
   }
 
   // =========================================
-  // CSS - Heart Thudikkum Pothu Opacity Maraikathu da
+  // CSS - Box Full ah Remove da - Heart Mattum da
   // =========================================
 
   function addStyles() {
@@ -473,18 +482,19 @@
     const style = document.createElement("style");
     style.id = "pixoro-v39-css";
     style.textContent = `
-      .pixoro-thudikku { animation: pixoroButtonPop .35s ease; display:inline-block; transform-box: fill-box; transform-origin: center; opacity:1 !important; }
+      .pixoro-thudikku { animation: pixoroButtonPop .38s ease; display:inline-block; transform-box: fill-box; transform-origin: center; opacity:1 !important; background:transparent !important; border:none !important; box-shadow:none !important; outline:none !important; }
       @keyframes pixoroButtonPop {
         0% { transform:scale(1); opacity:1; }
-        40% { transform:scale(1.3); opacity:1; }
+        35% { transform:scale(1.4); opacity:1; }
+        60% { transform:scale(0.95); opacity:1; }
         100% { transform:scale(1); opacity:1; }
       }
-      .like-btn, .like-button { transform:none !important; animation:none !important; }
-      .like-btn svg, .like-button svg { transform-origin: center !important; flex-shrink: 0 !important; opacity:1 !important; }
-      .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked { color:#FF3040 !important; }
+      .like-btn, .like-button, [data-like-btn] { background:transparent !important; border:none !important; outline:none !important; box-shadow:none !important; transform:none !important; animation:none !important; padding:0 !important; }
+      .like-btn svg, .like-button svg, [data-like-btn] svg { background:transparent !important; border:none !important; box-shadow:none !important; outline:none !important; transform-origin: center !important; flex-shrink: 0 !important; opacity:1 !important; }
+      .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked { color:#FF3040 !important; background:transparent !important; }
       .like-btn.liked svg, .like-button.liked svg { fill:#FF3040 !important; }
-      .pixoro-big-heart { pointer-events:none !important; }
-      [data-like-count], .like-count, .likes-count { transform:none !important; animation:none !important; flex-shrink: 0 !important; }
+      .pixoro-big-heart { pointer-events:none !important; background:transparent !important; border:none !important; box-shadow:none !important; }
+      [data-like-count], .like-count, .likes-count { transform:none !important; animation:none !important; flex-shrink: 0 !important; background:transparent !important; border:none !important; }
       .pixoro-tap-heart { display:none !important; opacity:0 !important; }
     `;
     document.head.appendChild(style);
