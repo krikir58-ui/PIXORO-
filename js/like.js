@@ -1,7 +1,7 @@
 /* =====================================================
    PIXORO LIKE SYSTEM V39
    Single Tap Photo = Onnum Illa
-   Double Tap = Naduvula Chinna Heart + Like
+   Double Tap = Touch Panna Edathula Irundhu Heart Killa Poi Maraiyum
    Like Button = Killa Irundhu Heart + Heart Thudikkum
 ===================================================== */
 
@@ -126,15 +126,17 @@
   }
 
   // =========================================
-  // ✅ CORRECT 1 - NADUVULA HEART CHINNA SIZE DA
-  // 130 -> 85 da - Dance Adum - Pathi Maraithu Pogum - Thirumba Varathu da
+  // ✅ CORRECT - TOUCH PANNA EDATHULA IRUNDHU HEART
+  // Dance Illa da - Mella Killa Poi Maraithu Pogum da - Size 62 da
   // =========================================
 
-  function showBigHeart(media) {
+  function showBigHeart(media, touchX, touchY) {
     if (!media) return;
     const rect = media.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
     document.querySelectorAll('.pixoro-big-heart, .pixoro-tap-heart').forEach(h => h.remove());
+    const startX = (typeof touchX === 'number' ? touchX : rect.left + rect.width / 2);
+    const startY = (typeof touchY === 'number' ? touchY : rect.top + rect.height / 2);
     const gid = 'pixoroGrad' + Date.now();
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
@@ -142,12 +144,12 @@
       position:fixed;
       z-index:999999;
       pointer-events:none;
-      left:${rect.left + rect.width / 2}px;
-      top:${rect.top + rect.height / 2}px;
-      width:85px;
-      height:85px;
+      left:${startX}px;
+      top:${startY}px;
+      width:62px;
+      height:62px;
       opacity:0;
-      transform:translate(-50%,-50%) scale(0) rotate(0deg);
+      transform:translate(-50%,-50%) scale(0);
     `;
     heart.innerHTML = `
       <svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45))">
@@ -170,13 +172,11 @@
     `;
     document.body.appendChild(heart);
     const animation = heart.animate([
-      { transform: "translate(-50%,-50%) scale(0) rotate(0deg)", opacity: 0, offset: 0 },
-      { transform: "translate(-50%,-50%) scale(1.35) rotate(-14deg)", opacity: 1, offset: 0.2 },
-      { transform: "translate(-50%,-50%) scale(1.05) rotate(12deg)", opacity: 1, offset: 0.35 },
-      { transform: "translate(-50%,-50%) scale(1.25) rotate(-10deg)", opacity: 1, offset: 0.5 },
-      { transform: "translate(-50%,-50%) scale(1.05) rotate(8deg)", opacity: 1, offset: 0.65 },
-      { transform: "translate(-50%,-50%) scale(1.15) rotate(-4deg)", opacity: 0.5, offset: 0.82 },
-      { transform: "translate(-50%,-50%) scale(1.1) rotate(0deg)", opacity: 0, offset: 1 }
+      { transform: "translate(-50%,-50%) scale(0)", opacity: 0, offset: 0 },
+      { transform: "translate(-50%,-50%) scale(1.2)", opacity: 1, offset: 0.25 },
+      { transform: "translate(-50%,-30%) scale(1.05)", opacity: 1, offset: 0.5 },
+      { transform: "translate(-50%,20%) scale(1)", opacity: 0.5, offset: 0.8 },
+      { transform: "translate(-50%,70%) scale(0.9)", opacity: 0, offset: 1 }
     ], { duration: HEART_DURATION, easing: "ease-out", fill: "forwards" });
     animation.onfinish = () => heart.remove();
     setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1100);
@@ -328,12 +328,12 @@
   }
 
   // =========================================
-  // ✅ DOUBLE TAP MATTUM LIKE + CHINNA HEART
+  // ✅ DOUBLE TAP - Touch Panna Edathula Irundhu Heart
   // =========================================
 
-  function handleDoubleTap(media, postId, post) {
+  function handleDoubleTap(media, postId, post, x, y) {
     blockClickUntil = Date.now() + 700;
-    showBigHeart(media);
+    showBigHeart(media, x, y);
     buttonAnimation(post);
     toggleLike(postId, post, true);
   }
@@ -351,12 +351,14 @@
     if (!post || !postId) return;
     const now = Date.now();
     const previous = lastTap.get(media);
-    lastTap.set(media, { time: now });
+    const touchX = event.touches && event.touches[0] ? event.touches[0].clientX : null;
+    const touchY = event.touches && event.touches[0] ? event.touches[0].clientY : null;
+    lastTap.set(media, { time: now, x: touchX, y: touchY });
     // ✅ Single Tap la Heart Illa da
     if (previous && now - previous.time <= DOUBLE_TAP_DELAY) {
       lastTap.delete(media);
       lastTouchTime = now;
-      handleDoubleTap(media, postId, post);
+      handleDoubleTap(media, postId, post, touchX, touchY);
     }
   }, { passive: true });
 
@@ -373,7 +375,7 @@
     const postId = getPostId(media);
     if (!post || !postId) return;
     event.preventDefault();
-    handleDoubleTap(media, postId, post);
+    handleDoubleTap(media, postId, post, event.clientX, event.clientY);
   });
 
   // =========================================
