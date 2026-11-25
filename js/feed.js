@@ -1,4 +1,4 @@
-/* PIXORO FEED - OPTIMISTIC LIKE DA - FIRST LOCAL, PINNADI SERVER DA */
+/* PIXORO FEED - FIXED - LIKE LOGIC ELLAM like.js LA THAAN DA - FEED.JS LA ILLA DA */
 (function () {
   'use strict';
   let loading = false;
@@ -7,77 +7,21 @@
   function safeURL(v){ try{ let u=new URL(v, location.href); return ['https:','http:'].includes(u.protocol)?escapeHTML(u.href):''; }catch{ return ''; } }
   function feedTime(t){ if(!t) return ''; let d=new Date(t), n=new Date(), diff=Math.floor((n-d)/1000); if(diff<60) return 'Just now'; if(diff<3600) return Math.floor(diff/60)+'m'; if(diff<86400) return Math.floor(diff/3600)+'h'; return d.toLocaleDateString([],{day:'numeric',month:'short'}); }
 
-  // ✅ 1. LOCAL LIKES - SPEED KU DA
+  // ✅ FIX - LOCAL LIKES - like.js Oda Same Key da - v2 Illa da
   if(!window.FEED_LIKES){
-    try{ window.FEED_LIKES = new Set(JSON.parse(localStorage.getItem('pixoro_likes_v2')||'[]')); }
+    try{ window.FEED_LIKES = new Set(JSON.parse(localStorage.getItem('pixoro_likes')||'[]')); }
     catch{ window.FEED_LIKES = new Set(); }
   }
   function saveLocal(){
-    try{ localStorage.setItem('pixoro_likes_v2', JSON.stringify([...window.FEED_LIKES])); }catch{}
+    try{ localStorage.setItem('pixoro_likes', JSON.stringify([...window.FEED_LIKES])); }catch{}
   }
 
-  // ✅ 2. DOUBLE TAP
-  let pixoroLastTap = 0;
-  window.pixoroFeedTap = function(postId, el, e){
-    let now = Date.now();
-    if(now - pixoroLastTap < 350){
-      pixoroShowBigHeart(el);
-      window.pixoroToggleLike(postId, null);
-    }
-    pixoroLastTap = now;
-  };
-
-  window.pixoroShowBigHeart = function(el){
-    if(!el) return;
-    let h = document.createElement('div');
-    h.innerHTML = '❤️';
-    h.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:90px;z-index:10;transition:all .3s;pointer-events:none;';
-    el.style.position = 'relative';
-    el.appendChild(h);
-    setTimeout(()=> h.style.transform='translate(-50%,-50%) scale(1.2)', 10);
-    setTimeout(()=> h.remove(), 700);
-  };
-
-  // ✅ 3. OPTIMISTIC LIKE - FIRST LOCAL, PINNADI SILENT SERVER DA
-  window.pixoroToggleLike = function(postId, btn){
-    let btnEl = btn || document.querySelector('[data-like-btn="'+postId+'"]');
-    if(!btnEl) return;
-    if(btnEl.dataset.busy === '1') return;
-    btnEl.dataset.busy = '1';
-    setTimeout(()=> btnEl.dataset.busy = '0', 350);
-
-    let isLiked = btnEl.classList.contains('liked');
-    let countEl = document.querySelector('[data-like-count="'+postId+'"]');
-    let count = parseInt(countEl?.textContent || '0') || 0;
-
-    // FIRST - UDANEY LOCAL LA MAATHU DA - 0ms SPEED DA
-    btnEl.classList.toggle('liked', !isLiked);
-    if(countEl) countEl.textContent = isLiked ? Math.max(0, count-1) : count+1;
-    if(!isLiked) window.FEED_LIKES.add(String(postId));
-    else window.FEED_LIKES.delete(String(postId));
-    saveLocal();
-
-    // PINNADI - SILENT AH SERVER KU ANUPU DA - WAIT PANNA VENDAAM DA
-    (async ()=>{
-      try{
-        let supa = getClient(); if(!supa) return;
-        let { data:{session} } = await supa.auth.getSession();
-        if(!session) return;
-        if(isLiked){
-          await supa.from('likes').delete().eq('post_id', postId).eq('user_id', session.user.id);
-        } else {
-          await supa.from('likes').insert({post_id: postId, user_id: session.user.id});
-        }
-      }catch(e){ console.log(e); }
-    })();
-  };
-
-  window.pixoroPaintAllLikes = function(){
-    document.querySelectorAll('[data-like-btn]').forEach(btn=>{
-      let id = btn.getAttribute('data-like-btn');
-      btn.classList.toggle('liked', window.FEED_LIKES.has(String(id)));
-    });
-  };
+  // ❌ DELETE PANNITEN DA - ITHU THAAN THAPPU DA ❌
+  // window.pixoroFeedTap - DELETE da - like.js la touchstart Paakkum da
+  // window.pixoroShowBigHeart - DELETE da - like.js la Body Heart Paakkum da
+  // window.pixoroToggleLike - DELETE da - like.js Thaan Paakkum da
+  // window.pixoroPaintAllLikes - DELETE da - like.js Thaan Paakkum da
+  // Itha Thirumba Pottana - Like.js Azhinjidum da!
 
   async function loadFeed(){
     const feed = document.getElementById('feed');
@@ -104,11 +48,7 @@
         (myLikes||[]).forEach(l=> likedSet.add(String(l.post_id)));
         let { data: mySaves } = await supa.from('saves').select('post_id').eq('user_id', MY_ID).in('post_id', postIds);
         (mySaves||[]).forEach(s=> savedSet.add(String(s.post_id)));
-        // ✅ SERVER THAAN FINAL DA - LOCAL AH SERVER ODA SYNC PANNU DA
-        // Server la iruntha mattum Local la vechu - Stale Red varathu da
         likedSet.forEach(id=> window.FEED_LIKES.add(id));
-        // Local la irunthu Server la illana - Athu innum save aagala nu artham - Server ku silent ah push pannu da
-        // Aana ippo UI ku - Server + Local rendum serthu kaatu da
         saveLocal();
       }
       feed.innerHTML = posts.map(post=>{
@@ -122,17 +62,12 @@
         const video = post.media_type==='video' || /\.(mp4|mov|webm)(\?|$)/i.test(media);
         const letter = username.charAt(0).toUpperCase();
         const isMine = MY_ID && String(post.user_id) === String(MY_ID);
-        // ✅ LIKE CHECK - LOCAL + SERVER RENDUM PAARU DA
         const isLikedNow = likedSet.has(id) || window.FEED_LIKES.has(id);
         const isLiked = isLikedNow ? ' liked' : '';
         const isSaved = savedSet.has(id) ? ' saved' : '';
-        // ✅ COUNT FIX DA - Red na Count 0 varave koodathu da
         let baseCount = parseInt(post.likes_count || 0) || 0;
         let showCount = baseCount;
         if(isLikedNow && showCount === 0) showCount = 1;
-        // Vera aalunga Like panni iruntha - Server count + Namba like = Correct count da
-        // Namba like server la already iruntha double count aagathu da - likedSet la iruntha base la already irukku nu vaichuko da
-        // So: Local mattum iruntha (server la illa) na +1 pannu da
         if(window.FEED_LIKES.has(id) && !likedSet.has(id) && baseCount > 0) showCount = baseCount + 1;
         return `
         <article class="post" data-post-id="${id}">
@@ -143,12 +78,12 @@
             </div>
             ${isMine ? `<span style="font-size:22px;color:#fff;cursor:pointer">⋯</span>` : `<button class="followBtnPost" onclick="pixoroToggleFollow('${username}',this)">Follow</button>`}
           </div>
-          <div class="postMedia" onclick="pixoroFeedTap('${id}', this, event)">
+          <div class="postMedia">
             ${safeMedia ? (video ? `<video class="main" src="${safeMedia}" muted playsinline loop></video>` : `<img class="main" src="${safeMedia}" loading="lazy">`) : '<p style="padding:25px;color:#aaa">Media unavailable</p>'}
           </div>
           <div class="actions">
             <div class="left">
-              <button data-like-btn="${id}" class="act${isLiked}" onclick="event.stopPropagation(); pixoroToggleLike('${id}', this)">
+              <button data-like-btn="${id}" class="act${isLiked}" onclick="event.stopPropagation(); window.pixoroToggleLike('${id}', this.closest('article'))">
                 <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
                 <span data-like-count="${id}">${showCount}</span>
               </button>
