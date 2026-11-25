@@ -1,6 +1,6 @@
 /* =====================================================
-   PIXORO LIKE SYSTEM V39 + INSTAGRAM FLOATING HEARTS
-   Instagram Double Tap Like + Tap Floating Hearts
+   PIXORO LIKE SYSTEM V39 + FLOATING HEARTS
+   Double Tap Like + Tap Floating Hearts
    Mobile + Desktop + Supabase
    Single Like System
 ===================================================== */
@@ -172,7 +172,7 @@
   }
 
   // =========================================
-  // HEART ANIMATION - 900MS
+  // HEART ANIMATION - 900MS - PAZHAYA CODE SAME DA
   // =========================================
 
   function showBigHeart(media) {
@@ -238,11 +238,10 @@
   }
 
   // =========================================
-  // ✅ NEW ONLY - INSTAGRAM TAP FLOATING HEART - VIDEO LA IRUKKURATHU DA
-  // Thotta Edathula Heart Vanthu Mela Paranthu Pogum da
+  // ✅ ADD ONLY - INSTAGRAM TAP FLOATING HEART
   // =========================================
 
-  const HEART_COLORS = ['#FF0A33','#FF5EA8','#FF8A00','#FFD600','#FF3DF0','#A259FF','#00D2FF','#FF2E63'];
+  const HEART_COLORS = ['#FF0A33','#FF5EA8','#FF8A00','#FFD600','#FF3DF0','#A259FF','#00D2FF','#FF2E63','#FF6B6B','#00FF88'];
 
   function showTapHeart(x, y) {
     if (!x || !y) return;
@@ -266,14 +265,78 @@
     document.body.appendChild(heart);
     try {
       const a = heart.animate([
-        { transform:'translate(-50%,-50%) scale(0) rotate(0deg)', opacity:1, offset:0 },
-        { transform:'translate(calc(-50% + '+(drift*0.3)+'px), -70%) scale(1.15) rotate(8deg)', opacity:1, offset:.3 },
-        { transform:'translate(calc(-50% + '+drift+'px), -160px) scale(1) rotate(-8deg)', opacity:.9, offset:.7 },
-        { transform:'translate(calc(-50% + '+(drift*1.4)+'px), -230px) scale(.9) rotate(0deg)', opacity:0, offset:1 }
-      ], { duration: 950, easing: 'ease-out' });
+        { transform:'translate(-50%,-50%) scale(0) rotate(-15deg)', opacity:1, offset:0 },
+        { transform:'translate(-50%,-50%) scale(1.35) rotate(12deg)', opacity:1, offset:.25 },
+        { transform:'translate(calc(-50% + '+(drift*0.4)+'px), -80px) scale(1.15) rotate(-12deg)', opacity:1, offset:.45 },
+        { transform:'translate(calc(-50% + '+drift+'px), -160px) scale(1) rotate(10deg)', opacity:.95, offset:.7 },
+        { transform:'translate(calc(-50% + '+(drift*1.3)+'px), -240px) scale(1.1) rotate(-8deg)', opacity:.6, offset:.88 },
+        { transform:'translate(calc(-50% + '+(drift*1.4)+'px), -270px) scale(.9) rotate(0deg)', opacity:0, offset:1 }
+      ], { duration: 1150, easing: 'ease-out' });
       a.onfinish = () => heart.remove();
-    } catch(e) { setTimeout(()=>heart.remove(), 950); }
-    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1100);
+    } catch(e) { setTimeout(()=>heart.remove(), 1150); }
+    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1300);
+  }
+
+  // =========================================
+  // ✅ ADD ONLY - MASS DANCE - WHITE HEART AH VIDA COLOUR HEARTS DA
+  // Pazhaya showBigHeart ah Koopdala da - Itha Kooda Add Panniten da
+  // =========================================
+
+  function showMassDance(media) {
+    if (!media) return;
+    const rect = media.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    // Naduvula Periya COLOUR Heart Dance da - White Illa da
+    const mainColor = HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)];
+    const main = document.createElement("div");
+    main.className = "pixoro-big-heart";
+    main.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${cx}px;top:${cy}px;width:130px;height:130px;opacity:0;transform:translate(-50%,-50%) scale(0);`;
+    main.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 6px 14px rgba(0,0,0,.45))"><path fill="${mainColor}" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+    document.body.appendChild(main);
+    try {
+      const a = main.animate([
+        { transform:"translate(-50%,-50%) scale(0) rotate(-10deg)", opacity:0, offset:0 },
+        { transform:"translate(-50%,-50%) scale(1.35) rotate(8deg)", opacity:1, offset:.25 },
+        { transform:"translate(-50%,-50%) scale(1.1) rotate(-8deg)", opacity:1, offset:.45 },
+        { transform:"translate(-50%,-50%) scale(1.25) rotate(8deg)", opacity:1, offset:.65 },
+        { transform:"translate(-50%,-50%) scale(1) rotate(-5deg)", opacity:1, offset:.8 },
+        { transform:"translate(-50%,-50%) scale(1.15) rotate(0deg)", opacity:0, offset:1 }
+      ], { duration: 1100, easing:"ease-out", fill:"forwards" });
+      a.onfinish = () => main.remove();
+    } catch(e) { setTimeout(()=>main.remove(), 1100); }
+    setTimeout(()=>{ try{main.remove()}catch(e){} }, 1300);
+
+    // Suththi 10 Colour Hearts Mass ah Dance Aadi Parakkum da
+    for (let i = 0; i < 10; i++) {
+      const c = HEART_COLORS[i % HEART_COLORS.length];
+      const angle = (i / 10) * Math.PI * 2 + Math.random() * 0.5;
+      const dist = 90 + Math.random() * 110;
+      const dx = Math.cos(angle) * dist;
+      const dy = Math.sin(angle) * dist - 70;
+      const size = 26 + Math.random() * 28;
+      const delay = i * 35;
+      const h = document.createElement("div");
+      h.className = "pixoro-tap-heart";
+      h.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;opacity:0;transform:translate(-50%,-50%) scale(0);`;
+      h.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 6px 14px rgba(0,0,0,.45))"><path fill="${c}" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+      document.body.appendChild(h);
+      setTimeout(() => {
+        try {
+          const a2 = h.animate([
+            { transform:"translate(-50%,-50%) scale(0) rotate(0deg)", opacity:0, offset:0 },
+            { transform:`translate(calc(-50% + ${dx*0.4}px), calc(-50% + ${dy*0.4}px)) scale(1.3) rotate(18deg)`, opacity:1, offset:.3 },
+            { transform:`translate(calc(-50% + ${dx*0.7}px), calc(-50% + ${dy*0.7}px)) scale(1.1) rotate(-18deg)`, opacity:1, offset:.55 },
+            { transform:`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1) rotate(12deg)`, opacity:1, offset:.75 },
+            { transform:`translate(calc(-50% + ${dx*1.2}px), calc(-50% + ${dy - 50}px)) scale(.8) rotate(0deg)`, opacity:0, offset:1 }
+          ], { duration: 1050, easing:"ease-out" });
+          a2.onfinish = () => h.remove();
+        } catch(e) { setTimeout(()=>h.remove(), 1050); }
+      }, delay);
+      setTimeout(()=>{ try{h.remove()}catch(e){} }, 1500 + delay);
+    }
   }
 
   // =========================================
@@ -439,7 +502,10 @@
   function handleDoubleTap(media, postId, post) {
     blockClickUntil = Date.now() + 700;
 
-    showBigHeart(media);
+    // ✅ ADD ONLY - White Heart ku Pathila Mass Dance Colour Hearts da
+    showMassDance(media);
+    // showBigHeart(media); // Pazhaya White Heart - Ippo Use Pannala da
+
     buttonAnimation(post);
 
     // Force Like only. Never Unlike on double tap.
@@ -707,7 +773,8 @@
   window.pixoroToggleLike = toggleLike;
   window.pixoroPaintAllLikes = paintAll;
   window.showBigHeart = showBigHeart;
-  window.pixoroTapHeart = showTapHeart; // ✅ NEW ONLY
+  window.pixoroTapHeart = showTapHeart;
+  window.pixoroMassDance = showMassDance; // ✅ ADD ONLY
 
   // =========================================
   // START
