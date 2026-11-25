@@ -1,20 +1,20 @@
 /* =====================================================
-   PIXORO LIKE SYSTEM V28 - PIXORO STYLE COLOUR
-   Naduvula Heart - White Illa da - Pixoro Gradient da
-   V27 Speed Logic Apdiye da - Local Muthalla, Server Apram Silent ah
+   PIXORO LIKE SYSTEM V29 - COUNT FIX
+   Red Heart + 0 Count Bug Fix da - Server Count Local ah Azhikkaathu da
 ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V28) return;
-  window.PIXORO_LIKE_V28 = true;
+  if (window.PIXORO_LIKE_V29) return;
+  window.PIXORO_LIKE_V29 = true;
   window.PIXORO_LIKE_V22 = true;
   window.PIXORO_LIKE_V23 = true;
   window.PIXORO_LIKE_V24 = true;
   window.PIXORO_LIKE_V25 = true;
   window.PIXORO_LIKE_V26 = true;
   window.PIXORO_LIKE_V27 = true;
+  window.PIXORO_LIKE_V28 = true;
 
   const supa = window.supa || window.supabaseClient;
   const TABLE = "likes";
@@ -119,9 +119,9 @@
   }
 
   function addHeartStyles() {
-    if (document.getElementById("pixoro-like-v28-css")) return;
+    if (document.getElementById("pixoro-like-v29-css")) return;
     const style = document.createElement("style");
-    style.id = "pixoro-like-v28-css";
+    style.id = "pixoro-like-v29-css";
     style.textContent = `
       @keyframes pixThudikku{
         0%{ transform:scale(1); }
@@ -159,8 +159,6 @@
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
     heart.style.cssText = 'position:absolute !important;z-index:99 !important;pointer-events:none !important;left:'+cx+'px !important;top:'+cy+'px !important;width:56px !important;height:56px !important;opacity:1 !important;transform:translate(-50%,-50%) scale(0.2);background:transparent !important;display:block !important;';
-    // ✅ V28 FIX - Naduvula Heart White Illa da - Pixoro Gradient da
-    // Pink #FF2E63 -> Red #FF0A33 -> Purple #A855F7 + White Border da
     heart.innerHTML = '<svg viewBox="0 0 24 24" style="width:100% !important;height:100% !important;display:block !important;filter:drop-shadow(0 8px 20px rgba(255,10,51,.55))"><defs><linearGradient id="pixoroGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF2E63"/><stop offset="50%" stop-color="#FF0A33"/><stop offset="100%" stop-color="#A855F7"/></linearGradient></defs><path fill="url(#pixoroGrad)" stroke="#ffffff" stroke-width="1.2" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
     container.appendChild(heart);
     let t = 0;
@@ -183,6 +181,7 @@
     }, 750);
   }
 
+  // ✅ V29 FIX - Server la Insert/Delete Mattum da - Count ah Thodave Maatom da
   async function pixoroServerSave(postId, willLike){
     let key = postId + ':' + (willLike ? '1' : '0');
     if(serverQueue.has(key)) return;
@@ -197,15 +196,8 @@
         let r = await supa.from(TABLE).delete().eq("post_id", postId).eq("user_id", userId);
         if(r.error) throw r.error;
       }
-      try{
-        let { count } = await supa.from(TABLE).select("*", { count: "exact", head: true }).eq("post_id", postId);
-        if(count !== null && count !== undefined){
-          window.FEED_COUNTS[String(postId)] = count;
-          pixoroSaveLocal();
-          let post = document.querySelector(`[data-post-id="${postId}"]`) || document.querySelector('.post');
-          if(post) paintCount(postId, count, post);
-        }
-      }catch(e){}
+      // ✅ V28 la Inga Thaan Thappu da - Server Count 0 nu Vanthu Local 1 ah Azhichuchu da
+      // V29 la Count ah Server la Irundhu Edukkave Maatom da - Local Thaan Correct da
     }catch(e){
       console.log('LIKE SERVER SILENT FAIL DA - LOCAL LA IRUKKU DA:', e.message);
     } finally {
@@ -224,9 +216,20 @@
     paintLike(postId, willLike, post);
     if(willLike) window.FEED_LIKES.add(String(postId));
     else window.FEED_LIKES.delete(String(postId));
+    // ✅ V29 FIX - Count ku DOM ah Namba Koodathu da - DOM la 0 nu Irukkum da
+    // FEED_COUNTS Thaan Correct da - Athula Irundhu Edu da
+    let domCount = 0;
     let cEl = getLikeCount(postId, post);
-    let cur = cEl ? (parseInt(cEl.textContent || '0', 10) || 0) : (window.FEED_COUNTS[String(postId)] || 0);
-    let newCount = Math.max(0, cur + (willLike ? 1 : -1));
+    if(cEl) domCount = parseInt(cEl.textContent || '0', 10) || 0;
+    let localCount = window.FEED_COUNTS[String(postId)];
+    // ✅ First Time Like Panna - Local Count Illana DOM Count ah Edu da
+    // Already Like Panna - Local Count Thaan Correct da
+    let base = (localCount !== undefined) ? Number(localCount) : domCount;
+    // ✅ Like Panna - base la Irundhu +1 - Unlike Panna -1 da
+    // Aana Unlike Panna Base 0 va Irundha -1 Poga Koodathu da
+    let newCount = willLike ? (base + 1) : Math.max(0, base - 1);
+    // ✅ Like Panna Count 1 kku Keezha Poga Koodathu da - Red + 0 Vara Koodathu da
+    if(willLike && newCount < 1) newCount = 1;
     window.FEED_COUNTS[String(postId)] = newCount;
     paintCount(postId, newCount, post);
     pixoroSaveLocal();
@@ -287,6 +290,7 @@
       const postId = post.dataset.postId || post.dataset.id;
       if (!postId) return;
       paintLike(postId, window.FEED_LIKES.has(String(postId)), post);
+      if(window.FEED_COUNTS[String(postId)] !== undefined) paintCount(postId, window.FEED_COUNTS[String(postId)], post);
     });
     try{
       const { data, error } = await supa.from(TABLE).select("post_id").eq("user_id", userId);
@@ -320,5 +324,5 @@
     loadMyLikes();
   }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO Like V28 loaded successfully.");
+  console.log("PIXORO Like V29 loaded successfully.");
 })();
