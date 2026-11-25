@@ -15,7 +15,7 @@
   const TABLE = "likes";
 
   const DOUBLE_TAP_DELAY = 320;
-  const HEART_DURATION = 900;
+  const HEART_DURATION = 1000;
 
   const lastTap = new WeakMap();
   const lastToggleAt = new Map();
@@ -126,15 +126,17 @@
   }
 
   // =========================================
-  // ✅ DOUBLE TAP HEART - Vanthu Pathi Maraithu Pogum da
-  // 1 -> 0.5 -> 0 da
+  // ✅ CORRECT MATTUM - DANCE HEART DA
+  // OREY Heart - Dance Adum - Pathi Maraithu Pogum
+  // White Pathulla Colour Colour da
   // =========================================
 
   function showBigHeart(media) {
     if (!media) return;
     const rect = media.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
-    document.querySelectorAll('.pixoro-big-heart').forEach(h => h.remove());
+    document.querySelectorAll('.pixoro-big-heart, .pixoro-tap-heart').forEach(h => h.remove());
+    const gid = 'pixoroGrad' + Date.now();
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
     heart.style.cssText = `
@@ -143,29 +145,42 @@
       pointer-events:none;
       left:${rect.left + rect.width / 2}px;
       top:${rect.top + rect.height / 2}px;
-      width:110px;
-      height:110px;
+      width:130px;
+      height:130px;
       opacity:0;
-      transform:translate(-50%,-50%) scale(0);
+      transform:translate(-50%,-50%) scale(0) rotate(0deg);
     `;
     heart.innerHTML = `
-      <svg viewBox="0 0 24 24"
-        style="width:100%;height:100%;
-        filter:drop-shadow(0 5px 15px rgba(0,0,0,.4))">
-        <path fill="#fff"
+      <svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45))">
+        <defs>
+          <linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FF0A33"/>
+            <stop offset="30%" stop-color="#FF3DF0"/>
+            <stop offset="60%" stop-color="#A259FF"/>
+            <stop offset="85%" stop-color="#FF8A00"/>
+            <stop offset="100%" stop-color="#FFD600"/>
+          </linearGradient>
+        </defs>
+        <path fill="url(#${gid})" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"
           d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>
+        <path fill="#fff" opacity="0.95"
+          d="M12 18.5L6.8 13.3a3.8 3.8 0 0 1 0-5.4 3.8 3.8 0 0 1 5.2 0L12 8l0-0.1a3.8 3.8 0 0 1 5.2 0 3.8 3.8 0 0 1 0 5.4L12 18.5z"
+          transform="translate(0,-1.2) scale(0.62) translate(7.4,7.4)"/>
+        <ellipse cx="8.5" cy="8" rx="1.6" ry="1" fill="#fff" opacity="0.85" transform="rotate(-20 8.5 8)"/>
       </svg>
     `;
     document.body.appendChild(heart);
     const animation = heart.animate([
-      { transform: "translate(-50%,-50%) scale(0)", opacity: 0, offset: 0 },
-      { transform: "translate(-50%,-50%) scale(1.2)", opacity: 1, offset: 0.25 },
-      { transform: "translate(-50%,-50%) scale(1)", opacity: 1, offset: 0.45 },
-      { transform: "translate(-50%,-50%) scale(1.05)", opacity: 0.5, offset: 0.7 },
-      { transform: "translate(-50%,-50%) scale(1.1)", opacity: 0, offset: 1 }
+      { transform: "translate(-50%,-50%) scale(0) rotate(0deg)", opacity: 0, offset: 0 },
+      { transform: "translate(-50%,-50%) scale(1.35) rotate(-14deg)", opacity: 1, offset: 0.2 },
+      { transform: "translate(-50%,-50%) scale(1.05) rotate(12deg)", opacity: 1, offset: 0.35 },
+      { transform: "translate(-50%,-50%) scale(1.25) rotate(-10deg)", opacity: 1, offset: 0.5 },
+      { transform: "translate(-50%,-50%) scale(1.05) rotate(8deg)", opacity: 1, offset: 0.65 },
+      { transform: "translate(-50%,-50%) scale(1.15) rotate(-4deg)", opacity: 0.5, offset: 0.82 },
+      { transform: "translate(-50%,-50%) scale(1.1) rotate(0deg)", opacity: 0, offset: 1 }
     ], { duration: HEART_DURATION, easing: "ease-out", fill: "forwards" });
     animation.onfinish = () => heart.remove();
-    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1000);
+    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1100);
   }
 
   // ✅ Display Touch Heart Full ah Remove da
