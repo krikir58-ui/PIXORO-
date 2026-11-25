@@ -400,7 +400,8 @@
   }
 
   // =========================================
-  // CSS - Heart Mattum Thudikkum da, Number Illa da
+  // CSS - ✅ CORRECT MATTUM ADD PANNITEN DA
+  // Pazhaya CSS Same da + 3 Line Add da
   // =========================================
 
   function addStyles() {
@@ -408,16 +409,19 @@
     const style = document.createElement("style");
     style.id = "pixoro-v39-css";
     style.textContent = `
-      .pixoro-thudikku { animation: pixoroButtonPop .35s ease; display:inline-block; }
+      .pixoro-thudikku { animation: pixoroButtonPop .35s ease; display:inline-block; transform-box: fill-box; transform-origin: center; }
       @keyframes pixoroButtonPop {
         0% { transform:scale(1); }
         40% { transform:scale(1.3); }
         100% { transform:scale(1); }
       }
+      .like-btn, .like-button { transform:none !important; animation:none !important; }
+      .like-btn svg, .like-button svg { transform-origin: center !important; flex-shrink: 0 !important; }
       .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked { color:#FF3040 !important; }
       .like-btn.liked svg, .like-button.liked svg { fill:#FF3040 !important; }
       .pixoro-big-heart { pointer-events:none !important; }
-      [data-like-count], .like-count, .likes-count { transform:none !important; animation:none !important; }
+      [data-like-count], .like-count, .likes-count { transform:none !important; animation:none !important; flex-shrink: 0 !important; }
+      .pixoro-tap-heart { display:none !important; opacity:0 !important; }
     `;
     document.head.appendChild(style);
   }
