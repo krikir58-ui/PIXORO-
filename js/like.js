@@ -1,11 +1,12 @@
 /* =====================================================
-   PIXORO LIKE SYSTEM V37 - FINAL - PIXORO REAL METHOD
-   touchstart Double Tap da - Heart Eppovum Naduvula da
+   PIXORO LIKE SYSTEM V38 - FINAL - BODY HEART FIX
+   Heart ah Body la Podurom da - Feed Azhikka Mudiyaathu da
 ===================================================== */
 
 (() => {
   "use strict";
-  if (window.PIXORO_LIKE_V37) return;
+  if (window.PIXORO_LIKE_V38) return;
+  window.PIXORO_LIKE_V38 = true;
   window.PIXORO_LIKE_V37 = true;
   window.PIXORO_LIKE_V36 = true;
   window.PIXORO_LIKE_V35 = true;
@@ -23,6 +24,7 @@
   const lastTap = new WeakMap();
   const serverQueue = new Set();
   const lastToggleAt = new Map();
+  let pixoroBlockClickUntil = 0;
 
   try{
     let local = JSON.parse(localStorage.getItem('pixoro_likes') || '[]');
@@ -147,9 +149,9 @@
   }
 
   function addHeartStyles() {
-    if (document.getElementById("pixoro-like-v37-css")) return;
+    if (document.getElementById("pixoro-like-v38-css")) return;
     const style = document.createElement("style");
-    style.id = "pixoro-like-v37-css";
+    style.id = "pixoro-like-v38-css";
     style.textContent = `
       @keyframes pixThudikku{
         0%{ transform:scale(1); }
@@ -157,7 +159,6 @@
         70%{ transform:scale(0.98); }
         100%{ transform:scale(1); }
       }
-      /* ✅ V37 - Double Tap Zoom Block da - Ithu Illana 2nd Tap Zoom Aayidum da */
       .postMedia, .post-media, .post-media-wrap, .post-content img, .post-content video, .post img, .post video { touch-action: manipulation !important; -webkit-tap-highlight-color: transparent !important; user-select:none !important; -webkit-user-select:none !important; }
       [data-like-btn], .like-btn, .like-button { overflow: visible !important; }
       [data-like-btn] svg, .like-btn svg, .like-button svg, [data-like-btn] i, .like-btn i { overflow: visible !important; transform-origin: center center !important; }
@@ -169,27 +170,23 @@
       .like-btn.liked i, .like-button.liked i, .like-btn.liked svg, .like-button.liked svg,
       .like-btn.liked path, .like-button.liked path { color: #FF0A33 !important; fill: #FF0A33 !important; stroke: #FF0A33 !important; opacity:1 !important; }
       [data-like-btn], .like-btn, .like-button { opacity:1 !important; }
-      .postMedia, .post-media, .post-media-wrap, .post-content, .post, .post-card { position:relative !important; }
     `;
     document.head.appendChild(style);
   }
 
-  // ✅ V37 -PIXORO Real Heart - Eppovum Naduvula da - Tap Edam Theva Illa da
+  // ✅ V38 MAIN FIX - Heart ah BODY la da - Post kulla Illa da - Feed Azhikka Mudiyaathu da
   function showBigHeart(media) {
     if (!media) return;
     document.querySelectorAll('.pixoro-big-heart').forEach(h=>h.remove());
-    let container = media.closest ? (media.closest('.postMedia') || media.closest('.post-media') || media.closest('.post-media-wrap') || media.closest('.post') || media.closest('.post-card') || media.closest('article')) : null;
-    if(!container) container = media;
-    if(!container) return;
-    let cs = window.getComputedStyle(container);
-    if(cs.position === 'static') container.style.position = 'relative';
-    container.style.overflow = 'hidden';
+    let r = media.getBoundingClientRect();
+    let cx = r.left + r.width / 2;
+    let cy = r.top + r.height / 2;
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
-    heart.style.cssText = 'position:absolute !important;z-index:999 !important;pointer-events:none !important;left:50% !important;top:50% !important;width:110px !important;height:110px !important;opacity:0 !important;transform:translate(-50%,-50%) scale(0);background:transparent !important;display:block !important;';
+    heart.style.cssText = 'position:fixed !important;z-index:99999 !important;pointer-events:none !important;left:'+cx+'px !important;top:'+cy+'px !important;width:120px !important;height:120px !important;opacity:0 !important;transform:translate(-50%,-50%) scale(0);background:transparent !important;display:block !important;';
     heart.innerHTML = '<svg viewBox="0 0 24 24" style="width:100% !important;height:100% !important;display:block !important;filter:drop-shadow(0 10px 22px rgba(0,0,0,.5))"><path fill="#ffffff" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
-    container.appendChild(heart);
-    console.log("PIXORO HEART SHOW DA");
+    document.body.appendChild(heart);
+    console.log("PIXORO HEART SHOW DA - BODY LA DA");
     try{
       let anim = heart.animate([
         { transform: 'translate(-50%,-50%) scale(0)', opacity: 0, offset: 0 },
@@ -271,13 +268,13 @@
   }
 
   function handleDoubleTap(media, postId, post){
+    pixoroBlockClickUntil = Date.now() + 500;
     showBigHeart(media);
     const btn = getLikeButton(postId, post);
     if(btn) pixoroThudikku(btn);
     toggleLike(postId, post, true);
   }
 
-  // ✅ V37 MAIN - Instagram Method - touchstart la Double Tap da - pointerup Illa da
   document.addEventListener("touchstart", (event) => {
     if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
     const media = findMedia(event.target);
@@ -294,7 +291,6 @@
     }
   }, { passive: true });
 
-  // ✅ Laptop ku - dblclick da
   document.addEventListener("dblclick", (event) => {
     if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
     const media = findMedia(event.target);
@@ -305,7 +301,14 @@
     handleDoubleTap(media, postId, post);
   });
 
+  // ✅ V38 - Double Tap ku Apram Varra Click ah Block Panrom da - Count 1-0 nu Maraathu da
   document.addEventListener("click", (event) => {
+    if (Date.now() < pixoroBlockClickUntil) {
+      if (event.target.closest("img, video, .postMedia, .post-media, .post-content")) {
+        event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
+        return;
+      }
+    }
     const button = event.target.closest("[data-like-btn], .like-btn, .like-button, [data-action='like']");
     if (!button) return;
     event.preventDefault();
@@ -356,5 +359,5 @@
     startWatchman();
   }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO Like V37 loaded successfully.");
+  console.log("PIXORO Like V38 loaded successfully.");
 })();
