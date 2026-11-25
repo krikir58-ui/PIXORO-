@@ -1,13 +1,13 @@
 /* =====================================================
-   PIXORO LIKE SYSTEM V34 -
-   Keezha Like Chinna Thudikku da - Number Perusa Aagaathu da
-   Big Heart Keezha Irundhu Mella Vanthu Aadi Keezha Pogum da
+   PIXORO LIKE SYSTEM V35 - JS DANCE FIX
+   CSS Block Pannalum Dance Aadum da - element.animate() da
 ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V34) return;
+  if (window.PIXORO_LIKE_V35) return;
+  window.PIXORO_LIKE_V35 = true;
   window.PIXORO_LIKE_V34 = true;
   window.PIXORO_LIKE_V33 = true;
   window.PIXORO_LIKE_V30 = true;
@@ -146,36 +146,21 @@
   }
 
   function addHeartStyles() {
-    if (document.getElementById("pixoro-like-v34-css")) return;
+    if (document.getElementById("pixoro-like-v35-css")) return;
     const style = document.createElement("style");
-    style.id = "pixoro-like-v34-css";
+    style.id = "pixoro-like-v35-css";
     style.textContent = `
-      /* ✅ V34 - Keezha Like Chinna Thudikku da - 1.35 Illa, 1.12 Mattum da */
       @keyframes pixThudikku{
         0%{ transform:scale(1); }
         40%{ transform:scale(1.12); }
         70%{ transform:scale(0.98); }
         100%{ transform:scale(1); }
       }
-      /* ✅ V34 - Instagram Big Heart Dance da - Keezha Irundhu Mella Mela Vanthu Aadi Thirumba Keezha Pogum da */
-      @keyframes pixBigInsta{
-        0%{ transform:translate(-50%, 90px) scale(0); opacity:0; }
-        15%{ transform:translate(-50%, 30px) scale(0.6); opacity:1; }
-        30%{ transform:translate(-50%, -10px) scale(1.18); opacity:1; }
-        40%{ transform:translate(-50%, 0px) scale(0.94); opacity:1; }
-        50%{ transform:translate(-50%, -8px) scale(1.06); opacity:1; }
-        60%{ transform:translate(-50%, 0px) scale(1); opacity:1; }
-        75%{ transform:translate(-50%, 0px) scale(1); opacity:1; }
-        88%{ transform:translate(-50%, 45px) scale(0.92); opacity:0.8; }
-        100%{ transform:translate(-50%, 90px) scale(0.6); opacity:0; }
-      }
       [data-like-btn], .like-btn, .like-button { overflow: visible !important; }
       [data-like-btn] svg, .like-btn svg, .like-button svg, [data-like-btn] i, .like-btn i { overflow: visible !important; transform-origin: center center !important; }
-      /* ✅ V34 MAIN - Thudikku Heart Mattum da - Button / Number Perusa Aagaathu da */
       [data-like-btn].thudikku, .like-btn.thudikku, .like-button.thudikku { animation:none !important; transform:none !important; }
       [data-like-btn].thudikku svg, .like-btn.thudikku svg, .like-button.thudikku svg,
       [data-like-btn].thudikku i, .like-btn.thudikku i { animation:pixThudikku 0.4s ease-in-out 1 !important; transform-origin:center center !important; }
-      /* ✅ Number Eppovum Same Size da - Thudikku Pothu Perusa Aagaathu da */
       .like-count, .likes-count, [data-like-count] { transform:none !important; animation:none !important; }
       .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked,
       .like-btn.liked i, .like-button.liked i, .like-btn.liked svg, .like-button.liked svg,
@@ -186,7 +171,7 @@
     document.head.appendChild(style);
   }
 
-  // ✅ V34 - Big Heart Instagram Mari da - Keezha Irundhu Varum da
+  // ✅ V35 MAIN FIX - JS animate() da - CSS Block Pannalum Dance Aadum da
   function showBigHeart(media, tapX, tapY) {
     if (!media) return;
     document.querySelectorAll('.pixoro-big-heart').forEach(h=>h.remove());
@@ -205,10 +190,27 @@
     let cy = rect.height * 0.55;
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
-    heart.style.cssText = 'position:absolute !important;z-index:99 !important;pointer-events:none !important;left:'+cx+'px !important;top:'+cy+'px !important;width:92px !important;height:92px !important;opacity:0 !important;transform:translate(-50%, 90px) scale(0);background:transparent !important;display:block !important;animation:pixBigInsta 1.1s cubic-bezier(.2,.8,.3,1.2) forwards !important;';
+    heart.style.cssText = 'position:absolute !important;z-index:99 !important;pointer-events:none !important;left:'+cx+'px !important;top:'+cy+'px !important;width:92px !important;height:92px !important;opacity:0 !important;transform:translate(-50%, 90px) scale(0);background:transparent !important;display:block !important;';
     heart.innerHTML = '<svg viewBox="0 0 24 24" style="width:100% !important;height:100% !important;display:block !important;filter:drop-shadow(0 10px 22px rgba(255,10,51,.55))"><defs><linearGradient id="pixoroGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF2E63"/><stop offset="50%" stop-color="#FF0A33"/><stop offset="100%" stop-color="#A855F7"/></linearGradient></defs><path fill="url(#pixoroGrad)" stroke="#ffffff" stroke-width="1.2" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
     container.appendChild(heart);
-    setTimeout(()=>{ heart.remove(); }, 1150);
+    // ✅ JS Dance - Keezha Irundhu Mela Vanthu Aadi Thirumba Keezha Pogum da
+    try{
+      let anim = heart.animate([
+        { transform: 'translate(-50%, 90px) scale(0)', opacity: 0, offset: 0 },
+        { transform: 'translate(-50%, 30px) scale(0.6)', opacity: 1, offset: 0.15 },
+        { transform: 'translate(-50%, -10px) scale(1.18)', opacity: 1, offset: 0.30 },
+        { transform: 'translate(-50%, 0px) scale(0.94)', opacity: 1, offset: 0.40 },
+        { transform: 'translate(-50%, -8px) scale(1.06)', opacity: 1, offset: 0.50 },
+        { transform: 'translate(-50%, 0px) scale(1)', opacity: 1, offset: 0.60 },
+        { transform: 'translate(-50%, 0px) scale(1)', opacity: 1, offset: 0.75 },
+        { transform: 'translate(-50%, 45px) scale(0.92)', opacity: 0.8, offset: 0.88 },
+        { transform: 'translate(-50%, 90px) scale(0.6)', opacity: 0, offset: 1 }
+      ], { duration: 1100, easing: 'cubic-bezier(.2,.8,.3,1.2)', fill: 'forwards' });
+      anim.onfinish = ()=>{ heart.remove(); };
+    }catch(e){
+      setTimeout(()=>{ heart.remove(); }, 1100);
+    }
+    setTimeout(()=>{ try{ heart.remove(); }catch(e){} }, 1300);
   }
 
   async function pixoroServerSave(postId, willLike){
@@ -346,5 +348,5 @@
     startWatchman();
   }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO Like V34 loaded successfully.");
+  console.log("PIXORO Like V35 loaded successfully.");
 })();
