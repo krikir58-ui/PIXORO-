@@ -1,8 +1,8 @@
 /* =====================================================
-   PIXORO LIKE SYSTEM V39 + INSTAGRAM FLOATING HEARTS
-   Single Tap = Gradient Heart Mattum - Like Illa
-   Double Click = Like Agum + Heart Varum
-   Like Button = Like Agum
+   PIXORO LIKE SYSTEM V39
+   Single Tap Photo = Onnum Illa
+   Double Tap = Naduvula Periya Heart + Like
+   Like Button = Heart Mattum Thudikkum + Like
 ===================================================== */
 
 (() => {
@@ -94,7 +94,7 @@
   }
 
   // =========================================
-  // LIKE UI
+  // LIKE UI - Number Perusa Agathu da
   // =========================================
 
   function paintLike(post, liked) {
@@ -120,17 +120,21 @@
     const el = getLikeCount(post);
     if (el) {
       el.textContent = Math.max(0, Number(count) || 0);
+      el.style.transform = "none";
+      el.style.animation = "none";
     }
   }
 
   // =========================================
-  // HEART ANIMATION - 900MS - PAZHAYA CODE SAME DA
+  // ✅ DOUBLE TAP HEART - Vanthu Pathi Maraithu Pogum da
+  // 1 -> 0.5 -> 0 da
   // =========================================
 
   function showBigHeart(media) {
     if (!media) return;
     const rect = media.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
+    document.querySelectorAll('.pixoro-big-heart').forEach(h => h.remove());
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
     heart.style.cssText = `
@@ -139,8 +143,8 @@
       pointer-events:none;
       left:${rect.left + rect.width / 2}px;
       top:${rect.top + rect.height / 2}px;
-      width:120px;
-      height:120px;
+      width:110px;
+      height:110px;
       opacity:0;
       transform:translate(-50%,-50%) scale(0);
     `;
@@ -154,82 +158,36 @@
     `;
     document.body.appendChild(heart);
     const animation = heart.animate([
-      { transform: "translate(-50%,-50%) scale(0)", opacity: 0 },
-      { transform: "translate(-50%,-50%) scale(1.2)", opacity: 1, offset: 0.3 },
-      { transform: "translate(-50%,-50%) scale(1)", opacity: 1, offset: 0.6 },
-      { transform: "translate(-50%,-50%) scale(.9)", opacity: 0 }
+      { transform: "translate(-50%,-50%) scale(0)", opacity: 0, offset: 0 },
+      { transform: "translate(-50%,-50%) scale(1.2)", opacity: 1, offset: 0.25 },
+      { transform: "translate(-50%,-50%) scale(1)", opacity: 1, offset: 0.45 },
+      { transform: "translate(-50%,-50%) scale(1.05)", opacity: 0.5, offset: 0.7 },
+      { transform: "translate(-50%,-50%) scale(1.1)", opacity: 0, offset: 1 }
     ], { duration: HEART_DURATION, easing: "ease-out", fill: "forwards" });
     animation.onfinish = () => heart.remove();
+    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1000);
   }
 
-  // =========================================
-  // ✅ VIDEO MARI GRADIENT HEART DA
-  // =========================================
-
-  const HEART_GRADIENTS = [
-    ['#FF8A00','#FFD600'],
-    ['#FF3DF0','#A259FF'],
-    ['#FF0A33','#FF5EA8'],
-    ['#FF5EA8','#FFD600'],
-    ['#00D2FF','#A259FF'],
-    ['#FF2E63','#FF8A00']
-  ];
-  let colorIndex = 0;
-
-  function showTapHeart(x, y) {
-    if (!x || !y) return;
-    const pair = HEART_GRADIENTS[colorIndex % HEART_GRADIENTS.length];
-    colorIndex++;
-    const gid = 'g' + Date.now() + Math.floor(Math.random()*9999);
-    const size = 38 + Math.random() * 18;
-    const drift = (Math.random() * 50 - 25);
-    const heart = document.createElement("div");
-    heart.className = "pixoro-tap-heart";
-    heart.style.cssText = `
-      position:fixed;
-      z-index:999999;
-      pointer-events:none;
-      left:${x}px;
-      top:${y}px;
-      width:${size}px;
-      height:${size}px;
-      opacity:1;
-      transform:translate(-50%,-50%) scale(0);
-    `;
-    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))"><defs><linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${pair[0]}"/><stop offset="100%" stop-color="${pair[1]}"/></linearGradient></defs><path fill="url(#${gid})" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
-    document.body.appendChild(heart);
-    try {
-      const a = heart.animate([
-        { transform:'translate(-50%,-50%) scale(0) rotate(0deg)', opacity:1, offset:0 },
-        { transform:'translate(-50%,-50%) scale(1.2) rotate(8deg)', opacity:1, offset:.25 },
-        { transform:'translate(calc(-50% + '+drift+'px), -70px) scale(1) rotate(-6deg)', opacity:1, offset:.55 },
-        { transform:'translate(calc(-50% + '+(drift*1.3)+'px), -150px) scale(0.95) rotate(4deg)', opacity:.8, offset:.8 },
-        { transform:'translate(calc(-50% + '+(drift*1.5)+'px), -190px) scale(0.9) rotate(0deg)', opacity:0, offset:1 }
-      ], { duration: 1000, easing: 'ease-out' });
-      a.onfinish = () => heart.remove();
-    } catch(e) { setTimeout(()=>heart.remove(), 1000); }
-    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1100);
-  }
-
-  // =========================================
-  // PAZHAYA MASS DANCE - USE PANNALA DA
-  // =========================================
-
+  // ✅ Display Touch Heart Full ah Remove da
+  function showTapHeart(x, y) { return; }
   function showMassDance(media) { return; }
 
   // =========================================
-  // BUTTON ANIMATION
+  // ✅ BUTTON ANIMATION - Heart Mattum Thudikkum da
+  // Number / Button Full ah Thudikkathu da
   // =========================================
 
   function buttonAnimation(post) {
     const button = getLikeButton(post);
     if (!button) return;
-    button.classList.remove("pixoro-thudikku");
-    void button.offsetWidth;
-    button.classList.add("pixoro-thudikku");
+    const icon = button.querySelector("svg, i");
+    if (!icon) return;
+    icon.classList.remove("pixoro-thudikku");
+    void icon.offsetWidth;
+    icon.classList.add("pixoro-thudikku");
     setTimeout(() => {
-      button.classList.remove("pixoro-thudikku");
-    }, 400);
+      icon.classList.remove("pixoro-thudikku");
+    }, 350);
   }
 
   // =========================================
@@ -308,22 +266,18 @@
   }
 
   // =========================================
-  // ✅ CORRECT ONLY - DOUBLE TAP = LIKE AGUM DA
-  // Single Tap la Like Illa da - Itha Mattum Maathinen da
+  // ✅ DOUBLE TAP MATTUM LIKE + PERIYA HEART
   // =========================================
 
-  function handleDoubleTap(media, postId, post, x, y) {
+  function handleDoubleTap(media, postId, post) {
     blockClickUntil = Date.now() + 700;
+    showBigHeart(media);
     buttonAnimation(post);
-    // ✅ Double Click Panna Like Agum da - Force Like da - Unlike Agathu da
     toggleLike(postId, post, true);
-    // Mobile la touchstart la Already Heart Vanthuchu da - Inga Extra Heart Vendaam da
-    // Laptop la dblclick ku Mattum Heart Venam da
-    if (x && y) showTapHeart(x, y);
   }
 
   // =========================================
-  // MOBILE TOUCH - Single Tap = Heart Mattum, Like Illa
+  // MOBILE TOUCH - Single Tap = Onnum Illa da
   // =========================================
 
   document.addEventListener("touchstart", event => {
@@ -336,18 +290,16 @@
     const now = Date.now();
     const previous = lastTap.get(media);
     lastTap.set(media, { time: now });
-    // ✅ 1 Touch ku 1 Gradient Heart da - Like Illa da
-    const touch = event.touches && event.touches[0];
-    if (touch) showTapHeart(touch.clientX, touch.clientY);
+    // ✅ Single Tap la Heart Illa da
     if (previous && now - previous.time <= DOUBLE_TAP_DELAY) {
       lastTap.delete(media);
       lastTouchTime = now;
-      handleDoubleTap(media, postId, post, 0, 0);
+      handleDoubleTap(media, postId, post);
     }
   }, { passive: true });
 
   // =========================================
-  // LAPTOP DOUBLE CLICK - Double Click = Like Agum da
+  // LAPTOP DOUBLE CLICK
   // =========================================
 
   document.addEventListener("dblclick", event => {
@@ -359,25 +311,20 @@
     const postId = getPostId(media);
     if (!post || !postId) return;
     event.preventDefault();
-    handleDoubleTap(media, postId, post, event.clientX, event.clientY);
+    handleDoubleTap(media, postId, post);
   });
 
   // =========================================
-  // LAPTOP SINGLE CLICK - Single Click = Heart Mattum, Like Illa
+  // LAPTOP SINGLE CLICK - Photo Click la Onnum Illa da
   // =========================================
 
   document.addEventListener("click", event => {
-    const btnCheck = event.target.closest("[data-like-btn], .like-btn, .like-button, [data-action='like']");
-    if (!btnCheck && Date.now() >= blockClickUntil) {
-      const mediaOnly = findMedia(event.target);
-      if (mediaOnly && !event.target.closest("button, a, input, textarea, select")) {
-        showTapHeart(event.clientX, event.clientY);
-      }
-    }
+    // ✅ Photo Click la Heart Illa da
+    return;
   }, true);
 
   // =========================================
-  // NORMAL LIKE BUTTON CLICK - Like Button Mattum Like da ✅
+  // NORMAL LIKE BUTTON CLICK
   // =========================================
 
   document.addEventListener("click", event => {
@@ -397,8 +344,7 @@
     const post = getPost(button);
     const postId = getPostId(button);
     if (!post || !postId) return;
-    const r = button.getBoundingClientRect();
-    showTapHeart(r.left + r.width / 2, r.top - 10);
+    // ✅ Like Button la Floating Heart Illa da - Heart Icon Mattum Thudikkum da
     buttonAnimation(post);
     toggleLike(postId, post, false);
   }, true);
@@ -454,7 +400,7 @@
   }
 
   // =========================================
-  // CSS
+  // CSS - Heart Mattum Thudikkum da, Number Illa da
   // =========================================
 
   function addStyles() {
@@ -462,15 +408,16 @@
     const style = document.createElement("style");
     style.id = "pixoro-v39-css";
     style.textContent = `
-      .pixoro-thudikku { animation: pixoroButtonPop .4s ease; }
+      .pixoro-thudikku { animation: pixoroButtonPop .35s ease; display:inline-block; }
       @keyframes pixoroButtonPop {
         0% { transform:scale(1); }
-        40% { transform:scale(1.2); }
+        40% { transform:scale(1.3); }
         100% { transform:scale(1); }
       }
       .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked { color:#FF3040 !important; }
       .like-btn.liked svg, .like-button.liked svg { fill:#FF3040 !important; }
       .pixoro-big-heart { pointer-events:none !important; }
+      [data-like-count], .like-count, .likes-count { transform:none !important; animation:none !important; }
     `;
     document.head.appendChild(style);
   }
