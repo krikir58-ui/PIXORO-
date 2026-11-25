@@ -1,7 +1,7 @@
 /* =====================================================
    PIXORO LIKE SYSTEM V39 - FINAL
-   Double Tap = Touch Panna Edathula Irundhu Heart Thudikku + Killa Poi Maraiyum
-   Like Button = Box Illa - Heart Mattum Thudikkum
+   Double Tap = Orey Heart - Mella Kulla Mass Dance Podu Poi Maraiyum
+   Like Button = Box Illa - Red Heart 2 Times Thudikkum
 ===================================================== */
 
 (() => {
@@ -14,7 +14,7 @@
   const TABLE = "likes";
 
   const DOUBLE_TAP_DELAY = 320;
-  const HEART_DURATION = 1100;
+  const HEART_DURATION = 1800;
 
   const lastTap = new WeakMap();
   const lastToggleAt = new Map();
@@ -129,8 +129,8 @@
   }
 
   // =========================================
-  // ✅ CORRECT 1 - TOUCH PANNA EDATHULA IRUNDHU HEART
-  // Thudikku + Mella Killa Poi Maraiyum da - Size 62 da
+  // ✅ CORRECT 1 - OREY HEART - MELLA MASS DANCE
+  // Fast Illa da - Mella Left-Right Aaditu Killa Poi Maraiyum da
   // =========================================
 
   function showBigHeart(media, touchX, touchY) {
@@ -179,15 +179,15 @@
     document.body.appendChild(heart);
     const animation = heart.animate([
       { transform: "translate(-50%,-50%) scale(0)", opacity: 0, offset: 0 },
-      { transform: "translate(-50%,-50%) scale(1.35)", opacity: 1, offset: 0.18 },
-      { transform: "translate(-50%,-50%) scale(1.0)", opacity: 1, offset: 0.30 },
-      { transform: "translate(-50%,-20%) scale(1.25)", opacity: 1, offset: 0.45 },
-      { transform: "translate(-50%,10%) scale(1.05)", opacity: 1, offset: 0.60 },
-      { transform: "translate(-50%,50%) scale(1.15)", opacity: 0.6, offset: 0.80 },
-      { transform: "translate(-50%,85%) scale(0.9)", opacity: 0, offset: 1 }
-    ], { duration: HEART_DURATION, easing: "ease-out", fill: "forwards" });
+      { transform: "translate(-50%,-50%) scale(1.15)", opacity: 1, offset: 0.12 },
+      { transform: "translate(calc(-50% - 14px),-30%) scale(1.05)", opacity: 1, offset: 0.28 },
+      { transform: "translate(calc(-50% + 14px),0%) scale(1.15)", opacity: 1, offset: 0.45 },
+      { transform: "translate(calc(-50% - 12px),30%) scale(1.05)", opacity: 1, offset: 0.62 },
+      { transform: "translate(calc(-50% + 10px),60%) scale(1.1)", opacity: 0.7, offset: 0.80 },
+      { transform: "translate(-50%,90%) scale(0.95)", opacity: 0, offset: 1 }
+    ], { duration: HEART_DURATION, easing: "ease-in-out", fill: "forwards" });
     animation.onfinish = () => heart.remove();
-    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1200);
+    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1900);
   }
 
   // ✅ Display Touch Heart Full ah Remove da
@@ -242,7 +242,7 @@
   }
 
   // =========================================
-  // ✅ CORRECT 3 - KILLA HEART - Box Illa - Thudikkum Pothu Maraikathu da
+  // ✅ CORRECT 3 - KILLA RED HEART 2 TIMES THUDIKKUM DA
   // =========================================
 
   function buttonAnimation(post) {
@@ -261,7 +261,7 @@
       icon.classList.remove("pixoro-thudikku");
       icon.style.opacity = "1";
       icon.style.transform = "scale(1)";
-    }, 380);
+    }, 600);
   }
 
   // =========================================
@@ -474,7 +474,7 @@
   }
 
   // =========================================
-  // CSS - Box Full ah Remove da - Heart Mattum da
+  // CSS - Box Remove + Red Heart 2 Times Thudikkum da
   // =========================================
 
   function addStyles() {
@@ -482,11 +482,13 @@
     const style = document.createElement("style");
     style.id = "pixoro-v39-css";
     style.textContent = `
-      .pixoro-thudikku { animation: pixoroButtonPop .38s ease; display:inline-block; transform-box: fill-box; transform-origin: center; opacity:1 !important; background:transparent !important; border:none !important; box-shadow:none !important; outline:none !important; }
+      .pixoro-thudikku { animation: pixoroButtonPop .6s ease; display:inline-block; transform-box: fill-box; transform-origin: center; opacity:1 !important; background:transparent !important; border:none !important; box-shadow:none !important; outline:none !important; }
       @keyframes pixoroButtonPop {
         0% { transform:scale(1); opacity:1; }
-        35% { transform:scale(1.4); opacity:1; }
-        60% { transform:scale(0.95); opacity:1; }
+        20% { transform:scale(1.5); opacity:1; }
+        40% { transform:scale(0.9); opacity:1; }
+        60% { transform:scale(1.35); opacity:1; }
+        80% { transform:scale(0.95); opacity:1; }
         100% { transform:scale(1); opacity:1; }
       }
       .like-btn, .like-button, [data-like-btn] { background:transparent !important; border:none !important; outline:none !important; box-shadow:none !important; transform:none !important; animation:none !important; padding:0 !important; }
