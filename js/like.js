@@ -1,7 +1,7 @@
 /* =====================================================
-   PIXORO LIKE SYSTEM V39 - FINAL
-   Double Tap = Orey Heart - Mella Kulla Mass Dance Podu Poi Maraiyum
-   Like Button = Box Illa - Red Heart 2 Times Thudikkum
+   PIXORO LIKE SYSTEM V39 - FINAL - INSTAGRAM STYLE
+   Double Tap = Thodura Edathula Ye Heart Nikkum + Thudikkum + Maraiyum
+   Like Button = Red Heart 2 Times Thudikkum
 ===================================================== */
 
 (() => {
@@ -14,7 +14,7 @@
   const TABLE = "likes";
 
   const DOUBLE_TAP_DELAY = 320;
-  const HEART_DURATION = 1800;
+  const HEART_DURATION = 850;
 
   const lastTap = new WeakMap();
   const lastToggleAt = new Map();
@@ -93,7 +93,7 @@
   }
 
   // =========================================
-  // LIKE UI - Number Perusa Agathu da - Box Illa da
+  // LIKE UI - Box Illa da
   // =========================================
 
   function paintLike(post, liked) {
@@ -129,18 +129,18 @@
   }
 
   // =========================================
-  // ✅ CORRECT 1 - OREY HEART - MELLA MASS DANCE
-  // Fast Illa da - Mella Left-Right Aaditu Killa Poi Maraiyum da
+  // ✅ CORRECT - VIDEO MARIYE DA
+  // Pambu Mari Pogathu da - Orey Edathula Nikkum da - Thudikkum da
   // =========================================
 
   function showBigHeart(media, touchX, touchY) {
     if (!media) return;
     const rect = media.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
-    document.querySelectorAll('.pixoro-big-heart, .pixoro-tap-heart').forEach(h => h.remove());
+    // ✅ Pazhaya Heart ah Delete Panna Koodathu da - Video la Pala Edathula Pala Heart Varuthu da
     const startX = (typeof touchX === 'number' && touchX > 0 ? touchX : rect.left + rect.width / 2);
     const startY = (typeof touchY === 'number' && touchY > 0 ? touchY : rect.top + rect.height / 2);
-    const gid = 'pixoroGrad' + Date.now();
+    const gid = 'pixoroGrad' + Date.now() + Math.floor(Math.random()*1000);
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
     heart.style.cssText = `
@@ -149,8 +149,8 @@
       pointer-events:none;
       left:${startX}px;
       top:${startY}px;
-      width:62px;
-      height:62px;
+      width:72px;
+      height:72px;
       opacity:0;
       transform:translate(-50%,-50%) scale(0);
       background:transparent !important;
@@ -177,25 +177,25 @@
       </svg>
     `;
     document.body.appendChild(heart);
+    // ✅ Orey Edathula Nikkum da - Nagaraathu da - Thudikkum da - Like Button Mariye da
     const animation = heart.animate([
       { transform: "translate(-50%,-50%) scale(0)", opacity: 0, offset: 0 },
-      { transform: "translate(-50%,-50%) scale(1.15)", opacity: 1, offset: 0.12 },
-      { transform: "translate(calc(-50% - 14px),-30%) scale(1.05)", opacity: 1, offset: 0.28 },
-      { transform: "translate(calc(-50% + 14px),0%) scale(1.15)", opacity: 1, offset: 0.45 },
-      { transform: "translate(calc(-50% - 12px),30%) scale(1.05)", opacity: 1, offset: 0.62 },
-      { transform: "translate(calc(-50% + 10px),60%) scale(1.1)", opacity: 0.7, offset: 0.80 },
-      { transform: "translate(-50%,90%) scale(0.95)", opacity: 0, offset: 1 }
-    ], { duration: HEART_DURATION, easing: "ease-in-out", fill: "forwards" });
+      { transform: "translate(-50%,-50%) scale(1.4)", opacity: 1, offset: 0.15 },
+      { transform: "translate(-50%,-50%) scale(1.0)", opacity: 1, offset: 0.30 },
+      { transform: "translate(-50%,-50%) scale(1.25)", opacity: 1, offset: 0.45 },
+      { transform: "translate(-50%,-50%) scale(1.05)", opacity: 1, offset: 0.60 },
+      { transform: "translate(-50%,-50%) scale(1.1)", opacity: 1, offset: 0.75 },
+      { transform: "translate(-50%,-50%) scale(1.1)", opacity: 0, offset: 1 }
+    ], { duration: HEART_DURATION, easing: "ease-out", fill: "forwards" });
     animation.onfinish = () => heart.remove();
-    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1900);
+    setTimeout(()=>{ try{heart.remove()}catch(e){} }, 950);
   }
 
-  // ✅ Display Touch Heart Full ah Remove da
   function showTapHeart(x, y) { return; }
   function showMassDance(media) { return; }
 
   // =========================================
-  // ✅ CORRECT 2 - KILLA IRUNDHU HEART PARAKKUM DA
+  // ✅ KILLA IRUNDHU HEART PARAKKUM DA
   // =========================================
 
   function showButtonHeart(button) {
@@ -242,7 +242,7 @@
   }
 
   // =========================================
-  // ✅ CORRECT 3 - KILLA RED HEART 2 TIMES THUDIKKUM DA
+  // ✅ KILLA RED HEART 2 TIMES THUDIKKUM DA
   // =========================================
 
   function buttonAnimation(post) {
@@ -340,7 +340,7 @@
   }
 
   // =========================================
-  // ✅ DOUBLE TAP - Touch Panna Edathula Irundhu Heart
+  // ✅ DOUBLE TAP
   // =========================================
 
   function handleDoubleTap(media, postId, post, x, y) {
@@ -351,7 +351,7 @@
   }
 
   // =========================================
-  // MOBILE TOUCH - Single Tap = Onnum Illa da
+  // MOBILE TOUCH
   // =========================================
 
   document.addEventListener("touchstart", event => {
@@ -390,7 +390,7 @@
   });
 
   // =========================================
-  // LAPTOP SINGLE CLICK - Photo Click la Onnum Illa da
+  // LAPTOP SINGLE CLICK
   // =========================================
 
   document.addEventListener("click", event => {
@@ -398,7 +398,7 @@
   }, true);
 
   // =========================================
-  // NORMAL LIKE BUTTON CLICK - Killa Heart Parakkum da
+  // NORMAL LIKE BUTTON CLICK
   // =========================================
 
   document.addEventListener("click", event => {
@@ -474,7 +474,7 @@
   }
 
   // =========================================
-  // CSS - Box Remove + Red Heart 2 Times Thudikkum da
+  // CSS - Box Remove + Red Heart Thudikkum da
   // =========================================
 
   function addStyles() {
