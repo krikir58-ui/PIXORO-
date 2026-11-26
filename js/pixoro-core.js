@@ -1,4 +1,5 @@
-// ===== PIXORO CORE - v1.0 - TOP NOTE KEELA + CLOSE BTN + SAFE DA - FULL =====
+// ===== PIXORO CORE - v1025 - CORRECTED - FULL =====
+// Like Guard + ReelSetup Conflict Fix + Photo Sync Fix da
 const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
 const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
 window.PIXORO_URL = SUPA_URL;
@@ -57,6 +58,11 @@ window.isGoldUser = isGoldUser; window.goldTickHTML = goldTickHTML; window.getTi
   .pfpRing{ width:40px;height:40px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5); flex-shrink:0; }
   .pfpInner{ width:100%;height:100%;border-radius:50%;overflow:hidden;background:#000;display:grid;place-items:center; }
   .pfpInner img{ width:100%;height:100%;object-fit:cover; }
+  /* ✅ LIKE FIX - vBar Mela da - Video Click ah Pudikka Koodathu da */
+  .vBar{position:absolute!important;right:10px!important;bottom:110px!important;z-index:50!important;pointer-events:auto!important}
+  .vBtn{pointer-events:auto!important;cursor:pointer!important;touch-action:manipulation!important}
+  .vBtn.liked svg,.vBtn.liked svg path{fill:#FF3040!important;stroke:#FF3040!important}
+  .centerCtrl{display:none!important}.centerCtrl.show{display:flex!important}
   `;
   let s = document.createElement('style'); s.id='pixoro-speed-css'; s.innerText = css; document.head.appendChild(s);
   if(location.pathname.includes('index') || location.pathname.endsWith('/')){
@@ -120,7 +126,6 @@ async function getAllPixoroPosts(){
   }
   return out;
 }
-function pixoroIsRealPhoto(url){ return true; }
 async function pixoroRemoveFromGrid(postId){
   if(!pixoroIsUuid(postId)) return;
   let s = pixoroGetSupa(); if(!s) return;
@@ -183,6 +188,7 @@ async function getPixoroFeed(){
   clean.sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
   return clean;
 }
+// ✅ CORRECTED - pixoroReelSetup la Click Handler Illa da - Reels oda Touch oda Sandai Illa da
 function pixoroReelSetup(videoEl, postId, userId){
   if(!videoEl) return;
   videoEl.loop = true; videoEl.muted = true; videoEl.playsInline = true; videoEl.autoplay = true;
@@ -194,18 +200,7 @@ function pixoroReelSetup(videoEl, postId, userId){
       try{ await s.from('views').insert({post_id:postId, user_id:window.ME_ID}); }catch(e){}
     }
   });
-  let lastTap = 0;
-  videoEl.addEventListener('click', ()=>{
-    let now = Date.now();
-    if(now-lastTap < 300){
-      let h = document.createElement('div'); h.innerText='❤️';
-      h.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:90px;z-index:99';
-      videoEl.parentElement.appendChild(h); setTimeout(()=>h.remove(),600);
-      if(window.pixoroFeedTap) window.pixoroFeedTap(postId, videoEl.parentElement, null);
-      else if(window.pixoroDoubleTapLike) window.pixoroDoubleTapLike(postId, videoEl.parentElement);
-    }
-    lastTap = now;
-  });
+  // ❌ Pazhaya Click Double-Tap Handler ah Remove Panniten da - Reels.js Thaan Handle Pannum da
 }
 async function pixoroSendNotification(toUserId, type, postId, message){ return; }
 window.pixoroSendNotification = pixoroSendNotification;
@@ -232,9 +227,7 @@ async function pixoroSavePost(fileUrl, isReel, caption){
   let row = { user_id: session.user.id, username: window.ME_RAW, media_url: fileUrl, video_url: isReel ? fileUrl : null, image_url: !isReel ? fileUrl : null, media_type: isReel ? 'reel' : 'post', caption: cap, is_archived:false, visibility:'public' };
   let {error} = await s.from('posts').insert(row);
   if(error){ console.log('POST SAVE FAIL', error.message); return; }
-  if(isReel && window.uploadReelPixoro){
-    await window.uploadReelPixoro(session.user.id, fileUrl, false, null, cap);
-  }
+  if(isReel && window.uploadReelPixoro){ await window.uploadReelPixoro(session.user.id, fileUrl, false, null, cap); }
   location.href = isReel ? './reels.html' : './index.html';
 }
 async function loadProfileRealCount(){
@@ -430,7 +423,7 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
-console.log('PIXORO CORE v1.0 - TOP NOTE KEELA + CLOSE BTN DA');
+console.log('PIXORO CORE v1025 - CORRECTED DA');
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
@@ -512,7 +505,6 @@ async function pixoroCheckBell(){
 window.pixoroCheckBell = pixoroCheckBell;
 setInterval(pixoroCheckBell, 15000);
 setTimeout(pixoroCheckBell, 3000);
-// ===== PIXORO CORE - PHOTO SYNC - CORRECTED DA - DB LA IRUNTHU EDU DA =====
 window.MY_PFP = window.MY_PFP || '';
 async function syncMyPhotoEverywhere(){
   let photo = window.MY_PFP || window.ME_PFP || '';
@@ -524,7 +516,6 @@ async function syncMyPhotoEverywhere(){
     let postImg = document.querySelector('.post .pfpInner img');
     if(postImg && postImg.src && postImg.src.length > 20 && !postImg.src.includes('ui-avatars')) photo = postImg.src;
   }
-  // ✅ CORRECT DA - Page la Illana DB ku Poyi Edu da
   if(!photo){
     try{
       let s = pixoroGetSupa();
@@ -544,10 +535,85 @@ async function syncMyPhotoEverywhere(){
   document.querySelectorAll('.myPfp, #navPfp, #myStoryImg, #myCommentPfpWrap img, #storyViewerPfp').forEach(function(img){
     if(img && img.tagName === 'IMG' && img.src !== photo){ img.src = photo; img.style.display = 'block'; }
   });
-  // ✅ CORRECT DA - My Story Letter mattum Hide da - Extra }); Illa da - i Illa da
   let myLetter = document.getElementById('myStoryLetter');
   if(myLetter) myLetter.style.display = 'none';
 }
 window.syncMyPhotoEverywhere = syncMyPhotoEverywhere;
 setInterval(syncMyPhotoEverywhere, 2000);
 if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', syncMyPhotoEverywhere); } else { syncMyPhotoEverywhere(); }
+
+// ===== ✅ V1025 CORRECT ADD - LIKE FINAL GUARD - Kadasiya Irukkanum da =====
+(function(){
+  "use strict";
+  if(window.PIXORO_LIKE_GUARD) return;
+  window.PIXORO_LIKE_GUARD = true;
+  function corePaint(btn, liked){
+    if(!btn) return;
+    btn.classList.toggle("liked", liked);
+    let svg = btn.querySelector("svg");
+    if(svg){ svg.setAttribute("fill", liked ? "#FF3040" : "none"); svg.setAttribute("stroke", liked ? "#FF3040" : "#fff"); svg.style.fill = liked ? "#FF3040" : "none"; }
+    let path = btn.querySelector("svg path");
+    if(path){ path.setAttribute("fill", liked ? "#FF3040" : "none"); path.style.fill = liked ? "#FF3040" : "none"; }
+  }
+  function coreLike(id, btn){
+    if(!btn) return;
+    let clean = String(id || btn.closest(".reel")?.dataset?.id || "").replace("reel-","");
+    if(!clean) return;
+    try{
+      if(!window.FEED_LIKES) window.FEED_LIKES = new Set(JSON.parse(localStorage.getItem("pixoro_likes")||"[]").map(String));
+      if(!window.FEED_COUNTS) window.FEED_COUNTS = JSON.parse(localStorage.getItem("pixoro_counts")||"{}");
+    }catch(_){ window.FEED_LIKES = window.FEED_LIKES || new Set(); window.FEED_COUNTS = window.FEED_COUNTS || {}; }
+    let liked = !window.FEED_LIKES.has(clean);
+    if(liked) window.FEED_LIKES.add(clean); else window.FEED_LIKES.delete(clean);
+    let oldC = Number(window.FEED_COUNTS[clean] ?? btn.querySelector(".rCount")?.textContent ?? 0);
+    let newC = liked ? oldC + 1 : Math.max(0, oldC - 1);
+    window.FEED_COUNTS[clean] = newC;
+    try{ localStorage.setItem("pixoro_likes", JSON.stringify([...window.FEED_LIKES])); localStorage.setItem("pixoro_counts", JSON.stringify(window.FEED_COUNTS)); }catch(_){}
+    corePaint(btn, liked);
+    let cnt = btn.querySelector(".rCount"); if(cnt) cnt.textContent = newC;
+    try{ btn.getAnimations().forEach(a=>a.cancel()); }catch(_){}
+    btn.animate([{transform:"scale(1)"},{transform:"scale(1.5)"},{transform:"scale(1)"}],{duration:400});
+    try{
+      let supa = window.getSupa ? window.getSupa() : window.supa;
+      if(supa && /^[0-9a-f-]{36}$/i.test(clean)){
+        supa.auth.getSession().then(r=>{
+          let uid = r.data?.session?.user?.id; if(!uid) return;
+          if(liked) supa.from("likes").insert({post_id:clean, user_id:uid}).then(()=>{});
+          else supa.from("likes").delete().eq("post_id",clean).eq("user_id",uid).then(()=>{});
+        });
+      }
+    }catch(_){}
+  }
+  window.likeReel = function(id, el, e){ if(e){ e.stopPropagation(); e.preventDefault(); } coreLike(id, el); };
+  window.pixoroLikeReel = window.likeReel;
+  document.addEventListener("touchend", e=>{
+    let btn = e.target.closest('[data-action="like"]');
+    if(!btn || !btn.closest(".reel")) return;
+    e.stopPropagation(); e.preventDefault();
+    btn.dataset.coreTouched = "1";
+    setTimeout(()=>{ btn.dataset.coreTouched = ""; }, 600);
+    coreLike(btn.closest(".reel")?.dataset?.id, btn);
+  }, { passive:false, capture:true });
+  document.addEventListener("click", e=>{
+    let btn = e.target.closest('[data-action="like"]');
+    if(!btn || !btn.closest(".reel")) return;
+    if(btn.dataset.coreTouched === "1") return;
+    e.stopPropagation(); e.preventDefault();
+    coreLike(btn.closest(".reel")?.dataset?.id, btn);
+  }, { capture:true });
+  function corePaintSaved(){
+    try{
+      if(!window.FEED_LIKES) window.FEED_LIKES = new Set(JSON.parse(localStorage.getItem("pixoro_likes")||"[]").map(String));
+      if(!window.FEED_COUNTS) window.FEED_COUNTS = JSON.parse(localStorage.getItem("pixoro_counts")||"{}");
+    }catch(_){}
+    document.querySelectorAll('.reel [data-action="like"]').forEach(btn=>{
+      let clean = String(btn.closest(".reel")?.dataset?.id || "").replace("reel-","");
+      if(!clean) return;
+      corePaint(btn, window.FEED_LIKES.has(clean));
+      let cnt = btn.querySelector(".rCount");
+      if(cnt && window.FEED_COUNTS[clean] !== undefined) cnt.textContent = window.FEED_COUNTS[clean];
+    });
+  }
+  setInterval(corePaintSaved, 1000);
+  console.log("✅ PIXORO CORE LIKE GUARD LOADED da");
+})();
