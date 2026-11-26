@@ -1,10 +1,10 @@
-/* ===== PIXORO REELS V1028 - FIXED - CORRECTED ===== */
+/* ===== PIXORO REELS V1028 - CORRECTED - FULL ===== */
 (function () {
   "use strict";
   let loading = false;
   let observer = null;
   function getClient() {
-    return window.getSupa ? window.getSupa() : window.supa || null;
+    return window.getSupa ? window.getSupa() : window.supa || window.supabaseClient || null;
   }
   function escapeHTML(v) {
     return String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -116,7 +116,7 @@
             heart.innerHTML = `<svg viewBox="0 0 24 24" fill="#ff3040" stroke="#fff" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
             heart.classList.remove("show"); void heart.offsetWidth; heart.classList.add("show");
             const btn = item.querySelector('[data-action="like"]');
-            if (btn && !btn.classList.contains("liked")) { if(window.likeReel) window.likeReel(item.dataset.id, btn); }
+            if (btn && !btn.classList.contains("liked") && window.likeReel) { window.likeReel(item.dataset.id, btn); }
           }
           lastTap = now;
         }, { passive: true });
@@ -131,7 +131,6 @@
             case "comments": window.openComments(id); break;
             case "share": window.openShare(id); break;
             case "save": window.saveReel(id, btn); break;
-            // ✅ CORRECTED - Core oda Real Follow ah Koopdu da - Reels la Overwrite Pannathu da
             case "follow": if(window.pixoroToggleFollow) window.pixoroToggleFollow(btn.dataset.followUser || btn.dataset.followUsername || "", btn); break;
             case "more": window._CUR = id; openSheet("viewerSheet"); break;
           }
@@ -140,29 +139,20 @@
       wrap.querySelectorAll("[data-profile]").forEach(el => { el.addEventListener("click", () => { window.openFriendProfile(el.dataset.profile); }); });
       window.dispatchEvent(new Event("pixoro-reels-rendered"));
       if (window.pixoroLoadAvatars) window.pixoroLoadAvatars();
-      // ✅ Follow Button ah Core kitta Paint Panna Sollu da
       if (window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
     } catch (e) {
       console.error("PIXORO REELS ERROR:", e);
       wrap.innerHTML = `<div style="color:#ff5ea8;text-align:center;padding-top:40vh">Reels load failed<br>${escapeHTML(e.message || "Unknown error")}</div>`;
     } finally { loading = false; }
   }
-  // ❌ likeReel ah Inga Overwrite Panna Koodathu da - Core Guard Thaan Handle Pannum da - Heart Mattum Thudikkum da
-  // ✅ CORRECTED - Save Real ah Pannu da - UI Mattum Illa da
-  window.saveReel = function (id, el) {
-    if(window.pixoroSave) window.pixoroSave(String(id||"").replace("reel-",""));
-    el?.classList.toggle("saved");
-  };
-  // ❌ toggleFollow ah Inga Overwrite Panna Koodathu da - Core oda Real Follow Pochidum da
+  // ✅ CORRECTED - likeReel ah Inga Overwrite Panna Koodathu da - Core Guard Thaan Like Handle Pannum da - Heart Mattum Thudikkum da
+  // ✅ CORRECTED - toggleFollow ah Inga Overwrite Panna Koodathu da - Core oda Real Follow Pochidum da
   window.openComments = function (id) { window._CUR = id; openSheet("commentSheet"); };
   window.postComment = function () { const input = document.getElementById("commentInput"); if (!input?.value.trim()) return; input.value = ""; };
   window.openShare = function (id) { window._CUR = id; openSheet("shareSheet"); };
+  window.saveReel = function (id, el) { if(window.pixoroSave) window.pixoroSave(String(id||"").replace("reel-","")); el?.classList.toggle("saved"); };
   window.copyLinkSafe = function () { navigator.clipboard?.writeText(location.href); window.closeSheet("viewerSheet"); window.closeSheet("shareSheet"); };
-  // ✅ CORRECTED - Profile ?u= Thaan da - ?user= Illa da
-  window.openFriendProfile = function (username) {
-    if (!username) return;
-    location.href = "profile.html?u=" + encodeURIComponent(username);
-  };
+  window.openFriendProfile = function (username) { if (!username) return; location.href = "profile.html?u=" + encodeURIComponent(username); };
   window.editReel = () => window.closeSheet("ownerSheet");
   window.shareQR = () => window.copyLinkSafe();
   window.deleteSafe = () => window.closeSheet("ownerSheet");
