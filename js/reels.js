@@ -1,27 +1,78 @@
 /* =====================================================
-   PIXORO REELS V1023 - FIXED - NO NEW FILE DA
-   Follow / Like / Pause - Ellam Fix da
+   PIXORO REELS V1024 - FINAL - Like + Play/Pause Work Aagum da
+   V39 ah Thodala da - Reels ye Direct ah Like Pannum da
    ===================================================== */
-
 (function () {
   "use strict";
   let loading = false;
   let reelObserver = null;
   function getClient() { return window.getSupa ? window.getSupa() : window.supa || window.supabaseClient || null; }
-  function escapeHTML(value) { return String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
-  function safeURL(value) { try { const url = new URL(value, location.href); return ["https:", "http:"].includes(url.protocol) ? escapeHTML(url.href) : ""; } catch (e) { return ""; } }
-  function isVideo(post) {
-    if (String(post.media_type || "").toLowerCase() === "video") return true;
-    if (post.is_reel === true) return true;
-    if (post.video_url) return true;
-    const media = String(post.media_url || "").trim();
-    if (!media) return false;
-    try { const url = new URL(media, location.href); return /\.(mp4|mov|webm|m4v|ogv)$/i.test(url.pathname); } catch (e) { return /\.(mp4|mov|webm|m4v|ogv)(\?|#|$)/i.test(media); }
+  function escapeHTML(v) { return String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
+  function safeURL(v) { try { const u = new URL(v, location.href); return ["https:", "http:"].includes(u.protocol) ? escapeHTML(u.href) : ""; } catch (e) { return ""; } }
+  function isVideo(p) {
+    if (String(p.media_type || "").toLowerCase() === "video") return true;
+    if (p.is_reel === true) return true;
+    if (p.video_url) return true;
+    const m = String(p.media_url || "").trim(); if (!m) return false;
+    try { const u = new URL(m, location.href); return /\.(mp4|mov|webm|m4v|ogv)$/i.test(u.pathname); } catch (e) { return /\.(mp4|mov|webm|m4v|ogv)(\?|#|$)/i.test(m); }
   }
   window.closeSheet = function (id) { const el = document.getElementById(id); if (el) el.classList.remove("open", "show"); };
   window.openSheet = function (id) { const el = document.getElementById(id); if (el) el.classList.add("open", "show"); };
-  window.toggleMuteAll = function () { window._MUTED = !window._MUTED; document.querySelectorAll(".reel-main").forEach(video => { video.muted = !!window._MUTED; }); };
-  window.openFriendProfile = function (username) { if (!username) return; location.href = "profile.html?user=" + encodeURIComponent(username); };
+  window.toggleMuteAll = function () { window._MUTED = !window._MUTED; document.querySelectorAll(".reel-main").forEach(v => { v.muted = !!window._MUTED; }); };
+  window.openFriendProfile = function (u) { if (!u) return; location.href = "profile.html?user=" + encodeURIComponent(u); };
+
+  // ===== ✅ LIKE - Reels ye Direct ah Pannum da - V39 ku Wait Panna Koodathu da =====
+  window.likeReel = function (id, el, e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    if (!el) return;
+    let reel = el.closest(".reel");
+    let clean = String(id || reel?.dataset?.id || "").replace("reel-", "");
+    if (!clean) return;
+    try {
+      if (!window.FEED_LIKES) window.FEED_LIKES = new Set(JSON.parse(localStorage.getItem("pixoro_likes") || "[]").map(String));
+      if (!window.FEED_COUNTS) window.FEED_COUNTS = JSON.parse(localStorage.getItem("pixoro_counts") || "{}");
+    } catch (_) { window.FEED_LIKES = window.FEED_LIKES || new Set(); window.FEED_COUNTS = window.FEED_COUNTS || {}; }
+    let liked = !window.FEED_LIKES.has(clean);
+    if (liked) window.FEED_LIKES.add(clean); else window.FEED_LIKES.delete(clean);
+    let oldC = Number(window.FEED_COUNTS[clean] ?? el.querySelector(".rCount")?.textContent ?? 0);
+    let newC = liked ? oldC + 1 : Math.max(0, oldC - 1);
+    window.FEED_COUNTS[clean] = newC;
+    try { localStorage.setItem("pixoro_likes", JSON.stringify([...window.FEED_LIKES])); localStorage.setItem("pixoro_counts", JSON.stringify(window.FEED_COUNTS)); } catch (_) {}
+    // ✅ Side Button Paint - Red / White da
+    el.classList.toggle("liked", liked);
+    let svg = el.querySelector("svg");
+    if (svg) { svg.setAttribute("fill", liked ? "#FF3040" : "none"); svg.setAttribute("stroke", liked ? "#FF3040" : "#fff"); }
+    let cnt = el.querySelector(".rCount"); if (cnt) cnt.textContent = newC;
+    el.animate([{ transform: "scale(1)" }, { transform: "scale(1.5)" }, { transform: "scale(1)" }], { duration: 400 });
+    // ✅ DB la Save - Fail Aana kooda Red Marathu da
+    try {
+      let supa = getClient();
+      if (supa && /^[0-9a-f-]{36}$/i.test(clean)) {
+        supa.auth.getSession().then(r => {
+          let uid = r.data?.session?.user?.id; if (!uid) return;
+          if (liked) supa.from("likes").insert({ post_id: clean, user_id: uid }).then(() => {});
+          else supa.from("likes").delete().eq("post_id", clean).eq("user_id", uid).then(() => {});
+        });
+      }
+    } catch (_) {}
+  };
+
+  // ✅ Page Load Aana Apparam - Already Like Pannathu Red ah Kaatu da
+  function paintSavedLikes() {
+    try {
+      if (!window.FEED_LIKES) window.FEED_LIKES = new Set(JSON.parse(localStorage.getItem("pixoro_likes") || "[]").map(String));
+      if (!window.FEED_COUNTS) window.FEED_COUNTS = JSON.parse(localStorage.getItem("pixoro_counts") || "{}");
+    } catch (_) {}
+    document.querySelectorAll(".reel").forEach(reel => {
+      let clean = String(reel.dataset.id || "").replace("reel-", "");
+      let btn = reel.querySelector('[data-action="like"]'); if (!btn) return;
+      let liked = window.FEED_LIKES.has(clean);
+      btn.classList.toggle("liked", liked);
+      let svg = btn.querySelector("svg"); if (svg) { svg.setAttribute("fill", liked ? "#FF3040" : "none"); svg.setAttribute("stroke", liked ? "#FF3040" : "#fff"); }
+      let cnt = btn.querySelector(".rCount");
+      if (cnt && window.FEED_COUNTS[clean] !== undefined) cnt.textContent = window.FEED_COUNTS[clean];
+    });
+  }
 
   async function loadReels() {
     const wrap = document.getElementById("reelWrap");
@@ -31,7 +82,7 @@
     loading = true;
     try {
       let MY_ID = "";
-      try { const session = await supa.auth.getSession(); MY_ID = session.data?.session?.user?.id || ""; } catch (e) {}
+      try { const s = await supa.auth.getSession(); MY_ID = s.data?.session?.user?.id || ""; } catch (e) {}
       window.MY_ID = MY_ID;
       const postResult = await supa.from("posts").select("*").order("created_at", { ascending: false }).limit(50);
       if (postResult.error) throw postResult.error;
@@ -41,8 +92,7 @@
         if (!reelResult.error && Array.isArray(reelResult.data)) {
           const existing = new Set(posts.map(p => String(p.video_url || p.media_url || "")).filter(Boolean));
           reelResult.data.forEach(r => {
-            const media = r.video_url || r.media_url || "";
-            if (!media || existing.has(String(media))) return;
+            const media = r.video_url || r.media_url || ""; if (!media || existing.has(String(media))) return;
             posts.push({ id: "reel-" + r.id, user_id: r.user_id, username: r.username, avatar_url: r.avatar_url, caption: r.caption, video_url: media, media_url: media, media_type: "video", created_at: r.created_at, likes_count: r.likes_count || 0, comments_count: r.comments_count || 0 });
             existing.add(String(media));
           });
@@ -53,22 +103,17 @@
       const userIds = [...new Set(videos.map(p => p.user_id).filter(Boolean))];
       const profileMap = {};
       if (userIds.length) {
-        const profileResult = await supa.from("profiles").select("id,username,avatar_url").in("id", userIds);
-        if (!profileResult.error) { (profileResult.data || []).forEach(profile => { profileMap[String(profile.id)] = profile; }); }
+        const pr = await supa.from("profiles").select("id,username,avatar_url").in("id", userIds);
+        if (!pr.error) (pr.data || []).forEach(p => { profileMap[String(p.id)] = p; });
       }
       if (MY_ID && profileMap[MY_ID]?.avatar_url) { window.MY_PFP = profileMap[MY_ID].avatar_url; document.querySelectorAll("#navPfp,.navPfp").forEach(img => { img.src = window.MY_PFP; }); }
       if (reelObserver) { reelObserver.disconnect(); reelObserver = null; }
-
-      // ✅ FIX 1 - Own Reel na Follow Vara Koodathu da
       wrap.innerHTML = videos.map(post => {
-        const id = escapeHTML(post.id);
-        const owner = escapeHTML(post.user_id || "");
+        const id = escapeHTML(post.id); const owner = escapeHTML(post.user_id || "");
         const profile = profileMap[String(post.user_id)] || {};
         const username = escapeHTML(profile.username || post.username || "Pixoro User");
-        const caption = escapeHTML(post.caption || "");
-        const avatar = safeURL(profile.avatar_url || post.avatar_url || "");
-        const media = safeURL(post.video_url || post.media_url || "");
-        if (!media) return "";
+        const caption = escapeHTML(post.caption || ""); const avatar = safeURL(profile.avatar_url || post.avatar_url || "");
+        const media = safeURL(post.video_url || post.media_url || ""); if (!media) return "";
         const letter = username.charAt(0).toUpperCase();
         const isMine = MY_ID && String(post.user_id) === String(MY_ID);
         return `
@@ -95,51 +140,44 @@
           </div>
         </div>`;
       }).join("");
-
       reelObserver = new IntersectionObserver(entries => {
         entries.forEach(entry => {
-          const video = entry.target.querySelector("video");
-          if (!video) return;
+          const video = entry.target.querySelector("video"); if (!video) return;
           if (entry.isIntersecting) { video.muted = !!window._MUTED; window._CUR = entry.target.dataset.id; video.play().catch(() => {}); } else { video.pause(); }
         });
       }, { threshold: 0.6 });
-
+      // ===== ✅ Play/Pause + Double Tap - Orey Touch Handler da - Sandai Illa da =====
       wrap.querySelectorAll(".reel").forEach(item => {
-        const video = item.querySelector("video");
-        const center = item.querySelector(".centerCtrl");
+        const video = item.querySelector("video"); const center = item.querySelector(".centerCtrl");
         reelObserver.observe(item);
-        // ✅ FIX 2 - Single Tap vs Double Tap - 320ms Wait da
-        let lastTap = 0, singleTimer = null, isDouble = false;
-        function doPlayPause(){ if(video.paused){ video.play().catch(()=>{}); center?.classList.remove("show"); } else { video.pause(); center?.classList.add("show"); } }
-        video.addEventListener("click", () => {
-          if(isDouble){ isDouble = false; return; }
-          if(Date.now() - lastTap < 350) return;
-          clearTimeout(singleTimer);
-          singleTimer = setTimeout(()=>{ if(!isDouble) doPlayPause(); }, 320);
-        });
+        let lastTap = 0, singleTimer = null;
         item.addEventListener("touchend", e => {
           if (e.target.closest(".vBar,.followBtnPerusa,.reel-pfp-wrap,.reel-username")) return;
           const now = Date.now();
           if (now - lastTap < 320) {
-            isDouble = true; clearTimeout(singleTimer); lastTap = 0;
+            clearTimeout(singleTimer); lastTap = 0;
             const heart = item.querySelector(".heartBurst");
             heart.innerHTML = `<svg viewBox="0 0 24 24" fill="#ff3040" stroke="#fff" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
             heart.classList.remove("show"); void heart.offsetWidth; heart.classList.add("show");
             const likeBtn = item.querySelector('[data-action="like"]');
-            if (likeBtn && window.likeReel) window.likeReel(item.dataset.id, likeBtn, null);
-            if(video.paused){ video.play().catch(()=>{}); center?.classList.remove("show"); }
-            setTimeout(()=> isDouble = false, 400);
-          } else { lastTap = now; }
+            if (likeBtn) window.likeReel(item.dataset.id, likeBtn, null);
+            if (video.paused) { video.play().catch(() => {}); center?.classList.remove("show"); }
+          } else {
+            lastTap = now;
+            clearTimeout(singleTimer);
+            singleTimer = setTimeout(() => {
+              if (video.paused) { video.play().catch(() => {}); center?.classList.remove("show"); }
+              else { video.pause(); center?.classList.add("show"); }
+            }, 330);
+          }
         }, { passive: true });
       });
-
       wrap.querySelectorAll("[data-action]").forEach(btn => {
         btn.addEventListener("click", e => {
           e.stopPropagation();
-          const reel = btn.closest(".reel");
-          const id = reel?.dataset.id;
+          const reel = btn.closest(".reel"); const id = reel?.dataset.id;
           switch (btn.dataset.action) {
-            case "like": if (window.likeReel) window.likeReel(id, btn, e); else console.warn("likeReel() missing"); break;
+            case "like": window.likeReel(id, btn, e); break;
             case "comments": if (window.openComments) window.openComments(id); else window.openSheet("commentSheet"); break;
             case "share": if (window.openShare) window.openShare(id); else window.openSheet("shareSheet"); break;
             case "save": if (window.saveReel) window.saveReel(id, btn); else console.warn("saveReel() missing"); break;
@@ -151,39 +189,12 @@
       wrap.querySelectorAll("[data-profile]").forEach(el => { el.addEventListener("click", () => { window.openFriendProfile(el.dataset.profile); }); });
       window.dispatchEvent(new Event("pixoro-reels-rendered"));
       if (window.pixoroLoadAvatars) window.pixoroLoadAvatars();
-      // ✅ FIX 3 - Bridge - Ingaye Irukku da - New File Venaam da
-      setTimeout(syncReelsLike, 100);
+      setTimeout(paintSavedLikes, 100);
     } catch (error) {
       console.error("PIXORO REELS ERROR:", error);
       wrap.innerHTML = `<div style="color:#ff5ea8;text-align:center;padding-top:40vh">Reels load failed<br>${escapeHTML(error.message || "Database error")}</div>`;
     } finally { loading = false; }
   }
-
-  // ✅ FIX 3 - BRIDGE INSIDE reels.js da - V39 ku Reels ah Puriya Vaikkum da - New File Venaam da
-  function syncReelsLike(){
-    document.querySelectorAll(".reel").forEach(reel=>{
-      let id = String(reel.dataset.id||"").replace("reel-","");
-      if(!id) return;
-      reel.dataset.postId = id;
-      reel.classList.add("post");
-      let btn = reel.querySelector('[data-action="like"]');
-      if(btn){ btn.classList.add("like-btn","like-button"); btn.setAttribute("data-like-btn", id); btn.dataset.postId = id;
-        let cnt = btn.querySelector(".rCount"); if(cnt){ cnt.classList.add("like-count"); cnt.setAttribute("data-like-count", id); }
-      }
-      if(!window.FEED_LIKES) return;
-      let liked = window.FEED_LIKES.has(id);
-      if(!btn) return;
-      btn.classList.toggle("liked", liked);
-      let svg = btn.querySelector("svg"); if(svg){ svg.setAttribute("fill", liked ? "#FF3040" : "none"); svg.setAttribute("stroke", liked ? "#FF3040" : "#fff"); }
-      let cnt2 = btn.querySelector(".rCount");
-      if(cnt2){ let c = window.FEED_COUNTS ? Number(window.FEED_COUNTS[id]||0) : Number(cnt2.textContent||0); if(liked && c < 1) c = 1; cnt2.textContent = c; }
-    });
-    if(window.pixoroPaintAllLikes) window.pixoroPaintAllLikes();
-  }
-  // ✅ V39 Like Panna - Reels Side Button ah Yum Red Aakku da
-  setInterval(syncReelsLike, 1000);
-  window.pixoroSyncReelsLike = syncReelsLike;
-
   window.editReel = function () { window.closeSheet("ownerSheet"); };
   window.shareQR = function () { if (window.copyLinkSafe) window.copyLinkSafe(); else window.closeSheet("ownerSheet"); };
   window.deleteSafe = function () { window.closeSheet("ownerSheet"); };
