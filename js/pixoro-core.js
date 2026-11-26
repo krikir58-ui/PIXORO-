@@ -1,13 +1,11 @@
-// ===== PIXORO CORE - v1027 - CORRECTED - FULL =====
+// ===== PIXORO CORE - v1031 - CORRECTED - FULL =====
 // Like Animation Fix - Heart Mattum Thudikkum da - Count Asaiyathu da
-// ✅ CORRECTED DA - Supabase ah Core Thodathu da - supabase.js Thaan Boss da - Sandai Illa da
-// ✅ getSupa ah Overwrite Panna Koodathu da - Gold Tick ah Overwrite Panna Koodathu da
-// ✅ Photo Sync Interval Delete da - Avatar.js Thaan Photo Paathukkum da
+// ✅ CORRECTED DA - Top Banner Remove da - @ Remove da - Fake Reels Remove da - Fake Photo Remove da
+// ✅ Supabase ah Core Thodathu da - supabase.js Thaan Boss da
 
 function pixoroGetBase(){ return location.href.split('?')[0].split('#')[0].replace(/\/[^\/]*$/,'/') + ''; }
 window.pixoroGetBase = pixoroGetBase;
 window.getBase = pixoroGetBase;
-// ✅ getSupa Helper - supabase.js oda getSupa ah Thaan Koopduvam da - Create Panna Maattom da
 function pixoroGetSupa(){ return (typeof window.getSupa === 'function') ? window.getSupa() : (window.supa || null); }
 window.pixoroGetSupa = pixoroGetSupa;
 
@@ -33,11 +31,14 @@ window.pixoroGetSupa = pixoroGetSupa;
   .bottom-nav span{font-size:10px!important}
   .followBtnPost,.followBtnSearch,.followBtnPerusa{ background:transparent!important;color:#fff!important;border:1.5px solid #fff!important;padding:4px 12px!important;border-radius:8px!important;font-size:12px!important;font-weight:700!important;cursor:pointer!important }
   .followBtnPost.following,.followBtnSearch.following,.followBtnPerusa.following{ border-color:#666!important;color:#aaa!important }
-  #pixoroTopNote{ position:fixed!important; top:58px!important; left:0!important; right:0!important; z-index:999!important; display:flex!important; justify-content:center!important; pointer-events:none!important; background:transparent!important; }
-  #pixoroTopNote div{ background:rgba(0,0,0,0.65)!important; backdrop-filter:blur(10px); color:#fff!important; font-size:12px!important; font-weight:700!important; padding:8px 14px!important; border-radius:0 0 16px 16px!important; border:1px solid rgba(255,255,255,0.15)!important; border-top:0!important; pointer-events:auto!important; cursor:pointer!important; }
+  /* ✅ V1031 - Top Banner + Trend Bar Full Remove da - My Story ah Maraikka Koodathu da */
+  #pixoroTopNote{ display:none!important; }
+  #trendBar, .trendBar{ display:none!important; }
   .pfpRing{ width:40px;height:40px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5); flex-shrink:0; }
   .pfpInner{ width:100%;height:100%;border-radius:50%;overflow:hidden;background:#000;display:grid;place-items:center; }
   .pfpInner img{ width:100%;height:100%;object-fit:cover; }
+  /* ✅ V1031 - Fake PFP Hide da - Photo Illana Empty Circle Theriya Koodathu da */
+  .pfpInner img[src=""], .pfpInner img:not([src]){ display:none!important; }
   .vBar{position:absolute!important;right:10px!important;bottom:110px!important;z-index:50!important;pointer-events:auto!important}
   .vBtn{pointer-events:auto!important;cursor:pointer!important;touch-action:manipulation!important;transform:none!important}
   .vBtn .vIcon{display:flex!important;transform-origin:center!important;will-change:transform}
@@ -52,30 +53,17 @@ window.pixoroGetSupa = pixoroGetSupa;
     if(document.body) document.body.classList.add('isHome');
     else document.addEventListener('DOMContentLoaded', ()=>{ if(document.body) document.body.classList.add('isHome'); });
   }
-  function addTopNote(){
-    if(document.getElementById('pixoroTopNote')) return;
-    if(!document.body) return;
-    let n = document.createElement('div');
-    n.id = 'pixoroTopNote';
-    n.innerHTML = `<div id="topNoteInner">🔔 Pixoro - New Updates Paaru da › <span id="topNoteClose" style="margin-left:8px;opacity:.6;padding:0 6px;cursor:pointer">✕</span></div>`;
-    document.body.appendChild(n);
-    document.getElementById('topNoteInner').onclick = ()=>{ location.href='dm.html'; };
-    document.getElementById('topNoteClose').onclick = (e)=>{ e.stopPropagation(); n.style.display='none'; };
-    setTimeout(()=>{ if(n) n.style.display='none'; }, 5000);
-  }
-  if(document.readyState !== 'loading') addTopNote();
-  else document.addEventListener('DOMContentLoaded', addTopNote);
+  // ✅ V1031 - addTopNote Delete Panniten da - Mela Pixoro Banner Venaam da
 })();
-
 window._PIXORO_PFP_CACHE = {};
+// ✅ V1031 - Fake Photo Remove da - ui-avatars Fake Photo Venaam da - Real Photo Illana Empty Thaan da
 window.getPfp = function(p){
-  if(!p) return 'https://ui-avatars.com/api/?name=P&background=ff5ea8&color=fff&size=200&bold=true';
+  if(!p) return '';
   if(typeof p === 'string' && p.includes('http')) return p;
   if(p.avatar_url) return p.avatar_url;
   if(p.profile_pic) return p.profile_pic;
   if(p.photo_url) return p.photo_url;
-  let n = p.username || 'P';
-  return 'https://ui-avatars.com/api/?name='+String(n).charAt(0)+'&background=ff5ea8&color=fff&size=200&bold=true';
+  return '';
 };
 window.pixoroRefreshPhotos = async function(){ return; };
 window.ME_ID = window.ME_ID || null;
@@ -95,19 +83,12 @@ async function pixoroFixMe(){
     }
   }catch(e){}
 }
+// ✅ V1031 - Fake Reels Remove da - getAllPixoroPosts la Posts Mattum Thaan da - Reels Table ah Merge Panna Koodathu da
 async function getAllPixoroPosts(){
   let s = pixoroGetSupa(); if(!s) return [];
   let all = [];
   try{ let r1 = await s.from('posts').select('*').order('created_at',{ascending:false}).limit(100); if(r1.data) all = all.concat(r1.data.map(p=>({...p,_from:'posts'}))); }catch(e){}
-  try{ let r2 = await s.from('reels').select('*').order('created_at',{ascending:false}).limit(100); if(r2.data) all = all.concat(r2.data.map(p=>({...p,_from:'reels'}))); }catch(e){}
-  let seen = new Set(), out = [];
-  for(let p of all){
-    let url = String(p.media_url||p.video_url||p.image_url||p.image||'').split('?')[0].toLowerCase();
-    if(url && seen.has(url)) continue;
-    if(url) seen.add(url);
-    out.push(p);
-  }
-  return out;
+  return all;
 }
 async function pixoroRemoveFromGrid(postId){
   if(!pixoroIsUuid(postId)) return;
@@ -208,7 +189,7 @@ async function pixoroSavePost(fileUrl, isReel, caption){
   let row = { user_id: session.user.id, username: window.ME_RAW, media_url: fileUrl, video_url: isReel ? fileUrl : null, image_url: !isReel ? fileUrl : null, media_type: isReel ? 'reel' : 'post', caption: cap, is_archived:false, visibility:'public' };
   let {error} = await s.from('posts').insert(row);
   if(error){ console.log('POST SAVE FAIL', error.message); return; }
-  if(isReel && window.uploadReelPixoro){ await window.uploadReelPixoro(session.user.id, fileUrl, false, null, cap); }
+  // ✅ V1031 - Reels Table la Duplicate Podathu da - Posts Table Mattum Pothum da - Fake Duplicate Varathu da
   location.href = isReel ? './reels.html' : './index.html';
 }
 async function loadProfileRealCount(){
@@ -223,7 +204,7 @@ async function loadProfileRealCount(){
   });
   let reels = mine.filter(p=>{
     let url = (p.video_url||p.media_url||p.image_url||'').toLowerCase();
-    return url.includes('.mp4') || url.includes('.mov') || p.media_type==='reel' || p.media_type==='video' || p._from==='reels';
+    return url.includes('.mp4') || url.includes('.mov') || p.media_type==='reel' || p.media_type==='video';
   });
   document.querySelectorAll('#postCount, .postCount').forEach(e=> e.innerText = mine.length);
   document.querySelectorAll('#reelCount, .reelCount').forEach(e=> e.innerText = reels.length);
@@ -241,9 +222,10 @@ async function pixoroOpenFollowList(type){
   let html = list.map(f=>{
     let pid = type==='following' ? f.following_id : f.follower_id;
     let pr = (profs||[]).find(p=> String(p.id)===String(pid));
-    let uname = pr?.username || f.following_name || f.follower_name || 'user';
-    let pfp = pr?.avatar_url || 'https://ui-avatars.com/api/?name='+uname.charAt(0)+'&background=ff5ea8&color=fff';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222"><img src="${pfp}" style="width:36px;height:36px;border-radius:50%;object-fit:cover"><b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='./profile.html?u=${pid}'">${uname}</b><button onclick="location.href='./profile.html?u=${pid}'" style="background:transparent;color:#fff;border:1.2px solid #fff;padding:6px 14px;border-radius:20px;font-weight:700">View</button></div>`;
+    let uname = String(pr?.username || f.following_name || f.follower_name || 'user').replace('@','');
+    let pfp = pr?.avatar_url || '';
+    let letter = uname.charAt(0).toUpperCase();
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #222">${pfp ? `<img src="${pfp}" style="width:36px;height:36px;border-radius:50%;object-fit:cover">` : `<div style="width:36px;height:36px;border-radius:50%;background:#FF4D8D;display:grid;place-items:center;color:#fff;font-weight:800">${letter}</div>`}<b style="flex:1;color:#fff;cursor:pointer" onclick="location.href='./profile.html?u=${pid}'">${uname}</b><button onclick="location.href='./profile.html?u=${pid}'" style="background:transparent;color:#fff;border:1.2px solid #fff;padding:6px 14px;border-radius:20px;font-weight:700">View</button></div>`;
   }).join('') || `<div style="color:#888;text-align:center;padding:20px">No ${type} yet</div>`;
   let old = document.getElementById('followModal'); if(old) old.remove();
   let m = document.createElement('div'); m.id = 'followModal';
@@ -404,7 +386,7 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
-console.log('PIXORO CORE v1027 - CORRECTED DA');
+console.log('PIXORO CORE v1031 - CORRECTED DA');
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
@@ -486,10 +468,8 @@ async function pixoroCheckBell(){
 window.pixoroCheckBell = pixoroCheckBell;
 setInterval(pixoroCheckBell, 15000);
 setTimeout(pixoroCheckBell, 3000);
-// ✅ CORRECTED DA - Photo Sync Interval Delete da - Avatar.js Thaan Photo Paathukkum da - Core Inga Thodathu da
 window.MY_PFP = window.MY_PFP || '';
-
-// ===== ✅ V1027 CORRECT ADD - LIKE FINAL GUARD - Kadasiya Irukkanum da =====
+// ===== ✅ V1031 CORRECT ADD - LIKE FINAL GUARD =====
 (function(){
   "use strict";
   if(window.PIXORO_LIKE_GUARD) return;
@@ -545,7 +525,7 @@ window.MY_PFP = window.MY_PFP || '';
   window.likeReel = function(id, el, e){ if(e){ e.stopPropagation(); e.preventDefault(); } coreLike(id, el); };
   window.pixoroLikeReel = window.likeReel;
   if(location.pathname.includes("reels.html")){
-    console.log("✅ CORE LIKE GUARD - Reels la Passive Mode da - Double Animation Illa da");
+    console.log("✅ CORE LIKE GUARD - Reels la Passive Mode da");
     return;
   }
   document.addEventListener("touchend", e=>{
