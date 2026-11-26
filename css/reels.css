@@ -33,6 +33,7 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 .reelsTop b span{color:#FF4D8D!important}
 .topRight{display:flex!important;gap:12px!important;align-items:center!important;pointer-events:auto}
 .volBtn,.searchTopBtn{background:transparent!important;border:none!important;width:28px!important;height:28px!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:20px;position:relative}
+.volBtn svg,.searchTopBtn svg{width:20px!important;height:20px!important;stroke:#fff!important;fill:none!important;stroke-width:1.8!important}
 .hashtag{color:#FF4D8D!important;font-weight:700!important;cursor:pointer!important}
 .bottom-nav{position:fixed!important;bottom:0!important;left:0!important;right:0!important;width:100vw!important;height:64px!important;background:#000!important;border-top:1px solid #222!important;display:flex!important;justify-content:space-around!important;align-items:center!important;z-index:100!important}
 .bottom-nav a{color:#888!important;text-decoration:none!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:2px!important;padding-bottom:4px!important}
@@ -47,12 +48,16 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 .centerCtrl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:0;transition:opacity .25s;z-index:25;background:rgba(0,0,0,0.4);width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 .centerCtrl.show{opacity:1}
 .centerIcon svg{width:36px!important;height:36px!important;fill:#fff!important}
-.heartBurst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);pointer-events:none;z-index:50;opacity:0;width:120px;height:120px;display:flex;align-items:center;justify-content:center}
-.heartBurst::before{content:'❤';font-size:90px!important;color:#ff3040!important}
+
+/* ✅ CORRECT - Heart Burst - Emoji Illa da - Outline SVG Heart da - 48px Chinna Size da */
+.heartBurst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);pointer-events:none;z-index:50;opacity:0;width:48px;height:48px;display:flex;align-items:center;justify-content:center}
+.heartBurst svg{width:48px!important;height:48px!important;fill:#ff3040!important;stroke:#fff!important;stroke-width:1.5!important;filter:drop-shadow(0 0 12px rgba(255,48,64,.8))!important}
 .heartBurst.show{animation:pixoroHeartPop 1.1s cubic-bezier(0.17,0.89,0.32,1.28) forwards}
-@keyframes pixoroHeartPop{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(1.25);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
+@keyframes pixoroHeartPop{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(1.25);opacity:1}30%{transform:translate(-50%,-50%) scale(1);opacity:1}45%{transform:translate(-50%,-50%) scale(1.3);opacity:1}60%{transform:translate(-50%,-50%) scale(1.05);opacity:1}75%{transform:translate(-50%,-50%) scale(1.18);opacity:1}100%{transform:translate(-50%,-50%) scale(1.1);opacity:0}}
+
 .sheet{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;align-items:flex-end;justify-content:center}
 .sheet.show{display:flex}
+.sheet.open{display:flex}
 .sheetBox{background:#fff;width:100%;max-width:480px;border-radius:28px 28px 0 0;padding:10px 0 34px;max-height:88vh;display:flex;flex-direction:column;overflow-y:auto}
 .sheetHandle{width:36px;height:5px;background:#ddd;border-radius:10px;margin:8px auto 18px}
 .pixHead{text-align:center;padding:0 20px 14px}
@@ -61,7 +66,8 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 .safeCard{margin:0 12px 12px;background:#F6F6F8;border-radius:18px;overflow:hidden}
 .safeItem{padding:16px 18px;display:flex;gap:14px;align-items:center;cursor:pointer}
 .safeItem:active{background:#EFEFF3}
-.safeItem .icon{width:36px;height:36px;border-radius:10px;background:#EDEDF2;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.safeItem .icon{width:36px;height:36px;border-radius:10px;background:#EDEDF2;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.safeItem .icon svg{width:20px!important;height:20px!important;stroke:#111!important;fill:none!important;stroke-width:1.8!important}
 .safeItem .txt{flex:1}
 .safeItem .title{font-size:15px;font-weight:600;color:#111}
 .safeItem .sub{font-size:12px;color:#999;margin-top:2px}
@@ -70,7 +76,7 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 .cRow{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;border-bottom:1px solid #eee}
 .cRow .del{color:#ff3b30;font-size:12px;font-weight:700;cursor:pointer}
 .toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:800;z-index:9999;display:none;white-space:nowrap;max-width:90vw}
-/* ✅ PUDHU REELS - GIRI SONNA CSS DA - v1008 */
+.toast.show{display:block}
 .reels-page { background:#000; color:#fff; height:100vh; overflow-y:scroll; scroll-snap-type:y mandatory; }
 .reel-card { height:100vh; scroll-snap-align:start; position:relative; }
 .reel-card video { width:100%; height:100%; object-fit:cover; }
@@ -79,3 +85,7 @@ body{background:#0b141a;color:#e9edef;width:100vw;height:100dvh;overflow:hidden}
 .reel-bottom { position:absolute; left:12px; bottom:90px; }
 .reel-bottom b { font-size:14px; }
 .reel-bottom p { font-size:13px; margin-top:5px; }
+/* ✅ Killa Like - Maraiyathu - Number Perusa Aagathu */
+.vBtn svg{overflow:visible!important;opacity:1!important;visibility:visible!important}
+.vBtn .rCount{font-size:14px!important;line-height:1!important;transform:none!important;animation:none!important}
+.pixoro-big-heart{pointer-events:none!important;background:transparent!important;border:none!important;box-shadow:none!important}
