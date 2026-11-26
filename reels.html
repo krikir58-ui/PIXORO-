@@ -4,13 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Pixoro — Reels</title>
+<!-- ✅ FIX - Reels ku Thevaiyana CSS Mattum da - post.css / profile.css Thookiten da - Athu Thaan Override Pannuchu da -->
 <link rel="stylesheet" href="css/reels.css">
 <link rel="stylesheet" href="css/common.css">
-<link rel="stylesheet" href="css/post.css">
-<link rel="stylesheet" href="css/profile.css">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
+<style>
+  /* ✅ FIX - Reels Blank Vara Koodathu nu Force Style da */
+  #reelWrap{ display:block !important; min-height:100vh; background:#000; }
+  .reel{ display:block !important; visibility:visible !important; }
+  .reel-main{ display:block !important; width:100% !important; height:100% !important; object-fit:cover; }
+</style>
 </head>
 <body>
 
@@ -39,7 +44,7 @@
   <div class="miniBar"><div class="miniFill" id="miniFill"></div></div>
 </div>
 
-<!-- BOTTOM NAV - ELLAM OUTLINE SVG -->
+<!-- BOTTOM NAV - ELLAM OUTLINE SVG - DM Add Pannen da -->
 <nav class="bottom-nav">
   <a href="index.html">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V21H3z"/><path d="M9 21v-6h6v6"/></svg>Home
@@ -53,10 +58,13 @@
   <a href="reels.html" class="active">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M10 9l5 3-5 3z"/></svg>Reels
   </a>
+  <a href="dm.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>DM
+  </a>
   <a href="profile.html"><img class="navPfp" id="navPfp" src="https://ui-avatars.com/api/?name=P&background=FF4D8D&color=fff">You</a>
 </nav>
 
-<!-- OWNER SHEET - ELLAM OUTLINE SVG -->
+<!-- OWNER SHEET -->
 <div class="sheet" id="ownerSheet" onclick="closeSheet('ownerSheet')">
   <div class="sheetBox" onclick="event.stopPropagation()">
     <div class="sheetHandle"></div>
@@ -78,13 +86,13 @@
   </div>
 </div>
 
-<!-- VIEWER SHEET - ELLAM OUTLINE SVG -->
+<!-- VIEWER SHEET -->
 <div class="sheet" id="viewerSheet" onclick="closeSheet('viewerSheet')">
   <div class="sheetBox" onclick="event.stopPropagation()">
     <div class="sheetHandle"></div>
     <div class="pixHead"><b>Reel Options</b><p>Safe &amp; kind actions only</p></div>
     <div class="safeCard">
-      <div class="safeItem" onclick="saveReel()">
+      <div class="safeItem" onclick="saveReel(window._CUR, this)">
         <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></span>
         <div class="txt"><div class="title">Save for later</div><div class="sub">Watch it again anytime</div></div>
       </div>
@@ -92,7 +100,7 @@
         <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span>
         <div class="txt"><div class="title">Copy Link</div><div class="sub">Share this reel anywhere</div></div>
       </div>
-      <div class="safeItem" onclick="openFriendProfile()">
+      <div class="safeItem" onclick="openFriendProfile(document.querySelector('.reel[data-id=&quot;'+window._CUR+'&quot;] .reel-username')?.textContent?.replace('@','') || '')">
         <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg></span>
         <div class="txt"><div class="title">View Profile</div><div class="sub">See who posted this</div></div>
       </div>
@@ -127,7 +135,7 @@
   </div>
 </div>
 
-<!-- SHARE SHEET - ELLAM OUTLINE SVG -->
+<!-- SHARE SHEET -->
 <div class="sheet" id="shareSheet" onclick="closeSheet('shareSheet')">
   <div class="sheetBox" onclick="event.stopPropagation()">
     <div class="sheetHandle"></div>
@@ -145,9 +153,10 @@
   </div>
 </div>
 
+<!-- ✅ FIX - Script Order da - Illatha File Thookiten da - GitHub la Irukka File Mattum da -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/pixoro-core.js"></script>
+<script src="js/avatar.js"></script>
 <script src="js/reels.js"></script>
-<script src="js/profile-sync.js"></script>
 </body>
 </html>
