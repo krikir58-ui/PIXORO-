@@ -1,196 +1,252 @@
-/* ===== PIXORO REELS V1029 - CORRECTED - FULL ===== */
-(function () {
+/* ===== PIXORO FEED V1030 - CORRECTED - FULL ===== */
+(function(){
   "use strict";
   let loading = false;
-  let observer = null;
-  let _reelTried = 0;
-  function getClient() {
+  let _tried = 0;
+
+  function getClient(){
     return (typeof window.getSupa === 'function') ? window.getSupa() : (window.supa || null);
   }
-  function escapeHTML(v) {
-    return String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  function esc(v){
+    return String(v ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
   }
-  function safeURL(v) {
-    try { const u = new URL(v, location.href); return ["https:", "http:"].includes(u.protocol) ? escapeHTML(u.href) : ""; } catch { return ""; }
+  function safeURL(v){
+    try{ const u = new URL(v, location.href); return ["https:","http:"].includes(u.protocol) ? esc(u.href) : ""; }catch{ return ""; }
   }
-  function openSheet(id) { document.getElementById(id)?.classList.add("open", "show"); }
-  window.openSheet = openSheet;
-  window.closeSheet = function (id) { document.getElementById(id)?.classList.remove("open", "show"); };
-  window.toggleMuteAll = function () {
-    window._MUTED = !window._MUTED;
-    document.querySelectorAll(".reel-main").forEach(v => { v.muted = !!window._MUTED; });
-  };
-  async function loadReels() {
-    const wrap = document.getElementById("reelWrap");
-    if (!wrap || loading) return;
-    const supa = getClient();
-    // ✅ CORRECTED DA - Supa Illana - 3 Thadava Retry Pannum da - Black Varathu da
-    if (!supa) {
-      _reelTried++;
-      if(_reelTried <= 3){
-        wrap.innerHTML = '<div style="color:white;text-align:center;padding-top:40vh">Reels Load Aaguthu da... 🔥</div>';
-        setTimeout(loadReels, 1500);
-        return;
-      }
-      wrap.innerHTML = '<div style="color:white;text-align:center;padding-top:40vh">Database not ready<br><button onclick="location.reload()" style="background:#FF2DCC;color:#fff;border:none;padding:10px 20px;border-radius:20px;margin-top:12px;font-weight:800">Retry Pannu da</button></div>';
+  function showFeedError(msg){
+    let e = document.getElementById("feedError");
+    if(e){ e.style.display = "block"; e.innerText = msg || "Feed Load Aagala da - Refresh Pannu da"; }
+  }
+  function hideFeedError(){
+    let e = document.getElementById("feedError");
+    if(e) e.style.display = "none";
+  }
+
+  // ✅ CORRECTED DA - Like ah Core Guard Thaan Handle Pannum da - Feed la Overwrite Panna Koodathu da
+
+  async function loadPixoroFeed(){
+    let feed = document.getElementById("feed");
+    if(!feed || loading) return;
+    let supa = getClient();
+
+    // ✅ CORRECTED DA - Supa Late ah Vantha - 3 Thadava Retry da - Black Varathu da
+    if(!supa){
+      _tried++;
+      feed.innerHTML = '<div style="color:#fff;text-align:center;padding:40px;font-weight:700">Feed Load Aaguthu da... 🔥</div>';
+      if(_tried <= 3){ setTimeout(loadPixoroFeed, 1500); return; }
+      feed.innerHTML = '<div style="color:#fff;text-align:center;padding:40px">Supabase Connect Aagala da ❌<br><br><button onclick="location.reload()" style="background:#FF2DCC;color:#fff;border:none;padding:12px 22px;border-radius:22px;font-weight:800">Retry Pannu da</button></div>';
       return;
     }
     loading = true;
-    try {
-      let MY_ID = "";
-      const sessionResult = await supa.auth.getSession();
-      MY_ID = sessionResult.data?.session?.user?.id || "";
-      const postResult = await supa.from("posts").select("*").order("created_at", { ascending: false }).limit(50);
-      if (postResult.error) throw postResult.error;
-      let posts = Array.isArray(postResult.data) ? [...postResult.data] : [];
-      const reelResult = await supa.from("reels").select("*").order("created_at", { ascending: false }).limit(50);
-      if (!reelResult.error && Array.isArray(reelResult.data)) {
-        // ✅ CORRECTED DA - Duplicate Check - URL + ID Rendum Paarkkanum da
-        let seenUrls = new Set(posts.map(p=>String(p.video_url||p.media_url||p.image_url||"").split("?")[0].toLowerCase()).filter(Boolean));
-        let seenIds = new Set(posts.map(p=>String(p.id).replace("reel-","")));
-        reelResult.data.forEach(r => {
-          const url = r.media_url || r.video_url || "";
-          if (!url) return;
-          let cleanUrl = String(url).split("?")[0].toLowerCase();
-          if (seenUrls.has(cleanUrl)) return;
-          if (seenIds.has(String(r.id))) return;
-          seenUrls.add(cleanUrl); seenIds.add(String(r.id));
-          posts.push({ id: "reel-" + r.id, user_id: r.user_id, username: r.username, avatar_url: r.avatar_url, caption: r.caption, media_url: url, video_url: url, media_type: "video", created_at: r.created_at, likes_count: r.likes_count || 0, comments_count: r.comments_count || 0 });
-        });
-      }
-      const videos = posts.filter(p => {
-        const url = String(p.video_url || p.media_url || p.image_url || "");
-        return String(p.media_type || "").toLowerCase() === "video" || String(p.media_type || "").toLowerCase() === "reel" || /\.(mp4|mov|webm|m4v)(\?|#|$)/i.test(url);
-      });
-      if (!videos.length) { wrap.innerHTML = '<div style="color:white;text-align:center;padding-top:40vh">Innum Reels Illa da 😅<br>Post la Video Upload Pannu da</div>'; return; }
-      const userIds = [...new Set(videos.map(p => p.user_id).filter(Boolean))];
-      const profileMap = {};
-      if (userIds.length) {
-        const profileResult = await supa.from("profiles").select("id,username,avatar_url").in("id", userIds);
-        if (!profileResult.error) { (profileResult.data || []).forEach(p => { profileMap[String(p.id)] = p; }); }
-      }
-      if (MY_ID && profileMap[String(MY_ID)]?.avatar_url) {
-        window.MY_PFP = profileMap[String(MY_ID)].avatar_url;
-        document.querySelectorAll("#navPfp,.navPfp").forEach(n => { n.src = window.MY_PFP; });
-      }
-      if (observer) observer.disconnect();
-      wrap.innerHTML = videos.map(p => {
-        const id = String(p.id);
-        const owner = String(p.user_id || "");
-        const prof = profileMap[owner] || {};
-        const username = String(prof.username || p.username || "Pixoro User");
-        const caption = escapeHTML(p.caption || "");
-        const safeName = escapeHTML(username);
-        const pfp = safeURL(prof.avatar_url || p.avatar_url || "");
-        const media = safeURL(p.video_url || p.media_url || p.image_url || "");
-        const letter = escapeHTML(username.charAt(0).toUpperCase());
-        // ✅ CORRECTED DA - Gold Tick ah Inga Add Panniten da
-        const tick = (typeof window.goldTickHTML === 'function') ? window.goldTickHTML({username: username, user_id: owner}) : '';
-        return `
-        <div class="reel" data-id="${escapeHTML(id)}" data-owner="${escapeHTML(owner)}">
-          <video class="reel-main" src="${media}" loop playsinline muted preload="metadata"></video>
-          <div class="progress"></div>
-          <div class="centerCtrl"><div class="centerIcon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
-          <div class="heartBurst"></div>
-          <div class="btm">
-            <div style="display:flex;align-items:center;gap:10px">
-              <div class="reel-pfp-wrap" data-profile="${safeName}">${pfp ? `<img src="${pfp}" onerror="this.remove()">` : `<div style="width:100%;height:100%;background:#FF4D8D;display:flex;align-items:center;justify-content:center;font-weight:800">${letter}</div>`}</div>
-              <span class="reel-username" data-profile="${safeName}">@${safeName} ${tick}</span>
-              <button class="followBtnPerusa" data-action="follow" data-follow-user="${safeName}" data-follow-username="${safeName}">Follow</button>
-            </div>
-            <div class="reel-caption"><b>@${safeName}</b> ${caption}</div>
-          </div>
-          <div class="vBar">
-            <div class="vBtn" data-action="like"><span class="vIcon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span><span class="rCount">${Number(p.likes_count) || 0}</span></div>
-            <div class="vBtn" data-action="comments"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.5-8.5h.5a8.5 8.5 0 0 1 8 8z"/></svg><span>${Number(p.comments_count) || 0}</span></div>
-            <div class="vBtn" data-action="share"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg><span>Share</span></div>
-            <div class="vBtn" data-action="save"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Save</span></div>
-            <div class="vBtn tildeBtn" data-action="more"><span>⋯</span></div>
-            <div class="audioWrap"><div class="audioDiscInBar">${pfp ? `<img src="${pfp}" style="width:100%;height:100%;object-fit:cover">` : letter}</div></div>
-          </div>
-        </div>`;
-      }).join("");
-      observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          const video = entry.target.querySelector("video");
-          if (!video) return;
-          if (entry.isIntersecting) { video.muted = !!window._MUTED; window._CUR = entry.target.dataset.id; video.play().catch(() => {}); } else { video.pause(); }
-        });
-      }, { threshold: 0.6 });
-      wrap.querySelectorAll(".reel").forEach(item => {
-        observer.observe(item);
-        const video = item.querySelector("video");
-        video.addEventListener("click", () => {
-          const center = item.querySelector(".centerCtrl");
-          if (video.paused) { video.play().catch(() => {}); center?.classList.remove("show"); } else { video.pause(); center?.classList.add("show"); }
-        });
-        let lastTap = 0;
-        item.addEventListener("touchend", e => {
-          if (e.target.closest(".vBar,.followBtnPerusa,.reel-pfp-wrap,.reel-username")) return;
-          const now = Date.now();
-          if (now - lastTap < 320) {
-            const heart = item.querySelector(".heartBurst");
-            heart.innerHTML = `<svg viewBox="0 0 24 24" fill="#ff3040" stroke="#fff" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
-            heart.classList.remove("show"); void heart.offsetWidth; heart.classList.add("show");
-            const btn = item.querySelector('[data-action="like"]');
-            if (btn && !btn.classList.contains("liked") && window.likeReel) { window.likeReel(item.dataset.id, btn); }
-          }
-          lastTap = now;
-        }, { passive: true });
-      });
-      wrap.querySelectorAll("[data-action]").forEach(btn => {
-        btn.addEventListener("click", e => {
-          e.stopPropagation();
-          const reel = btn.closest(".reel");
-          const id = reel?.dataset.id;
-          switch (btn.dataset.action) {
-            case "like": if(window.likeReel) window.likeReel(id, btn); break;
-            case "comments": if(window.openComments) window.openComments(id); break;
-            case "share": if(window.openShare) window.openShare(id); break;
-            case "save": if(window.saveReel) window.saveReel(id, btn); break;
-            case "follow": if(window.pixoroToggleFollow) window.pixoroToggleFollow(btn.dataset.followUser || btn.dataset.followUsername || "", btn); break;
-            case "more": window._CUR = id; openSheet("viewerSheet"); break;
-          }
-        });
-      });
-      wrap.querySelectorAll("[data-profile]").forEach(el => { el.addEventListener("click", () => { if(window.openFriendProfile) window.openFriendProfile(el.dataset.profile); }); });
-      window.dispatchEvent(new Event("pixoro-reels-rendered"));
-      if (window.pixoroLoadAvatars) window.pixoroLoadAvatars();
-      if (window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
-    } catch (e) {
-      console.error("PIXORO REELS ERROR:", e);
-      wrap.innerHTML = `<div style="color:#ff5ea8;text-align:center;padding-top:40vh">Reels load failed<br>${escapeHTML(e.message || "Unknown error")}<br><button onclick="location.reload()" style="background:#FF2DCC;color:#fff;border:none;padding:10px 20px;border-radius:20px;margin-top:12px;font-weight:800">Retry Pannu da</button></div>`;
-    } finally { loading = false; }
-  }
-  // ✅ CORRECTED DA - Comment ah Real ah Save Pannum da - Fake Clear Illa da
-  window.openComments = function (id) { window._CUR = id; if(window.openComment) return window.openComment(id); openSheet("commentSheet"); };
-  window.postComment = async function () {
-    const input = document.getElementById("commentInput");
-    if (!input?.value.trim()) return;
-    if(window.addComment) return window.addComment();
-    // Fallback - Comments.js Illana - Direct Supabase la Podum da
+    _tried = 0;
+    hideFeedError();
+    feed.innerHTML = '<div style="color:#fff;text-align:center;padding:40px;font-weight:700">Feed Load Aaguthu da... 🔥</div>';
+
     try{
-      let s = getClient(); let txt = input.value.trim(); input.value = "";
-      if(!s) return;
-      let {data:{session}} = await s.auth.getSession();
-      if(!session) return;
-      let pid = String(window._CUR||"").replace("reel-","");
-      await s.from("comments").insert({post_id: pid, user_id: session.user.id, username: window.ME_RAW||"user", text: txt});
-    }catch(e){ console.log("COMMENT FAIL", e); }
+      // ✅ Session - Login Illana Kooda Feed Kaamikkum da - Login Loop Illa da
+      let MY_ID = "";
+      try{ let {data:{session}} = await supa.auth.getSession(); MY_ID = session?.user?.id || ""; window.ME_ID = MY_ID || window.ME_ID; }catch(_){}
+
+      let r = await supa.from("posts").select("*").order("created_at",{ascending:false}).limit(100);
+      if(r.error) throw r.error;
+      let posts = Array.isArray(r.data) ? [...r.data] : [];
+
+      // ✅ Reels Table la Irukka Video Post ah Kooda Feed la Kaamikkum da - Duplicate Illama da
+      try{
+        let rr = await supa.from("reels").select("*").order("created_at",{ascending:false}).limit(50);
+        if(!rr.error && Array.isArray(rr.data)){
+          let seenUrl = new Set(posts.map(p=>String(p.media_url||p.video_url||p.image_url||"").split("?")[0].toLowerCase()).filter(Boolean));
+          let seenId = new Set(posts.map(p=>String(p.id)));
+          rr.data.forEach(x=>{
+            let url = x.media_url||x.video_url||"";
+            if(!url) return;
+            let cu = String(url).split("?")[0].toLowerCase();
+            if(seenUrl.has(cu) || seenId.has(String(x.id))) return;
+            seenUrl.add(cu); seenId.add(String(x.id));
+            posts.push({ id: x.id, user_id: x.user_id, username: x.username, avatar_url: x.avatar_url, caption: x.caption, media_url: url, video_url: url, image_url: url, media_type: x.media_type||"reel", created_at: x.created_at, likes_count: x.likes_count||0, comments_count: x.comments_count||0 });
+          });
+        }
+      }catch(_){}
+
+      // ✅ Filter - Archived + Private Share + Blocked ah Thookidum da
+      let blocked = [];
+      try{ if(window.ME_ID && typeof window.pixoroGetBlockedIds === 'function'){ blocked = await window.pixoroGetBlockedIds(); } }catch(_){}
+      let mode = window.PIXORO_FEED_MODE || 'foryou';
+      let clean = posts.filter(p=>{
+        if(p.is_archived === true) return false;
+        if(p.visibility === 'private_share') return false;
+        if(p.user_id && blocked.includes(String(p.user_id))) return false;
+        return true;
+      });
+
+      // ✅ Following Mode - Following Pannavanga Post Mattum da
+      if(mode === 'following' && MY_ID){
+        try{
+          let {data:fl} = await supa.from("follows").select("following_id").eq("follower_id", MY_ID).eq("status","accepted");
+          let ids = new Set((fl||[]).map(x=>String(x.following_id)));
+          ids.add(String(MY_ID));
+          clean = clean.filter(p=> ids.has(String(p.user_id)));
+        }catch(_){}
+      }
+      // ✅ Latest Mode - Time Order da - ForYou Mode - Time Order Thaan da
+      clean.sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
+
+      if(!clean.length){
+        feed.innerHTML = '<div style="color:#fff;text-align:center;padding:40px;line-height:1.8;font-weight:700">Innum Post Illa da 😅<br><span style="color:#aaa;font-size:13px;font-weight:400">+ Button ah Thottu Post Podu da</span><br><br><button onclick="location.href=\'./create.html\'" style="background:#FF2DCC;color:#fff;border:none;padding:12px 22px;border-radius:22px;font-weight:800">+ Post Podu da</button></div>';
+        return;
+      }
+
+      // ✅ Profile Map - Avatar + Username Correct ah Varum da
+      let userIds = [...new Set(clean.map(p=>p.user_id).filter(Boolean))];
+      let profileMap = {};
+      if(userIds.length){
+        try{
+          let pr = await supa.from("profiles").select("id,username,avatar_url").in("id", userIds);
+          if(!pr.error) (pr.data||[]).forEach(p=>{ profileMap[String(p.id)] = p; });
+        }catch(_){}
+      }
+      window.profileMap = profileMap;
+
+      // ✅ My PFP - Nav + Story ku da
+      if(MY_ID && profileMap[String(MY_ID)]){
+        window.ME_RAW = profileMap[String(MY_ID)].username || window.ME_RAW;
+        if(profileMap[String(MY_ID)].avatar_url){
+          window.MY_PFP = profileMap[String(MY_ID)].avatar_url;
+        }
+      }
+
+      // ✅ Trend Bar - Top la 3 Trending Username da
+      try{
+        let tb = document.getElementById("trendBar");
+        if(tb){
+          let top = clean.slice(0,3).map(p=>{
+            let u = profileMap[String(p.user_id)]?.username || p.username || "user";
+            return '<span onclick="location.href=\'./profile.html?u='+esc(String(p.user_id||u))+'\'" style="background:#1a1a1d;border:1px solid #333;color:#fff;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer">🔥 @'+esc(u)+'</span>';
+          }).join("");
+          tb.innerHTML = top ? '<div style="display:flex;gap:8px;overflow-x:auto;padding:10px 12px">'+top+'</div>' : "";
+        }
+      }catch(_){}
+
+      // ✅ Feed Render da - Gold Tick + Avatar + Like + Comment + Share + Save + More Ellaam da
+      feed.innerHTML = clean.map(p=>{
+        let id = String(p.id);
+        let owner = String(p.user_id||"");
+        let prof = profileMap[owner] || {};
+        let username = String(prof.username || p.username || "Pixoro User");
+        let avatar = safeURL(prof.avatar_url || p.avatar_url || "");
+        let letter = esc(username.charAt(0).toUpperCase());
+        let caption = esc(p.caption||"");
+        let img = safeURL(p.image_url || p.media_url || p.video_url || "");
+        let isVideo = /\.(mp4|mov|webm|m4v)(\?|#|$)/i.test(img) || String(p.media_type||"").toLowerCase()==="video" || String(p.media_type||"").toLowerCase()==="reel";
+        let tick = (typeof window.goldTickHTML === 'function') ? window.goldTickHTML({username: username, user_id: owner, id: owner}) : '';
+        let likes = Number(p.likes_count)||0;
+        let comments = Number(p.comments_count)||0;
+        let isMine = MY_ID && String(MY_ID) === owner;
+        let time = p.created_at ? new Date(p.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"short"}) : "";
+
+        return '<article class="post" data-id="'+esc(id)+'" data-owner="'+esc(owner)+'" style="background:#000;border-bottom:1px solid #222;padding-bottom:12px;margin-bottom:8px">'
+        + '<div style="display:flex;align-items:center;gap:10px;padding:12px">'
+        + '<div class="pfpRing" onclick="location.href=\'./profile.html?u='+esc(owner)+'\'" style="cursor:pointer"><div class="pfpInner">'+(avatar ? '<img src="'+avatar+'" onerror="this.remove()">' : '<span style="color:#fff;font-weight:800">'+letter+'</span>')+'</div></div>'
+        + '<div style="flex:1;min-width:0"><b style="color:#fff;cursor:pointer" onclick="location.href=\'./profile.html?u='+esc(owner)+'\'">@'+esc(username)+' '+tick+'</b><div style="color:#888;font-size:11px">'+esc(time)+'</div></div>'
+        + (isMine ? '' : '<button class="followBtnPost" data-action="follow" data-follow-user="'+esc(username)+'" data-follow-username="'+esc(username)+'">Follow</button>')
+        + '<button onclick="openPostMenu(\''+esc(id)+'\',\''+esc(owner)+'\',\''+esc(username)+'\')" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer">⋯</button>'
+        + '</div>'
+        + (img ? (isVideo ? '<video src="'+img+'" style="width:100%;aspect-ratio:4/5;object-fit:cover;background:#111" controls playsinline preload="metadata"></video>' : '<img src="'+img+'" style="width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#111">') : '')
+        + '<div style="display:flex;gap:18px;padding:10px 12px;align-items:center">'
+        + '<button data-action="like" data-post-id="'+esc(id)+'" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;gap:6px"><span class="vIcon">❤️</span><span class="rCount" style="font-size:14px">'+likes+'</span></button>'
+        + '<button onclick="openComment(\''+esc(id)+'\')" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer">💬 <span style="font-size:14px">'+comments+'</span></button>'
+        + '<button onclick="openShareModal ? openShareModal(\''+esc(id)+'\') : openShare(\''+esc(id)+'\')" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer">✈️</button>'
+        + '<button onclick="savePostFeed(\''+esc(id)+'\', this)" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;margin-left:auto">🔖</button>'
+        + '</div>'
+        + '<div style="padding:0 12px 10px;color:#fff;font-size:14px"><b>@'+esc(username)+'</b> '+caption+'</div>'
+        + '</article>';
+      }).join("");
+
+      // ✅ Like Button - Core Guard oda Same Logic da - Heart Mattum Thudikkum da
+      feed.querySelectorAll('[data-action="like"]').forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          let pid = btn.dataset.postId;
+          let liked = btn.classList.toggle("liked");
+          let cntEl = btn.querySelector(".rCount");
+          let c = Number(cntEl?.textContent||0);
+          if(cntEl) cntEl.textContent = liked ? c+1 : Math.max(0, c-1);
+          let heart = btn.querySelector(".vIcon");
+          if(heart){ try{ heart.getAnimations().forEach(a=>a.cancel()); }catch(_){} heart.animate([{transform:"scale(1)"},{transform:"scale(1.25)"},{transform:"scale(0.95)"},{transform:"scale(1)"}],{duration:280,easing:"ease-out"}); }
+          // DB la Save Pannum da
+          (async()=>{
+            try{
+              if(!MY_ID) return;
+              if(liked) await supa.from("likes").insert({post_id: pid, user_id: MY_ID});
+              else await supa.from("likes").delete().eq("post_id", pid).eq("user_id", MY_ID);
+            }catch(_){}
+          })();
+        });
+      });
+
+      // ✅ Follow Button - Core oda Real Follow da
+      feed.querySelectorAll('[data-action="follow"]').forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          if(window.pixoroToggleFollow) window.pixoroToggleFollow(btn.dataset.followUser||"", btn);
+        });
+      });
+
+      if(window.pixoroLoadAvatars) window.pixoroLoadAvatars();
+      if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
+      if(window.pixoroCheckBell) window.pixoroCheckBell();
+      window.dispatchEvent(new Event("pixoro-feed-rendered"));
+
+    }catch(e){
+      console.error("PIXORO FEED ERROR:", e);
+      showFeedError("Feed Load Failed da - "+(e.message||""));
+      feed.innerHTML = '<div style="color:#fff;text-align:center;padding:40px">Feed Load Failed da ❌<br><span style="color:#ff5ea8;font-size:13px">'+esc(e.message||"")+'</span><br><br><button onclick="location.reload()" style="background:#FF2DCC;color:#fff;border:none;padding:12px 22px;border-radius:22px;font-weight:800">Retry Pannu da</button></div>';
+    }finally{
+      loading = false;
+    }
+  }
+
+  // ✅ Helper Functions - Feed la Irundhu Koopduvam da
+  window.openComment = function(id){
+    window._CUR = id;
+    if(window.openComments) return window.openComments(id);
+    let m = document.getElementById("commentModal");
+    if(m) m.style.display = "block";
   };
-  window.openShare = function (id) { window._CUR = id; if(window.openShareModal) return window.openShareModal(id); openSheet("shareSheet"); };
-  window.saveReel = function (id, el) { if(window.pixoroSave) window.pixoroSave(String(id||"").replace("reel-","")); el?.classList.toggle("saved"); };
-  window.copyLinkSafe = function () { navigator.clipboard?.writeText(location.href); window.closeSheet("viewerSheet"); window.closeSheet("shareSheet"); };
-  window.openFriendProfile = function (username) { if (!username) return; location.href = "profile.html?u=" + encodeURIComponent(username); };
-  window.editReel = () => window.closeSheet("ownerSheet");
-  window.shareQR = () => window.copyLinkSafe();
-  window.deleteSafe = () => window.closeSheet("ownerSheet");
-  window.notInterestedSafe = () => window.closeSheet("viewerSheet");
-  window.hideReelSafe = () => window.closeSheet("viewerSheet");
-  window.reportSafe = () => window.closeSheet("viewerSheet");
-  window.shareWA = function () { const url = "https://wa.me/?text=" + encodeURIComponent("Pixoro Reel Paaru 🔥 " + location.href); window.open(url, "_blank", "noopener"); };
-  window.loadPixoroReels = loadReels;
-  // ✅ CORRECTED DA - Supa Ready Aana Thirumba Load Aagum da
-  window.addEventListener("pixoro-supa-ready", ()=>{ _reelTried = 0; loading = false; loadReels(); });
-  if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", loadReels); } else { loadReels(); }
+  window.closeComment = function(){ let m = document.getElementById("commentModal"); if(m) m.style.display = "none"; };
+  window.openPostMenu = function(id, owner, username){
+    window._CUR = id; window._CUR_OWNER = owner; window._CUR_USER = username;
+    let box = document.getElementById("postMenuBox");
+    let sheet = document.getElementById("postMenu");
+    if(box) box.innerHTML = '<div style="padding:16px;color:#fff;text-align:center">'
+      + '<div onclick="openComment(\''+esc(id)+'\')" style="padding:12px;border-bottom:1px solid #333;cursor:pointer">💬 Comments</div>'
+      + '<div onclick="openShare(\''+esc(id)+'\')" style="padding:12px;border-bottom:1px solid #333;cursor:pointer">✈️ Share</div>'
+      + '<div onclick="closePostMenu()" style="padding:12px;cursor:pointer;color:#aaa">Cancel</div></div>';
+    if(sheet) sheet.style.display = "block";
+  };
+  window.closePostMenu = function(){ let s = document.getElementById("postMenu"); if(s) s.style.display = "none"; };
+  window.savePostFeed = async function(id, btn){
+    try{
+      if(window.pixoroSave) await window.pixoroSave(id);
+      if(btn) btn.style.opacity = "0.5";
+    }catch(_){}
+  };
+
+  // ✅ Feed Mode - Tab Thotta Feed Thirumba Load Aagum da
+  window.setFeedMode = function(mode){
+    window.PIXORO_FEED_MODE = mode || 'foryou';
+    document.querySelectorAll('.feedTab').forEach(t=>t.classList.remove('active'));
+    let map = {foryou:'tabForYou', following:'tabFollowing', latest:'tabLatest'};
+    let el = document.getElementById(map[mode]||'tabForYou');
+    if(el) el.classList.add('active');
+    loading = false;
+    loadPixoroFeed();
+  };
+
+  window.loadPixoroFeed = loadPixoroFeed;
+  window.getPixoroFeed = loadPixoroFeed;
+
+  // ✅ Supa Ready Aana Thirumba Load Aagum da
+  window.addEventListener("pixoro-supa-ready", ()=>{ _tried = 0; loading = false; loadPixoroFeed(); });
+
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", loadPixoroFeed); }
+  else { loadPixoroFeed(); }
 })();
