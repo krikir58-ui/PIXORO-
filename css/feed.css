@@ -1,4 +1,4 @@
-/* ===== PIXORO FEED.CSS - FINAL DA - CORRECTED DA - v1033 DA ===== */
+/* ===== PIXORO FEED.CSS - FINAL DA - CORRECTED DA - v1034 DA ===== */
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
 html{background:#000}
 body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-bottom:70px;overflow-x:hidden}
@@ -28,16 +28,23 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 @keyframes beat{0%{transform:scale(1)}30%{transform:scale(1.35)}60%{transform:scale(.95)}100%{transform:scale(1)}}
 .postMedia{position:relative!important;overflow:hidden!important;border-radius:0!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;user-select:none!important}
 
-/* ✅ V1033 - DOUBLE TAP HEART + COLOUR RING DA - Pazhaya Mass Style da - Feed.js oda Class ku Match Panniten da */
+/* ✅ V1034 FIX 1 - MELLA PAATHEN DA - .pixoro-big-heart ah Generic ah Podala da - .pixoro-media > .pixoro-big-heart nu Maathiten da */
+/* ✅ V39 Heart - body la position:fixed la Varum da - Ithu Atha Thoda Koodathu da - Adhanala > Selector da */
+/* ✅ V1034 FIX 2 - opacity / inset la !important ah Eduthuten da - V39 animate() Velai Seiyyanum da */
 .pixoro-media{ position:relative!important; overflow:hidden!important; touch-action:manipulation!important; -webkit-tap-highlight-color:transparent!important; user-select:none!important; }
-.pixoro-big-heart{ position:absolute!important; inset:0!important; display:grid!important; place-items:center!important; pointer-events:none!important; z-index:99!important; opacity:0!important; }
-.pixoro-big-heart .ring{ position:absolute!important; width:110px!important; height:110px!important; border-radius:50%!important; border:3px solid #FF3040!important; opacity:0!important; }
-.pixoro-big-heart svg{ width:90px!important; height:90px!important; filter:drop-shadow(0 6px 16px rgba(255,10,51,.7))!important; }
-.pixoro-big-heart.show{ animation:pixoroBigHeart .8s ease-out forwards!important; }
-.pixoro-big-heart.show .ring{ animation:pixoroRing .8s ease-out forwards!important; }
+.pixoro-media > .pixoro-big-heart{ position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; z-index:99; opacity:0; }
+.pixoro-media > .pixoro-big-heart .ring{ position:absolute; width:110px; height:110px; border-radius:50%; border:3px solid #FF3040; opacity:0; }
+.pixoro-media > .pixoro-big-heart svg{ width:90px; height:90px; filter:drop-shadow(0 6px 16px rgba(255,10,51,.7)); }
+.pixoro-media > .pixoro-big-heart.show{ animation:pixoroBigHeart .8s ease-out forwards; }
+.pixoro-media > .pixoro-big-heart.show .ring{ animation:pixoroRing .8s ease-out forwards; }
 @keyframes pixoroBigHeart{ 0%{opacity:0; transform:scale(.4)} 25%{opacity:1; transform:scale(1.15)} 45%{transform:scale(1)} 70%{opacity:1} 100%{opacity:0; transform:scale(1.1)} }
 @keyframes pixoroRing{ 0%{ transform:scale(.5); opacity:.9 } 100%{ transform:scale(1.8); opacity:0 } }
-/* Pazhaya .bigHeart Class um Vechirukkom da - Vera File Koopta Kooda Velai Seiyum da */
+
+/* ✅ V1034 FIX 3 - V39 Heart ku - CSS Thadukka Koodathu da - Body la Varra Heart ah Apdiye Vidrom da */
+body > .pixoro-big-heart{ pointer-events:none!important; background:transparent!important; border:none!important; box-shadow:none!important; overflow:visible!important; }
+/* V39 Heart oda SVG ah - 90px aakka Koodathu da - 48px / 42px / 13px - V39 Sonna Size Thaan da */
+body > .pixoro-big-heart svg{ width:100%!important; height:100%!important; }
+
 .bigHeart{ position:absolute!important; left:50%!important; top:50%!important; transform:translate(-50%,-50%) scale(0)!important; z-index:99!important;pointer-events:none!important;opacity:0!important; filter:drop-shadow(0 6px 16px rgba(255,10,51,.7))!important; font-size:90px!important; line-height:1!important; width:80px!important; height:80px!important; }
 .bigHeart svg{width:100%!important;height:100%!important;display:block!important}
 .bigHeart.show{opacity:1!important; animation:pixHeartDance 600ms ease forwards!important}
@@ -84,8 +91,6 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 .menuItem{padding:14px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #222;cursor:pointer;font-size:14px}
 .menuItem.delete{color:#ff3040}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#ff5ea8,#ff7a00);color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
-
-/* ✅ V1033 - Trend Bar Full Hide da - @Pixoro Duplicate Varathu da */
 .trendBar, #trendBar{ display:none!important; }
 .trendChip{background:#111;border:1px solid #ff5ea866;padding:7px 12px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer}
 .feedTabs{display:flex;border-bottom:1px solid #111}
@@ -95,7 +100,6 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 .followBtnPost,[data-follow-user]{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.5px solid #fff!important;padding:0 14px!important;border-radius:8px!important;font-size:14px!important;line-height:1!important;font-weight:600!important;white-space:nowrap!important;box-shadow:none!important;height:30px!important;min-width:80px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}
 .followBtnPost.following,[data-follow-user].following{background:transparent!important;background-color:transparent!important;color:#fff!important;border:1.5px solid rgba(255,255,255,.6)!important}
 #feed{min-height:300px;padding-bottom:110px!important;display:block!important;background:#000!important}
-/* ✅ V1033 - Feed Empty Loading Text ah Full Delete da - Ithu Thaan Naduvula Vanthu Feed ah Azhichuchu da */
 #feed:empty::after{ content:none!important; display:none!important; }
 .skel{height:340px;background:#111;border-radius:0!important;margin:0!important;animation:sk 1s infinite alternate}
 @keyframes sk{from{opacity:.6}to{opacity:1}}
@@ -105,7 +109,6 @@ body{background:#000!important;color:#fff;max-width:450px;margin:0 auto;padding-
 .post video.main,.reel-card video{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;min-height:250px!important;aspect-ratio:4/5!important;object-fit:cover!important;border-radius:0!important}
 .reel-card{background:#000!important;border:0!important;border-bottom:1px solid #1a1a1a!important;border-radius:0!important;margin:0!important;overflow:hidden!important;padding:0!important;padding-bottom:10px!important;box-shadow:none!important}
 .reel-card img,.reel-card video{border-radius:0!important;background:#111!important}
-/* ✅ V1033 - Top Banner Full Hide da - Mela Pixoro Banner Varathu da */
 #pixoroTopNote{ display:none!important; }
 .bottom-nav a{background:transparent!important;background-color:transparent!important;box-shadow:none!important}
 .bottom-nav a.active{background:transparent!important;background-color:transparent!important;border-radius:0!important;border-bottom:2px solid #FF2DCC!important;box-shadow:none!important}
