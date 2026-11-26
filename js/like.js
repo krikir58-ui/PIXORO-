@@ -1,7 +1,7 @@
 /* =====================================================
    PIXORO LIKE SYSTEM V39 - FINAL - YARUM VAIKKATHA STYLE
-   Double Tap = Thodura Edathula Ye Heart Nikkum + Thudikkum + Ring + Sparkles
-   Like Button = Heart Mattum Thudikkum - Number Perusa Aagathu
+   Double Tap = Killa Heart 1 Time Thudikkum + Marupadium Thudikkum + Maraiyathu
+   Naduvula Heart = Chinna Size 48px - Number Perusa Aagathu
 ===================================================== */
 
 (() => {
@@ -93,7 +93,7 @@
   }
 
   // =========================================
-  // LIKE UI - Box Illa da
+  // LIKE UI - Box Illa da - Maraiyathu da
   // =========================================
 
   function paintLike(post, liked) {
@@ -108,7 +108,13 @@
     button.style.setProperty("border", "none", "important");
     button.style.setProperty("box-shadow", "none", "important");
     button.style.setProperty("outline", "none", "important");
+    button.style.setProperty("overflow", "visible", "important");
+    button.style.setProperty("opacity", "1", "important");
+    button.style.setProperty("visibility", "visible", "important");
     button.querySelectorAll("svg, i, path").forEach(el => {
+      el.style.setProperty("opacity", "1", "important");
+      el.style.setProperty("visibility", "visible", "important");
+      el.style.setProperty("overflow", "visible", "important");
       if (el.tagName === "SVG" || el.tagName === "PATH") {
         el.style.setProperty("fill", liked ? "#FF3040" : "none", "important");
         el.style.setProperty("stroke", liked ? "#FF3040" : "", "important");
@@ -119,7 +125,7 @@
     });
   }
 
-  // ✅ FIX 1 - Number Perusa Aagathu da
+  // ✅ Number Perusa Aagathu da
   function paintCount(post, count) {
     const el = getLikeCount(post);
     if (el) {
@@ -129,6 +135,7 @@
       el.style.fontSize = "14px";
       el.style.lineHeight = "1";
       el.style.display = "inline-block";
+      el.style.opacity = "1";
     }
   }
 
@@ -162,9 +169,9 @@
       const s = document.createElement("div");
       s.className = "pixoro-big-heart";
       const angle = (i / 6) * Math.PI * 2;
-      const dx = Math.cos(angle) * 55;
-      const dy = Math.sin(angle) * 55;
-      s.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:16px;height:16px;transform:translate(-50%,-50%);opacity:1;`;
+      const dx = Math.cos(angle) * 45;
+      const dy = Math.sin(angle) * 45;
+      s.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:13px;height:13px;transform:translate(-50%,-50%);opacity:1;`;
       s.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><path fill="#FF3DF0" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
       document.body.appendChild(s);
       s.animate([
@@ -175,7 +182,7 @@
       setTimeout(()=>{ try{s.remove()}catch(e){} }, 850);
     }
 
-    // ✅ FIX 2 - Instagram Size da - 78px -> 60px da
+    // ✅ FIX - Naduvula Heart Chinna Size da - 60px -> 48px da
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
     heart.style.cssText = `
@@ -184,8 +191,8 @@
       pointer-events:none;
       left:${startX}px;
       top:${startY}px;
-      width:60px;
-      height:60px;
+      width:48px;
+      height:48px;
       opacity:0;
       transform:translate(-50%,-50%) scale(0);
       background:transparent !important;
@@ -276,24 +283,31 @@
   }
 
   // =========================================
-  // ✅ FIX 1 - KILLA HEART MATTUM THUDIKKUM DA
-  // Button ah Thudikka Vaikkala da - Number Perusa Aagathu da
+  // ✅ FIX - KILLA HEART 1 TIME THUDIKKUM DA
+  // Double Click Panna 1 Time - Marupadium Double Click Panna Marupadium 1 Time
+  // CSS Class Illa da - Direct animate() da - Maraiyathu da
   // =========================================
 
   function buttonAnimation(post) {
     const button = getLikeButton(post);
     if (!button) return;
+    button.style.setProperty("overflow", "visible", "important");
+    button.style.setProperty("opacity", "1", "important");
+    button.style.setProperty("visibility", "visible", "important");
     const icon = button.querySelector("svg, i, img, span");
     if (!icon) return;
-    icon.style.opacity = "1";
-    icon.classList.remove("pixoro-thudikku");
-    void icon.offsetWidth;
-    icon.classList.add("pixoro-thudikku");
-    setTimeout(() => {
-      icon.classList.remove("pixoro-thudikku");
-      icon.style.opacity = "1";
-      icon.style.transform = "scale(1)";
-    }, 600);
+    icon.style.setProperty("opacity", "1", "important");
+    icon.style.setProperty("visibility", "visible", "important");
+    icon.style.setProperty("overflow", "visible", "important");
+    try { icon.getAnimations().forEach(a => a.cancel()); } catch(e) {}
+    icon.animate([
+      { transform: "scale(1)", opacity: 1, offset: 0 },
+      { transform: "scale(1.5)", opacity: 1, offset: 0.2 },
+      { transform: "scale(0.9)", opacity: 1, offset: 0.4 },
+      { transform: "scale(1.35)", opacity: 1, offset: 0.6 },
+      { transform: "scale(0.95)", opacity: 1, offset: 0.8 },
+      { transform: "scale(1)", opacity: 1, offset: 1 }
+    ], { duration: 600, easing: "ease-out", fill: "forwards" });
   }
 
   // =========================================
@@ -380,6 +394,7 @@
     showBigHeart(media, x, y);
     buttonAnimation(post);
     toggleLike(postId, post, true);
+    setTimeout(() => paintLike(post, true), 50);
   }
 
   // =========================================
@@ -506,7 +521,7 @@
   }
 
   // =========================================
-  // CSS - Number Perusa Aagathu da
+  // CSS - Killa Heart Maraiyathu da - Overflow Visible da
   // =========================================
 
   function addStyles() {
@@ -514,17 +529,8 @@
     const style = document.createElement("style");
     style.id = "pixoro-v39-css";
     style.textContent = `
-      .pixoro-thudikku { animation: pixoroButtonPop .6s ease; display:inline-block; transform-box: fill-box; transform-origin: center; opacity:1 !important; background:transparent !important; border:none !important; box-shadow:none !important; outline:none !important; }
-      @keyframes pixoroButtonPop {
-        0% { transform:scale(1); opacity:1; }
-        20% { transform:scale(1.5); opacity:1; }
-        40% { transform:scale(0.9); opacity:1; }
-        60% { transform:scale(1.35); opacity:1; }
-        80% { transform:scale(0.95); opacity:1; }
-        100% { transform:scale(1); opacity:1; }
-      }
-      .like-btn, .like-button, [data-like-btn] { background:transparent !important; border:none !important; outline:none !important; box-shadow:none !important; padding:0 !important; }
-      .like-btn svg, .like-button svg, [data-like-btn] svg { background:transparent !important; border:none !important; box-shadow:none !important; outline:none !important; transform-origin: center !important; flex-shrink: 0 !important; opacity:1 !important; }
+      .like-btn, .like-button, [data-like-btn] { background:transparent !important; border:none !important; outline:none !important; box-shadow:none !important; padding:0 !important; overflow:visible !important; opacity:1 !important; visibility:visible !important; }
+      .like-btn svg, .like-button svg, [data-like-btn] svg { background:transparent !important; border:none !important; box-shadow:none !important; outline:none !important; transform-origin: center !important; flex-shrink: 0 !important; opacity:1 !important; visibility:visible !important; overflow:visible !important; }
       .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked { color:#FF3040 !important; background:transparent !important; }
       .like-btn.liked svg, .like-button.liked svg { fill:#FF3040 !important; }
       .pixoro-big-heart { pointer-events:none !important; background:transparent !important; border:none !important; box-shadow:none !important; }
