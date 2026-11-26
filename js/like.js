@@ -1,7 +1,7 @@
 /* =====================================================
    PIXORO LIKE SYSTEM V39 - FINAL - YARUM VAIKKATHA STYLE
    Double Tap = Thodura Edathula Ye Heart Nikkum + Thudikkum + Ring + Sparkles
-   Like Button = Button Full ah Thudikkum
+   Like Button = Heart Mattum Thudikkum - Number Perusa Aagathu
 ===================================================== */
 
 (() => {
@@ -119,12 +119,16 @@
     });
   }
 
+  // ✅ FIX 1 - Number Perusa Aagathu da
   function paintCount(post, count) {
     const el = getLikeCount(post);
     if (el) {
       el.textContent = Math.max(0, Number(count) || 0);
       el.style.transform = "none";
       el.style.animation = "none";
+      el.style.fontSize = "14px";
+      el.style.lineHeight = "1";
+      el.style.display = "inline-block";
     }
   }
 
@@ -171,7 +175,7 @@
       setTimeout(()=>{ try{s.remove()}catch(e){} }, 850);
     }
 
-    // ✅ Main Heart - Orey Edathula Nikkum da - Thudikkum da
+    // ✅ FIX 2 - Instagram Size da - 78px -> 60px da
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
     heart.style.cssText = `
@@ -180,8 +184,8 @@
       pointer-events:none;
       left:${startX}px;
       top:${startY}px;
-      width:78px;
-      height:78px;
+      width:60px;
+      height:60px;
       opacity:0;
       transform:translate(-50%,-50%) scale(0);
       background:transparent !important;
@@ -272,32 +276,24 @@
   }
 
   // =========================================
-  // ✅ KILLA HEART - BUTTON FULL AH THUDIKKUM DA - FIXED
-  // svg Illana Kooda Thudikkum da
+  // ✅ FIX 1 - KILLA HEART MATTUM THUDIKKUM DA
+  // Button ah Thudikka Vaikkala da - Number Perusa Aagathu da
   // =========================================
 
   function buttonAnimation(post) {
     const button = getLikeButton(post);
     if (!button) return;
-    button.classList.remove("pixoro-thudikku-btn");
-    void button.offsetWidth;
-    button.classList.add("pixoro-thudikku-btn");
     const icon = button.querySelector("svg, i, img, span");
-    if (icon) {
-      icon.style.opacity = "1";
-      icon.classList.remove("pixoro-thudikku");
-      void icon.offsetWidth;
-      icon.classList.add("pixoro-thudikku");
-    }
+    if (!icon) return;
+    icon.style.opacity = "1";
+    icon.classList.remove("pixoro-thudikku");
+    void icon.offsetWidth;
+    icon.classList.add("pixoro-thudikku");
     setTimeout(() => {
-      button.classList.remove("pixoro-thudikku-btn");
-      button.style.transform = "scale(1)";
-      if (icon) {
-        icon.classList.remove("pixoro-thudikku");
-        icon.style.opacity = "1";
-        icon.style.transform = "scale(1)";
-      }
-    }, 650);
+      icon.classList.remove("pixoro-thudikku");
+      icon.style.opacity = "1";
+      icon.style.transform = "scale(1)";
+    }, 600);
   }
 
   // =========================================
@@ -510,7 +506,7 @@
   }
 
   // =========================================
-  // CSS - Button Full ah Thudikkum da - Block Remove Panniten da
+  // CSS - Number Perusa Aagathu da
   // =========================================
 
   function addStyles() {
@@ -519,7 +515,6 @@
     style.id = "pixoro-v39-css";
     style.textContent = `
       .pixoro-thudikku { animation: pixoroButtonPop .6s ease; display:inline-block; transform-box: fill-box; transform-origin: center; opacity:1 !important; background:transparent !important; border:none !important; box-shadow:none !important; outline:none !important; }
-      .pixoro-thudikku-btn { animation: pixoroButtonPopBtn .65s ease !important; transform-origin: center !important; display:inline-block !important; }
       @keyframes pixoroButtonPop {
         0% { transform:scale(1); opacity:1; }
         20% { transform:scale(1.5); opacity:1; }
@@ -528,20 +523,12 @@
         80% { transform:scale(0.95); opacity:1; }
         100% { transform:scale(1); opacity:1; }
       }
-      @keyframes pixoroButtonPopBtn {
-        0% { transform:scale(1); }
-        20% { transform:scale(1.45); }
-        40% { transform:scale(0.9); }
-        60% { transform:scale(1.3); }
-        80% { transform:scale(0.95); }
-        100% { transform:scale(1); }
-      }
       .like-btn, .like-button, [data-like-btn] { background:transparent !important; border:none !important; outline:none !important; box-shadow:none !important; padding:0 !important; }
       .like-btn svg, .like-button svg, [data-like-btn] svg { background:transparent !important; border:none !important; box-shadow:none !important; outline:none !important; transform-origin: center !important; flex-shrink: 0 !important; opacity:1 !important; }
       .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked { color:#FF3040 !important; background:transparent !important; }
       .like-btn.liked svg, .like-button.liked svg { fill:#FF3040 !important; }
       .pixoro-big-heart { pointer-events:none !important; background:transparent !important; border:none !important; box-shadow:none !important; }
-      [data-like-count], .like-count, .likes-count { transform:none !important; animation:none !important; flex-shrink: 0 !important; background:transparent !important; border:none !important; }
+      [data-like-count], .like-count, .likes-count { transform:none !important; animation:none !important; flex-shrink: 0 !important; background:transparent !important; border:none !important; font-size:14px !important; line-height:1 !important; }
       .pixoro-tap-heart { display:none !important; opacity:0 !important; }
     `;
     document.head.appendChild(style);
