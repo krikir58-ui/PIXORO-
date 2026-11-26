@@ -4,18 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Pixoro — Reels</title>
-<!-- ✅ FIX - Reels ku Thevaiyana CSS Mattum da - post.css / profile.css Thookiten da - Athu Thaan Override Pannuchu da -->
 <link rel="stylesheet" href="css/reels.css">
 <link rel="stylesheet" href="css/common.css">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
-<style>
-  /* ✅ FIX - Reels Blank Vara Koodathu nu Force Style da */
-  #reelWrap{ display:block !important; min-height:100vh; background:#000; }
-  .reel{ display:block !important; visibility:visible !important; }
-  .reel-main{ display:block !important; width:100% !important; height:100% !important; object-fit:cover; }
-</style>
 </head>
 <body>
 
@@ -34,8 +27,6 @@
 
 <!-- REELS -->
 <div id="reelWrap" class="reelWrap"></div>
-
-<!-- TOAST -->
 <div id="toast" class="toast"></div>
 
 <!-- MINI UPLOAD BOX -->
@@ -44,23 +35,13 @@
   <div class="miniBar"><div class="miniFill" id="miniFill"></div></div>
 </div>
 
-<!-- BOTTOM NAV - ELLAM OUTLINE SVG - DM Add Pannen da -->
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <a href="index.html">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V21H3z"/><path d="M9 21v-6h6v6"/></svg>Home
-  </a>
-  <a href="search.html">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Search
-  </a>
-  <a href="upload.html">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></svg>Post
-  </a>
-  <a href="reels.html" class="active">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M10 9l5 3-5 3z"/></svg>Reels
-  </a>
-  <a href="dm.html">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>DM
-  </a>
+  <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V21H3z"/><path d="M9 21v-6h6v6"/></svg>Home</a>
+  <a href="search.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Search</a>
+  <a href="upload.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></svg>Post</a>
+  <a href="reels.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M10 9l5 3-5 3z"/></svg>Reels</a>
+  <a href="dm.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>DM</a>
   <a href="profile.html"><img class="navPfp" id="navPfp" src="https://ui-avatars.com/api/?name=P&background=FF4D8D&color=fff">You</a>
 </nav>
 
@@ -70,18 +51,9 @@
     <div class="sheetHandle"></div>
     <div class="pixHead"><b>Your Reel</b><p>You own this reel</p></div>
     <div class="safeCard">
-      <div class="safeItem" onclick="editReel()">
-        <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span>
-        <div class="txt"><div class="title">Edit Caption</div><div class="sub">Fix a typo — no re-upload needed</div></div>
-      </div>
-      <div class="safeItem" onclick="shareQR()">
-        <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></svg></span>
-        <div class="txt"><div class="title">Share via QR</div><div class="sub">Let friends scan &amp; watch</div></div>
-      </div>
-      <div class="safeItem" onclick="deleteSafe()">
-        <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></span>
-        <div class="txt"><div class="title">Delete</div><div class="sub">Moves to archive for 30 days</div></div>
-      </div>
+      <div class="safeItem" onclick="editReel()"><span class="icon">✏️</span><div class="txt"><div class="title">Edit Caption</div><div class="sub">Fix a typo — no re-upload needed</div></div></div>
+      <div class="safeItem" onclick="shareQR()"><span class="icon">🔳</span><div class="txt"><div class="title">Share via QR</div><div class="sub">Let friends scan &amp; watch</div></div></div>
+      <div class="safeItem" onclick="deleteSafe()"><span class="icon">🗑️</span><div class="txt"><div class="title">Delete</div><div class="sub">Moves to archive for 30 days</div></div></div>
     </div>
   </div>
 </div>
@@ -92,30 +64,12 @@
     <div class="sheetHandle"></div>
     <div class="pixHead"><b>Reel Options</b><p>Safe &amp; kind actions only</p></div>
     <div class="safeCard">
-      <div class="safeItem" onclick="saveReel(window._CUR, this)">
-        <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></span>
-        <div class="txt"><div class="title">Save for later</div><div class="sub">Watch it again anytime</div></div>
-      </div>
-      <div class="safeItem" onclick="copyLinkSafe()">
-        <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span>
-        <div class="txt"><div class="title">Copy Link</div><div class="sub">Share this reel anywhere</div></div>
-      </div>
-      <div class="safeItem" onclick="openFriendProfile(document.querySelector('.reel[data-id=&quot;'+window._CUR+'&quot;] .reel-username')?.textContent?.replace('@','') || '')">
-        <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg></span>
-        <div class="txt"><div class="title">View Profile</div><div class="sub">See who posted this</div></div>
-      </div>
-      <div class="safeItem" onclick="notInterestedSafe()">
-        <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01"/><path d="M9 15c1 1 2 1.5 3 1.5s2-.5 3-1.5"/></svg></span>
-        <div class="txt"><div class="title">Not Interested</div><div class="sub">We'll show fewer like this</div></div>
-      </div>
-      <div class="safeItem" onclick="hideReelSafe()">
-        <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><path d="M3 3l18 18"/></svg></span>
-        <div class="txt"><div class="title">Hide Reel</div><div class="sub">You won't see it again</div></div>
-      </div>
-      <div class="safeItem" onclick="reportSafe()">
-        <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4a1 1 0 0 1 1-1h13l-2 6 2 6H5"/><path d="M4 22h2"/></svg></span>
-        <div class="txt"><div class="title">Report</div><div class="sub">Help keep Pixoro safe</div></div>
-      </div>
+      <div class="safeItem" onclick="saveReel(window._CUR, this)"><span class="icon">🔖</span><div class="txt"><div class="title">Save for later</div><div class="sub">Watch it again anytime</div></div></div>
+      <div class="safeItem" onclick="copyLinkSafe()"><span class="icon">🔗</span><div class="txt"><div class="title">Copy Link</div><div class="sub">Share this reel anywhere</div></div></div>
+      <div class="safeItem" onclick="openFriendProfile(document.querySelector('.reel[data-id=&quot;'+window._CUR+'&quot;] .reel-username')?.textContent?.replace('@','') || '')"><span class="icon">👤</span><div class="txt"><div class="title">View Profile</div><div class="sub">See who posted this</div></div></div>
+      <div class="safeItem" onclick="notInterestedSafe()"><span class="icon">😐</span><div class="txt"><div class="title">Not Interested</div><div class="sub">We'll show fewer like this</div></div></div>
+      <div class="safeItem" onclick="hideReelSafe()"><span class="icon">👁️</span><div class="txt"><div class="title">Hide Reel</div><div class="sub">You won't see it again</div></div></div>
+      <div class="safeItem" onclick="reportSafe()"><span class="icon">🚩</span><div class="txt"><div class="title">Report</div><div class="sub">Help keep Pixoro safe</div></div></div>
     </div>
   </div>
 </div>
@@ -128,9 +82,7 @@
     <div id="commentList" style="max-height:32vh;overflow:auto;padding:0 16px"></div>
     <div style="display:flex;gap:8px;padding:12px 16px">
       <input id="commentInput" placeholder="Add a kind comment..." style="flex:1;padding:10px 14px;border-radius:20px;border:1px solid #ddd;outline:none">
-      <button onclick="postComment()" style="background:#FF3040;border:none;color:#fff;width:42px;height:42px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
-      </button>
+      <button onclick="postComment()" style="background:#FF3040;border:none;color:#fff;width:42px;height:42px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center">➤</button>
     </div>
   </div>
 </div>
@@ -141,22 +93,21 @@
     <div class="sheetHandle"></div>
     <div class="pixHead"><b>Share Reel</b><p>Spread the vibe</p></div>
     <div class="safeCard">
-      <div class="safeItem" onclick="shareWA()">
-        <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.5L3 21l2-5.4A8.5 8.5 0 1 1 21 11.5z"/><path d="M8.5 10.5c.5 2 2 3.5 4 4l1.5-1.5 2 1c-.3 1.5-1.5 2-2.5 2-3.5 0-6.5-3-6.5-6.5 0-1 .5-2 2-2.5l1 2z"/></svg></span>
-        <div class="txt"><div class="title">WhatsApp</div><div class="sub">Send to friends</div></div>
-      </div>
-      <div class="safeItem" onclick="copyLinkSafe()">
-        <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span>
-        <div class="txt"><div class="title">Copy Link</div><div class="sub">Paste anywhere</div></div>
-      </div>
+      <div class="safeItem" onclick="shareWA()"><span class="icon">💬</span><div class="txt"><div class="title">WhatsApp</div><div class="sub">Send to friends</div></div></div>
+      <div class="safeItem" onclick="copyLinkSafe()"><span class="icon">🔗</span><div class="txt"><div class="title">Copy Link</div><div class="sub">Paste anywhere</div></div></div>
     </div>
   </div>
 </div>
 
-<!-- ✅ FIX - Script Order da - Illatha File Thookiten da - GitHub la Irukka File Mattum da -->
+<!-- ✅ HTML MATTUM DA - CSS / JS THANi FILE LA IRUKKU DA -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/pixoro-core.js"></script>
 <script src="js/avatar.js"></script>
 <script src="js/reels.js"></script>
+<script src="js/like.js"></script>
+<script src="js/comments.js"></script>
+<script src="js/share.js"></script>
+<script src="js/save.js"></script>
+
 </body>
 </html>
