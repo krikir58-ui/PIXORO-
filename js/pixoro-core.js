@@ -1,35 +1,15 @@
-// ===== PIXORO CORE - v1026 - CORRECTED - FULL =====
-// Like Animation Fix - Heart Mattum Thudikkum da - Count Asaiyathu da - Like + Unlike Rendum Animation da
-const SUPA_URL = 'https://yecpltndhlzfjplzhcpm.supabase.co';
-const SUPA_KEY = 'sb_publishable_byUfZPczrxfkYKTmUNco5w_oqabYQJ_';
-window.PIXORO_URL = SUPA_URL;
-window.PIXORO_KEY = SUPA_KEY;
-if(!window.supa && window.supabase && window.supabase.createClient){
-  window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-  console.log("✅ Pixoro Supa Connected da!");
-}
-function pixoroGetSupa(){
-  if(window.supa) return window.supa;
-  if(window.supabase && window.supabase.createClient){
-    try{ window.supa = window.supabase.createClient(SUPA_URL, SUPA_KEY); return window.supa; }catch(e){ return null; }
-  }
-  return null;
-}
-window.getSupa = pixoroGetSupa;
-window.pixoroGetSupa = pixoroGetSupa;
+// ===== PIXORO CORE - v1027 - CORRECTED - FULL =====
+// Like Animation Fix - Heart Mattum Thudikkum da - Count Asaiyathu da
+// ✅ CORRECTED DA - Supabase ah Core Thodathu da - supabase.js Thaan Boss da - Sandai Illa da
+// ✅ getSupa ah Overwrite Panna Koodathu da - Gold Tick ah Overwrite Panna Koodathu da
+// ✅ Photo Sync Interval Delete da - Avatar.js Thaan Photo Paathukkum da
+
 function pixoroGetBase(){ return location.href.split('?')[0].split('#')[0].replace(/\/[^\/]*$/,'/') + ''; }
 window.pixoroGetBase = pixoroGetBase;
 window.getBase = pixoroGetBase;
-function isGoldUser(p){
-  if(!p) return false;
-  if(p.is_gold === true) return true;
-  if(p.is_verified === true) return true;
-  if(p.gold_tick === true) return true;
-  let u = String(p.username||p.name||'').toLowerCase().replace('@','').trim();
-  return u === 'giri_official' || u === 'giri_ceo';
-}
-function goldTickHTML(p){ if(!isGoldUser(p)) return ''; return ' <span style="color:#FFD700;font-size:14px">✔</span>'; }
-window.isGoldUser = isGoldUser; window.goldTickHTML = goldTickHTML; window.getTick = goldTickHTML;
+// ✅ getSupa Helper - supabase.js oda getSupa ah Thaan Koopduvam da - Create Panna Maattom da
+function pixoroGetSupa(){ return (typeof window.getSupa === 'function') ? window.getSupa() : (window.supa || null); }
+window.pixoroGetSupa = pixoroGetSupa;
 
 (function(){
   if(document.getElementById('pixoro-speed-css')) return;
@@ -58,7 +38,6 @@ window.isGoldUser = isGoldUser; window.goldTickHTML = goldTickHTML; window.getTi
   .pfpRing{ width:40px;height:40px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5); flex-shrink:0; }
   .pfpInner{ width:100%;height:100%;border-radius:50%;overflow:hidden;background:#000;display:grid;place-items:center; }
   .pfpInner img{ width:100%;height:100%;object-fit:cover; }
-  /* ✅ V1026 LIKE FIX - Heart Mattum Thudikkum da - Count Asaiyathu da */
   .vBar{position:absolute!important;right:10px!important;bottom:110px!important;z-index:50!important;pointer-events:auto!important}
   .vBtn{pointer-events:auto!important;cursor:pointer!important;touch-action:manipulation!important;transform:none!important}
   .vBtn .vIcon{display:flex!important;transform-origin:center!important;will-change:transform}
@@ -425,7 +404,7 @@ window.pixoroIsFollowing = pixoroIsFollowing;
 window.pixoroResolveId = async (t)=>{ let r = await pixoroResolveName(t); return r.id; };
 document.addEventListener('DOMContentLoaded', ()=>{ pixoroFixMe(); pixoroLoadFollowing(); });
 if(document.readyState !== 'loading'){ pixoroFixMe(); pixoroLoadFollowing(); }
-console.log('PIXORO CORE v1026 - CORRECTED DA');
+console.log('PIXORO CORE v1027 - CORRECTED DA');
 const PHOTO_CONFIG = { maxSize: 5*1024*1024, allowed: ['image/jpeg','image/png','image/webp'], maxCount: 5 };
 async function pixoroCleanPhoto(file){
   if(!PHOTO_CONFIG.allowed.includes(file.type)) throw new Error('JPG / PNG / WEBP mattum da');
@@ -507,44 +486,10 @@ async function pixoroCheckBell(){
 window.pixoroCheckBell = pixoroCheckBell;
 setInterval(pixoroCheckBell, 15000);
 setTimeout(pixoroCheckBell, 3000);
+// ✅ CORRECTED DA - Photo Sync Interval Delete da - Avatar.js Thaan Photo Paathukkum da - Core Inga Thodathu da
 window.MY_PFP = window.MY_PFP || '';
-async function syncMyPhotoEverywhere(){
-  let photo = window.MY_PFP || window.ME_PFP || '';
-  if(!photo){
-    let nav = document.getElementById('navPfp');
-    if(nav && nav.src && nav.src.length > 20 && !nav.src.includes('ui-avatars')) photo = nav.src;
-  }
-  if(!photo){
-    let postImg = document.querySelector('.post .pfpInner img');
-    if(postImg && postImg.src && postImg.src.length > 20 && !postImg.src.includes('ui-avatars')) photo = postImg.src;
-  }
-  if(!photo){
-    try{
-      let s = pixoroGetSupa();
-      if(s){
-        let {data:{session}} = await s.auth.getSession();
-        let uid = window.ME_ID || session?.user?.id;
-        if(uid){
-          window.ME_ID = uid;
-          let {data:prof} = await s.from('profiles').select('avatar_url').eq('id', uid).maybeSingle();
-          if(prof && prof.avatar_url && String(prof.avatar_url).length > 20) photo = String(prof.avatar_url);
-        }
-      }
-    }catch(e){}
-  }
-  if(!photo) return;
-  window.MY_PFP = photo; window.ME_PFP = photo;
-  document.querySelectorAll('.myPfp, #navPfp, #myStoryImg, #myCommentPfpWrap img, #storyViewerPfp').forEach(function(img){
-    if(img && img.tagName === 'IMG' && img.src !== photo){ img.src = photo; img.style.display = 'block'; }
-  });
-  let myLetter = document.getElementById('myStoryLetter');
-  if(myLetter) myLetter.style.display = 'none';
-}
-window.syncMyPhotoEverywhere = syncMyPhotoEverywhere;
-setInterval(syncMyPhotoEverywhere, 2000);
-if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', syncMyPhotoEverywhere); } else { syncMyPhotoEverywhere(); }
 
-// ===== ✅ V1026 CORRECT ADD - LIKE FINAL GUARD - Kadasiya Irukkanum da =====
+// ===== ✅ V1027 CORRECT ADD - LIKE FINAL GUARD - Kadasiya Irukkanum da =====
 (function(){
   "use strict";
   if(window.PIXORO_LIKE_GUARD) return;
@@ -557,7 +502,6 @@ if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoad
     let path = btn.querySelector("svg path");
     if(path){ path.setAttribute("fill", liked ? "#FF3040" : "none"); path.style.fill = liked ? "#FF3040" : "none"; }
   }
-  // ✅ V1026 - Animation Function - Heart Mattum da
   function corePlayAnim(btn){
     if(!btn) return;
     let heartIcon = btn.querySelector(".vIcon, svg");
@@ -586,10 +530,9 @@ if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoad
     try{ localStorage.setItem("pixoro_likes", JSON.stringify([...window.FEED_LIKES])); localStorage.setItem("pixoro_counts", JSON.stringify(window.FEED_COUNTS)); }catch(_){}
     corePaint(btn, liked);
     let cnt = btn.querySelector(".rCount"); if(cnt) cnt.textContent = newC;
-    // ✅ CORRECTED - Button Full ah Illa da - Heart Mattum da - Like + Unlike Rendum Animation da
     corePlayAnim(btn);
     try{
-      let supa = window.getSupa ? window.getSupa() : window.supa;
+      let supa = (typeof window.getSupa === 'function') ? window.getSupa() : window.supa;
       if(supa && /^[0-9a-f-]{36}$/i.test(clean)){
         supa.auth.getSession().then(r=>{
           let uid = r.data?.session?.user?.id; if(!uid) return;
@@ -601,7 +544,6 @@ if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoad
   }
   window.likeReel = function(id, el, e){ if(e){ e.stopPropagation(); e.preventDefault(); } coreLike(id, el); };
   window.pixoroLikeReel = window.likeReel;
-  // ✅ V1026 - Reels Page la Core Listener Venaam da - Reels.js Thaan Handle Pannum da - Double Animation Illa da
   if(location.pathname.includes("reels.html")){
     console.log("✅ CORE LIKE GUARD - Reels la Passive Mode da - Double Animation Illa da");
     return;
