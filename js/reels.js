@@ -1,6 +1,6 @@
 /* =====================================================
-   PIXORO REELS V1024 - FINAL - Like + Play/Pause Work Aagum da
-   V39 ah Thodala da - Reels ye Direct ah Like Pannum da
+   PIXORO REELS V1025 - FINAL CORRECTED DA
+   Like = Touch + Click Rendum + Path Red + vBar Mela da
    ===================================================== */
 (function () {
   "use strict";
@@ -21,7 +21,21 @@
   window.toggleMuteAll = function () { window._MUTED = !window._MUTED; document.querySelectorAll(".reel-main").forEach(v => { v.muted = !!window._MUTED; }); };
   window.openFriendProfile = function (u) { if (!u) return; location.href = "profile.html?user=" + encodeURIComponent(u); };
 
-  // ===== ✅ LIKE - Reels ye Direct ah Pannum da - V39 ku Wait Panna Koodathu da =====
+  // ✅ FIX 1 - CSS ah Ingaye Podu da - reels.css ah Namba Venaam da
+  if (!document.getElementById("pixoro-like-css")) {
+    let st = document.createElement("style"); st.id = "pixoro-like-css";
+    st.textContent = `.vBar{position:absolute !important;right:10px !important;bottom:110px !important;z-index:50 !important;pointer-events:auto !important}.vBtn{pointer-events:auto !important;cursor:pointer !important;touch-action:manipulation !important}.vBtn.liked svg,.vBtn.liked svg path{fill:#FF3040 !important;stroke:#FF3040 !important}.centerCtrl{display:none !important}.centerCtrl.show{display:flex !important}`;
+    document.head.appendChild(st);
+  }
+
+  // ✅ FIX 2 - Like Paint - SVG + PATH Rendum Red da
+  function paintBtn(btn, liked) {
+    if (!btn) return;
+    btn.classList.toggle("liked", liked);
+    let svg = btn.querySelector("svg"); if (svg) { svg.setAttribute("fill", liked ? "#FF3040" : "none"); svg.setAttribute("stroke", liked ? "#FF3040" : "#fff"); svg.style.fill = liked ? "#FF3040" : "none"; }
+    let path = btn.querySelector("svg path"); if (path) { path.setAttribute("fill", liked ? "#FF3040" : "none"); path.style.fill = liked ? "#FF3040" : "none"; }
+  }
+
   window.likeReel = function (id, el, e) {
     if (e) { e.stopPropagation(); e.preventDefault(); }
     if (!el) return;
@@ -38,13 +52,10 @@
     let newC = liked ? oldC + 1 : Math.max(0, oldC - 1);
     window.FEED_COUNTS[clean] = newC;
     try { localStorage.setItem("pixoro_likes", JSON.stringify([...window.FEED_LIKES])); localStorage.setItem("pixoro_counts", JSON.stringify(window.FEED_COUNTS)); } catch (_) {}
-    // ✅ Side Button Paint - Red / White da
-    el.classList.toggle("liked", liked);
-    let svg = el.querySelector("svg");
-    if (svg) { svg.setAttribute("fill", liked ? "#FF3040" : "none"); svg.setAttribute("stroke", liked ? "#FF3040" : "#fff"); }
+    paintBtn(el, liked);
     let cnt = el.querySelector(".rCount"); if (cnt) cnt.textContent = newC;
+    try { el.getAnimations().forEach(a => a.cancel()); } catch (_) {}
     el.animate([{ transform: "scale(1)" }, { transform: "scale(1.5)" }, { transform: "scale(1)" }], { duration: 400 });
-    // ✅ DB la Save - Fail Aana kooda Red Marathu da
     try {
       let supa = getClient();
       if (supa && /^[0-9a-f-]{36}$/i.test(clean)) {
@@ -57,7 +68,6 @@
     } catch (_) {}
   };
 
-  // ✅ Page Load Aana Apparam - Already Like Pannathu Red ah Kaatu da
   function paintSavedLikes() {
     try {
       if (!window.FEED_LIKES) window.FEED_LIKES = new Set(JSON.parse(localStorage.getItem("pixoro_likes") || "[]").map(String));
@@ -66,9 +76,7 @@
     document.querySelectorAll(".reel").forEach(reel => {
       let clean = String(reel.dataset.id || "").replace("reel-", "");
       let btn = reel.querySelector('[data-action="like"]'); if (!btn) return;
-      let liked = window.FEED_LIKES.has(clean);
-      btn.classList.toggle("liked", liked);
-      let svg = btn.querySelector("svg"); if (svg) { svg.setAttribute("fill", liked ? "#FF3040" : "none"); svg.setAttribute("stroke", liked ? "#FF3040" : "#fff"); }
+      paintBtn(btn, window.FEED_LIKES.has(clean));
       let cnt = btn.querySelector(".rCount");
       if (cnt && window.FEED_COUNTS[clean] !== undefined) cnt.textContent = window.FEED_COUNTS[clean];
     });
@@ -146,7 +154,7 @@
           if (entry.isIntersecting) { video.muted = !!window._MUTED; window._CUR = entry.target.dataset.id; video.play().catch(() => {}); } else { video.pause(); }
         });
       }, { threshold: 0.6 });
-      // ===== ✅ Play/Pause + Double Tap - Orey Touch Handler da - Sandai Illa da =====
+
       wrap.querySelectorAll(".reel").forEach(item => {
         const video = item.querySelector("video"); const center = item.querySelector(".centerCtrl");
         reelObserver.observe(item);
@@ -163,8 +171,7 @@
             if (likeBtn) window.likeReel(item.dataset.id, likeBtn, null);
             if (video.paused) { video.play().catch(() => {}); center?.classList.remove("show"); }
           } else {
-            lastTap = now;
-            clearTimeout(singleTimer);
+            lastTap = now; clearTimeout(singleTimer);
             singleTimer = setTimeout(() => {
               if (video.paused) { video.play().catch(() => {}); center?.classList.remove("show"); }
               else { video.pause(); center?.classList.add("show"); }
@@ -172,20 +179,36 @@
           }
         }, { passive: true });
       });
-      wrap.querySelectorAll("[data-action]").forEach(btn => {
-        btn.addEventListener("click", e => {
-          e.stopPropagation();
-          const reel = btn.closest(".reel"); const id = reel?.dataset.id;
-          switch (btn.dataset.action) {
-            case "like": window.likeReel(id, btn, e); break;
-            case "comments": if (window.openComments) window.openComments(id); else window.openSheet("commentSheet"); break;
-            case "share": if (window.openShare) window.openShare(id); else window.openSheet("shareSheet"); break;
-            case "save": if (window.saveReel) window.saveReel(id, btn); else console.warn("saveReel() missing"); break;
-            case "follow": if (window.toggleFollow) window.toggleFollow(btn); else console.warn("toggleFollow() missing"); break;
-            case "more": window._CUR = id; window.openSheet("viewerSheet"); break;
-          }
-        });
+
+      // ✅ FIX 3 - Like ku - Click + Touch Rendum da - Oru Vela Click Varala na - Touch Thaan Kaapathan da
+      // ✅ Itha wrap la Delegate Panniten da - Render Aana Apparam kooda Work Aagum da
+      wrap.addEventListener("touchend", e => {
+        let btn = e.target.closest('[data-action="like"]'); if (!btn) return;
+        e.stopPropagation(); e.preventDefault();
+        let reel = btn.closest(".reel");
+        window.likeReel(reel?.dataset.id, btn, e);
+      }, { passive: false });
+      wrap.addEventListener("click", e => {
+        let btn = e.target.closest("[data-action]"); if (!btn) return;
+        // ✅ Like - Touch la Already Panniten da - Click la Thirumba Panna Koodathu da - Double Count Aayidum da
+        if (btn.dataset.action === "like" && btn.dataset.touched === "1") { btn.dataset.touched = ""; return; }
+        e.stopPropagation();
+        const reel = btn.closest(".reel"); const id = reel?.dataset.id;
+        switch (btn.dataset.action) {
+          case "like": window.likeReel(id, btn, e); break;
+          case "comments": if (window.openComments) window.openComments(id); else window.openSheet("commentSheet"); break;
+          case "share": if (window.openShare) window.openShare(id); else window.openSheet("shareSheet"); break;
+          case "save": if (window.saveReel) window.saveReel(id, btn); else console.warn("saveReel() missing"); break;
+          case "follow": if (window.toggleFollow) window.toggleFollow(btn); else console.warn("toggleFollow() missing"); break;
+          case "more": window._CUR = id; window.openSheet("viewerSheet"); break;
+        }
       });
+      // ✅ Touch Panna - Click ah Block Pannu da - Double Like Aagathu da
+      wrap.addEventListener("touchend", e => {
+        let btn = e.target.closest('[data-action="like"]'); if (btn) btn.dataset.touched = "1";
+        setTimeout(() => { if (btn) btn.dataset.touched = ""; }, 500);
+      }, { passive: true });
+
       wrap.querySelectorAll("[data-profile]").forEach(el => { el.addEventListener("click", () => { window.openFriendProfile(el.dataset.profile); }); });
       window.dispatchEvent(new Event("pixoro-reels-rendered"));
       if (window.pixoroLoadAvatars) window.pixoroLoadAvatars();
