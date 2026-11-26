@@ -1,205 +1,194 @@
-/* ===== PIXORO LIKE V40 - V39 FIXED - BLACK SCREEN FIX - Vera Edhuvum Maathala da ===== */
-(() => {
+/* ===== PIXORO FEED V1032 - CORRECTED - FULL - OLD SVG STYLE ===== */
+(function(){
   "use strict";
-  if (window.PIXORO_LIKE_V39) return;
-  window.PIXORO_LIKE_V39 = true;
-
-  // ✅ FIX 1 - Supa ah Load Time la Edukka Koodathu da - Eppovum Fresh ah Eduppom da
-  function getSupa(){ return window.supa || window.supabaseClient || (typeof window.getSupa === 'function' ? window.getSupa() : null); }
-  const TABLE = "likes";
-  const DOUBLE_TAP_DELAY = 320;
-  const HEART_DURATION = 1000;
-  const lastTap = new WeakMap();
-  const lastToggleAt = new Map();
-  const pending = new Map();
-  let blockClickUntil = 0;
-  let lastTouchTime = 0;
-
-  try { const saved = JSON.parse(localStorage.getItem("pixoro_likes") || "[]"); window.FEED_LIKES = new Set(saved.map(String)); } catch { window.FEED_LIKES = new Set(); }
-  try { window.FEED_COUNTS = JSON.parse(localStorage.getItem("pixoro_counts") || "{}"); } catch { window.FEED_COUNTS = {}; }
-  function saveLocal(){ try{ localStorage.setItem("pixoro_likes", JSON.stringify([...window.FEED_LIKES])); localStorage.setItem("pixoro_counts", JSON.stringify(window.FEED_COUNTS)); }catch(e){} }
-
-  async function getUserId(){
-    if (window.currentUser?.id) return window.currentUser.id;
-    let supa = getSupa();
-    if (!supa) return null;
-    try{ const { data, error } = await supa.auth.getUser(); if (error || !data?.user?.id) return null; return data.user.id; }catch{ return null; }
+  let loading = false;
+  let _tried = 0;
+  function getClient(){
+    return (typeof window.getSupa === 'function') ? window.getSupa() : (window.supa || null);
   }
-
-  function getPost(element){ return element?.closest("[data-post-id], .post, .post-card, article, .post-item"); }
-  function getPostId(element){
-    const post = getPost(element);
-    return ( element?.dataset?.postId || element?.dataset?.likeBtn || post?.dataset?.postId || post?.dataset?.id || null );
+  function esc(v){
+    return String(v ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
   }
-  function getLikeButton(post){ if (!post) return null; return post.querySelector("[data-like-btn], .like-btn, .like-button, [data-action='like']"); }
-  function getLikeCount(post){ if (!post) return null; return post.querySelector("[data-like-count], .like-count, .likes-count, [data-count='likes']"); }
-
-  function paintLike(post, liked){
-    const button = getLikeButton(post); if (!button) return;
-    button.classList.toggle("liked", liked); button.classList.toggle("is-liked", liked);
-    button.setAttribute("aria-pressed", String(liked)); button.dataset.liked = liked ? "true" : "false";
-    button.style.setProperty("color", liked ? "#FF3040" : "", "important");
-    button.style.setProperty("background", "transparent", "important");
-    button.style.setProperty("border", "none", "important");
-    button.style.setProperty("box-shadow", "none", "important");
-    button.style.setProperty("outline", "none", "important");
-    button.style.setProperty("overflow", "visible", "important");
-    button.style.setProperty("opacity", "1", "important");
-    button.style.setProperty("visibility", "visible", "important");
-    button.querySelectorAll("svg, i, path").forEach(el => {
-      el.style.setProperty("opacity", "1", "important"); el.style.setProperty("visibility", "visible", "important"); el.style.setProperty("overflow", "visible", "important");
-      if (el.tagName === "SVG" || el.tagName === "PATH"){ el.style.setProperty("fill", liked ? "#FF3040" : "none", "important"); el.style.setProperty("stroke", liked ? "#FF3040" : "", "important"); }
-      if (el.tagName === "I"){ el.style.setProperty("color", liked ? "#FF3040" : "", "important"); }
-    });
+  function cleanName(v){ return String(v||"").replace(/^@+/,"").trim(); }
+  function safeURL(v){
+    try{ const u = new URL(v, location.href); return ["https:","http:"].includes(u.protocol) ? esc(u.href) : ""; }catch{ return ""; }
   }
-
-  // ✅ FIX 2 - Count ah 0 nu Overwrite Panna Koodathu da - Local la Illana Server Count ah Apdiye Viduvom da
-  function paintCount(post, count){
-    const el = getLikeCount(post); if (!el) return;
-    if (count === undefined || count === null || isNaN(Number(count))) return;
-    el.textContent = Math.max(0, Number(count) || 0);
-    el.style.transform = "none"; el.style.animation = "none"; el.style.fontSize = "14px"; el.style.lineHeight = "1"; el.style.display = "inline-block"; el.style.opacity = "1";
-  }
-
-  function showBigHeart(media, touchX, touchY){
-    if (!media) return;
-    const rect = media.getBoundingClientRect(); if (!rect.width || !rect.height) return;
-    const startX = (typeof touchX === 'number' && touchX > 0 ? touchX : rect.left + rect.width / 2);
-    const startY = (typeof touchY === 'number' && touchY > 0 ? touchY : rect.top + rect.height / 2);
-    const gid = 'pixoroGrad' + Date.now() + Math.floor(Math.random()*10000);
-    const ring = document.createElement("div"); ring.className = "pixoro-big-heart";
-    ring.style.cssText = `position:fixed;z-index:999998;pointer-events:none;left:${startX}px;top:${startY}px;width:20px;height:20px;transform:translate(-50%,-50%);border:3px solid #FF3DF0;border-radius:50%;opacity:0.9;background:transparent;`;
-    document.body.appendChild(ring);
-    ring.animate([{ transform: "translate(-50%,-50%) scale(0.5)", opacity: 0.9 },{ transform: "translate(-50%,-50%) scale(4.5)", opacity: 0 }], { duration: 700, easing: "ease-out", fill: "forwards" });
-    setTimeout(()=>{ try{ring.remove()}catch(e){} }, 750);
-    for (let i = 0; i < 6; i++){
-      const s = document.createElement("div"); s.className = "pixoro-big-heart";
-      const angle = (i / 6) * Math.PI * 2; const dx = Math.cos(angle) * 45; const dy = Math.sin(angle) * 45;
-      s.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:13px;height:13px;transform:translate(-50%,-50%);opacity:1;`;
-      s.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><path fill="#FF3DF0" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
-      document.body.appendChild(s);
-      s.animate([{ transform: "translate(-50%,-50%) scale(0)", opacity: 1 },{ transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)`, opacity: 1, offset: 0.5 },{ transform: `translate(calc(-50% + ${dx * 1.4}px), calc(-50% + ${dy * 1.4}px)) scale(0)`, opacity: 0 }], { duration: 800, easing: "ease-out", fill: "forwards" });
-      setTimeout(()=>{ try{s.remove()}catch(e){} }, 850);
+  async function loadPixoroFeed(){
+    let feed = document.getElementById("feed");
+    if(!feed || loading) return;
+    let supa = getClient();
+    if(!supa){
+      _tried++;
+      // ✅ V1032 - Feed Load Aaguthu Text ah Full Remove Panniten da - Feed ah Azhikka Koodathu da
+      if(_tried <= 3){ setTimeout(loadPixoroFeed, 1500); return; }
+      return;
     }
-    const heart = document.createElement("div"); heart.className = "pixoro-big-heart";
-    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:48px;height:48px;opacity:0;transform:translate(-50%,-50%) scale(0);background:transparent !important;border:none !important;box-shadow:none !important;`;
-    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent;filter:drop-shadow(0 0 18px rgba(255,61,240,.8))"><defs><linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF0A33"/><stop offset="30%" stop-color="#FF3DF0"/><stop offset="60%" stop-color="#A259FF"/><stop offset="85%" stop-color="#FF8A00"/><stop offset="100%" stop-color="#FFD600"/></linearGradient></defs><path fill="url(#${gid})" stroke="#fff" stroke-width="1.2" stroke-linejoin="round" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/><path fill="#fff" opacity="0.95" d="M12 18.5L6.8 13.3a3.8 3.8 0 0 1 0-5.4 3.8 3.8 0 0 1 5.2 0L12 8l0-0.1a3.8 3.8 0 0 1 5.2 0 3.8 3.8 0 0 1 0 5.4L12 18.5z" transform="translate(0,-1.2) scale(0.62) translate(7.4,7.4)"/><ellipse cx="8.5" cy="8" rx="1.6" ry="1" fill="#fff" opacity="0.85" transform="rotate(-20 8.5 8)"/></svg>`;
-    document.body.appendChild(heart);
-    const animation = heart.animate([{ transform: "translate(-50%,-50%) scale(0)", opacity: 0, offset: 0 },{ transform: "translate(-50%,-50%) scale(1.45)", opacity: 1, offset: 0.15 },{ transform: "translate(-50%,-50%) scale(1.0)", opacity: 1, offset: 0.30 },{ transform: "translate(-50%,-50%) scale(1.30)", opacity: 1, offset: 0.45 },{ transform: "translate(-50%,-50%) scale(1.05)", opacity: 1, offset: 0.60 },{ transform: "translate(-50%,-50%) scale(1.18)", opacity: 1, offset: 0.75 },{ transform: "translate(-50%,-50%) scale(1.1)", opacity: 0, offset: 1 }], { duration: HEART_DURATION, easing: "ease-out", fill: "forwards" });
-    animation.onfinish = () => heart.remove(); setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1100);
-  }
-  function showTapHeart(x, y) { return; }
-  function showMassDance(media) { return; }
-
-  function showButtonHeart(button){
-    if (!button) return; const r = button.getBoundingClientRect(); const gid = 'pixoroBtn' + Date.now();
-    const heart = document.createElement("div"); heart.className = "pixoro-big-heart";
-    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${r.left + r.width / 2}px;top:${r.top}px;width:42px;height:42px;opacity:0;transform:translate(-50%,-50%) scale(0);background:transparent !important;border:none !important;`;
-    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))"><defs><linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF0A33"/><stop offset="50%" stop-color="#FF3DF0"/><stop offset="100%" stop-color="#FF8A00"/></linearGradient></defs><path fill="url(#${gid})" stroke="#fff" stroke-width="1.2" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
-    document.body.appendChild(heart);
-    const a = heart.animate([{ transform: "translate(-50%,-50%) scale(0)", opacity: 0, offset: 0 },{ transform: "translate(-50%,-50%) scale(1.2)", opacity: 1, offset: 0.25 },{ transform: "translate(-50%,-90%) scale(1)", opacity: 1, offset: 0.6 },{ transform: "translate(-50%,-180%) scale(0.9)", opacity: 0, offset: 1 }], { duration: 700, easing: "ease-out", fill: "forwards" });
-    a.onfinish = () => heart.remove(); setTimeout(()=>{ try{heart.remove()}catch(e){} }, 800);
-  }
-
-  function buttonAnimation(post){
-    const button = getLikeButton(post); if (!button) return;
-    button.style.setProperty("overflow", "visible", "important"); button.style.setProperty("opacity", "1", "important"); button.style.setProperty("visibility", "visible", "important");
-    const icon = button.querySelector("svg, i, img, span"); if (!icon) return;
-    icon.style.setProperty("opacity", "1", "important"); icon.style.setProperty("visibility", "visible", "important"); icon.style.setProperty("overflow", "visible", "important");
-    try { icon.getAnimations().forEach(a => a.cancel()); } catch(e) {}
-    icon.animate([{ transform: "scale(1)", opacity: 1, offset: 0 },{ transform: "scale(1.5)", opacity: 1, offset: 0.2 },{ transform: "scale(0.9)", opacity: 1, offset: 0.4 },{ transform: "scale(1.35)", opacity: 1, offset: 0.6 },{ transform: "scale(0.95)", opacity: 1, offset: 0.8 },{ transform: "scale(1)", opacity: 1, offset: 1 }], { duration: 600, easing: "ease-out", fill: "forwards" });
-  }
-
-  async function serverSave(postId, liked){
-    let supa = getSupa(); if (!supa) return false;
-    const userId = await getUserId(); if (!userId) return false;
+    loading = true;
+    _tried = 0;
+    // ✅ V1032 - Feed Empty ah Irundha Mattum Loading Kaamikkum da - Already Post Irundha Azhikka Maattom da
+    if(!feed.innerHTML.trim() || feed.innerHTML.includes("Innum Post")){
+      feed.innerHTML = '';
+    }
     try{
-      if (liked){ const { error } = await supa.from(TABLE).insert({ post_id: postId, user_id: userId }); if (error && error.code !== "23505") throw error; }
-      else { const { error } = await supa.from(TABLE).delete().eq("post_id", postId).eq("user_id", userId); if (error) throw error; }
-      return true;
-    }catch(error){ console.error("PIXORO LIKE ERROR:", error); return false; }
+      let MY_ID = "";
+      try{ let {data:{session}} = await supa.auth.getSession(); MY_ID = session?.user?.id || ""; window.ME_ID = MY_ID || window.ME_ID; }catch(_){}
+      let r = await supa.from("posts").select("*").order("created_at",{ascending:false}).limit(100);
+      if(r.error) throw r.error;
+      let posts = Array.isArray(r.data) ? [...r.data] : [];
+      let blocked = [];
+      try{ if(window.ME_ID && typeof window.pixoroGetBlockedIds === 'function'){ blocked = await window.pixoroGetBlockedIds(); } }catch(_){}
+      let mode = window.PIXORO_FEED_MODE || 'foryou';
+      let clean = posts.filter(p=>{
+        if(p.is_archived === true) return false;
+        if(p.visibility === 'private_share') return false;
+        if(p.user_id && blocked.includes(String(p.user_id))) return false;
+        // ✅ V1032 - Pixoro Fake ID oda Post ah Mattum Thookidurom da - Oru Photo Mattum da
+        let uname = cleanName(p.username||"").toLowerCase();
+        if(uname === "pixoro") return false;
+        return true;
+      });
+      if(mode === 'following' && MY_ID){
+        try{
+          let {data:fl} = await supa.from("follows").select("following_id").eq("follower_id", MY_ID).eq("status","accepted");
+          let ids = new Set((fl||[]).map(x=>String(x.following_id)));
+          ids.add(String(MY_ID));
+          clean = clean.filter(p=> ids.has(String(p.user_id)));
+        }catch(_){}
+      }
+      clean.sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
+      if(!clean.length){
+        feed.innerHTML = '<div style="color:#fff;text-align:center;padding:40px;line-height:1.8;font-weight:700">Innum Post Illa da 😅<br><span style="color:#aaa;font-size:13px;font-weight:400">+ Button ah Thottu Post Podu da</span><br><br><button onclick="location.href=\'./create.html\'" style="background:#FF2DCC;color:#fff;border:none;padding:12px 22px;border-radius:22px;font-weight:800">+ Post Podu da</button></div>';
+        return;
+      }
+      let userIds = [...new Set(clean.map(p=>p.user_id).filter(Boolean))];
+      let profileMap = {};
+      if(userIds.length){
+        try{
+          let pr = await supa.from("profiles").select("id,username,avatar_url").in("id", userIds);
+          if(!pr.error) (pr.data||[]).forEach(p=>{ profileMap[String(p.id)] = p; });
+        }catch(_){}
+      }
+      window.profileMap = profileMap;
+      if(MY_ID && profileMap[String(MY_ID)]){
+        window.ME_RAW = cleanName(profileMap[String(MY_ID)].username || window.ME_RAW);
+        if(profileMap[String(MY_ID)].avatar_url) window.MY_PFP = profileMap[String(MY_ID)].avatar_url;
+      }
+      try{
+        let tb = document.getElementById("trendBar");
+        if(tb){ tb.style.display = "none"; tb.innerHTML = ""; }
+        let tn = document.getElementById("pixoroTopNote");
+        if(tn) tn.style.display = "none";
+      }catch(_){}
+      // ✅ V1032 - PAZHAYA STYLE DA - Outline SVG Like / Comment / Share / Save - Emoji Illa da
+      feed.innerHTML = clean.map(p=>{
+        let id = String(p.id);
+        let owner = String(p.user_id||"");
+        let prof = profileMap[owner] || {};
+        let username = cleanName(prof.username || p.username || "Pixoro User");
+        let avatar = safeURL(prof.avatar_url || p.avatar_url || "");
+        let letter = esc(username.charAt(0).toUpperCase());
+        let caption = esc(p.caption||"");
+        let img = safeURL(p.image_url || p.media_url || p.video_url || "");
+        let isVideo = /\.(mp4|mov|webm|m4v)(\?|#|$)/i.test(img) || String(p.media_type||"").toLowerCase()==="video" || String(p.media_type||"").toLowerCase()==="reel";
+        let tick = (typeof window.goldTickHTML === 'function') ? window.goldTickHTML({username: username, user_id: owner, id: owner}) : '';
+        let likes = Number(p.likes_count)||0;
+        let comments = Number(p.comments_count)||0;
+        let isMine = MY_ID && String(MY_ID) === owner;
+        let time = p.created_at ? new Date(p.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"short"}) : "";
+        return '<article class="post" data-id="'+esc(id)+'" data-owner="'+esc(owner)+'" style="background:#000;border-bottom:1px solid #222;padding-bottom:12px;margin-bottom:8px">'
+        + '<div style="display:flex;align-items:center;gap:10px;padding:12px">'
+        + '<div class="pfpRing" onclick="location.href=\'./profile.html?u='+esc(owner)+'\'" style="cursor:pointer"><div class="pfpInner">'+(avatar ? '<img src="'+avatar+'" onerror="this.remove()">' : '<span style="color:#fff;font-weight:800">'+letter+'</span>')+'</div></div>'
+        + '<div style="flex:1;min-width:0"><b style="color:#fff;cursor:pointer" onclick="location.href=\'./profile.html?u='+esc(owner)+'\'">'+esc(username)+' '+tick+'</b><div style="color:#888;font-size:11px">'+esc(time)+'</div></div>'
+        + (isMine ? '' : '<button class="followBtnPost" data-action="follow" data-follow-user="'+esc(username)+'" data-follow-username="'+esc(username)+'">Follow</button>')
+        + '<button onclick="openPostMenu(\''+esc(id)+'\',\''+esc(owner)+'\',\''+esc(username)+'\')" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer">⋯</button>'
+        + '</div>'
+        + (img ? (isVideo ? '<video src="'+img+'" style="width:100%;aspect-ratio:4/5;object-fit:cover;background:#111" controls playsinline preload="metadata"></video>' : '<img src="'+img+'" style="width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#111">') : '')
+        // ✅ PAZHAYA OUTLINE SVG BAR DA - Emoji Illa da
+        + '<div style="display:flex;gap:18px;padding:10px 12px;align-items:center">'
+        + '<button data-action="like" data-post-id="'+esc(id)+'" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="rCount" style="color:#fff;font-size:14px">'+likes+'</span></button>'
+        + '<button onclick="openComment(\''+esc(id)+'\')" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.5-8.5h.5a8.5 8.5 0 0 1 8 8z"/></svg><span style="color:#fff;font-size:14px">'+comments+'</span></button>'
+        + '<button onclick="openShareModal ? openShareModal(\''+esc(id)+'\') : openShare(\''+esc(id)+'\')" style="background:none;border:none;cursor:pointer"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button>'
+        + '<button onclick="savePostFeed(\''+esc(id)+'\', this)" style="background:none;border:none;cursor:pointer;margin-left:auto"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>'
+        + '</div>'
+        + '<div style="padding:0 12px 10px;color:#fff;font-size:14px"><b>'+esc(username)+'</b> '+caption+'</div>'
+        + '</article>';
+      }).join("");
+      // ✅ Like - Outline la Irundhu Red Fill Aagum da - Pazhaya Style da
+      feed.querySelectorAll('[data-action="like"]').forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          let pid = btn.dataset.postId;
+          let liked = btn.classList.toggle("liked");
+          let cntEl = btn.querySelector(".rCount");
+          let c = Number(cntEl?.textContent||0);
+          if(cntEl) cntEl.textContent = liked ? c+1 : Math.max(0, c-1);
+          let svg = btn.querySelector("svg");
+          if(svg){
+            svg.setAttribute("fill", liked ? "#FF3040" : "none");
+            svg.setAttribute("stroke", liked ? "#FF3040" : "#fff");
+            let path = svg.querySelector("path"); if(path) path.setAttribute("fill", liked ? "#FF3040" : "none");
+            try{ svg.getAnimations().forEach(a=>a.cancel()); }catch(_){}
+            svg.animate([{transform:"scale(1)"},{transform:"scale(1.25)"},{transform:"scale(0.95)"},{transform:"scale(1)"}],{duration:280,easing:"ease-out"});
+          }
+          (async()=>{
+            try{
+              if(!MY_ID) return;
+              if(liked) await supa.from("likes").insert({post_id: pid, user_id: MY_ID});
+              else await supa.from("likes").delete().eq("post_id", pid).eq("user_id", MY_ID);
+            }catch(_){}
+          })();
+        });
+      });
+      feed.querySelectorAll('[data-action="follow"]').forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          if(window.pixoroToggleFollow) window.pixoroToggleFollow(btn.dataset.followUser||"", btn);
+        });
+      });
+      if(window.pixoroLoadAvatars) window.pixoroLoadAvatars();
+      if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
+      if(window.pixoroCheckBell) window.pixoroCheckBell();
+      window.dispatchEvent(new Event("pixoro-feed-rendered"));
+    }catch(e){
+      console.error("PIXORO FEED ERROR:", e);
+    }finally{
+      loading = false;
+    }
   }
-
-  function toggleLike(postId, post, forceLike = false){
-    if (!postId || !post) return false; postId = String(postId);
-    const now = Date.now(); const previous = lastToggleAt.get(postId) || 0;
-    if (!forceLike && now - previous < 300) return window.FEED_LIKES.has(postId);
-    lastToggleAt.set(postId, now);
-    const alreadyLiked = window.FEED_LIKES.has(postId); const willLike = forceLike ? true : !alreadyLiked;
-    if (forceLike && alreadyLiked){ paintLike(post, true); const current = Number(window.FEED_COUNTS[postId] || 0); if (current < 1){ window.FEED_COUNTS[postId] = 1; saveLocal(); } paintCount(post, Math.max(1, current)); return true; }
-    let countElement = getLikeCount(post);
-    // ✅ FIX 3 - Local la Illana - Server Count (Text la Irukka Count) ah Eduppom da - 0 nu Vaikka Koodathu da
-    let oldCount = (window.FEED_COUNTS[postId] !== undefined) ? Number(window.FEED_COUNTS[postId]) : Number(countElement?.textContent ?? 0);
-    let newCount = willLike ? oldCount + 1 : Math.max(0, oldCount - 1);
-    if (willLike) window.FEED_LIKES.add(postId); else window.FEED_LIKES.delete(postId);
-    window.FEED_COUNTS[postId] = newCount; paintLike(post, willLike); paintCount(post, newCount); saveLocal();
-    const previousSave = pending.get(postId) || Promise.resolve();
-    const nextSave = previousSave.catch(() => {}).then(() => serverSave(postId, willLike));
-    pending.set(postId, nextSave); nextSave.finally(() => { if (pending.get(postId) === nextSave) pending.delete(postId); });
-    return willLike;
-  }
-
-  function findMedia(element){ if (!element?.closest) return null; return element.closest(".postMedia, .post-media, .post-media-wrap, .post-content img, .post-content video, img, video"); }
-  function handleDoubleTap(media, postId, post, x, y){ blockClickUntil = Date.now() + 700; showBigHeart(media, x, y); buttonAnimation(post); toggleLike(postId, post, true); setTimeout(() => paintLike(post, true), 50); }
-
-  document.addEventListener("touchstart", event => {
-    if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
-    const media = findMedia(event.target); if (!media) return;
-    const post = getPost(media); const postId = getPostId(media); if (!post || !postId) return;
-    const now = Date.now(); const previous = lastTap.get(media);
-    const touchX = event.touches && event.touches[0] ? event.touches[0].clientX : null;
-    const touchY = event.touches && event.touches[0] ? event.touches[0].clientY : null;
-    lastTap.set(media, { time: now, x: touchX, y: touchY });
-    if (previous && now - previous.time <= DOUBLE_TAP_DELAY){ lastTap.delete(media); lastTouchTime = now; handleDoubleTap(media, postId, post, touchX, touchY); }
-  }, { passive: true });
-
-  document.addEventListener("dblclick", event => {
-    if (Date.now() - lastTouchTime < 800) return;
-    if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
-    const media = findMedia(event.target); if (!media) return;
-    const post = getPost(media); const postId = getPostId(media); if (!post || !postId) return;
-    event.preventDefault(); handleDoubleTap(media, postId, post, event.clientX, event.clientY);
-  });
-
-  document.addEventListener("click", event => {
-    if (Date.now() < blockClickUntil){ const media = findMedia(event.target); if (media){ event.preventDefault(); event.stopImmediatePropagation(); return; } }
-    const button = event.target.closest("[data-like-btn], .like-btn, .like-button, [data-action='like']"); if (!button) return;
-    event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
-    const post = getPost(button); const postId = getPostId(button); if (!post || !postId) return;
-    showButtonHeart(button); buttonAnimation(post); toggleLike(postId, post, false);
-  }, true);
-
-  // ✅ FIX - PaintAll - Local la Like Panna Post ku Mattum Paint Pannuvom da - Ella Post oda Count ah Azhikka Koodathu da
-  function paintAll(){
-    document.querySelectorAll("[data-post-id], .post, .post-card, article, .post-item").forEach(post => {
-      const postId = String(post.dataset.postId || post.dataset.id || ""); if (!postId) return;
-      const liked = window.FEED_LIKES.has(postId); paintLike(post, liked);
-      if (window.FEED_COUNTS[postId] !== undefined){ paintCount(post, Number(window.FEED_COUNTS[postId])); }
-      // Local la Illana - Server Count ah Apdiye Viduvom da - Overwrite Panna Koodathu da
-    });
-  }
-
-  async function loadMyLikes(){
-    paintAll(); const userId = await getUserId(); let supa = getSupa(); if (!userId || !supa) return;
-    try{ const { data, error } = await supa.from(TABLE).select("post_id").eq("user_id", userId); if (error) throw error; const serverLikes = new Set((data || []).map(item => String(item.post_id))); window.FEED_LIKES = serverLikes; saveLocal(); paintAll(); }catch(error){ console.error("PIXORO LOAD LIKES:", error); }
-  }
-
-  function startWatchman(){
-    if (window.PIXORO_WATCHMAN_ON) return; window.PIXORO_WATCHMAN_ON = true; let timer;
-    const observer = new MutationObserver(() => { clearTimeout(timer); timer = setTimeout(paintAll, 100); });
-    observer.observe(document.body, { childList: true, subtree: true });
-  }
-
-  function addStyles(){
-    if (document.getElementById("pixoro-v39-css")) return;
-    const style = document.createElement("style"); style.id = "pixoro-v39-css";
-    style.textContent = `.like-btn, .like-button, [data-like-btn] { background:transparent !important; border:none !important; outline:none !important; box-shadow:none !important; padding:0 !important; overflow:visible !important; opacity:1 !important; visibility:visible !important; } .like-btn svg, .like-button svg, [data-like-btn] svg { background:transparent !important; border:none !important; box-shadow:none !important; outline:none !important; transform-origin: center !important; flex-shrink: 0 !important; opacity:1 !important; visibility:visible !important; overflow:visible !important; } .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked { color:#FF3040 !important; background:transparent !important; } .like-btn.liked svg, .like-button.liked svg { fill:#FF3040 !important; } .pixoro-big-heart { pointer-events:none !important; background:transparent !important; border:none !important; box-shadow:none !important; } [data-like-count], .like-count, .likes-count { transform:none !important; animation:none !important; flex-shrink: 0 !important; background:transparent !important; border:none !important; font-size:14px !important; line-height:1 !important; } .pixoro-tap-heart { display:none !important; opacity:0 !important; }`;
-    document.head.appendChild(style);
-  }
-
-  window.pixoroToggleLike = toggleLike; window.pixoroPaintAllLikes = paintAll; window.showBigHeart = showBigHeart; window.pixoroTapHeart = showTapHeart; window.pixoroMassDance = showMassDance;
-  function start(){ addStyles(); paintAll(); loadMyLikes(); startWatchman(); }
-  if (document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", start, { once: true }); } else { start(); }
-  window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO LIKE V40 LOADED ❤️");
+  window.openComment = function(id){
+    window._CUR = id;
+    if(window.openComments) return window.openComments(id);
+    let m = document.getElementById("commentModal");
+    if(m) m.style.display = "block";
+  };
+  window.closeComment = function(){ let m = document.getElementById("commentModal"); if(m) m.style.display = "none"; };
+  window.openPostMenu = function(id, owner, username){
+    window._CUR = id; window._CUR_OWNER = owner; window._CUR_USER = username;
+    let box = document.getElementById("postMenuBox");
+    let sheet = document.getElementById("postMenu");
+    if(box) box.innerHTML = '<div style="padding:16px;color:#fff;text-align:center">'
+      + '<div onclick="openComment(\''+esc(id)+'\')" style="padding:12px;border-bottom:1px solid #333;cursor:pointer">💬 Comments</div>'
+      + '<div onclick="openShare(\''+esc(id)+'\')" style="padding:12px;border-bottom:1px solid #333;cursor:pointer">✈️ Share</div>'
+      + '<div onclick="closePostMenu()" style="padding:12px;cursor:pointer;color:#aaa">Cancel</div></div>';
+    if(sheet) sheet.style.display = "block";
+  };
+  window.closePostMenu = function(){ let s = document.getElementById("postMenu"); if(s) s.style.display = "none"; };
+  window.savePostFeed = async function(id, btn){
+    try{
+      if(window.pixoroSave) await window.pixoroSave(id);
+      if(btn){ let svg = btn.querySelector("svg"); if(svg){ svg.setAttribute("fill","#fff"); svg.querySelector("path")?.setAttribute("fill","#fff"); } }
+    }catch(_){}
+  };
+  window.setFeedMode = function(mode){
+    window.PIXORO_FEED_MODE = mode || 'foryou';
+    document.querySelectorAll('.feedTab').forEach(t=>t.classList.remove('active'));
+    let map = {foryou:'tabForYou', following:'tabFollowing', latest:'tabLatest'};
+    let el = document.getElementById(map[mode]||'tabForYou');
+    if(el) el.classList.add('active');
+    loading = false;
+    loadPixoroFeed();
+  };
+  window.loadPixoroFeed = loadPixoroFeed;
+  window.getPixoroFeed = loadPixoroFeed;
+  window.addEventListener("pixoro-supa-ready", ()=>{ _tried = 0; loading = false; loadPixoroFeed(); });
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", loadPixoroFeed); }
+  else { loadPixoroFeed(); }
 })();
