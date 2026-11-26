@@ -1,8 +1,8 @@
 
 /* =====================================================
-   PIXORO REELS V1021
-   Separate File Connection
-   Like / Comments / Follow / Save / Share
+   PIXORO REELS V1022
+   FIXED - SEPARATE FILE CONNECTION
+   Follow / Like / Comments / Save / Share
    ===================================================== */
 
 (function () {
@@ -39,14 +39,9 @@
     }
   }
 
-  // VIDEO DETECTION
   function isVideo(post) {
-    if (String(post.media_type || "").toLowerCase() === "video") {
-      return true;
-    }
-
+    if (String(post.media_type || "").toLowerCase() === "video") return true;
     if (post.is_reel === true) return true;
-
     if (post.video_url) return true;
 
     const media = String(post.media_url || "").trim();
@@ -55,9 +50,7 @@
 
     try {
       const url = new URL(media, location.href);
-      const path = url.pathname.toLowerCase();
-
-      return /\.(mp4|mov|webm|m4v|ogv)$/i.test(path);
+      return /\.(mp4|mov|webm|m4v|ogv)$/i.test(url.pathname);
     } catch (e) {
       return /\.(mp4|mov|webm|m4v|ogv)(\?|#|$)/i.test(media);
     }
@@ -74,13 +67,21 @@
     if (el) el.classList.add("open", "show");
   };
 
-  // MUTE ALL REELS
+  // MUTE
   window.toggleMuteAll = function () {
     window._MUTED = !window._MUTED;
 
     document.querySelectorAll(".reel-main").forEach(video => {
       video.muted = !!window._MUTED;
     });
+  };
+
+  // PROFILE
+  window.openFriendProfile = function (username) {
+    if (!username) return;
+
+    location.href =
+      "profile.html?user=" + encodeURIComponent(username);
   };
 
   // LOAD REELS
@@ -100,7 +101,6 @@
     loading = true;
 
     try {
-      // CURRENT USER
       let MY_ID = "";
 
       try {
@@ -110,7 +110,7 @@
         console.warn("Session error:", e);
       }
 
-      // LOAD POSTS
+      // POSTS
       const postResult = await supa
         .from("posts")
         .select("*")
@@ -123,7 +123,7 @@
         ? [...postResult.data]
         : [];
 
-      // LOAD REELS TABLE
+      // OPTIONAL REELS TABLE
       try {
         const reelResult = await supa
           .from("reels")
@@ -164,7 +164,7 @@
         console.warn("Reels table unavailable:", e);
       }
 
-      // ONLY VIDEOS
+      // VIDEO FILTER
       const videos = posts
         .filter(isVideo)
         .filter(p => p.video_url || p.media_url)
@@ -182,7 +182,7 @@
         return;
       }
 
-      // LOAD PROFILES
+      // PROFILES
       const userIds = [
         ...new Set(videos.map(p => p.user_id).filter(Boolean))
       ];
@@ -202,7 +202,7 @@
         }
       }
 
-      // MY PROFILE PHOTO
+      // MY AVATAR
       if (MY_ID && profileMap[MY_ID]?.avatar_url) {
         window.MY_PFP = profileMap[MY_ID].avatar_url;
 
@@ -211,13 +211,13 @@
         });
       }
 
-      // REMOVE OLD OBSERVER
+      // RESET OBSERVER
       if (reelObserver) {
         reelObserver.disconnect();
         reelObserver = null;
       }
 
-      // RENDER REELS
+      // RENDER
       wrap.innerHTML = videos.map(post => {
         const id = escapeHTML(post.id);
         const owner = escapeHTML(post.user_id || "");
@@ -287,7 +287,8 @@
               </span>
 
               <button class="followBtnPerusa"
-                      data-action="follow">
+                      data-action="follow"
+                      data-user="${owner}">
                 Follow
               </button>
 
@@ -361,7 +362,7 @@
         </div>`;
       }).join("");
 
-      // OBSERVER
+      // AUTO PLAY OBSERVER
       reelObserver = new IntersectionObserver(entries => {
         entries.forEach(entry => {
           const video = entry.target.querySelector("video");
@@ -385,7 +386,6 @@
 
         reelObserver.observe(item);
 
-        // VIDEO PLAY / PAUSE
         video.addEventListener("click", () => {
           if (video.paused) {
             video.play().catch(() => {});
@@ -396,7 +396,7 @@
           }
         });
 
-        // DOUBLE TAP LIKE
+        // DOUBLE TAP
         let lastTap = 0;
 
         item.addEventListener("touchend", e => {
@@ -432,7 +432,7 @@
         }, { passive: true });
       });
 
-      // SEPARATE FILE CONNECTION
+      // ACTION CONNECTIONS
       wrap.querySelectorAll("[data-action]").forEach(btn => {
         btn.addEventListener("click", e => {
           e.stopPropagation();
@@ -445,30 +445,40 @@
             case "like":
               if (window.likeReel) {
                 window.likeReel(id, btn, e);
+              } else {
+                console.warn("likeReel() missing in like.js");
               }
               break;
 
             case "comments":
               if (window.openComments) {
                 window.openComments(id);
+              } else {
+                window.openSheet("commentSheet");
               }
               break;
 
             case "share":
               if (window.openShare) {
                 window.openShare(id);
+              } else {
+                window.openSheet("shareSheet");
               }
               break;
 
             case "save":
               if (window.saveReel) {
                 window.saveReel(id, btn);
+              } else {
+                console.warn("saveReel() missing in save.js");
               }
               break;
 
             case "follow":
               if (window.toggleFollow) {
                 window.toggleFollow(btn);
+              } else {
+                console.warn("toggleFollow() missing in follow.js");
               }
               break;
 
@@ -487,9 +497,7 @@
         });
       });
 
-      window.dispatchEvent(
-        new Event("pixoro-reels-rendered")
-      );
+      window.dispatchEvent(new Event("pixoro-reels-rendered"));
 
       if (window.pixoroLoadAvatars) {
         window.pixoroLoadAvatars();
@@ -503,38 +511,18 @@
           Reels load failed
           <br>${escapeHTML(error.message || "Database error")}
         </div>`;
-    }
-
-    finally {
+    } finally {
       loading = false;
     }
   }
 
-  // FOLLOW UI ONLY
-  // Database follow action should be handled by follow.js
-  window.toggleFollow = function(btn) {
-    if (!btn) return;
-
-    btn.classList.toggle("following");
-
-    btn.textContent =
-      btn.classList.contains("following")
-        ? "Following"
-        : "Follow";
-  };
-
-  // PROFILE
-  window.openFriendProfile = function(username) {
-    if (!username) return;
-
-    location.href =
-      "profile.html?user=" + encodeURIComponent(username);
-  };
-
   // SHEET ACTIONS
-  window.editReel = () => window.closeSheet("ownerSheet");
+  window.editReel = function () {
+    window.closeSheet("ownerSheet");
+    console.warn("Edit Reel action needs an edit handler.");
+  };
 
-  window.shareQR = () => {
+  window.shareQR = function () {
     if (window.copyLinkSafe) {
       window.copyLinkSafe();
     } else {
@@ -542,12 +530,25 @@
     }
   };
 
-  window.deleteSafe = () => window.closeSheet("ownerSheet");
-  window.notInterestedSafe = () => window.closeSheet("viewerSheet");
-  window.hideReelSafe = () => window.closeSheet("viewerSheet");
-  window.reportSafe = () => window.closeSheet("viewerSheet");
+  window.deleteSafe = function () {
+    window.closeSheet("ownerSheet");
+    console.warn("Delete action is not connected to the database yet.");
+  };
 
-  // RELOAD FUNCTION
+  window.notInterestedSafe = function () {
+    window.closeSheet("viewerSheet");
+  };
+
+  window.hideReelSafe = function () {
+    window.closeSheet("viewerSheet");
+  };
+
+  window.reportSafe = function () {
+    window.closeSheet("viewerSheet");
+    console.warn("Report action needs a reports table connection.");
+  };
+
+  // RELOAD
   window.loadPixoroReels = loadReels;
 
   // INITIAL LOAD
