@@ -1,4 +1,4 @@
-/* ===== PIXORO FEED V1031 - CORRECTED - FULL ===== */
+/* ===== PIXORO FEED V1032 - CORRECTED - FULL - OLD SVG STYLE ===== */
 (function(){
   "use strict";
   let loading = false;
@@ -9,18 +9,9 @@
   function esc(v){
     return String(v ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
   }
-  // ✅ V1031 - @ Remove Pannum Helper da - Username la @ Vandha Thookidum da
   function cleanName(v){ return String(v||"").replace(/^@+/,"").trim(); }
   function safeURL(v){
     try{ const u = new URL(v, location.href); return ["https:","http:"].includes(u.protocol) ? esc(u.href) : ""; }catch{ return ""; }
-  }
-  function showFeedError(msg){
-    let e = document.getElementById("feedError");
-    if(e){ e.style.display = "block"; e.innerText = msg || "Feed Load Aagala da - Refresh Pannu da"; }
-  }
-  function hideFeedError(){
-    let e = document.getElementById("feedError");
-    if(e) e.style.display = "none";
   }
   async function loadPixoroFeed(){
     let feed = document.getElementById("feed");
@@ -28,22 +19,22 @@
     let supa = getClient();
     if(!supa){
       _tried++;
-      feed.innerHTML = '<div style="color:#fff;text-align:center;padding:40px;font-weight:700">Feed Load Aaguthu da... 🔥</div>';
+      // ✅ V1032 FIX 1 - Feed Load Aaguthu Text ah Full Delete da - Ithu Thaan Flicker ku Kaaranam da
       if(_tried <= 3){ setTimeout(loadPixoroFeed, 1500); return; }
-      feed.innerHTML = '<div style="color:#fff;text-align:center;padding:40px">Supabase Connect Aagala da ❌<br><br><button onclick="location.reload()" style="background:#FF2DCC;color:#fff;border:none;padding:12px 22px;border-radius:22px;font-weight:800">Retry Pannu da</button></div>';
       return;
     }
     loading = true;
     _tried = 0;
-    hideFeedError();
-    feed.innerHTML = '<div style="color:#fff;text-align:center;padding:40px;font-weight:700">Feed Load Aaguthu da... 🔥</div>';
+    // ✅ V1032 FIX 1 - Feed la Already Post Irundha - Azhikka Koodathu da - Empty ah Irundha Mattum Clear Pannuvom da
+    if(!feed.querySelector(".post")){
+      feed.innerHTML = '';
+    }
     try{
       let MY_ID = "";
       try{ let {data:{session}} = await supa.auth.getSession(); MY_ID = session?.user?.id || ""; window.ME_ID = MY_ID || window.ME_ID; }catch(_){}
       let r = await supa.from("posts").select("*").order("created_at",{ascending:false}).limit(100);
       if(r.error) throw r.error;
       let posts = Array.isArray(r.data) ? [...r.data] : [];
-      // ✅ V1031 - Fake Reels Remove da - Feed la Posts Table Mattum Thaan da - Reels Merge Delete Panniten da
       let blocked = [];
       try{ if(window.ME_ID && typeof window.pixoroGetBlockedIds === 'function'){ blocked = await window.pixoroGetBlockedIds(); } }catch(_){}
       let mode = window.PIXORO_FEED_MODE || 'foryou';
@@ -51,6 +42,9 @@
         if(p.is_archived === true) return false;
         if(p.visibility === 'private_share') return false;
         if(p.user_id && blocked.includes(String(p.user_id))) return false;
+        // ✅ V1032 FIX 2 - Pixoro Fake ID oda Oru Photo ah Mattum Thookidurom da
+        let uname = cleanName(p.username||"").toLowerCase();
+        if(uname === "pixoro") return false;
         return true;
       });
       if(mode === 'following' && MY_ID){
@@ -77,11 +71,8 @@
       window.profileMap = profileMap;
       if(MY_ID && profileMap[String(MY_ID)]){
         window.ME_RAW = cleanName(profileMap[String(MY_ID)].username || window.ME_RAW);
-        if(profileMap[String(MY_ID)].avatar_url){
-          window.MY_PFP = profileMap[String(MY_ID)].avatar_url;
-        }
+        if(profileMap[String(MY_ID)].avatar_url) window.MY_PFP = profileMap[String(MY_ID)].avatar_url;
       }
-      // ✅ V1031 - Trend Bar Remove da - @Pixoro Duplicate Varathu da - Hide Panniten da
       try{
         let tb = document.getElementById("trendBar");
         if(tb){ tb.style.display = "none"; tb.innerHTML = ""; }
@@ -92,7 +83,6 @@
         let id = String(p.id);
         let owner = String(p.user_id||"");
         let prof = profileMap[owner] || {};
-        // ✅ V1031 - @ Remove da - Username la @ Irundha Thookidum da
         let username = cleanName(prof.username || p.username || "Pixoro User");
         let avatar = safeURL(prof.avatar_url || p.avatar_url || "");
         let letter = esc(username.charAt(0).toUpperCase());
@@ -106,24 +96,23 @@
         let time = p.created_at ? new Date(p.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"short"}) : "";
         return '<article class="post" data-id="'+esc(id)+'" data-owner="'+esc(owner)+'" style="background:#000;border-bottom:1px solid #222;padding-bottom:12px;margin-bottom:8px">'
         + '<div style="display:flex;align-items:center;gap:10px;padding:12px">'
-        // ✅ V1031 - Fake Photo Remove da - Avatar Illana Letter Mattum da - Empty Circle Illa da
         + '<div class="pfpRing" onclick="location.href=\'./profile.html?u='+esc(owner)+'\'" style="cursor:pointer"><div class="pfpInner">'+(avatar ? '<img src="'+avatar+'" onerror="this.remove()">' : '<span style="color:#fff;font-weight:800">'+letter+'</span>')+'</div></div>'
-        // ✅ V1031 - @ Remove da - Pixoro Mattum Theriyum da
         + '<div style="flex:1;min-width:0"><b style="color:#fff;cursor:pointer" onclick="location.href=\'./profile.html?u='+esc(owner)+'\'">'+esc(username)+' '+tick+'</b><div style="color:#888;font-size:11px">'+esc(time)+'</div></div>'
         + (isMine ? '' : '<button class="followBtnPost" data-action="follow" data-follow-user="'+esc(username)+'" data-follow-username="'+esc(username)+'">Follow</button>')
         + '<button onclick="openPostMenu(\''+esc(id)+'\',\''+esc(owner)+'\',\''+esc(username)+'\')" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer">⋯</button>'
         + '</div>'
         + (img ? (isVideo ? '<video src="'+img+'" style="width:100%;aspect-ratio:4/5;object-fit:cover;background:#111" controls playsinline preload="metadata"></video>' : '<img src="'+img+'" style="width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#111">') : '')
+        // ✅ V1032 FIX 3 - PAZHAYA OUTLINE SVG DA - Emoji Illa da - ❤️💬✈️🔖 Delete da
         + '<div style="display:flex;gap:18px;padding:10px 12px;align-items:center">'
-        + '<button data-action="like" data-post-id="'+esc(id)+'" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;gap:6px"><span class="vIcon">❤️</span><span class="rCount" style="font-size:14px">'+likes+'</span></button>'
-        + '<button onclick="openComment(\''+esc(id)+'\')" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer">💬 <span style="font-size:14px">'+comments+'</span></button>'
-        + '<button onclick="openShareModal ? openShareModal(\''+esc(id)+'\') : openShare(\''+esc(id)+'\')" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer">✈️</button>'
-        + '<button onclick="savePostFeed(\''+esc(id)+'\', this)" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;margin-left:auto">🔖</button>'
+        + '<button data-action="like" data-post-id="'+esc(id)+'" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="rCount" style="color:#fff;font-size:14px">'+likes+'</span></button>'
+        + '<button onclick="openComment(\''+esc(id)+'\')" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.5-8.5h.5a8.5 8.5 0 0 1 8 8z"/></svg><span style="color:#fff;font-size:14px">'+comments+'</span></button>'
+        + '<button onclick="openShareModal ? openShareModal(\''+esc(id)+'\') : openShare(\''+esc(id)+'\')" style="background:none;border:none;cursor:pointer"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button>'
+        + '<button onclick="savePostFeed(\''+esc(id)+'\', this)" style="background:none;border:none;cursor:pointer;margin-left:auto"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>'
         + '</div>'
-        // ✅ V1031 - @ Remove da
         + '<div style="padding:0 12px 10px;color:#fff;font-size:14px"><b>'+esc(username)+'</b> '+caption+'</div>'
         + '</article>';
       }).join("");
+      // ✅ Like - Outline la Irundhu Red Fill Aagum da
       feed.querySelectorAll('[data-action="like"]').forEach(btn=>{
         btn.addEventListener("click", ()=>{
           let pid = btn.dataset.postId;
@@ -131,8 +120,14 @@
           let cntEl = btn.querySelector(".rCount");
           let c = Number(cntEl?.textContent||0);
           if(cntEl) cntEl.textContent = liked ? c+1 : Math.max(0, c-1);
-          let heart = btn.querySelector(".vIcon");
-          if(heart){ try{ heart.getAnimations().forEach(a=>a.cancel()); }catch(_){} heart.animate([{transform:"scale(1)"},{transform:"scale(1.25)"},{transform:"scale(0.95)"},{transform:"scale(1)"}],{duration:280,easing:"ease-out"}); }
+          let svg = btn.querySelector("svg");
+          if(svg){
+            svg.setAttribute("fill", liked ? "#FF3040" : "none");
+            svg.setAttribute("stroke", liked ? "#FF3040" : "#fff");
+            let path = svg.querySelector("path"); if(path) path.setAttribute("fill", liked ? "#FF3040" : "none");
+            try{ svg.getAnimations().forEach(a=>a.cancel()); }catch(_){}
+            svg.animate([{transform:"scale(1)"},{transform:"scale(1.25)"},{transform:"scale(0.95)"},{transform:"scale(1)"}],{duration:280,easing:"ease-out"});
+          }
           (async()=>{
             try{
               if(!MY_ID) return;
@@ -153,8 +148,6 @@
       window.dispatchEvent(new Event("pixoro-feed-rendered"));
     }catch(e){
       console.error("PIXORO FEED ERROR:", e);
-      showFeedError("Feed Load Failed da - "+(e.message||""));
-      feed.innerHTML = '<div style="color:#fff;text-align:center;padding:40px">Feed Load Failed da ❌<br><span style="color:#ff5ea8;font-size:13px">'+esc(e.message||"")+'</span><br><br><button onclick="location.reload()" style="background:#FF2DCC;color:#fff;border:none;padding:12px 22px;border-radius:22px;font-weight:800">Retry Pannu da</button></div>';
     }finally{
       loading = false;
     }
@@ -171,8 +164,8 @@
     let box = document.getElementById("postMenuBox");
     let sheet = document.getElementById("postMenu");
     if(box) box.innerHTML = '<div style="padding:16px;color:#fff;text-align:center">'
-      + '<div onclick="openComment(\''+esc(id)+'\')" style="padding:12px;border-bottom:1px solid #333;cursor:pointer">💬 Comments</div>'
-      + '<div onclick="openShare(\''+esc(id)+'\')" style="padding:12px;border-bottom:1px solid #333;cursor:pointer">✈️ Share</div>'
+      + '<div onclick="openComment(\''+esc(id)+'\')" style="padding:12px;border-bottom:1px solid #333;cursor:pointer">Comments</div>'
+      + '<div onclick="openShare(\''+esc(id)+'\')" style="padding:12px;border-bottom:1px solid #333;cursor:pointer">Share</div>'
       + '<div onclick="closePostMenu()" style="padding:12px;cursor:pointer;color:#aaa">Cancel</div></div>';
     if(sheet) sheet.style.display = "block";
   };
@@ -180,7 +173,7 @@
   window.savePostFeed = async function(id, btn){
     try{
       if(window.pixoroSave) await window.pixoroSave(id);
-      if(btn) btn.style.opacity = "0.5";
+      if(btn){ let svg = btn.querySelector("svg"); if(svg){ svg.setAttribute("fill","#fff"); svg.querySelector("path")?.setAttribute("fill","#fff"); } }
     }catch(_){}
   };
   window.setFeedMode = function(mode){
