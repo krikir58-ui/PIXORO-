@@ -1,4 +1,4 @@
-// ===== PIXORO REELS VISIBILITY - v1008 CORRECTED - THANI FILE DA =====
+// ===== PIXORO REELS VISIBILITY - v1009 CORRECTED - THANI FILE DA =====
 // ✅ export ILLA DA - window.supa THAAN DA
 
 async function uploadReelPixoro(userId, videoUrl, isPrivateShare, sharedWithIds, captionText){
@@ -19,7 +19,7 @@ async function uploadReelPixoro(userId, videoUrl, isPrivateShare, sharedWithIds,
     let payload = {
       ...row,
       visibility: isPrivateShare ? 'private_share' : 'public',
-      shared_with: isPrivateShare ? (sharedWithIds || []) : null
+      shared_with: isPrivateShare ? (sharedWithIds || []).map(x => String(x)) : null
     };
     let {data, error} = await s.from('reels').insert(payload).select().single();
     if(error) throw error;
@@ -46,11 +46,13 @@ async function getFeedPixoro(currentUserId){
   }catch(e){}
 
   // ✅ 2. Public reels mattum eduthuko da - Private Share reels feed la vara koodathu da, DM la mattum da
-  // ✅ FIX: profiles join serthachu da - username + pfp varum da
-  let {data: reels, error} = await s.from('reels').select('*, profiles:profiles(username,avatar_url)').order('created_at',{ascending:false}).limit(50);
+  // ✅ FIX: Join fail aana kooda feed empty aagathu da - profiles join illama fetch pannu da
+  let reels = [];
+  let {data: reelsData, error} = await s.from('reels').select('*').order('created_at',{ascending:false}).limit(50);
   if(error){ console.log('reels fetch fail', error.message); return []; }
+  reels = reelsData || [];
 
-  // ✅ 3. Private account check da - Public account reels + Naan follow panra private account reels mattum da
+  // ✅ Profiles ah thaniya eduthuko da - Join problem eh illa da
   let profMap = {};
   try{
     let {data: profs} = await s.from('profiles').select('id,is_private_account,username,avatar_url').limit(200);
@@ -61,12 +63,18 @@ async function getFeedPixoro(currentUserId){
     // ✅ Private Share reels feed la vara koodathu da
     if(r.visibility === 'private_share') return false;
     if(r.visibility === 'private') return false;
-    // ✅ Archived reels feed la vara koodathu da - FIX ADDED DA
+    // ✅ Archived reels feed la vara koodathu da
     if(r.is_archived === true) return false;
+    if(r.is_deleted === true) return false;
 
     // ✅ FIX: profiles illa na - profMap la irundhu eduthuko da
     if(!r.profiles && profMap[String(r.user_id)]){
       r.profiles = profMap[String(r.user_id)];
+    }
+    // ✅ FIX: username / avatar direct ah reel la vachidu da - render la easy da
+    if(profMap[String(r.user_id)]){
+      r.username = r.username || profMap[String(r.user_id)].username;
+      r.avatar_url = r.avatar_url || profMap[String(r.user_id)].avatar_url;
     }
 
     let pr = profMap[String(r.user_id)] || r.profiles;
@@ -90,13 +98,32 @@ async function getFeedPixoro(currentUserId){
 }
 window.getFeedPixoro = getFeedPixoro;
 
-// ✅ NEW FIX ADDED DA - DM la Private Share Reels Kaamikka da
+// ✅ DM la Private Share Reels Kaamikka da - CORRECTED - String Compare da
 async function getDMPrivateReelsPixoro(currentUserId){
   let s = window.supa; if(!s) return [];
-  let {data} = await s.from('reels').select('*, profiles:profiles(username,avatar_url)').eq('visibility','private_share').order('created_at',{ascending:false}).limit(50);
+  if(!currentUserId) return [];
+  let me = String(currentUserId);
+  let {data, error} = await s.from('reels').select('*').eq('visibility','private_share').order('created_at',{ascending:false}).limit(50);
+  if(error){ console.log('DM reels fail', error.message); return []; }
+
+  // ✅ Profiles ah thaniya map pannu da
+  let profMap = {};
+  try{
+    let {data: profs} = await s.from('profiles').select('id,username,avatar_url').limit(200);
+    (profs||[]).forEach(p=>{ profMap[String(p.id)] = p; });
+  }catch(e){}
+
   return (data||[]).filter(r=>{
-    let shared = r.shared_with || [];
-    return String(r.user_id) === String(currentUserId) || shared.includes(currentUserId) || shared.includes(String(currentUserId));
+    if(r.is_archived === true) return false;
+    if(r.is_deleted === true) return false;
+    // ✅ FIX: shared_with la number irundhalum string ah maathi compare pannu da
+    let shared = (r.shared_with || []).map(x => String(x));
+    if(profMap[String(r.user_id)]){
+      r.profiles = profMap[String(r.user_id)];
+      r.username = r.username || profMap[String(r.user_id)].username;
+      r.avatar_url = r.avatar_url || profMap[String(r.user_id)].avatar_url;
+    }
+    return String(r.user_id) === me || shared.includes(me);
   });
 }
 window.getDMPrivateReelsPixoro = getDMPrivateReelsPixoro;
