@@ -1,561 +1,195 @@
-
 /* =====================================================
-   PIXORO REELS V1022
-   FIXED - SEPARATE FILE CONNECTION
-   Follow / Like / Comments / Save / Share
+   PIXORO REELS V1023 - FIXED - NO NEW FILE DA
+   Follow / Like / Pause - Ellam Fix da
    ===================================================== */
 
 (function () {
   "use strict";
-
   let loading = false;
   let reelObserver = null;
-
-  function getClient() {
-    return window.getSupa
-      ? window.getSupa()
-      : window.supa || window.supabaseClient || null;
-  }
-
-  function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, c => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    })[c]);
-  }
-
-  function safeURL(value) {
-    try {
-      const url = new URL(value, location.href);
-
-      return ["https:", "http:"].includes(url.protocol)
-        ? escapeHTML(url.href)
-        : "";
-    } catch (e) {
-      return "";
-    }
-  }
-
+  function getClient() { return window.getSupa ? window.getSupa() : window.supa || window.supabaseClient || null; }
+  function escapeHTML(value) { return String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
+  function safeURL(value) { try { const url = new URL(value, location.href); return ["https:", "http:"].includes(url.protocol) ? escapeHTML(url.href) : ""; } catch (e) { return ""; } }
   function isVideo(post) {
     if (String(post.media_type || "").toLowerCase() === "video") return true;
     if (post.is_reel === true) return true;
     if (post.video_url) return true;
-
     const media = String(post.media_url || "").trim();
-
     if (!media) return false;
-
-    try {
-      const url = new URL(media, location.href);
-      return /\.(mp4|mov|webm|m4v|ogv)$/i.test(url.pathname);
-    } catch (e) {
-      return /\.(mp4|mov|webm|m4v|ogv)(\?|#|$)/i.test(media);
-    }
+    try { const url = new URL(media, location.href); return /\.(mp4|mov|webm|m4v|ogv)$/i.test(url.pathname); } catch (e) { return /\.(mp4|mov|webm|m4v|ogv)(\?|#|$)/i.test(media); }
   }
+  window.closeSheet = function (id) { const el = document.getElementById(id); if (el) el.classList.remove("open", "show"); };
+  window.openSheet = function (id) { const el = document.getElementById(id); if (el) el.classList.add("open", "show"); };
+  window.toggleMuteAll = function () { window._MUTED = !window._MUTED; document.querySelectorAll(".reel-main").forEach(video => { video.muted = !!window._MUTED; }); };
+  window.openFriendProfile = function (username) { if (!username) return; location.href = "profile.html?user=" + encodeURIComponent(username); };
 
-  // SHEETS
-  window.closeSheet = function (id) {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove("open", "show");
-  };
-
-  window.openSheet = function (id) {
-    const el = document.getElementById(id);
-    if (el) el.classList.add("open", "show");
-  };
-
-  // MUTE
-  window.toggleMuteAll = function () {
-    window._MUTED = !window._MUTED;
-
-    document.querySelectorAll(".reel-main").forEach(video => {
-      video.muted = !!window._MUTED;
-    });
-  };
-
-  // PROFILE
-  window.openFriendProfile = function (username) {
-    if (!username) return;
-
-    location.href =
-      "profile.html?user=" + encodeURIComponent(username);
-  };
-
-  // LOAD REELS
   async function loadReels() {
     const wrap = document.getElementById("reelWrap");
-
     if (!wrap || loading) return;
-
     const supa = getClient();
-
-    if (!supa) {
-      wrap.innerHTML =
-        '<div style="color:white;text-align:center;padding-top:40vh">Database not ready</div>';
-      return;
-    }
-
+    if (!supa) { wrap.innerHTML = '<div style="color:white;text-align:center;padding-top:40vh">Database not ready</div>'; return; }
     loading = true;
-
     try {
       let MY_ID = "";
-
-      try {
-        const session = await supa.auth.getSession();
-        MY_ID = session.data?.session?.user?.id || "";
-      } catch (e) {
-        console.warn("Session error:", e);
-      }
-
-      // POSTS
-      const postResult = await supa
-        .from("posts")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
-
+      try { const session = await supa.auth.getSession(); MY_ID = session.data?.session?.user?.id || ""; } catch (e) {}
+      window.MY_ID = MY_ID;
+      const postResult = await supa.from("posts").select("*").order("created_at", { ascending: false }).limit(50);
       if (postResult.error) throw postResult.error;
-
-      let posts = Array.isArray(postResult.data)
-        ? [...postResult.data]
-        : [];
-
-      // OPTIONAL REELS TABLE
+      let posts = Array.isArray(postResult.data) ? [...postResult.data] : [];
       try {
-        const reelResult = await supa
-          .from("reels")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(50);
-
+        const reelResult = await supa.from("reels").select("*").order("created_at", { ascending: false }).limit(50);
         if (!reelResult.error && Array.isArray(reelResult.data)) {
-          const existing = new Set(
-            posts.map(p =>
-              String(p.video_url || p.media_url || "")
-            ).filter(Boolean)
-          );
-
+          const existing = new Set(posts.map(p => String(p.video_url || p.media_url || "")).filter(Boolean));
           reelResult.data.forEach(r => {
             const media = r.video_url || r.media_url || "";
-
             if (!media || existing.has(String(media))) return;
-
-            posts.push({
-              id: "reel-" + r.id,
-              user_id: r.user_id,
-              username: r.username,
-              avatar_url: r.avatar_url,
-              caption: r.caption,
-              video_url: media,
-              media_url: media,
-              media_type: "video",
-              created_at: r.created_at,
-              likes_count: r.likes_count || 0,
-              comments_count: r.comments_count || 0
-            });
-
+            posts.push({ id: "reel-" + r.id, user_id: r.user_id, username: r.username, avatar_url: r.avatar_url, caption: r.caption, video_url: media, media_url: media, media_type: "video", created_at: r.created_at, likes_count: r.likes_count || 0, comments_count: r.comments_count || 0 });
             existing.add(String(media));
           });
         }
-      } catch (e) {
-        console.warn("Reels table unavailable:", e);
-      }
-
-      // VIDEO FILTER
-      const videos = posts
-        .filter(isVideo)
-        .filter(p => p.video_url || p.media_url)
-        .sort((a, b) =>
-          new Date(b.created_at || 0) -
-          new Date(a.created_at || 0)
-        );
-
-      if (!videos.length) {
-        wrap.innerHTML = `
-          <div style="color:white;text-align:center;padding-top:40vh">
-            Innum Reels Illa da 😅
-            <br>Post la Video Upload Pannu da
-          </div>`;
-        return;
-      }
-
-      // PROFILES
-      const userIds = [
-        ...new Set(videos.map(p => p.user_id).filter(Boolean))
-      ];
-
+      } catch (e) {}
+      const videos = posts.filter(isVideo).filter(p => p.video_url || p.media_url).sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      if (!videos.length) { wrap.innerHTML = `<div style="color:white;text-align:center;padding-top:40vh">Innum Reels Illa da 😅<br>Post la Video Upload Pannu da</div>`; return; }
+      const userIds = [...new Set(videos.map(p => p.user_id).filter(Boolean))];
       const profileMap = {};
-
       if (userIds.length) {
-        const profileResult = await supa
-          .from("profiles")
-          .select("id,username,avatar_url")
-          .in("id", userIds);
-
-        if (!profileResult.error) {
-          (profileResult.data || []).forEach(profile => {
-            profileMap[String(profile.id)] = profile;
-          });
-        }
+        const profileResult = await supa.from("profiles").select("id,username,avatar_url").in("id", userIds);
+        if (!profileResult.error) { (profileResult.data || []).forEach(profile => { profileMap[String(profile.id)] = profile; }); }
       }
+      if (MY_ID && profileMap[MY_ID]?.avatar_url) { window.MY_PFP = profileMap[MY_ID].avatar_url; document.querySelectorAll("#navPfp,.navPfp").forEach(img => { img.src = window.MY_PFP; }); }
+      if (reelObserver) { reelObserver.disconnect(); reelObserver = null; }
 
-      // MY AVATAR
-      if (MY_ID && profileMap[MY_ID]?.avatar_url) {
-        window.MY_PFP = profileMap[MY_ID].avatar_url;
-
-        document.querySelectorAll("#navPfp,.navPfp").forEach(img => {
-          img.src = window.MY_PFP;
-        });
-      }
-
-      // RESET OBSERVER
-      if (reelObserver) {
-        reelObserver.disconnect();
-        reelObserver = null;
-      }
-
-      // RENDER
+      // ✅ FIX 1 - Own Reel na Follow Vara Koodathu da
       wrap.innerHTML = videos.map(post => {
         const id = escapeHTML(post.id);
         const owner = escapeHTML(post.user_id || "");
-
         const profile = profileMap[String(post.user_id)] || {};
-
-        const username = escapeHTML(
-          profile.username || post.username || "Pixoro User"
-        );
-
+        const username = escapeHTML(profile.username || post.username || "Pixoro User");
         const caption = escapeHTML(post.caption || "");
-
-        const avatar = safeURL(
-          profile.avatar_url || post.avatar_url || ""
-        );
-
-        const media = safeURL(
-          post.video_url || post.media_url || ""
-        );
-
+        const avatar = safeURL(profile.avatar_url || post.avatar_url || "");
+        const media = safeURL(post.video_url || post.media_url || "");
         if (!media) return "";
-
         const letter = username.charAt(0).toUpperCase();
-
+        const isMine = MY_ID && String(post.user_id) === String(MY_ID);
         return `
-        <div class="reel"
-             data-id="${id}"
-             data-owner="${owner}">
-
-          <video
-            class="reel-main"
-            src="${media}"
-            loop
-            playsinline
-            muted
-            preload="metadata">
-          </video>
-
+        <div class="reel" data-id="${id}" data-owner="${owner}">
+          <video class="reel-main" src="${media}" loop playsinline muted preload="metadata"></video>
           <div class="progress"></div>
-
-          <div class="centerCtrl">
-            <div class="centerIcon">
-              <svg viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
-            </div>
-          </div>
-
+          <div class="centerCtrl"><div class="centerIcon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
           <div class="heartBurst"></div>
-
           <div class="btm">
-
             <div style="display:flex;align-items:center;gap:10px">
-
-              <div class="reel-pfp-wrap"
-                   data-profile="${username}">
-                ${
-                  avatar
-                    ? `<img src="${avatar}" onerror="this.remove()">`
-                    : `<div style="width:100%;height:100%;background:#FF4D8D;display:flex;align-items:center;justify-content:center;font-weight:800">${letter}</div>`
-                }
-              </div>
-
-              <span class="reel-username"
-                    data-profile="${username}">
-                @${username}
-              </span>
-
-              <button class="followBtnPerusa"
-                      data-action="follow"
-                      data-user="${owner}">
-                Follow
-              </button>
-
+              <div class="reel-pfp-wrap" data-profile="${username}">${avatar ? `<img src="${avatar}" onerror="this.remove()">` : `<div style="width:100%;height:100%;background:#FF4D8D;display:flex;align-items:center;justify-content:center;font-weight:800">${letter}</div>`}</div>
+              <span class="reel-username" data-profile="${username}">@${username}</span>
+              ${isMine ? `` : `<button class="followBtnPerusa" data-action="follow" data-user="${owner}">Follow</button>`}
             </div>
-
-            <div class="reel-caption">
-              <b>@${username}</b> ${caption}
-            </div>
-
+            <div class="reel-caption"><b>@${username}</b> ${caption}</div>
           </div>
-
           <div class="vBar">
-
-            <div class="vBtn" data-action="like">
-              <span class="vIcon">
-                <svg viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="#fff"
-                     stroke-width="1.8">
-                  <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>
-                </svg>
-              </span>
-              <span class="rCount">${Number(post.likes_count) || 0}</span>
-            </div>
-
-            <div class="vBtn" data-action="comments">
-              <svg viewBox="0 0 24 24"
-                   fill="none"
-                   stroke="#fff"
-                   stroke-width="1.8">
-                <path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.5-8.5h.5a8.5 8.5 0 0 1 8 8z"/>
-              </svg>
-              <span>${Number(post.comments_count) || 0}</span>
-            </div>
-
-            <div class="vBtn" data-action="share">
-              <svg viewBox="0 0 24 24"
-                   fill="none"
-                   stroke="#fff"
-                   stroke-width="1.8">
-                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>
-              </svg>
-              <span>Share</span>
-            </div>
-
-            <div class="vBtn" data-action="save">
-              <svg viewBox="0 0 24 24"
-                   fill="none"
-                   stroke="#fff"
-                   stroke-width="1.8">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-              </svg>
-              <span>Save</span>
-            </div>
-
-            <div class="vBtn tildeBtn" data-action="more">
-              <span>⋯</span>
-            </div>
-
-            <div class="audioWrap">
-              <div class="audioDiscInBar">
-                ${
-                  avatar
-                    ? `<img src="${avatar}" style="width:100%;height:100%;object-fit:cover">`
-                    : letter
-                }
-              </div>
-            </div>
-
+            <div class="vBtn" data-action="like"><span class="vIcon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span><span class="rCount">${Number(post.likes_count) || 0}</span></div>
+            <div class="vBtn" data-action="comments"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.5-8.5h.5a8.5 8.5 0 0 1 8 8z"/></svg><span>${Number(post.comments_count) || 0}</span></div>
+            <div class="vBtn" data-action="share"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg><span>Share</span></div>
+            <div class="vBtn" data-action="save"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Save</span></div>
+            <div class="vBtn tildeBtn" data-action="more"><span>⋯</span></div>
+            <div class="audioWrap"><div class="audioDiscInBar">${avatar ? `<img src="${avatar}" style="width:100%;height:100%;object-fit:cover">` : letter}</div></div>
           </div>
         </div>`;
       }).join("");
 
-      // AUTO PLAY OBSERVER
       reelObserver = new IntersectionObserver(entries => {
         entries.forEach(entry => {
           const video = entry.target.querySelector("video");
-
           if (!video) return;
-
-          if (entry.isIntersecting) {
-            video.muted = !!window._MUTED;
-            window._CUR = entry.target.dataset.id;
-            video.play().catch(() => {});
-          } else {
-            video.pause();
-          }
+          if (entry.isIntersecting) { video.muted = !!window._MUTED; window._CUR = entry.target.dataset.id; video.play().catch(() => {}); } else { video.pause(); }
         });
       }, { threshold: 0.6 });
 
-      // REEL EVENTS
       wrap.querySelectorAll(".reel").forEach(item => {
         const video = item.querySelector("video");
         const center = item.querySelector(".centerCtrl");
-
         reelObserver.observe(item);
-
+        // ✅ FIX 2 - Single Tap vs Double Tap - 320ms Wait da
+        let lastTap = 0, singleTimer = null, isDouble = false;
+        function doPlayPause(){ if(video.paused){ video.play().catch(()=>{}); center?.classList.remove("show"); } else { video.pause(); center?.classList.add("show"); } }
         video.addEventListener("click", () => {
-          if (video.paused) {
-            video.play().catch(() => {});
-            center?.classList.remove("show");
-          } else {
-            video.pause();
-            center?.classList.add("show");
-          }
+          if(isDouble){ isDouble = false; return; }
+          if(Date.now() - lastTap < 350) return;
+          clearTimeout(singleTimer);
+          singleTimer = setTimeout(()=>{ if(!isDouble) doPlayPause(); }, 320);
         });
-
-        // DOUBLE TAP
-        let lastTap = 0;
-
         item.addEventListener("touchend", e => {
-          if (e.target.closest(
-            ".vBar,.followBtnPerusa,.reel-pfp-wrap,.reel-username"
-          )) return;
-
+          if (e.target.closest(".vBar,.followBtnPerusa,.reel-pfp-wrap,.reel-username")) return;
           const now = Date.now();
-
           if (now - lastTap < 320) {
+            isDouble = true; clearTimeout(singleTimer); lastTap = 0;
             const heart = item.querySelector(".heartBurst");
-
-            heart.innerHTML = `
-              <svg viewBox="0 0 24 24"
-                   fill="#ff3040"
-                   stroke="#fff"
-                   stroke-width="1.5">
-                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>
-              </svg>`;
-
-            heart.classList.remove("show");
-            void heart.offsetWidth;
-            heart.classList.add("show");
-
+            heart.innerHTML = `<svg viewBox="0 0 24 24" fill="#ff3040" stroke="#fff" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+            heart.classList.remove("show"); void heart.offsetWidth; heart.classList.add("show");
             const likeBtn = item.querySelector('[data-action="like"]');
-
-            if (likeBtn && window.likeReel) {
-              window.likeReel(item.dataset.id, likeBtn, null);
-            }
-          }
-
-          lastTap = now;
+            if (likeBtn && window.likeReel) window.likeReel(item.dataset.id, likeBtn, null);
+            if(video.paused){ video.play().catch(()=>{}); center?.classList.remove("show"); }
+            setTimeout(()=> isDouble = false, 400);
+          } else { lastTap = now; }
         }, { passive: true });
       });
 
-      // ACTION CONNECTIONS
       wrap.querySelectorAll("[data-action]").forEach(btn => {
         btn.addEventListener("click", e => {
           e.stopPropagation();
-
           const reel = btn.closest(".reel");
           const id = reel?.dataset.id;
-
           switch (btn.dataset.action) {
-
-            case "like":
-              if (window.likeReel) {
-                window.likeReel(id, btn, e);
-              } else {
-                console.warn("likeReel() missing in like.js");
-              }
-              break;
-
-            case "comments":
-              if (window.openComments) {
-                window.openComments(id);
-              } else {
-                window.openSheet("commentSheet");
-              }
-              break;
-
-            case "share":
-              if (window.openShare) {
-                window.openShare(id);
-              } else {
-                window.openSheet("shareSheet");
-              }
-              break;
-
-            case "save":
-              if (window.saveReel) {
-                window.saveReel(id, btn);
-              } else {
-                console.warn("saveReel() missing in save.js");
-              }
-              break;
-
-            case "follow":
-              if (window.toggleFollow) {
-                window.toggleFollow(btn);
-              } else {
-                console.warn("toggleFollow() missing in follow.js");
-              }
-              break;
-
-            case "more":
-              window._CUR = id;
-              window.openSheet("viewerSheet");
-              break;
+            case "like": if (window.likeReel) window.likeReel(id, btn, e); else console.warn("likeReel() missing"); break;
+            case "comments": if (window.openComments) window.openComments(id); else window.openSheet("commentSheet"); break;
+            case "share": if (window.openShare) window.openShare(id); else window.openSheet("shareSheet"); break;
+            case "save": if (window.saveReel) window.saveReel(id, btn); else console.warn("saveReel() missing"); break;
+            case "follow": if (window.toggleFollow) window.toggleFollow(btn); else console.warn("toggleFollow() missing"); break;
+            case "more": window._CUR = id; window.openSheet("viewerSheet"); break;
           }
         });
       });
-
-      // PROFILE CLICK
-      wrap.querySelectorAll("[data-profile]").forEach(el => {
-        el.addEventListener("click", () => {
-          window.openFriendProfile(el.dataset.profile);
-        });
-      });
-
+      wrap.querySelectorAll("[data-profile]").forEach(el => { el.addEventListener("click", () => { window.openFriendProfile(el.dataset.profile); }); });
       window.dispatchEvent(new Event("pixoro-reels-rendered"));
-
-      if (window.pixoroLoadAvatars) {
-        window.pixoroLoadAvatars();
-      }
-
+      if (window.pixoroLoadAvatars) window.pixoroLoadAvatars();
+      // ✅ FIX 3 - Bridge - Ingaye Irukku da - New File Venaam da
+      setTimeout(syncReelsLike, 100);
     } catch (error) {
       console.error("PIXORO REELS ERROR:", error);
-
-      wrap.innerHTML = `
-        <div style="color:#ff5ea8;text-align:center;padding-top:40vh">
-          Reels load failed
-          <br>${escapeHTML(error.message || "Database error")}
-        </div>`;
-    } finally {
-      loading = false;
-    }
+      wrap.innerHTML = `<div style="color:#ff5ea8;text-align:center;padding-top:40vh">Reels load failed<br>${escapeHTML(error.message || "Database error")}</div>`;
+    } finally { loading = false; }
   }
 
-  // SHEET ACTIONS
-  window.editReel = function () {
-    window.closeSheet("ownerSheet");
-    console.warn("Edit Reel action needs an edit handler.");
-  };
+  // ✅ FIX 3 - BRIDGE INSIDE reels.js da - V39 ku Reels ah Puriya Vaikkum da - New File Venaam da
+  function syncReelsLike(){
+    document.querySelectorAll(".reel").forEach(reel=>{
+      let id = String(reel.dataset.id||"").replace("reel-","");
+      if(!id) return;
+      reel.dataset.postId = id;
+      reel.classList.add("post");
+      let btn = reel.querySelector('[data-action="like"]');
+      if(btn){ btn.classList.add("like-btn","like-button"); btn.setAttribute("data-like-btn", id); btn.dataset.postId = id;
+        let cnt = btn.querySelector(".rCount"); if(cnt){ cnt.classList.add("like-count"); cnt.setAttribute("data-like-count", id); }
+      }
+      if(!window.FEED_LIKES) return;
+      let liked = window.FEED_LIKES.has(id);
+      if(!btn) return;
+      btn.classList.toggle("liked", liked);
+      let svg = btn.querySelector("svg"); if(svg){ svg.setAttribute("fill", liked ? "#FF3040" : "none"); svg.setAttribute("stroke", liked ? "#FF3040" : "#fff"); }
+      let cnt2 = btn.querySelector(".rCount");
+      if(cnt2){ let c = window.FEED_COUNTS ? Number(window.FEED_COUNTS[id]||0) : Number(cnt2.textContent||0); if(liked && c < 1) c = 1; cnt2.textContent = c; }
+    });
+    if(window.pixoroPaintAllLikes) window.pixoroPaintAllLikes();
+  }
+  // ✅ V39 Like Panna - Reels Side Button ah Yum Red Aakku da
+  setInterval(syncReelsLike, 1000);
+  window.pixoroSyncReelsLike = syncReelsLike;
 
-  window.shareQR = function () {
-    if (window.copyLinkSafe) {
-      window.copyLinkSafe();
-    } else {
-      window.closeSheet("ownerSheet");
-    }
-  };
-
-  window.deleteSafe = function () {
-    window.closeSheet("ownerSheet");
-    console.warn("Delete action is not connected to the database yet.");
-  };
-
-  window.notInterestedSafe = function () {
-    window.closeSheet("viewerSheet");
-  };
-
-  window.hideReelSafe = function () {
-    window.closeSheet("viewerSheet");
-  };
-
-  window.reportSafe = function () {
-    window.closeSheet("viewerSheet");
-    console.warn("Report action needs a reports table connection.");
-  };
-
-  // RELOAD
+  window.editReel = function () { window.closeSheet("ownerSheet"); };
+  window.shareQR = function () { if (window.copyLinkSafe) window.copyLinkSafe(); else window.closeSheet("ownerSheet"); };
+  window.deleteSafe = function () { window.closeSheet("ownerSheet"); };
+  window.notInterestedSafe = function () { window.closeSheet("viewerSheet"); };
+  window.hideReelSafe = function () { window.closeSheet("viewerSheet"); };
+  window.reportSafe = function () { window.closeSheet("viewerSheet"); };
   window.loadPixoroReels = loadReels;
-
-  // INITIAL LOAD
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", loadReels, { once: true });
-  } else {
-    loadReels();
-  }
-
+  if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", loadReels, { once: true }); } else { loadReels(); }
 })();
