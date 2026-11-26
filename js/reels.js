@@ -1,4 +1,4 @@
-// ===== PIXORO REELS - V1019 - FINAL CORRECT DA - BLOCK ILLA DA =====
+// ===== PIXORO REELS - V1020 - FINAL CORRECT DA - Thani File Connect da =====
 (function(){
 "use strict";
 let loading = false;
@@ -7,6 +7,7 @@ function getClient(){ return window.getSupa ? window.getSupa() : window.supa || 
 function escapeHTML(v){ return String(v ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function safeURL(v){ try{ let u=new URL(v, location.href); return ['https:','http:'].includes(u.protocol)?escapeHTML(u.href):''; }catch{ return ''; } }
 
+// ✅ Reels ku Thevaiyana Sheet / Mute Mattum Inga Irukku da
 window.closeSheet = (id)=>{ document.getElementById(id)?.classList.remove("open"); document.getElementById(id)?.classList.remove("show"); };
 function openSheet(id){ document.getElementById(id)?.classList.add("open"); document.getElementById(id)?.classList.add("show"); }
 window.openSheet = openSheet;
@@ -22,12 +23,9 @@ async function loadReels(){
     let MY_ID = "";
     try{ let r = await supa.auth.getSession(); MY_ID = r.data?.session?.user?.id || ""; }catch(e){}
 
-    // ✅ FEED MARIYE - posts Table la irunthu Edu da
     let {data: posts, error} = await supa.from('posts').select('*').order('created_at',{ascending:false}).limit(50);
     if(error) throw error;
-    console.log('REELS DEBUG - posts:', posts?.length, 'first:', posts?.[0]);
 
-    // ✅ Reels Table la iruntha kooda Serthu da
     try{
       let {data: reels} = await supa.from('reels').select('*').order('created_at',{ascending:false}).limit(50);
       (reels||[]).forEach(r=>{
@@ -36,21 +34,18 @@ async function loadReels(){
       });
     }catch(e){}
 
-    // ✅ FIX v1019 - CORRECT FILTER DA - .mp4 Illana kooda Video va Edu da - Ithu Thaan Periya Fix da
     let videos = (posts||[]).filter(p=>{
       let v = String(p.video_url || '').trim();
       let m = String(p.media_url || p.image_url || '').trim();
-      if(v) return true; // video_url Column la Ethuvum Irundha - Video Thaan da
+      if(v) return true;
       if(p.media_type === 'video' || p.is_reel === true) return true;
       if(/\.(mp4|mov|webm)(\?|$)/i.test(m) || m.includes('video')) return true;
-      if(/\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(m)) return false; // Photo da - Thookidu da
-      return !!m; // Ethuvum Theriyala na - media_url irundha Kaattu da - Blank Vida Paravalla da
+      if(/\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(m)) return false;
+      return !!m;
     });
-    console.log('REELS DEBUG - videos:', videos.length);
 
     if(!videos.length){ wrap.innerHTML = `<div style="color:#fff;text-align:center;padding-top:40vh">Innum Reels Illa da 😅<br>Post la Video Upload Pannu da</div>`; return; }
 
-    // ✅ FEED MARIYE - Profiles Map da - Profile Photo Inga irunthu Varum da
     let userIds = [...new Set(videos.map(p=>p.user_id).filter(Boolean))];
     let profileMap = {};
     if(userIds.length){
@@ -62,7 +57,6 @@ async function loadReels(){
       document.querySelectorAll('#navPfp,.navPfp').forEach(n=> n.src = window.MY_PFP);
     }
 
-    // ✅ CSS ku Match Aana Class da - .reel / .reel-main / .vBar / .btm
     wrap.innerHTML = videos.map(p=>{
       let id = escapeHTML(String(p.id));
       let prof = profileMap[String(p.user_id)] || {};
@@ -118,7 +112,8 @@ async function loadReels(){
           hb.innerHTML = `<svg viewBox="0 0 24 24" fill="#ff3040" stroke="#fff" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
           hb.classList.remove("show"); void hb.offsetWidth; hb.classList.add("show");
           let btn = item.querySelector(".vBtn");
-          if(btn) likeReel(item.dataset.id, btn, null);
+          // ✅ Double Tap Like - Thani File la Irukka likeReel ah Koopdu da
+          if(btn && window.likeReel) window.likeReel(item.dataset.id, btn, null);
         }
         last = now;
       },{passive:true});
@@ -138,30 +133,18 @@ async function loadReels(){
   }finally{ loading = false; }
 }
 
+// ✅ Reels ku Mattum Thevaiyana Small Functions da - Like / Comment / Share / Save Inga Illa da
 window.toggleFollow = (btn)=>{ btn.classList.toggle("following"); btn.textContent = btn.classList.contains("following") ? "Following" : "Follow"; };
-window.likeReel = (id, el, e)=>{
-  if(e) e.stopPropagation();
-  let icon = el.querySelector(".vIcon") || el;
-  let liked = !el.classList.contains("liked");
-  el.classList.toggle("liked", liked);
-  icon.innerHTML = `<svg viewBox="0 0 24 24" fill="${liked?'#ff3040':'none'}" stroke="${liked?'#ff3040':'#fff'}" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
-  let c = el.querySelector(".rCount"); if(c) c.textContent = liked ? 1 : 0;
-  try{ el.getAnimations().forEach(a=>a.cancel()); }catch(err){}
-  el.animate([{transform:"scale(1)"},{transform:"scale(1.5)",offset:.2},{transform:"scale(0.9)",offset:.4},{transform:"scale(1.3)",offset:.6},{transform:"scale(1)"}],{duration:600});
-};
-window.openComments = (id)=>{ window._CUR=id; openSheet("commentSheet"); };
-window.postComment = ()=>{ let i=document.getElementById("commentInput"); if(!i?.value.trim()) return; i.value=""; };
-window.openShare = (id)=>{ window._CUR=id; openSheet("shareSheet"); };
-window.saveReel = (id,el)=>{ el?.classList.toggle("saved"); };
-window.copyLinkSafe = ()=>{ navigator.clipboard?.writeText(location.href); window.closeSheet("viewerSheet"); window.closeSheet("shareSheet"); };
 window.openFriendProfile = (u)=>{ if(u) location.href="profile.html?user="+encodeURIComponent(u); };
 window.editReel = ()=> window.closeSheet("ownerSheet");
-window.shareQR = ()=> window.copyLinkSafe();
+window.shareQR = ()=>{ if(window.copyLinkSafe) window.copyLinkSafe(); else window.closeSheet("ownerSheet"); };
 window.deleteSafe = ()=> window.closeSheet("ownerSheet");
 window.notInterestedSafe = ()=> window.closeSheet("viewerSheet");
 window.hideReelSafe = ()=> window.closeSheet("viewerSheet");
 window.reportSafe = ()=> window.closeSheet("viewerSheet");
-window.shareWA = ()=> window.open("https://wa.me/?text="+encodeURIComponent("Pixoro Reel Paaru da 🔥 "+location.href),"_blank");
+
+// ❌ THOOKITEN DA - Ithu Ellam Thani File la Irukku da - Inga Irundha Duplicate Aayidum da
+// window.likeReel, window.openComments, window.postComment, window.openShare, window.saveReel, window.copyLinkSafe, window.shareWA
 
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", loadReels);
 else loadReels();
