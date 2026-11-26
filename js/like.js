@@ -1,4 +1,4 @@
-// ===== PIXORO REELS BRIDGE - V39 ku Reels ah Puriya Vaikkum Translator da =====
+// ===== PIXORO REELS BRIDGE V40 - V39 ku Reels ah Puriya Vaikkum Translator da =====
 // ⚠️ V39 ah Thodatha da - Ithu Mattum Add Pannu da
 (function(){
 "use strict";
@@ -6,22 +6,18 @@ if(window.PIXORO_REELS_BRIDGE) return;
 window.PIXORO_REELS_BRIDGE = true;
 
 // ✅ Reels DOM ah - V39 ku Puriyura Mari Maathu da
-// .reel -> data-post-id + .post
-// .vBtn (Like) -> .like-btn + data-like-btn
-// .rCount -> .like-count + data-like-count
-// video.reel-main -> .postMedia
 function bridgeOneReel(reel){
   if(!reel || reel.dataset.bridged) return;
   reel.dataset.bridged = "1";
-  // ✅ V39 getPostId() - data-post-id ah Paakkum da
-  let id = reel.dataset.id || reel.getAttribute("data-id") || "";
+  let rawId = reel.dataset.id || reel.getAttribute("data-id") || "";
+  let id = String(rawId||"");
+  if(id.startsWith("reel-")) id = id.replace("reel-","");
   if(id){
-    if(id.startsWith("reel-")) id = id.replace("reel-","");
     reel.dataset.postId = id;
-    reel.dataset.id = reel.getAttribute("data-id"); // Original ah Vaichuko da
+    // ✅ Original data-id ah Azhikka Koodathu da - Reels.js ku Theva da
   }
   reel.classList.add("post", "post-card");
-  let video = reel.querySelector("video.reel-main");
+  let video = reel.querySelector("video.reel-main, video");
   if(video) video.classList.add("postMedia", "post-media");
 
   // ✅ Like Button - First .vBtn Thaan Like da
@@ -38,47 +34,50 @@ function bridgeOneReel(reel){
       cnt.setAttribute("data-like-count", id);
     }
   }
-  // ✅ Comment Count - V39 ku Theva Illa da - Aana Count Correct ah Varum da
 }
 
-// ✅ Ellam Reels ah Bridge Pannu da
+let _bridgeTimer = null;
+let _paintTimer = null;
 function bridgeAll(){
-  document.querySelectorAll(".reel[data-id]").forEach(bridgeOneReel);
-  // ✅ V39 Paint ah Thirumba Koopdu da - Reels Like Red Aagum da
-  if(window.pixoroPaintAllLikes) window.pixoroPaintAllLikes();
+  // ✅ FIX 1 - Debounce da - Ella Mutation kum Oda Koodathu da - 120ms Wait Pannuvom da
+  clearTimeout(_bridgeTimer);
+  _bridgeTimer = setTimeout(()=>{
+    document.querySelectorAll(".reel[data-id]").forEach(bridgeOneReel);
+    // ✅ V39 Paint ah - Bridge Mudinja Apparam Mattum Koopdu da - Loop Varathu da
+    clearTimeout(_paintTimer);
+    _paintTimer = setTimeout(()=>{ try{ if(window.pixoroPaintAllLikes) window.pixoroPaintAllLikes(); }catch(_){} }, 50);
+  }, 120);
 }
 
-// ✅ Reels Render Aana Odane Bridge Pannu da
 window.addEventListener("pixoro-reels-rendered", ()=> setTimeout(bridgeAll, 50));
 
-// ✅ Dynamic ah Reels Vantha kooda Bridge Pannu da
-let obs = new MutationObserver(()=> bridgeAll());
+// ✅ FIX 1 - MutationObserver - Debounce oda Thaan da - Direct ah bridgeAll ah Koopda Koodathu da
+let obs = new MutationObserver(()=>{ bridgeAll(); });
 if(document.body) obs.observe(document.body, {childList:true, subtree:true});
 
-// ✅ Reels la Irukka Pazhaya likeReel / openComments ah - V39 ku Connect Pannu da
-// reels.js la Irukka likeReel ah Override Pannatha da - V39 Button Click ah Thaan Use Pannu da
+// ✅ FIX 2 - likeReel - el.click() Panna Koodathu da - Thirumba likeReel ah Koopdum da - Recursion da
+// ✅ Direct ah V39 Toggle ah Koopduvom da - Click ah Simulate Panna Venaam da
 window.likeReel = function(id, el, e){
-  if(e) e.stopPropagation();
-  // ✅ V39 Button Click Mariye - Button ah Click Panna Mari Seiyu da
-  // El irundha - Athu Thaan Button da - Atha V39 ku Kudu da
-  if(el){
-    // V39 - Click Listener la Irukku da - Manual ah Toggle Pannu da
-    let reel = el.closest(".reel");
-    if(reel) bridgeOneReel(reel);
-    // Button ah Click Panna - V39 Click Handler Odum da
-    el.click();
-    // Click Handler Block Aana - Direct ah Paint Pannu da
-    setTimeout(()=>{
-      let clean = String(id||"").replace("reel-","");
-      let liked = window.FEED_LIKES ? window.FEED_LIKES.has(clean) : el.classList.contains("liked");
-      // Heart Burst - Reels la Irukka HeartBurst ah Kaatu da
-      let hb = reel?.querySelector(".heartBurst");
-      if(hb && liked){
-        hb.innerHTML = `<svg viewBox="0 0 24 24" fill="#ff3040" stroke="#fff" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
-        hb.classList.remove("show"); void hb.offsetWidth; hb.classList.add("show");
-      }
-    }, 60);
+  if(e){ try{ e.stopPropagation(); e.preventDefault(); }catch(_){} }
+  if(!el) return;
+  let reel = el.closest(".reel");
+  if(reel) bridgeOneReel(reel);
+  let clean = String(id||"").replace("reel-","");
+  // ✅ V39 Toggle da - Click Simulate Panna Venaam da
+  if(window.pixoroToggleLike && reel){
+    let liked = window.pixoroToggleLike(clean, reel, false);
+    // ✅ Button Animation - V39 Button Animation Mariye da
+    try{ el.animate([{transform:"scale(1)"},{transform:"scale(1.35)"},{transform:"scale(1)"}],{duration:280}); }catch(_){}
+    // ✅ Heart Burst - Reels la Irukka HeartBurst ah Kaatu da
+    let hb = reel?.querySelector(".heartBurst");
+    if(hb && liked){
+      hb.innerHTML = `<svg viewBox="0 0 24 24" fill="#ff3040" stroke="#fff" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+      hb.classList.remove("show"); void hb.offsetWidth; hb.classList.add("show");
+    }
+    return liked;
   }
+  // ✅ V39 Illana - Pazhaya Style la Mattum Toggle Pannu da - Fallback da
+  el.classList.toggle("liked");
 };
 
 // ✅ Follow Block Fix - V39 la Follow Illa da - Inga Mattum Fix Pannu da
@@ -91,11 +90,10 @@ window.toggleFollow = window.toggleFollow || function(btn){
   btn.style.pointerEvents = "auto";
 };
 
-// ✅ Start
 if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", bridgeAll);
 else bridgeAll();
 setTimeout(bridgeAll, 500);
 setTimeout(bridgeAll, 1500);
 
-console.log("PIXORO REELS BRIDGE LOADED - V39 + Reels Connected ❤️");
+console.log("PIXORO REELS BRIDGE V40 LOADED - V39 + Reels Connected ❤️");
 })();
