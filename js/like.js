@@ -1,14 +1,18 @@
-/* ===== PIXORO LIKE V42 - V40 CORRECTED - HOME BLOCK FIX ===== */
+/* ===== PIXORO LIKE V43 - V42 CORRECTED - DOUBLE TAP FIX ONLY ===== */
+// ✅ V43 FIX - Double Tap ah Post ID ah Vachu Check Pannurom da - Media Element Illa da
+// ✅ Pazhaya Code Full Same da - Vera Edhuvum Maathala da
 (() => {
   "use strict";
   if (window.PIXORO_LIKE_V39) return;
   window.PIXORO_LIKE_V39 = true;
   window.PIXORO_LIKE_V42 = true;
+  window.PIXORO_LIKE_V43 = true;
   function getSupa(){ return window.supa || window.supabaseClient || (typeof window.getSupa === 'function' ? window.getSupa() : null); }
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 320;
   const HEART_DURATION = 1000;
-  const lastTap = new WeakMap();
+  // ✅ V43 FIX - WeakMap ah Delete da - Post ID Map Thaan da
+  const lastTap = new Map();
   const lastToggleAt = new Map();
   const pending = new Map();
   let blockClickUntil = 0;
@@ -131,11 +135,13 @@
     if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
     const media = findMedia(event.target); if (!media) return;
     const post = getPost(media); const postId = getPostId(media); if (!post || !postId) return;
-    const now = Date.now(); const previous = lastTap.get(media);
+    const now = Date.now();
+    // ✅ V43 FIX - Post ID ah Key ah Vachom da - Media Element Illa da
+    const previous = lastTap.get(String(postId));
     const touchX = event.touches && event.touches[0] ? event.touches[0].clientX : null;
     const touchY = event.touches && event.touches[0] ? event.touches[0].clientY : null;
-    lastTap.set(media, { time: now, x: touchX, y: touchY });
-    if (previous && now - previous.time <= DOUBLE_TAP_DELAY){ lastTap.delete(media); lastTouchTime = now; handleDoubleTap(media, postId, post, touchX, touchY); }
+    lastTap.set(String(postId), { time: now, x: touchX, y: touchY });
+    if (previous && now - previous.time <= DOUBLE_TAP_DELAY){ lastTap.delete(String(postId)); lastTouchTime = now; handleDoubleTap(media, postId, post, touchX, touchY); }
   }, { passive: true });
   document.addEventListener("dblclick", event => {
     if (Date.now() - lastTouchTime < 800) return;
@@ -149,6 +155,7 @@
     const button = event.target.closest("[data-like-btn], .like-btn, .like-button"); if (!button) return;
     event.preventDefault(); event.stopPropagation();
     const post = getPost(button); const postId = getPostId(button); if (!post || !postId) return;
+    // ✅ Like / Unlike 2 kuum Heart Varum da - Ithu Already Correct da
     showButtonHeart(button); buttonAnimation(post); toggleLike(postId, post, false);
   }, true);
   function paintAll(){
@@ -174,5 +181,5 @@
   function start(){ addStyles(); paintAll(); loadMyLikes(); }
   if (document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", start, { once: true }); } else { start(); }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO LIKE V42 LOADED ❤️");
+  console.log("PIXORO LIKE V43 LOADED ❤️");
 })();
