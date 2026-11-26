@@ -1,10 +1,11 @@
-/* ===== PIXORO REELS V1028 - CORRECTED - FULL ===== */
+/* ===== PIXORO REELS V1029 - CORRECTED - FULL ===== */
 (function () {
   "use strict";
   let loading = false;
   let observer = null;
+  let _reelTried = 0;
   function getClient() {
-    return window.getSupa ? window.getSupa() : window.supa || window.supabaseClient || null;
+    return (typeof window.getSupa === 'function') ? window.getSupa() : (window.supa || null);
   }
   function escapeHTML(v) {
     return String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -23,7 +24,17 @@
     const wrap = document.getElementById("reelWrap");
     if (!wrap || loading) return;
     const supa = getClient();
-    if (!supa) { wrap.innerHTML = '<div style="color:white;text-align:center;padding-top:40vh">Database not ready</div>'; return; }
+    // ✅ CORRECTED DA - Supa Illana - 3 Thadava Retry Pannum da - Black Varathu da
+    if (!supa) {
+      _reelTried++;
+      if(_reelTried <= 3){
+        wrap.innerHTML = '<div style="color:white;text-align:center;padding-top:40vh">Reels Load Aaguthu da... 🔥</div>';
+        setTimeout(loadReels, 1500);
+        return;
+      }
+      wrap.innerHTML = '<div style="color:white;text-align:center;padding-top:40vh">Database not ready<br><button onclick="location.reload()" style="background:#FF2DCC;color:#fff;border:none;padding:10px 20px;border-radius:20px;margin-top:12px;font-weight:800">Retry Pannu da</button></div>';
+      return;
+    }
     loading = true;
     try {
       let MY_ID = "";
@@ -34,13 +45,17 @@
       let posts = Array.isArray(postResult.data) ? [...postResult.data] : [];
       const reelResult = await supa.from("reels").select("*").order("created_at", { ascending: false }).limit(50);
       if (!reelResult.error && Array.isArray(reelResult.data)) {
+        // ✅ CORRECTED DA - Duplicate Check - URL + ID Rendum Paarkkanum da
+        let seenUrls = new Set(posts.map(p=>String(p.video_url||p.media_url||p.image_url||"").split("?")[0].toLowerCase()).filter(Boolean));
+        let seenIds = new Set(posts.map(p=>String(p.id).replace("reel-","")));
         reelResult.data.forEach(r => {
           const url = r.media_url || r.video_url || "";
           if (!url) return;
-          const duplicate = posts.some(p => { const purl = p.video_url || p.media_url || p.image_url || ""; return purl === url; });
-          if (!duplicate) {
-            posts.push({ id: "reel-" + r.id, user_id: r.user_id, username: r.username, avatar_url: r.avatar_url, caption: r.caption, media_url: url, video_url: url, media_type: "video", created_at: r.created_at, likes_count: r.likes_count || 0, comments_count: r.comments_count || 0 });
-          }
+          let cleanUrl = String(url).split("?")[0].toLowerCase();
+          if (seenUrls.has(cleanUrl)) return;
+          if (seenIds.has(String(r.id))) return;
+          seenUrls.add(cleanUrl); seenIds.add(String(r.id));
+          posts.push({ id: "reel-" + r.id, user_id: r.user_id, username: r.username, avatar_url: r.avatar_url, caption: r.caption, media_url: url, video_url: url, media_type: "video", created_at: r.created_at, likes_count: r.likes_count || 0, comments_count: r.comments_count || 0 });
         });
       }
       const videos = posts.filter(p => {
@@ -69,6 +84,8 @@
         const pfp = safeURL(prof.avatar_url || p.avatar_url || "");
         const media = safeURL(p.video_url || p.media_url || p.image_url || "");
         const letter = escapeHTML(username.charAt(0).toUpperCase());
+        // ✅ CORRECTED DA - Gold Tick ah Inga Add Panniten da
+        const tick = (typeof window.goldTickHTML === 'function') ? window.goldTickHTML({username: username, user_id: owner}) : '';
         return `
         <div class="reel" data-id="${escapeHTML(id)}" data-owner="${escapeHTML(owner)}">
           <video class="reel-main" src="${media}" loop playsinline muted preload="metadata"></video>
@@ -78,7 +95,7 @@
           <div class="btm">
             <div style="display:flex;align-items:center;gap:10px">
               <div class="reel-pfp-wrap" data-profile="${safeName}">${pfp ? `<img src="${pfp}" onerror="this.remove()">` : `<div style="width:100%;height:100%;background:#FF4D8D;display:flex;align-items:center;justify-content:center;font-weight:800">${letter}</div>`}</div>
-              <span class="reel-username" data-profile="${safeName}">@${safeName}</span>
+              <span class="reel-username" data-profile="${safeName}">@${safeName} ${tick}</span>
               <button class="followBtnPerusa" data-action="follow" data-follow-user="${safeName}" data-follow-username="${safeName}">Follow</button>
             </div>
             <div class="reel-caption"><b>@${safeName}</b> ${caption}</div>
@@ -128,28 +145,40 @@
           const id = reel?.dataset.id;
           switch (btn.dataset.action) {
             case "like": if(window.likeReel) window.likeReel(id, btn); break;
-            case "comments": window.openComments(id); break;
-            case "share": window.openShare(id); break;
-            case "save": window.saveReel(id, btn); break;
+            case "comments": if(window.openComments) window.openComments(id); break;
+            case "share": if(window.openShare) window.openShare(id); break;
+            case "save": if(window.saveReel) window.saveReel(id, btn); break;
             case "follow": if(window.pixoroToggleFollow) window.pixoroToggleFollow(btn.dataset.followUser || btn.dataset.followUsername || "", btn); break;
             case "more": window._CUR = id; openSheet("viewerSheet"); break;
           }
         });
       });
-      wrap.querySelectorAll("[data-profile]").forEach(el => { el.addEventListener("click", () => { window.openFriendProfile(el.dataset.profile); }); });
+      wrap.querySelectorAll("[data-profile]").forEach(el => { el.addEventListener("click", () => { if(window.openFriendProfile) window.openFriendProfile(el.dataset.profile); }); });
       window.dispatchEvent(new Event("pixoro-reels-rendered"));
       if (window.pixoroLoadAvatars) window.pixoroLoadAvatars();
       if (window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
     } catch (e) {
       console.error("PIXORO REELS ERROR:", e);
-      wrap.innerHTML = `<div style="color:#ff5ea8;text-align:center;padding-top:40vh">Reels load failed<br>${escapeHTML(e.message || "Unknown error")}</div>`;
+      wrap.innerHTML = `<div style="color:#ff5ea8;text-align:center;padding-top:40vh">Reels load failed<br>${escapeHTML(e.message || "Unknown error")}<br><button onclick="location.reload()" style="background:#FF2DCC;color:#fff;border:none;padding:10px 20px;border-radius:20px;margin-top:12px;font-weight:800">Retry Pannu da</button></div>`;
     } finally { loading = false; }
   }
-  // ✅ CORRECTED - likeReel ah Inga Overwrite Panna Koodathu da - Core Guard Thaan Like Handle Pannum da - Heart Mattum Thudikkum da
-  // ✅ CORRECTED - toggleFollow ah Inga Overwrite Panna Koodathu da - Core oda Real Follow Pochidum da
-  window.openComments = function (id) { window._CUR = id; openSheet("commentSheet"); };
-  window.postComment = function () { const input = document.getElementById("commentInput"); if (!input?.value.trim()) return; input.value = ""; };
-  window.openShare = function (id) { window._CUR = id; openSheet("shareSheet"); };
+  // ✅ CORRECTED DA - Comment ah Real ah Save Pannum da - Fake Clear Illa da
+  window.openComments = function (id) { window._CUR = id; if(window.openComment) return window.openComment(id); openSheet("commentSheet"); };
+  window.postComment = async function () {
+    const input = document.getElementById("commentInput");
+    if (!input?.value.trim()) return;
+    if(window.addComment) return window.addComment();
+    // Fallback - Comments.js Illana - Direct Supabase la Podum da
+    try{
+      let s = getClient(); let txt = input.value.trim(); input.value = "";
+      if(!s) return;
+      let {data:{session}} = await s.auth.getSession();
+      if(!session) return;
+      let pid = String(window._CUR||"").replace("reel-","");
+      await s.from("comments").insert({post_id: pid, user_id: session.user.id, username: window.ME_RAW||"user", text: txt});
+    }catch(e){ console.log("COMMENT FAIL", e); }
+  };
+  window.openShare = function (id) { window._CUR = id; if(window.openShareModal) return window.openShareModal(id); openSheet("shareSheet"); };
   window.saveReel = function (id, el) { if(window.pixoroSave) window.pixoroSave(String(id||"").replace("reel-","")); el?.classList.toggle("saved"); };
   window.copyLinkSafe = function () { navigator.clipboard?.writeText(location.href); window.closeSheet("viewerSheet"); window.closeSheet("shareSheet"); };
   window.openFriendProfile = function (username) { if (!username) return; location.href = "profile.html?u=" + encodeURIComponent(username); };
@@ -161,5 +190,7 @@
   window.reportSafe = () => window.closeSheet("viewerSheet");
   window.shareWA = function () { const url = "https://wa.me/?text=" + encodeURIComponent("Pixoro Reel Paaru 🔥 " + location.href); window.open(url, "_blank", "noopener"); };
   window.loadPixoroReels = loadReels;
+  // ✅ CORRECTED DA - Supa Ready Aana Thirumba Load Aagum da
+  window.addEventListener("pixoro-supa-ready", ()=>{ _reelTried = 0; loading = false; loadReels(); });
   if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", loadReels); } else { loadReels(); }
 })();
