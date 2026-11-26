@@ -1,9 +1,23 @@
-// ===== PIXORO AVATAR - v1016 - FIXED DA - Block Illa da =====
+// ===== PIXORO AVATAR - v1017 - FINAL CORRECT DA - Flicker Illa da =====
 window.PIXORO_AVATAR_MAP = window.PIXORO_AVATAR_MAP || {};
+let _AVATAR_RUNNING = false;
+let _AVATAR_DONE = false;
+
+// ✅ FIX v1017 - Photo va Preload Pannitu - Load Aana Appuram Mattum Maathu da - Flicker Varathu da
+function pixoroSetImgSafe(img, url){
+  if(!img || !url) return;
+  if(img.src === url) return; // ✅ Already Same Photo na - Thodatha da - Ithu Thaan Flicker Fix da
+  let pre = new Image();
+  pre.onload = ()=>{ img.src = url; img.style.display = 'block'; };
+  pre.onerror = ()=>{ /* Photo Load Agala na - G Appadiye Irukkattum da - Maathatha da */ };
+  pre.src = url;
+}
 
 async function pixoroLoadAvatars(){
+  if(_AVATAR_RUNNING) return; // ✅ Already Oduthu na - Marupadiyum Oda Vena da
+  _AVATAR_RUNNING = true;
   let s = window.getSupa ? window.getSupa() : window.supa;
-  if(!s) return;
+  if(!s){ _AVATAR_RUNNING = false; return; }
   try{
     let r = await s.from('profiles').select('id,avatar_url,username').limit(500);
     (r.data||[]).forEach(p=>{
@@ -11,15 +25,13 @@ async function pixoroLoadAvatars(){
       if(url) window.PIXORO_AVATAR_MAP[String(p.id)] = url;
     });
 
-    // ✅ FIX DA - ME_ID illa na Auth la irunthu Edu da
     let myId = window.ME_ID;
     if(!myId){
       try{
         let {data:{user}} = await s.auth.getUser();
-        if(user) { myId = user.id; window.ME_ID = myId; }
+        if(user){ myId = user.id; window.ME_ID = myId; }
       }catch(e){}
     }
-    // ✅ FIX DA - localStorage la iruntha kooda Edu da - Auth Late aana kooda Work Aagum da
     if(!myId){
       try{
         let saved = JSON.parse(localStorage.getItem('pixoro_user') || localStorage.getItem('pixoro_profile') || 'null');
@@ -28,8 +40,6 @@ async function pixoroLoadAvatars(){
     }
 
     let myPhoto = myId ? window.PIXORO_AVATAR_MAP[String(myId)] : '';
-
-    // ✅ FIX DA - En Photo illa na, Supabase la Thaniya Kelu da
     if(!myPhoto && myId){
       let {data} = await s.from('profiles').select('avatar_url').eq('id', myId).single();
       myPhoto = String(data?.avatar_url || '').trim();
@@ -39,63 +49,66 @@ async function pixoroLoadAvatars(){
     if(myPhoto){
       window.MY_PFP = myPhoto;
 
-      // ✅ FIX v1016 - Ella PFP yum Update pannu da - Orey oru Id mattum illa da
       // 1. data-avatar-user irukka Ellam
       document.querySelectorAll('[data-avatar-user]').forEach(img=>{
-        if(String(img.dataset.avatarUser) === String(myId)) img.src = myPhoto;
+        let uid = String(img.dataset.avatarUser || '');
+        if(window.PIXORO_AVATAR_MAP[uid]) pixoroSetImgSafe(img, window.PIXORO_AVATAR_MAP[uid]);
+        else if(String(myId) === uid) pixoroSetImgSafe(img, myPhoto);
       });
 
-      // 2. Ella avatar img yum - Map la irukka ID ku match aana
+      // 2. Ella avatar img yum
       document.querySelectorAll('img[data-user-id], img[data-uid]').forEach(img=>{
         let uid = String(img.dataset.userId || img.dataset.uid || '');
-        if(window.PIXORO_AVATAR_MAP[uid]) img.src = window.PIXORO_AVATAR_MAP[uid];
+        if(window.PIXORO_AVATAR_MAP[uid]) pixoroSetImgSafe(img, window.PIXORO_AVATAR_MAP[uid]);
       });
 
-      // 3. Reels / Home PFP - reel-pfp-wrap la irukka img
+      // 3. Reels PFP
       document.querySelectorAll('.reel-pfp-wrap img, .reelUserRow img, .rPfp img').forEach(img=>{
         let parent = img.closest('[data-owner], [data-user-id], .reelItem, .reel');
         let uid = parent?.dataset?.owner || parent?.dataset?.userId || '';
-        if(uid && window.PIXORO_AVATAR_MAP[String(uid)]) img.src = window.PIXORO_AVATAR_MAP[String(uid)];
-        else if(myId && img.src.includes('ui-avatars')) img.src = myPhoto;
+        if(uid && window.PIXORO_AVATAR_MAP[String(uid)]) pixoroSetImgSafe(img, window.PIXORO_AVATAR_MAP[String(uid)]);
       });
 
-      // 4. Nav PFP - Ella Page layum
-      document.querySelectorAll('#navPfp, .navPfp').forEach(nav=>{ nav.src = myPhoto; });
+      // 4. Nav PFP
+      document.querySelectorAll('#navPfp, .navPfp').forEach(nav=> pixoroSetImgSafe(nav, myPhoto));
 
       // 5. Profile Page PFP
-      document.querySelectorAll('#profilePfp, #profileImg, .profilePfp').forEach(el=>{ el.src = myPhoto; });
+      document.querySelectorAll('#profilePfp, #profileImg, .profilePfp').forEach(el=> pixoroSetImgSafe(el, myPhoto));
 
-      // ✅ My Story - Ithu thaan Mukkiyam da
+      // ✅ My Story - Flicker Fix da - Orey Thadava Mattum Maathu da
       let myStory = document.getElementById('myStoryImg');
-      if(myStory){
-        myStory.src = myPhoto;
-        myStory.style.display = 'block';
-        // G letter iruntha Maraichidu da
-        let parent = myStory.parentElement;
-        if(parent){ parent.classList.remove('no-photo'); parent.classList.add('has-photo'); }
-        // Letter span iruntha hide pannu da
-        let letter = parent?.querySelector('.storyLetter, .avatarLetter');
-        if(letter) letter.style.display = 'none';
+      if(myStory && myStory.src !== myPhoto){
+        // ✅ Image Load Aana Appuram Mattum Letter ah Maraichidu da - Illana G Varum da
+        let pre = new Image();
+        pre.onload = ()=>{
+          myStory.src = myPhoto;
+          myStory.style.display = 'block';
+          let parent = myStory.parentElement;
+          if(parent){ parent.classList.remove('no-photo'); parent.classList.add('has-photo'); }
+          let letter = parent?.querySelector('.storyLetter, .avatarLetter, .avaLetterHome');
+          if(letter) letter.style.display = 'none';
+          _AVATAR_DONE = true;
+        };
+        pre.src = myPhoto;
       }
     }
 
-    // ✅ FIX v1016 - Vera Users Avatar um Update pannu da - Reels la PFP Blank Irukkathu da
+    // Vera Users Avatar
     document.querySelectorAll('img[data-avatar-user]').forEach(img=>{
       let uid = String(img.dataset.avatarUser || '');
-      if(window.PIXORO_AVATAR_MAP[uid]) img.src = window.PIXORO_AVATAR_MAP[uid];
+      if(window.PIXORO_AVATAR_MAP[uid]) pixoroSetImgSafe(img, window.PIXORO_AVATAR_MAP[uid]);
     });
 
   }catch(e){ console.log('avatar error', e); }
+  _AVATAR_RUNNING = false;
 }
 window.pixoroLoadAvatars = pixoroLoadAvatars;
 
 window.pixoroGetAvatar = function(p){
-  // ✅ FIX - String ID kodutha kooda Map la paaru da
   if(!p) return window.MY_PFP || '';
   if(typeof p === 'string'){
     return window.PIXORO_AVATAR_MAP[String(p)] || window.MY_PFP || '';
   }
-  // ✅ FIX - avatar / avatar_url / profiles.avatar_url Ellam Paaru da
   let uid = String(p.user_id || p.id || p.owner || '');
   return String(
     p.avatar_url || p.avatar || p.profiles?.avatar_url ||
@@ -104,14 +117,13 @@ window.pixoroGetAvatar = function(p){
   ).trim();
 };
 
-// ✅ FIX DA - Function ah Thanava Koopdu da + Reels Render Aana Appuramum Koopdu da
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(pixoroLoadAvatars, 500);
-  setTimeout(pixoroLoadAvatars, 2000);
-  setTimeout(pixoroLoadAvatars, 4000);
-});
-
-// ✅ FIX v1016 - Reels / Home Render Aana Appuram Avatar Update Aaganum da - Ithu Thaan Block Fix da
-window.addEventListener('pixoro-reels-rendered', pixoroLoadAvatars);
-window.addEventListener('pixoro-feed-rendered', pixoroLoadAvatars);
-// Reels.js la render mudinja appuram - dispatchEvent(new Event('pixoro-reels-rendered')) nu podu da
+// ✅ FIX v1017 - 3 Thadava Koopdatha da - Orey Thadava + Debounce da - Flicker Fix da
+let _avatarTimer = null;
+function pixoroAvatarOnce(){
+  if(_AVATAR_DONE) return;
+  clearTimeout(_avatarTimer);
+  _avatarTimer = setTimeout(pixoroLoadAvatars, 600);
+}
+document.addEventListener('DOMContentLoaded', pixoroAvatarOnce);
+window.addEventListener('pixoro-reels-rendered', pixoroAvatarOnce);
+window.addEventListener('pixoro-feed-rendered', pixoroAvatarOnce);
