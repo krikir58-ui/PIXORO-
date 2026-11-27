@@ -1,14 +1,14 @@
-
 /* =====================================================
-   PIXORO FEED V1042
+   PIXORO FEED V1043 FINAL - CORRECT DA 🔥❤️
    SUPABASE POST LOADING
-   LIKE LOGIC = like.js ONLY
+   LIKE LOGIC = like.js ONLY - FEED LA LIKE LOGIC ILLA
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_FEED_V1042) return;
+  if (window.PIXORO_FEED_V1043) return;
+  window.PIXORO_FEED_V1043 = true;
   window.PIXORO_FEED_V1042 = true;
 
   const POSTS_TABLE = "posts";
@@ -48,13 +48,10 @@
 
   function getMediaType(post, url) {
     const type = String(post.media_type || "").toLowerCase();
-
     if (type.includes("video")) return "video";
-
     if (/\.(mp4|webm|ogg|mov)(\?|$)/i.test(url)) {
       return "video";
     }
-
     return "image";
   }
 
@@ -85,35 +82,37 @@
     );
   }
 
+  /* ✅ V1043 FIX - Like Panna Count ah FEED_COUNTS la irundhu Edukkum da - DB Pazhaya Count ah Tharaathu da */
   function getPostCount(post) {
+    const id = String(post.id || "");
+    if (window.FEED_COUNTS && window.FEED_COUNTS[id] !== undefined) {
+      return Math.max(0, Number(window.FEED_COUNTS[id]));
+    }
     return Math.max(0, Number(post.likes_count || 0));
   }
 
   function mediaHTML(post) {
     const url = getMedia(post);
-
     if (!url) {
       return `<div class="post-media-empty">No media available</div>`;
     }
-
     const safeURL = escapeHTML(url);
     const type = getMediaType(post, url);
-
     if (type === "video") {
       return `
         <div class="post-media">
           <video
             class="postMedia"
             src="${safeURL}"
-            controls
             playsinline
             preload="metadata"
+            muted
+            loop
             data-media="video">
           </video>
         </div>
       `;
     }
-
     return `
       <div class="post-media">
         <img
@@ -130,26 +129,24 @@
   function postHTML(post) {
     const id = String(post.id || "");
     if (!id) return "";
-
     const username = escapeHTML(getPostUser(post));
     const avatar = escapeHTML(getAvatar(post));
     const caption = escapeHTML(post.caption || "");
     const count = getPostCount(post);
 
+    /* ✅ V1043 FIX - feedPfpImg Add Panniten da - Avatar 42px Circle da */
     const avatarHTML = avatar
-      ? `<img src="${avatar}" alt="" class="post-avatar">`
-      : `<div class="post-avatar post-avatar-empty">P</div>`;
+      ? `<img src="${avatar}" alt="" class="post-avatar feedPfpImg">`
+      : `<div class="post-avatar feedPfpImg post-avatar-empty">P</div>`;
 
     return `
       <article class="post" data-post-id="${escapeHTML(id)}" data-id="${escapeHTML(id)}">
 
         <div class="post-header">
           ${avatarHTML}
-
           <div class="post-user-info">
             <span class="post-username">${username}</span>
           </div>
-
           <button class="post-more" type="button" aria-label="More options">
             ⋯
           </button>
@@ -165,7 +162,6 @@
             data-like-btn="true"
             aria-label="Like"
             aria-pressed="false">
-
             <svg viewBox="0 0 24 24"
               width="27"
               height="27"
@@ -174,10 +170,8 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round">
-
               <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>
             </svg>
-
           </button>
 
           <button type="button" class="comment-btn" aria-label="Comments">
@@ -224,24 +218,18 @@
 
   async function loadFeed(force = false) {
     if (loading) return;
-
     if (loaded && !force) return;
-
     const supa = getClient();
     const container = getFeedContainer();
-
     if (!supa) {
       console.error("PIXORO: Supabase client not ready");
       return;
     }
-
     if (!container) {
       console.error("PIXORO: feedList container not found");
       return;
     }
-
     loading = true;
-
     if (!loaded || force) {
       container.innerHTML = `
         <div class="feed-loading">
@@ -249,48 +237,36 @@
         </div>
       `;
     }
-
     try {
       const { data, error } = await supa
         .from(POSTS_TABLE)
         .select("*")
         .order("created_at", { ascending: false })
         .limit(FEED_LIMIT);
-
       if (error) throw error;
-
       const posts = data || [];
-
       if (!posts.length) {
         container.innerHTML = `
           <div class="feed-empty">
             No posts yet. Be the first to share!
           </div>
         `;
-
         loaded = true;
         return;
       }
-
       container.innerHTML = posts.map(postHTML).join("");
-
       loaded = true;
-
       window.dispatchEvent(
         new Event("pixoro-feed-rendered")
       );
-
       if (typeof window.pixoroPaintAllLikes === "function") {
         window.pixoroPaintAllLikes();
       }
-
       setTimeout(() => {
         window.pixoroSyncLikes?.();
       }, 150);
-
     } catch (error) {
       console.error("PIXORO FEED ERROR:", error);
-
       container.innerHTML = `
         <div class="feed-error">
           <p>Unable to load posts.</p>
@@ -299,42 +275,28 @@
           </button>
         </div>
       `;
-
       document.getElementById("pixoroFeedRetry")
         ?.addEventListener("click", () => loadFeed(true));
-
     } finally {
       loading = false;
     }
   }
 
-  /* RETRY / REFRESH */
-
   window.pixoroLoadFeed = loadFeed;
-
   window.pixoroRefreshFeed = () => {
     loaded = false;
     return loadFeed(true);
   };
-
-  /* SUPABASE READY */
-
   window.addEventListener("pixoro-supa-ready", () => {
     loadFeed(true);
   });
-
-  /* LOGIN */
-
   window.addEventListener("pixoro:login", () => {
     loadFeed(true);
   });
 
-  /* INITIAL LOAD */
-
   function start() {
     loadFeed();
   }
-
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", start, {
       once: true
@@ -342,6 +304,5 @@
   } else {
     start();
   }
-
-  console.log("PIXORO FEED V1042 READY");
+  console.log("PIXORO FEED V1043 READY");
 })();
