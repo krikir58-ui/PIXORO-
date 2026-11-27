@@ -1,24 +1,27 @@
-/* ===== PIXORO LIKE V51 - V49 + 48px + WHITE UNLIKE + BUTTON HEART UP ===== */
-// ✅ V51 FIX 1 - Naduvula Heart 90px -> 48px da
-// ✅ V51 FIX 2 - Unlike na Heart White da - stroke #fff da
-// ✅ V51 FIX 3 - Like Button Heart - Server Save Aana Aprom Thaan Mela Pogum da
-// ✅ V51 FIX 4 - REAL LIKE ONLY da - Fake Illa da - Face Illa da
+/* ===== PIXORO LIKE V52 - V51 + INSTAGRAM SPEED ===== */
+// ✅ V52 - Local First da - Thotta Udaney Red/White + Count + Animation - 0 Sec da
+// ✅ V52 - Server Silent da - Pinnadi Poi Save Aagum da - Await Illa da
+// ✅ V52 - Saving Block Illa da - Speed ah Thotta Kooda Work Aagum da
+// ✅ V52 - 48px Heart + White Unlike + Button Heart Mela Pogum da
 (() => {
   "use strict";
   if (window.PIXORO_LIKE_V39) return;
   window.PIXORO_LIKE_V39 = true;
-  window.PIXORO_LIKE_V51 = true;
+  window.PIXORO_LIKE_V52 = true;
   function getSupa(){ return window.supa || window.supabaseClient || (typeof window.getSupa === 'function' ? window.getSupa() : null); }
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 350;
   const HEART_DURATION = 900;
   const lastTap = new Map();
-  const saving = new Set();
+  const pending = new Map();
   let blockClickUntil = 0;
   let lastTouchTime = 0;
-  try{ localStorage.removeItem("pixoro_likes"); localStorage.removeItem("pixoro_counts"); localStorage.removeItem("pixoro_unliked"); }catch(e){}
-  window.FEED_LIKES = new Set();
-  window.FEED_COUNTS = {};
+
+  // ✅ V52 FIX - Local ah Azhikka Maatom da - Local Thaan Speed da
+  try { const saved = JSON.parse(localStorage.getItem("pixoro_likes") || "[]"); window.FEED_LIKES = new Set(saved.map(String)); } catch { window.FEED_LIKES = new Set(); }
+  try { window.FEED_COUNTS = JSON.parse(localStorage.getItem("pixoro_counts") || "{}"); } catch { window.FEED_COUNTS = {}; }
+  function saveLocal(){ try{ localStorage.setItem("pixoro_likes", JSON.stringify([...window.FEED_LIKES])); localStorage.setItem("pixoro_counts", JSON.stringify(window.FEED_COUNTS)); }catch(e){} }
+
   async function getUserId(){
     if (window.currentUser?.id) return window.currentUser.id;
     let supa = getSupa(); if (!supa) return null;
@@ -31,7 +34,6 @@
   }
   function getLikeButton(post){ if (!post) return null; return post.querySelector("[data-like-btn], .like-btn, .like-button"); }
   function getLikeCount(post){ if (!post) return null; return post.querySelector("[data-like-count], .like-count, .likes-count, [data-count='likes'], .rCount"); }
-  // ✅ V51 FIX 2 - Unlike na stroke #fff da - Empty Illa da
   function paintLike(post, liked){
     const button = getLikeButton(post); if (!button) return;
     button.classList.toggle("liked", liked); button.classList.toggle("is-liked", liked);
@@ -60,7 +62,6 @@
     el.textContent = Math.max(0, Number(count) || 0);
     el.style.transform = "none"; el.style.animation = "none"; el.style.fontSize = "14px"; el.style.lineHeight = "1"; el.style.display = "inline-block"; el.style.opacity = "1"; el.style.visibility = "visible";
   }
-  // ✅ V51 FIX 1 - Naduvula Heart 48px da
   function showBigHeart(media, touchX, touchY){
     if (!media) return;
     const rect = media.getBoundingClientRect(); if (!rect.width || !rect.height) return;
@@ -90,7 +91,6 @@
   }
   function showTapHeart(x, y) { return; }
   function showMassDance(media) { return; }
-  // ✅ V51 FIX 3 - Button Heart - Button Center la Irundhu Mela Pogum da
   function showButtonHeart(button){
     if (!button) return; const r = button.getBoundingClientRect(); if (!r.width) return; const gid = 'pixoroBtn' + Date.now() + Math.floor(Math.random()*10000);
     const heart = document.createElement("div"); heart.className = "pixoro-big-heart";
@@ -112,48 +112,55 @@
     const icon = button.querySelector("svg, i, img, span"); if (!icon) return;
     icon.style.setProperty("opacity", "1", "important"); icon.style.setProperty("visibility", "visible", "important"); icon.style.setProperty("overflow", "visible", "important");
     try { icon.getAnimations().forEach(a => a.cancel()); } catch(e) {}
-    icon.animate([{ transform: "scale(1)", opacity: 1, offset: 0 },{ transform: "scale(1.5)", opacity: 1, offset: 0.2 },{ transform: "scale(0.9)", opacity: 1, offset: 0.4 },{ transform: "scale(1.35)", opacity: 1, offset: 0.6 },{ transform: "scale(0.95)", opacity: 1, offset: 0.8 },{ transform: "scale(1)", opacity: 1, offset: 1 }], { duration: 600, easing: "ease-out", fill: "forwards" });
+    icon.animate([{ transform: "scale(1)", opacity: 1, offset: 0 },{ transform: "scale(1.5)", opacity: 1, offset: 0.2 },{ transform: "scale(0.9)", opacity: 1, offset: 0.4 },{ transform: "scale(1.35)", opacity: 1, offset: 0.6 },{ transform: "scale(0.95)", opacity: 1, offset: 0.8 },{ transform: "scale(1)", opacity: 1, offset: 1 }], { duration: 500, easing: "ease-out", fill: "forwards" });
   }
-  async function serverSave(postId, liked){
-    let supa = getSupa(); if (!supa) return { ok:false, count:null };
-    const userId = await getUserId(); if (!userId) return { ok:false, count:null };
+  // ✅ V52 - SILENT SERVER da - Pinnadi Save Aagum da - Fail Aana Mattum Rollback da
+  async function serverSave(postId, liked, oldLiked, oldCount){
+    let supa = getSupa(); if (!supa) return;
+    const userId = await getUserId(); if (!userId) return;
     try{
       if (liked){ const { error } = await supa.from(TABLE).insert({ post_id: postId, user_id: userId }); if (error && error.code !== "23505") throw error; }
       else { const { error } = await supa.from(TABLE).delete().eq("post_id", postId).eq("user_id", userId); if (error) throw error; }
-      let realCount = null;
       try{
-        const { count, error: cErr } = await supa.from(TABLE).select("*", { count: "exact", head: true }).eq("post_id", postId);
-        if (!cErr) realCount = Number(count || 0);
+        const { count } = await supa.from(TABLE).select("*", { count: "exact", head: true }).eq("post_id", postId);
+        const realCount = Number(count || 0);
+        window.FEED_COUNTS[String(postId)] = realCount; saveLocal();
+        try{ await supa.from("posts").update({ likes_count: realCount }).eq("id", postId); }catch(e){}
       }catch(e){}
-      if (realCount !== null){ try{ await supa.from("posts").update({ likes_count: realCount }).eq("id", postId); }catch(e){} }
-      return { ok:true, count: realCount };
-    }catch(error){ console.error("PIXORO REAL LIKE ERROR:", error); return { ok:false, count:null }; }
+    }catch(error){
+      console.error("PIXORO LIKE SILENT FAIL - Rollback:", error);
+      const post = document.querySelector(`[data-post-id="${postId}"]`);
+      if (post){
+        if (oldLiked) window.FEED_LIKES.add(String(postId)); else window.FEED_LIKES.delete(String(postId));
+        window.FEED_COUNTS[String(postId)] = oldCount; saveLocal();
+        paintLike(post, oldLiked); paintCount(post, oldCount);
+      }
+    }
   }
-  async function toggleLike(postId, post, forceLike = false, fromButton = false){
+  // ✅ V52 - SYNC da - AWAIT ILLA da - Udaney Return da
+  function toggleLike(postId, post, forceLike = false){
     if (!postId || !post) return false; postId = String(postId);
-    if (saving.has(postId)) return window.FEED_LIKES.has(postId);
     const alreadyLiked = window.FEED_LIKES.has(postId); const willLike = forceLike ? true : !alreadyLiked;
-    if (forceLike && alreadyLiked) return true;
-    saving.add(postId);
-    const button = getLikeButton(post); if (button) button.style.opacity = "0.6";
-    const res = await serverSave(postId, willLike);
-    if (button) button.style.opacity = "1";
-    saving.delete(postId);
-    if (!res.ok){ paintLike(post, alreadyLiked); return alreadyLiked; }
+    if (forceLike && alreadyLiked){ paintLike(post, true); return true; }
+    const countEl = getLikeCount(post);
+    const oldCount = (window.FEED_COUNTS[postId] !== undefined) ? Number(window.FEED_COUNTS[postId]) : Number(countEl?.textContent ?? 0);
+    const newCount = willLike ? oldCount + 1 : Math.max(0, oldCount - 1);
+    // STEP 1 - LOCAL UDANEY da - 0 Sec da
     if (willLike) window.FEED_LIKES.add(postId); else window.FEED_LIKES.delete(postId);
-    if (res.count !== null){ window.FEED_COUNTS[postId] = res.count; paintCount(post, res.count); }
-    else { let c = Number(getLikeCount(post)?.textContent || 0); let nc = willLike ? c + 1 : Math.max(0, c - 1); window.FEED_COUNTS[postId] = nc; paintCount(post, nc); }
-    paintLike(post, willLike);
-    if (!willLike){ setTimeout(()=>{ paintLike(post, false); }, 50); setTimeout(()=>{ paintLike(post, false); }, 150); }
-    if (willLike && fromButton && button){ showButtonHeart(button); }
+    window.FEED_COUNTS[postId] = newCount; saveLocal();
+    paintLike(post, willLike); paintCount(post, newCount);
+    // STEP 2 - SERVER SILENT da - Queue la Pinnadi Pogum da
+    const prev = pending.get(postId) || Promise.resolve();
+    const next = prev.catch(()=>{}).then(()=> serverSave(postId, willLike, alreadyLiked, oldCount));
+    pending.set(postId, next); next.finally(()=>{ if (pending.get(postId) === next) pending.delete(postId); });
     return willLike;
   }
   function findMedia(element){ if (!element?.closest) return null; return element.closest(".postMedia, .post-media, .post-media-wrap, .post-content img, .post-content video, img, video"); }
-  async function handleDoubleTap(media, postId, post, x, y){
+  function handleDoubleTap(media, postId, post, x, y){
     blockClickUntil = Date.now() + 700;
-    const ok = await toggleLike(postId, post, true, false);
-    if (ok){ showBigHeart(media || post, x, y); buttonAnimation(post); }
-    setTimeout(() => paintLike(post, window.FEED_LIKES.has(String(postId))), 50);
+    showBigHeart(media || post, x, y);
+    buttonAnimation(post);
+    toggleLike(postId, post, true);
   }
   document.addEventListener("touchstart", event => {
     if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
@@ -179,8 +186,10 @@
     const button = event.target.closest("[data-like-btn], .like-btn, .like-button"); if (button){
       event.preventDefault(); event.stopPropagation();
       const post = getPost(button); const postId = getPostId(button); if (!post || !postId) return;
+      const wasLiked = window.FEED_LIKES.has(String(postId));
+      if (!wasLiked) showButtonHeart(button);
       buttonAnimation(post);
-      toggleLike(postId, post, false, true);
+      toggleLike(postId, post, false);
       return;
     }
     if (Date.now() < blockClickUntil){ const post = getPost(event.target); if (post){ event.preventDefault(); return; } }
@@ -189,15 +198,16 @@
     document.querySelectorAll("[data-post-id]").forEach(post => {
       const postId = String(post.dataset.postId || post.dataset.id || ""); if (!postId) return;
       const liked = window.FEED_LIKES.has(postId); paintLike(post, liked);
+      if (window.FEED_COUNTS[postId] !== undefined){ paintCount(post, Number(window.FEED_COUNTS[postId])); }
     });
   }
   async function loadMyLikes(){
-    const userId = await getUserId(); let supa = getSupa(); if (!userId || !supa){ paintAll(); return; }
+    paintAll(); const userId = await getUserId(); let supa = getSupa(); if (!userId || !supa) return;
     try{
       const { data, error } = await supa.from(TABLE).select("post_id").eq("user_id", userId); if (error) throw error;
-      window.FEED_LIKES = new Set((data || []).map(item => String(item.post_id)));
-      paintAll();
-    }catch(error){ console.error("PIXORO LOAD REAL LIKES:", error); }
+      (data || []).forEach(item => window.FEED_LIKES.add(String(item.post_id)));
+      saveLocal(); paintAll();
+    }catch(error){ console.error("PIXORO LOAD LIKES:", error); }
   }
   window.addEventListener("pixoro-feed-rendered", ()=> setTimeout(paintAll, 50));
   window.addEventListener("pixoro-reels-rendered", ()=> setTimeout(paintAll, 50));
@@ -211,5 +221,5 @@
   function start(){ addStyles(); paintAll(); loadMyLikes(); }
   if (document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", start, { once: true }); } else { start(); }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO LIKE V51 LOADED ❤️");
+  console.log("PIXORO LIKE V52 INSTAGRAM SPEED ❤️");
 })();
