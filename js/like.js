@@ -207,8 +207,8 @@
       pointer-events:none;
       left:${px}px;
       top:${py}px;
-      width:58px;
-      height:58px;
+      width:84px;
+      height:84px;
       transform:translate(-50%,-50%) scale(0);
       opacity:0;
     `;
@@ -271,18 +271,18 @@
   window.pixoroShowHeartDance = showBigHeart;
   window.showBigHeart = showBigHeart;
 
-  /* ✅ CORRECTED DA - Count Pakkathula Perusa 36px da - Cut Aagaathu da */
+  /* ✅ CORRECTED DA - Count Pakkathula Perusa 44px da - Cut Aagaathu da */
   function showUnlikeHeart(button) {
     if (!button) return;
     const rect = button.getBoundingClientRect();
     if (!rect.width) return;
-    let x = rect.left + rect.width + 30;
+    let x = rect.left + rect.width + 34;
     x = Math.max(30, Math.min(x, window.innerWidth - 30));
-    const y = rect.top - 8;
+    const y = rect.top - 10;
     const heart = document.createElement("div");
     heart.className = "pixoro-unlike-heart";
-    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${x}px;top:${y}px;width:36px!important;height:36px!important;transform:translate(-50%,-50%) scale(1);opacity:1;`;
-    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:36px!important;height:36px!important;filter:drop-shadow(0 8px 18px rgba(255,45,149,.6))"><path fill="#FF2D95" stroke="#FFFFFF" stroke-width=".6" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${x}px;top:${y}px;width:44px!important;height:44px!important;transform:translate(-50%,-50%) scale(1);opacity:1;`;
+    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:44px!important;height:44px!important;filter:drop-shadow(0 8px 18px rgba(255,45,149,.6))"><path fill="#FF2D95" stroke="#FFFFFF" stroke-width=".6" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
     document.body.appendChild(heart);
     const anim = heart.animate([
       { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
@@ -303,7 +303,7 @@
 
     icon.animate([
       { transform: "scale(1)" },
-      { transform: "scale(1.15)", offset: .35 },
+      { transform: "scale(1.30)", offset: .35 },
       { transform: "scale(.95)", offset: .65 },
       { transform: "scale(1)" }
     ], {
@@ -684,9 +684,9 @@
         overflow: visible !important;
         cursor: pointer !important;
         -webkit-tap-highlight-color: transparent !important;
-        min-width: 32px !important;
-        min-height: 32px !important;
-        padding: 4px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+        padding: 5px !important;
         margin-left: 2px !important;
         flex-shrink: 0 !important;
       }
@@ -697,8 +697,8 @@
         transform-origin: center !important;
         flex-shrink: 0 !important;
         overflow: visible !important;
-        width: 24px !important;
-        height: 24px !important;
+        width: 28px !important;
+        height: 28px !important;
       }
 
       .like-btn.liked,
@@ -732,8 +732,8 @@
 
       /* ✅ CORRECTED DA - Unlike Heart ku Thaniya CSS da - 110px Rule Pudikkaathu da */
       .pixoro-unlike-heart {
-        width: 36px !important;
-        height: 36px !important;
+        width: 44px !important;
+        height: 44px !important;
         pointer-events: none !important;
         background: transparent !important;
         border: none !important;
@@ -741,8 +741,8 @@
       }
 
       .pixoro-unlike-heart svg {
-        width: 36px !important;
-        height: 36px !important;
+        width: 44px !important;
+        height: 44px !important;
       }
 
       /* ✅ Like Button Cut Aagaama - Parent Clip Panna Vidaama da */
