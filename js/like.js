@@ -271,24 +271,23 @@
   window.pixoroShowHeartDance = showBigHeart;
   window.showBigHeart = showBigHeart;
 
-  /* ✅ ADD MATTUM DA - VERA CODE ILLA DA - UNLIKE HEART - MELLA MELA POI MARAIYUM DA */
-  function showUnlikeHeart(post) {
-    if (!post) return;
-    const media = post.querySelector(".post-media, .postMedia") || post;
-    const rect = media.getBoundingClientRect();
+  /* ✅ CORRECTED DA - UNLIKE HEART - LIKE BUTTON PAKKATHULA THAAN DA - CENTER LA ILLA DA */
+  function showUnlikeHeart(button) {
+    if (!button) return;
+    const rect = button.getBoundingClientRect();
     if (!rect.width) return;
     const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
+    const y = rect.top - 10;
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
-    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${x}px;top:${y}px;width:58px;height:58px;transform:translate(-50%,-50%) scale(1);opacity:1;`;
+    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${x}px;top:${y}px;width:28px;height:28px;transform:translate(-50%,-50%) scale(1);opacity:1;`;
     heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 8px 18px rgba(255,45,149,.6))"><path fill="#FF2D95" stroke="#FFFFFF" stroke-width=".6" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
     document.body.appendChild(heart);
     const anim = heart.animate([
       { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
-      { transform: "translate(-50%,-70%) scale(0.85)", opacity: 0.8, offset: 0.35 },
-      { transform: "translate(-50%,-110%) scale(0.6)", opacity: 0.4, offset: 0.65 },
-      { transform: "translate(-50%,-160%) scale(0.3)", opacity: 0 }
+      { transform: "translate(-50%,-90%) scale(0.9)", opacity: 0.9, offset: 0.3 },
+      { transform: "translate(-50%,-160%) scale(0.7)", opacity: 0.5, offset: 0.65 },
+      { transform: "translate(-50%,-220%) scale(0.4)", opacity: 0 }
     ], { duration: 900, easing: "ease-out", fill: "forwards" });
     anim.onfinish = () => heart.remove();
   }
@@ -524,14 +523,14 @@
 
       if (!post || !postId) return;
 
-      /* ✅ ADD MATTUM DA - LIKE BUTTON THOTTALUM POP - UNLIKE NA MELLA POI MARAIYUM DA */
+      /* ✅ CORRECTED DA - LIKE BUTTON THOTTALUM POP - UNLIKE NA BUTTON PAKKATHULA MELLA POI MARAIYUM DA */
       const wasLiked = window.FEED_LIKES.has(String(postId));
       const media = post.querySelector(".post-media, .postMedia") || post;
       const r = media.getBoundingClientRect();
       if (!wasLiked) {
         showBigHeart(media, r.left + r.width / 2, r.top + r.height / 2);
       } else {
-        showUnlikeHeart(post);
+        showUnlikeHeart(button);
       }
 
       buttonAnimation(post);
