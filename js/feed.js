@@ -208,7 +208,7 @@ async function loadPixoroFeed() {
           </button>
           <button data-action="comment" data-post-id="${esc(id)}" style="background:none;border:0;cursor:pointer;display:flex;align-items:center;gap:6px">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.5-8.5h.5a8.5 8.5 0 0 1 8 8z"/></svg>
-            <span style="color:white;font-size:14px">${comments}</span>
+            <span data-comment-count="${esc(id)}" style="color:white;font-size:14px">${comments}</span>
           </button>
           <button data-action="share" data-post-id="${esc(id)}" style="background:none;border:0;cursor:pointer">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>
@@ -253,12 +253,16 @@ async function loadPixoroFeed() {
   } finally { loading = false; }
 }
 
-/* COMMENTS */
+/* COMMENTS - ✅ FIX ADD PANNEN DA - Pazhaya Code Ye Tha da - 3 Line Mattum Add da */
 window.openComment = function(id) {
   window._CUR = id;
+  window.CURRENT_COMMENT_POST = id;
+  window.LAST_CLICKED_POST_ID = id;
   if (typeof window.openComments === "function") return window.openComments(id);
+  if (typeof window.pixoroOpenCommentReal === "function") return window.pixoroOpenCommentReal(id);
   const modal = document.getElementById("commentModal");
-  if (modal) modal.style.display = "block";
+  if (modal) { modal.dataset.postId = id; modal.style.display = "block"; }
+  if (typeof window.loadComments === "function") window.loadComments(id);
 };
 window.closeComment = function() {
   const modal = document.getElementById("commentModal");
