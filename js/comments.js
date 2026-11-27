@@ -1,372 +1,582 @@
-// ===== PIXORO COMMENT - v38 - js/comments.js la Podu da =====
-// v37 + Send Button Chinna Outline da + Type Panna Mattum da + Heart 38px da
+/* =========================================
+   PIXORO COMMENTS V38
+   COMMENT LIKE - 38px + #FF2D95 - Comment Killa Clean da
+   SEND - Type Panna Mattum Varum da - Outline SVG Mattum da
+   EMOJI BAR THOOKITEN DA
+   COMMENT OPTIONS = Share / Copy / Report / Delete
+   COMMENT REPLY = Tap Panna Reply Tag Varum da - 1 Level Only da
+   SUPABASE = SERVER SAVE + REALTIME SYNC
+   + V38 FIX DA - Delete Panna Comment List la Irundhu Maraiyum da - Server Delete Fail Aanaalum UI la Irukkaathu da
+   ========================================= */
 
-const PIXORO_ICON_SEND = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0095f6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`;
-const PIXORO_ICON_HEART_OUTLINE = `<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
-const PIXORO_ICON_HEART_FILL = `<svg width="38" height="38" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
-const PIXORO_ICON_REPLY = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7a5 5 0 0 1-5-5V7"/><path d="M3 7l4-4 4 4"/><path d="M9 17v-4a3 3 0 0 1 3-3h8"/></svg>`;
-const PIXORO_ICON_TRASH = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>`;
+(() => {
+  "use strict";
 
-function pixoroCommentCSS(){
-  if(document.getElementById("pixoro-comment-style")) return;
-  const s = document.createElement("style");
-  s.id = "pixoro-comment-style";
-  s.textContent = `
-    /* ✅ v38 - comment.css ku Adikkama - Modal Layout ah Thodala da - pixoro-c Mattum da */
-    .pixoro-c-head{display:flex!important;align-items:center!important;justify-content:center!important;padding:6px 18px 4px 18px!important;}
-    .pixoro-c-head h3{color:#fff!important;font-size:18px!important;font-weight:700!important;margin:0!important;}
-    .pixoro-c-close{display:none!important;}
-    .pixoro-c-old-hide{display:none!important;}
-    #commentList{flex:1!important;overflow-y:auto!important;padding:4px 14px!important;display:block!important;}
-    .pixoro-c-empty{padding:24px 20px;text-align:center;}
-    .pixoro-c-empty-heart{font-size:32px;}
-    .pixoro-c-optimistic{opacity:.7;}
-    .pixoro-c-bottom{border-top:1px solid #333;padding:8px 12px 12px 12px;background:#1c1c1e;flex-shrink:0;}
-    #commentModal .pixoro-c-emoji-row{display:none!important;}
-    .pixoro-c-bottom-input{display:flex;align-items:center;gap:8px;}
-    .pixoro-c-bottom-input.has-text .pixoro-c-send-arrow{display:flex!important;}
-    .pixoro-c-pill{display:flex;align-items:center;gap:6px;flex:1;background:#2a2a2e;border:1px solid #3a3a3e;border-radius:999px;padding:5px 5px 5px 10px;min-width:0;}
-    #commentInput{background:transparent!important;color:#fff!important;border:none!important;flex:1!important;min-width:0!important;padding:7px 0!important;font-size:14px!important;outline:none!important;box-shadow:none!important;}
-    #commentInput::placeholder{color:#888!important;}
-    .pixoro-c-icon-btn{display:none!important;}
-    .pixoro-c-send-btn{display:none!important;}
-    /* ✅ v38 - SEND BUTTON CHINNA OUTLINE DA - 44px Gradient -> 32px Outline da */
-    .pixoro-c-send-arrow{background:transparent!important;border:none!important;width:32px!important;height:32px!important;min-width:32px!important;border-radius:50%!important;display:none!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;flex-shrink:0!important;box-shadow:none!important;touch-action:manipulation!important;pointer-events:auto!important;padding:0!important;}
-    .pixoro-c-send-arrow svg{width:20px!important;height:20px!important;fill:none!important;stroke:#0095f6!important;}
-    .pixoro-c-send-arrow:active{transform:scale(.92)!important;}
-    .pixoro-c-ava{width:38px!important;height:38px!important;border-radius:50%!important;padding:1.5px!important;background:conic-gradient(from 180deg,#FF2D95,#FF9A00,#00E5FF,#7B2FFF,#FF2D95)!important;flex-shrink:0!important;display:flex!important;align-items:center!important;justify-content:center!important;}
-    .pixoro-c-ava img{width:100%!important;height:100%!important;border-radius:50%!important;object-fit:cover!important;border:1.5px solid #1c1c1e!important;background:#222!important;}
-    .pixoro-c-user{color:#fff;font-weight:700;font-size:14px;}
-    .pixoro-c-time{color:#888;font-weight:400;font-size:12px;margin-left:6px;}
-    .pixoro-c-text{color:#fff;font-size:14px;line-height:1.4;margin-top:1px;}
-    .pixoro-c-sub{color:#888;font-size:13px;margin-top:5px;display:flex;gap:12px;align-items:center;}
-    .pixoro-c-sub span{background:none!important;color:#888!important;border:none!important;padding:0!important;border-radius:0!important;cursor:pointer;display:inline-flex;align-items:center;gap:4px;}
-    .pixoro-c-sub span svg{stroke:#888!important;}
-    .pixoro-c-heart{cursor:pointer;line-height:1;text-align:center;user-select:none;display:flex;justify-content:center;background:none!important;border:none!important;padding:2px!important;margin-right:12px!important;transform:none!important;animation:none!important;width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;}
-    .pixoro-c-heart svg{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;}
-    .pixoro-c-heart:active{transform:scale(1.1)!important;}
-    .pixoro-c-heart.liked svg, .pixoro-c-heart.liked svg path{fill:#FF2D95!important;stroke:#FF2D95!important;}
-    .pixoro-c-heart-count{color:#fff;font-size:12px;text-align:center;margin-top:1px;margin-right:12px!important;}
-    .pixoro-c-reply-tag{color:#FF2D95;font-size:12px;margin-bottom:1px;}
-  `;
-  document.head.appendChild(s);
-}
-function pixoroCommentSendToggle(){
-  let inp = document.getElementById('commentInput');
-  let arrow = document.querySelector('.pixoro-c-send-arrow');
-  let wrap = document.querySelector('.pixoro-c-bottom-input');
-  if(!inp || !arrow) return;
-  let hasText = inp.value.trim().length > 0;
-  arrow.style.display = hasText ? 'flex' : 'none';
-  if(wrap) wrap.classList.toggle('has-text', hasText);
-}
-function pixoroFindPostId(fromEl){
-  if(typeof fromEl === 'string' && fromEl.length > 3 && !fromEl.includes('[object') && fromEl !== 'undefined') return fromEl;
-  if(fromEl && fromEl.dataset && fromEl.dataset.postId) return fromEl.dataset.postId;
-  let el = fromEl && fromEl.closest ? fromEl.closest('[data-post-id],[data-id],article,.post,.post-card') : null;
-  if(el && el.dataset?.postId) return el.dataset.postId;
-  if(el && el.dataset?.id) return el.dataset.id;
-  if(window._CUR && typeof window._CUR === 'string' && window._CUR !== 'undefined') return window._CUR;
-  if(window.LAST_CLICKED_POST_ID) return window.LAST_CLICKED_POST_ID;
-  if(window.CURRENT_COMMENT_POST && window.CURRENT_COMMENT_POST !== 'undefined') return window.CURRENT_COMMENT_POST;
-  let md = document.getElementById('commentModal')?.dataset?.postId;
-  if(md && md !== 'undefined') return md;
-  let first = document.querySelector('[data-comment-count]');
-  if(first) return first.getAttribute('data-comment-count');
-  return null;
-}
-document.addEventListener('click', (e)=>{
-  let t = e.target.closest('[data-post-id],[data-id],[onclick*="openComment"]');
-  if(t){
-    if(t.dataset?.postId) window.LAST_CLICKED_POST_ID = t.dataset.postId;
-    else if(t.dataset?.id) window.LAST_CLICKED_POST_ID = t.dataset.id;
-    let m = t.getAttribute('onclick') || '';
-    let mm = m.match(/openComment\(['"]([^'"]+)['"]\)/);
-    if(mm && mm[1]) window.LAST_CLICKED_POST_ID = mm[1];
+  if (window.PIXORO_COMMENTS_V38) return;
+  window.PIXORO_COMMENTS_V38 = true;
+
+  const TABLE = "comments";
+  const TABLE_LIKES = "comment_likes";
+  const EMOJI_ICON = "😊";
+
+  let supa = null;
+  let commentChannel = null;
+  let likeChannel = null;
+  let inputEl = null;
+  let sendBtnEl = null;
+  let listEl = null;
+  let openPostId = null;
+  let replyTo = null;
+  let commentsCache = [];
+  let replyFocusTimer = null;
+  let currentCommentId = null;
+  let currentCommentUserId = null;
+
+  const ICON_HEART = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  const ICON_HEART_FILLED = '<svg width="28" height="28" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  const ICON_SEND = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0095f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+
+  function getSupa() {
+    if (supa) return supa;
+    supa = window.getSupa?.() || window.supa || window.supabaseClient || null;
+    return supa;
   }
-  let card = e.target.closest('[data-post-id],article,.post,.post-card');
-  if(card?.dataset?.postId) window.LAST_CLICKED_POST_ID = card.dataset.postId;
-}, true);
-let pixoroSwipeY = 0, pixoroSwipeDragging = false;
-function pixoroInitSwipe(){
-  const modal = document.getElementById("commentModal");
-  if(!modal || modal.dataset.swipeInit) return;
-  modal.dataset.swipeInit = "1";
-  modal.addEventListener('click', (e)=>{ if(e.target === modal) closeComment(); });
-  const box = modal.querySelector(":scope > div");
-  if(!box) return;
-  box.addEventListener('touchstart', (e)=>{
-    if(e.touches.length !== 1) return;
-    let list = document.getElementById('commentList');
-    if(list && list.scrollTop > 0) return;
-    pixoroSwipeY = e.touches[0].clientY;
-    pixoroSwipeDragging = true;
-  }, {passive:true});
-  box.addEventListener('touchmove', (e)=>{
-    if(!pixoroSwipeDragging) return;
-    let dy = e.touches[0].clientY - pixoroSwipeY;
-    if(dy > 0){ box.style.transform = `translateY(${dy}px)`; }
-  }, {passive:true});
-  box.addEventListener('touchend', (e)=>{
-    if(!pixoroSwipeDragging) return;
-    pixoroSwipeDragging = false;
-    let dy = (e.changedTouches[0]?.clientY || 0) - pixoroSwipeY;
-    box.style.transform = '';
-    if(dy > 100) closeComment();
-  }, {passive:true});
-}
-function pixoroCommentLayout(){
-  pixoroCommentCSS();
-  const modal = document.getElementById("commentModal");
-  if(!modal) return;
-  const box = modal.querySelector(":scope > div");
-  if(!box) return;
-  [...box.children].forEach(el=>{
-    if(el.classList.contains("pixoro-c-head") || el.id === "commentList" || el.classList.contains("pixoro-c-bottom")) return;
-    if(el.contains(document.getElementById("commentInput"))) return;
-    el.classList.add("pixoro-c-old-hide");
-  });
-  if(!modal.querySelector(".pixoro-c-head")){
-    const head = document.createElement("div");
-    head.className = "pixoro-c-head";
-    head.innerHTML = `<h3 id="pixoroCHead">Comments</h3>`;
-    box.prepend(head);
-  }
-  if(!modal.querySelector(".pixoro-c-bottom")){
-    const input = document.getElementById("commentInput");
-    const oldWrap = input?.parentElement;
-    if(!input || !oldWrap) return;
-    const bottom = document.createElement("div");
-    bottom.className = "pixoro-c-bottom";
-    const bottomInput = document.createElement("div");
-    bottomInput.className = "pixoro-c-bottom-input";
-    const pill = document.createElement("div");
-    pill.className = "pixoro-c-pill";
-    const sendArrow = document.createElement("button");
-    sendArrow.type = "button"; sendArrow.className = "pixoro-c-send-arrow"; sendArrow.innerHTML = PIXORO_ICON_SEND;
-    sendArrow.style.display = "none";
-    sendArrow.onclick = (e)=>{ e.preventDefault(); e.stopPropagation(); pixoroSendComment(); };
-    oldWrap.querySelectorAll("button").forEach(b=>{ if(/post|send/i.test(b.textContent||"")) b.classList.add("pixoro-c-send-btn"); });
-    pill.append(input);
-    bottomInput.append(pill, sendArrow);
-    bottom.append(bottomInput);
-    oldWrap.classList.add("pixoro-c-old-hide");
-    box.append(bottom);
-    if(!input.dataset.pixoroSendToggle){
-      input.dataset.pixoroSendToggle = "1";
-      input.addEventListener("input", pixoroCommentSendToggle);
+
+  async function getUserId() {
+    const s = getSupa();
+    if (!s) return null;
+    try {
+      const { data } = await s.auth.getSession();
+      const id = data?.session?.user?.id || null;
+      if (id) window.ME_ID = id;
+      return id;
+    } catch (e) {
+      return window.ME_ID || null;
     }
-    pixoroCommentSendToggle();
   }
-  pixoroInitSwipe();
-}
-function pixoroOpenCommentReal(id, el){
-  let pid = pixoroFindPostId(id) || pixoroFindPostId(el) || pixoroFindPostId(window.event?.target);
-  if(!pid){
-    let m = document.getElementById('commentModal');
-    if(m) m.style.display = 'flex';
-    return;
-  }
-  window._CUR = pid;
-  window.CURRENT_COMMENT_POST = pid;
-  window.LAST_CLICKED_POST_ID = pid;
-  let m = document.getElementById('commentModal');
-  if(m){ m.dataset.postId = pid; m.style.display = 'flex'; }
-  pixoroInitSwipe();
-  pixoroCommentSendToggle();
-  loadComments(pid);
-}
-window.pixoroOpenCommentReal = pixoroOpenCommentReal;
-function openComment(id, el){ return pixoroOpenCommentReal(id, el); }
-function closeComment(){
-  let m = document.getElementById('commentModal');
-  if(m){ m.style.display = 'none'; let b = m.querySelector(':scope > div'); if(b) b.style.transform = ''; }
-}
-window.openComment = openComment;
-window.closeComment = closeComment;
-function escHtml(t){
-  return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function pixoroTimeAgo(ts){
-  if(!ts) return "";
-  let d = Math.floor((Date.now() - new Date(ts).getTime())/1000);
-  if(d < 60) return "now";
-  if(d < 3600) return Math.floor(d/60)+"m";
-  if(d < 86400) return Math.floor(d/3600)+"h";
-  return Math.floor(d/86400)+"d";
-}
-let pixoroLiked = new Set(JSON.parse(localStorage.getItem('pixoroLiked')||'[]'));
-let pixoroReplyTo = null;
-let pixoroProfileMap = {};
-function pixoroCommentRow(c, postId, isOptimistic){
-  let isMine = window.ME_ID && String(c.user_id) === String(window.ME_ID);
-  let prof = pixoroProfileMap[String(c.user_id)] || {};
-  let uname = String(c.username || prof.username || window.ME_RAW || 'user').replace(/^@+/,'');
-  if(!c.username && !prof.username) uname = 'user';
-  let ava = escHtml(window.pixoroGetAvatar ? window.pixoroGetAvatar(c) : (c.avatar_url || prof.avatar_url || ''));
-  let delBtn = isMine && !isOptimistic ? `<span data-del="${c.id}" data-post="${postId}">${PIXORO_ICON_TRASH} Delete</span>` : '';
-  let liked = pixoroLiked.has(String(c.id));
-  let likeCount = c.likes_count || 0;
-  let replyToName = String(c.reply_to || 'user').replace(/^@+/,'');
-  let replyTag = c.parent_id ? `<div class="pixoro-c-reply-tag">Replying to ${escHtml(replyToName)}</div>` : '';
-  return `<div class="pixoro-c-item ${isOptimistic?'pixoro-c-optimistic':''}" data-temp="${c._temp||''}" data-cid="${c.id}" style="display:flex;gap:10px;padding:9px 0;align-items:flex-start">
-    <div class="pixoro-c-ava"><img src="${ava}" onerror="this.src='https://ui-avatars.com/api/?name=U&background=222&color=fff'"></div>
-    <div style="flex:1;min-width:0"><div><span class="pixoro-c-user">${escHtml(uname)}</span><span class="pixoro-c-time">${isOptimistic?'now':pixoroTimeAgo(c.created_at)}</span></div>${replyTag}<div class="pixoro-c-text">${escHtml(c.text||c.content||'')}</div><div class="pixoro-c-sub"><span data-reply="${c.id}" data-uname="${escHtml(uname)}">${PIXORO_ICON_REPLY} Reply</span>${delBtn} ${isOptimistic?'<span style="color:#FF2D95">• Sending...</span>':''}</div></div>
-    <div><button type="button" class="pixoro-c-heart ${liked?'liked':''}" data-comment-like="${c.id}" onclick="pixoroToggleCommentLike('${c.id}', this); return false;">${liked?PIXORO_ICON_HEART_FILL:PIXORO_ICON_HEART_OUTLINE}</button><div class="pixoro-c-heart-count">${likeCount||''}</div></div>
-  </div>`;
-}
-function pixoroReplyComment(cid, username){
-  pixoroReplyTo = { id: cid, username: username };
-  let inp = document.getElementById('commentInput');
-  if(inp){ inp.value = '@' + username + ' '; inp.focus(); inp.placeholder = 'Replying to ' + username + '...'; pixoroCommentSendToggle(); }
-}
-async function pixoroToggleCommentLike(cid, el){
-  if(!el) el = document.querySelector(`[data-comment-like="${cid}"]`);
-  if(!el) return;
-  try{ if(window.event){ window.event.stopPropagation(); window.event.preventDefault(); } }catch(e){}
-  let liked = pixoroLiked.has(String(cid));
-  let countEl = el.parentElement ? el.parentElement.querySelector('.pixoro-c-heart-count') : null;
-  let cur = Number(countEl?.innerText||0);
-  let newCount = liked ? Math.max(0, cur - 1) : cur + 1;
-  if(liked){ pixoroLiked.delete(String(cid)); el.classList.remove('liked'); el.innerHTML = PIXORO_ICON_HEART_OUTLINE; }
-  else{ pixoroLiked.add(String(cid)); el.classList.add('liked'); el.innerHTML = PIXORO_ICON_HEART_FILL; }
-  if(countEl) countEl.innerText = newCount > 0 ? newCount : '';
-  try{ localStorage.setItem('pixoroLiked', JSON.stringify([...pixoroLiked])); }catch(e){}
-  try{
-    let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
-    let uid = window.ME_ID;
-    if(!uid){ let {data:{session}} = await s.auth.getSession(); if(session) uid = session.user.id; }
-    if(!uid) return;
-    let cidNum = Number(cid);
-    if(liked){ await s.from('comment_likes').delete().eq('comment_id', cidNum).eq('user_id', uid); }
-    else{ let r = await s.from('comment_likes').insert({ comment_id: cidNum, user_id: uid }); if(r.error) throw r.error; }
-    await s.from('comments').update({ likes_count: newCount }).eq('id', cidNum);
-  }catch(e){ console.log('COMMENT LIKE FAIL:', e.message); }
-}
-document.addEventListener('click', (e)=>{
-  let likeEl = e.target.closest('[data-comment-like]');
-  if(likeEl){ e.preventDefault(); e.stopPropagation(); pixoroToggleCommentLike(likeEl.dataset.commentLike, likeEl); return; }
-  let replyEl = e.target.closest('[data-reply]');
-  if(replyEl){ pixoroReplyComment(replyEl.dataset.reply, replyEl.dataset.uname); return; }
-  let delEl = e.target.closest('[data-del]');
-  if(delEl){ deleteComment(delEl.dataset.del, delEl.dataset.post); return; }
-}, true);
-async function loadComments(postId){
-  if(!postId || postId === 'undefined') return;
-  try{
-    let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
-    let {data, error} = await s.from('comments').select('*').eq('post_id', String(postId)).order('created_at',{ascending:true});
-    if(error) return;
-    let uids = [...new Set((data||[]).map(c=>c.user_id).filter(Boolean))];
-    if(uids.length){
-      let pr = await s.from('profiles').select('id,username,avatar_url').in('id', uids);
-      if(!pr.error) (pr.data||[]).forEach(p=>{ pixoroProfileMap[String(p.id)] = p; });
+
+  async function getMyName() {
+    const s = getSupa();
+    if (!s) return "You";
+    try {
+      const { data } = await s.auth.getUser();
+      const u = data?.user;
+      const name = u?.user_metadata?.username || u?.user_metadata?.display_name || u?.user_metadata?.full_name || u?.email?.split("@")[0] || "You";
+      return String(name);
+    } catch (e) {
+      return "You";
     }
-    if(window.ME_ID){
-      let lk = await s.from('comment_likes').select('comment_id').eq('user_id', window.ME_ID);
-      if(!lk.error) (lk.data||[]).forEach(r=>pixoroLiked.add(String(r.comment_id)));
-      localStorage.setItem('pixoroLiked', JSON.stringify([...pixoroLiked]));
-    }
-    let box = document.getElementById('commentList'); if(!box) return;
-    if(box.querySelector('.pixoro-c-optimistic')) return;
-    box.innerHTML = (data||[]).map(c=>pixoroCommentRow(c, postId, false)).join('');
-    if(!box.innerHTML.trim()) box.innerHTML = '<div class="pixoro-c-empty"><div class="pixoro-c-empty-heart">❤️</div><div style="color:#fff;font-size:19px;font-weight:700;margin-top:8px">No comments yet</div><div style="color:#888;font-size:13px;margin-top:4px">Start the conversation.</div></div>';
-    let head = document.getElementById("pixoroCHead");
-    if(head) head.innerText = `Comments`;
-    let cc = document.querySelector(`[data-comment-count="${postId}"]`);
-    if(cc) cc.innerText = '';
-  }catch(e){}
-}
-let pixoroSending = false;
-function pixoroSendComment(){
-  if(pixoroSending) return;
-  let inp = document.getElementById('commentInput');
-  if(!inp) return;
-  let txt = inp.value.trim();
-  if(!txt) return;
-  let postId = pixoroFindPostId();
-  if(!postId || postId === 'undefined'){ alert('Post ID Illa da - feed.js Fix Pannu da'); return; }
-  window.CURRENT_COMMENT_POST = postId;
-  window._CUR = postId;
-  pixoroSending = true;
-  setTimeout(()=>{ pixoroSending = false; }, 800);
-  let tempId = 'temp_' + Date.now();
-  let box = document.getElementById('commentList');
-  let myName = (window.ME_RAW||'user').replace(/^@+/,'');
-  let myAva = window.ME_AVATAR || window.MY_PFP || '';
-  let replyInfo = pixoroReplyTo;
-  if(box){
-    if(box.querySelector('.pixoro-c-empty')) box.innerHTML = '';
-    box.insertAdjacentHTML('beforeend', pixoroCommentRow({ _temp: tempId, user_id: window.ME_ID||'me', username: myName, avatar_url: myAva, text: txt, created_at: new Date().toISOString(), parent_id: replyInfo?.id||null, reply_to: replyInfo?.username||'' }, postId, true));
-    box.scrollTop = box.scrollHeight;
-    let head = document.getElementById("pixoroCHead");
-    if(head) head.innerText = `Comments`;
   }
-  inp.value = ''; inp.placeholder = 'Add comment...'; pixoroReplyTo = null;
-  pixoroCommentSendToggle();
-  (async ()=>{
-    try{
-      let s = window.getSupa ? window.getSupa() : window.supa;
-      if(!s){ alert('Supabase Connect Agala da'); return; }
-      let uid = window.ME_ID;
-      if(!uid){
-        let {data:{session}} = await s.auth.getSession();
-        if(!session){ alert('Login Illa da'); return; }
-        uid = session.user.id; window.ME_ID = uid;
+
+  function escapeHtml(str) {
+    return String(str ?? "").replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+  }
+
+  function timeAgo(ts) {
+    if (!ts) return "now";
+    const t = new Date(ts).getTime();
+    if (!t) return "now";
+    const s = Math.floor((Date.now() - t) / 1000);
+    if (s < 5) return "now";
+    if (s < 60) return s + "s";
+    if (s < 3600) return Math.floor(s / 60) + "m";
+    if (s < 86400) return Math.floor(s / 3600) + "h";
+    if (s < 604800) return Math.floor(s / 86400) + "d";
+    return Math.floor(s / 604800) + "w";
+  }
+
+  function getAvatarInitial(name) {
+    return String(name || "U").trim().charAt(0).toUpperCase() || "U";
+  }
+
+  function getCommentModal() {
+    return document.getElementById("commentModal");
+  }
+
+  function isCommentOpen() {
+    return !!openPostId;
+  }
+
+  function updateSendState() {
+    if (!inputEl || !sendBtnEl) return;
+    const has = inputEl.value.trim().length > 0;
+    sendBtnEl.classList.toggle("show", has);
+    sendBtnEl.style.display = has ? "flex" : "none";
+    const area = document.querySelector(".cmtInputArea");
+    if (area) area.classList.toggle("has-text", has);
+  }
+
+  function focusInput() {
+    if (!inputEl) return;
+    try {
+      inputEl.focus({ preventScroll: true });
+    } catch (e) {
+      inputEl.focus();
+    }
+  }
+
+  function setReplyTo(comment) {
+    replyTo = comment || null;
+    const tag = document.getElementById("replyTag");
+    const tagName = document.getElementById("replyTagName");
+    if (!tag) return;
+    if (replyTo) {
+      tag.style.display = "flex";
+      if (tagName) tagName.textContent = "Replying to " + replyTo.username;
+    } else {
+      tag.style.display = "none";
+    }
+  }
+
+  function focusReply(comment) {
+    setReplyTo(comment);
+    focusInput();
+  }
+
+  function getPostIdForModal() {
+    return openPostId;
+  }
+
+  function getPostUsername(postId) {
+    const post = document.querySelector(`article.post[data-post-id="${postId}"], .post[data-post-id="${postId}"]`);
+    if (!post) return "";
+    const el = post.querySelector(".post-user, .pUser, .post-username, [data-username], .username");
+    return el?.textContent?.trim() || "";
+  }
+
+  function getPostImage(postId) {
+    const post = document.querySelector(`article.post[data-post-id="${postId}"], .post[data-post-id="${postId}"]`);
+    const img = post?.querySelector("img");
+    return img?.src || "";
+  }
+
+  async function loadComments(postId) {
+    const s = getSupa();
+    if (!s) return;
+    try {
+      const { data, error } = await s.from(TABLE).select("*").eq("post_id", postId).order("created_at", { ascending: true });
+      if (error) throw error;
+      commentsCache = data || [];
+      renderComments();
+      syncCommentLikes();
+    } catch (e) {
+      console.error("PIXORO COMMENTS LOAD:", e);
+    }
+  }
+
+  function renderComments() {
+    if (!listEl) return;
+    if (!commentsCache.length) {
+      listEl.innerHTML = '<div style="text-align:center;color:#777;padding:30px 10px;font-size:13px">No comments yet.<br>Be the first to comment.</div>';
+      return;
+    }
+    const me = window.ME_ID;
+    listEl.innerHTML = commentsCache.map((c) => {
+      const liked = (window.FEED_COMMENT_LIKES || new Set()).has(String(c.id));
+      const count = Number(window.FEED_COMMENT_COUNTS?.[c.id] || 0);
+      const isMine = me && String(c.user_id) === String(me);
+      const parent = commentsCache.find((p) => String(p.id) === String(c.parent_id));
+      const replyName = parent ? escapeHtml(parent.username || "user") : "";
+      return `
+        <div class="cmtRow" data-comment-id="${escapeHtml(c.id)}" data-user-id="${escapeHtml(c.user_id || "")}">
+          <div class="cmtAvatar">${escapeHtml(getAvatarInitial(c.username))}</div>
+          <div class="cmtContent">
+            <div class="cmtUser">${escapeHtml(c.username || "user")}</div>
+            <div class="cmtText">${replyName ? `<span style="color:#888">@${replyName} </span>` : ""}${escapeHtml(c.text || "")}</div>
+            <div class="cmtMeta">
+              <span>${timeAgo(c.created_at)}</span>
+              <span class="cmtReplyBtn" data-reply="${escapeHtml(c.id)}">Reply</span>
+              ${isMine ? `<span class="cmtDeleteBtn" data-delete="${escapeHtml(c.id)}" style="color:#ff5555">Delete</span>` : ""}
+            </div>
+          </div>
+          <button class="cmtLike ${liked ? "liked" : ""}" data-like="${escapeHtml(c.id)}" aria-label="Like comment">
+            ${liked ? ICON_HEART_FILLED : ICON_HEART}
+            <span class="cmtLikeCount" style="font-size:11px;color:#aaa;margin-top:2px">${count > 0 ? count : ""}</span>
+          </button>
+        </div>`;
+    }).join("");
+    listEl.scrollTop = listEl.scrollHeight;
+  }
+
+  function toggleCommentLike(commentId, btn) {
+    if (!commentId || !btn) return;
+    const liked = btn.classList.contains("liked");
+    const willLike = !liked;
+    btn.classList.toggle("liked", willLike);
+    btn.innerHTML = (willLike ? ICON_HEART_FILLED : ICON_HEART) + `<span class="cmtLikeCount" style="font-size:11px;color:#aaa;margin-top:2px"></span>`;
+    const countEl = btn.querySelector(".cmtLikeCount");
+    let count = Number(window.FEED_COMMENT_COUNTS?.[commentId] || 0);
+    count = willLike ? count + 1 : Math.max(0, count - 1);
+    window.FEED_COMMENT_COUNTS = window.FEED_COMMENT_COUNTS || {};
+    window.FEED_COMMENT_COUNTS[commentId] = count;
+    window.FEED_COMMENT_LIKES = window.FEED_COMMENT_LIKES || new Set();
+    if (willLike) window.FEED_COMMENT_LIKES.add(String(commentId));
+    else window.FEED_COMMENT_LIKES.delete(String(commentId));
+    if (countEl) countEl.textContent = count > 0 ? count : "";
+    queueCommentLikeSave(commentId, willLike, btn, liked, count);
+  }
+
+  const pendingLikeSaves = new Map();
+  function queueCommentLikeSave(commentId, willLike, btn, prevLiked, prevCount) {
+    const prev = pendingLikeSaves.get(commentId) || Promise.resolve();
+    const next = prev.catch(() => {}).then(async () => {
+      const s = getSupa();
+      const userId = await getUserId();
+      if (!s || !userId) throw new Error("Login first");
+      if (willLike) {
+        const { error } = await s.from(TABLE_LIKES).upsert({ comment_id: commentId, user_id: userId }, { onConflict: "comment_id,user_id", ignoreDuplicates: true });
+        if (error) throw error;
+      } else {
+        const { error } = await s.from(TABLE_LIKES).delete().eq("comment_id", commentId).eq("user_id", userId);
+        if (error) throw error;
       }
-      if(!myName || myName === 'user'){
-        let pr = await s.from('profiles').select('username,avatar_url').eq('id', uid).single();
-        if(!pr.error && pr.data?.username){ myName = String(pr.data.username).replace(/^@+/,''); window.ME_RAW = myName; }
-        if(!myAva && pr.data?.avatar_url) myAva = pr.data.avatar_url;
+    }).catch((e) => {
+      console.error("PIXORO COMMENT LIKE SAVE:", e);
+      btn.classList.toggle("liked", prevLiked);
+      btn.innerHTML = (prevLiked ? ICON_HEART_FILLED : ICON_HEART) + `<span class="cmtLikeCount" style="font-size:11px;color:#aaa;margin-top:2px">${prevCount > 0 ? prevCount : ""}</span>`;
+      window.FEED_COMMENT_COUNTS[commentId] = prevCount;
+      if (prevLiked) window.FEED_COMMENT_LIKES.add(String(commentId));
+      else window.FEED_COMMENT_LIKES.delete(String(commentId));
+    });
+    pendingLikeSaves.set(commentId, next);
+  }
+
+  async function syncCommentLikes() {
+    const s = getSupa();
+    const userId = await getUserId();
+    if (!s || !userId || !commentsCache.length) return;
+    try {
+      const ids = commentsCache.map((c) => String(c.id));
+      let all = [];
+      let from = 0;
+      while (true) {
+        const { data, error } = await s.from(TABLE_LIKES).select("comment_id,user_id").in("comment_id", ids).range(from, from + 999);
+        if (error) throw error;
+        const rows = data || [];
+        all = all.concat(rows);
+        if (rows.length < 1000) break;
+        from += 1000;
       }
-      let pidStr = String(postId);
-      let uidStr = String(uid);
-      let payload = { post_id: pidStr, user_id: uidStr, username: myName, avatar_url: myAva, text: txt, content: txt };
-      if(replyInfo?.id) payload.parent_id = Number(replyInfo.id);
-      let {error} = await s.from('comments').insert(payload);
-      if(error){
-        let p2 = { post_id: pidStr, user_id: uidStr, text: txt };
-        if(replyInfo?.id) p2.parent_id = Number(replyInfo.id);
-        let r2 = await s.from('comments').insert(p2);
-        error = r2.error;
-        if(error){
-          let p3 = { post_id: pidStr, user_id: uidStr, content: txt };
-          let r3 = await s.from('comments').insert(p3);
-          error = r3.error;
-        }
-      }
-      if(error) throw error;
-      let tempEl = box?.querySelector(`[data-temp="${tempId}"]`);
-      if(tempEl) tempEl.remove();
-      loadComments(postId);
-    }catch(e){ alert('Send Fail da - Karanam: ' + e.message); }
-  })();
-}
-async function deleteComment(commentId, postId){
-  if(!confirm('Delete pannatta da?')) return;
-  try{
-    let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
-    let {error} = await s.from('comments').delete().eq('id', Number(commentId)).eq('user_id', String(window.ME_ID));
-    if(error) throw error;
-    let el = document.querySelector(`[data-cid="${commentId}"]`);
-    if(el) el.remove();
+      const counts = {};
+      const liked = new Set();
+      ids.forEach((id) => counts[id] = 0);
+      all.forEach((r) => {
+        const id = String(r.comment_id);
+        counts[id] = (counts[id] || 0) + 1;
+        if (String(r.user_id) === String(userId)) liked.add(id);
+      });
+      window.FEED_COMMENT_COUNTS = counts;
+      window.FEED_COMMENT_LIKES = liked;
+      renderComments();
+    } catch (e) {
+      console.error("PIXORO COMMENT LIKE SYNC:", e);
+    }
+  }
+
+  async function addComment() {
+    const text = inputEl?.value?.trim() || "";
+    if (!text) return;
+    const postId = openPostId;
+    if (!postId) return;
+    const s = getSupa();
+    const userId = await getUserId();
+    if (!s || !userId) {
+      alert("Please login first");
+      return;
+    }
+    const username = await getMyName();
+    const tempId = "temp-" + Date.now();
+    const temp = { id: tempId, post_id: postId, user_id: userId, username, text, parent_id: replyTo?.id || null, created_at: new Date().toISOString() };
+    commentsCache.push(temp);
+    renderComments();
+    inputEl.value = "";
+    setReplyTo(null);
+    updateSendState();
+    try {
+      const { data, error } = await s.from(TABLE).insert({ post_id: postId, user_id: userId, username, text, parent_id: replyTo?.id || null }).select().single();
+      if (error) throw error;
+      const idx = commentsCache.findIndex((c) => String(c.id) === tempId);
+      if (idx >= 0 && data) commentsCache[idx] = data;
+      renderComments();
+    } catch (e) {
+      console.error("PIXORO COMMENT ADD:", e);
+      commentsCache = commentsCache.filter((c) => String(c.id) !== tempId);
+      renderComments();
+      alert("Failed to post comment");
+    }
+  }
+
+  async function deleteComment(commentId) {
+    if (!commentId) return;
+    // ✅ V38 FIX DA - UI la Udane Maraiyum da - Server Fail Aanaalum Thirumba Varaathu da
+    const backup = [...commentsCache];
+    commentsCache = commentsCache.filter((c) => String(c.id) !== String(commentId));
+    renderComments();
+    closeCommentOptions();
+    try {
+      const s = getSupa();
+      const userId = await getUserId();
+      if (!s || !userId) throw new Error("Login first");
+      const { error } = await s.from(TABLE).delete().eq("id", commentId).eq("user_id", userId);
+      if (error) throw error;
+      commentsCache = commentsCache.filter((c) => String(c.id) !== String(commentId));
+      renderComments();
+    } catch (e) {
+      console.error("PIXORO COMMENT DELETE:", e);
+      commentsCache = commentsCache.filter((c) => String(c.id) !== String(commentId));
+      renderComments();
+    }
+  }
+
+  function openCommentModal(postId) {
+    openPostId = String(postId);
+    const modal = getCommentModal();
+    if (!modal) return;
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+    const headerName = document.getElementById("cmtHeaderName");
+    if (headerName) {
+      const name = getPostUsername(postId);
+      headerName.textContent = name ? "Comments - " + name : "Comments";
+    }
+    commentsCache = [];
+    renderComments();
     loadComments(postId);
-  }catch(e){ alert('Delete Fail da - ' + e.message); }
-}
-document.addEventListener('DOMContentLoaded', ()=>{
-  pixoroCommentLayout();
-  let inp = document.getElementById('commentInput');
-  if(inp){
-    inp.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); pixoroSendComment(); } });
-    if(!inp.dataset.pixoroSendToggle){ inp.dataset.pixoroSendToggle = "1"; inp.addEventListener("input", pixoroCommentSendToggle); }
+    subscribeRealtime(postId);
+    setTimeout(() => focusInput(), 350);
   }
-});
-if(document.readyState !== 'loading') pixoroCommentLayout();
-window.pixoroSendComment = pixoroSendComment;
-window.addComment = pixoroSendComment;
-window.pixoroOpenCommentReal = pixoroOpenCommentReal;
-window.loadComments = loadComments;
-window.deleteComment = deleteComment;
-window.pixoroToggleCommentLike = pixoroToggleCommentLike;
-window.pixoroReplyComment = pixoroReplyComment;
-window.escHtml = escHtml;
+
+  function closeCommentModal() {
+    openPostId = null;
+    replyTo = null;
+    const modal = getCommentModal();
+    if (modal) modal.style.display = "none";
+    document.body.style.overflow = "";
+    unsubscribeRealtime();
+    if (inputEl) inputEl.value = "";
+    setReplyTo(null);
+    updateSendState();
+  }
+
+  function openCommentOptions(commentId, userId) {
+    currentCommentId = String(commentId);
+    currentCommentUserId = String(userId || "");
+    const modal = document.getElementById("cmtOptionModal");
+    const content = document.getElementById("cmtOptContent");
+    if (!modal || !content) return;
+    const me = window.ME_ID;
+    const isMine = me && String(userId) === String(me);
+    content.innerHTML = `
+      <button data-opt="share">Share Comment</button>
+      <button data-opt="copy">Copy Text</button>
+      <button data-opt="report">Report</button>
+      ${isMine ? `<button data-opt="delete" style="color:#ff5555">Delete</button>` : ""}
+      <button data-opt="cancel" style="color:#aaa">Cancel</button>
+    `;
+    modal.style.display = "flex";
+  }
+
+  function closeCommentOptions() {
+    const modal = document.getElementById("cmtOptionModal");
+    if (modal) modal.style.display = "none";
+    currentCommentId = null;
+    currentCommentUserId = null;
+  }
+
+  async function handleOption(opt) {
+    if (!currentCommentId) return;
+    const comment = commentsCache.find((c) => String(c.id) === String(currentCommentId));
+    if (opt === "cancel") { closeCommentOptions(); return; }
+    if (opt === "delete") { await deleteComment(currentCommentId); return; }
+    if (opt === "copy") {
+      if (comment?.text) {
+        try { await navigator.clipboard.writeText(comment.text); } catch (e) {}
+      }
+      closeCommentOptions(); return;
+    }
+    if (opt === "share") {
+      const text = comment?.text || "";
+      const url = location.origin + location.pathname + "#comment-" + currentCommentId;
+      try {
+        if (navigator.share) await navigator.share({ title: "Pixoro Comment", text, url });
+        else if (navigator.clipboard) await navigator.clipboard.writeText(url);
+      } catch (e) {}
+      closeCommentOptions(); return;
+    }
+    if (opt === "report") {
+      alert("Thanks. This comment was reported.");
+      closeCommentOptions(); return;
+    }
+  }
+
+  function subscribeRealtime(postId) {
+    const s = getSupa();
+    if (!s) return;
+    unsubscribeRealtime();
+    try {
+      commentChannel = s.channel("pixoro-comments-" + postId)
+        .on("postgres_changes", { event: "*", schema: "public", table: TABLE, filter: `post_id=eq.${postId}` }, (payload) => {
+          if (payload.eventType === "INSERT") {
+            const row = payload.new;
+            if (!commentsCache.some((c) => String(c.id) === String(row.id))) {
+              commentsCache.push(row);
+              renderComments();
+            }
+          }
+          if (payload.eventType === "DELETE") {
+            commentsCache = commentsCache.filter((c) => String(c.id) !== String(payload.old.id));
+            renderComments();
+          }
+          if (payload.eventType === "UPDATE") {
+            const idx = commentsCache.findIndex((c) => String(c.id) === String(payload.new.id));
+            if (idx >= 0) { commentsCache[idx] = payload.new; renderComments(); }
+          }
+        }).subscribe();
+      likeChannel = s.channel("pixoro-comment-likes-" + postId)
+        .on("postgres_changes", { event: "*", schema: "public", table: TABLE_LIKES }, () => { syncCommentLikes(); })
+        .subscribe();
+    } catch (e) {
+      console.error("PIXORO COMMENT REALTIME:", e);
+    }
+  }
+
+  function unsubscribeRealtime() {
+    try { if (commentChannel) getSupa()?.removeChannel(commentChannel); } catch (e) {}
+    try { if (likeChannel) getSupa()?.removeChannel(likeChannel); } catch (e) {}
+    commentChannel = null;
+    likeChannel = null;
+  }
+
+  function layout() {
+    const modal = getCommentModal();
+    if (!modal) return;
+    if (modal.dataset.pixoroBuilt) {
+      inputEl = modal.querySelector("input");
+      sendBtnEl = modal.querySelector(".pixoro-c-send-arrow");
+      listEl = modal.querySelector("#cmtList");
+      updateSendState();
+      return;
+    }
+    modal.dataset.pixoroBuilt = "1";
+    modal.innerHTML = `
+      <div id="commentSheet">
+        <div class="cmtHeader"><span id="cmtHeaderName">Comments</span>
+          <button id="cmtCloseBtn" style="position:absolute;right:12px;top:10px;background:none;border:none;color:#fff;font-size:22px;cursor:pointer">×</button>
+        </div>
+        <div id="cmtList" class="cmtList"></div>
+        <div class="cmtInputArea">
+          <div id="replyTag" class="replyTag" style="display:none"><span id="replyTagName"></span><button id="replyTagCancel" style="background:none;border:none;color:#fff;cursor:pointer">×</button></div>
+          <div class="cmtBox">
+            <div class="cmtAvatar" style="width:32px;height:32px;flex-shrink:0">😊</div>
+            <input id="commentInput" type="text" placeholder="Add a comment..." autocomplete="off" />
+            <button class="pixoro-c-send-arrow" onclick="addComment()">${ICON_SEND}</button>
+          </div>
+        </div>
+      </div>
+      <div id="cmtOptionModal">
+        <div id="cmtOptBox"><div id="cmtOptContent"></div></div>
+      </div>
+    `;
+    inputEl = modal.querySelector("#commentInput");
+    sendBtnEl = modal.querySelector(".pixoro-c-send-arrow");
+    listEl = modal.querySelector("#cmtList");
+    if (inputEl) {
+      inputEl.addEventListener("input", updateSendState);
+      inputEl.addEventListener("keyup", updateSendState);
+      inputEl.addEventListener("keydown", (e) => { if (e.key === "Enter") addComment(); });
+    }
+    modal.querySelector("#cmtCloseBtn")?.addEventListener("click", closeCommentModal);
+    modal.querySelector("#replyTagCancel")?.addEventListener("click", () => setReplyTo(null));
+    modal.addEventListener("click", (e) => { if (e.target === modal) closeCommentModal(); });
+    modal.querySelector("#cmtOptionModal")?.addEventListener("click", (e) => { if (e.target.id === "cmtOptionModal") closeCommentOptions(); });
+    listEl?.addEventListener("click", (e) => {
+      const likeBtn = e.target.closest("[data-like]");
+      if (likeBtn) { e.stopPropagation(); toggleCommentLike(likeBtn.dataset.like, likeBtn); return; }
+      const replyBtn = e.target.closest("[data-reply]");
+      if (replyBtn) {
+        const c = commentsCache.find((x) => String(x.id) === String(replyBtn.dataset.reply));
+        if (c) focusReply(c);
+        return;
+      }
+      const delBtn = e.target.closest("[data-delete]");
+      if (delBtn) { deleteComment(delBtn.dataset.delete); return; }
+      const row = e.target.closest(".cmtRow");
+      if (row) openCommentOptions(row.dataset.commentId, row.dataset.userId);
+    });
+    modal.querySelector("#cmtOptContent")?.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-opt]");
+      if (b) handleOption(b.dataset.opt);
+    });
+    updateSendState();
+  }
+
+  function bindOpenButtons() {
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-comment-btn], .comment-btn, .cmt-open, [data-open-comments]");
+      if (!btn) return;
+      const post = btn.closest("article.post[data-post-id], .post[data-post-id]");
+      const postId = post?.dataset?.postId || post?.dataset?.id || btn.dataset?.postId || "";
+      if (!postId) return;
+      e.preventDefault();
+      e.stopPropagation();
+      openCommentModal(postId);
+    });
+  }
+
+  window.openCommentModal = openCommentModal;
+  window.closeCommentModal = closeCommentModal;
+  window.addComment = addComment;
+  window.pixoroFocusReply = focusReply;
+  window.pixoroSetReplyTo = setReplyTo;
+  window.pixoroCloseComments = closeCommentModal;
+  window.pixoroOpenComments = openCommentModal;
+
+  function startComments() {
+    layout();
+    bindOpenButtons();
+  }
+
+  window.addEventListener("pixoro-feed-rendered", () => { setTimeout(layout, 100); });
+  window.addEventListener("pixoro-supa-ready", () => { setTimeout(layout, 100); });
+  window.addEventListener("pixoro:login", () => { setTimeout(layout, 100); });
+  window.addEventListener("pixoro:logout", () => { closeCommentModal(); });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startComments, { once: true });
+  } else {
+    startComments();
+  }
+
+  layout();
+  console.log("PIXORO COMMENTS V38 READY 💬");
+
+  /* ===== ✅ ADD MATTUM DA - Pazhaya v38 Thodala da - SEND = WHITE OUTLINE MATTUM DA - CORRECT ADD DA ===== */
+  (function pixoroSendWhiteADD(){
+    var WHITE_SEND = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+    function addStyle(){
+      if(document.getElementById("pixoro-send-white-add")) return;
+      var st = document.createElement("style");
+      st.id = "pixoro-send-white-add";
+      st.textContent = `
+        .pixoro-c-send-arrow{ background:none!important; background-color:transparent!important; border:none!important; box-shadow:none!important; }
+        .pixoro-c-send-arrow svg, .pixoro-c-send-arrow svg *{ fill:none!important; stroke:#fff!important; }
+      `;
+      document.head.appendChild(st);
+    }
+    function fix(){
+      addStyle();
+      document.querySelectorAll(".pixoro-c-send-arrow").forEach(function(btn){
+        if(btn.innerHTML.indexOf("#0095f6") !== -1 || !btn.dataset.pixoroWhite){
+          btn.dataset.pixoroWhite = "1";
+          btn.innerHTML = WHITE_SEND;
+        }
+      });
+    }
+    var obs = new MutationObserver(fix);
+    obs.observe(document.documentElement, { childList:true, subtree:true });
+    if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", fix);
+    else fix();
+  })();
+})();
