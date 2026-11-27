@@ -1,5 +1,5 @@
-// ===== PIXORO COMMENT - v23 - js/comments.js la Podu da =====
-// v22 + avatar_url Fix da - Pazhaya Code Appadiye da - Insert Mattum Fix da
+// ===== PIXORO COMMENT - v24 - js/comments.js la Podu da =====
+// v23 + uuid = text Fix da - Pazhaya Code Appadiye da - Insert Mattum Fix da
 
 const PIXORO_COMMENT_EMOJIS = ["❤️","🙌","🔥","👏","😍","😮","😂","💯"];
 const PIXORO_ICON_EMOJI = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`;
@@ -172,7 +172,7 @@ async function loadComments(postId){
   if(!postId || postId === 'undefined') return;
   try{
     let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
-    let {data, error} = await s.from('comments').select('*').eq('post_id',postId).order('created_at',{ascending:true});
+    let {data, error} = await s.from('comments').select('*').eq('post_id', String(postId)).order('created_at',{ascending:true});
     if(error) return;
     let box = document.getElementById('commentList'); if(!box) return;
     if(box.querySelector('.pixoro-c-optimistic')) return;
@@ -220,11 +220,12 @@ function pixoroSendComment(){
         if(!session){ alert('Login Illa da'); return; }
         uid = session.user.id; window.ME_ID = uid;
       }
-      // ✅ v23 FIX - avatar_url / username Anuppa Maatten da - Table la Illa da - text Mattum Anuppuven da
-      let {error} = await s.from('comments').insert({ post_id: postId, user_id: uid, text: txt });
+      // ✅ v24 FIX - Rendum String ah Tha Anuppuven da - uuid = text Error Vara Koodathu da
+      let pidStr = String(postId);
+      let uidStr = String(uid);
+      let {error} = await s.from('comments').insert({ post_id: pidStr, user_id: uidStr, text: txt });
       if(error){
-        // ✅ text Fail Aana - content la Try Pannu da
-        let r2 = await s.from('comments').insert({ post_id: postId, user_id: uid, content: txt });
+        let r2 = await s.from('comments').insert({ post_id: pidStr, user_id: uidStr, content: txt });
         error = r2.error;
       }
       if(error) throw error;
@@ -240,7 +241,7 @@ function pixoroSendComment(){
 async function deleteComment(commentId, postId){
   if(!confirm('Delete pannatta da?')) return;
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
-  await s.from('comments').delete().eq('id',commentId).eq('user_id',window.ME_ID);
+  await s.from('comments').delete().eq('id',commentId).eq('user_id', String(window.ME_ID));
   loadComments(postId);
 }
 document.addEventListener('DOMContentLoaded', ()=>{
