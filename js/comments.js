@@ -1,9 +1,9 @@
-// ===== PIXORO COMMENT - v37 - js/comments.js la Podu da =====
-// v35 + Killa Type Box Clean da + Send Type Panna Mattum da + Like Perusa da
+// ===== PIXORO COMMENT - v38 - js/comments.js la Podu da =====
+// v37 + Send Button Chinna Outline da + Type Panna Mattum da + Heart 38px da
 
-const PIXORO_ICON_SEND = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`;
-const PIXORO_ICON_HEART_OUTLINE = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
-const PIXORO_ICON_HEART_FILL = `<svg width="28" height="28" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+const PIXORO_ICON_SEND = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0095f6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`;
+const PIXORO_ICON_HEART_OUTLINE = `<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+const PIXORO_ICON_HEART_FILL = `<svg width="38" height="38" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
 const PIXORO_ICON_REPLY = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7a5 5 0 0 1-5-5V7"/><path d="M3 7l4-4 4 4"/><path d="M9 17v-4a3 3 0 0 1 3-3h8"/></svg>`;
 const PIXORO_ICON_TRASH = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>`;
 
@@ -12,10 +12,7 @@ function pixoroCommentCSS(){
   const s = document.createElement("style");
   s.id = "pixoro-comment-style";
   s.textContent = `
-    #commentModal, #commentModal *, #commentModal *:before, #commentModal *:after{transition:none!important;}
-    #commentModal{position:fixed!important;inset:0!important;background:rgba(0,0,0,.6)!important;display:none;align-items:flex-end!important;justify-content:center!important;z-index:9999!important;}
-    #commentModal > div{position:absolute!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;background:#1c1c1e!important;border-radius:18px 18px 0 0!important;overflow:hidden!important;width:100%!important;height:92dvh!important;max-height:92dvh!important;display:flex!important;flex-direction:column!important;transform:none!important;touch-action:pan-y!important;}
-    #commentModal > div:before{content:"";width:36px;height:4px;background:#555;border-radius:99px;margin:8px auto 2px auto;flex-shrink:0;}
+    /* ✅ v38 - comment.css ku Adikkama - Modal Layout ah Thodala da - pixoro-c Mattum da */
     .pixoro-c-head{display:flex!important;align-items:center!important;justify-content:center!important;padding:6px 18px 4px 18px!important;}
     .pixoro-c-head h3{color:#fff!important;font-size:18px!important;font-weight:700!important;margin:0!important;}
     .pixoro-c-close{display:none!important;}
@@ -33,7 +30,9 @@ function pixoroCommentCSS(){
     #commentInput::placeholder{color:#888!important;}
     .pixoro-c-icon-btn{display:none!important;}
     .pixoro-c-send-btn{display:none!important;}
-    .pixoro-c-send-arrow{background:linear-gradient(135deg,#7B2FFF,#A855F7)!important;border:none!important;width:44px!important;height:44px!important;min-width:44px!important;border-radius:50%!important;display:none!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;flex-shrink:0!important;box-shadow:0 4px 16px rgba(123,47,255,.5)!important;touch-action:manipulation!important;pointer-events:auto!important;}
+    /* ✅ v38 - SEND BUTTON CHINNA OUTLINE DA - 44px Gradient -> 32px Outline da */
+    .pixoro-c-send-arrow{background:transparent!important;border:none!important;width:32px!important;height:32px!important;min-width:32px!important;border-radius:50%!important;display:none!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;flex-shrink:0!important;box-shadow:none!important;touch-action:manipulation!important;pointer-events:auto!important;padding:0!important;}
+    .pixoro-c-send-arrow svg{width:20px!important;height:20px!important;fill:none!important;stroke:#0095f6!important;}
     .pixoro-c-send-arrow:active{transform:scale(.92)!important;}
     .pixoro-c-ava{width:38px!important;height:38px!important;border-radius:50%!important;padding:1.5px!important;background:conic-gradient(from 180deg,#FF2D95,#FF9A00,#00E5FF,#7B2FFF,#FF2D95)!important;flex-shrink:0!important;display:flex!important;align-items:center!important;justify-content:center!important;}
     .pixoro-c-ava img{width:100%!important;height:100%!important;border-radius:50%!important;object-fit:cover!important;border:1.5px solid #1c1c1e!important;background:#222!important;}
@@ -43,7 +42,8 @@ function pixoroCommentCSS(){
     .pixoro-c-sub{color:#888;font-size:13px;margin-top:5px;display:flex;gap:12px;align-items:center;}
     .pixoro-c-sub span{background:none!important;color:#888!important;border:none!important;padding:0!important;border-radius:0!important;cursor:pointer;display:inline-flex;align-items:center;gap:4px;}
     .pixoro-c-sub span svg{stroke:#888!important;}
-    .pixoro-c-heart{cursor:pointer;line-height:1;text-align:center;user-select:none;display:flex;justify-content:center;background:none!important;border:none!important;padding:2px!important;margin-right:12px!important;transform:none!important;animation:none!important;}
+    .pixoro-c-heart{cursor:pointer;line-height:1;text-align:center;user-select:none;display:flex;justify-content:center;background:none!important;border:none!important;padding:2px!important;margin-right:12px!important;transform:none!important;animation:none!important;width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;}
+    .pixoro-c-heart svg{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;}
     .pixoro-c-heart:active{transform:scale(1.1)!important;}
     .pixoro-c-heart.liked svg, .pixoro-c-heart.liked svg path{fill:#FF2D95!important;stroke:#FF2D95!important;}
     .pixoro-c-heart-count{color:#fff;font-size:12px;text-align:center;margin-top:1px;margin-right:12px!important;}
