@@ -4,6 +4,7 @@
 // Comment panna -> Server la Save + Count Update aagum da
 //       Save = Server la mattum thaan da - LocalStorage Illa da
 // STYLE: Pixoro Comment + Pixoro Pink-Purple da
+// SPEED: Modal Fast Open da - Mella Varathu da
 
 const PIXORO_COMMENT_EMOJIS = ["❤️","🙌","🔥","👏","😢","😍","😮","😂"];
 
@@ -17,14 +18,17 @@ function pixoroCommentCSS(){
   const s = document.createElement("style");
   s.id = "pixoro-comment-style";
   s.textContent = `
-    #commentModal{background:rgba(0,0,0,.65)!important;align-items:flex-end!important;}
-    #commentModal > div{background:#121212!important;border-radius:22px 22px 0 0!important;overflow:hidden!important;position:relative!important;width:100%!important;max-height:88vh!important;display:flex!important;flex-direction:column!important;}
+    /* ✅ FAST MODAL da - Mella Varathu da */
+    #commentModal{position:fixed!important;inset:0!important;background:rgba(0,0,0,.65)!important;display:none;align-items:flex-end!important;justify-content:center!important;z-index:9999!important;animation:none!important;transition:none!important;}
+    #commentModal > div{background:#121212!important;border-radius:22px 22px 0 0!important;overflow:hidden!important;position:relative!important;width:100%!important;max-height:88vh!important;display:flex!important;flex-direction:column!important;animation:pixoroSlideUp .18s ease-out!important;will-change:transform!important;}
+    @keyframes pixoroSlideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
     #commentModal > div:before{content:"";height:4px;background:linear-gradient(90deg,#FF2D95,#FF5E8A,#C86BFF);display:block;flex-shrink:0;}
     #commentModal .pixoro-c-emoji-row{display:flex;gap:18px;overflow-x:auto;padding:12px 16px;border-top:1px solid #222;scrollbar-width:none;}
     #commentModal .pixoro-c-emoji-row::-webkit-scrollbar{display:none;}
     #commentModal .pixoro-c-emoji-row button{background:none;border:none;font-size:26px;cursor:pointer;flex-shrink:0;}
     #commentModal .pixoro-c-emoji-row button:active{transform:scale(1.4);}
-    #commentInput{border:1.5px solid #333!important;}
+    #commentInput{background:#1a1a1a!important;color:#fff!important;border:1.5px solid #333!important;}
+    #commentInput::placeholder{color:#888!important;}
     #commentInput:focus{border-color:#FF2D95!important;box-shadow:0 0 0 2px rgba(255,45,149,.25)!important;outline:none!important;}
     .pixoro-c-send-btn{background:linear-gradient(90deg,#FF2D95,#C86BFF)!important;color:#fff!important;border:none!important;font-weight:800!important;padding:10px 16px!important;border-radius:999px!important;cursor:pointer!important;}
     .pixoro-c-empty{padding:36px 20px;text-align:center;}
@@ -102,9 +106,9 @@ function openComment(id){
   pixoroCommentEmojiRow();
   pixoroCommentIcons();
   let m = document.getElementById('commentModal');
+  // ✅ FAST da - Muthalla Modal ah Kaamichidu da - Apuram Comment Load pannu da - 100ms Delay Illa da
   if(m) m.style.display = 'flex';
   loadComments(id);
-  setTimeout(()=>{ let i=document.getElementById('commentInput'); if(i) i.focus(); }, 100);
 }
 function closeComment(){
   let m = document.getElementById('commentModal');
