@@ -1,8 +1,9 @@
 /* =====================================================
-   PIXORO FEED V1043 - FULL CORRECT CODE DA 🔥
+   PIXORO FEED V1044 - FULL CORRECT CODE DA 🔥
    DOUBLE TAP DELETE - LIKE ONLY IN like.js V67
    HEART 46px - SPEED 1000ms - LIKE=RED / UNLIKE=WHITE
    + COMMENT LIKE GUARD REMOVE DA - like.js V72 Tha Paakkum da - feed.js Thodathu da
+   + v1044 CORRECT - setFeedMode Bug Fix + openComment display:flex Fix da
    ===================================================== */
 
 (function () {
@@ -254,7 +255,7 @@ async function loadPixoroFeed() {
   } finally { loading = false; }
 }
 
-/* COMMENTS - ✅ FIX ADD PANNEN DA - Pazhaya Code Ye Tha da - 3 Line Mattum Add da */
+/* COMMENTS - ✅ v1044 CORRECT - display:flex da - comment.css ku Match da */
 window.openComment = function(id) {
   window._CUR = id;
   window.CURRENT_COMMENT_POST = id;
@@ -262,7 +263,7 @@ window.openComment = function(id) {
   if (typeof window.openComments === "function") return window.openComments(id);
   if (typeof window.pixoroOpenCommentReal === "function") return window.pixoroOpenCommentReal(id);
   const modal = document.getElementById("commentModal");
-  if (modal) { modal.dataset.postId = id; modal.style.display = "block"; }
+  if (modal) { modal.dataset.postId = id; modal.style.display = "flex"; }
   if (typeof window.loadComments === "function") window.loadComments(id);
 };
 window.closeComment = function() {
@@ -308,12 +309,12 @@ window.savePostFeed = async function(id, btn) {
   } catch (e) { console.error("SAVE ERROR:", e); }
 };
 
-/* FEED TABS */
+/* FEED TABS - ✅ v1044 CORRECT - tabIds[mode] da - Pazhaya la tabIds Full Object ah Potten da */
 window.setFeedMode = function(mode) {
   window.PIXORO_FEED_MODE = mode || "foryou";
   document.querySelectorAll(".feedTab").forEach(tab => tab.classList.remove("active"));
   const tabIds = { foryou: "tabForYou", following: "tabFollowing", latest: "tabLatest" };
-  const active = document.getElementById(tabIds || "tabForYou");
+  const active = document.getElementById(tabIds[mode] || "tabForYou");
   if (active) active.classList.add("active");
   loadPixoroFeed();
 };
