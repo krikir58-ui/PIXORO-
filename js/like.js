@@ -271,7 +271,7 @@
   window.pixoroShowHeartDance = showBigHeart;
   window.showBigHeart = showBigHeart;
 
-  /* ✅ CORRECTED DA - UNLIKE HEART - LIKE BUTTON PAKKATHULA THAAN DA - CENTER LA ILLA DA */
+  /* ✅ CORRECTED DA - Class ah Maathiten da - pixoro-big-heart Illa da - pixoro-unlike-heart da */
   function showUnlikeHeart(button) {
     if (!button) return;
     const rect = button.getBoundingClientRect();
@@ -279,9 +279,9 @@
     const x = rect.left + rect.width / 2;
     const y = rect.top - 10;
     const heart = document.createElement("div");
-    heart.className = "pixoro-big-heart";
-    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${x}px;top:${y}px;width:28px;height:28px;transform:translate(-50%,-50%) scale(1);opacity:1;`;
-    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 8px 18px rgba(255,45,149,.6))"><path fill="#FF2D95" stroke="#FFFFFF" stroke-width=".6" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+    heart.className = "pixoro-unlike-heart";
+    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${x}px;top:${y}px;width:28px!important;height:28px!important;transform:translate(-50%,-50%) scale(1);opacity:1;`;
+    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:28px!important;height:28px!important;filter:drop-shadow(0 8px 18px rgba(255,45,149,.6))"><path fill="#FF2D95" stroke="#FFFFFF" stroke-width=".6" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
     document.body.appendChild(heart);
     const anim = heart.animate([
       { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
@@ -719,6 +719,21 @@
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
+      }
+
+      /* ✅ CORRECTED DA - Unlike Heart ku Thaniya CSS da - 110px Rule Pudikkaathu da */
+      .pixoro-unlike-heart {
+        width: 28px !important;
+        height: 28px !important;
+        pointer-events: none !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      .pixoro-unlike-heart svg {
+        width: 28px !important;
+        height: 28px !important;
       }
 
       [data-like-count],
