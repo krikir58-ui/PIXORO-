@@ -182,7 +182,6 @@
 
   /* ✅ MASS DESIGN DA - Kutti Heart + MASS DA Dialogue Suthi Varum da */
   function showMiniHearts(px, py) {
-    // 1. Kutti Heart - Clockwise Suthi Varum da
     const mini = document.createElement("div");
     mini.className = "pixoro-mini-heart";
     mini.style.cssText = `position:fixed;z-index:999998;pointer-events:none;left:${px}px;top:${py}px;width:22px!important;height:22px!important;transform:translate(-50%,-50%) scale(1);opacity:1;`;
@@ -205,7 +204,6 @@
     ], { duration: 1100, easing: "ease-in-out", fill: "forwards" });
     anim1.onfinish = () => mini.remove();
 
-    // 2. MASS DA Dialogue - Anti-Clockwise Suthi Varum da
     const dlg = document.createElement("div");
     dlg.className = "pixoro-mass-dialogue";
     dlg.textContent = "MASS DA 🔥";
@@ -228,7 +226,7 @@
     anim2.onfinish = () => dlg.remove();
   }
 
-  /* POP HEART */
+  /* POP HEART - ✅ Chinna Thudippu Mattum da */
 
   function showBigHeart(media, x, y) {
     if (!media) return;
@@ -286,26 +284,36 @@
 
     const anim = heart.animate([
       {
-        transform: "translate(-50%,-50%) scale(0)",
+        transform: "translate(-50%,-50%) scale(0.85)",
         opacity: 0
       },
       {
-        transform: "translate(-50%,-50%) scale(1.4)",
+        transform: "translate(-50%,-50%) scale(1.12)",
         opacity: 1,
         offset: .18
       },
       {
         transform: "translate(-50%,-50%) scale(1)",
         opacity: 1,
-        offset: .42
+        offset: .32
       },
       {
-        transform: "translate(-50%,-65%) scale(1.05)",
+        transform: "translate(-50%,-50%) scale(1.08)",
         opacity: 1,
-        offset: .70
+        offset: .45
       },
       {
-        transform: "translate(-50%,-120%) scale(.8)",
+        transform: "translate(-50%,-50%) scale(1)",
+        opacity: 1,
+        offset: .58
+      },
+      {
+        transform: "translate(-50%,-65%) scale(1.02)",
+        opacity: 1,
+        offset: .75
+      },
+      {
+        transform: "translate(-50%,-120%) scale(.95)",
         opacity: 0
       }
     ], {
