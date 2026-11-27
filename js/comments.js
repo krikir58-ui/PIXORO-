@@ -1,15 +1,15 @@
-// ===== PIXORO COMMENT - v32 - js/comments.js la Podu da =====
-// v31 + Small Size + Reply/Delete Normal + X Remove + Swipe Down Close da
+// ===== PIXORO COMMENT - v34 - js/comments.js la Podu da =====
+// v32 + Koncham Perusa da - Romba Perusa Illa da
 
 const PIXORO_COMMENT_EMOJIS = ["❤️","🙌","🔥","👏","😍","😮","😂","💯"];
-const PIXORO_ICON_EMOJI = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`;
-const PIXORO_ICON_GIF = `<svg width="22" height="20" viewBox="0 0 30 26" fill="none" stroke="#fff" stroke-width="1.8"><rect x="1" y="3" width="28" height="20" rx="5"/><text x="15" y="17" text-anchor="middle" font-size="10" font-weight="800" fill="#fff" stroke="none" font-family="system-ui">GIF</text></svg>`;
-const PIXORO_ICON_STICKER = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 2.4 3.4-.5.5 3.4L21 10l-1.5 2.5 1 3.3-3 1.5L16 20l-2.5-1.2L11 20l-1.5-2.7-3-1.5 1-3.3L6 10l2.7-2.7.5-3.4 3.4.5L12 2z"/><circle cx="12" cy="12" r="3"/></svg>`;
-const PIXORO_ICON_SEND = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`;
-const PIXORO_ICON_HEART_OUTLINE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
-const PIXORO_ICON_HEART_FILL = `<svg width="16" height="16" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
-const PIXORO_ICON_REPLY = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7a5 5 0 0 1-5-5V7"/><path d="M3 7l4-4 4 4"/><path d="M9 17v-4a3 3 0 0 1 3-3h8"/></svg>`;
-const PIXORO_ICON_TRASH = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>`;
+const PIXORO_ICON_EMOJI = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`;
+const PIXORO_ICON_GIF = `<svg width="24" height="22" viewBox="0 0 30 26" fill="none" stroke="#fff" stroke-width="1.8"><rect x="1" y="3" width="28" height="20" rx="5"/><text x="15" y="17" text-anchor="middle" font-size="10" font-weight="800" fill="#fff" stroke="none" font-family="system-ui">GIF</text></svg>`;
+const PIXORO_ICON_STICKER = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 2.4 3.4-.5.5 3.4L21 10l-1.5 2.5 1 3.3-3 1.5L16 20l-2.5-1.2L11 20l-1.5-2.7-3-1.5 1-3.3L6 10l2.7-2.7.5-3.4 3.4.5L12 2z"/><circle cx="12" cy="12" r="3"/></svg>`;
+const PIXORO_ICON_SEND = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`;
+const PIXORO_ICON_HEART_OUTLINE = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+const PIXORO_ICON_HEART_FILL = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+const PIXORO_ICON_REPLY = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7a5 5 0 0 1-5-5V7"/><path d="M3 7l4-4 4 4"/><path d="M9 17v-4a3 3 0 0 1 3-3h8"/></svg>`;
+const PIXORO_ICON_TRASH = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>`;
 
 function pixoroCommentCSS(){
   if(document.getElementById("pixoro-comment-style")) return;
@@ -21,38 +21,38 @@ function pixoroCommentCSS(){
     #commentModal > div{position:absolute!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;background:#1c1c1e!important;border-radius:18px 18px 0 0!important;overflow:hidden!important;width:100%!important;height:92dvh!important;max-height:92dvh!important;display:flex!important;flex-direction:column!important;transform:none!important;touch-action:pan-y!important;}
     #commentModal > div:before{content:"";width:36px;height:4px;background:#555;border-radius:99px;margin:8px auto 2px auto;flex-shrink:0;}
     .pixoro-c-head{display:flex!important;align-items:center!important;justify-content:center!important;padding:6px 18px 4px 18px!important;}
-    .pixoro-c-head h3{color:#fff!important;font-size:16px!important;font-weight:700!important;margin:0!important;}
+    .pixoro-c-head h3{color:#fff!important;font-size:18px!important;font-weight:700!important;margin:0!important;}
     .pixoro-c-close{display:none!important;}
     .pixoro-c-old-hide{display:none!important;}
-    #commentList{flex:1!important;overflow-y:auto!important;padding:2px 14px!important;display:block!important;}
+    #commentList{flex:1!important;overflow-y:auto!important;padding:4px 14px!important;display:block!important;}
     .pixoro-c-empty{padding:24px 20px;text-align:center;}
-    .pixoro-c-empty-heart{font-size:30px;}
+    .pixoro-c-empty-heart{font-size:32px;}
     .pixoro-c-optimistic{opacity:.7;}
     .pixoro-c-bottom{border-top:1px solid #333;padding:8px 12px 12px 12px;background:#1c1c1e;flex-shrink:0;}
-    #commentModal .pixoro-c-emoji-row{display:flex;gap:16px;overflow-x:auto;padding:2px 4px 8px 4px;scrollbar-width:none;}
+    #commentModal .pixoro-c-emoji-row{display:flex;gap:18px;overflow-x:auto;padding:2px 4px 8px 4px;scrollbar-width:none;}
     #commentModal .pixoro-c-emoji-row::-webkit-scrollbar{display:none;}
-    #commentModal .pixoro-c-emoji-row button{background:none;border:none;font-size:22px;cursor:pointer;flex-shrink:0;line-height:1;}
+    #commentModal .pixoro-c-emoji-row button{background:none;border:none;font-size:24px;cursor:pointer;flex-shrink:0;line-height:1;}
     .pixoro-c-bottom-input{display:flex;align-items:center;gap:8px;}
-    .pixoro-c-pill{display:flex;align-items:center;gap:6px;flex:1;background:#2a2a2e;border:1px solid #3a3a3e;border-radius:999px;padding:4px 4px 4px 10px;min-width:0;}
-    #commentInput{background:transparent!important;color:#fff!important;border:none!important;flex:1!important;min-width:0!important;padding:6px 0!important;font-size:13px!important;outline:none!important;box-shadow:none!important;}
+    .pixoro-c-pill{display:flex;align-items:center;gap:6px;flex:1;background:#2a2a2e;border:1px solid #3a3a3e;border-radius:999px;padding:5px 5px 5px 10px;min-width:0;}
+    #commentInput{background:transparent!important;color:#fff!important;border:none!important;flex:1!important;min-width:0!important;padding:7px 0!important;font-size:14px!important;outline:none!important;box-shadow:none!important;}
     #commentInput::placeholder{color:#888!important;}
     .pixoro-c-icon-btn{background:none!important;border:none!important;cursor:pointer!important;padding:4px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0!important;}
     .pixoro-c-send-btn{display:none!important;}
-    .pixoro-c-send-arrow{background:linear-gradient(135deg,#7B2FFF,#A855F7)!important;border:none!important;width:40px!important;height:40px!important;min-width:40px!important;border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;flex-shrink:0!important;box-shadow:0 4px 16px rgba(123,47,255,.5)!important;touch-action:manipulation!important;pointer-events:auto!important;}
+    .pixoro-c-send-arrow{background:linear-gradient(135deg,#7B2FFF,#A855F7)!important;border:none!important;width:44px!important;height:44px!important;min-width:44px!important;border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;flex-shrink:0!important;box-shadow:0 4px 16px rgba(123,47,255,.5)!important;touch-action:manipulation!important;pointer-events:auto!important;}
     .pixoro-c-send-arrow:active{transform:scale(.92)!important;}
-    .pixoro-c-ava{width:32px!important;height:32px!important;border-radius:50%!important;padding:1.5px!important;background:conic-gradient(from 180deg,#FF2D95,#FF9A00,#00E5FF,#7B2FFF,#FF2D95)!important;flex-shrink:0!important;display:flex!important;align-items:center!important;justify-content:center!important;}
+    .pixoro-c-ava{width:38px!important;height:38px!important;border-radius:50%!important;padding:1.5px!important;background:conic-gradient(from 180deg,#FF2D95,#FF9A00,#00E5FF,#7B2FFF,#FF2D95)!important;flex-shrink:0!important;display:flex!important;align-items:center!important;justify-content:center!important;}
     .pixoro-c-ava img{width:100%!important;height:100%!important;border-radius:50%!important;object-fit:cover!important;border:1.5px solid #1c1c1e!important;background:#222!important;}
-    .pixoro-c-user{color:#fff;font-weight:700;font-size:13px;}
-    .pixoro-c-time{color:#888;font-weight:400;font-size:11px;margin-left:6px;}
-    .pixoro-c-text{color:#fff;font-size:13px;line-height:1.4;margin-top:1px;}
-    .pixoro-c-sub{color:#888;font-size:12px;margin-top:4px;display:flex;gap:12px;align-items:center;}
+    .pixoro-c-user{color:#fff;font-weight:700;font-size:14px;}
+    .pixoro-c-time{color:#888;font-weight:400;font-size:12px;margin-left:6px;}
+    .pixoro-c-text{color:#fff;font-size:14px;line-height:1.4;margin-top:1px;}
+    .pixoro-c-sub{color:#888;font-size:13px;margin-top:5px;display:flex;gap:12px;align-items:center;}
     .pixoro-c-sub span{background:none!important;color:#888!important;border:none!important;padding:0!important;border-radius:0!important;cursor:pointer;display:inline-flex;align-items:center;gap:4px;}
     .pixoro-c-sub span svg{stroke:#888!important;}
     .pixoro-c-heart{cursor:pointer;line-height:1;text-align:center;user-select:none;display:flex;justify-content:center;background:none!important;border:none!important;padding:2px!important;transform:none!important;animation:none!important;}
     .pixoro-c-heart:active{transform:scale(1.1)!important;}
     .pixoro-c-heart.liked svg, .pixoro-c-heart.liked svg path{fill:#FF2D95!important;stroke:#FF2D95!important;}
-    .pixoro-c-heart-count{color:#fff;font-size:11px;text-align:center;margin-top:1px;}
-    .pixoro-c-reply-tag{color:#FF2D95;font-size:11px;margin-bottom:1px;}
+    .pixoro-c-heart-count{color:#fff;font-size:12px;text-align:center;margin-top:1px;}
+    .pixoro-c-reply-tag{color:#FF2D95;font-size:12px;margin-bottom:1px;}
   `;
   document.head.appendChild(s);
 }
@@ -211,10 +211,10 @@ function pixoroCommentRow(c, postId, isOptimistic){
   let likeCount = c.likes_count || 0;
   let replyToName = String(c.reply_to || 'user').replace(/^@+/,'');
   let replyTag = c.parent_id ? `<div class="pixoro-c-reply-tag">Replying to ${escHtml(replyToName)}</div>` : '';
-  return `<div class="pixoro-c-item ${isOptimistic?'pixoro-c-optimistic':''}" data-temp="${c._temp||''}" data-cid="${c.id}" style="display:flex;gap:10px;padding:8px 0;align-items:flex-start">
+  return `<div class="pixoro-c-item ${isOptimistic?'pixoro-c-optimistic':''}" data-temp="${c._temp||''}" data-cid="${c.id}" style="display:flex;gap:10px;padding:9px 0;align-items:flex-start">
     <div class="pixoro-c-ava"><img src="${ava}" onerror="this.src='https://ui-avatars.com/api/?name=U&background=222&color=fff'"></div>
     <div style="flex:1;min-width:0"><div><span class="pixoro-c-user">${escHtml(uname)}</span><span class="pixoro-c-time">${isOptimistic?'now':pixoroTimeAgo(c.created_at)}</span></div>${replyTag}<div class="pixoro-c-text">${escHtml(c.text||c.content||'')}</div><div class="pixoro-c-sub"><span data-reply="${c.id}" data-uname="${escHtml(uname)}">${PIXORO_ICON_REPLY} Reply</span>${delBtn} ${isOptimistic?'<span style="color:#FF2D95">• Sending...</span>':''}</div></div>
-    <div><button type="button" class="pixoro-c-heart ${liked?'liked':''}" data-like="${c.id}" onclick="pixoroToggleCommentLike('${c.id}', this); return false;">${liked?PIXORO_ICON_HEART_FILL:PIXORO_ICON_HEART_OUTLINE}</button><div class="pixoro-c-heart-count">${likeCount||''}</div></div>
+    <div><button type="button" class="pixoro-c-heart ${liked?'liked':''}" data-comment-like="${c.id}" onclick="pixoroToggleCommentLike('${c.id}', this); return false;">${liked?PIXORO_ICON_HEART_FILL:PIXORO_ICON_HEART_OUTLINE}</button><div class="pixoro-c-heart-count">${likeCount||''}</div></div>
   </div>`;
 }
 function pixoroReplyComment(cid, username){
@@ -223,7 +223,7 @@ function pixoroReplyComment(cid, username){
   if(inp){ inp.value = '@' + username + ' '; inp.focus(); inp.placeholder = 'Replying to ' + username + '...'; }
 }
 async function pixoroToggleCommentLike(cid, el){
-  if(!el) el = document.querySelector(`[data-like="${cid}"]`);
+  if(!el) el = document.querySelector(`[data-comment-like="${cid}"]`);
   if(!el) return;
   try{ if(window.event){ window.event.stopPropagation(); window.event.preventDefault(); } }catch(e){}
   let liked = pixoroLiked.has(String(cid));
@@ -246,8 +246,8 @@ async function pixoroToggleCommentLike(cid, el){
   }catch(e){ console.log('COMMENT LIKE FAIL:', e.message); }
 }
 document.addEventListener('click', (e)=>{
-  let likeEl = e.target.closest('[data-like]');
-  if(likeEl){ e.preventDefault(); e.stopPropagation(); pixoroToggleCommentLike(likeEl.dataset.like, likeEl); return; }
+  let likeEl = e.target.closest('[data-comment-like]');
+  if(likeEl){ e.preventDefault(); e.stopPropagation(); pixoroToggleCommentLike(likeEl.dataset.commentLike, likeEl); return; }
   let replyEl = e.target.closest('[data-reply]');
   if(replyEl){ pixoroReplyComment(replyEl.dataset.reply, replyEl.dataset.uname); return; }
   let delEl = e.target.closest('[data-del]');
@@ -272,7 +272,7 @@ async function loadComments(postId){
     let box = document.getElementById('commentList'); if(!box) return;
     if(box.querySelector('.pixoro-c-optimistic')) return;
     box.innerHTML = (data||[]).map(c=>pixoroCommentRow(c, postId, false)).join('');
-    if(!box.innerHTML.trim()) box.innerHTML = '<div class="pixoro-c-empty"><div class="pixoro-c-empty-heart">❤️</div><div style="color:#fff;font-size:18px;font-weight:700;margin-top:8px">No comments yet</div><div style="color:#888;font-size:12px;margin-top:4px">Start the conversation.</div></div>';
+    if(!box.innerHTML.trim()) box.innerHTML = '<div class="pixoro-c-empty"><div class="pixoro-c-empty-heart">❤️</div><div style="color:#fff;font-size:19px;font-weight:700;margin-top:8px">No comments yet</div><div style="color:#888;font-size:13px;margin-top:4px">Start the conversation.</div></div>';
     let head = document.getElementById("pixoroCHead");
     if(head) head.innerText = `Comments`;
     let cc = document.querySelector(`[data-comment-count="${postId}"]`);
