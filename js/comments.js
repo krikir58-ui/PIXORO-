@@ -1,5 +1,5 @@
-// ===== PIXORO COMMENT - v29 - js/comments.js la Podu da =====
-// v28 + Reply/Delete Full Black + Comments (1) Remove da
+// ===== PIXORO COMMENT - v31 - js/comments.js la Podu da =====
+// v29 + Comment Like Rename Fix da - like.js kooda Modhaathu da
 
 const PIXORO_COMMENT_EMOJIS = ["❤️","🙌","🔥","👏","😍","😮","😂","💯"];
 const PIXORO_ICON_EMOJI = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`;
@@ -46,7 +46,6 @@ function pixoroCommentCSS(){
     .pixoro-c-time{color:#888;font-weight:400;font-size:14px;margin-left:8px;}
     .pixoro-c-text{color:#fff;font-size:16px;line-height:1.4;margin-top:2px;}
     .pixoro-c-sub{color:#fff;font-size:14px;margin-top:6px;display:flex;gap:14px;align-items:center;}
-    /* ✅ v29 - Reply / Delete Full Black da - Grey Illa da */
     .pixoro-c-sub span{background:#000!important;color:#fff!important;border:1px solid #000!important;padding:6px 12px!important;border-radius:999px!important;cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
     .pixoro-c-sub span svg{stroke:#fff!important;}
     .pixoro-c-heart{cursor:pointer;line-height:1;text-align:center;user-select:none;display:flex;justify-content:center;background:none!important;border:none!important;padding:4px!important;}
@@ -176,7 +175,6 @@ function pixoroCommentRow(c, postId, isOptimistic){
   let uname = String(c.username || prof.username || window.ME_RAW || 'user').replace(/^@+/,'');
   if(!c.username && !prof.username) uname = 'user';
   let ava = escHtml(window.pixoroGetAvatar ? window.pixoroGetAvatar(c) : (c.avatar_url || prof.avatar_url || ''));
-  // ✅ v29 - Reply / Delete Full Black Button da
   let delBtn = isMine && !isOptimistic ? `<span data-del="${c.id}" data-post="${postId}">${PIXORO_ICON_TRASH} Delete</span>` : '';
   let liked = pixoroLiked.has(String(c.id));
   let likeCount = c.likes_count || 0;
@@ -185,7 +183,7 @@ function pixoroCommentRow(c, postId, isOptimistic){
   return `<div class="pixoro-c-item ${isOptimistic?'pixoro-c-optimistic':''}" data-temp="${c._temp||''}" data-cid="${c.id}" style="display:flex;gap:12px;padding:12px 0;align-items:flex-start">
     <div class="pixoro-c-ava"><img src="${ava}" onerror="this.src='https://ui-avatars.com/api/?name=U&background=222&color=fff'"></div>
     <div style="flex:1;min-width:0"><div><span class="pixoro-c-user">${escHtml(uname)}</span><span class="pixoro-c-time">${isOptimistic?'now':pixoroTimeAgo(c.created_at)}</span></div>${replyTag}<div class="pixoro-c-text">${escHtml(c.text||c.content||'')}</div><div class="pixoro-c-sub"><span data-reply="${c.id}" data-uname="${escHtml(uname)}">${PIXORO_ICON_REPLY} Reply</span>${delBtn} ${isOptimistic?'<span style="color:#FF2D95">• Sending...</span>':''}</div></div>
-    <div><button type="button" class="pixoro-c-heart ${liked?'liked':''}" data-like="${c.id}">${liked?PIXORO_ICON_HEART_FILL:PIXORO_ICON_HEART_OUTLINE}</button><div class="pixoro-c-heart-count">${likeCount||''}</div></div>
+    <div><button type="button" class="pixoro-c-heart ${liked?'liked':''}" data-like="${c.id}" onclick="pixoroToggleCommentLike('${c.id}', this); return false;">${liked?PIXORO_ICON_HEART_FILL:PIXORO_ICON_HEART_OUTLINE}</button><div class="pixoro-c-heart-count">${likeCount||''}</div></div>
   </div>`;
 }
 function pixoroReplyComment(cid, username){
@@ -193,18 +191,19 @@ function pixoroReplyComment(cid, username){
   let inp = document.getElementById('commentInput');
   if(inp){ inp.value = '@' + username + ' '; inp.focus(); inp.placeholder = 'Replying to ' + username + '...'; }
 }
-async function pixoroToggleLike(cid, el){
+// ✅ v31 FIX - Peru Maathiten da - pixoroToggleLike Illa da - pixoroToggleCommentLike da - like.js kooda Modhaathu da
+async function pixoroToggleCommentLike(cid, el){
   if(!el) el = document.querySelector(`[data-like="${cid}"]`);
   if(!el) return;
-  if(window.event){ window.event.stopPropagation(); window.event.preventDefault(); }
+  try{ if(window.event){ window.event.stopPropagation(); window.event.preventDefault(); } }catch(e){}
   let liked = pixoroLiked.has(String(cid));
-  let countEl = el.parentElement.querySelector('.pixoro-c-heart-count');
+  let countEl = el.parentElement ? el.parentElement.querySelector('.pixoro-c-heart-count') : null;
   let cur = Number(countEl?.innerText||0);
   let newCount = liked ? Math.max(0, cur - 1) : cur + 1;
   if(liked){ pixoroLiked.delete(String(cid)); el.classList.remove('liked'); el.innerHTML = PIXORO_ICON_HEART_OUTLINE; }
   else{ pixoroLiked.add(String(cid)); el.classList.add('liked'); el.innerHTML = PIXORO_ICON_HEART_FILL; }
   if(countEl) countEl.innerText = newCount > 0 ? newCount : '';
-  localStorage.setItem('pixoroLiked', JSON.stringify([...pixoroLiked]));
+  try{ localStorage.setItem('pixoroLiked', JSON.stringify([...pixoroLiked])); }catch(e){}
   try{
     let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
     let uid = window.ME_ID;
@@ -214,11 +213,11 @@ async function pixoroToggleLike(cid, el){
     if(liked){ await s.from('comment_likes').delete().eq('comment_id', cidNum).eq('user_id', uid); }
     else{ let r = await s.from('comment_likes').insert({ comment_id: cidNum, user_id: uid }); if(r.error) throw r.error; }
     await s.from('comments').update({ likes_count: newCount }).eq('id', cidNum);
-  }catch(e){ console.log('LIKE FAIL:', e.message); }
+  }catch(e){ console.log('COMMENT LIKE FAIL:', e.message); }
 }
 document.addEventListener('click', (e)=>{
   let likeEl = e.target.closest('[data-like]');
-  if(likeEl){ e.preventDefault(); e.stopPropagation(); pixoroToggleLike(likeEl.dataset.like, likeEl); return; }
+  if(likeEl){ e.preventDefault(); e.stopPropagation(); pixoroToggleCommentLike(likeEl.dataset.like, likeEl); return; }
   let replyEl = e.target.closest('[data-reply]');
   if(replyEl){ pixoroReplyComment(replyEl.dataset.reply, replyEl.dataset.uname); return; }
   let delEl = e.target.closest('[data-del]');
@@ -244,7 +243,6 @@ async function loadComments(postId){
     if(box.querySelector('.pixoro-c-optimistic')) return;
     box.innerHTML = (data||[]).map(c=>pixoroCommentRow(c, postId, false)).join('');
     if(!box.innerHTML.trim()) box.innerHTML = '<div class="pixoro-c-empty"><div class="pixoro-c-empty-heart">❤️</div><div style="color:#fff;font-size:22px;font-weight:700;margin-top:10px">No comments yet</div><div style="color:#888;font-size:14px;margin-top:6px">Start the conversation.</div></div>';
-    // ✅ v29 - Mela Irukka Comments (1) Remove da - Comments Mattum da
     let head = document.getElementById("pixoroCHead");
     if(head) head.innerText = `Comments`;
     let cc = document.querySelector(`[data-comment-count="${postId}"]`);
@@ -273,7 +271,6 @@ function pixoroSendComment(){
     if(box.querySelector('.pixoro-c-empty')) box.innerHTML = '';
     box.insertAdjacentHTML('beforeend', pixoroCommentRow({ _temp: tempId, user_id: window.ME_ID||'me', username: myName, avatar_url: myAva, text: txt, created_at: new Date().toISOString(), parent_id: replyInfo?.id||null, reply_to: replyInfo?.username||'' }, postId, true));
     box.scrollTop = box.scrollHeight;
-    // ✅ v29 - Send Panna Kooda (1) Vara Koodathu da
     let head = document.getElementById("pixoroCHead");
     if(head) head.innerText = `Comments`;
   }
@@ -338,6 +335,7 @@ window.addComment = pixoroSendComment;
 window.pixoroOpenCommentReal = pixoroOpenCommentReal;
 window.loadComments = loadComments;
 window.deleteComment = deleteComment;
-window.pixoroToggleLike = pixoroToggleLike;
+// ✅ v31 - Pudhu Peru Mattum da - Pazhaya Peru Illa da
+window.pixoroToggleCommentLike = pixoroToggleCommentLike;
 window.pixoroReplyComment = pixoroReplyComment;
 window.escHtml = escHtml;
