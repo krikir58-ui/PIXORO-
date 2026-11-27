@@ -180,6 +180,34 @@
     });
   }
 
+  /* ✅ Orey Oru Kutti Heart da - Periya Heart ah Suthi Varum da */
+  function showMiniHearts(px, py) {
+    const size = 22;
+    const radius = 62;
+
+    const mini = document.createElement("div");
+    mini.className = "pixoro-mini-heart";
+    mini.style.cssText = `position:fixed;z-index:999998;pointer-events:none;left:${px}px;top:${py}px;width:${size}px!important;height:${size}px!important;transform:translate(-50%,-50%) scale(1);opacity:1;`;
+    mini.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 4px 10px rgba(255,45,149,.6))"><path fill="#FF2D95" stroke="#FFFFFF" stroke-width=".6" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+    document.body.appendChild(mini);
+
+    const at = (deg) => {
+      const r = deg * Math.PI / 180;
+      return `translate(calc(-50% + ${Math.cos(r) * radius}px), calc(-50% + ${Math.sin(r) * radius}px)) scale(1)`;
+    };
+
+    const anim = mini.animate([
+      { transform: at(-90), opacity: 0 },
+      { transform: at(-90), opacity: 1, offset: .1 },
+      { transform: at(0), opacity: 1, offset: .3 },
+      { transform: at(90), opacity: 1, offset: .55 },
+      { transform: at(180), opacity: 1, offset: .8 },
+      { transform: at(270), opacity: 0.6, offset: .95 },
+      { transform: at(270), opacity: 0 }
+    ], { duration: 1100, easing: "ease-in-out", fill: "forwards" });
+    anim.onfinish = () => mini.remove();
+  }
+
   /* POP HEART */
 
   function showBigHeart(media, x, y) {
@@ -234,6 +262,7 @@
     `;
 
     document.body.appendChild(heart);
+    showMiniHearts(px, py);
 
     const anim = heart.animate([
       {
@@ -717,6 +746,13 @@
       }
 
       .pixoro-big-heart {
+        pointer-events: none !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      .pixoro-mini-heart {
         pointer-events: none !important;
         background: transparent !important;
         border: none !important;
