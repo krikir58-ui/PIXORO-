@@ -1,16 +1,16 @@
 
 /* =====================================================
-   PIXORO LIKE V69 - SERVER SYNC FINAL
-   LIKE BUTTON = LIKE / UNLIKE
-   PHOTO DOUBLE TAP = POP HEART + LIKE
-   SUPABASE = PERMANENT SERVER SAVE
+   PIXORO LIKE V70
+   LIKE BUTTON  = LIKE / UNLIKE
+   PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
+   SUPABASE = SERVER SAVE
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V69) return;
-  window.PIXORO_LIKE_V69 = true;
+  if (window.PIXORO_LIKE_V70) return;
+  window.PIXORO_LIKE_V70 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
@@ -22,6 +22,8 @@
 
   let suppressMediaClickUntil = 0;
   let heartId = 0;
+  let syncRunning = false;
+  let syncAgain = false;
 
   function getSupa() {
     return window.getSupa?.() ||
@@ -31,8 +33,6 @@
   }
 
   async function getUserId() {
-    if (window.ME_ID) return String(window.ME_ID);
-
     const supa = getSupa();
     if (!supa) return null;
 
@@ -41,8 +41,7 @@
       if (error) throw error;
 
       const id = data?.session?.user?.id || null;
-      if (id) window.ME_ID = id;
-
+      window.ME_ID = id;
       return id;
     } catch (error) {
       console.error("PIXORO AUTH:", error);
@@ -61,7 +60,10 @@
     window.FEED_COUNTS = JSON.parse(
       localStorage.getItem("pixoro_counts") || "{}"
     );
-  } catch (error) {}
+  } catch (error) {
+    window.FEED_LIKES = new Set();
+    window.FEED_COUNTS = {};
+  }
 
   function saveLocal() {
     try {
@@ -77,23 +79,33 @@
     } catch (error) {}
   }
 
+  /* ARTICLE ONLY - FIXED */
+
   function getPost(element) {
-    return element?.closest("[data-post-id]");
+    return element?.closest(
+      "article.post[data-post-id], .post[data-post-id]"
+    ) || null;
   }
 
   function getPostId(element) {
     const post = getPost(element);
 
     return String(
-      element?.dataset?.postId ||
       post?.dataset?.postId ||
       post?.dataset?.id ||
+      element?.dataset?.postId ||
       ""
     );
   }
 
   function getLikeButton(post) {
-    return post?.querySelector(
+    if (!post) return null;
+
+    if (post.matches?.(
+      "[data-like-btn], .like-btn, .like-button"
+    )) return post;
+
+    return post.querySelector(
       "[data-like-btn], .like-btn, .like-button"
     );
   }
@@ -101,7 +113,7 @@
   function getLikeCount(post) {
     return post?.querySelector(
       "[data-like-count], .like-count, .likes-count, [data-count='likes'], .rCount"
-    );
+    ) || null;
   }
 
   function findMedia(element) {
@@ -109,6 +121,8 @@
       ".postMedia, .post-media, .post-media-wrap"
     ) || null;
   }
+
+  /* UI */
 
   function paintLike(post, liked) {
     const button = getLikeButton(post);
@@ -150,8 +164,13 @@
   }
 
   function paintAll() {
-    document.querySelectorAll("[data-post-id]").forEach(post => {
-      const id = String(post.dataset.postId || post.dataset.id || "");
+    document.querySelectorAll(
+      "article.post[data-post-id], .post[data-post-id]"
+    ).forEach(post => {
+      const id = String(
+        post.dataset.postId || post.dataset.id || ""
+      );
+
       if (!id) return;
 
       paintLike(post, window.FEED_LIKES.has(id));
@@ -162,9 +181,7 @@
     });
   }
 
-  /* ==========================================
-     POP HEART - PHOTO DOUBLE TAP ONLY
-     ========================================== */
+  /* POP HEART */
 
   function showBigHeart(media, x, y) {
     if (!media) return;
@@ -172,11 +189,16 @@
     const rect = media.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
 
-    const px = Number.isFinite(x) ? x : rect.left + rect.width / 2;
-    const py = Number.isFinite(y) ? y : rect.top + rect.height / 2;
+    const px = Number.isFinite(x)
+      ? x
+      : rect.left + rect.width / 2;
+
+    const py = Number.isFinite(y)
+      ? y
+      : rect.top + rect.height / 2;
 
     const heart = document.createElement("div");
-    const gid = "pixoroV69Heart" + (++heartId);
+    const gid = "pixoroV70Heart" + (++heartId);
 
     heart.className = "pixoro-big-heart";
 
@@ -186,9 +208,8 @@
       pointer-events:none;
       left:${px}px;
       top:${py}px;
-      width:46px;
-      height:46px;
-      display:block;
+      width:58px;
+      height:58px;
       transform:translate(-50%,-50%) scale(0);
       opacity:0;
     `;
@@ -223,17 +244,17 @@
       {
         transform: "translate(-50%,-50%) scale(1.4)",
         opacity: 1,
-        offset: 0.18
+        offset: .18
       },
       {
         transform: "translate(-50%,-50%) scale(1)",
         opacity: 1,
-        offset: 0.42
+        offset: .42
       },
       {
         transform: "translate(-50%,-65%) scale(1.05)",
         opacity: 1,
-        offset: 0.70
+        offset: .70
       },
       {
         transform: "translate(-50%,-120%) scale(.8)",
@@ -251,9 +272,7 @@
   window.pixoroShowHeartDance = showBigHeart;
   window.showBigHeart = showBigHeart;
 
-  /* ==========================================
-     BUTTON ANIMATION - NO POP HEART
-     ========================================== */
+  /* BUTTON ANIMATION */
 
   function buttonAnimation(post) {
     const icon = getLikeButton(post)?.querySelector("svg");
@@ -272,9 +291,7 @@
     });
   }
 
-  /* ==========================================
-     SERVER SAVE - INSERT / DELETE
-     ========================================== */
+  /* SERVER SAVE */
 
   async function serverSave(postId, liked) {
     const supa = getSupa();
@@ -298,7 +315,6 @@
         );
 
       if (error) throw error;
-
     } else {
       const { error } = await supa
         .from(TABLE)
@@ -310,9 +326,7 @@
     }
   }
 
-  /* ==========================================
-     QUEUED SERVER SYNC
-     ========================================== */
+  /* QUEUED SAVE */
 
   function queueServerSave(
     postId,
@@ -329,9 +343,8 @@
       .catch(() => {})
       .then(() => serverSave(postId, liked))
       .catch(error => {
-        console.error("PIXORO SERVER LIKE ERROR:", error);
+        console.error("PIXORO LIKE SAVE ERROR:", error);
 
-        // Roll back only if no newer click happened.
         if (revisions.get(postId) === revision) {
           if (previousLiked) {
             window.FEED_LIKES.add(postId);
@@ -358,9 +371,7 @@
     return nextRequest;
   }
 
-  /* ==========================================
-     LIKE / UNLIKE
-     ========================================== */
+  /* LIKE / UNLIKE */
 
   function toggleLike(postId, post, forceLike = false) {
     if (!postId || !post) return false;
@@ -370,7 +381,6 @@
     const alreadyLiked = window.FEED_LIKES.has(postId);
     const willLike = forceLike ? true : !alreadyLiked;
 
-    // Double tap on an already liked post does nothing.
     if (forceLike && alreadyLiked) {
       paintLike(post, true);
       return true;
@@ -401,12 +411,10 @@
     const revision = (revisions.get(postId) || 0) + 1;
     revisions.set(postId, revision);
 
-    // Instant UI update.
     saveLocal();
     paintLike(post, willLike);
     paintCount(post, newCount);
 
-    // Permanent server save.
     queueServerSave(
       postId,
       willLike,
@@ -421,23 +429,21 @@
 
   window.pixoroToggleLike = toggleLike;
 
-  window.pixoroDoLike = (postId, btn) => {
-    const post = getPost(btn);
+  window.pixoroDoLike = (postId, button) => {
+    const post = getPost(button);
     return toggleLike(postId, post, true);
   };
 
   window.likePost = window.pixoroDoLike;
 
-  /* ==========================================
-     PHOTO DOUBLE TAP
-     ========================================== */
+  /* PHOTO DOUBLE TAP */
 
   function handleDoubleTap(media, postId, post, x, y) {
     suppressMediaClickUntil = Date.now() + 500;
 
     showBigHeart(media, x, y);
 
-    // Only like. Never unlike through photo double tap.
+    // Photo double tap only likes. It never unlikes.
     toggleLike(postId, post, true);
   }
 
@@ -458,7 +464,10 @@
     const now = Date.now();
     const previous = lastTap.get(postId);
 
-    if (previous && now - previous.time <= DOUBLE_TAP_DELAY) {
+    if (
+      previous &&
+      now - previous.time <= DOUBLE_TAP_DELAY
+    ) {
       lastTap.delete(postId);
 
       handleDoubleTap(
@@ -477,9 +486,7 @@
     }
   }, true);
 
-  /* ==========================================
-     LIKE BUTTON CLICK
-     ========================================== */
+  /* LIKE BUTTON CLICK */
 
   document.addEventListener("click", event => {
     const button = event.target.closest(
@@ -497,28 +504,22 @@
       if (!post || !postId) return;
 
       buttonAnimation(post);
-
-      // Only button can Like / Unlike.
       toggleLike(postId, post, false);
       return;
     }
 
     if (
       Date.now() < suppressMediaClickUntil &&
-      event.target.closest(".postMedia, .post-media, .post-media-wrap")
+      event.target.closest(
+        ".postMedia, .post-media, .post-media-wrap"
+      )
     ) {
       event.preventDefault();
       event.stopPropagation();
     }
   }, true);
 
-  /* ==========================================
-     LOAD SERVER LIKES + COUNTS
-     ONE QUERY FOR VISIBLE FEED POSTS
-     ========================================== */
-
-  let syncRunning = false;
-  let syncAgain = false;
+  /* SERVER SYNC */
 
   async function syncVisiblePosts() {
     if (syncRunning) {
@@ -526,12 +527,17 @@
       return;
     }
 
-    const posts = [...document.querySelectorAll("[data-post-id]")];
+    const posts = [...document.querySelectorAll(
+      "article.post[data-post-id], .post[data-post-id]"
+    )];
 
     const postMap = new Map();
 
     posts.forEach(post => {
-      const id = String(post.dataset.postId || post.dataset.id || "");
+      const id = String(
+        post.dataset.postId || post.dataset.id || ""
+      );
+
       if (id) postMap.set(id, post);
     });
 
@@ -548,20 +554,41 @@
 
     syncRunning = true;
 
-    try {
-      const { data, error } = await supa
-        .from(TABLE)
-        .select("post_id,user_id")
-        .in("post_id", ids);
+    // Protect local clicks made while the server query is running.
+    const startingRevisions = new Map();
 
-      if (error) throw error;
+    ids.forEach(id => {
+      startingRevisions.set(id, revisions.get(id) || 0);
+    });
+
+    try {
+      let allRows = [];
+      let from = 0;
+      const pageSize = 1000;
+
+      while (true) {
+        const { data, error } = await supa
+          .from(TABLE)
+          .select("post_id,user_id")
+          .in("post_id", ids)
+          .range(from, from + pageSize - 1);
+
+        if (error) throw error;
+
+        const rows = data || [];
+        allRows = allRows.concat(rows);
+
+        if (rows.length < pageSize) break;
+
+        from += pageSize;
+      }
 
       const counts = {};
       const serverLiked = new Set();
 
       ids.forEach(id => counts[id] = 0);
 
-      (data || []).forEach(row => {
+      allRows.forEach(row => {
         const id = String(row.post_id);
 
         counts[id] = (counts[id] || 0) + 1;
@@ -571,12 +598,17 @@
         }
       });
 
-      // Replace local state for visible posts with server truth.
       ids.forEach(id => {
-        window.FEED_LIKES.delete(id);
+        // Do not overwrite a newer local click.
+        if (
+          (revisions.get(id) || 0) !==
+          startingRevisions.get(id)
+        ) return;
 
         if (serverLiked.has(id)) {
           window.FEED_LIKES.add(id);
+        } else {
+          window.FEED_LIKES.delete(id);
         }
 
         window.FEED_COUNTS[id] = counts[id];
@@ -586,7 +618,7 @@
       paintAll();
 
     } catch (error) {
-      console.error("PIXORO SERVER SYNC:", error);
+      console.error("PIXORO SERVER SYNC ERROR:", error);
       paintAll();
 
     } finally {
@@ -594,7 +626,7 @@
 
       if (syncAgain) {
         syncAgain = false;
-        setTimeout(syncVisiblePosts, 100);
+        setTimeout(syncVisiblePosts, 150);
       }
     }
   }
@@ -602,15 +634,13 @@
   window.pixoroSyncLikes = syncVisiblePosts;
   window.pixoroPaintAllLikes = paintAll;
 
-  /* ==========================================
-     STYLES
-     ========================================== */
+  /* STYLES */
 
   function addStyles() {
-    if (document.getElementById("pixoro-like-v69-css")) return;
+    if (document.getElementById("pixoro-like-v70-css")) return;
 
     const style = document.createElement("style");
-    style.id = "pixoro-like-v69-css";
+    style.id = "pixoro-like-v70-css";
 
     style.textContent = `
       .like-btn,
@@ -634,8 +664,7 @@
 
       .like-btn.liked,
       .like-button.liked,
-      [data-like-btn].liked,
-      .like-btn.is-liked {
+      [data-like-btn].liked {
         color: #FF3040 !important;
       }
 
@@ -672,9 +701,7 @@
     document.head.appendChild(style);
   }
 
-  /* ==========================================
-     FEED EVENTS
-     ========================================== */
+  /* EVENTS */
 
   function start() {
     addStyles();
@@ -695,10 +722,14 @@
   });
 
   window.addEventListener("pixoro:login", () => {
+    window.FEED_LIKES.clear();
+    window.FEED_COUNTS = {};
+    saveLocal();
     setTimeout(syncVisiblePosts, 100);
   });
 
   window.addEventListener("pixoro:logout", () => {
+    window.ME_ID = null;
     window.FEED_LIKES.clear();
     window.FEED_COUNTS = {};
     saveLocal();
@@ -706,10 +737,12 @@
   });
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", start, { once: true });
+    document.addEventListener("DOMContentLoaded", start, {
+      once: true
+    });
   } else {
     start();
   }
 
-  console.log("PIXORO LIKE V69 SERVER SYNC READY ❤️");
+  console.log("PIXORO LIKE V70 READY ❤️");
 })();
