@@ -1,15 +1,16 @@
 /* =====================================================
-   PIXORO LIKE V70
+   PIXORO LIKE V71
    LIKE BUTTON  = LIKE / UNLIKE
    PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
    SUPABASE = SERVER SAVE
+   + COMMENT MODAL GUARD DA - Comment Like ah like.js Thodathu da
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V70) return;
-  window.PIXORO_LIKE_V70 = true;
+  if (window.PIXORO_LIKE_V71) return;
+  window.PIXORO_LIKE_V71 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
@@ -469,6 +470,8 @@
   }
 
   document.addEventListener("pointerdown", event => {
+    // ✅ V71 ADD - Comment Modal la Irundha - like.js Thodave Koodathu da - comments.js Paathukkum da
+    if (event.target.closest && event.target.closest("#commentModal")) return;
     if (event.target.closest(
       "button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]"
     )) return;
@@ -510,6 +513,8 @@
   /* LIKE BUTTON CLICK */
 
   document.addEventListener("click", event => {
+    // ✅ V71 ADD - Comment Modal la Irundha - like.js Thodave Koodathu da - comments.js Paathukkum da
+    if (event.target.closest && event.target.closest("#commentModal")) return;
     const button = event.target.closest(
       "[data-like-btn], .like-btn, .like-button"
     );
@@ -661,10 +666,10 @@
   /* STYLES */
 
   function addStyles() {
-    if (document.getElementById("pixoro-like-v70-css")) return;
+    if (document.getElementById("pixoro-like-v71-css")) return;
 
     const style = document.createElement("style");
-    style.id = "pixoro-like-v70-css";
+    style.id = "pixoro-like-v71-css";
 
     style.textContent = `
       .like-btn,
@@ -798,5 +803,5 @@
     start();
   }
 
-  console.log("PIXORO LIKE V70 READY ❤️");
+  console.log("PIXORO LIKE V71 READY ❤️");
 })();
