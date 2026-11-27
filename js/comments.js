@@ -1,9 +1,54 @@
 // ===== PIXORO COMMENT - THANI FILE DA =====
 // RULE: Comment panna -> Server la Save + Count Update aagum da
 //       Save = Server la mattum thaan da - LocalStorage Illa da
+// STYLE: Instagram Screenshot + Pixoro Pink-Purple da
+
+const PIXORO_COMMENT_EMOJIS = ["❤️","🙌","🔥","👏","😢","😍","😮","😂"];
+
+function pixoroCommentCSS(){
+  if(document.getElementById("pixoro-comment-style")) return;
+  const s = document.createElement("style");
+  s.id = "pixoro-comment-style";
+  s.textContent = `
+    #commentModal{background:rgba(0,0,0,.65)!important;align-items:flex-end!important;}
+    #commentModal > div{background:#121212!important;border-radius:22px 22px 0 0!important;overflow:hidden!important;position:relative!important;width:100%!important;max-height:88vh!important;display:flex!important;flex-direction:column!important;}
+    #commentModal > div:before{content:"";height:4px;background:linear-gradient(90deg,#FF2D95,#FF5E8A,#C86BFF);display:block;flex-shrink:0;}
+    #commentModal .pixoro-c-emoji-row{display:flex;gap:18px;overflow-x:auto;padding:12px 16px;border-top:1px solid #222;scrollbar-width:none;}
+    #commentModal .pixoro-c-emoji-row::-webkit-scrollbar{display:none;}
+    #commentModal .pixoro-c-emoji-row button{background:none;border:none;font-size:26px;cursor:pointer;flex-shrink:0;}
+    #commentModal .pixoro-c-emoji-row button:active{transform:scale(1.4);}
+    #commentInput{border:1.5px solid #333!important;}
+    #commentInput:focus{border-color:#FF2D95!important;box-shadow:0 0 0 2px rgba(255,45,149,.25)!important;outline:none!important;}
+    .pixoro-c-send-btn{background:linear-gradient(90deg,#FF2D95,#C86BFF)!important;color:#fff!important;border:none!important;font-weight:800!important;padding:10px 16px!important;border-radius:999px!important;cursor:pointer!important;}
+    .pixoro-c-empty{padding:36px 20px;text-align:center;}
+    .pixoro-c-empty-heart{font-size:42px;animation:pixoroHeartBeat 1.2s infinite;}
+    @keyframes pixoroHeartBeat{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
+  `;
+  document.head.appendChild(s);
+}
+
+function pixoroCommentEmojiRow(){
+  pixoroCommentCSS();
+  const modal = document.getElementById("commentModal");
+  if(!modal || modal.querySelector(".pixoro-c-emoji-row")) return;
+  const input = document.getElementById("commentInput");
+  if(!input) return;
+  const row = document.createElement("div");
+  row.className = "pixoro-c-emoji-row";
+  row.innerHTML = PIXORO_COMMENT_EMOJIS.map(e=>`<button type="button" data-emoji="${e}">${e}</button>`).join("");
+  row.querySelectorAll("[data-emoji]").forEach(b=>{
+    b.onclick = ()=>{ input.value += b.dataset.emoji; input.focus(); };
+  });
+  input.parentElement?.before(row);
+  // Send button ku Pixoro colour
+  modal.querySelectorAll("button").forEach(b=>{
+    if(/post|send/i.test(b.textContent||"")) b.classList.add("pixoro-c-send-btn");
+  });
+}
 
 function openComment(id){
   window.CURRENT_COMMENT_POST = id;
+  pixoroCommentEmojiRow();
   let m = document.getElementById('commentModal');
   if(m) m.style.display = 'flex';
   loadComments(id);
@@ -31,11 +76,12 @@ async function loadComments(postId){
       let isMine = window.ME_ID && String(c.user_id) === String(window.ME_ID);
       // ✅ FIX - ID ku Quote Potten da - UUID ku Quote Illana Error da!
       let delBtn = isMine ? `<span onclick="deleteComment('${c.id}', '${postId}')" style="color:#888;font-size:11px;cursor:pointer;margin-left:8px">Delete</span>` : '';
-      return `<div style="display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #222">
-        <img src="${escHtml(window.pixoroGetAvatar ? window.pixoroGetAvatar(c) : (c.avatar_url||''))}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;background:#222" onerror="this.src='https://ui-avatars.com/api/?name=U&background=222&color=fff'">
-        <div style="flex:1"><b>@${escHtml(String(c.username||'user').replace('@',''))}</b> <span>${escHtml(c.text||c.content||'')}</span><div>${delBtn}</div></div>
+      return `<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #222">
+        <img src="${escHtml(window.pixoroGetAvatar ? window.pixoroGetAvatar(c) : (c.avatar_url||''))}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;background:#222;border:1.5px solid #FF2D95;flex-shrink:0" onerror="this.src='https://ui-avatars.com/api/?name=U&background=222&color=fff'">
+        <div style="flex:1"><b style="color:#fff">@${escHtml(String(c.username||'user').replace('@',''))}</b> <span style="color:#ddd">${escHtml(c.text||c.content||'')}</span><div style="color:#888;font-size:12px;margin-top:4px">Reply &nbsp; Like ${delBtn}</div></div>
+        <span style="color:#fff;font-size:18px;cursor:pointer">♡</span>
       </div>`;
-    }).join('') || '<p style="color:#888;text-align:center;padding:20px">No comments yet da - First comment nee podu da!</p>';
+    }).join('') || '<div class="pixoro-c-empty"><div class="pixoro-c-empty-heart">❤️</div><div style="color:#fff;font-size:22px;font-weight:700;margin-top:10px">No comments yet</div><div style="color:#888;font-size:14px;margin-top:6px">Start the conversation.</div></div>';
 
     let cnt = (data||[]).length;
     let cc = document.querySelector(`[data-comment-count="${postId}"]`);
@@ -83,6 +129,7 @@ async function deleteComment(commentId, postId){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
+  pixoroCommentEmojiRow();
   let inp = document.getElementById('commentInput');
   if(inp) inp.addEventListener('keydown', (e)=>{ if(e.key==='Enter') addComment(); });
 });
