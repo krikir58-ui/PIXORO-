@@ -1,17 +1,18 @@
 /* =====================================================
-   PIXORO LIKE V72
-   LIKE BUTTON  = LIKE / UNLIKE
+   PIXORO LIKE V73
+   LIKE BUTTON  = LIKE / UNLIKE - SMOOTH DA - Comment Mari da
    PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
    SUPABASE = SERVER SAVE
    + COMMENT MODAL GUARD DA - Comment Like ah like.js Thodathu da
    + COMMENT LIKE CHINNA DA - Perusa Heart Parakkaathu da
+   + V73 FIX DA - Like Button Click la Mela Heart Parakkaathu da - Button 1.15x Smooth Mattum Thudikkum da
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V72) return;
-  window.PIXORO_LIKE_V72 = true;
+  if (window.PIXORO_LIKE_V73) return;
+  window.PIXORO_LIKE_V73 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
@@ -274,6 +275,7 @@
   window.showBigHeart = showBigHeart;
 
   /* ✅ CORRECTED DA - Like Button ku Nerra Ye Mela Poi Maraiyum da - Comment Nera Pogaathu da */
+  /* ✅ V73 - Idhu Function Appadiye Irukku da - Aana Like Button Click la Ippo Koopda Maattom da - Double Tap ku Mattum Illa - Ippo Yaarum Koopda Maattanga da */
   function showUnlikeHeart(button) {
     // ✅ V72 ADD - Comment Button na Perusa Heart Parakka Koodathu da
     if (!button) return;
@@ -305,13 +307,13 @@
 
     icon.getAnimations().forEach(a => a.cancel());
 
+    /* ✅ V73 CORRECT - 1.30x / 250ms -> 1.15x / 180ms da - Comment Mari Smooth da - Romba Thudikkaathu da */
     icon.animate([
       { transform: "scale(1)" },
-      { transform: "scale(1.30)", offset: .35 },
-      { transform: "scale(.95)", offset: .65 },
+      { transform: "scale(1.15)", offset: .4 },
       { transform: "scale(1)" }
     ], {
-      duration: 250,
+      duration: 180,
       easing: "ease-out"
     });
   }
@@ -532,8 +534,8 @@
 
       if (!post || !postId) return;
 
-      /* ✅ CORRECTED DA - Like Pannalum Unlike Pannalum - Like Button ku Nerra Ye Mella Mela Poi Maraiyum da */
-      showUnlikeHeart(button);
+      /* ✅ V73 CORRECTED DA - Like Button Click la Mela Heart Parakka Koodathu da - showUnlikeHeart Call ah Thookiten da */
+      /* showUnlikeHeart(button); */
 
       buttonAnimation(post);
       toggleLike(postId, post, false);
@@ -669,10 +671,10 @@
   /* STYLES */
 
   function addStyles() {
-    if (document.getElementById("pixoro-like-v72-css")) return;
+    if (document.getElementById("pixoro-like-v73-css")) return;
 
     const style = document.createElement("style");
-    style.id = "pixoro-like-v72-css";
+    style.id = "pixoro-like-v73-css";
 
     style.textContent = `
       .like-btn,
@@ -746,10 +748,11 @@
         height: 44px !important;
       }
 
-      /* ✅ V72 ADD - Comment Like Chinna Tha Irukkanum da - Perusa Aaga Koodathu da */
+      /* ✅ V73 - Comment Like - feed.css v1044 Kooda Match Aaganum da - 24px + Left da - like.js 16px Aakidathu da */
       #commentModal .pixoro-c-heart,
       #commentModal .pixoro-c-heart svg{
-        width:16px!important; height:16px!important;
+        width:24px!important; height:24px!important;
+        margin-right:12px!important;
         animation:none!important; transform:none!important;
       }
       #commentModal .pixoro-c-heart:active{ transform:scale(1.1)!important; }
@@ -816,5 +819,5 @@
     start();
   }
 
-  console.log("PIXORO LIKE V72 READY ❤️");
+  console.log("PIXORO LIKE V73 READY ❤️");
 })();
