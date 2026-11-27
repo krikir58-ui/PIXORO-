@@ -1,13 +1,12 @@
-/* ===== PIXORO LIKE V54 - V53 CORRECTED - INSTAGRAM 2026 DA ===== */
-// ✅ V54 FIX 1 - upsert da - 23505 Varaathu da
-// ✅ V54 FIX 2 - Rollback Illa da - Red Nikkum da - Flicker Illa da
-// ✅ V54 FIX 3 - Double Tap Oru Handler Mattum da - touchstart Mattum da - dblclick Delete da
-// ✅ V54 FIX 4 - getPost Correct da - data-post-id Mattum da
+/* ===== PIXORO LIKE V55 - V54 CORRECTED - INSTAGRAM 2026 DA ===== */
+// ✅ V55 FIX 1 - posts Update Delete da - RLS Fail Varaathu da
+// ✅ V55 FIX 2 - loadMyLikes la Count ah likes Table la Irundhu Edukkrom da - Pazhaya 0 Stuck Aagaathu da
+// ✅ V55 FIX 3 - supa-ready ku Aprom Thaan loadMyLikes da - User ID Kedaikkum da
 (() => {
   "use strict";
-  if (window.PIXORO_LIKE_V54) return;
+  if (window.PIXORO_LIKE_V55) return;
+  window.PIXORO_LIKE_V55 = true;
   window.PIXORO_LIKE_V54 = true;
-  window.PIXORO_LIKE_V53 = true;
   function getSupa(){ return window.supa || window.supabaseClient || (typeof window.getSupa === 'function' ? window.getSupa() : null); }
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 350;
@@ -24,7 +23,6 @@
     let supa = getSupa(); if (!supa) return null;
     try{ const { data, error } = await supa.auth.getUser(); if (error || !data?.user?.id) return null; return data.user.id; }catch{ return null; }
   }
-  // ✅ V54 FIX - data-post-id Irukka Article Mattum da
   function getPost(element){ return element?.closest("[data-post-id]"); }
   function getPostId(element){
     const post = getPost(element);
@@ -114,21 +112,14 @@
     try { icon.getAnimations().forEach(a => a.cancel()); } catch(e) {}
     icon.animate([{ transform: "scale(1)", opacity: 1, offset: 0 },{ transform: "scale(1.5)", opacity: 1, offset: 0.2 },{ transform: "scale(0.9)", opacity: 1, offset: 0.4 },{ transform: "scale(1.35)", opacity: 1, offset: 0.6 },{ transform: "scale(0.95)", opacity: 1, offset: 0.8 },{ transform: "scale(1)", opacity: 1, offset: 1 }], { duration: 500, easing: "ease-out", fill: "forwards" });
   }
-  // ✅ V54 FIX - upsert + NO ROLLBACK da
+  // ✅ V55 FIX 1 - posts Update Full Delete da - likes Mattum da
   async function serverSave(postId, liked){
     let supa = getSupa(); if (!supa) return;
     const userId = await getUserId(); if (!userId) return;
     try{
       if (liked){ await supa.from(TABLE).upsert({ post_id: postId, user_id: userId }, { onConflict: "post_id,user_id" }); }
       else { await supa.from(TABLE).delete().eq("post_id", postId).eq("user_id", userId); }
-      try{
-        const { count } = await supa.from(TABLE).select("*", { count: "exact", head: true }).eq("post_id", postId);
-        try{ await supa.from("posts").update({ likes_count: Number(count || 0) }).eq("id", postId); }catch(e){}
-      }catch(e){}
-    }catch(error){
-      // ✅ Rollback Illa da - UI la Red Nikkattum da - Next Time Sync Aayidum da
-      console.log("PIXORO LIKE SYNC LATER:", error?.message);
-    }
+    }catch(error){ console.log("PIXORO LIKE SYNC LATER:", error?.message); }
   }
   function toggleLike(postId, post, forceLike = false){
     if (!postId || !post) return false; postId = String(postId);
@@ -167,7 +158,6 @@
     lastTap.set(String(postId), { time: now, x: touchX, y: touchY });
     if (previous && now - previous.time <= DOUBLE_TAP_DELAY){ lastTap.delete(String(postId)); handleDoubleTap(media, postId, post, touchX, touchY); }
   }, { passive: true, capture: true });
-  // ✅ V54 - dblclick Delete da - Mobile la touchstart Thaan da - Desktop la Double Click ku Click Handler Pothum da - Illana 2 Vaati Fire Aagum da
   document.addEventListener("click", event => {
     const button = event.target.closest("[data-like-btn], .like-btn, .like-button"); if (button){
       event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
@@ -187,16 +177,25 @@
       if (window.FEED_COUNTS[postId] !== undefined){ paintCount(post, Number(window.FEED_COUNTS[postId])); }
     });
   }
+  // ✅ V55 FIX 2 - Count ah likes Table la Irundhu Edu da
   async function loadMyLikes(){
     paintAll(); const userId = await getUserId(); let supa = getSupa(); if (!userId || !supa) return;
     try{
       const { data, error } = await supa.from(TABLE).select("post_id").eq("user_id", userId); if (error) throw error;
       (data || []).forEach(item => window.FEED_LIKES.add(String(item.post_id)));
+      // ✅ Pazhaya 0 ah Clear Pannitu - Real Count ah Edu da
+      const ids = [...new Set(document.querySelectorAll("[data-post-id]")).values()].map(p=>String(p.dataset.postId)).filter(Boolean);
+      for(const id of ids){
+        const { count } = await supa.from(TABLE).select("*", { count: "exact", head: true }).eq("post_id", id);
+        if(count !== null && count !== undefined) window.FEED_COUNTS[id] = Number(count);
+      }
       saveLocal(); paintAll();
     }catch(error){ console.error("PIXORO LOAD LIKES:", error); }
   }
   window.addEventListener("pixoro-feed-rendered", ()=> setTimeout(paintAll, 50));
   window.addEventListener("pixoro-reels-rendered", ()=> setTimeout(paintAll, 50));
+  // ✅ V55 FIX 3 - supa-ready ku Aprom Thaan Load da
+  window.addEventListener("pixoro-supa-ready", ()=> setTimeout(loadMyLikes, 100));
   function addStyles(){
     if (document.getElementById("pixoro-v39-css")) return;
     const style = document.createElement("style"); style.id = "pixoro-v39-css";
@@ -207,5 +206,5 @@
   function start(){ addStyles(); paintAll(); loadMyLikes(); }
   if (document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", start, { once: true }); } else { start(); }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO LIKE V54 LOADED ❤️");
+  console.log("PIXORO LIKE V55 LOADED ❤️");
 })();
