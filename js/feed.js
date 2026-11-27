@@ -1,8 +1,8 @@
 /* =====================================================
-   PIXORO FEED V1042 - FULL CORRECT CODE DA 🔥
+   PIXORO FEED V1043 - FULL CORRECT CODE DA 🔥
    DOUBLE TAP DELETE - LIKE ONLY IN like.js V67
    HEART 46px - SPEED 1000ms - LIKE=RED / UNLIKE=WHITE
-   + COMMENT LIKE GUARD DA - like.js Comment Heart ah Thoda Koodathu da
+   + COMMENT LIKE GUARD REMOVE DA - like.js V72 Tha Paakkum da - feed.js Thodathu da
    ===================================================== */
 
 (function () {
@@ -270,17 +270,11 @@ window.closeComment = function() {
   if (modal) modal.style.display = "none";
 };
 
-/* ✅ v1042 ADD - COMMENT LIKE GUARD DA - Idhu Mattum Add Pannen da */
-/* Comment Heart ah Thotta - Post Like (like.js) ku Poga Vida Maatten da - Comment Like Mattum Work Aagum da */
-if (!window.__pixoroCommentLikeGuard) {
-  window.__pixoroCommentLikeGuard = true;
-  document.addEventListener('click', (e) => {
-    const cLike = e.target.closest && e.target.closest('[data-like]');
-    if (cLike) { e.stopPropagation(); return; }
-    const cModal = e.target.closest && e.target.closest('#commentModal');
-    if (cModal && e.target.closest && e.target.closest('[data-like-btn]')) { e.stopPropagation(); return; }
-  }, true);
-}
+/* ✅ v1043 - COMMENT LIKE GUARD REMOVE DA - Idha Thookiten da */
+/* Karanam: Inga stopPropagation() Pottu - Comment Heart ku Click Poga Vida Maatten da - Adhu Tha Perusa Thudikuthu da */
+/* like.js V72 la Already Guard Irukku da - Adhu Pothum da - feed.js la Guard Venaam da */
+
+window.__pixoroCommentLikeGuard = true;
 
 /* POST MENU */
 window.openPostMenu = function(id, owner, username) {
@@ -319,7 +313,7 @@ window.setFeedMode = function(mode) {
   window.PIXORO_FEED_MODE = mode || "foryou";
   document.querySelectorAll(".feedTab").forEach(tab => tab.classList.remove("active"));
   const tabIds = { foryou: "tabForYou", following: "tabFollowing", latest: "tabLatest" };
-  const active = document.getElementById(tabIds[mode] || "tabForYou");
+  const active = document.getElementById(tabIds || "tabForYou");
   if (active) active.classList.add("active");
   loadPixoroFeed();
 };
