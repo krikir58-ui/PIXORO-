@@ -1,17 +1,18 @@
 /* =====================================================
-   PIXORO LIKE V64 FINAL
+   PIXORO LIKE V65 FINAL - MASS HEART DA 🔥❤️
+   CHINNA HEART - NITTU NIKKUM - MAKKAL RASIPPANGA DA
    DOUBLE TAP = LIKE ONLY - UNLIKE = LIKE BUTTON ONLY
-   LIKE = RED - UNLIKE = WHITE - HEART SLOW DA ❤️
+   LIKE = RED - UNLIKE = WHITE
    ===================================================== */
 
 (() => {
   "use strict";
-  if (window.PIXORO_LIKE_V64) return;
-  window.PIXORO_LIKE_V64 = true;
+  if (window.PIXORO_LIKE_V65) return;
+  window.PIXORO_LIKE_V65 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 400;
-  const HEART_DURATION = 1400; // ✅ SLOW DA - 950 la irundhu 1400 da
+  const HEART_DURATION = 1800; // ✅ 1.8 Sec Nikkum da - Speed ah Pogaathu da
   const lastTap = new Map();
   const lastToggleAt = new Map();
   const pending = new Map();
@@ -45,20 +46,29 @@
     return element.closest(".postMedia, .post-media, .post-media-wrap") || element.closest("[data-post-id]");
   }
 
-  /* ✅ LIKE = RED - UNLIKE = WHITE */
+  /* ✅ LIKE = RED - UNLIKE = WHITE - Ippo Kandippa Red Aagum da */
   function paintLike(post, liked) {
     const button = getLikeButton(post); if (!button) return;
-    button.classList.toggle("liked", liked); button.classList.toggle("is-liked", liked);
-    button.setAttribute("aria-pressed", String(liked)); button.dataset.liked = String(liked);
+    button.classList.toggle("liked", liked);
+    button.classList.toggle("is-liked", liked);
+    button.setAttribute("aria-pressed", String(liked));
+    button.dataset.liked = String(liked);
     button.style.setProperty("color", liked ? "#FF3040" : "#fff", "important");
-    button.querySelectorAll("svg, svg path").forEach(el => {
-      el.style.setProperty("fill", liked ? "#FF3040" : "none", "important");
-      el.style.setProperty("stroke", liked ? "#FF3040" : "#fff", "important");
+    button.querySelectorAll("svg").forEach(svg => {
+      svg.style.setProperty("fill", liked ? "#FF3040" : "none", "important");
+      svg.style.setProperty("stroke", liked ? "#FF3040" : "#fff", "important");
+    });
+    // ✅ V65 FIX - Ithu Thaan Mukkiyam da - SVG Path oda Attribute ah Ye Maathurom da - Illana Red Aagaathu da
+    button.querySelectorAll("svg path").forEach(p => {
+      p.style.setProperty("fill", liked ? "#FF3040" : "none", "important");
+      p.style.setProperty("stroke", liked ? "#FF3040" : "#fff", "important");
+      p.setAttribute("fill", liked ? "#FF3040" : "none");
+      p.setAttribute("stroke", liked ? "#FF3040" : "#fff");
     });
   }
   function paintCount(post, count) { const el = getLikeCount(post); if (!el) return; el.textContent = Math.max(0, Number(count) || 0); }
 
-  /* ✅ HEART SLOW DA - Nadu la Rompa Neram Nikkum da */
+  /* ✅ MASS HEART - Chinna Size - Nittu Nikkum da */
   function showBigHeart(media, x, y) {
     if (!media) return;
     const rect = media.getBoundingClientRect();
@@ -66,35 +76,36 @@
     const startX = Number.isFinite(x) ? x : rect.left + rect.width / 2;
     const startY = Number.isFinite(y) ? y : rect.top + rect.height / 2;
     _heartId++;
-    const gid = "pixoroHeartIG" + _heartId;
+    const gid = "pixoroHeartMass" + _heartId;
+    // ✅ Chinna Size da - 110 la irundhu 72 aakiten da
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
-    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:110px;height:110px;transform:translate(-50%,-50%) scale(0);opacity:0;display:block;`;
-    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 12px 24px rgba(255,45,149,.55))"><defs><linearGradient id="${gid}"><stop offset="0%" stop-color="#FF2D95"/><stop offset="55%" stop-color="#FF5E8A"/><stop offset="100%" stop-color="#C86BFF"/></linearGradient></defs><path fill="url(#${gid})" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:72px;height:72px;transform:translate(-50%,-50%) scale(0);opacity:0;display:block;`;
+    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 10px 22px rgba(255,45,149,.65))"><defs><linearGradient id="${gid}"><stop offset="0%" stop-color="#FF2D95"/><stop offset="55%" stop-color="#FF5E8A"/><stop offset="100%" stop-color="#C86BFF"/></linearGradient></defs><path fill="url(#${gid})" stroke="#fff" stroke-width="0.6" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
     document.body.appendChild(heart);
-    // ✅ 0% to 60% Varaikkum Full Opacity la Nikkum da - Aprom Mella Fade da
+    // ✅ Nittu Nikkum da - 70% Varaikkum Full Theriyum da - Aprom Mella Mela Porum da
     const anim = heart.animate([
-      { transform: "translate(-50%,-50%) scale(0) rotate(-8deg)", opacity: 0 },
-      { transform: "translate(-50%,-50%) scale(1.35) rotate(4deg)", opacity: 1, offset: 0.15 },
-      { transform: "translate(-50%,-50%) scale(0.95) rotate(-2deg)", opacity: 1, offset: 0.25 },
-      { transform: "translate(-50%,-50%) scale(1.05) rotate(0deg)", opacity: 1, offset: 0.35 },
-      { transform: "translate(-50%,-55%) scale(1.05) rotate(0deg)", opacity: 1, offset: 0.60 },
-      { transform: "translate(-50%,-80%) scale(1.02) rotate(0deg)", opacity: 1, offset: 0.78 },
-      { transform: "translate(-50%,-130%) scale(1) rotate(0deg)", opacity: 0.6, offset: 0.90 },
-      { transform: "translate(-50%,-170%) scale(0.9) rotate(0deg)", opacity: 0 }
+      { transform: "translate(-50%,-50%) scale(0) rotate(-10deg)", opacity: 0 },
+      { transform: "translate(-50%,-50%) scale(1.4) rotate(5deg)", opacity: 1, offset: 0.14 },
+      { transform: "translate(-50%,-50%) scale(1) rotate(-3deg)", opacity: 1, offset: 0.24 },
+      { transform: "translate(-50%,-50%) scale(1.08) rotate(2deg)", opacity: 1, offset: 0.35 },
+      { transform: "translate(-50%,-50%) scale(1) rotate(0deg)", opacity: 1, offset: 0.55 },
+      { transform: "translate(-50%,-55%) scale(1) rotate(0deg)", opacity: 1, offset: 0.70 },
+      { transform: "translate(-50%,-85%) scale(1) rotate(0deg)", opacity: 1, offset: 0.85 },
+      { transform: "translate(-50%,-120%) scale(0.9) rotate(0deg)", opacity: 0 }
     ], { duration: HEART_DURATION, easing: "ease-out", fill: "forwards" });
     anim.onfinish = () => heart.remove();
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 8; i++) {
       const s = document.createElement("div");
-      const angle = (i / 6) * Math.PI * 2;
-      const dist = 55 + Math.random() * 20;
-      s.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:10px;height:10px;border-radius:50%;background:${i % 2 ? "#FF2D95" : "#FFD93D"};opacity:1;`;
+      const angle = (i / 8) * Math.PI * 2;
+      const dist = 45 + Math.random() * 25;
+      s.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:8px;height:8px;border-radius:50%;background:${i % 3 === 0 ? "#FF2D95" : i % 3 === 1 ? "#FFD93D" : "#C86BFF"};opacity:1;`;
       document.body.appendChild(s);
       const a2 = s.animate([
         { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
-        { transform: `translate(${Math.cos(angle)*dist - 5}px, ${Math.sin(angle)*dist - 5 - 30}px) scale(0)`, opacity: 0 }
-      ], { duration: 650, easing: "ease-out", fill: "forwards" });
+        { transform: `translate(${Math.cos(angle)*dist - 4}px, ${Math.sin(angle)*dist - 4 - 25}px) scale(0)`, opacity: 0 }
+      ], { duration: 800, easing: "ease-out", fill: "forwards" });
       a2.onfinish = () => s.remove();
     }
   }
@@ -105,7 +116,7 @@
     const button = getLikeButton(post); if (!button) return;
     const icon = button.querySelector("svg"); if (!icon) return;
     try { icon.getAnimations().forEach(a => a.cancel()); } catch(e){}
-    icon.animate([{ transform: "scale(1)" },{ transform: "scale(1.45)", offset: .3 },{ transform: "scale(.9)", offset: .55 },{ transform: "scale(1.15)", offset: .75 },{ transform: "scale(1)" }], { duration: 450, easing: "ease-out" });
+    icon.animate([{ transform: "scale(1)" },{ transform: "scale(1.5)", offset: .3 },{ transform: "scale(.9)", offset: .55 },{ transform: "scale(1.2)", offset: .75 },{ transform: "scale(1)" }], { duration: 500, easing: "ease-out" });
   }
 
   async function serverSave(postId, liked) {
@@ -139,8 +150,6 @@
     return willLike;
   }
 
-  /* ✅ V64 FIX - Ithu Thaan Mukkiyam da - V63 la false Irundhuchu da - Ippo true da */
-  /* feed.js Double Tap Kooda Vandhaalum Like Mattum Thaan Aagum da - Unlike Aagaathu da */
   window.pixoroDoLike = (postId, btn) => { const post = btn?.closest("[data-post-id]"); return toggleLike(postId, post, true); };
   window.likePost = window.pixoroDoLike;
 
@@ -148,7 +157,7 @@
     suppressMediaClickUntil = Date.now() + 450;
     showBigHeart(media || post, x, y);
     buttonAnimation(post);
-    toggleLike(postId, post, true); // ✅ Double Tap = Like Mattum da
+    toggleLike(postId, post, true);
   }
 
   document.addEventListener("pointerdown", event => {
@@ -163,14 +172,13 @@
     } else { lastTap.set(postId, { time: now, x: event.clientX, y: event.clientY }); }
   }, true);
 
-  /* ✅ Like Button Mattum Thaan Unlike Pannum da */
   document.addEventListener("click", event => {
     const button = event.target.closest("[data-like-btn], .like-btn, .like-button");
     if (button) {
       event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
       const post = getPost(button); const postId = getPostId(button); if (!post || !postId) return;
       buttonAnimation(post);
-      toggleLike(postId, post, false); // ✅ Button na Toggle da - Like na Unlike, Unlike na Like da
+      toggleLike(postId, post, false);
       return;
     }
     if (Date.now() < suppressMediaClickUntil && event.target.closest(".postMedia, .post-media, .post-media-wrap")) {
@@ -197,13 +205,14 @@
   }
 
   function addStyles() {
-    const old = document.getElementById("pixoro-like-v64-css"); if (old) old.remove();
-    const style = document.createElement("style"); style.id = "pixoro-like-v64-css";
+    const old = document.getElementById("pixoro-like-v65-css"); if (old) old.remove();
+    const style = document.createElement("style"); style.id = "pixoro-like-v65-css";
     style.textContent = `
       .like-btn, .like-button, [data-like-btn] { background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; overflow: visible !important; visibility: visible !important; }
       .like-btn svg, .like-button svg, [data-like-btn] svg { transform-origin: center !important; flex-shrink: 0 !important; }
       .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked { color: #FF3040 !important; }
       .like-btn.liked svg, .like-button.liked svg, [data-like-btn].liked svg { fill: #FF3040 !important; stroke: #FF3040 !important; }
+      .like-btn.liked svg path, .like-button.liked svg path, [data-like-btn].liked svg path { fill: #FF3040 !important; stroke: #FF3040 !important; }
       .like-btn:not(.liked) svg, .like-btn:not(.liked) svg path, .like-button:not(.liked) svg path { fill: none !important; stroke: #fff !important; }
       .pixoro-big-heart { pointer-events: none !important; background: transparent !important; border: none !important; box-shadow: none !important; }
       [data-like-count], .like-count, .likes-count { flex-shrink: 0 !important; }
@@ -220,5 +229,5 @@
 
   function start() { addStyles(); paintAll(); loadMyLikes(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true }); else start();
-  console.log("PIXORO LIKE V64 LOADED ❤️");
+  console.log("PIXORO LIKE V65 LOADED ❤️🔥 MASS HEART");
 })();
