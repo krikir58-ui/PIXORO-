@@ -1,9 +1,11 @@
-/* ===== PIXORO LIKE V56 - V55 CORRECTED - FINAL DA ===== */
-// ✅ V56 FIX 1 - blockClick Check ah Mela Pottachu da - feed.js Click Unlike Pannaathu da
-// ✅ V56 FIX 2 - DB Count 0 vantha Local 1 ah Azhikka Maatom da - Max(Local, DB) da
+/* ===== PIXORO LIKE V57 - V56 CORRECTED - FINAL DA ===== */
+// ✅ V57 FIX 1 - paintLike la Attribute + Inline Rendum Red da - feed.js ku Kooda Theriyum da
+// ✅ V57 FIX 2 - addStyles ah Body Kadasiya Podu da - Ella CSS ah Vida Jeyikkum da
+// ✅ V57 FIX 3 - Force Repaint da - Red Udaney Varum da
 (() => {
   "use strict";
-  if (window.PIXORO_LIKE_V56) return;
+  if (window.PIXORO_LIKE_V57) return;
+  window.PIXORO_LIKE_V57 = true;
   window.PIXORO_LIKE_V56 = true;
   window.PIXORO_LIKE_V55 = true;
   function getSupa(){ return window.supa || window.supabaseClient || (typeof window.getSupa === 'function' ? window.getSupa() : null); }
@@ -29,6 +31,7 @@
   }
   function getLikeButton(post){ if (!post) return null; return post.querySelector("[data-like-btn], .like-btn, .like-button"); }
   function getLikeCount(post){ if (!post) return null; return post.querySelector("[data-like-count], .like-count, .likes-count, [data-count='likes'], .rCount"); }
+  // ✅ V57 FIX 1 - paintLike Correct da
   function paintLike(post, liked){
     const button = getLikeButton(post); if (!button) return;
     button.classList.toggle("liked", liked); button.classList.toggle("is-liked", liked);
@@ -44,12 +47,14 @@
     button.querySelectorAll("svg, i, path").forEach(el => {
       el.style.setProperty("opacity", "1", "important"); el.style.setProperty("visibility", "visible", "important"); el.style.setProperty("overflow", "visible", "important");
       if (el.tagName === "SVG" || el.tagName === "PATH"){
+        el.setAttribute("fill", liked ? "#FF3040" : "none");
         el.style.setProperty("fill", liked ? "#FF3040" : "none", "important");
         el.style.setProperty("stroke", liked ? "#FF3040" : "#fff", "important");
         el.style.setProperty("stroke-width", "1.8", "important");
       }
       if (el.tagName === "I"){ el.style.setProperty("color", liked ? "#FF3040" : "#fff", "important"); }
     });
+    void button.offsetWidth;
   }
   function paintCount(post, count){
     const el = getLikeCount(post); if (!el) return;
@@ -125,7 +130,6 @@
     if (!forceLike && now - prevAt < 300) return window.FEED_LIKES.has(postId);
     lastToggleAt.set(postId, now);
     const alreadyLiked = window.FEED_LIKES.has(postId); const willLike = forceLike ? true : !alreadyLiked;
-    // ✅ V56 FIX - Already Liked na Count ah 0 la Vekkaathe da - Kuraiva 1 da
     if (forceLike && alreadyLiked){ if(Number(window.FEED_COUNTS[postId]||0) < 1){ window.FEED_COUNTS[postId]=1; saveLocal(); paintCount(post, 1); } paintLike(post, true); return true; }
     const countEl = getLikeCount(post);
     const oldCount = (window.FEED_COUNTS[postId] !== undefined) ? Number(window.FEED_COUNTS[postId]) : Number(countEl?.textContent ?? 0);
@@ -157,7 +161,6 @@
     lastTap.set(String(postId), { time: now, x: touchX, y: touchY });
     if (previous && now - previous.time <= DOUBLE_TAP_DELAY){ lastTap.delete(String(postId)); handleDoubleTap(media, postId, post, touchX, touchY); }
   }, { passive: true, capture: true });
-  // ✅ V56 FIX 1 - Block Check Mela da - Button ku Munnadi da
   document.addEventListener("click", event => {
     if (Date.now() < blockClickUntil){ event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); return; }
     const button = event.target.closest("[data-like-btn], .like-btn, .like-button"); if (button){
@@ -174,7 +177,6 @@
     document.querySelectorAll("[data-post-id]").forEach(post => {
       const postId = String(post.dataset.postId || post.dataset.id || ""); if (!postId) return;
       const liked = window.FEED_LIKES.has(postId); paintLike(post, liked);
-      // ✅ V56 FIX - Liked na Count 0 Vara Koodathu da
       if (liked && Number(window.FEED_COUNTS[postId]||0) < 1) window.FEED_COUNTS[postId] = 1;
       if (window.FEED_COUNTS[postId] !== undefined){ paintCount(post, Number(window.FEED_COUNTS[postId])); }
     });
@@ -187,7 +189,6 @@
       const ids = [...new Set(document.querySelectorAll("[data-post-id]")).values()].map(p=>String(p.dataset.postId)).filter(Boolean);
       for(const id of ids){
         const { count } = await supa.from(TABLE).select("*", { count: "exact", head: true }).eq("post_id", id);
-        // ✅ V56 FIX 2 - DB 0 vantha Local ah Azhikkaathe da - Periya Count Thaan da
         if(count !== null && count !== undefined) window.FEED_COUNTS[id] = Math.max(Number(window.FEED_COUNTS[id]||0), Number(count));
       }
       saveLocal(); paintAll();
@@ -196,15 +197,20 @@
   window.addEventListener("pixoro-feed-rendered", ()=> setTimeout(paintAll, 50));
   window.addEventListener("pixoro-reels-rendered", ()=> setTimeout(paintAll, 50));
   window.addEventListener("pixoro-supa-ready", ()=> setTimeout(loadMyLikes, 100));
+  // ✅ V57 FIX 2 - addStyles Body Kadasiya da
   function addStyles(){
-    if (document.getElementById("pixoro-v39-css")) return;
+    let old = document.getElementById("pixoro-v39-css"); if(old) old.remove();
+    let old2 = document.getElementById("pixoro-like-final-css"); if(old2) old2.remove();
     const style = document.createElement("style"); style.id = "pixoro-v39-css";
     style.textContent = `.like-btn, .like-button, [data-like-btn] { background:transparent !important; border:none !important; outline:none !important; box-shadow:none !important; padding:0 !important; overflow:visible !important; opacity:1 !important; visibility:visible !important; } .like-btn svg, .like-button svg, [data-like-btn] svg { background:transparent !important; border:none !important; box-shadow:none !important; outline:none !important; transform-origin: center !important; flex-shrink: 0 !important; opacity:1 !important; visibility:visible !important; overflow:visible !important; } .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked { color:#FF3040 !important; background:transparent !important; } .like-btn.liked svg, .like-button.liked svg { fill:#FF3040 !important; stroke:#FF3040 !important; } .like-btn:not(.liked) svg, .like-btn:not(.liked) svg path { fill:none !important; stroke:#fff !important; } .pixoro-big-heart { pointer-events:none !important; background:transparent !important; border:none !important; box-shadow:none !important; display:block !important; } [data-like-count], .like-count, .likes-count { transform:none !important; animation:none !important; flex-shrink: 0 !important; background:transparent !important; border:none !important; font-size:14px !important; line-height:1 !important; } .pixoro-tap-heart { display:none !important; opacity:0 !important; }`;
-    document.head.appendChild(style);
+    document.body.appendChild(style);
+    const finalStyle = document.createElement("style"); finalStyle.id = "pixoro-like-final-css";
+    finalStyle.textContent = `.like-btn.liked svg, .like-btn.liked svg path, button[data-like-btn].liked svg, button[data-like-btn].liked svg path{ fill:#FF3040 !important; stroke:#FF3040 !important; } .like-btn:not(.liked) svg, .like-btn:not(.liked) svg path, button[data-like-btn]:not(.liked) svg, button[data-like-btn]:not(.liked) svg path{ fill:none !important; stroke:#fff !important; }`;
+    document.body.appendChild(finalStyle);
   }
   window.pixoroToggleLike = toggleLike; window.pixoroPaintAllLikes = paintAll; window.showBigHeart = showBigHeart; window.pixoroTapHeart = showTapHeart; window.pixoroMassDance = showMassDance;
   function start(){ addStyles(); paintAll(); loadMyLikes(); }
   if (document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", start, { once: true }); } else { start(); }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO LIKE V56 LOADED ❤️");
+  console.log("PIXORO LIKE V57 LOADED ❤️");
 })();
