@@ -1,4 +1,7 @@
-/* ===== PIXORO FEED V1032 - CORRECTED - FULL - OLD SVG STYLE ===== */
+/* ===== PIXORO FEED V1033 - CORRECTED - LIKE.JS KU VITTOm DA ===== */
+// ✅ V1033 FIX 1 - Article la data-post-id Add da - like.js ku Theriyum da
+// ✅ V1033 FIX 2 - Like Button ku like-btn + data-like-btn Add da
+// ✅ V1033 FIX 3 - Feed.js oda Thaniya Like Listener ah Delete da - like.js Thaan Pannum da
 (function(){
   "use strict";
   let loading = false;
@@ -19,13 +22,11 @@
     let supa = getClient();
     if(!supa){
       _tried++;
-      // ✅ V1032 - Feed Load Aaguthu Text ah Full Remove Panniten da - Feed ah Azhikka Koodathu da
       if(_tried <= 3){ setTimeout(loadPixoroFeed, 1500); return; }
       return;
     }
     loading = true;
     _tried = 0;
-    // ✅ V1032 - Feed Empty ah Irundha Mattum Loading Kaamikkum da - Already Post Irundha Azhikka Maattom da
     if(!feed.innerHTML.trim() || feed.innerHTML.includes("Innum Post")){
       feed.innerHTML = '';
     }
@@ -42,7 +43,6 @@
         if(p.is_archived === true) return false;
         if(p.visibility === 'private_share') return false;
         if(p.user_id && blocked.includes(String(p.user_id))) return false;
-        // ✅ V1032 - Pixoro Fake ID oda Post ah Mattum Thookidurom da - Oru Photo Mattum da
         let uname = cleanName(p.username||"").toLowerCase();
         if(uname === "pixoro") return false;
         return true;
@@ -79,7 +79,6 @@
         let tn = document.getElementById("pixoroTopNote");
         if(tn) tn.style.display = "none";
       }catch(_){}
-      // ✅ V1032 - PAZHAYA STYLE DA - Outline SVG Like / Comment / Share / Save - Emoji Illa da
       feed.innerHTML = clean.map(p=>{
         let id = String(p.id);
         let owner = String(p.user_id||"");
@@ -95,7 +94,8 @@
         let comments = Number(p.comments_count)||0;
         let isMine = MY_ID && String(MY_ID) === owner;
         let time = p.created_at ? new Date(p.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"short"}) : "";
-        return '<article class="post" data-id="'+esc(id)+'" data-owner="'+esc(owner)+'" style="background:#000;border-bottom:1px solid #222;padding-bottom:12px;margin-bottom:8px">'
+        // ✅ V1033 FIX 1 - data-post-id Add da - data-id um Vechirom da - Pazhaya Code Kedathu da
+        return '<article class="post" data-post-id="'+esc(id)+'" data-id="'+esc(id)+'" data-owner="'+esc(owner)+'" style="background:#000;border-bottom:1px solid #222;padding-bottom:12px;margin-bottom:8px">'
         + '<div style="display:flex;align-items:center;gap:10px;padding:12px">'
         + '<div class="pfpRing" onclick="location.href=\'./profile.html?u='+esc(owner)+'\'" style="cursor:pointer"><div class="pfpInner">'+(avatar ? '<img src="'+avatar+'" onerror="this.remove()">' : '<span style="color:#fff;font-weight:800">'+letter+'</span>')+'</div></div>'
         + '<div style="flex:1;min-width:0"><b style="color:#fff;cursor:pointer" onclick="location.href=\'./profile.html?u='+esc(owner)+'\'">'+esc(username)+' '+tick+'</b><div style="color:#888;font-size:11px">'+esc(time)+'</div></div>'
@@ -103,9 +103,9 @@
         + '<button onclick="openPostMenu(\''+esc(id)+'\',\''+esc(owner)+'\',\''+esc(username)+'\')" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer">⋯</button>'
         + '</div>'
         + (img ? (isVideo ? '<video src="'+img+'" style="width:100%;aspect-ratio:4/5;object-fit:cover;background:#111" controls playsinline preload="metadata"></video>' : '<img src="'+img+'" style="width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#111">') : '')
-        // ✅ PAZHAYA OUTLINE SVG BAR DA - Emoji Illa da
         + '<div style="display:flex;gap:18px;padding:10px 12px;align-items:center">'
-        + '<button data-action="like" data-post-id="'+esc(id)+'" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="rCount" style="color:#fff;font-size:14px">'+likes+'</span></button>'
+        // ✅ V1033 FIX 2 - like-btn + data-like-btn + data-like-count Add da - like.js ku Theriyum da
+        + '<button class="like-btn" data-like-btn="true" data-action="like" data-post-id="'+esc(id)+'" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="rCount like-count" data-like-count="true" style="color:#fff;font-size:14px">'+likes+'</span></button>'
         + '<button onclick="openComment(\''+esc(id)+'\')" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.5-8.5h.5a8.5 8.5 0 0 1 8 8z"/></svg><span style="color:#fff;font-size:14px">'+comments+'</span></button>'
         + '<button onclick="openShareModal ? openShareModal(\''+esc(id)+'\') : openShare(\''+esc(id)+'\')" style="background:none;border:none;cursor:pointer"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button>'
         + '<button onclick="savePostFeed(\''+esc(id)+'\', this)" style="background:none;border:none;cursor:pointer;margin-left:auto"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>'
@@ -113,31 +113,8 @@
         + '<div style="padding:0 12px 10px;color:#fff;font-size:14px"><b>'+esc(username)+'</b> '+caption+'</div>'
         + '</article>';
       }).join("");
-      // ✅ Like - Outline la Irundhu Red Fill Aagum da - Pazhaya Style da
-      feed.querySelectorAll('[data-action="like"]').forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          let pid = btn.dataset.postId;
-          let liked = btn.classList.toggle("liked");
-          let cntEl = btn.querySelector(".rCount");
-          let c = Number(cntEl?.textContent||0);
-          if(cntEl) cntEl.textContent = liked ? c+1 : Math.max(0, c-1);
-          let svg = btn.querySelector("svg");
-          if(svg){
-            svg.setAttribute("fill", liked ? "#FF3040" : "none");
-            svg.setAttribute("stroke", liked ? "#FF3040" : "#fff");
-            let path = svg.querySelector("path"); if(path) path.setAttribute("fill", liked ? "#FF3040" : "none");
-            try{ svg.getAnimations().forEach(a=>a.cancel()); }catch(_){}
-            svg.animate([{transform:"scale(1)"},{transform:"scale(1.25)"},{transform:"scale(0.95)"},{transform:"scale(1)"}],{duration:280,easing:"ease-out"});
-          }
-          (async()=>{
-            try{
-              if(!MY_ID) return;
-              if(liked) await supa.from("likes").insert({post_id: pid, user_id: MY_ID});
-              else await supa.from("likes").delete().eq("post_id", pid).eq("user_id", MY_ID);
-            }catch(_){}
-          })();
-        });
-      });
+      // ✅ V1033 FIX 3 - Feed oda Thaniya Like Listener ah Full Delete da - like.js Thaan Like Pannum da
+      // ✅ Ithu Irundha - Rendu Like Nadakkum da - Local Save Aagathu da - Fake Like Varum da
       feed.querySelectorAll('[data-action="follow"]').forEach(btn=>{
         btn.addEventListener("click", ()=>{
           if(window.pixoroToggleFollow) window.pixoroToggleFollow(btn.dataset.followUser||"", btn);
@@ -147,6 +124,8 @@
       if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
       if(window.pixoroCheckBell) window.pixoroCheckBell();
       window.dispatchEvent(new Event("pixoro-feed-rendered"));
+      // ✅ Feed Render Aana Aprom Like ah Paint Pannu da
+      if(window.pixoroPaintAllLikes) setTimeout(()=>window.pixoroPaintAllLikes(), 50);
     }catch(e){
       console.error("PIXORO FEED ERROR:", e);
     }finally{
