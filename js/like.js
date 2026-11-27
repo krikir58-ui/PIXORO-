@@ -1,16 +1,17 @@
 /* =====================================================
-   PIXORO LIKE V71
+   PIXORO LIKE V72
    LIKE BUTTON  = LIKE / UNLIKE
    PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
    SUPABASE = SERVER SAVE
    + COMMENT MODAL GUARD DA - Comment Like ah like.js Thodathu da
+   + COMMENT LIKE CHINNA DA - Perusa Heart Parakkaathu da
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V71) return;
-  window.PIXORO_LIKE_V71 = true;
+  if (window.PIXORO_LIKE_V72) return;
+  window.PIXORO_LIKE_V72 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
@@ -274,7 +275,9 @@
 
   /* ✅ CORRECTED DA - Like Button ku Nerra Ye Mela Poi Maraiyum da - Comment Nera Pogaathu da */
   function showUnlikeHeart(button) {
+    // ✅ V72 ADD - Comment Button na Perusa Heart Parakka Koodathu da
     if (!button) return;
+    if (button.closest && (button.closest("#commentModal") || button.closest("[data-comment-like]") || button.closest("[data-like]"))) return;
     const rect = button.getBoundingClientRect();
     if (!rect.width) return;
     let x = rect.left + rect.width / 2;
@@ -470,8 +473,8 @@
   }
 
   document.addEventListener("pointerdown", event => {
-    // ✅ V71 ADD - Comment Modal la Irundha - like.js Thodave Koodathu da - comments.js Paathukkum da
-    if (event.target.closest && event.target.closest("#commentModal")) return;
+    // ✅ V72 ADD - Comment Modal / Comment Like na like.js Thodave Koodathu da
+    if (event.target.closest && (event.target.closest("#commentModal") || event.target.closest("[data-comment-like]") || event.target.closest("[data-like]"))) return;
     if (event.target.closest(
       "button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]"
     )) return;
@@ -513,8 +516,8 @@
   /* LIKE BUTTON CLICK */
 
   document.addEventListener("click", event => {
-    // ✅ V71 ADD - Comment Modal la Irundha - like.js Thodave Koodathu da - comments.js Paathukkum da
-    if (event.target.closest && event.target.closest("#commentModal")) return;
+    // ✅ V72 ADD - Comment Modal / Comment Like na like.js Thodave Koodathu da
+    if (event.target.closest && (event.target.closest("#commentModal") || event.target.closest("[data-comment-like]") || event.target.closest("[data-like]"))) return;
     const button = event.target.closest(
       "[data-like-btn], .like-btn, .like-button"
     );
@@ -666,10 +669,10 @@
   /* STYLES */
 
   function addStyles() {
-    if (document.getElementById("pixoro-like-v71-css")) return;
+    if (document.getElementById("pixoro-like-v72-css")) return;
 
     const style = document.createElement("style");
-    style.id = "pixoro-like-v71-css";
+    style.id = "pixoro-like-v72-css";
 
     style.textContent = `
       .like-btn,
@@ -743,6 +746,16 @@
         height: 44px !important;
       }
 
+      /* ✅ V72 ADD - Comment Like Chinna Tha Irukkanum da - Perusa Aaga Koodathu da */
+      #commentModal .pixoro-c-heart,
+      #commentModal .pixoro-c-heart svg{
+        width:16px!important; height:16px!important;
+        animation:none!important; transform:none!important;
+      }
+      #commentModal .pixoro-c-heart:active{ transform:scale(1.1)!important; }
+      #commentModal .pixoro-unlike-heart,
+      #commentModal .pixoro-big-heart{ display:none!important; }
+
       /* ✅ Like Button Cut Aagaama - Parent Clip Panna Vidaama da */
       .post-actions, .post-footer, .actions, .post-action-bar, .rActions, .post-actions-row {
         overflow: visible !important;
@@ -803,5 +816,5 @@
     start();
   }
 
-  console.log("PIXORO LIKE V71 READY ❤️");
+  console.log("PIXORO LIKE V72 READY ❤️");
 })();
