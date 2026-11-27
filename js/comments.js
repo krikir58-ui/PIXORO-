@@ -1,6 +1,6 @@
-// ===== PIXORO COMMENT - v18 FINAL FIX da =====
-// Send Button ah 3 Vazhila Kattiten da - Overwrite Panna Mudiyaathu da
-// pointerdown preventDefault ah Thookiten da - Adhu Tha iPhone la Block Pannuchu da
+// ===== PIXORO COMMENT - v20 - js/comments.js la Mattum Podu da =====
+// Send = Oru Vazhi Mattum da - Triple Call Illa da
+// openComment(id) Illanaalum - Auto Post ID da
 
 const PIXORO_COMMENT_EMOJIS = ["❤️","🙌","🔥","👏","😍","😮","😂","💯"];
 const PIXORO_ICON_EMOJI = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`;
@@ -49,6 +49,36 @@ function pixoroCommentCSS(){
   document.head.appendChild(s);
 }
 
+// ✅ POST ID FINDER da - ID Illanaalum Kandupidikkum da
+function pixoroFindPostId(fromEl){
+  if(typeof fromEl === 'string' && fromEl.length > 3 && !fromEl.includes('[object') && fromEl !== 'undefined') return fromEl;
+  if(fromEl && fromEl.dataset && fromEl.dataset.postId) return fromEl.dataset.postId;
+  let el = fromEl && fromEl.closest ? fromEl.closest('[data-post-id],[data-id],article,.post,.post-card') : null;
+  if(el && el.dataset?.postId) return el.dataset.postId;
+  if(el && el.dataset?.id) return el.dataset.id;
+  if(window.LAST_CLICKED_POST_ID) return window.LAST_CLICKED_POST_ID;
+  if(window.CURRENT_COMMENT_POST && window.CURRENT_COMMENT_POST !== 'undefined') return window.CURRENT_COMMENT_POST;
+  let md = document.getElementById('commentModal')?.dataset?.postId;
+  if(md && md !== 'undefined') return md;
+  let first = document.querySelector('[data-comment-count]');
+  if(first) return first.getAttribute('data-comment-count');
+  return null;
+}
+
+// ✅ Feed la Enna Click Pannalum - Post ID ah Save Panniduven da
+document.addEventListener('click', (e)=>{
+  let t = e.target.closest('[data-post-id],[data-id],[onclick*="openComment"]');
+  if(t){
+    if(t.dataset?.postId) window.LAST_CLICKED_POST_ID = t.dataset.postId;
+    else if(t.dataset?.id) window.LAST_CLICKED_POST_ID = t.dataset.id;
+    let m = t.getAttribute('onclick') || '';
+    let mm = m.match(/openComment\(['"]([^'"]+)['"]\)/);
+    if(mm && mm[1]) window.LAST_CLICKED_POST_ID = mm[1];
+  }
+  let card = e.target.closest('[data-post-id],article,.post,.post-card');
+  if(card?.dataset?.postId) window.LAST_CLICKED_POST_ID = card.dataset.postId;
+}, true);
+
 function pixoroCommentLayout(){
   pixoroCommentCSS();
   const modal = document.getElementById("commentModal");
@@ -91,10 +121,8 @@ function pixoroCommentLayout(){
     stickerBtn.onclick = ()=>{ emojiRow.style.display = "flex"; input.focus(); };
     const sendArrow = document.createElement("button");
     sendArrow.type = "button"; sendArrow.className = "pixoro-c-send-arrow"; sendArrow.innerHTML = PIXORO_ICON_SEND;
-    // ✅ 1. Inline onclick - Pazhaya File Overwrite Pannalum Idhu Work Aagum da
-    sendArrow.setAttribute("onclick", "pixoroSendComment()");
-    // ✅ 2. Direct onclick
-    sendArrow.onclick = ()=> pixoroSendComment();
+    // ✅ Oru Vazhi Mattum da - onclick Mattum da - Global Delegation Illa da - Triple Call Illa da
+    sendArrow.onclick = (e)=>{ e.preventDefault(); e.stopPropagation(); pixoroSendComment(); };
     oldWrap.querySelectorAll("button").forEach(b=>{ if(/post|send/i.test(b.textContent||"")) b.classList.add("pixoro-c-send-btn"); });
     pill.append(emojiBtn, input, gifBtn, stickerBtn);
     bottomInput.append(pill, sendArrow);
@@ -104,12 +132,15 @@ function pixoroCommentLayout(){
   }
 }
 
-function openComment(id){
-  window.CURRENT_COMMENT_POST = id;
-  window.LAST_POST_ID = id;
+// ✅ openComment - ID Illana Pazhaya ID ah Azhikka Maatten da - Adhu Tha v18 Bug da
+function openComment(id, el){
+  let pid = pixoroFindPostId(id) || pixoroFindPostId(el) || pixoroFindPostId(window.event?.target);
+  if(!pid){ alert('Post ID Kandupidikka Mudiyala da - Feed Button la openComment(post.id) nu Podu da'); return; }
+  window.CURRENT_COMMENT_POST = pid;
+  window.LAST_CLICKED_POST_ID = pid;
   let m = document.getElementById('commentModal');
-  if(m){ m.dataset.postId = id; m.style.display = 'flex'; }
-  loadComments(id);
+  if(m){ m.dataset.postId = pid; m.style.display = 'flex'; }
+  loadComments(pid);
 }
 function closeComment(){
   let m = document.getElementById('commentModal');
@@ -139,8 +170,8 @@ function pixoroCommentRow(c, postId, isOptimistic){
     <div><div class="pixoro-c-heart">♡</div><div class="pixoro-c-heart-count">${c.likes_count||''}</div></div>
   </div>`;
 }
-
 async function loadComments(postId){
+  if(!postId || postId === 'undefined') return;
   try{
     let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
     let {data, error} = await s.from('comments').select('*').eq('post_id',postId).order('created_at',{ascending:true});
@@ -156,23 +187,18 @@ async function loadComments(postId){
     if(cc) cc.innerText = cnt;
   }catch(e){}
 }
-
-// ✅ MAIN SEND FUNCTION da - Periu Maathiten da - Pazhaya addComment Overwrite Panna Mudiyaathu da
-// ✅ Double Click Aana Rendume Send Aagaathu da - Lock Vechiten da
 let pixoroSending = false;
 function pixoroSendComment(){
   if(pixoroSending) return;
   let inp = document.getElementById('commentInput');
-  if(!inp){ alert('Input Illa da'); return; }
+  if(!inp) return;
   let txt = inp.value.trim();
-  if(!txt){ alert('Type Pannu da'); return; }
-  let postId = window.CURRENT_COMMENT_POST || document.getElementById('commentModal')?.dataset?.postId || window.LAST_POST_ID;
-  if(!postId){ alert('Post ID Illa da - Comment Button ah Thottu Open Pannu da'); return; }
+  if(!txt) return;
+  let postId = pixoroFindPostId();
+  if(!postId || postId === 'undefined'){ alert('Post ID Illa da - Feed Button la openComment(post.id) nu Podu da'); return; }
   window.CURRENT_COMMENT_POST = postId;
   pixoroSending = true;
-  setTimeout(()=>{ pixoroSending = false; }, 1000);
-
-  // 1. ODANE SCREEN LA VARUM da
+  setTimeout(()=>{ pixoroSending = false; }, 800);
   let tempId = 'temp_' + Date.now();
   let box = document.getElementById('commentList');
   let myName = (window.ME_RAW||'user').replace('@','');
@@ -185,7 +211,6 @@ function pixoroSendComment(){
     if(cc) cc.innerText = Number(cc.innerText||0) + 1;
   }
   inp.value = '';
-  // 2. BACKGROUND SAVE da
   (async ()=>{
     try{
       let s = window.getSupa ? window.getSupa() : window.supa;
@@ -203,25 +228,19 @@ function pixoroSendComment(){
     }catch(e){ alert('Send Fail da - Karanam: ' + e.message); }
   })();
 }
-
-// ✅ 3. GLOBAL DELEGATION da - Button Evlo Thadava Create Aanaalum Idhu Work Aagum da
-document.addEventListener('click', (e)=>{
-  if(e.target.closest('.pixoro-c-send-arrow')){ pixoroSendComment(); }
-});
-
 async function deleteComment(commentId, postId){
   if(!confirm('Delete pannatta da?')) return;
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
   await s.from('comments').delete().eq('id',commentId).eq('user_id',window.ME_ID);
   loadComments(postId);
 }
-
 document.addEventListener('DOMContentLoaded', ()=>{
   pixoroCommentLayout();
   let inp = document.getElementById('commentInput');
   if(inp) inp.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); pixoroSendComment(); } });
 });
-
+// ✅ DOMContentLoaded Miss Aanaalum Layout Varum da - Script Late ah Load Aanaalum da
+if(document.readyState !== 'loading') pixoroCommentLayout();
 window.pixoroSendComment = pixoroSendComment;
 window.addComment = pixoroSendComment;
 window.loadComments = loadComments;
