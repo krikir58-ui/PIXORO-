@@ -1,230 +1,715 @@
+
 /* =====================================================
-   PIXORO LIKE V68 FINAL - SANDAI ILLA DA 🔥❤️
-   FEED.JS = RENDER ONLY - LIKE.JS = LIKE ONLY
-   HEART 46px - SPEED 1000ms - LIKE=RED / UNLIKE=WHITE OUTLINE
+   PIXORO LIKE V69 - SERVER SYNC FINAL
+   LIKE BUTTON = LIKE / UNLIKE
+   PHOTO DOUBLE TAP = POP HEART + LIKE
+   SUPABASE = PERMANENT SERVER SAVE
    ===================================================== */
 
 (() => {
   "use strict";
-  if (window.PIXORO_LIKE_V68) return;
-  window.PIXORO_LIKE_V68 = true;
-  // ✅ Pazhaya V65 / V66 / V67 Irundha Block Pannidu da - Rendume Oda Koodathu da
-  window.PIXORO_LIKE_V65 = true; window.PIXORO_LIKE_V66 = true; window.PIXORO_LIKE_V67 = true;
+
+  if (window.PIXORO_LIKE_V69) return;
+  window.PIXORO_LIKE_V69 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
-  const HEART_DURATION = 1000; // ✅ Nee Ketta Speed da - 1000ms
+  const HEART_DURATION = 1000;
+
   const lastTap = new Map();
-  const lastToggleAt = new Map();
   const pending = new Map();
+  const revisions = new Map();
+
   let suppressMediaClickUntil = 0;
-  let _heartId = 0;
-  let _heartLock = 0;
-  let _activeHeart = null;
+  let heartId = 0;
 
   function getSupa() {
-    return window.supa || window.supabaseClient || (typeof window.getSupa === "function" ? window.getSupa() : null);
+    return window.getSupa?.() ||
+      window.supa ||
+      window.supabaseClient ||
+      null;
   }
+
   async function getUserId() {
-    if (window.ME_ID) return window.ME_ID;
-    const supa = getSupa(); if (!supa) return null;
-    try { const { data } = await supa.auth.getSession(); return data?.session?.user?.id || null; } catch { return null; }
+    if (window.ME_ID) return String(window.ME_ID);
+
+    const supa = getSupa();
+    if (!supa) return null;
+
+    try {
+      const { data, error } = await supa.auth.getSession();
+      if (error) throw error;
+
+      const id = data?.session?.user?.id || null;
+      if (id) window.ME_ID = id;
+
+      return id;
+    } catch (error) {
+      console.error("PIXORO AUTH:", error);
+      return null;
+    }
   }
 
-  try { window.FEED_LIKES = new Set(JSON.parse(localStorage.getItem("pixoro_likes") || "[]").map(String)); } catch { window.FEED_LIKES = new Set(); }
-  try { window.FEED_COUNTS = JSON.parse(localStorage.getItem("pixoro_counts") || "{}"); } catch { window.FEED_COUNTS = {}; }
+  window.FEED_LIKES = new Set();
+  window.FEED_COUNTS = {};
+
+  try {
+    window.FEED_LIKES = new Set(
+      JSON.parse(localStorage.getItem("pixoro_likes") || "[]").map(String)
+    );
+
+    window.FEED_COUNTS = JSON.parse(
+      localStorage.getItem("pixoro_counts") || "{}"
+    );
+  } catch (error) {}
+
   function saveLocal() {
-    try { localStorage.setItem("pixoro_likes", JSON.stringify([...window.FEED_LIKES])); localStorage.setItem("pixoro_counts", JSON.stringify(window.FEED_COUNTS)); } catch(e){}
+    try {
+      localStorage.setItem(
+        "pixoro_likes",
+        JSON.stringify([...window.FEED_LIKES])
+      );
+
+      localStorage.setItem(
+        "pixoro_counts",
+        JSON.stringify(window.FEED_COUNTS)
+      );
+    } catch (error) {}
   }
 
-  function getPost(element) { return element?.closest("[data-post-id]"); }
+  function getPost(element) {
+    return element?.closest("[data-post-id]");
+  }
+
   function getPostId(element) {
     const post = getPost(element);
-    return String(element?.dataset?.postId || post?.dataset?.postId || post?.dataset?.id || "");
-  }
-  function getLikeButton(post) { return post?.querySelector("[data-like-btn], .like-btn, .like-button"); }
-  function getLikeCount(post) { return post?.querySelector("[data-like-count], .like-count, .likes-count, [data-count='likes'], .rCount"); }
-  function findMedia(element) {
-    if (!element?.closest) return null;
-    return element.closest(".postMedia, .post-media, .post-media-wrap") || element.closest("[data-post-id]");
+
+    return String(
+      element?.dataset?.postId ||
+      post?.dataset?.postId ||
+      post?.dataset?.id ||
+      ""
+    );
   }
 
-  /* ✅ V68 FIX - ITHU THAAN MUKKIYAM DA - Unlike = NONE da - #fff Illa da */
+  function getLikeButton(post) {
+    return post?.querySelector(
+      "[data-like-btn], .like-btn, .like-button"
+    );
+  }
+
+  function getLikeCount(post) {
+    return post?.querySelector(
+      "[data-like-count], .like-count, .likes-count, [data-count='likes'], .rCount"
+    );
+  }
+
+  function findMedia(element) {
+    return element?.closest(
+      ".postMedia, .post-media, .post-media-wrap"
+    ) || null;
+  }
+
   function paintLike(post, liked) {
-    const button = getLikeButton(post); if (!button) return;
+    const button = getLikeButton(post);
+    if (!button) return;
+
     button.classList.toggle("liked", liked);
     button.classList.toggle("is-liked", liked);
     button.classList.toggle("active", liked);
-    button.setAttribute("aria-pressed", String(liked));
+
     button.dataset.liked = String(liked);
-    button.style.setProperty("color", liked ? "#FF3040" : "#fff", "important");
-    button.querySelectorAll("svg, svg path, svg use, svg g").forEach(el => {
-      // ✅ Like = Red Fill + Red Stroke | Unlike = NO Fill + White Stroke (Outline Mattum da)
-      el.style.setProperty("fill", liked ? "#FF3040" : "none", "important");
-      el.style.setProperty("stroke", liked ? "#FF3040" : "#fff", "important");
-      try { el.setAttribute("fill", liked ? "#FF3040" : "none"); el.setAttribute("stroke", liked ? "#FF3040" : "#fff"); } catch(e){}
-    });
-    button.querySelectorAll("*").forEach(el => {
-      el.style.setProperty("fill", liked ? "#FF3040" : "none", "important");
-      el.style.setProperty("stroke", liked ? "#FF3040" : "#fff", "important");
+    button.setAttribute("aria-pressed", String(liked));
+
+    button.style.setProperty(
+      "color",
+      liked ? "#FF3040" : "#FFFFFF",
+      "important"
+    );
+
+    button.querySelectorAll("svg, svg *").forEach(el => {
+      el.style.setProperty(
+        "fill",
+        liked ? "#FF3040" : "none",
+        "important"
+      );
+
+      el.style.setProperty(
+        "stroke",
+        liked ? "#FF3040" : "#FFFFFF",
+        "important"
+      );
     });
   }
-  function paintCount(post, count) { const el = getLikeCount(post); if (!el) return; el.textContent = Math.max(0, Number(count) || 0); }
 
-  /* ✅ Heart 46px - Orey Heart - Speed 1000ms */
+  function paintCount(post, count) {
+    const el = getLikeCount(post);
+    if (!el) return;
+
+    el.textContent = String(Math.max(0, Number(count) || 0));
+  }
+
+  function paintAll() {
+    document.querySelectorAll("[data-post-id]").forEach(post => {
+      const id = String(post.dataset.postId || post.dataset.id || "");
+      if (!id) return;
+
+      paintLike(post, window.FEED_LIKES.has(id));
+
+      if (window.FEED_COUNTS[id] !== undefined) {
+        paintCount(post, window.FEED_COUNTS[id]);
+      }
+    });
+  }
+
+  /* ==========================================
+     POP HEART - PHOTO DOUBLE TAP ONLY
+     ========================================== */
+
   function showBigHeart(media, x, y) {
     if (!media) return;
-    const now = Date.now();
-    if (now - _heartLock < 800) return;
-    _heartLock = now;
-    if (_activeHeart) { try { _activeHeart.remove(); } catch(e){} _activeHeart = null; }
-    document.querySelectorAll(".pixoro-big-heart").forEach(el => el.remove());
+
     const rect = media.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
-    const startX = Number.isFinite(x) ? x : rect.left + rect.width / 2;
-    const startY = Number.isFinite(y) ? y : rect.top + rect.height / 2;
-    _heartId++;
-    const gid = "pixoroHeartV68" + _heartId;
+
+    const px = Number.isFinite(x) ? x : rect.left + rect.width / 2;
+    const py = Number.isFinite(y) ? y : rect.top + rect.height / 2;
+
     const heart = document.createElement("div");
+    const gid = "pixoroV69Heart" + (++heartId);
+
     heart.className = "pixoro-big-heart";
-    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:46px;height:46px;transform:translate(-50%,-50%) scale(0);opacity:0;display:block;`;
-    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 10px 22px rgba(255,45,149,.65))"><defs><linearGradient id="${gid}"><stop offset="0%" stop-color="#FF2D95"/><stop offset="55%" stop-color="#FF5E8A"/><stop offset="100%" stop-color="#C86BFF"/></linearGradient></defs><path fill="url(#${gid})" stroke="#fff" stroke-width="0.6" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+
+    heart.style.cssText = `
+      position:fixed;
+      z-index:999999;
+      pointer-events:none;
+      left:${px}px;
+      top:${py}px;
+      width:46px;
+      height:46px;
+      display:block;
+      transform:translate(-50%,-50%) scale(0);
+      opacity:0;
+    `;
+
+    heart.innerHTML = `
+      <svg viewBox="0 0 24 24"
+        style="width:100%;height:100%;
+        filter:drop-shadow(0 8px 18px rgba(255,45,149,.6))">
+        <defs>
+          <linearGradient id="${gid}">
+            <stop offset="0%" stop-color="#FF2D95"/>
+            <stop offset="55%" stop-color="#FF5E8A"/>
+            <stop offset="100%" stop-color="#C86BFF"/>
+          </linearGradient>
+        </defs>
+        <path
+          fill="url(#${gid})"
+          stroke="#FFFFFF"
+          stroke-width=".6"
+          d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"
+        />
+      </svg>
+    `;
+
     document.body.appendChild(heart);
-    _activeHeart = heart;
+
     const anim = heart.animate([
-      { transform: "translate(-50%,-50%) scale(0) rotate(-10deg)", opacity: 0 },
-      { transform: "translate(-50%,-50%) scale(1.4) rotate(5deg)", opacity: 1, offset: 0.14 },
-      { transform: "translate(-50%,-50%) scale(1) rotate(-3deg)", opacity: 1, offset: 0.24 },
-      { transform: "translate(-50%,-50%) scale(1.08) rotate(2deg)", opacity: 1, offset: 0.35 },
-      { transform: "translate(-50%,-50%) scale(1) rotate(0deg)", opacity: 1, offset: 0.55 },
-      { transform: "translate(-50%,-55%) scale(1) rotate(0deg)", opacity: 1, offset: 0.70 },
-      { transform: "translate(-50%,-85%) scale(1) rotate(0deg)", opacity: 1, offset: 0.85 },
-      { transform: "translate(-50%,-120%) scale(0.9) rotate(0deg)", opacity: 0 }
-    ], { duration: HEART_DURATION, easing: "ease-out", fill: "forwards" });
-    anim.onfinish = () => { heart.remove(); if (_activeHeart === heart) _activeHeart = null; };
+      {
+        transform: "translate(-50%,-50%) scale(0)",
+        opacity: 0
+      },
+      {
+        transform: "translate(-50%,-50%) scale(1.4)",
+        opacity: 1,
+        offset: 0.18
+      },
+      {
+        transform: "translate(-50%,-50%) scale(1)",
+        opacity: 1,
+        offset: 0.42
+      },
+      {
+        transform: "translate(-50%,-65%) scale(1.05)",
+        opacity: 1,
+        offset: 0.70
+      },
+      {
+        transform: "translate(-50%,-120%) scale(.8)",
+        opacity: 0
+      }
+    ], {
+      duration: HEART_DURATION,
+      easing: "ease-out",
+      fill: "forwards"
+    });
+
+    anim.onfinish = () => heart.remove();
   }
-  window.pixoroShowHeartDance = (media, x, y) => showBigHeart(media, x, y);
+
+  window.pixoroShowHeartDance = showBigHeart;
   window.showBigHeart = showBigHeart;
 
+  /* ==========================================
+     BUTTON ANIMATION - NO POP HEART
+     ========================================== */
+
   function buttonAnimation(post) {
-    const button = getLikeButton(post); if (!button) return;
-    const icon = button.querySelector("svg"); if (!icon) return;
-    try { icon.getAnimations().forEach(a => a.cancel()); } catch(e){}
-    icon.animate([{ transform: "scale(1)" },{ transform: "scale(1.5)", offset: .3 },{ transform: "scale(.9)", offset: .55 },{ transform: "scale(1.2)", offset: .75 },{ transform: "scale(1)" }], { duration: 400, easing: "ease-out" });
+    const icon = getLikeButton(post)?.querySelector("svg");
+    if (!icon) return;
+
+    icon.getAnimations().forEach(a => a.cancel());
+
+    icon.animate([
+      { transform: "scale(1)" },
+      { transform: "scale(1.35)", offset: .35 },
+      { transform: "scale(.95)", offset: .65 },
+      { transform: "scale(1)" }
+    ], {
+      duration: 250,
+      easing: "ease-out"
+    });
   }
 
+  /* ==========================================
+     SERVER SAVE - INSERT / DELETE
+     ========================================== */
+
   async function serverSave(postId, liked) {
-    const supa = getSupa(); if (!supa) return;
-    const userId = await getUserId(); if (!userId) return;
-    try {
-      if (liked) { const { error } = await supa.from(TABLE).upsert({ post_id: postId, user_id: userId }, { onConflict: "post_id,user_id" }); if (error) throw error; }
-      else { const { error } = await supa.from(TABLE).delete().eq("post_id", postId).eq("user_id", userId); if (error) throw error; }
-    } catch (error) { console.error("PIXORO LIKE SAVE:", error); }
+    const supa = getSupa();
+    if (!supa) throw new Error("Supabase client not ready");
+
+    const userId = await getUserId();
+    if (!userId) throw new Error("Please login first");
+
+    if (liked) {
+      const { error } = await supa
+        .from(TABLE)
+        .upsert(
+          {
+            post_id: postId,
+            user_id: userId
+          },
+          {
+            onConflict: "post_id,user_id",
+            ignoreDuplicates: true
+          }
+        );
+
+      if (error) throw error;
+
+    } else {
+      const { error } = await supa
+        .from(TABLE)
+        .delete()
+        .eq("post_id", postId)
+        .eq("user_id", userId);
+
+      if (error) throw error;
+    }
   }
+
+  /* ==========================================
+     QUEUED SERVER SYNC
+     ========================================== */
+
+  function queueServerSave(
+    postId,
+    liked,
+    revision,
+    previousLiked,
+    previousCount,
+    post
+  ) {
+    const previousRequest =
+      pending.get(postId) || Promise.resolve();
+
+    const nextRequest = previousRequest
+      .catch(() => {})
+      .then(() => serverSave(postId, liked))
+      .catch(error => {
+        console.error("PIXORO SERVER LIKE ERROR:", error);
+
+        // Roll back only if no newer click happened.
+        if (revisions.get(postId) === revision) {
+          if (previousLiked) {
+            window.FEED_LIKES.add(postId);
+          } else {
+            window.FEED_LIKES.delete(postId);
+          }
+
+          window.FEED_COUNTS[postId] = previousCount;
+
+          saveLocal();
+          paintLike(post, previousLiked);
+          paintCount(post, previousCount);
+        }
+      });
+
+    pending.set(postId, nextRequest);
+
+    nextRequest.then(() => {
+      if (pending.get(postId) === nextRequest) {
+        pending.delete(postId);
+      }
+    });
+
+    return nextRequest;
+  }
+
+  /* ==========================================
+     LIKE / UNLIKE
+     ========================================== */
 
   function toggleLike(postId, post, forceLike = false) {
     if (!postId || !post) return false;
+
     postId = String(postId);
-    const now = Date.now(); const previous = lastToggleAt.get(postId) || 0;
-    if (!forceLike && now - previous < 300) return window.FEED_LIKES.has(postId);
-    lastToggleAt.set(postId, now);
+
     const alreadyLiked = window.FEED_LIKES.has(postId);
     const willLike = forceLike ? true : !alreadyLiked;
-    if (forceLike && alreadyLiked) { paintLike(post, true); setTimeout(() => paintLike(post, true), 80); return true; }
+
+    // Double tap on an already liked post does nothing.
+    if (forceLike && alreadyLiked) {
+      paintLike(post, true);
+      return true;
+    }
+
     const countEl = getLikeCount(post);
-    const oldCount = window.FEED_COUNTS[postId] !== undefined ? Number(window.FEED_COUNTS[postId]) : Number(countEl?.textContent || 0);
-    const newCount = willLike ? oldCount + 1 : Math.max(0, oldCount - 1);
-    if (willLike) window.FEED_LIKES.add(postId); else window.FEED_LIKES.delete(postId);
-    window.FEED_COUNTS[postId] = newCount; saveLocal();
-    paintLike(post, willLike); paintCount(post, newCount);
-    // ✅ Feed.js White Aakkinaalum Thirumba Red / White Aakkurom da
-    setTimeout(() => { paintLike(post, willLike); paintCount(post, newCount); }, 80);
-    setTimeout(() => { paintLike(post, willLike); paintCount(post, newCount); }, 250);
-    const previousRequest = pending.get(postId) || Promise.resolve();
-    const nextRequest = previousRequest.catch(()=>{}).then(() => serverSave(postId, willLike));
-    pending.set(postId, nextRequest);
-    nextRequest.finally(() => { if (pending.get(postId) === nextRequest) pending.delete(postId); });
+
+    const oldCount =
+      window.FEED_COUNTS[postId] !== undefined
+        ? Number(window.FEED_COUNTS[postId])
+        : Number(countEl?.textContent || 0);
+
+    const previousCount = Math.max(0, oldCount);
+    const previousLiked = alreadyLiked;
+
+    const newCount = willLike
+      ? previousCount + 1
+      : Math.max(0, previousCount - 1);
+
+    if (willLike) {
+      window.FEED_LIKES.add(postId);
+    } else {
+      window.FEED_LIKES.delete(postId);
+    }
+
+    window.FEED_COUNTS[postId] = newCount;
+
+    const revision = (revisions.get(postId) || 0) + 1;
+    revisions.set(postId, revision);
+
+    // Instant UI update.
+    saveLocal();
+    paintLike(post, willLike);
+    paintCount(post, newCount);
+
+    // Permanent server save.
+    queueServerSave(
+      postId,
+      willLike,
+      revision,
+      previousLiked,
+      previousCount,
+      post
+    );
+
     return willLike;
   }
 
-  window.pixoroDoLike = (postId, btn) => { const post = btn?.closest("[data-post-id]"); return toggleLike(postId, post, true); };
+  window.pixoroToggleLike = toggleLike;
+
+  window.pixoroDoLike = (postId, btn) => {
+    const post = getPost(btn);
+    return toggleLike(postId, post, true);
+  };
+
   window.likePost = window.pixoroDoLike;
 
+  /* ==========================================
+     PHOTO DOUBLE TAP
+     ========================================== */
+
   function handleDoubleTap(media, postId, post, x, y) {
-    suppressMediaClickUntil = Date.now() + 450;
-    showBigHeart(media || post, x, y);
-    buttonAnimation(post);
+    suppressMediaClickUntil = Date.now() + 500;
+
+    showBigHeart(media, x, y);
+
+    // Only like. Never unlike through photo double tap.
     toggleLike(postId, post, true);
   }
 
   document.addEventListener("pointerdown", event => {
-    if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
-    const post = getPost(event.target); if (!post) return;
-    const postId = getPostId(event.target); if (!postId) return;
-    const media = findMedia(event.target); if (!media) return;
-    const now = Date.now(); const previous = lastTap.get(postId);
+    if (event.target.closest(
+      "button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]"
+    )) return;
+
+    const post = getPost(event.target);
+    if (!post) return;
+
+    const postId = getPostId(event.target);
+    if (!postId) return;
+
+    const media = findMedia(event.target);
+    if (!media) return;
+
+    const now = Date.now();
+    const previous = lastTap.get(postId);
+
     if (previous && now - previous.time <= DOUBLE_TAP_DELAY) {
       lastTap.delete(postId);
-      handleDoubleTap(media, postId, post, event.clientX, event.clientY);
-    } else { lastTap.set(postId, { time: now, x: event.clientX, y: event.clientY }); }
+
+      handleDoubleTap(
+        media,
+        postId,
+        post,
+        event.clientX,
+        event.clientY
+      );
+    } else {
+      lastTap.set(postId, {
+        time: now,
+        x: event.clientX,
+        y: event.clientY
+      });
+    }
   }, true);
 
+  /* ==========================================
+     LIKE BUTTON CLICK
+     ========================================== */
+
   document.addEventListener("click", event => {
-    const button = event.target.closest("[data-like-btn], .like-btn, .like-button");
+    const button = event.target.closest(
+      "[data-like-btn], .like-btn, .like-button"
+    );
+
     if (button) {
-      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
-      const post = getPost(button); const postId = getPostId(button); if (!post || !postId) return;
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      const post = getPost(button);
+      const postId = getPostId(button);
+
+      if (!post || !postId) return;
+
       buttonAnimation(post);
+
+      // Only button can Like / Unlike.
       toggleLike(postId, post, false);
       return;
     }
-    if (Date.now() < suppressMediaClickUntil && event.target.closest(".postMedia, .post-media, .post-media-wrap")) {
-      event.preventDefault(); event.stopPropagation();
+
+    if (
+      Date.now() < suppressMediaClickUntil &&
+      event.target.closest(".postMedia, .post-media, .post-media-wrap")
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
     }
   }, true);
 
-  function paintAll() {
-    document.querySelectorAll("[data-post-id]").forEach(post => {
-      const postId = String(post.dataset.postId || post.dataset.id || ""); if (!postId) return;
-      const liked = window.FEED_LIKES.has(postId); paintLike(post, liked);
-      if (window.FEED_COUNTS[postId] !== undefined) paintCount(post, window.FEED_COUNTS[postId]);
+  /* ==========================================
+     LOAD SERVER LIKES + COUNTS
+     ONE QUERY FOR VISIBLE FEED POSTS
+     ========================================== */
+
+  let syncRunning = false;
+  let syncAgain = false;
+
+  async function syncVisiblePosts() {
+    if (syncRunning) {
+      syncAgain = true;
+      return;
+    }
+
+    const posts = [...document.querySelectorAll("[data-post-id]")];
+
+    const postMap = new Map();
+
+    posts.forEach(post => {
+      const id = String(post.dataset.postId || post.dataset.id || "");
+      if (id) postMap.set(id, post);
     });
+
+    const ids = [...postMap.keys()];
+    if (!ids.length) return;
+
+    const supa = getSupa();
+    const userId = await getUserId();
+
+    if (!supa || !userId) {
+      paintAll();
+      return;
+    }
+
+    syncRunning = true;
+
+    try {
+      const { data, error } = await supa
+        .from(TABLE)
+        .select("post_id,user_id")
+        .in("post_id", ids);
+
+      if (error) throw error;
+
+      const counts = {};
+      const serverLiked = new Set();
+
+      ids.forEach(id => counts[id] = 0);
+
+      (data || []).forEach(row => {
+        const id = String(row.post_id);
+
+        counts[id] = (counts[id] || 0) + 1;
+
+        if (String(row.user_id) === String(userId)) {
+          serverLiked.add(id);
+        }
+      });
+
+      // Replace local state for visible posts with server truth.
+      ids.forEach(id => {
+        window.FEED_LIKES.delete(id);
+
+        if (serverLiked.has(id)) {
+          window.FEED_LIKES.add(id);
+        }
+
+        window.FEED_COUNTS[id] = counts[id];
+      });
+
+      saveLocal();
+      paintAll();
+
+    } catch (error) {
+      console.error("PIXORO SERVER SYNC:", error);
+      paintAll();
+
+    } finally {
+      syncRunning = false;
+
+      if (syncAgain) {
+        syncAgain = false;
+        setTimeout(syncVisiblePosts, 100);
+      }
+    }
   }
 
-  async function loadMyLikes() {
-    const supa = getSupa(); const userId = await getUserId(); if (!supa || !userId) { paintAll(); return; }
-    try {
-      const { data, error } = await supa.from(TABLE).select("post_id").eq("user_id", userId);
-      if (error) throw error;
-      window.FEED_LIKES = new Set((data || []).map(item => String(item.post_id)));
-      saveLocal(); paintAll();
-    } catch (error) { console.error("PIXORO LOAD LIKES:", error); }
-  }
+  window.pixoroSyncLikes = syncVisiblePosts;
+  window.pixoroPaintAllLikes = paintAll;
+
+  /* ==========================================
+     STYLES
+     ========================================== */
 
   function addStyles() {
-    const old = document.getElementById("pixoro-like-v68-css"); if (old) old.remove();
-    const style = document.createElement("style"); style.id = "pixoro-like-v68-css";
+    if (document.getElementById("pixoro-like-v69-css")) return;
+
+    const style = document.createElement("style");
+    style.id = "pixoro-like-v69-css";
+
     style.textContent = `
-      .like-btn, .like-button, [data-like-btn] { background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; overflow: visible !important; visibility: visible !important; }
-      .like-btn svg, .like-button svg, [data-like-btn] svg { transform-origin: center !important; flex-shrink: 0 !important; }
-      .like-btn.liked, .like-button.liked, .like-btn.is-liked, .like-button.is-liked, .like-btn.active { color: #FF3040 !important; }
-      .like-btn.liked svg, .like-button.liked svg, [data-like-btn].liked svg, .like-btn.liked svg *, .like-button.liked svg * { fill: #FF3040 !important; stroke: #FF3040 !important; }
-      .like-btn.liked svg path, .like-button.liked svg path, [data-like-btn].liked svg path { fill: #FF3040 !important; stroke: #FF3040 !important; }
-      .like-btn:not(.liked) svg, .like-btn:not(.liked) svg path, .like-button:not(.liked) svg path { fill: none !important; stroke: #fff !important; }
-      .pixoro-big-heart { pointer-events: none !important; background: transparent !important; border: none !important; box-shadow: none !important; }
-      [data-like-count], .like-count, .likes-count { flex-shrink: 0 !important; }
+      .like-btn,
+      .like-button,
+      [data-like-btn] {
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+        cursor: pointer !important;
+        -webkit-tap-highlight-color: transparent !important;
+      }
+
+      .like-btn svg,
+      .like-button svg,
+      [data-like-btn] svg {
+        transform-origin: center !important;
+        flex-shrink: 0 !important;
+      }
+
+      .like-btn.liked,
+      .like-button.liked,
+      [data-like-btn].liked,
+      .like-btn.is-liked {
+        color: #FF3040 !important;
+      }
+
+      .like-btn.liked svg,
+      .like-button.liked svg,
+      [data-like-btn].liked svg,
+      .like-btn.liked svg *,
+      .like-button.liked svg * {
+        fill: #FF3040 !important;
+        stroke: #FF3040 !important;
+      }
+
+      .like-btn:not(.liked) svg,
+      .like-button:not(.liked) svg,
+      [data-like-btn]:not(.liked) svg {
+        fill: none !important;
+        stroke: #FFFFFF !important;
+      }
+
+      .pixoro-big-heart {
+        pointer-events: none !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      [data-like-count],
+      .like-count,
+      .likes-count {
+        flex-shrink: 0 !important;
+      }
     `;
+
     document.head.appendChild(style);
   }
 
-  window.pixoroToggleLike = toggleLike;
-  window.pixoroPaintAllLikes = paintAll;
-  window.addEventListener("pixoro-feed-rendered", () => setTimeout(paintAll, 50));
-  window.addEventListener("pixoro-reels-rendered", () => setTimeout(paintAll, 50));
-  window.addEventListener("pixoro-supa-ready", () => setTimeout(loadMyLikes, 100));
-  window.addEventListener("pixoro:login", loadMyLikes);
+  /* ==========================================
+     FEED EVENTS
+     ========================================== */
 
-  function start() { addStyles(); paintAll(); loadMyLikes(); }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true }); else start();
-  console.log("PIXORO LIKE V68 LOADED ❤️🔥 NO FIGHT - 46px 1000ms");
+  function start() {
+    addStyles();
+    paintAll();
+    syncVisiblePosts();
+  }
+
+  window.addEventListener("pixoro-feed-rendered", () => {
+    setTimeout(syncVisiblePosts, 100);
+  });
+
+  window.addEventListener("pixoro-reels-rendered", () => {
+    setTimeout(syncVisiblePosts, 100);
+  });
+
+  window.addEventListener("pixoro-supa-ready", () => {
+    setTimeout(syncVisiblePosts, 100);
+  });
+
+  window.addEventListener("pixoro:login", () => {
+    setTimeout(syncVisiblePosts, 100);
+  });
+
+  window.addEventListener("pixoro:logout", () => {
+    window.FEED_LIKES.clear();
+    window.FEED_COUNTS = {};
+    saveLocal();
+    paintAll();
+  });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start, { once: true });
+  } else {
+    start();
+  }
+
+  console.log("PIXORO LIKE V69 SERVER SYNC READY ❤️");
 })();
