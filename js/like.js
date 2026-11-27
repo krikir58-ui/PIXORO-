@@ -524,15 +524,8 @@
 
       if (!post || !postId) return;
 
-      /* ✅ CORRECTED DA - LIKE BUTTON THOTTALUM POP - UNLIKE NA BUTTON PAKKATHULA MELLA POI MARAIYUM DA */
-      const wasLiked = window.FEED_LIKES.has(String(postId));
-      const media = post.querySelector(".post-media, .postMedia") || post;
-      const r = media.getBoundingClientRect();
-      if (!wasLiked) {
-        showBigHeart(media, r.left + r.width / 2, r.top + r.height / 2);
-      } else {
-        showUnlikeHeart(button);
-      }
+      /* ✅ CORRECTED DA - Like Pannalum Unlike Pannalum - Like Button ku Nerra Ye Mella Mela Poi Maraiyum da */
+      showUnlikeHeart(button);
 
       buttonAnimation(post);
       toggleLike(postId, post, false);
