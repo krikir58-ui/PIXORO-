@@ -1,7 +1,7 @@
-/* ===== PIXORO FEED V1034 - CORRECTED - INSTAGRAM 2026 LIKE ===== */
-// ✅ V1034 FIX 1 - Photo ku post-media Wrapper + big-heart da
-// ✅ V1034 FIX 2 - Double Tap = Always LIKE da - Unlike Illa da
-// ✅ V1034 FIX 3 - like.js Thaan Like Pannum da - Feed la Thaniya Like Illa da
+/* ===== PIXORO FEED V1035 - CORRECTED - INSTAGRAM 2026 LIKE + AVATAR DA ===== */
+// ✅ V1035 FIX 1 - setupDoubleTap FULL DELETE da - like.js Mattum Like Pannum da - Unlike Aagaathu da
+// ✅ V1035 FIX 2 - Avatar Fix da - Profile Photo Thaan Ella Page ku Varum da - G Letter Varaathu da
+// ✅ V1035 FIX 3 - big-heart Div Delete da - like.js Thaan Periya Heart Kaattum da
 (function(){
   "use strict";
   let loading = false;
@@ -16,31 +16,40 @@
   function safeURL(v){
     try{ const u = new URL(v, location.href); return ["https:","http:"].includes(u.protocol) ? esc(u.href) : ""; }catch{ return ""; }
   }
-
-  // ✅ V1034 - Double Tap Setup da
-  function setupDoubleTap(){
-    document.querySelectorAll(".post-media").forEach(media=>{
-      if(media.dataset.dt) return; media.dataset.dt = "1";
-      let lastTap = 0;
-      media.addEventListener("click", ()=>{
-        const now = Date.now();
-        if(now - lastTap < 300){
-          const postId = media.dataset.postId;
-          const btn = document.querySelector('.like-btn[data-post-id="'+postId+'"]');
-          // Periya Heart Animation - Eppovum Kaattu da
-          const h = media.querySelector(".big-heart");
-          if(h){ h.style.transition="all .3s"; h.style.opacity="1"; h.style.transform="scale(1.2)"; setTimeout(()=>{ h.style.opacity="0"; h.style.transform="scale(0.3)"; }, 750); }
-          // Already Like Pannirundha - Unlike Pannaathe da - like.js ku Vidaathe da
-          if(btn){
-            const svg = btn.querySelector("svg");
-            const isLiked = svg && (svg.getAttribute("fill") === "#FF2D55" || svg.getAttribute("fill") === "red" || svg.getAttribute("fill") === "#ff2d55");
-            if(!isLiked){ btn.click(); }
-          }
-        }
-        lastTap = now;
-      });
-    });
+  // ✅ V1035 - En Photo va Eduthu Ella Edathula Podu da
+  function getMyPhoto(){
+    return window.MY_PFP || localStorage.getItem("pixoro_avatar") || localStorage.getItem("pixoro_pfp") || localStorage.getItem("my_avatar") || "";
   }
+  function getAvatarFor(owner, prof, p, MY_ID){
+    // 1. En Post na - En Profile Photo Thaan da
+    if(MY_ID && String(owner) === String(MY_ID)){
+      let mine = getMyPhoto() || prof?.avatar_url || p?.avatar_url || "";
+      if(mine) return safeURL(mine);
+    }
+    // 2. Vera User na - profiles la Irukka Photo da
+    let a = prof?.avatar_url || p?.avatar_url || "";
+    return a ? safeURL(a) : "";
+  }
+  // ✅ V1035 - Profile Photo ah Ella Page ku Sync Pannu da - nav + story + feed
+  async function pixoroSyncMyAvatar(MY_ID){
+    let supa = getClient(); if(!supa || !MY_ID) return;
+    try{
+      let { data } = await supa.from("profiles").select("avatar_url,username").eq("id", MY_ID).single();
+      let photo = data?.avatar_url || getMyPhoto();
+      if(!photo) return;
+      window.MY_PFP = photo;
+      try{ localStorage.setItem("pixoro_avatar", photo); }catch(e){}
+      // Nav + Story la Irukka En Photo ah Maathu da
+      document.querySelectorAll(".myPfp, #navPfp, #myStoryImg").forEach(img=>{
+        if(img && img.tagName === "IMG"){ img.src = photo; img.style.display = "block"; }
+      });
+      let letter = document.getElementById("myStoryLetter"); if(letter) letter.style.display = "none";
+      // Feed la En Post ku Irukka Photo ah Maathu da
+      document.querySelectorAll('[data-owner="'+MY_ID+'"] .feedPfpImg').forEach(img=>{ img.src = photo; img.style.display = "block"; });
+      document.querySelectorAll('[data-owner="'+MY_ID+'"] .feedPfpLetter').forEach(s=>{ s.style.display = "none"; });
+    }catch(e){}
+  }
+  window.pixoroSyncMyAvatar = pixoroSyncMyAvatar;
 
   async function loadPixoroFeed(){
     let feed = document.getElementById("feed");
@@ -59,6 +68,8 @@
     try{
       let MY_ID = "";
       try{ let {data:{session}} = await supa.auth.getSession(); MY_ID = session?.user?.id || ""; window.ME_ID = MY_ID || window.ME_ID; }catch(_){}
+      // ✅ En Photo va Munnadiye Edu da
+      if(MY_ID) await pixoroSyncMyAvatar(MY_ID);
       let r = await supa.from("posts").select("*").order("created_at",{ascending:false}).limit(100);
       if(r.error) throw r.error;
       let posts = Array.isArray(r.data) ? [...r.data] : [];
@@ -97,7 +108,7 @@
       window.profileMap = profileMap;
       if(MY_ID && profileMap[String(MY_ID)]){
         window.ME_RAW = cleanName(profileMap[String(MY_ID)].username || window.ME_RAW);
-        if(profileMap[String(MY_ID)].avatar_url) window.MY_PFP = profileMap[String(MY_ID)].avatar_url;
+        if(profileMap[String(MY_ID)].avatar_url){ window.MY_PFP = profileMap[String(MY_ID)].avatar_url; try{ localStorage.setItem("pixoro_avatar", window.MY_PFP); }catch(e){} }
       }
       try{
         let tb = document.getElementById("trendBar");
@@ -110,7 +121,8 @@
         let owner = String(p.user_id||"");
         let prof = profileMap[owner] || {};
         let username = cleanName(prof.username || p.username || "Pixoro User");
-        let avatar = safeURL(prof.avatar_url || p.avatar_url || "");
+        // ✅ V1035 - Avatar Fix da - En Photo na En Photo, Vera User na Avanga Photo da
+        let avatar = getAvatarFor(owner, prof, p, MY_ID);
         let letter = esc(username.charAt(0).toUpperCase());
         let caption = esc(p.caption||"");
         let img = safeURL(p.image_url || p.media_url || p.video_url || "");
@@ -122,15 +134,15 @@
         let time = p.created_at ? new Date(p.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"short"}) : "";
         return '<article class="post" data-post-id="'+esc(id)+'" data-id="'+esc(id)+'" data-owner="'+esc(owner)+'" style="background:#000;border-bottom:1px solid #222;padding-bottom:12px;margin-bottom:8px">'
         + '<div style="display:flex;align-items:center;gap:10px;padding:12px">'
-        + '<div class="pfpRing" onclick="location.href=\'./profile.html?u='+esc(owner)+'\'" style="cursor:pointer"><div class="pfpInner">'+(avatar ? '<img src="'+avatar+'" onerror="this.remove()">' : '<span style="color:#fff;font-weight:800">'+letter+'</span>')+'</div></div>'
+        // ✅ V1035 - ID Pakkathula Circle Photo da - Photo Illana Mattum Letter da - Photo Irundha Letter Varaathu da
+        + '<div class="pfpRing" onclick="location.href=\'./profile.html?u='+esc(owner)+'\'" style="cursor:pointer"><div class="pfpInner">'+(avatar ? '<img class="feedPfpImg" src="'+avatar+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><span class="feedPfpLetter" style="color:#fff;font-weight:800;display:none">'+letter+'</span>' : '<span class="feedPfpLetter" style="color:#fff;font-weight:800">'+letter+'</span>')+'</div></div>'
         + '<div style="flex:1;min-width:0"><b style="color:#fff;cursor:pointer" onclick="location.href=\'./profile.html?u='+esc(owner)+'\'">'+esc(username)+' '+tick+'</b><div style="color:#888;font-size:11px">'+esc(time)+'</div></div>'
         + (isMine ? '' : '<button class="followBtnPost" data-action="follow" data-follow-user="'+esc(username)+'" data-follow-username="'+esc(username)+'">Follow</button>')
         + '<button onclick="openPostMenu(\''+esc(id)+'\',\''+esc(owner)+'\',\''+esc(username)+'\')" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer">⋯</button>'
         + '</div>'
-        // ✅ V1034 CORRECTED - Photo Wrapper da
+        // ✅ V1035 - Photo Wrapper da - big-heart Delete da - like.js Thaan Heart Kaattum da
         + (img ? '<div class="post-media" data-post-id="'+esc(id)+'" style="position:relative;overflow:hidden">'
         + (isVideo ? '<video src="'+img+'" style="width:100%;aspect-ratio:4/5;object-fit:cover;background:#111" controls playsinline preload="metadata"></video>' : '<img src="'+img+'" style="width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#111">')
-        + '<div class="big-heart" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:90px;opacity:0;transform:scale(0.3);pointer-events:none;z-index:10">❤️</div>'
         + '</div>' : '')
         + '<div style="display:flex;gap:18px;padding:10px 12px;align-items:center">'
         + '<button class="like-btn" data-like-btn="true" data-action="like" data-post-id="'+esc(id)+'" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="rCount like-count" data-like-count="true" style="color:#fff;font-size:14px">'+likes+'</span></button>'
@@ -149,10 +161,10 @@
       if(window.pixoroLoadAvatars) window.pixoroLoadAvatars();
       if(window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
       if(window.pixoroCheckBell) window.pixoroCheckBell();
+      if(MY_ID) pixoroSyncMyAvatar(MY_ID);
       window.dispatchEvent(new Event("pixoro-feed-rendered"));
       if(window.pixoroPaintAllLikes) setTimeout(()=>window.pixoroPaintAllLikes(), 50);
-      // ✅ V1034 - Double Tap ah Inga Call Pannu da
-      setTimeout(()=>setupDoubleTap(), 80);
+      // ❌ setupDoubleTap Call Delete da - like.js Thaan Pannum da
     }catch(e){
       console.error("PIXORO FEED ERROR:", e);
     }finally{
