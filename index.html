@@ -4,21 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Pixoro - Final Mass Killa</title>
-<!-- ✅ V1036 - Ellam v1036 / v54 da - Cache Adikka Koodathu da -->
-<link rel="stylesheet" href="style.css?v=1036">
-<link rel="stylesheet" href="css/comments.css?v=1036">
-<link rel="stylesheet" href="css/pixoro-style.css?v=1036">
-<link rel="stylesheet" href="css/top-plus.css?v=1036">
-<link rel="stylesheet" href="css/feed.css?v=1036">
-<link rel="stylesheet" href="css/top-fix.css?v=1036">
+<!-- ✅ V1037 - Ellam v1037 / v56 da - Cache Adikka Koodathu da -->
+<link rel="stylesheet" href="style.css?v=1037">
+<link rel="stylesheet" href="css/comments.css?v=1037">
+<link rel="stylesheet" href="css/pixoro-style.css?v=1037">
+<link rel="stylesheet" href="css/top-plus.css?v=1037">
+<link rel="stylesheet" href="css/feed.css?v=1037">
+<link rel="stylesheet" href="css/top-fix.css?v=1037">
 <style>
-/* ✅ V1036 - Trend Bar + Top Banner + Loading Text Full Hide da */
+/* ✅ V1037 - Trend Bar + Top Banner + Loading Text Full Hide da */
 #trendBar, .trendBar, #pixoroTopNote{ display:none!important; }
 #feedError{ display:none!important; }
-/* ✅ V1036 - V54 Heart ku Protection da - feed.css kooda Same da */
+/* ✅ V1037 - V56 Heart ku Protection da */
 body > .pixoro-big-heart{ position:fixed!important; display:block!important; pointer-events:none!important; background:transparent!important; border:none!important; box-shadow:none!important; overflow:visible!important; z-index:999999!important; visibility:visible!important; }
 body > .pixoro-big-heart svg{ width:100%!important; height:100%!important; display:block!important; visibility:visible!important; }
 </style>
+<!-- ✅ V1037 FIX - En Photo va Udaney Podu da - Supabase Wait Panna Venaam da - G Letter Varaathu da -->
+<script>
+  try{
+    var _myPfp = localStorage.getItem("pixoro_avatar") || localStorage.getItem("pixoro_pfp") || localStorage.getItem("my_avatar") || "";
+    if(_myPfp){ window.MY_PFP = _myPfp; }
+  }catch(e){}
+</script>
 </head>
 <body>
 <div class="top"><b>Pixoro</b><div class="topRight"><div class="topPlus" onclick="location.href='./create.html'">+</div><div class="bellWhite" onclick="location.href='./notification.html'"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span id="pixoroBellDot"></span></div></div></div>
@@ -74,21 +81,31 @@ body > .pixoro-big-heart svg{ width:100%!important; height:100%!important; displ
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<!-- ✅ V1036 CORRECTED ORDER + VERSION DA - Ellam Same Version da -->
-<script src="js/supabase.js?v=1036"></script>
-<script src="js/pixoro-core.js?v=1036"></script>
-<script src="js/avatar.js?v=1036"></script>
-<script src="js/follow.js?v=1036"></script>
-<script src="js/comments.js?v=1036"></script>
-<script src="js/share.js?v=1036"></script>
-<script src="js/save.js?v=1036"></script>
-<script src="js/story.js?v=1036"></script>
-<!-- ✅ V1036 FIX - like.js V54 ah Feed ku MUNNAADI Podurom da -->
-<script src="js/like.js?v=55"></script>
-<!-- ✅ V1036 - feed.js V1034 da - Double Tap Delete Panna Feed da - like.js Thaan Like Pannum da -->
-<script src="js/feed.js?v=1034"></script>
+<!-- ✅ V1037 CORRECTED ORDER + VERSION DA - Ellam Same Version da -->
+<script src="js/supabase.js?v=1037"></script>
+<script src="js/pixoro-core.js?v=1037"></script>
+<script src="js/avatar.js?v=1037"></script>
+<script src="js/follow.js?v=1037"></script>
+<script src="js/comments.js?v=1037"></script>
+<script src="js/share.js?v=1037"></script>
+<script src="js/save.js?v=1037"></script>
+<script src="js/story.js?v=1037"></script>
+<!-- ✅ V1037 FIX - like.js V56 ah Feed ku MUNNAADI Podurom da -->
+<script src="js/like.js?v=56"></script>
+<!-- ✅ V1037 - feed.js V1035 da - Double Tap Delete Panna Feed da - like.js Thaan Like Pannum da -->
+<script src="js/feed.js?v=1035"></script>
 <script>
 window.PIXORO_FEED_MODE = 'foryou';
+// ✅ V1037 FIX - En Photo va Udaney Ellam Edathula Podu da - G Letter ah Hide Pannu da
+(function(){
+  try{
+    var p = window.MY_PFP || localStorage.getItem("pixoro_avatar") || "";
+    if(!p) return;
+    var nav = document.getElementById("navPfp"); if(nav){ nav.src = p; nav.style.display = "block"; }
+    var story = document.getElementById("myStoryImg"); if(story){ story.src = p; story.style.display = "block"; }
+    var letter = document.getElementById("myStoryLetter"); if(letter) letter.style.display = "none";
+  }catch(e){}
+})();
 </script>
 </body>
 </html>
