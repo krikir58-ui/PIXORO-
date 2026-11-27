@@ -1,18 +1,19 @@
 /* =====================================================
-   PIXORO LIKE V73
+   PIXORO LIKE V74
    LIKE BUTTON  = LIKE / UNLIKE - SMOOTH DA - Comment Mari da
    PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
    SUPABASE = SERVER SAVE
    + COMMENT MODAL GUARD DA - Comment Like ah like.js Thodathu da
    + COMMENT LIKE CHINNA DA - Perusa Heart Parakkaathu da
    + V73 FIX DA - Like Button Click la Mela Heart Parakkaathu da - Button 1.15x Smooth Mattum Thudikkum da
+   + V74 ADD DA - Home Heart Less Thudikkum da - 1.06x Chinna Beat Mattum da - Like / Unlike Panna Chinna Heart Mella Mela Poi Maraiyum da - 1100ms Slow da
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V73) return;
-  window.PIXORO_LIKE_V73 = true;
+  if (window.PIXORO_LIKE_V74) return;
+  window.PIXORO_LIKE_V74 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
@@ -671,10 +672,10 @@
   /* STYLES */
 
   function addStyles() {
-    if (document.getElementById("pixoro-like-v73-css")) return;
+    if (document.getElementById("pixoro-like-v74-css")) return;
 
     const style = document.createElement("style");
-    style.id = "pixoro-like-v73-css";
+    style.id = "pixoro-like-v74-css";
 
     style.textContent = `
       .like-btn,
@@ -819,5 +820,69 @@
     start();
   }
 
-  console.log("PIXORO LIKE V73 READY ❤️");
+  console.log("PIXORO LIKE V74 READY ❤️");
+
+  /* ===== ✅ ADD MATTUM DA - Pazhaya V73 Thodala da - HOME HEART LESS THUDIKKU + MELLA MARAIYUM HEART DA - CORRECT ADD DA ===== */
+  (function pixoroHomeHeartSoftADD(){
+    function addStyle(){
+      if(document.getElementById("pixoro-home-heart-soft")) return;
+      var st = document.createElement("style");
+      st.id = "pixoro-home-heart-soft";
+      st.textContent = `
+        .like-btn svg, .like-button svg, [data-like-btn] svg{
+          transition:transform .18s ease, fill .18s ease, stroke .18s ease!important;
+        }
+        .pixoro-soft-float{
+          position:fixed!important; z-index:999999!important; pointer-events:none!important;
+          width:28px!important; height:28px!important;
+          transform:translate(-50%,-50%) scale(1)!important; opacity:1!important;
+        }
+        .pixoro-soft-float svg{ width:28px!important; height:28px!important; display:block!important; }
+      `;
+      document.head.appendChild(st);
+    }
+    addStyle();
+    function floatHeart(btn, liked){
+      if(!btn || btn.closest("#commentModal")) return;
+      var r = btn.getBoundingClientRect();
+      if(!r.width) return;
+      var x = r.left + r.width / 2;
+      var y = r.top - 4;
+      var d = document.createElement("div");
+      d.className = "pixoro-soft-float";
+      d.style.left = x + "px";
+      d.style.top = y + "px";
+      var fill = liked ? "#FF2D95" : "none";
+      var stroke = liked ? "#FF2D95" : "#fff";
+      d.innerHTML = '<svg viewBox="0 0 24 24" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+      document.body.appendChild(d);
+      var anim = d.animate([
+        { transform:"translate(-50%,-50%) scale(0.7)", opacity:0 },
+        { transform:"translate(-50%,-50%) scale(1)", opacity:1, offset:0.2 },
+        { transform:"translate(-50%,-140%) scale(0.95)", opacity:0.9, offset:0.6 },
+        { transform:"translate(-50%,-260%) scale(0.8)", opacity:0 }
+      ], { duration:1100, easing:"ease-out", fill:"forwards" });
+      anim.onfinish = function(){ d.remove(); };
+    }
+    document.addEventListener("pointerdown", function(e){
+      var btn = e.target.closest ? e.target.closest("[data-like-btn], .like-btn, .like-button") : null;
+      if(!btn || btn.closest("#commentModal")) return;
+      var wasLiked = btn.classList.contains("liked");
+      setTimeout(function(){
+        var nowLiked = btn.classList.contains("liked");
+        if(nowLiked !== wasLiked){
+          floatHeart(btn, nowLiked);
+          var svg = btn.querySelector("svg");
+          if(svg){
+            svg.getAnimations().forEach(function(a){ a.cancel(); });
+            svg.animate([
+              { transform:"scale(1)" },
+              { transform:"scale(1.06)" , offset:0.4 },
+              { transform:"scale(1)" }
+            ], { duration:150, easing:"ease-out" });
+          }
+        }
+      }, 80);
+    }, true);
+  })();
 })();
