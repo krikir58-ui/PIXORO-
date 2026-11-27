@@ -1,27 +1,24 @@
-/* ===== PIXORO LIKE V52 - V51 + INSTAGRAM SPEED ===== */
-// ✅ V52 - Local First da - Thotta Udaney Red/White + Count + Animation - 0 Sec da
-// ✅ V52 - Server Silent da - Pinnadi Poi Save Aagum da - Await Illa da
-// ✅ V52 - Saving Block Illa da - Speed ah Thotta Kooda Work Aagum da
-// ✅ V52 - 48px Heart + White Unlike + Button Heart Mela Pogum da
+/* ===== PIXORO LIKE V53 - V52 + DOUBLE FIRE FIX ===== */
+// ✅ V53 FIX 1 - 1 Tap = 1 Toggle Thaan da - 300ms kulla 2nd Toggle Block da
+// ✅ V53 FIX 2 - Server Count ah Local Mela Overwrite Panna Maatom da - Local Thaan Final da
+// ✅ V53 FIX 3 - Pazhaya Heart ah Clear Pannitu Thaan Puthu Heart da - Ninnu Pogaathu da
 (() => {
   "use strict";
   if (window.PIXORO_LIKE_V39) return;
   window.PIXORO_LIKE_V39 = true;
-  window.PIXORO_LIKE_V52 = true;
+  window.PIXORO_LIKE_V53 = true;
   function getSupa(){ return window.supa || window.supabaseClient || (typeof window.getSupa === 'function' ? window.getSupa() : null); }
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 350;
   const HEART_DURATION = 900;
   const lastTap = new Map();
+  const lastToggleAt = new Map();
   const pending = new Map();
   let blockClickUntil = 0;
   let lastTouchTime = 0;
-
-  // ✅ V52 FIX - Local ah Azhikka Maatom da - Local Thaan Speed da
   try { const saved = JSON.parse(localStorage.getItem("pixoro_likes") || "[]"); window.FEED_LIKES = new Set(saved.map(String)); } catch { window.FEED_LIKES = new Set(); }
   try { window.FEED_COUNTS = JSON.parse(localStorage.getItem("pixoro_counts") || "{}"); } catch { window.FEED_COUNTS = {}; }
   function saveLocal(){ try{ localStorage.setItem("pixoro_likes", JSON.stringify([...window.FEED_LIKES])); localStorage.setItem("pixoro_counts", JSON.stringify(window.FEED_COUNTS)); }catch(e){} }
-
   async function getUserId(){
     if (window.currentUser?.id) return window.currentUser.id;
     let supa = getSupa(); if (!supa) return null;
@@ -62,8 +59,10 @@
     el.textContent = Math.max(0, Number(count) || 0);
     el.style.transform = "none"; el.style.animation = "none"; el.style.fontSize = "14px"; el.style.lineHeight = "1"; el.style.display = "inline-block"; el.style.opacity = "1"; el.style.visibility = "visible";
   }
+  function clearOldHearts(){ document.querySelectorAll(".pixoro-big-heart").forEach(h => { try{ h.remove(); }catch(e){} }); }
   function showBigHeart(media, touchX, touchY){
     if (!media) return;
+    clearOldHearts();
     const rect = media.getBoundingClientRect(); if (!rect.width || !rect.height) return;
     const startX = (typeof touchX === 'number' && touchX > 0 ? touchX : rect.left + rect.width / 2);
     const startY = (typeof touchY === 'number' && touchY > 0 ? touchY : rect.top + rect.height / 2);
@@ -114,7 +113,6 @@
     try { icon.getAnimations().forEach(a => a.cancel()); } catch(e) {}
     icon.animate([{ transform: "scale(1)", opacity: 1, offset: 0 },{ transform: "scale(1.5)", opacity: 1, offset: 0.2 },{ transform: "scale(0.9)", opacity: 1, offset: 0.4 },{ transform: "scale(1.35)", opacity: 1, offset: 0.6 },{ transform: "scale(0.95)", opacity: 1, offset: 0.8 },{ transform: "scale(1)", opacity: 1, offset: 1 }], { duration: 500, easing: "ease-out", fill: "forwards" });
   }
-  // ✅ V52 - SILENT SERVER da - Pinnadi Save Aagum da - Fail Aana Mattum Rollback da
   async function serverSave(postId, liked, oldLiked, oldCount){
     let supa = getSupa(); if (!supa) return;
     const userId = await getUserId(); if (!userId) return;
@@ -123,9 +121,7 @@
       else { const { error } = await supa.from(TABLE).delete().eq("post_id", postId).eq("user_id", userId); if (error) throw error; }
       try{
         const { count } = await supa.from(TABLE).select("*", { count: "exact", head: true }).eq("post_id", postId);
-        const realCount = Number(count || 0);
-        window.FEED_COUNTS[String(postId)] = realCount; saveLocal();
-        try{ await supa.from("posts").update({ likes_count: realCount }).eq("id", postId); }catch(e){}
+        try{ await supa.from("posts").update({ likes_count: Number(count || 0) }).eq("id", postId); }catch(e){}
       }catch(e){}
     }catch(error){
       console.error("PIXORO LIKE SILENT FAIL - Rollback:", error);
@@ -137,19 +133,19 @@
       }
     }
   }
-  // ✅ V52 - SYNC da - AWAIT ILLA da - Udaney Return da
   function toggleLike(postId, post, forceLike = false){
     if (!postId || !post) return false; postId = String(postId);
+    const now = Date.now(); const prevAt = lastToggleAt.get(postId) || 0;
+    if (!forceLike && now - prevAt < 300) return window.FEED_LIKES.has(postId);
+    lastToggleAt.set(postId, now);
     const alreadyLiked = window.FEED_LIKES.has(postId); const willLike = forceLike ? true : !alreadyLiked;
     if (forceLike && alreadyLiked){ paintLike(post, true); return true; }
     const countEl = getLikeCount(post);
     const oldCount = (window.FEED_COUNTS[postId] !== undefined) ? Number(window.FEED_COUNTS[postId]) : Number(countEl?.textContent ?? 0);
     const newCount = willLike ? oldCount + 1 : Math.max(0, oldCount - 1);
-    // STEP 1 - LOCAL UDANEY da - 0 Sec da
     if (willLike) window.FEED_LIKES.add(postId); else window.FEED_LIKES.delete(postId);
     window.FEED_COUNTS[postId] = newCount; saveLocal();
     paintLike(post, willLike); paintCount(post, newCount);
-    // STEP 2 - SERVER SILENT da - Queue la Pinnadi Pogum da
     const prev = pending.get(postId) || Promise.resolve();
     const next = prev.catch(()=>{}).then(()=> serverSave(postId, willLike, alreadyLiked, oldCount));
     pending.set(postId, next); next.finally(()=>{ if (pending.get(postId) === next) pending.delete(postId); });
@@ -184,7 +180,7 @@
   }, true);
   document.addEventListener("click", event => {
     const button = event.target.closest("[data-like-btn], .like-btn, .like-button"); if (button){
-      event.preventDefault(); event.stopPropagation();
+      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
       const post = getPost(button); const postId = getPostId(button); if (!post || !postId) return;
       const wasLiked = window.FEED_LIKES.has(String(postId));
       if (!wasLiked) showButtonHeart(button);
@@ -221,5 +217,5 @@
   function start(){ addStyles(); paintAll(); loadMyLikes(); }
   if (document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", start, { once: true }); } else { start(); }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO LIKE V52 INSTAGRAM SPEED ❤️");
+  console.log("PIXORO LIKE V53 LOADED ❤️");
 })();
