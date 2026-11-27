@@ -1,13 +1,9 @@
-// ===== PIXORO COMMENT - v35 - js/comments.js la Podu da =====
-// v34 + Like Koncham Left + Koncham Perusa da
+// ===== PIXORO COMMENT - v37 - js/comments.js la Podu da =====
+// v35 + Killa Type Box Clean da + Send Type Panna Mattum da + Like Perusa da
 
-const PIXORO_COMMENT_EMOJIS = ["❤️","🙌","🔥","👏","😍","😮","😂","💯"];
-const PIXORO_ICON_EMOJI = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`;
-const PIXORO_ICON_GIF = `<svg width="24" height="22" viewBox="0 0 30 26" fill="none" stroke="#fff" stroke-width="1.8"><rect x="1" y="3" width="28" height="20" rx="5"/><text x="15" y="17" text-anchor="middle" font-size="10" font-weight="800" fill="#fff" stroke="none" font-family="system-ui">GIF</text></svg>`;
-const PIXORO_ICON_STICKER = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 2.4 3.4-.5.5 3.4L21 10l-1.5 2.5 1 3.3-3 1.5L16 20l-2.5-1.2L11 20l-1.5-2.7-3-1.5 1-3.3L6 10l2.7-2.7.5-3.4 3.4.5L12 2z"/><circle cx="12" cy="12" r="3"/></svg>`;
 const PIXORO_ICON_SEND = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`;
-const PIXORO_ICON_HEART_OUTLINE = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
-const PIXORO_ICON_HEART_FILL = `<svg width="24" height="24" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+const PIXORO_ICON_HEART_OUTLINE = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+const PIXORO_ICON_HEART_FILL = `<svg width="28" height="28" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
 const PIXORO_ICON_REPLY = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7a5 5 0 0 1-5-5V7"/><path d="M3 7l4-4 4 4"/><path d="M9 17v-4a3 3 0 0 1 3-3h8"/></svg>`;
 const PIXORO_ICON_TRASH = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>`;
 
@@ -29,16 +25,15 @@ function pixoroCommentCSS(){
     .pixoro-c-empty-heart{font-size:32px;}
     .pixoro-c-optimistic{opacity:.7;}
     .pixoro-c-bottom{border-top:1px solid #333;padding:8px 12px 12px 12px;background:#1c1c1e;flex-shrink:0;}
-    #commentModal .pixoro-c-emoji-row{display:flex;gap:18px;overflow-x:auto;padding:2px 4px 8px 4px;scrollbar-width:none;}
-    #commentModal .pixoro-c-emoji-row::-webkit-scrollbar{display:none;}
-    #commentModal .pixoro-c-emoji-row button{background:none;border:none;font-size:24px;cursor:pointer;flex-shrink:0;line-height:1;}
+    #commentModal .pixoro-c-emoji-row{display:none!important;}
     .pixoro-c-bottom-input{display:flex;align-items:center;gap:8px;}
+    .pixoro-c-bottom-input.has-text .pixoro-c-send-arrow{display:flex!important;}
     .pixoro-c-pill{display:flex;align-items:center;gap:6px;flex:1;background:#2a2a2e;border:1px solid #3a3a3e;border-radius:999px;padding:5px 5px 5px 10px;min-width:0;}
     #commentInput{background:transparent!important;color:#fff!important;border:none!important;flex:1!important;min-width:0!important;padding:7px 0!important;font-size:14px!important;outline:none!important;box-shadow:none!important;}
     #commentInput::placeholder{color:#888!important;}
-    .pixoro-c-icon-btn{background:none!important;border:none!important;cursor:pointer!important;padding:4px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0!important;}
+    .pixoro-c-icon-btn{display:none!important;}
     .pixoro-c-send-btn{display:none!important;}
-    .pixoro-c-send-arrow{background:linear-gradient(135deg,#7B2FFF,#A855F7)!important;border:none!important;width:44px!important;height:44px!important;min-width:44px!important;border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;flex-shrink:0!important;box-shadow:0 4px 16px rgba(123,47,255,.5)!important;touch-action:manipulation!important;pointer-events:auto!important;}
+    .pixoro-c-send-arrow{background:linear-gradient(135deg,#7B2FFF,#A855F7)!important;border:none!important;width:44px!important;height:44px!important;min-width:44px!important;border-radius:50%!important;display:none!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;flex-shrink:0!important;box-shadow:0 4px 16px rgba(123,47,255,.5)!important;touch-action:manipulation!important;pointer-events:auto!important;}
     .pixoro-c-send-arrow:active{transform:scale(.92)!important;}
     .pixoro-c-ava{width:38px!important;height:38px!important;border-radius:50%!important;padding:1.5px!important;background:conic-gradient(from 180deg,#FF2D95,#FF9A00,#00E5FF,#7B2FFF,#FF2D95)!important;flex-shrink:0!important;display:flex!important;align-items:center!important;justify-content:center!important;}
     .pixoro-c-ava img{width:100%!important;height:100%!important;border-radius:50%!important;object-fit:cover!important;border:1.5px solid #1c1c1e!important;background:#222!important;}
@@ -55,6 +50,15 @@ function pixoroCommentCSS(){
     .pixoro-c-reply-tag{color:#FF2D95;font-size:12px;margin-bottom:1px;}
   `;
   document.head.appendChild(s);
+}
+function pixoroCommentSendToggle(){
+  let inp = document.getElementById('commentInput');
+  let arrow = document.querySelector('.pixoro-c-send-arrow');
+  let wrap = document.querySelector('.pixoro-c-bottom-input');
+  if(!inp || !arrow) return;
+  let hasText = inp.value.trim().length > 0;
+  arrow.style.display = hasText ? 'flex' : 'none';
+  if(wrap) wrap.classList.toggle('has-text', hasText);
 }
 function pixoroFindPostId(fromEl){
   if(typeof fromEl === 'string' && fromEl.length > 3 && !fromEl.includes('[object') && fromEl !== 'undefined') return fromEl;
@@ -134,32 +138,25 @@ function pixoroCommentLayout(){
     if(!input || !oldWrap) return;
     const bottom = document.createElement("div");
     bottom.className = "pixoro-c-bottom";
-    const emojiRow = document.createElement("div");
-    emojiRow.className = "pixoro-c-emoji-row";
-    emojiRow.innerHTML = PIXORO_COMMENT_EMOJIS.map(e=>`<button type="button" data-emoji="${e}">${e}</button>`).join("");
-    emojiRow.querySelectorAll("[data-emoji]").forEach(b=>{ b.onclick = ()=>{ input.value += b.dataset.emoji; input.focus(); }; });
     const bottomInput = document.createElement("div");
     bottomInput.className = "pixoro-c-bottom-input";
     const pill = document.createElement("div");
     pill.className = "pixoro-c-pill";
-    const emojiBtn = document.createElement("button");
-    emojiBtn.type = "button"; emojiBtn.className = "pixoro-c-icon-btn"; emojiBtn.innerHTML = PIXORO_ICON_EMOJI;
-    emojiBtn.onclick = ()=>{ emojiRow.style.display = emojiRow.style.display === "none" ? "flex" : "none"; input.focus(); };
-    const gifBtn = document.createElement("button");
-    gifBtn.type = "button"; gifBtn.className = "pixoro-c-icon-btn"; gifBtn.innerHTML = PIXORO_ICON_GIF;
-    gifBtn.onclick = ()=>{ emojiRow.style.display = "flex"; input.focus(); };
-    const stickerBtn = document.createElement("button");
-    stickerBtn.type = "button"; stickerBtn.className = "pixoro-c-icon-btn"; stickerBtn.innerHTML = PIXORO_ICON_STICKER;
-    stickerBtn.onclick = ()=>{ emojiRow.style.display = "flex"; input.focus(); };
     const sendArrow = document.createElement("button");
     sendArrow.type = "button"; sendArrow.className = "pixoro-c-send-arrow"; sendArrow.innerHTML = PIXORO_ICON_SEND;
+    sendArrow.style.display = "none";
     sendArrow.onclick = (e)=>{ e.preventDefault(); e.stopPropagation(); pixoroSendComment(); };
     oldWrap.querySelectorAll("button").forEach(b=>{ if(/post|send/i.test(b.textContent||"")) b.classList.add("pixoro-c-send-btn"); });
-    pill.append(emojiBtn, input, gifBtn, stickerBtn);
+    pill.append(input);
     bottomInput.append(pill, sendArrow);
-    bottom.append(emojiRow, bottomInput);
+    bottom.append(bottomInput);
     oldWrap.classList.add("pixoro-c-old-hide");
     box.append(bottom);
+    if(!input.dataset.pixoroSendToggle){
+      input.dataset.pixoroSendToggle = "1";
+      input.addEventListener("input", pixoroCommentSendToggle);
+    }
+    pixoroCommentSendToggle();
   }
   pixoroInitSwipe();
 }
@@ -176,6 +173,7 @@ function pixoroOpenCommentReal(id, el){
   let m = document.getElementById('commentModal');
   if(m){ m.dataset.postId = pid; m.style.display = 'flex'; }
   pixoroInitSwipe();
+  pixoroCommentSendToggle();
   loadComments(pid);
 }
 window.pixoroOpenCommentReal = pixoroOpenCommentReal;
@@ -220,7 +218,7 @@ function pixoroCommentRow(c, postId, isOptimistic){
 function pixoroReplyComment(cid, username){
   pixoroReplyTo = { id: cid, username: username };
   let inp = document.getElementById('commentInput');
-  if(inp){ inp.value = '@' + username + ' '; inp.focus(); inp.placeholder = 'Replying to ' + username + '...'; }
+  if(inp){ inp.value = '@' + username + ' '; inp.focus(); inp.placeholder = 'Replying to ' + username + '...'; pixoroCommentSendToggle(); }
 }
 async function pixoroToggleCommentLike(cid, el){
   if(!el) el = document.querySelector(`[data-comment-like="${cid}"]`);
@@ -305,6 +303,7 @@ function pixoroSendComment(){
     if(head) head.innerText = `Comments`;
   }
   inp.value = ''; inp.placeholder = 'Add comment...'; pixoroReplyTo = null;
+  pixoroCommentSendToggle();
   (async ()=>{
     try{
       let s = window.getSupa ? window.getSupa() : window.supa;
@@ -357,7 +356,10 @@ async function deleteComment(commentId, postId){
 document.addEventListener('DOMContentLoaded', ()=>{
   pixoroCommentLayout();
   let inp = document.getElementById('commentInput');
-  if(inp) inp.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); pixoroSendComment(); } });
+  if(inp){
+    inp.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); pixoroSendComment(); } });
+    if(!inp.dataset.pixoroSendToggle){ inp.dataset.pixoroSendToggle = "1"; inp.addEventListener("input", pixoroCommentSendToggle); }
+  }
 });
 if(document.readyState !== 'loading') pixoroCommentLayout();
 window.pixoroSendComment = pixoroSendComment;
