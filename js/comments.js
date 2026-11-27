@@ -1,13 +1,13 @@
-// ===== PIXORO COMMENT - v34 - js/comments.js la Podu da =====
-// v32 + Koncham Perusa da - Romba Perusa Illa da
+// ===== PIXORO COMMENT - v35 - js/comments.js la Podu da =====
+// v34 + Like Koncham Left + Koncham Perusa da
 
 const PIXORO_COMMENT_EMOJIS = ["❤️","🙌","🔥","👏","😍","😮","😂","💯"];
 const PIXORO_ICON_EMOJI = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`;
 const PIXORO_ICON_GIF = `<svg width="24" height="22" viewBox="0 0 30 26" fill="none" stroke="#fff" stroke-width="1.8"><rect x="1" y="3" width="28" height="20" rx="5"/><text x="15" y="17" text-anchor="middle" font-size="10" font-weight="800" fill="#fff" stroke="none" font-family="system-ui">GIF</text></svg>`;
 const PIXORO_ICON_STICKER = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 2.4 3.4-.5.5 3.4L21 10l-1.5 2.5 1 3.3-3 1.5L16 20l-2.5-1.2L11 20l-1.5-2.7-3-1.5 1-3.3L6 10l2.7-2.7.5-3.4 3.4.5L12 2z"/><circle cx="12" cy="12" r="3"/></svg>`;
 const PIXORO_ICON_SEND = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`;
-const PIXORO_ICON_HEART_OUTLINE = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
-const PIXORO_ICON_HEART_FILL = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+const PIXORO_ICON_HEART_OUTLINE = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+const PIXORO_ICON_HEART_FILL = `<svg width="24" height="24" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
 const PIXORO_ICON_REPLY = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7a5 5 0 0 1-5-5V7"/><path d="M3 7l4-4 4 4"/><path d="M9 17v-4a3 3 0 0 1 3-3h8"/></svg>`;
 const PIXORO_ICON_TRASH = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>`;
 
@@ -48,10 +48,10 @@ function pixoroCommentCSS(){
     .pixoro-c-sub{color:#888;font-size:13px;margin-top:5px;display:flex;gap:12px;align-items:center;}
     .pixoro-c-sub span{background:none!important;color:#888!important;border:none!important;padding:0!important;border-radius:0!important;cursor:pointer;display:inline-flex;align-items:center;gap:4px;}
     .pixoro-c-sub span svg{stroke:#888!important;}
-    .pixoro-c-heart{cursor:pointer;line-height:1;text-align:center;user-select:none;display:flex;justify-content:center;background:none!important;border:none!important;padding:2px!important;transform:none!important;animation:none!important;}
+    .pixoro-c-heart{cursor:pointer;line-height:1;text-align:center;user-select:none;display:flex;justify-content:center;background:none!important;border:none!important;padding:2px!important;margin-right:12px!important;transform:none!important;animation:none!important;}
     .pixoro-c-heart:active{transform:scale(1.1)!important;}
     .pixoro-c-heart.liked svg, .pixoro-c-heart.liked svg path{fill:#FF2D95!important;stroke:#FF2D95!important;}
-    .pixoro-c-heart-count{color:#fff;font-size:12px;text-align:center;margin-top:1px;}
+    .pixoro-c-heart-count{color:#fff;font-size:12px;text-align:center;margin-top:1px;margin-right:12px!important;}
     .pixoro-c-reply-tag{color:#FF2D95;font-size:12px;margin-bottom:1px;}
   `;
   document.head.appendChild(s);
