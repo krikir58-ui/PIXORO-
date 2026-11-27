@@ -1,5 +1,5 @@
 /* =====================================================
-   PIXORO LIKE V74
+   PIXORO LIKE V75
    LIKE BUTTON  = LIKE / UNLIKE - SMOOTH DA - Comment Mari da
    PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
    SUPABASE = SERVER SAVE
@@ -7,13 +7,14 @@
    + COMMENT LIKE CHINNA DA - Perusa Heart Parakkaathu da
    + V73 FIX DA - Like Button Click la Mela Heart Parakkaathu da - Button 1.15x Smooth Mattum Thudikkum da
    + V74 ADD DA - Home Heart Less Thudikkum da - 1.06x Chinna Beat Mattum da - Like / Unlike Panna Chinna Heart Mella Mela Poi Maraiyum da - 1100ms Slow da
+   + V75 CORRECT ADD DA - 80ms Timing Thappu Illa da - MutationObserver da - Class Maariya Udane Pudikkum da - Unlike na White Heart Tha Varum da - Pink Varaathu da
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V74) return;
-  window.PIXORO_LIKE_V74 = true;
+  if (window.PIXORO_LIKE_V75) return;
+  window.PIXORO_LIKE_V75 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
@@ -672,10 +673,10 @@
   /* STYLES */
 
   function addStyles() {
-    if (document.getElementById("pixoro-like-v74-css")) return;
+    if (document.getElementById("pixoro-like-v75-css")) return;
 
     const style = document.createElement("style");
-    style.id = "pixoro-like-v74-css";
+    style.id = "pixoro-like-v75-css";
 
     style.textContent = `
       .like-btn,
@@ -820,18 +821,15 @@
     start();
   }
 
-  console.log("PIXORO LIKE V74 READY ❤️");
+  console.log("PIXORO LIKE V75 READY ❤️");
 
-  /* ===== ✅ ADD MATTUM DA - Pazhaya V73 Thodala da - HOME HEART LESS THUDIKKU + MELLA MARAIYUM HEART DA - CORRECT ADD DA ===== */
-  (function pixoroHomeHeartSoftADD(){
+  /* ===== ✅ V75 CORRECT ADD DA - Pazhaya 80ms ADD ah Delete Panniten da - MutationObserver da - Timing Thappu Illa da ===== */
+  (function pixoroHomeHeartCorrectADD(){
     function addStyle(){
-      if(document.getElementById("pixoro-home-heart-soft")) return;
+      if(document.getElementById("pixoro-home-heart-soft2")) return;
       var st = document.createElement("style");
-      st.id = "pixoro-home-heart-soft";
+      st.id = "pixoro-home-heart-soft2";
       st.textContent = `
-        .like-btn svg, .like-button svg, [data-like-btn] svg{
-          transition:transform .18s ease, fill .18s ease, stroke .18s ease!important;
-        }
         .pixoro-soft-float{
           position:fixed!important; z-index:999999!important; pointer-events:none!important;
           width:28px!important; height:28px!important;
@@ -842,16 +840,20 @@
       document.head.appendChild(st);
     }
     addStyle();
+    var lastTouch = new WeakMap();
+    document.addEventListener("pointerdown", function(e){
+      var btn = e.target.closest ? e.target.closest("[data-like-btn], .like-btn, .like-button") : null;
+      if(!btn || btn.closest("#commentModal")) return;
+      lastTouch.set(btn, Date.now());
+    }, true);
     function floatHeart(btn, liked){
       if(!btn || btn.closest("#commentModal")) return;
       var r = btn.getBoundingClientRect();
       if(!r.width) return;
-      var x = r.left + r.width / 2;
-      var y = r.top - 4;
       var d = document.createElement("div");
       d.className = "pixoro-soft-float";
-      d.style.left = x + "px";
-      d.style.top = y + "px";
+      d.style.left = (r.left + r.width / 2) + "px";
+      d.style.top = (r.top - 4) + "px";
       var fill = liked ? "#FF2D95" : "none";
       var stroke = liked ? "#FF2D95" : "#fff";
       d.innerHTML = '<svg viewBox="0 0 24 24" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
@@ -864,25 +866,29 @@
       ], { duration:1100, easing:"ease-out", fill:"forwards" });
       anim.onfinish = function(){ d.remove(); };
     }
-    document.addEventListener("pointerdown", function(e){
-      var btn = e.target.closest ? e.target.closest("[data-like-btn], .like-btn, .like-button") : null;
-      if(!btn || btn.closest("#commentModal")) return;
-      var wasLiked = btn.classList.contains("liked");
-      setTimeout(function(){
+    var prevLiked = new WeakMap();
+    var obs = new MutationObserver(function(muts){
+      muts.forEach(function(m){
+        var btn = m.target;
+        if(!btn.matches || !btn.matches("[data-like-btn], .like-btn, .like-button")) return;
+        if(btn.closest("#commentModal")) return;
+        var touched = lastTouch.get(btn) || 0;
+        if(Date.now() - touched > 600) return;
         var nowLiked = btn.classList.contains("liked");
-        if(nowLiked !== wasLiked){
-          floatHeart(btn, nowLiked);
-          var svg = btn.querySelector("svg");
-          if(svg){
-            svg.getAnimations().forEach(function(a){ a.cancel(); });
-            svg.animate([
-              { transform:"scale(1)" },
-              { transform:"scale(1.06)" , offset:0.4 },
-              { transform:"scale(1)" }
-            ], { duration:150, easing:"ease-out" });
-          }
+        if(prevLiked.get(btn) === nowLiked) return;
+        prevLiked.set(btn, nowLiked);
+        floatHeart(btn, nowLiked);
+        var svg = btn.querySelector("svg");
+        if(svg){
+          svg.getAnimations().forEach(function(a){ a.cancel(); });
+          svg.animate([
+            { transform:"scale(1)" },
+            { transform:"scale(1.06)", offset:0.4 },
+            { transform:"scale(1)" }
+          ], { duration:150, easing:"ease-out" });
         }
-      }, 80);
-    }, true);
+      });
+    });
+    obs.observe(document.documentElement, { attributes:true, attributeFilter:["class"], subtree:true });
   })();
 })();
