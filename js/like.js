@@ -820,4 +820,43 @@
   }
 
   console.log("PIXORO LIKE V73 READY ❤️");
+
+  /* ===== ✅ ADD MATTUM DA - Pazhaya V73 Thodala da - v74 ADD da - HOME LIKE = COMMENT LIKE DA ===== */
+  function pixoroLikeSmoothADD(){
+    function addSmoothStyle(){
+      var old = document.getElementById("pixoro-like-smooth-add");
+      if(old) old.remove();
+      var st = document.createElement("style");
+      st.id = "pixoro-like-smooth-add";
+      st.textContent = `
+        .like-btn svg, .like-btn svg path, .like-button svg, [data-like-btn] svg{
+          transition:fill .18s ease, stroke .18s ease, transform .18s ease!important;
+          animation:none!important;
+        }
+        .like-btn.liked svg, .like-btn.liked svg path{
+          fill:#FF2D95!important; stroke:#FF2D95!important;
+        }
+        #commentModal .pixoro-c-heart, #commentModal .pixoro-c-heart svg{
+          width:38px!important; height:38px!important; min-width:38px!important; min-height:38px!important;
+          animation:none!important; transform:none!important;
+        }
+      `;
+      document.head.appendChild(st);
+    }
+    setTimeout(addSmoothStyle, 600);
+    setTimeout(addSmoothStyle, 1500);
+    var fixInline = function(){
+      document.querySelectorAll(".like-btn.liked svg, .like-btn.liked svg path, .like-button.liked svg, [data-like-btn].liked svg").forEach(function(el){
+        var f = (el.style.fill || "").toLowerCase();
+        if(f === "rgb(255, 48, 64)" || f === "#ff3040" || f === "rgb(255,48,64)"){
+          el.style.setProperty("fill", "#FF2D95", "important");
+          el.style.setProperty("stroke", "#FF2D95", "important");
+        }
+      });
+    };
+    var obs = new MutationObserver(fixInline);
+    obs.observe(document.documentElement, { attributes:true, attributeFilter:["style","class"], subtree:true, childList:true });
+    fixInline();
+  }
+  pixoroLikeSmoothADD();
 })();
