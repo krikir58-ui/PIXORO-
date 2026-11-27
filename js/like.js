@@ -1,19 +1,19 @@
 /* =====================================================
-   PIXORO LIKE V76
+   PIXORO LIKE V77
    LIKE BUTTON  = LIKE / UNLIKE - SMOOTH DA - Comment Mari da
    PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
    SUPABASE = SERVER SAVE
    + COMMENT MODAL GUARD DA - Comment Like ah like.js Thodathu da
    + COMMENT LIKE CHINNA DA - Perusa Heart Parakkaathu da
    + V73 FIX DA - Like Button Click la Mela Heart Parakkaathu da - Button 1.15x Smooth Mattum Thudikkum da
-   + V76 ADD DA - Like Button Thotta Heart Vanthu Mella Poi Maraiyum da - 1500ms Slow da - 38px Pink Heart da - Like / Unlike Rendum Pink da
+   + V77 ADD DA - Like / Unlike Panna Photo NADUVULA Heart POP Aagum da - Double Tap Mari da - 1500ms Mella Poi Maraiyum da - Button Kitta Heart Varaathu da
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V76) return;
-  window.PIXORO_LIKE_V76 = true;
+  if (window.PIXORO_LIKE_V77) return;
+  window.PIXORO_LIKE_V77 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
@@ -672,10 +672,10 @@
   /* STYLES */
 
   function addStyles() {
-    if (document.getElementById("pixoro-like-v76-css")) return;
+    if (document.getElementById("pixoro-like-v77-css")) return;
 
     const style = document.createElement("style");
-    style.id = "pixoro-like-v76-css";
+    style.id = "pixoro-like-v77-css";
 
     style.textContent = `
       .like-btn,
@@ -820,21 +820,21 @@
     start();
   }
 
-  console.log("PIXORO LIKE V76 READY ❤️");
+  console.log("PIXORO LIKE V77 READY ❤️");
 
-  /* ===== ✅ V76 CORRECT ADD DA - Like Button Thotta Heart Vanthu Mella Poi Maraiyum da - 1500ms Slow da ===== */
-  (function pixoroLikeHeartSlowADD(){
+  /* ===== ✅ V77 CORRECT ADD DA - Like / Unlike Panna Photo NADUVULA Heart POP + Mella Maraiyum da - Button Kitta Heart Varaathu da ===== */
+  (function pixoroCenterPopADD(){
     function addStyle(){
-      if(document.getElementById("pixoro-like-heart-slow")) return;
+      if(document.getElementById("pixoro-center-pop")) return;
       var st = document.createElement("style");
-      st.id = "pixoro-like-heart-slow";
+      st.id = "pixoro-center-pop";
       st.textContent = `
-        .pixoro-slow-float{
+        .pixoro-center-pop{
           position:fixed!important; z-index:999999!important; pointer-events:none!important;
-          width:38px!important; height:38px!important;
-          transform:translate(-50%,-50%) scale(1)!important; opacity:1!important;
+          width:84px!important; height:84px!important;
+          transform:translate(-50%,-50%) scale(0)!important; opacity:0!important;
         }
-        .pixoro-slow-float svg{ width:38px!important; height:38px!important; display:block!important; }
+        .pixoro-center-pop svg{ width:84px!important; height:84px!important; display:block!important; }
       `;
       document.head.appendChild(st);
     }
@@ -845,22 +845,26 @@
       if(!btn || btn.closest("#commentModal")) return;
       lastTouch.set(btn, Date.now());
     }, true);
-    function floatHeart(btn){
+    function centerPop(btn){
       if(!btn || btn.closest("#commentModal")) return;
-      var r = btn.getBoundingClientRect();
+      var post = btn.closest("article.post, .post");
+      var media = post ? post.querySelector(".postMedia, .post-media, .post-media-wrap, img.main, video.main") : null;
+      if(!media) return;
+      var r = media.getBoundingClientRect();
       if(!r.width) return;
       var d = document.createElement("div");
-      d.className = "pixoro-slow-float";
+      d.className = "pixoro-center-pop";
       d.style.left = (r.left + r.width / 2) + "px";
-      d.style.top = (r.top - 6) + "px";
-      d.innerHTML = '<svg viewBox="0 0 24 24" fill="#FF2D95" stroke="#FFFFFF" stroke-width="0.6"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+      d.style.top = (r.top + r.height / 2) + "px";
+      d.innerHTML = '<svg viewBox="0 0 24 24" style="filter:drop-shadow(0 8px 18px rgba(255,45,149,.6))"><path fill="#FF2D95" stroke="#FFFFFF" stroke-width="0.6" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
       document.body.appendChild(d);
       var anim = d.animate([
-        { transform:"translate(-50%,-50%) scale(0.6)", opacity:0 },
-        { transform:"translate(-50%,-50%) scale(1)", opacity:1, offset:0.15 },
-        { transform:"translate(-50%,-100%) scale(1)", opacity:1, offset:0.45 },
-        { transform:"translate(-50%,-180%) scale(0.9)", opacity:0.8, offset:0.7 },
-        { transform:"translate(-50%,-260%) scale(0.7)", opacity:0 }
+        { transform:"translate(-50%,-50%) scale(0)", opacity:0 },
+        { transform:"translate(-50%,-50%) scale(1.4)", opacity:1, offset:0.15 },
+        { transform:"translate(-50%,-50%) scale(1)", opacity:1, offset:0.30 },
+        { transform:"translate(-50%,-55%) scale(1.05)", opacity:1, offset:0.55 },
+        { transform:"translate(-50%,-80%) scale(1)", opacity:0.8, offset:0.75 },
+        { transform:"translate(-50%,-130%) scale(0.8)", opacity:0 }
       ], { duration:1500, easing:"ease-out", fill:"forwards" });
       anim.onfinish = function(){ d.remove(); };
     }
@@ -874,7 +878,7 @@
         var nowLiked = btn.classList.contains("liked");
         if(prevLiked.get(btn) === nowLiked) return;
         prevLiked.set(btn, nowLiked);
-        floatHeart(btn);
+        centerPop(btn);
         var svg = btn.querySelector("svg");
         if(svg){
           svg.getAnimations().forEach(function(a){ a.cancel(); });
