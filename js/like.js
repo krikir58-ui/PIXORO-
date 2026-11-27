@@ -276,7 +276,7 @@
     if (!button) return;
     const rect = button.getBoundingClientRect();
     if (!rect.width) return;
-    let x = rect.left + rect.width + 22;
+    let x = rect.left + rect.width + 30;
     x = Math.max(30, Math.min(x, window.innerWidth - 30));
     const y = rect.top - 8;
     const heart = document.createElement("div");
@@ -684,6 +684,11 @@
         overflow: visible !important;
         cursor: pointer !important;
         -webkit-tap-highlight-color: transparent !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
+        padding: 4px !important;
+        margin-left: 2px !important;
+        flex-shrink: 0 !important;
       }
 
       .like-btn svg,
@@ -691,6 +696,9 @@
       [data-like-btn] svg {
         transform-origin: center !important;
         flex-shrink: 0 !important;
+        overflow: visible !important;
+        width: 24px !important;
+        height: 24px !important;
       }
 
       .like-btn.liked,
@@ -737,9 +745,11 @@
         height: 36px !important;
       }
 
-      /* ✅ Cut Aagaama - Parent ah Clip Panna Vidaama da */
-      .post-actions, .post-footer, .actions, .post-action-bar {
+      /* ✅ Like Button Cut Aagaama - Parent Clip Panna Vidaama da */
+      .post-actions, .post-footer, .actions, .post-action-bar, .rActions, .post-actions-row {
         overflow: visible !important;
+        padding-left: 10px !important;
+        padding-right: 6px !important;
       }
 
       [data-like-count],
