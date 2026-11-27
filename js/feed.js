@@ -1,7 +1,8 @@
 /* =====================================================
-   PIXORO FEED V1041 - FULL CORRECT CODE DA 🔥
+   PIXORO FEED V1042 - FULL CORRECT CODE DA 🔥
    DOUBLE TAP DELETE - LIKE ONLY IN like.js V67
    HEART 46px - SPEED 1000ms - LIKE=RED / UNLIKE=WHITE
+   + COMMENT LIKE GUARD DA - like.js Comment Heart ah Thoda Koodathu da
    ===================================================== */
 
 (function () {
@@ -268,6 +269,18 @@ window.closeComment = function() {
   const modal = document.getElementById("commentModal");
   if (modal) modal.style.display = "none";
 };
+
+/* ✅ v1042 ADD - COMMENT LIKE GUARD DA - Idhu Mattum Add Pannen da */
+/* Comment Heart ah Thotta - Post Like (like.js) ku Poga Vida Maatten da - Comment Like Mattum Work Aagum da */
+if (!window.__pixoroCommentLikeGuard) {
+  window.__pixoroCommentLikeGuard = true;
+  document.addEventListener('click', (e) => {
+    const cLike = e.target.closest && e.target.closest('[data-like]');
+    if (cLike) { e.stopPropagation(); return; }
+    const cModal = e.target.closest && e.target.closest('#commentModal');
+    if (cModal && e.target.closest && e.target.closest('[data-like-btn]')) { e.stopPropagation(); return; }
+  }, true);
+}
 
 /* POST MENU */
 window.openPostMenu = function(id, owner, username) {
