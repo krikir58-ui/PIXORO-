@@ -1,8 +1,7 @@
 /* =====================================================
-   PIXORO FEED V1040 - FULL CODE
-   BLACK SCREEN FIX + HEART DANCE FIX + MOBILE DOUBLE TAP FIX
-   SUPABASE POSTS + PROFILE + FOLLOW
-   LIKE LOGIC ONLY IN like.js
+   PIXORO FEED V1041 - FULL CORRECT CODE DA 🔥
+   DOUBLE TAP DELETE - LIKE ONLY IN like.js V67
+   HEART 46px - SPEED 1000ms - LIKE=RED / UNLIKE=WHITE
    ===================================================== */
 
 (function () {
@@ -10,8 +9,6 @@
 
 let loading = false;
 let retryCount = 0;
-let _lastTapTime = 0;
-let _lastTapPostId = "";
 
 function getClient() {
   return typeof window.getSupa === "function"
@@ -205,7 +202,7 @@ async function loadPixoroFeed() {
             ${isVideo ? `<video class="main" src="${esc(media)}" style="width:100%;aspect-ratio:4/5;object-fit:cover;background:#111" playsinline preload="metadata"></video>` : `<img class="main" src="${esc(media)}" style="width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#111">`}
           </div>` : ""}
         <div style="display:flex;gap:18px;padding:10px 12px;align-items:center">
-          <button class="like-btn" data-like-btn="true" data-action="like" data-post-id="${esc(id)}" style="background:none;border:0;cursor:pointer;display:flex;align-items:center;gap:6px">
+          <button class="like-btn" data-like-btn="true" data-post-id="${esc(id)}" style="background:none;border:0;cursor:pointer;display:flex;align-items:center;gap:6px">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
             <span class="rCount like-count" data-like-count="true" style="color:white;font-size:14px">${likes}</span>
           </button>
@@ -241,23 +238,7 @@ async function loadPixoroFeed() {
       el.addEventListener("click", () => { location.href = "./profile.html?u=" + encodeURIComponent(el.dataset.profileOwner); });
     });
 
-    /* ✅ V1040 FIX - MOBILE DOUBLE TAP DA - dblclick Mobile la Varathu da */
-    feed.querySelectorAll(".post-media").forEach(media => {
-      media.addEventListener("touchend", (e) => {
-        const now = Date.now();
-        const pid = media.dataset.postId || "";
-        if (pid && pid === _lastTapPostId && (now - _lastTapTime) < 350) {
-          _lastTapTime = 0; _lastTapPostId = "";
-          const post = media.closest(".post");
-          const btn = post?.querySelector('[data-like-btn]');
-          if (btn) {
-            if (btn.classList.contains('liked')) { if (window.pixoroShowHeartDance) window.pixoroShowHeartDance(media); }
-            else if (window.pixoroDoLike) window.pixoroDoLike(pid, btn);
-            else if (window.likePost) window.likePost(pid, btn);
-          } else if (window.pixoroShowHeartDance) window.pixoroShowHeartDance(media);
-        } else { _lastTapTime = now; _lastTapPostId = pid; }
-      });
-    });
+    /* ✅ V1041 - DOUBLE TAP INGA ILLA DA - like.js MATTUM THAAN PAARKKUM DA - NARIYA HEART VARAATHU DA */
 
     if (window.pixoroLoadAvatars) window.pixoroLoadAvatars();
     if (window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
@@ -328,7 +309,6 @@ window.setFeedMode = function(mode) {
 
 /* GLOBAL FUNCTIONS */
 window.loadPixoroFeed = loadPixoroFeed;
-/* ✅ V1040 FIX - window.getPixoroFeed ah Inga Vekka Koodathu da - Core oda Sandai da - Delete Panniten da */
 
 /* SUPABASE READY */
 window.addEventListener("pixoro-supa-ready", () => { retryCount = 0; loadPixoroFeed(); });
