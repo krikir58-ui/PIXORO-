@@ -180,32 +180,52 @@
     });
   }
 
-  /* ✅ Orey Oru Kutti Heart da - Periya Heart ah Suthi Varum da */
+  /* ✅ MASS DESIGN DA - Kutti Heart + MASS DA Dialogue Suthi Varum da */
   function showMiniHearts(px, py) {
-    const size = 22;
-    const radius = 62;
-
+    // 1. Kutti Heart - Clockwise Suthi Varum da
     const mini = document.createElement("div");
     mini.className = "pixoro-mini-heart";
-    mini.style.cssText = `position:fixed;z-index:999998;pointer-events:none;left:${px}px;top:${py}px;width:${size}px!important;height:${size}px!important;transform:translate(-50%,-50%) scale(1);opacity:1;`;
+    mini.style.cssText = `position:fixed;z-index:999998;pointer-events:none;left:${px}px;top:${py}px;width:22px!important;height:22px!important;transform:translate(-50%,-50%) scale(1);opacity:1;`;
     mini.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 4px 10px rgba(255,45,149,.6))"><path fill="#FF2D95" stroke="#FFFFFF" stroke-width=".6" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
     document.body.appendChild(mini);
 
-    const at = (deg) => {
+    const at = (deg, radius) => {
       const r = deg * Math.PI / 180;
       return `translate(calc(-50% + ${Math.cos(r) * radius}px), calc(-50% + ${Math.sin(r) * radius}px)) scale(1)`;
     };
 
-    const anim = mini.animate([
-      { transform: at(-90), opacity: 0 },
-      { transform: at(-90), opacity: 1, offset: .1 },
-      { transform: at(0), opacity: 1, offset: .3 },
-      { transform: at(90), opacity: 1, offset: .55 },
-      { transform: at(180), opacity: 1, offset: .8 },
-      { transform: at(270), opacity: 0.6, offset: .95 },
-      { transform: at(270), opacity: 0 }
+    const anim1 = mini.animate([
+      { transform: at(-90, 62), opacity: 0 },
+      { transform: at(-90, 62), opacity: 1, offset: .1 },
+      { transform: at(0, 62), opacity: 1, offset: .3 },
+      { transform: at(90, 62), opacity: 1, offset: .55 },
+      { transform: at(180, 62), opacity: 1, offset: .8 },
+      { transform: at(270, 62), opacity: 0.6, offset: .95 },
+      { transform: at(270, 62), opacity: 0 }
     ], { duration: 1100, easing: "ease-in-out", fill: "forwards" });
-    anim.onfinish = () => mini.remove();
+    anim1.onfinish = () => mini.remove();
+
+    // 2. MASS DA Dialogue - Anti-Clockwise Suthi Varum da
+    const dlg = document.createElement("div");
+    dlg.className = "pixoro-mass-dialogue";
+    dlg.textContent = "MASS DA 🔥";
+    dlg.style.cssText = `position:fixed;z-index:999998;pointer-events:none;left:${px}px;top:${py}px;transform:translate(-50%,-50%);opacity:0;white-space:nowrap;font-weight:900;font-size:15px;letter-spacing:1px;color:#FFFFFF;background:linear-gradient(90deg,#FF2D95,#FF5E8A,#C86BFF);padding:6px 12px;border-radius:999px;border:1.5px solid #FFFFFF;box-shadow:0 8px 20px rgba(255,45,149,.7);text-shadow:0 1px 4px rgba(0,0,0,.4);`;
+    document.body.appendChild(dlg);
+
+    const atDlg = (deg, radius) => {
+      const r = deg * Math.PI / 180;
+      return `translate(calc(-50% + ${Math.cos(r) * radius}px), calc(-50% + ${Math.sin(r) * radius}px)) scale(1)`;
+    };
+
+    const anim2 = dlg.animate([
+      { transform: atDlg(90, 88), opacity: 0 },
+      { transform: atDlg(90, 88), opacity: 1, offset: .12 },
+      { transform: atDlg(0, 88), opacity: 1, offset: .35 },
+      { transform: atDlg(-90, 88), opacity: 1, offset: .6 },
+      { transform: atDlg(-180, 88), opacity: 1, offset: .85 },
+      { transform: atDlg(-270, 88), opacity: 0 }
+    ], { duration: 1200, easing: "ease-in-out", fill: "forwards" });
+    anim2.onfinish = () => dlg.remove();
   }
 
   /* POP HEART */
@@ -757,6 +777,11 @@
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
+      }
+
+      .pixoro-mass-dialogue {
+        pointer-events: none !important;
+        font-family: system-ui, -apple-system, sans-serif !important;
       }
 
       /* ✅ CORRECTED DA - Unlike Heart ku Thaniya CSS da - 110px Rule Pudikkaathu da */
