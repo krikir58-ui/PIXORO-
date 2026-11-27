@@ -1,120 +1,120 @@
 // ===== PIXORO COMMENT - THANI FILE DA =====
+// STYLE: 2nd Photo Mari da - Pixoro Premium Comment da
 // RULE: OPTIMISTIC UI da - Pixoro Mari da
 // Send -> Udane Screen la Varum -> Pinnadi Server Save da
 // Comment panna -> Server la Save + Count Update aagum da
 //       Save = Server la mattum thaan da - LocalStorage Illa da
-// STYLE: Pixoro Comment + Pixoro Pink-Purple da
 // SPEED: Animation Illa da - Instant da - 0 Sec da
 
-const PIXORO_COMMENT_EMOJIS = ["❤️","🙌","🔥","👏","😢","😍","😮","😂"];
+const PIXORO_COMMENT_EMOJIS = ["❤️","🙌","🔥","👏","😍","😮","😂","💯"];
 
-// ✅ OUTLINE SVG ICONS da - Fill Illa da - Image / Photo Icon Illa da
-const PIXORO_ICON_EMOJI = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`;
-const PIXORO_ICON_GIF = `<svg width="28" height="24" viewBox="0 0 28 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="26" height="18" rx="4"/><text x="14" y="16" text-anchor="middle" font-size="9" font-weight="800" fill="#fff" stroke="none" font-family="system-ui">GIF</text></svg>`;
-const PIXORO_ICON_STICKER = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 2.4 3.4-.5.5 3.4L21 10l-1.5 2.5 1 3.3-3 1.5L16 20l-2.5-1.2L11 20l-1.5-2.7-3-1.5 1-3.3L6 10l2.7-2.7.5-3.4 3.4.5L12 2z"/><circle cx="12" cy="12" r="3"/></svg>`;
-// ✅ SEND ARROW da - Type Box Pakkathula da - Post ku Badhila da
-const PIXORO_ICON_SEND = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF2D95" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`;
+const PIXORO_ICON_EMOJI = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`;
+const PIXORO_ICON_GIF = `<svg width="30" height="26" viewBox="0 0 30 26" fill="none" stroke="#fff" stroke-width="1.8"><rect x="1" y="3" width="28" height="20" rx="5"/><text x="15" y="17" text-anchor="middle" font-size="10" font-weight="800" fill="#fff" stroke="none" font-family="system-ui">GIF</text></svg>`;
+const PIXORO_ICON_STICKER = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 2.4 3.4-.5.5 3.4L21 10l-1.5 2.5 1 3.3-3 1.5L16 20l-2.5-1.2L11 20l-1.5-2.7-3-1.5 1-3.3L6 10l2.7-2.7.5-3.4 3.4.5L12 2z"/><circle cx="12" cy="12" r="3"/></svg>`;
+// ✅ 2nd Photo Send da - Purple Circle + White Arrow da - Pink Arrow Illa da
+const PIXORO_ICON_SEND = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`;
 
 function pixoroCommentCSS(){
   if(document.getElementById("pixoro-comment-style")) return;
   const s = document.createElement("style");
   s.id = "pixoro-comment-style";
   s.textContent = `
-    /* ✅ INSTANT da - Animation Illa da - Mella Varathu da */
-    #commentModal{position:fixed!important;inset:0!important;background:rgba(0,0,0,.65)!important;display:none;align-items:flex-end!important;justify-content:center!important;z-index:9999!important;animation:none!important;transition:none!important;}
-    #commentModal > div{position:absolute!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;background:#121212!important;border-radius:22px 22px 0 0!important;overflow:hidden!important;width:100%!important;max-height:88vh!important;display:flex!important;flex-direction:column!important;animation:none!important;transition:none!important;transform:none!important;}
-    #commentModal > div:before{content:"";height:4px;background:linear-gradient(90deg,#FF2D95,#FF5E8A,#C86BFF);display:block;flex-shrink:0;}
-    #commentModal .pixoro-c-emoji-row{display:flex;gap:18px;overflow-x:auto;padding:12px 16px;border-top:1px solid #222;scrollbar-width:none;}
-    #commentModal .pixoro-c-emoji-row::-webkit-scrollbar{display:none;}
-    #commentModal .pixoro-c-emoji-row button{background:none;border:none;font-size:26px;cursor:pointer;flex-shrink:0;}
-    #commentModal .pixoro-c-emoji-row button:active{transform:scale(1.4);}
-    #commentInput{background:#1a1a1a!important;color:#fff!important;border:1.5px solid #333!important;flex:1!important;min-width:0!important;}
-    #commentInput::placeholder{color:#888!important;}
-    #commentInput:focus{border-color:#FF2D95!important;box-shadow:0 0 0 2px rgba(255,45,149,.25)!important;outline:none!important;}
-    /* ✅ POST BUTTON AH MARAICHITEN da */
-    .pixoro-c-send-btn{display:none!important;}
+    /* ✅ 2nd PHOTO STYLE da - Instant da */
+    #commentModal{position:fixed!important;inset:0!important;background:rgba(0,0,0,.6)!important;display:none;align-items:flex-end!important;justify-content:center!important;z-index:9999!important;animation:none!important;transition:none!important;}
+    #commentModal > div{position:absolute!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;background:#000!important;border-radius:24px 24px 0 0!important;overflow:hidden!important;width:100%!important;max-height:92vh!important;display:flex!important;flex-direction:column!important;animation:none!important;transition:none!important;transform:none!important;}
+    #commentModal > div:before{content:"";width:48px;height:5px;background:#444;border-radius:99px;margin:10px auto 4px auto;flex-shrink:0;}
+    /* Header - Comments (842) + X da - 1st Photo Mari Ottikitta Mari Varathu da */
+    .pixoro-c-head{display:flex;align-items:center;justify-content:space-between;padding:10px 18px 6px 18px;}
+    .pixoro-c-head h3{color:#fff!important;font-size:22px!important;font-weight:800!important;margin:0!important;}
+    .pixoro-c-close{color:#fff!important;font-size:28px!important;cursor:pointer!important;background:none!important;border:none!important;line-height:1!important;}
+    #commentList{flex:1!important;overflow-y:auto!important;padding:4px 16px!important;}
     .pixoro-c-empty{padding:36px 20px;text-align:center;}
     .pixoro-c-empty-heart{font-size:42px;animation:pixoroHeartBeat 1.2s infinite;}
     @keyframes pixoroHeartBeat{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
     .pixoro-c-optimistic{opacity:.7;}
+    /* Bottom Bar - Emoji Row + Pill Input da */
+    .pixoro-c-bottom{border-top:1px solid #1a1a1a;padding:10px 16px 16px 16px;background:#000;}
+    #commentModal .pixoro-c-emoji-row{display:flex;gap:22px;overflow-x:auto;padding:2px 4px 12px 4px;scrollbar-width:none;}
+    #commentModal .pixoro-c-emoji-row::-webkit-scrollbar{display:none;}
+    #commentModal .pixoro-c-emoji-row button{background:none;border:none;font-size:30px;cursor:pointer;flex-shrink:0;line-height:1;}
+    #commentModal .pixoro-c-emoji-row button:active{transform:scale(1.3);}
+    .pixoro-c-bottom-input{display:flex;align-items:center;gap:10px;}
+    .pixoro-c-pill{display:flex;align-items:center;gap:8px;flex:1;background:#1c1c1e;border:1px solid #2a2a2a;border-radius:999px;padding:6px 6px 6px 12px;min-width:0;}
+    #commentInput{background:transparent!important;color:#fff!important;border:none!important;flex:1!important;min-width:0!important;padding:8px 0!important;font-size:15px!important;outline:none!important;box-shadow:none!important;}
+    #commentInput::placeholder{color:#888!important;}
     .pixoro-c-icon-btn{background:none!important;border:none!important;cursor:pointer!important;padding:6px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0!important;}
     .pixoro-c-icon-btn:active{transform:scale(1.2);}
-    .pixoro-c-icon-btn.active svg{stroke:#FF2D95!important;}
-    /* ✅ SEND ARROW BUTTON da */
-    .pixoro-c-send-arrow{background:rgba(255,45,149,.15)!important;border:none!important;width:40px!important;height:40px!important;border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;flex-shrink:0!important;}
-    .pixoro-c-send-arrow:active{transform:scale(1.15);background:rgba(255,45,149,.3)!important;}
+    /* ✅ POST BUTTON AH MARAICHITEN da */
+    .pixoro-c-send-btn{display:none!important;}
+    /* ✅ Send Button - Purple Circle da - 2nd Photo Mari da */
+    .pixoro-c-send-arrow{background:linear-gradient(135deg,#7B2FFF,#A855F7)!important;border:none!important;width:52px!important;height:52px!important;border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;flex-shrink:0!important;box-shadow:0 4px 16px rgba(123,47,255,.5)!important;}
+    .pixoro-c-send-arrow:active{transform:scale(.92);}
+    /* ✅ Avatar Gradient Ring da - 2nd Photo Mari da */
+    .pixoro-c-ava{width:44px!important;height:44px!important;border-radius:50%!important;padding:2px!important;background:conic-gradient(from 180deg,#FF2D95,#FF9A00,#00E5FF,#7B2FFF,#FF2D95)!important;flex-shrink:0!important;display:flex!important;align-items:center!important;justify-content:center!important;}
+    .pixoro-c-ava img{width:100%!important;height:100%!important;border-radius:50%!important;object-fit:cover!important;border:2px solid #000!important;background:#222!important;}
+    .pixoro-c-user{color:#fff;font-weight:700;font-size:15px;}
+    .pixoro-c-time{color:#888;font-weight:400;font-size:14px;margin-left:8px;}
+    .pixoro-c-text{color:#fff;font-size:16px;line-height:1.4;margin-top:2px;}
+    .pixoro-c-sub{color:#888;font-size:14px;margin-top:6px;}
+    .pixoro-c-heart{color:#fff;font-size:22px;cursor:pointer;line-height:1;text-align:center;}
+    .pixoro-c-heart-count{color:#fff;font-size:13px;text-align:center;margin-top:2px;}
   `;
   document.head.appendChild(s);
 }
 
-function pixoroCommentEmojiRow(){
+function pixoroCommentLayout(){
   pixoroCommentCSS();
   const modal = document.getElementById("commentModal");
-  if(!modal || modal.querySelector(".pixoro-c-emoji-row")) return;
-  const input = document.getElementById("commentInput");
-  if(!input) return;
-  const row = document.createElement("div");
-  row.className = "pixoro-c-emoji-row";
-  row.innerHTML = PIXORO_COMMENT_EMOJIS.map(e=>`<button type="button" data-emoji="${e}">${e}</button>`).join("");
-  row.querySelectorAll("[data-emoji]").forEach(b=>{
-    b.onclick = ()=>{ input.value += b.dataset.emoji; input.focus(); };
-  });
-  input.parentElement?.before(row);
-  modal.querySelectorAll("button").forEach(b=>{
-    if(/post|send/i.test(b.textContent||"")) b.classList.add("pixoro-c-send-btn");
-  });
-}
-
-// ✅ Type Box Pakkathula - [Image] [Type] [Emoji] [GIF] [Sticker] [Send Arrow ➤] da
-function pixoroCommentIcons(){
-  const modal = document.getElementById("commentModal");
-  const input = document.getElementById("commentInput");
-  if(!modal || !input || modal.querySelector(".pixoro-c-send-arrow")) return;
-  const wrap = input.parentElement;
-  if(!wrap) return;
-  wrap.style.display = "flex";
-  wrap.style.alignItems = "center";
-  wrap.style.gap = "4px";
-
-  const emojiBtn = document.createElement("button");
-  emojiBtn.type = "button"; emojiBtn.className = "pixoro-c-icon-btn"; emojiBtn.innerHTML = PIXORO_ICON_EMOJI;
-  emojiBtn.onclick = ()=>{
-    const row = modal.querySelector(".pixoro-c-emoji-row");
-    if(row){ row.style.display = row.style.display === "none" ? "flex" : "none"; emojiBtn.classList.toggle("active"); }
-    input.focus();
-  };
-
-  const gifBtn = document.createElement("button");
-  gifBtn.type = "button"; gifBtn.className = "pixoro-c-icon-btn"; gifBtn.innerHTML = PIXORO_ICON_GIF;
-  gifBtn.onclick = ()=>{ input.value += " [GIF] "; input.focus(); };
-
-  const stickerBtn = document.createElement("button");
-  stickerBtn.type = "button"; stickerBtn.className = "pixoro-c-icon-btn"; stickerBtn.innerHTML = PIXORO_ICON_STICKER;
-  stickerBtn.onclick = ()=>{
-    const row = modal.querySelector(".pixoro-c-emoji-row");
-    if(row){ row.style.display = "flex"; }
-    input.focus();
-  };
-
-  // ✅ SEND ARROW da - Post ku Badhila da
-  const sendArrow = document.createElement("button");
-  sendArrow.type = "button"; sendArrow.className = "pixoro-c-send-arrow"; sendArrow.innerHTML = PIXORO_ICON_SEND;
-  sendArrow.onclick = ()=> addComment();
-
-  // Pazhaya Post button ah Maraichidu da
-  modal.querySelectorAll("button").forEach(b=>{
-    if(/post|send/i.test(b.textContent||"")) b.classList.add("pixoro-c-send-btn");
-  });
-
-  wrap.append(emojiBtn, gifBtn, stickerBtn, sendArrow);
+  if(!modal) return;
+  const box = modal.querySelector(":scope > div");
+  if(!box) return;
+  if(!modal.querySelector(".pixoro-c-head")){
+    const head = document.createElement("div");
+    head.className = "pixoro-c-head";
+    head.innerHTML = `<h3 id="pixoroCHead">Comments</h3><button type="button" class="pixoro-c-close" onclick="closeComment()">✕</button>`;
+    box.prepend(head);
+  }
+  if(!modal.querySelector(".pixoro-c-bottom")){
+    const input = document.getElementById("commentInput");
+    const oldWrap = input?.parentElement;
+    if(!input || !oldWrap) return;
+    const bottom = document.createElement("div");
+    bottom.className = "pixoro-c-bottom";
+    const emojiRow = document.createElement("div");
+    emojiRow.className = "pixoro-c-emoji-row";
+    emojiRow.innerHTML = PIXORO_COMMENT_EMOJIS.map(e=>`<button type="button" data-emoji="${e}">${e}</button>`).join("");
+    emojiRow.querySelectorAll("[data-emoji]").forEach(b=>{
+      b.onclick = ()=>{ input.value += b.dataset.emoji; input.focus(); };
+    });
+    const bottomInput = document.createElement("div");
+    bottomInput.className = "pixoro-c-bottom-input";
+    const pill = document.createElement("div");
+    pill.className = "pixoro-c-pill";
+    const emojiBtn = document.createElement("button");
+    emojiBtn.type = "button"; emojiBtn.className = "pixoro-c-icon-btn"; emojiBtn.innerHTML = PIXORO_ICON_EMOJI;
+    emojiBtn.onclick = ()=>{ emojiRow.style.display = emojiRow.style.display === "none" ? "flex" : "none"; input.focus(); };
+    const gifBtn = document.createElement("button");
+    gifBtn.type = "button"; gifBtn.className = "pixoro-c-icon-btn"; gifBtn.innerHTML = PIXORO_ICON_GIF;
+    gifBtn.onclick = ()=>{ input.value += " [GIF] "; input.focus(); };
+    const stickerBtn = document.createElement("button");
+    stickerBtn.type = "button"; stickerBtn.className = "pixoro-c-icon-btn"; stickerBtn.innerHTML = PIXORO_ICON_STICKER;
+    stickerBtn.onclick = ()=>{ emojiRow.style.display = "flex"; input.focus(); };
+    const sendArrow = document.createElement("button");
+    sendArrow.type = "button"; sendArrow.className = "pixoro-c-send-arrow"; sendArrow.innerHTML = PIXORO_ICON_SEND;
+    sendArrow.onclick = ()=> addComment();
+    oldWrap.querySelectorAll("button").forEach(b=>{ if(/post|send/i.test(b.textContent||"")) b.classList.add("pixoro-c-send-btn"); });
+    pill.append(emojiBtn, input, gifBtn, stickerBtn);
+    bottomInput.append(pill, sendArrow);
+    bottom.append(emojiRow, bottomInput);
+    oldWrap.style.display = "none";
+    box.append(bottom);
+  }
 }
 
 function openComment(id){
   window.CURRENT_COMMENT_POST = id;
-  pixoroCommentEmojiRow();
-  pixoroCommentIcons();
+  pixoroCommentLayout();
   let m = document.getElementById('commentModal');
-  // ✅ INSTANT da - Thotta Odane Varum da - Delay Illa da
   if(m) m.style.display = 'flex';
   loadComments(id);
 }
@@ -125,18 +125,26 @@ function closeComment(){
 window.openComment = openComment;
 window.closeComment = closeComment;
 
-// HTML Injection block pannu da - <script> potta kooda work aagaathu da
 function escHtml(t){
   return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function pixoroTimeAgo(ts){
+  if(!ts) return "";
+  let d = Math.floor((Date.now() - new Date(ts).getTime())/1000);
+  if(d < 60) return "now";
+  if(d < 3600) return Math.floor(d/60)+"m";
+  if(d < 86400) return Math.floor(d/3600)+"h";
+  return Math.floor(d/86400)+"d";
 }
 
 function pixoroCommentRow(c, postId, isOptimistic){
   let isMine = window.ME_ID && String(c.user_id) === String(window.ME_ID);
-  let delBtn = isMine && !isOptimistic ? `<span onclick="deleteComment('${c.id}', '${postId}')" style="color:#888;font-size:11px;cursor:pointer;margin-left:8px">Delete</span>` : '';
-  return `<div class="pixoro-c-item ${isOptimistic?'pixoro-c-optimistic':''}" data-temp="${c._temp||''}" style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #222">
-    <img src="${escHtml(window.pixoroGetAvatar ? window.pixoroGetAvatar(c) : (c.avatar_url||''))}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;background:#222;border:1.5px solid #FF2D95;flex-shrink:0" onerror="this.src='https://ui-avatars.com/api/?name=U&background=222&color=fff'">
-    <div style="flex:1"><b style="color:#fff">@${escHtml(String(c.username||'user').replace('@',''))}</b> <span style="color:#ddd">${escHtml(c.text||c.content||'')}</span><div style="color:#888;font-size:12px;margin-top:4px">Reply &nbsp; Like ${delBtn} ${isOptimistic?'<span style="color:#FF2D95">• Sending...</span>':''}</div></div>
-    <span style="color:#fff;font-size:18px;cursor:pointer">♡</span>
+  let delBtn = isMine && !isOptimistic ? ` • <span onclick="deleteComment('${c.id}', '${postId}')" style="cursor:pointer">Delete</span>` : '';
+  let ava = escHtml(window.pixoroGetAvatar ? window.pixoroGetAvatar(c) : (c.avatar_url||''));
+  return `<div class="pixoro-c-item ${isOptimistic?'pixoro-c-optimistic':''}" data-temp="${c._temp||''}" style="display:flex;gap:12px;padding:12px 0;align-items:flex-start">
+    <div class="pixoro-c-ava"><img src="${ava}" onerror="this.src='https://ui-avatars.com/api/?name=U&background=222&color=fff'"></div>
+    <div style="flex:1;min-width:0"><div><span class="pixoro-c-user">@${escHtml(String(c.username||'user').replace('@',''))}</span><span class="pixoro-c-time">${isOptimistic?'now':pixoroTimeAgo(c.created_at)}</span></div><div class="pixoro-c-text">${escHtml(c.text||c.content||'')}</div><div class="pixoro-c-sub">Reply &nbsp;•&nbsp; See translation ${delBtn} ${isOptimistic?'<span style="color:#FF2D95">• Sending...</span>':''}</div></div>
+    <div><div class="pixoro-c-heart">♡</div><div class="pixoro-c-heart-count">${c.likes_count||''}</div></div>
   </div>`;
 }
 
@@ -150,6 +158,8 @@ async function loadComments(postId){
     if(optimistic) box.innerHTML += optimistic;
     if(!box.innerHTML.trim()) box.innerHTML = '<div class="pixoro-c-empty"><div class="pixoro-c-empty-heart">❤️</div><div style="color:#fff;font-size:22px;font-weight:700;margin-top:10px">No comments yet</div><div style="color:#888;font-size:14px;margin-top:6px">Start the conversation.</div></div>';
     let cnt = (data||[]).length;
+    let head = document.getElementById("pixoroCHead");
+    if(head) head.innerText = `Comments (${cnt})`;
     let cc = document.querySelector(`[data-comment-count="${postId}"]`);
     if(cc) cc.innerText = cnt;
   }catch(e){ console.log('Comment Load Fail da:', e.message); }
@@ -166,20 +176,17 @@ async function addComment(){
     if(!session){ location.href='./login.html'; return; }
     window.ME_ID = session.user.id;
   }
-
-  // ✅ OPTIMISTIC DA - Udane Screen la Varum da
   let tempId = 'temp_' + Date.now();
   let box = document.getElementById('commentList');
   if(box){
     if(box.querySelector('.pixoro-c-empty')) box.innerHTML = '';
-    box.insertAdjacentHTML('beforeend', pixoroCommentRow({ _temp: tempId, user_id: window.ME_ID, username: (window.ME_RAW||'user').replace('@',''), avatar_url: window.ME_AVATAR || '', text: txt }, postId, true));
+    box.insertAdjacentHTML('beforeend', pixoroCommentRow({ _temp: tempId, user_id: window.ME_ID, username: (window.ME_RAW||'user').replace('@',''), avatar_url: window.ME_AVATAR || '', text: txt, created_at: new Date().toISOString() }, postId, true));
     box.scrollTop = box.scrollHeight;
     let cc = document.querySelector(`[data-comment-count="${postId}"]`);
     if(cc) cc.innerText = Number(cc.innerText||0) + 1;
   }
   inp.value = '';
   inp.disabled = true;
-
   try{
     let {error} = await s.from('comments').insert({ post_id: postId, user_id: window.ME_ID, username: (window.ME_RAW||'user').replace('@',''), avatar_url: window.ME_AVATAR || '', text: txt });
     if(error) throw error;
@@ -197,7 +204,6 @@ async function addComment(){
   inp.focus();
 }
 
-// ✅ Own Comment ah Delete panna - Long press maari da
 async function deleteComment(commentId, postId){
   if(!confirm('Delete pannatta da?')) return;
   let s = window.getSupa ? window.getSupa() : window.supa; if(!s) return;
@@ -206,8 +212,7 @@ async function deleteComment(commentId, postId){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  pixoroCommentEmojiRow();
-  pixoroCommentIcons();
+  pixoroCommentLayout();
   let inp = document.getElementById('commentInput');
   if(inp) inp.addEventListener('keydown', (e)=>{ if(e.key==='Enter') addComment(); });
 });
