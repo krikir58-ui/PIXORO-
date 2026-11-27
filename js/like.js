@@ -1,17 +1,19 @@
-/* ===== PIXORO LIKE V43 - V42 CORRECTED - DOUBLE TAP FIX ONLY ===== */
-// ✅ V43 FIX - Double Tap ah Post ID ah Vachu Check Pannurom da - Media Element Illa da
-// ✅ Pazhaya Code Full Same da - Vera Edhuvum Maathala da
+/* ===== PIXORO LIKE V44 - V43 CORRECTED - DOUBLE TAP + BUTTON HEART FIX ===== */
+// ✅ V44 FIX 1 - Double Tap ah Post Card Mela Vachom da - findMedia Venaam da
+// ✅ V44 FIX 2 - Like Button Heart - Keezha Irundhu Mela Poyi Maraiyum da
+// ✅ V44 FIX 3 - Count ku .rCount Add da
+// ✅ Vera Edhuvum Maathala da
 (() => {
   "use strict";
   if (window.PIXORO_LIKE_V39) return;
   window.PIXORO_LIKE_V39 = true;
   window.PIXORO_LIKE_V42 = true;
   window.PIXORO_LIKE_V43 = true;
+  window.PIXORO_LIKE_V44 = true;
   function getSupa(){ return window.supa || window.supabaseClient || (typeof window.getSupa === 'function' ? window.getSupa() : null); }
   const TABLE = "likes";
-  const DOUBLE_TAP_DELAY = 320;
+  const DOUBLE_TAP_DELAY = 350;
   const HEART_DURATION = 1000;
-  // ✅ V43 FIX - WeakMap ah Delete da - Post ID Map Thaan da
   const lastTap = new Map();
   const lastToggleAt = new Map();
   const pending = new Map();
@@ -32,7 +34,8 @@
     return ( element?.dataset?.postId || element?.dataset?.likeBtn || post?.dataset?.postId || post?.dataset?.id || null );
   }
   function getLikeButton(post){ if (!post) return null; return post.querySelector("[data-like-btn], .like-btn, .like-button"); }
-  function getLikeCount(post){ if (!post) return null; return post.querySelector("[data-like-count], .like-count, .likes-count, [data-count='likes']"); }
+  // ✅ V44 FIX 3 - .rCount Add da
+  function getLikeCount(post){ if (!post) return null; return post.querySelector("[data-like-count], .like-count, .likes-count, [data-count='likes'], .rCount"); }
   function paintLike(post, liked){
     const button = getLikeButton(post); if (!button) return;
     button.classList.toggle("liked", liked); button.classList.toggle("is-liked", liked);
@@ -55,7 +58,7 @@
     const el = getLikeCount(post); if (!el) return;
     if (count === undefined || count === null || isNaN(Number(count))) return;
     el.textContent = Math.max(0, Number(count) || 0);
-    el.style.transform = "none"; el.style.animation = "none"; el.style.fontSize = "14px"; el.style.lineHeight = "1"; el.style.display = "inline-block"; el.style.opacity = "1";
+    el.style.transform = "none"; el.style.animation = "none"; el.style.fontSize = "14px"; el.style.lineHeight = "1"; el.style.display = "inline-block"; el.style.opacity = "1"; el.style.visibility = "visible";
   }
   function showBigHeart(media, touchX, touchY){
     if (!media) return;
@@ -86,14 +89,20 @@
   }
   function showTapHeart(x, y) { return; }
   function showMassDance(media) { return; }
+  // ✅ V44 FIX 2 - Heart Keezha Irundhu Varum da
   function showButtonHeart(button){
     if (!button) return; const r = button.getBoundingClientRect(); const gid = 'pixoroBtn' + Date.now();
     const heart = document.createElement("div"); heart.className = "pixoro-big-heart";
-    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${r.left + r.width / 2}px;top:${r.top}px;width:42px;height:42px;opacity:0;transform:translate(-50%,-50%) scale(0);background:transparent !important;border:none !important;`;
+    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${r.left + r.width / 2}px;top:${r.bottom + 10}px;width:38px;height:38px;opacity:0;transform:translate(-50%,0) scale(0.5);background:transparent !important;border:none !important;`;
     heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))"><defs><linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF0A33"/><stop offset="50%" stop-color="#FF3DF0"/><stop offset="100%" stop-color="#FF8A00"/></linearGradient></defs><path fill="url(#${gid})" stroke="#fff" stroke-width="1.2" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
     document.body.appendChild(heart);
-    const a = heart.animate([{ transform: "translate(-50%,-50%) scale(0)", opacity: 0, offset: 0 },{ transform: "translate(-50%,-50%) scale(1.2)", opacity: 1, offset: 0.25 },{ transform: "translate(-50%,-90%) scale(1)", opacity: 1, offset: 0.6 },{ transform: "translate(-50%,-180%) scale(0.9)", opacity: 0, offset: 1 }], { duration: 700, easing: "ease-out", fill: "forwards" });
-    a.onfinish = () => heart.remove(); setTimeout(()=>{ try{heart.remove()}catch(e){} }, 800);
+    const a = heart.animate([
+      { transform: "translate(-50%,0) scale(0.5)", opacity: 0, offset: 0 },
+      { transform: "translate(-50%,-30px) scale(1.2)", opacity: 1, offset: 0.3 },
+      { transform: "translate(-50%,-70px) scale(1)", opacity: 1, offset: 0.6 },
+      { transform: "translate(-50%,-110px) scale(0.9)", opacity: 0, offset: 1 }
+    ], { duration: 800, easing: "ease-out", fill: "forwards" });
+    a.onfinish = () => heart.remove(); setTimeout(()=>{ try{heart.remove()}catch(e){} }, 900);
   }
   function buttonAnimation(post){
     const button = getLikeButton(post); if (!button) return;
@@ -130,13 +139,20 @@
     return willLike;
   }
   function findMedia(element){ if (!element?.closest) return null; return element.closest(".postMedia, .post-media, .post-media-wrap, .post-content img, .post-content video, img, video"); }
-  function handleDoubleTap(media, postId, post, x, y){ blockClickUntil = Date.now() + 700; showBigHeart(media, x, y); buttonAnimation(post); toggleLike(postId, post, true); setTimeout(() => paintLike(post, true), 50); }
+  function handleDoubleTap(media, postId, post, x, y){
+    blockClickUntil = Date.now() + 700;
+    showBigHeart(media || post, x, y);
+    buttonAnimation(post); toggleLike(postId, post, true);
+    setTimeout(() => paintLike(post, true), 50);
+    setTimeout(()=>{ paintLike(post, true); paintCount(post, window.FEED_COUNTS[String(postId)]); }, 100);
+  }
+  // ✅ V44 FIX 1 - touchstart la Post ah Direct ah Paappom da - findMedia Check Illa da
   document.addEventListener("touchstart", event => {
     if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
-    const media = findMedia(event.target); if (!media) return;
-    const post = getPost(media); const postId = getPostId(media); if (!post || !postId) return;
+    const post = getPost(event.target); if (!post) return;
+    const postId = getPostId(event.target); if (!postId) return;
+    const media = findMedia(event.target) || post;
     const now = Date.now();
-    // ✅ V43 FIX - Post ID ah Key ah Vachom da - Media Element Illa da
     const previous = lastTap.get(String(postId));
     const touchX = event.touches && event.touches[0] ? event.touches[0].clientX : null;
     const touchY = event.touches && event.touches[0] ? event.touches[0].clientY : null;
@@ -146,16 +162,16 @@
   document.addEventListener("dblclick", event => {
     if (Date.now() - lastTouchTime < 800) return;
     if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
-    const media = findMedia(event.target); if (!media) return;
-    const post = getPost(media); const postId = getPostId(media); if (!post || !postId) return;
+    const post = getPost(event.target); if (!post) return;
+    const postId = getPostId(event.target); if (!postId) return;
+    const media = findMedia(event.target) || post;
     event.preventDefault(); handleDoubleTap(media, postId, post, event.clientX, event.clientY);
   });
   document.addEventListener("click", event => {
-    if (Date.now() < blockClickUntil){ const media = findMedia(event.target); if (media){ event.preventDefault(); return; } }
+    if (Date.now() < blockClickUntil){ const post = getPost(event.target); if (post){ event.preventDefault(); return; } }
     const button = event.target.closest("[data-like-btn], .like-btn, .like-button"); if (!button) return;
     event.preventDefault(); event.stopPropagation();
     const post = getPost(button); const postId = getPostId(button); if (!post || !postId) return;
-    // ✅ Like / Unlike 2 kuum Heart Varum da - Ithu Already Correct da
     showButtonHeart(button); buttonAnimation(post); toggleLike(postId, post, false);
   }, true);
   function paintAll(){
@@ -181,5 +197,5 @@
   function start(){ addStyles(); paintAll(); loadMyLikes(); }
   if (document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", start, { once: true }); } else { start(); }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO LIKE V43 LOADED ❤️");
+  console.log("PIXORO LIKE V44 LOADED ❤️");
 })();
