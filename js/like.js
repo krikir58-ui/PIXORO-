@@ -1,11 +1,12 @@
-/* ===== PIXORO LIKE V53 - V52 + DOUBLE FIRE FIX ===== */
-// ✅ V53 FIX 1 - 1 Tap = 1 Toggle Thaan da - 300ms kulla 2nd Toggle Block da
-// ✅ V53 FIX 2 - Server Count ah Local Mela Overwrite Panna Maatom da - Local Thaan Final da
-// ✅ V53 FIX 3 - Pazhaya Heart ah Clear Pannitu Thaan Puthu Heart da - Ninnu Pogaathu da
+/* ===== PIXORO LIKE V54 - V53 CORRECTED - INSTAGRAM 2026 DA ===== */
+// ✅ V54 FIX 1 - upsert da - 23505 Varaathu da
+// ✅ V54 FIX 2 - Rollback Illa da - Red Nikkum da - Flicker Illa da
+// ✅ V54 FIX 3 - Double Tap Oru Handler Mattum da - touchstart Mattum da - dblclick Delete da
+// ✅ V54 FIX 4 - getPost Correct da - data-post-id Mattum da
 (() => {
   "use strict";
-  if (window.PIXORO_LIKE_V39) return;
-  window.PIXORO_LIKE_V39 = true;
+  if (window.PIXORO_LIKE_V54) return;
+  window.PIXORO_LIKE_V54 = true;
   window.PIXORO_LIKE_V53 = true;
   function getSupa(){ return window.supa || window.supabaseClient || (typeof window.getSupa === 'function' ? window.getSupa() : null); }
   const TABLE = "likes";
@@ -15,7 +16,6 @@
   const lastToggleAt = new Map();
   const pending = new Map();
   let blockClickUntil = 0;
-  let lastTouchTime = 0;
   try { const saved = JSON.parse(localStorage.getItem("pixoro_likes") || "[]"); window.FEED_LIKES = new Set(saved.map(String)); } catch { window.FEED_LIKES = new Set(); }
   try { window.FEED_COUNTS = JSON.parse(localStorage.getItem("pixoro_counts") || "{}"); } catch { window.FEED_COUNTS = {}; }
   function saveLocal(){ try{ localStorage.setItem("pixoro_likes", JSON.stringify([...window.FEED_LIKES])); localStorage.setItem("pixoro_counts", JSON.stringify(window.FEED_COUNTS)); }catch(e){} }
@@ -24,10 +24,11 @@
     let supa = getSupa(); if (!supa) return null;
     try{ const { data, error } = await supa.auth.getUser(); if (error || !data?.user?.id) return null; return data.user.id; }catch{ return null; }
   }
-  function getPost(element){ return element?.closest("[data-post-id], .post, .post-card, article, .post-item"); }
+  // ✅ V54 FIX - data-post-id Irukka Article Mattum da
+  function getPost(element){ return element?.closest("[data-post-id]"); }
   function getPostId(element){
     const post = getPost(element);
-    return ( element?.dataset?.postId || element?.dataset?.likeBtn || post?.dataset?.postId || post?.dataset?.id || null );
+    return String(element?.dataset?.postId || post?.dataset?.postId || post?.dataset?.id || "");
   }
   function getLikeButton(post){ if (!post) return null; return post.querySelector("[data-like-btn], .like-btn, .like-button"); }
   function getLikeCount(post){ if (!post) return null; return post.querySelector("[data-like-count], .like-count, .likes-count, [data-count='likes'], .rCount"); }
@@ -82,7 +83,7 @@
       setTimeout(()=>{ try{s.remove()}catch(e){} }, 750);
     }
     const heart = document.createElement("div"); heart.className = "pixoro-big-heart";
-    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:48px;height:48px;opacity:0;transform:translate(-50%,-50%) scale(0);background:transparent !important;border:none !important;box-shadow:none !important;display:block !important;`;
+    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:90px;height:90px;opacity:0;transform:translate(-50%,-50%) scale(0);background:transparent !important;border:none !important;box-shadow:none !important;display:block !important;`;
     heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent;display:block;filter:drop-shadow(0 0 14px rgba(255,61,240,.8))"><defs><linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF0A33"/><stop offset="30%" stop-color="#FF3DF0"/><stop offset="60%" stop-color="#A259FF"/><stop offset="85%" stop-color="#FF8A00"/><stop offset="100%" stop-color="#FFD600"/></linearGradient></defs><path fill="url(#${gid})" stroke="#fff" stroke-width="1.2" stroke-linejoin="round" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
     document.body.appendChild(heart);
     const animation = heart.animate([{ transform: "translate(-50%,-50%) scale(0)", opacity: 0, offset: 0 },{ transform: "translate(-50%,-50%) scale(1.25)", opacity: 1, offset: 0.2 },{ transform: "translate(-50%,-50%) scale(1)", opacity: 1, offset: 0.4 },{ transform: "translate(-50%,-50%) scale(1.1)", opacity: 1, offset: 0.6 },{ transform: "translate(-50%,-50%) scale(1)", opacity: 1, offset: 0.8 },{ transform: "translate(-50%,-50%) scale(1)", opacity: 0, offset: 1 }], { duration: HEART_DURATION, easing: "ease-out", fill: "forwards" });
@@ -113,24 +114,20 @@
     try { icon.getAnimations().forEach(a => a.cancel()); } catch(e) {}
     icon.animate([{ transform: "scale(1)", opacity: 1, offset: 0 },{ transform: "scale(1.5)", opacity: 1, offset: 0.2 },{ transform: "scale(0.9)", opacity: 1, offset: 0.4 },{ transform: "scale(1.35)", opacity: 1, offset: 0.6 },{ transform: "scale(0.95)", opacity: 1, offset: 0.8 },{ transform: "scale(1)", opacity: 1, offset: 1 }], { duration: 500, easing: "ease-out", fill: "forwards" });
   }
-  async function serverSave(postId, liked, oldLiked, oldCount){
+  // ✅ V54 FIX - upsert + NO ROLLBACK da
+  async function serverSave(postId, liked){
     let supa = getSupa(); if (!supa) return;
     const userId = await getUserId(); if (!userId) return;
     try{
-      if (liked){ const { error } = await supa.from(TABLE).insert({ post_id: postId, user_id: userId }); if (error && error.code !== "23505") throw error; }
-      else { const { error } = await supa.from(TABLE).delete().eq("post_id", postId).eq("user_id", userId); if (error) throw error; }
+      if (liked){ await supa.from(TABLE).upsert({ post_id: postId, user_id: userId }, { onConflict: "post_id,user_id" }); }
+      else { await supa.from(TABLE).delete().eq("post_id", postId).eq("user_id", userId); }
       try{
         const { count } = await supa.from(TABLE).select("*", { count: "exact", head: true }).eq("post_id", postId);
         try{ await supa.from("posts").update({ likes_count: Number(count || 0) }).eq("id", postId); }catch(e){}
       }catch(e){}
     }catch(error){
-      console.error("PIXORO LIKE SILENT FAIL - Rollback:", error);
-      const post = document.querySelector(`[data-post-id="${postId}"]`);
-      if (post){
-        if (oldLiked) window.FEED_LIKES.add(String(postId)); else window.FEED_LIKES.delete(String(postId));
-        window.FEED_COUNTS[String(postId)] = oldCount; saveLocal();
-        paintLike(post, oldLiked); paintCount(post, oldCount);
-      }
+      // ✅ Rollback Illa da - UI la Red Nikkattum da - Next Time Sync Aayidum da
+      console.log("PIXORO LIKE SYNC LATER:", error?.message);
     }
   }
   function toggleLike(postId, post, forceLike = false){
@@ -147,11 +144,11 @@
     window.FEED_COUNTS[postId] = newCount; saveLocal();
     paintLike(post, willLike); paintCount(post, newCount);
     const prev = pending.get(postId) || Promise.resolve();
-    const next = prev.catch(()=>{}).then(()=> serverSave(postId, willLike, alreadyLiked, oldCount));
+    const next = prev.catch(()=>{}).then(()=> serverSave(postId, willLike));
     pending.set(postId, next); next.finally(()=>{ if (pending.get(postId) === next) pending.delete(postId); });
     return willLike;
   }
-  function findMedia(element){ if (!element?.closest) return null; return element.closest(".postMedia, .post-media, .post-media-wrap, .post-content img, .post-content video, img, video"); }
+  function findMedia(element){ if (!element?.closest) return null; return element.closest(".postMedia, .post-media, .post-media-wrap") || element.closest("[data-post-id]"); }
   function handleDoubleTap(media, postId, post, x, y){
     blockClickUntil = Date.now() + 700;
     showBigHeart(media || post, x, y);
@@ -168,16 +165,9 @@
     const touchX = event.touches && event.touches[0] ? event.touches[0].clientX : null;
     const touchY = event.touches && event.touches[0] ? event.touches[0].clientY : null;
     lastTap.set(String(postId), { time: now, x: touchX, y: touchY });
-    if (previous && now - previous.time <= DOUBLE_TAP_DELAY){ lastTap.delete(String(postId)); lastTouchTime = now; handleDoubleTap(media, postId, post, touchX, touchY); }
+    if (previous && now - previous.time <= DOUBLE_TAP_DELAY){ lastTap.delete(String(postId)); handleDoubleTap(media, postId, post, touchX, touchY); }
   }, { passive: true, capture: true });
-  document.addEventListener("dblclick", event => {
-    if (Date.now() - lastTouchTime < 800) return;
-    if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
-    const post = getPost(event.target); if (!post) return;
-    const postId = getPostId(event.target); if (!postId) return;
-    const media = findMedia(event.target) || post;
-    event.preventDefault(); handleDoubleTap(media, postId, post, event.clientX, event.clientY);
-  }, true);
+  // ✅ V54 - dblclick Delete da - Mobile la touchstart Thaan da - Desktop la Double Click ku Click Handler Pothum da - Illana 2 Vaati Fire Aagum da
   document.addEventListener("click", event => {
     const button = event.target.closest("[data-like-btn], .like-btn, .like-button"); if (button){
       event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
@@ -217,5 +207,5 @@
   function start(){ addStyles(); paintAll(); loadMyLikes(); }
   if (document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", start, { once: true }); } else { start(); }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO LIKE V53 LOADED ❤️");
+  console.log("PIXORO LIKE V54 LOADED ❤️");
 })();
