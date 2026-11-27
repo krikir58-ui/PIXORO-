@@ -1,28 +1,26 @@
-/* ===== PIXORO LIKE V45 - V44 + LOCAL FIRST + SERVER SILENT ===== */
-// ✅ V45 FIX - Local First da - Thotta Udaney Red + Count 1 da
-// ✅ V45 FIX - Server Silent da - Pinnadi Methuva Save Aagum da
-// ✅ V45 FIX - loadMyLikes la Merge Thaan da - Overwrite Illa da - Local Azhiyathu da
-// ✅ V44 oda Double Tap + Button Heart Same da
+/* ===== PIXORO LIKE V49 - V45 + REAL LIKE ONLY + FACE REMOVE ===== */
+// ✅ V49 FIX 1 - REAL LIKE da - Local Fake Illa da - Server Save Aana Aprom Thaan Red da
+// ✅ V49 FIX 2 - FACE REMOVE da - Heart la White Face Illa da - Plain Gradient Heart Thaan da
+// ✅ V49 FIX 3 - posts.likes_count ah Server laye Update da - Real Count da
 (() => {
   "use strict";
   if (window.PIXORO_LIKE_V39) return;
   window.PIXORO_LIKE_V39 = true;
-  window.PIXORO_LIKE_V42 = true;
-  window.PIXORO_LIKE_V43 = true;
-  window.PIXORO_LIKE_V44 = true;
-  window.PIXORO_LIKE_V45 = true;
+  window.PIXORO_LIKE_V49 = true;
   function getSupa(){ return window.supa || window.supabaseClient || (typeof window.getSupa === 'function' ? window.getSupa() : null); }
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 350;
   const HEART_DURATION = 1000;
   const lastTap = new Map();
-  const lastToggleAt = new Map();
-  const pending = new Map();
+  const saving = new Set();
   let blockClickUntil = 0;
   let lastTouchTime = 0;
-  try { const saved = JSON.parse(localStorage.getItem("pixoro_likes") || "[]"); window.FEED_LIKES = new Set(saved.map(String)); } catch { window.FEED_LIKES = new Set(); }
-  try { window.FEED_COUNTS = JSON.parse(localStorage.getItem("pixoro_counts") || "{}"); } catch { window.FEED_COUNTS = {}; }
-  function saveLocal(){ try{ localStorage.setItem("pixoro_likes", JSON.stringify([...window.FEED_LIKES])); localStorage.setItem("pixoro_counts", JSON.stringify(window.FEED_COUNTS)); }catch(e){} }
+
+  // ✅ V49 - Fake Local ah Azhichiduvom da
+  try{ localStorage.removeItem("pixoro_likes"); localStorage.removeItem("pixoro_counts"); localStorage.removeItem("pixoro_unliked"); }catch(e){}
+  window.FEED_LIKES = new Set();
+  window.FEED_COUNTS = {};
+
   async function getUserId(){
     if (window.currentUser?.id) return window.currentUser.id;
     let supa = getSupa();
@@ -60,6 +58,7 @@
     el.textContent = Math.max(0, Number(count) || 0);
     el.style.transform = "none"; el.style.animation = "none"; el.style.fontSize = "14px"; el.style.lineHeight = "1"; el.style.display = "inline-block"; el.style.opacity = "1"; el.style.visibility = "visible";
   }
+  // ✅ V49 - FACE REMOVE da - Plain Gradient Heart Mattum da - White Face Path + Ellipse Illa da
   function showBigHeart(media, touchX, touchY){
     if (!media) return;
     const rect = media.getBoundingClientRect(); if (!rect.width || !rect.height) return;
@@ -81,8 +80,9 @@
       setTimeout(()=>{ try{s.remove()}catch(e){} }, 850);
     }
     const heart = document.createElement("div"); heart.className = "pixoro-big-heart";
-    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:48px;height:48px;opacity:0;transform:translate(-50%,-50%) scale(0);background:transparent !important;border:none !important;box-shadow:none !important;`;
-    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent;filter:drop-shadow(0 0 18px rgba(255,61,240,.8))"><defs><linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF0A33"/><stop offset="30%" stop-color="#FF3DF0"/><stop offset="60%" stop-color="#A259FF"/><stop offset="85%" stop-color="#FF8A00"/><stop offset="100%" stop-color="#FFD600"/></linearGradient></defs><path fill="url(#${gid})" stroke="#fff" stroke-width="1.2" stroke-linejoin="round" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/><path fill="#fff" opacity="0.95" d="M12 18.5L6.8 13.3a3.8 3.8 0 0 1 0-5.4 3.8 3.8 0 0 1 5.2 0L12 8l0-0.1a3.8 3.8 0 0 1 5.2 0 3.8 3.8 0 0 1 0 5.4L12 18.5z" transform="translate(0,-1.2) scale(0.62) translate(7.4,7.4)"/><ellipse cx="8.5" cy="8" rx="1.6" ry="1" fill="#fff" opacity="0.85" transform="rotate(-20 8.5 8)"/></svg>`;
+    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:90px;height:90px;opacity:0;transform:translate(-50%,-50%) scale(0);background:transparent !important;border:none !important;box-shadow:none !important;`;
+    // ✅ NO FACE da - Oru Heart Path Mattum da
+    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;background:transparent;filter:drop-shadow(0 0 18px rgba(255,61,240,.8))"><defs><linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF0A33"/><stop offset="30%" stop-color="#FF3DF0"/><stop offset="60%" stop-color="#A259FF"/><stop offset="85%" stop-color="#FF8A00"/><stop offset="100%" stop-color="#FFD600"/></linearGradient></defs><path fill="url(#${gid})" stroke="#fff" stroke-width="1.2" stroke-linejoin="round" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
     document.body.appendChild(heart);
     const animation = heart.animate([{ transform: "translate(-50%,-50%) scale(0)", opacity: 0, offset: 0 },{ transform: "translate(-50%,-50%) scale(1.45)", opacity: 1, offset: 0.15 },{ transform: "translate(-50%,-50%) scale(1.0)", opacity: 1, offset: 0.30 },{ transform: "translate(-50%,-50%) scale(1.30)", opacity: 1, offset: 0.45 },{ transform: "translate(-50%,-50%) scale(1.05)", opacity: 1, offset: 0.60 },{ transform: "translate(-50%,-50%) scale(1.18)", opacity: 1, offset: 0.75 },{ transform: "translate(-50%,-50%) scale(1.1)", opacity: 0, offset: 1 }], { duration: HEART_DURATION, easing: "ease-out", fill: "forwards" });
     animation.onfinish = () => heart.remove(); setTimeout(()=>{ try{heart.remove()}catch(e){} }, 1100);
@@ -111,43 +111,46 @@
     try { icon.getAnimations().forEach(a => a.cancel()); } catch(e) {}
     icon.animate([{ transform: "scale(1)", opacity: 1, offset: 0 },{ transform: "scale(1.5)", opacity: 1, offset: 0.2 },{ transform: "scale(0.9)", opacity: 1, offset: 0.4 },{ transform: "scale(1.35)", opacity: 1, offset: 0.6 },{ transform: "scale(0.95)", opacity: 1, offset: 0.8 },{ transform: "scale(1)", opacity: 1, offset: 1 }], { duration: 600, easing: "ease-out", fill: "forwards" });
   }
-  // ✅ SERVER SILENT da - Pinnadi Save Aagum da
+  // ✅ REAL SAVE da - Server la Save Aana Thaan True da + Real Count da
   async function serverSave(postId, liked){
-    let supa = getSupa(); if (!supa) return false;
-    const userId = await getUserId(); if (!userId) return false;
+    let supa = getSupa(); if (!supa) return { ok:false, count:null };
+    const userId = await getUserId(); if (!userId) return { ok:false, count:null };
     try{
       if (liked){ const { error } = await supa.from(TABLE).insert({ post_id: postId, user_id: userId }); if (error && error.code !== "23505") throw error; }
       else { const { error } = await supa.from(TABLE).delete().eq("post_id", postId).eq("user_id", userId); if (error) throw error; }
-      return true;
-    }catch(error){ console.error("PIXORO LIKE ERROR:", error); return false; }
+      let realCount = null;
+      try{
+        const { count, error: cErr } = await supa.from(TABLE).select("*", { count: "exact", head: true }).eq("post_id", postId);
+        if (!cErr) realCount = Number(count || 0);
+      }catch(e){}
+      if (realCount !== null){ try{ await supa.from("posts").update({ likes_count: realCount }).eq("id", postId); }catch(e){} }
+      return { ok:true, count: realCount };
+    }catch(error){ console.error("PIXORO REAL LIKE ERROR:", error); return { ok:false, count:null }; }
   }
-  // ✅ LOCAL FIRST da - Udaney Paint + Local Save - Aprom Thaan Server da
-  function toggleLike(postId, post, forceLike = false){
+  // ✅ REAL TOGGLE da - Server ku Wait Pannuvom da - Fake Kaatta Maatom da
+  async function toggleLike(postId, post, forceLike = false){
     if (!postId || !post) return false; postId = String(postId);
-    const now = Date.now(); const previous = lastToggleAt.get(postId) || 0;
-    if (!forceLike && now - previous < 300) return window.FEED_LIKES.has(postId);
-    lastToggleAt.set(postId, now);
+    if (saving.has(postId)) return window.FEED_LIKES.has(postId);
     const alreadyLiked = window.FEED_LIKES.has(postId); const willLike = forceLike ? true : !alreadyLiked;
-    if (forceLike && alreadyLiked){ paintLike(post, true); const current = Number(window.FEED_COUNTS[postId] || 0); if (current < 1){ window.FEED_COUNTS[postId] = 1; saveLocal(); } paintCount(post, Math.max(1, current)); return true; }
-    // STEP 1 - LOCAL FIRST da ✅
-    let countElement = getLikeCount(post);
-    let oldCount = (window.FEED_COUNTS[postId] !== undefined) ? Number(window.FEED_COUNTS[postId]) : Number(countElement?.textContent ?? 0);
-    let newCount = willLike ? oldCount + 1 : Math.max(0, oldCount - 1);
+    if (forceLike && alreadyLiked) return true;
+    saving.add(postId);
+    const button = getLikeButton(post); if (button) button.style.opacity = "0.6";
+    const res = await serverSave(postId, willLike);
+    if (button) button.style.opacity = "1";
+    saving.delete(postId);
+    if (!res.ok){ paintLike(post, alreadyLiked); return alreadyLiked; }
     if (willLike) window.FEED_LIKES.add(postId); else window.FEED_LIKES.delete(postId);
-    window.FEED_COUNTS[postId] = newCount; paintLike(post, willLike); paintCount(post, newCount); saveLocal();
-    // STEP 2 - SERVER SILENT da ✅ - await Illa da
-    const previousSave = pending.get(postId) || Promise.resolve();
-    const nextSave = previousSave.catch(() => {}).then(() => serverSave(postId, willLike));
-    pending.set(postId, nextSave); nextSave.finally(() => { if (pending.get(postId) === nextSave) pending.delete(postId); });
+    if (res.count !== null){ window.FEED_COUNTS[postId] = res.count; paintCount(post, res.count); }
+    else { let c = Number(getLikeCount(post)?.textContent || 0); let nc = willLike ? c + 1 : Math.max(0, c - 1); window.FEED_COUNTS[postId] = nc; paintCount(post, nc); }
+    paintLike(post, willLike);
     return willLike;
   }
   function findMedia(element){ if (!element?.closest) return null; return element.closest(".postMedia, .post-media, .post-media-wrap, .post-content img, .post-content video, img, video"); }
-  function handleDoubleTap(media, postId, post, x, y){
+  async function handleDoubleTap(media, postId, post, x, y){
     blockClickUntil = Date.now() + 700;
-    showBigHeart(media || post, x, y);
-    buttonAnimation(post); toggleLike(postId, post, true);
-    setTimeout(() => paintLike(post, true), 50);
-    setTimeout(()=>{ paintLike(post, true); paintCount(post, window.FEED_COUNTS[String(postId)]); }, 100);
+    const ok = await toggleLike(postId, post, true);
+    if (ok){ showBigHeart(media || post, x, y); buttonAnimation(post); }
+    setTimeout(() => paintLike(post, window.FEED_LIKES.has(String(postId))), 50);
   }
   document.addEventListener("touchstart", event => {
     if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
@@ -160,7 +163,7 @@
     const touchY = event.touches && event.touches[0] ? event.touches[0].clientY : null;
     lastTap.set(String(postId), { time: now, x: touchX, y: touchY });
     if (previous && now - previous.time <= DOUBLE_TAP_DELAY){ lastTap.delete(String(postId)); lastTouchTime = now; handleDoubleTap(media, postId, post, touchX, touchY); }
-  }, { passive: true });
+  }, { passive: true, capture: true });
   document.addEventListener("dblclick", event => {
     if (Date.now() - lastTouchTime < 800) return;
     if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
@@ -168,29 +171,32 @@
     const postId = getPostId(event.target); if (!postId) return;
     const media = findMedia(event.target) || post;
     event.preventDefault(); handleDoubleTap(media, postId, post, event.clientX, event.clientY);
-  });
+  }, true);
   document.addEventListener("click", event => {
+    const button = event.target.closest("[data-like-btn], .like-btn, .like-button"); if (button){
+      event.preventDefault(); event.stopPropagation();
+      const post = getPost(button); const postId = getPostId(button); if (!post || !postId) return;
+      const wasLiked = window.FEED_LIKES.has(String(postId));
+      if (!wasLiked) showButtonHeart(button);
+      buttonAnimation(post); toggleLike(postId, post, false);
+      return;
+    }
     if (Date.now() < blockClickUntil){ const post = getPost(event.target); if (post){ event.preventDefault(); return; } }
-    const button = event.target.closest("[data-like-btn], .like-btn, .like-button"); if (!button) return;
-    event.preventDefault(); event.stopPropagation();
-    const post = getPost(button); const postId = getPostId(button); if (!post || !postId) return;
-    showButtonHeart(button); buttonAnimation(post); toggleLike(postId, post, false);
   }, true);
   function paintAll(){
     document.querySelectorAll("[data-post-id]").forEach(post => {
       const postId = String(post.dataset.postId || post.dataset.id || ""); if (!postId) return;
       const liked = window.FEED_LIKES.has(postId); paintLike(post, liked);
-      if (window.FEED_COUNTS[postId] !== undefined){ paintCount(post, Number(window.FEED_COUNTS[postId])); }
     });
   }
-  // ✅ V45 FIX - Overwrite Illa da - Merge Thaan da
+  // ✅ REAL LOAD da - Server Like Mattum Thaan da
   async function loadMyLikes(){
-    paintAll(); const userId = await getUserId(); let supa = getSupa(); if (!userId || !supa) return;
+    const userId = await getUserId(); let supa = getSupa(); if (!userId || !supa){ paintAll(); return; }
     try{
       const { data, error } = await supa.from(TABLE).select("post_id").eq("user_id", userId); if (error) throw error;
-      (data || []).forEach(item => window.FEED_LIKES.add(String(item.post_id)));
-      saveLocal(); paintAll();
-    }catch(error){ console.error("PIXORO LOAD LIKES:", error); }
+      window.FEED_LIKES = new Set((data || []).map(item => String(item.post_id)));
+      paintAll();
+    }catch(error){ console.error("PIXORO LOAD REAL LIKES:", error); }
   }
   window.addEventListener("pixoro-feed-rendered", ()=> setTimeout(paintAll, 50));
   window.addEventListener("pixoro-reels-rendered", ()=> setTimeout(paintAll, 50));
@@ -204,5 +210,5 @@
   function start(){ addStyles(); paintAll(); loadMyLikes(); }
   if (document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", start, { once: true }); } else { start(); }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO LIKE V45 LOADED ❤️");
+  console.log("PIXORO LIKE V49 REAL + NO FACE ❤️");
 })();
