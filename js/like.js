@@ -1,23 +1,25 @@
 /* =====================================================
-   PIXORO LIKE V65 FINAL - MASS HEART DA 🔥❤️
-   CHINNA HEART - NITTU NIKKUM - MAKKAL RASIPPANGA DA
+   PIXORO LIKE V66 FINAL - CORRECT DA 🔥❤️
+   HEART 46px - OREY HEART THAAN - NARIYA HEART ILLA
    DOUBLE TAP = LIKE ONLY - UNLIKE = LIKE BUTTON ONLY
    LIKE = RED - UNLIKE = WHITE
    ===================================================== */
 
 (() => {
   "use strict";
-  if (window.PIXORO_LIKE_V65) return;
-  window.PIXORO_LIKE_V65 = true;
+  if (window.PIXORO_LIKE_V66) return;
+  window.PIXORO_LIKE_V66 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 400;
-  const HEART_DURATION = 1800; // ✅ 1.8 Sec Nikkum da - Speed ah Pogaathu da
+  const HEART_DURATION = 1800;
   const lastTap = new Map();
   const lastToggleAt = new Map();
   const pending = new Map();
   let suppressMediaClickUntil = 0;
   let _heartId = 0;
+  let _heartLock = 0;
+  let _activeHeart = null;
 
   function getSupa() {
     return window.supa || window.supabaseClient || (typeof window.getSupa === "function" ? window.getSupa() : null);
@@ -46,7 +48,6 @@
     return element.closest(".postMedia, .post-media, .post-media-wrap") || element.closest("[data-post-id]");
   }
 
-  /* ✅ LIKE = RED - UNLIKE = WHITE - Ippo Kandippa Red Aagum da */
   function paintLike(post, liked) {
     const button = getLikeButton(post); if (!button) return;
     button.classList.toggle("liked", liked);
@@ -58,7 +59,6 @@
       svg.style.setProperty("fill", liked ? "#FF3040" : "none", "important");
       svg.style.setProperty("stroke", liked ? "#FF3040" : "#fff", "important");
     });
-    // ✅ V65 FIX - Ithu Thaan Mukkiyam da - SVG Path oda Attribute ah Ye Maathurom da - Illana Red Aagaathu da
     button.querySelectorAll("svg path").forEach(p => {
       p.style.setProperty("fill", liked ? "#FF3040" : "none", "important");
       p.style.setProperty("stroke", liked ? "#FF3040" : "#fff", "important");
@@ -68,22 +68,32 @@
   }
   function paintCount(post, count) { const el = getLikeCount(post); if (!el) return; el.textContent = Math.max(0, Number(count) || 0); }
 
-  /* ✅ MASS HEART - Chinna Size - Nittu Nikkum da */
+  /* ✅ V66 CORRECT - 46px - Orey Heart Thaan da */
   function showBigHeart(media, x, y) {
     if (!media) return;
+    const now = Date.now();
+    // ✅ 800ms Lock - Thirumba Thirumba Double Tap Pannalum Orey Heart Thaan da
+    if (now - _heartLock < 800) return;
+    _heartLock = now;
+
+    // ✅ Pazhaya Heart Irundha Delete - Nariya Heart Seraathu da
+    if (_activeHeart) { try { _activeHeart.remove(); } catch(e){} _activeHeart = null; }
+    document.querySelectorAll(".pixoro-big-heart").forEach(el => el.remove());
+
     const rect = media.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
     const startX = Number.isFinite(x) ? x : rect.left + rect.width / 2;
     const startY = Number.isFinite(y) ? y : rect.top + rect.height / 2;
     _heartId++;
     const gid = "pixoroHeartMass" + _heartId;
-    // ✅ Chinna Size da - 110 la irundhu 72 aakiten da
+
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
-    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:72px;height:72px;transform:translate(-50%,-50%) scale(0);opacity:0;display:block;`;
+    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:46px;height:46px;transform:translate(-50%,-50%) scale(0);opacity:0;display:block;`;
     heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 10px 22px rgba(255,45,149,.65))"><defs><linearGradient id="${gid}"><stop offset="0%" stop-color="#FF2D95"/><stop offset="55%" stop-color="#FF5E8A"/><stop offset="100%" stop-color="#C86BFF"/></linearGradient></defs><path fill="url(#${gid})" stroke="#fff" stroke-width="0.6" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
     document.body.appendChild(heart);
-    // ✅ Nittu Nikkum da - 70% Varaikkum Full Theriyum da - Aprom Mella Mela Porum da
+    _activeHeart = heart;
+
     const anim = heart.animate([
       { transform: "translate(-50%,-50%) scale(0) rotate(-10deg)", opacity: 0 },
       { transform: "translate(-50%,-50%) scale(1.4) rotate(5deg)", opacity: 1, offset: 0.14 },
@@ -94,18 +104,19 @@
       { transform: "translate(-50%,-85%) scale(1) rotate(0deg)", opacity: 1, offset: 0.85 },
       { transform: "translate(-50%,-120%) scale(0.9) rotate(0deg)", opacity: 0 }
     ], { duration: HEART_DURATION, easing: "ease-out", fill: "forwards" });
-    anim.onfinish = () => heart.remove();
+    anim.onfinish = () => { heart.remove(); if (_activeHeart === heart) _activeHeart = null; };
 
-    for (let i = 0; i < 8; i++) {
+    // ✅ Sparkles 4 Mattum da - Nariya Thuli Illa da
+    for (let i = 0; i < 4; i++) {
       const s = document.createElement("div");
-      const angle = (i / 8) * Math.PI * 2;
-      const dist = 45 + Math.random() * 25;
-      s.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:8px;height:8px;border-radius:50%;background:${i % 3 === 0 ? "#FF2D95" : i % 3 === 1 ? "#FFD93D" : "#C86BFF"};opacity:1;`;
+      const angle = (i / 4) * Math.PI * 2;
+      const dist = 35 + Math.random() * 15;
+      s.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${startX}px;top:${startY}px;width:6px;height:6px;border-radius:50%;background:${i % 2 ? "#FF2D95" : "#FFD93D"};opacity:1;`;
       document.body.appendChild(s);
       const a2 = s.animate([
         { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
-        { transform: `translate(${Math.cos(angle)*dist - 4}px, ${Math.sin(angle)*dist - 4 - 25}px) scale(0)`, opacity: 0 }
-      ], { duration: 800, easing: "ease-out", fill: "forwards" });
+        { transform: `translate(${Math.cos(angle)*dist - 3}px, ${Math.sin(angle)*dist - 3 - 20}px) scale(0)`, opacity: 0 }
+      ], { duration: 700, easing: "ease-out", fill: "forwards" });
       a2.onfinish = () => s.remove();
     }
   }
@@ -205,8 +216,8 @@
   }
 
   function addStyles() {
-    const old = document.getElementById("pixoro-like-v65-css"); if (old) old.remove();
-    const style = document.createElement("style"); style.id = "pixoro-like-v65-css";
+    const old = document.getElementById("pixoro-like-v66-css"); if (old) old.remove();
+    const style = document.createElement("style"); style.id = "pixoro-like-v66-css";
     style.textContent = `
       .like-btn, .like-button, [data-like-btn] { background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; overflow: visible !important; visibility: visible !important; }
       .like-btn svg, .like-button svg, [data-like-btn] svg { transform-origin: center !important; flex-shrink: 0 !important; }
@@ -229,5 +240,5 @@
 
   function start() { addStyles(); paintAll(); loadMyLikes(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true }); else start();
-  console.log("PIXORO LIKE V65 LOADED ❤️🔥 MASS HEART");
+  console.log("PIXORO LIKE V66 LOADED ❤️🔥 46px SINGLE HEART");
 })();
