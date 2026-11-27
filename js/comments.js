@@ -1,5 +1,5 @@
-// ===== PIXORO COMMENT - v22 - js/comments.js la Podu da =====
-// v20 + Correct Fix da - Pazhaya Code Appadiye da - 3 Add Mattum da
+// ===== PIXORO COMMENT - v23 - js/comments.js la Podu da =====
+// v22 + avatar_url Fix da - Pazhaya Code Appadiye da - Insert Mattum Fix da
 
 const PIXORO_COMMENT_EMOJIS = ["❤️","🙌","🔥","👏","😍","😮","😂","💯"];
 const PIXORO_ICON_EMOJI = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`;
@@ -53,7 +53,6 @@ function pixoroFindPostId(fromEl){
   let el = fromEl && fromEl.closest ? fromEl.closest('[data-post-id],[data-id],article,.post,.post-card') : null;
   if(el && el.dataset?.postId) return el.dataset.postId;
   if(el && el.dataset?.id) return el.dataset.id;
-  // ✅ ADD 1 - feed.js Set Pannura _CUR ah Inga Edukkuren da - Idhu Tha Fix da
   if(window._CUR && typeof window._CUR === 'string' && window._CUR !== 'undefined') return window._CUR;
   if(window.LAST_CLICKED_POST_ID) return window.LAST_CLICKED_POST_ID;
   if(window.CURRENT_COMMENT_POST && window.CURRENT_COMMENT_POST !== 'undefined') return window.CURRENT_COMMENT_POST;
@@ -126,7 +125,6 @@ function pixoroCommentLayout(){
     box.append(bottom);
   }
 }
-// ✅ ADD 2 - Real Function ah Thani Perila Save Panniten da - feed.js Overwrite Pannalum Idhu Azhiyaathu da
 function pixoroOpenCommentReal(id, el){
   let pid = pixoroFindPostId(id) || pixoroFindPostId(el) || pixoroFindPostId(window.event?.target);
   if(!pid){
@@ -222,10 +220,20 @@ function pixoroSendComment(){
         if(!session){ alert('Login Illa da'); return; }
         uid = session.user.id; window.ME_ID = uid;
       }
-      let {error} = await s.from('comments').insert({ post_id: postId, user_id: uid, username: myName, avatar_url: myAva, text: txt, content: txt });
+      // ✅ v23 FIX - avatar_url / username Anuppa Maatten da - Table la Illa da - text Mattum Anuppuven da
+      let {error} = await s.from('comments').insert({ post_id: postId, user_id: uid, text: txt });
+      if(error){
+        // ✅ text Fail Aana - content la Try Pannu da
+        let r2 = await s.from('comments').insert({ post_id: postId, user_id: uid, content: txt });
+        error = r2.error;
+      }
       if(error) throw error;
       let tempEl = box?.querySelector(`[data-temp="${tempId}"]`);
-      if(tempEl) tempEl.classList.remove('pixoro-c-optimistic');
+      if(tempEl){
+        tempEl.classList.remove('pixoro-c-optimistic');
+        let sub = tempEl.querySelector('.pixoro-c-sub');
+        if(sub) sub.innerHTML = sub.innerHTML.replace('• Sending...','');
+      }
     }catch(e){ alert('Send Fail da - Karanam: ' + e.message); }
   })();
 }
@@ -243,7 +251,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
 if(document.readyState !== 'loading') pixoroCommentLayout();
 window.pixoroSendComment = pixoroSendComment;
 window.addComment = pixoroSendComment;
-// ✅ ADD 3
 window.pixoroOpenCommentReal = pixoroOpenCommentReal;
 window.loadComments = loadComments;
 window.deleteComment = deleteComment;
