@@ -271,14 +271,14 @@
   window.pixoroShowHeartDance = showBigHeart;
   window.showBigHeart = showBigHeart;
 
-  /* ✅ CORRECTED DA - Count Pakkathula Perusa 44px da - Cut Aagaathu da */
+  /* ✅ CORRECTED DA - Like Button ku Nerra Ye Mela Poi Maraiyum da - Comment Nera Pogaathu da */
   function showUnlikeHeart(button) {
     if (!button) return;
     const rect = button.getBoundingClientRect();
     if (!rect.width) return;
-    let x = rect.left + rect.width + 34;
-    x = Math.max(30, Math.min(x, window.innerWidth - 30));
-    const y = rect.top - 10;
+    let x = rect.left + rect.width / 2;
+    x = Math.max(26, Math.min(x, window.innerWidth - 26));
+    const y = rect.top - 6;
     const heart = document.createElement("div");
     heart.className = "pixoro-unlike-heart";
     heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${x}px;top:${y}px;width:44px!important;height:44px!important;transform:translate(-50%,-50%) scale(1);opacity:1;`;
