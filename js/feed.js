@@ -1,13 +1,13 @@
 /* =====================================================
-   PIXORO FEED V1043 FINAL - CORRECT DA 🔥❤️
-   SUPABASE POST LOADING
-   LIKE LOGIC = like.js ONLY - FEED LA LIKE LOGIC ILLA
+   PIXORO FEED V1044 FINAL - CORRECT DA 🔥❤️
+   SUPABASE POST LOADING - LIKE LOGIC = like.js ONLY
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_FEED_V1043) return;
+  if (window.PIXORO_FEED_V1044) return;
+  window.PIXORO_FEED_V1044 = true;
   window.PIXORO_FEED_V1043 = true;
   window.PIXORO_FEED_V1042 = true;
 
@@ -16,6 +16,7 @@
 
   let loading = false;
   let loaded = false;
+  let retryCount = 0;
 
   function getClient() {
     return (
@@ -55,9 +56,11 @@
     return "image";
   }
 
+  /* ✅ V1044 FIX 1 - #feed um Theduren da - FeedList Illanaalum Feed Varum da */
   function getFeedContainer() {
     return (
       document.getElementById("feedList") ||
+      document.getElementById("feed") ||
       document.querySelector("#feed-list") ||
       document.querySelector(".feed-list") ||
       document.querySelector(".feedList")
@@ -82,7 +85,6 @@
     );
   }
 
-  /* ✅ V1043 FIX - Like Panna Count ah FEED_COUNTS la irundhu Edukkum da - DB Pazhaya Count ah Tharaathu da */
   function getPostCount(post) {
     const id = String(post.id || "");
     if (window.FEED_COUNTS && window.FEED_COUNTS[id] !== undefined) {
@@ -134,7 +136,6 @@
     const caption = escapeHTML(post.caption || "");
     const count = getPostCount(post);
 
-    /* ✅ V1043 FIX - feedPfpImg Add Panniten da - Avatar 42px Circle da */
     const avatarHTML = avatar
       ? `<img src="${avatar}" alt="" class="post-avatar feedPfpImg">`
       : `<div class="post-avatar feedPfpImg post-avatar-empty">P</div>`;
@@ -221,10 +222,17 @@
     if (loaded && !force) return;
     const supa = getClient();
     const container = getFeedContainer();
+    /* ✅ V1044 FIX 2 - Supa Late ah Vanthaalum Thirumba Try Pannum da - Return Panna Maatam da */
     if (!supa) {
-      console.error("PIXORO: Supabase client not ready");
+      if (retryCount < 10) {
+        retryCount++;
+        setTimeout(() => loadFeed(force), 500);
+      } else {
+        console.error("PIXORO: Supabase client not ready");
+      }
       return;
     }
+    retryCount = 0;
     if (!container) {
       console.error("PIXORO: feedList container not found");
       return;
@@ -304,5 +312,5 @@
   } else {
     start();
   }
-  console.log("PIXORO FEED V1043 READY");
+  console.log("PIXORO FEED V1044 READY");
 })();
