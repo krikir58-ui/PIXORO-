@@ -1,8 +1,8 @@
-/* ===== PIXORO LIKE V44 - V43 CORRECTED - DOUBLE TAP + BUTTON HEART FIX ===== */
-// ✅ V44 FIX 1 - Double Tap ah Post Card Mela Vachom da - findMedia Venaam da
-// ✅ V44 FIX 2 - Like Button Heart - Keezha Irundhu Mela Poyi Maraiyum da
-// ✅ V44 FIX 3 - Count ku .rCount Add da
-// ✅ Vera Edhuvum Maathala da
+/* ===== PIXORO LIKE V45 - V44 + LOCAL FIRST + SERVER SILENT ===== */
+// ✅ V45 FIX - Local First da - Thotta Udaney Red + Count 1 da
+// ✅ V45 FIX - Server Silent da - Pinnadi Methuva Save Aagum da
+// ✅ V45 FIX - loadMyLikes la Merge Thaan da - Overwrite Illa da - Local Azhiyathu da
+// ✅ V44 oda Double Tap + Button Heart Same da
 (() => {
   "use strict";
   if (window.PIXORO_LIKE_V39) return;
@@ -10,6 +10,7 @@
   window.PIXORO_LIKE_V42 = true;
   window.PIXORO_LIKE_V43 = true;
   window.PIXORO_LIKE_V44 = true;
+  window.PIXORO_LIKE_V45 = true;
   function getSupa(){ return window.supa || window.supabaseClient || (typeof window.getSupa === 'function' ? window.getSupa() : null); }
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 350;
@@ -34,7 +35,6 @@
     return ( element?.dataset?.postId || element?.dataset?.likeBtn || post?.dataset?.postId || post?.dataset?.id || null );
   }
   function getLikeButton(post){ if (!post) return null; return post.querySelector("[data-like-btn], .like-btn, .like-button"); }
-  // ✅ V44 FIX 3 - .rCount Add da
   function getLikeCount(post){ if (!post) return null; return post.querySelector("[data-like-count], .like-count, .likes-count, [data-count='likes'], .rCount"); }
   function paintLike(post, liked){
     const button = getLikeButton(post); if (!button) return;
@@ -89,7 +89,6 @@
   }
   function showTapHeart(x, y) { return; }
   function showMassDance(media) { return; }
-  // ✅ V44 FIX 2 - Heart Keezha Irundhu Varum da
   function showButtonHeart(button){
     if (!button) return; const r = button.getBoundingClientRect(); const gid = 'pixoroBtn' + Date.now();
     const heart = document.createElement("div"); heart.className = "pixoro-big-heart";
@@ -112,6 +111,7 @@
     try { icon.getAnimations().forEach(a => a.cancel()); } catch(e) {}
     icon.animate([{ transform: "scale(1)", opacity: 1, offset: 0 },{ transform: "scale(1.5)", opacity: 1, offset: 0.2 },{ transform: "scale(0.9)", opacity: 1, offset: 0.4 },{ transform: "scale(1.35)", opacity: 1, offset: 0.6 },{ transform: "scale(0.95)", opacity: 1, offset: 0.8 },{ transform: "scale(1)", opacity: 1, offset: 1 }], { duration: 600, easing: "ease-out", fill: "forwards" });
   }
+  // ✅ SERVER SILENT da - Pinnadi Save Aagum da
   async function serverSave(postId, liked){
     let supa = getSupa(); if (!supa) return false;
     const userId = await getUserId(); if (!userId) return false;
@@ -121,6 +121,7 @@
       return true;
     }catch(error){ console.error("PIXORO LIKE ERROR:", error); return false; }
   }
+  // ✅ LOCAL FIRST da - Udaney Paint + Local Save - Aprom Thaan Server da
   function toggleLike(postId, post, forceLike = false){
     if (!postId || !post) return false; postId = String(postId);
     const now = Date.now(); const previous = lastToggleAt.get(postId) || 0;
@@ -128,11 +129,13 @@
     lastToggleAt.set(postId, now);
     const alreadyLiked = window.FEED_LIKES.has(postId); const willLike = forceLike ? true : !alreadyLiked;
     if (forceLike && alreadyLiked){ paintLike(post, true); const current = Number(window.FEED_COUNTS[postId] || 0); if (current < 1){ window.FEED_COUNTS[postId] = 1; saveLocal(); } paintCount(post, Math.max(1, current)); return true; }
+    // STEP 1 - LOCAL FIRST da ✅
     let countElement = getLikeCount(post);
     let oldCount = (window.FEED_COUNTS[postId] !== undefined) ? Number(window.FEED_COUNTS[postId]) : Number(countElement?.textContent ?? 0);
     let newCount = willLike ? oldCount + 1 : Math.max(0, oldCount - 1);
     if (willLike) window.FEED_LIKES.add(postId); else window.FEED_LIKES.delete(postId);
     window.FEED_COUNTS[postId] = newCount; paintLike(post, willLike); paintCount(post, newCount); saveLocal();
+    // STEP 2 - SERVER SILENT da ✅ - await Illa da
     const previousSave = pending.get(postId) || Promise.resolve();
     const nextSave = previousSave.catch(() => {}).then(() => serverSave(postId, willLike));
     pending.set(postId, nextSave); nextSave.finally(() => { if (pending.get(postId) === nextSave) pending.delete(postId); });
@@ -146,7 +149,6 @@
     setTimeout(() => paintLike(post, true), 50);
     setTimeout(()=>{ paintLike(post, true); paintCount(post, window.FEED_COUNTS[String(postId)]); }, 100);
   }
-  // ✅ V44 FIX 1 - touchstart la Post ah Direct ah Paappom da - findMedia Check Illa da
   document.addEventListener("touchstart", event => {
     if (event.target.closest("button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]")) return;
     const post = getPost(event.target); if (!post) return;
@@ -181,9 +183,14 @@
       if (window.FEED_COUNTS[postId] !== undefined){ paintCount(post, Number(window.FEED_COUNTS[postId])); }
     });
   }
+  // ✅ V45 FIX - Overwrite Illa da - Merge Thaan da
   async function loadMyLikes(){
     paintAll(); const userId = await getUserId(); let supa = getSupa(); if (!userId || !supa) return;
-    try{ const { data, error } = await supa.from(TABLE).select("post_id").eq("user_id", userId); if (error) throw error; const serverLikes = new Set((data || []).map(item => String(item.post_id))); window.FEED_LIKES = serverLikes; saveLocal(); paintAll(); }catch(error){ console.error("PIXORO LOAD LIKES:", error); }
+    try{
+      const { data, error } = await supa.from(TABLE).select("post_id").eq("user_id", userId); if (error) throw error;
+      (data || []).forEach(item => window.FEED_LIKES.add(String(item.post_id)));
+      saveLocal(); paintAll();
+    }catch(error){ console.error("PIXORO LOAD LIKES:", error); }
   }
   window.addEventListener("pixoro-feed-rendered", ()=> setTimeout(paintAll, 50));
   window.addEventListener("pixoro-reels-rendered", ()=> setTimeout(paintAll, 50));
@@ -197,5 +204,5 @@
   function start(){ addStyles(); paintAll(); loadMyLikes(); }
   if (document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", start, { once: true }); } else { start(); }
   window.addEventListener("pixoro:login", loadMyLikes);
-  console.log("PIXORO LIKE V44 LOADED ❤️");
+  console.log("PIXORO LIKE V45 LOADED ❤️");
 })();
