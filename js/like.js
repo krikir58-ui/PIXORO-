@@ -11,8 +11,8 @@
   window.PIXORO_LIKE_V66 = true;
 
   const TABLE = "likes";
-  const DOUBLE_TAP_DELAY = 400;
-  const HEART_DURATION = 1800;
+  const DOUBLE_TAP_DELAY = 300;
+  const HEART_DURATION = 1700;
   const lastTap = new Map();
   const lastToggleAt = new Map();
   const pending = new Map();
@@ -60,9 +60,9 @@
       svg.style.setProperty("stroke", liked ? "#FF3040" : "#fff", "important");
     });
     button.querySelectorAll("svg path").forEach(p => {
-      p.style.setProperty("fill", liked ? "#FF3040" : "none", "important");
+      p.style.setProperty("fill", liked ? "#FF3040" : "#fff", "important");
       p.style.setProperty("stroke", liked ? "#FF3040" : "#fff", "important");
-      p.setAttribute("fill", liked ? "#FF3040" : "none");
+      p.setAttribute("fill", liked ? "#FF3040" : "#fff");
       p.setAttribute("stroke", liked ? "#FF3040" : "#fff");
     });
   }
@@ -73,7 +73,7 @@
     if (!media) return;
     const now = Date.now();
     // ✅ 800ms Lock - Thirumba Thirumba Double Tap Pannalum Orey Heart Thaan da
-    if (now - _heartLock < 800) return;
+    if (now - _heartLock < 600) return;
     _heartLock = now;
 
     // ✅ Pazhaya Heart Irundha Delete - Nariya Heart Seraathu da
