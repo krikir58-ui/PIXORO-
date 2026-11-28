@@ -1,20 +1,19 @@
 /* =====================================================
-   PIXORO LIKE V82
+   PIXORO LIKE V84
    LIKE BUTTON  = LIKE / UNLIKE - SMOOTH DA - Comment Mari da
    PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
    SUPABASE = SERVER SAVE
    + COMMENT MODAL GUARD DA - Comment Like ah like.js Thodathu da
    + COMMENT LIKE CHINNA DA - Perusa Heart Parakkaathu da
-   + V82 BEST DA - Like CSS Thani File da - css/like.css la Tha Irukku da - Like.js la CSS Illa da
-   + V82 FIX DA - Like / Unlike Panna Photo NADUVULA 38px Heart Vanthu Mella Poi Maraiyum da - 1500ms da - Button Kitta Illa da
-   + V82 ADD ONLY DA - Naduvula Vera Heart Kooda Varum da - Pazhaya Heart ku Pathilla da - 72px Red + White da
+   + V84 BEST DA - Like CSS Thani File da - css/like.css la Tha Irukku da - Like.js la CSS Illa da
+   + V84 FIX DA - Home Pink Heart Illa da - Reels Heart Athe Design Tha Home kum da - Chinna Size 52px da
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V82) return;
-  window.PIXORO_LIKE_V82 = true;
+  if (window.PIXORO_LIKE_V84) return;
+  window.PIXORO_LIKE_V84 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
@@ -186,6 +185,7 @@
   }
 
   /* POP HEART - DOUBLE TAP MATTUM DA - PHOTO NADUVULA DA */
+  /* ✅ V84 FIX DA - Double Tap Heart Kooda Reels Design Tha da - Pink Gradient Illa da - Chinna Size da */
 
   function showBigHeart(media, x, y) {
     if (!media) return;
@@ -212,8 +212,8 @@
       pointer-events:none;
       left:${px}px;
       top:${py}px;
-      width:84px;
-      height:84px;
+      width:52px;
+      height:52px;
       transform:translate(-50%,-50%) scale(0);
       opacity:0;
     `;
@@ -221,18 +221,11 @@
     heart.innerHTML = `
       <svg viewBox="0 0 24 24"
         style="width:100%;height:100%;
-        filter:drop-shadow(0 8px 18px rgba(255,45,149,.6))">
-        <defs>
-          <linearGradient id="${gid}">
-            <stop offset="0%" stop-color="#FF2D95"/>
-            <stop offset="55%" stop-color="#FF5E8A"/>
-            <stop offset="100%" stop-color="#C86BFF"/>
-          </linearGradient>
-        </defs>
+        filter:drop-shadow(0 8px 18px rgba(255,48,64,.55))">
         <path
-          fill="url(#${gid})"
+          fill="#FF3040"
           stroke="#FFFFFF"
-          stroke-width=".6"
+          stroke-width="1.2"
           d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"
         />
       </svg>
@@ -276,7 +269,7 @@
   window.pixoroShowHeartDance = showBigHeart;
   window.showBigHeart = showBigHeart;
 
-  /* ✅ V81 - Pazhaya Unlike Heart Function ah Kolli da - Ippo Adhu Theva Illa da - Naduvula Heart Tha Venum da */
+  /* ✅ V84 - Pazhaya Unlike Heart Function ah Kolli da - Ippo Adhu Theva Illa da - Naduvula Heart Tha Venum da */
   function showUnlikeHeart(button) {
     return;
   }
@@ -289,7 +282,7 @@
 
     icon.getAnimations().forEach(a => a.cancel());
 
-    /* ✅ V81 CORRECT - 1.06x / 150ms da - Perusa Thudikkaathu da */
+    /* ✅ V84 CORRECT - 1.06x / 150ms da - Perusa Thudikkaathu da */
     icon.animate([
       { transform: "scale(1)" },
       { transform: "scale(1.06)", offset: .4 },
@@ -647,7 +640,7 @@
   window.pixoroSyncLikes = syncVisiblePosts;
   window.pixoroPaintAllLikes = paintAll;
 
-  /* ✅ V81 - LIKE CSS THOOKITEN DA - CSS Inime css/like.css la Tha Irukku da - Like.js la CSS Illa da */
+  /* ✅ V84 - LIKE CSS THOOKITEN DA - CSS Inime css/like.css la Tha Irukku da - Like.js la CSS Illa da */
 
   /* EVENTS */
 
@@ -691,78 +684,21 @@
     start();
   }
 
-  console.log("PIXORO LIKE V82 READY ❤️");
+  console.log("PIXORO LIKE V84 READY ❤️");
 
-  /* ===== ✅ V81 FIX DA - Like / Unlike Panna Photo NADUVULA 38px Heart Vanthu Mella Poi Maraiyum da - Button Kitta Illa da ===== */
-  (function pixoroCenterPopADD(){
-    var lastTouch = new WeakMap();
-    document.addEventListener("pointerdown", function(e){
-      var btn = e.target.closest ? e.target.closest("[data-like-btn], .like-btn, .like-button") : null;
-      if(!btn || btn.closest("#commentModal")) return;
-      lastTouch.set(btn, Date.now());
-    }, true);
-    function centerPop(btn, isLiked){
-      if(!btn || btn.closest("#commentModal")) return;
-      // ✅ V81 FIX - Button Kitta Illa da - Photo NADUVULA Tha da - Video Mari da
-      var post = btn.closest("article.post, .post");
-      var media = post ? post.querySelector(".postMedia, .post-media, .post-media-wrap, img.main, video.main") : null;
-      if(!media) return;
-      var r = media.getBoundingClientRect();
-      if(!r.width) return;
-      var d = document.createElement("div");
-      d.className = "pixoro-center-pop" + (isLiked ? "" : " is-unlike");
-      // ✅ Photo Naduvula Tha da - 38px Heart da
-      d.style.left = (r.left + r.width / 2) + "px";
-      d.style.top = (r.top + r.height / 2) + "px";
-      d.innerHTML = '<svg viewBox="0 0 24 24" style="filter:drop-shadow(0 8px 18px rgba(255,45,149,.6))"><path fill="#FF2D95" stroke="#FFFFFF" stroke-width="0.6" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
-      document.body.appendChild(d);
-      // ✅ V81 - Naduvula Vanthu - Konjam Ninnu - Mella Mela Poi Maraiyum da - 1500ms da
-      var anim = d.animate([
-        { transform:"translate(-50%,-50%) scale(0)", opacity:0 },
-        { transform:"translate(-50%,-50%) scale(1.2)", opacity:1, offset:0.15 },
-        { transform:"translate(-50%,-50%) scale(1)", opacity:1, offset:0.30 },
-        { transform:"translate(-50%,-55%) scale(1)", opacity:1, offset:0.55 },
-        { transform:"translate(-50%,-80%) scale(0.95)", opacity:0.6, offset:0.80 },
-        { transform:"translate(-50%,-110%) scale(0.85)", opacity:0 }
-      ], { duration:1500, easing:"ease-out", fill:"forwards" });
-      anim.onfinish = function(){ d.remove(); };
-    }
-    var prevLiked = new WeakMap();
-    var obs = new MutationObserver(function(muts){
-      muts.forEach(function(m){
-        var btn = m.target;
-        if(!btn.matches || !btn.matches("[data-like-btn], .like-btn, .like-button")) return;
-        if(btn.closest("#commentModal")) return;
-        if(Date.now() - (lastTouch.get(btn) || 0) > 600) return;
-        var nowLiked = btn.classList.contains("liked");
-        if(prevLiked.get(btn) === nowLiked) return;
-        prevLiked.set(btn, nowLiked);
-        // ✅ Like / Unlike Rendum - Naduvula Heart Varum da
-        centerPop(btn, nowLiked);
-        var svg = btn.querySelector("svg");
-        if(svg){
-          svg.getAnimations().forEach(function(a){ a.cancel(); });
-          svg.animate([
-            { transform:"scale(1)" },
-            { transform:"scale(1.06)", offset:0.4 },
-            { transform:"scale(1)" }
-          ], { duration:150, easing:"ease-out" });
-        }
-      });
-    });
-    obs.observe(document.documentElement, { attributes:true, attributeFilter:["class"], subtree:true });
-  })();
+  /* ✅ V84 FIX DA - Home Pink Heart Function FULL Delete Panniten da ❌ */
+  /* ✅ Pazhaya pixoroCenterPopADD() Illa da - 38px Pink #FF2D95 Heart Inime Varathu da */
+  /* ✅ Home kum Reels kum - Kezha Irukka Reels Heart Tha Varum da */
 
   /* ===== ✅ V81 KILL SWITCH DA - Pazhaya Slow Heart Vantha Udane Delete Pannidum da ===== */
   (function pixoroKillOldHeart(){
     var obs = new MutationObserver(function(){
-      document.querySelectorAll(".pixoro-slow-float, .pixoro-soft-float").forEach(function(el){ el.remove(); });
+      document.querySelectorAll(".pixoro-slow-float, .pixoro-soft-float, .pixoro-center-pop").forEach(function(el){ el.remove(); });
     });
     obs.observe(document.body, { childList:true, subtree:true });
   })();
 
-  /* ===== ✅ V82 ADD ONLY DA - Ithula Mattum Add Pannen da - Mela Edhuvum Maathala da ===== */
-  /* ✅ Naduvula Vera Heart da - Pazhaya 38px Heart ku Pathilla da - Idhu Pudhu Heart Mattum da */
+  /* ===== ✅ V84 - Reels Heart Tha Home kum da - Athe Design Athe Heart da - Chinna Size da ===== */
   (function pixoroReelCenterHeartADD(){
     var lastTouch2 = new WeakMap();
     document.addEventListener("pointerdown", function(e){
