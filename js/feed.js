@@ -1,9 +1,10 @@
 /* =====================================================
-   PIXORO FEED V1044 - FULL CORRECT CODE DA 🔥
-   DOUBLE TAP DELETE - LIKE ONLY IN like.js V67
-   HEART 46px - SPEED 1000ms - LIKE=RED / UNLIKE=WHITE
-   + COMMENT LIKE GUARD REMOVE DA - like.js V72 Tha Paakkum da - feed.js Thodathu da
-   + v1044 CORRECT - setFeedMode Bug Fix + openComment display:flex Fix da
+   PIXORO FEED V1045 - FULL CORRECT CODE DA 🔥
+   LIKE REMOVED DA - LIKE ONLY IN like.js V90 DA
+   FEED = RENDER MATTUM DA - LIKE / DOUBLE TAP / HEART - FEED.JS THODATHU DA
+   HEART 52px - POP HEART - LIKE=RED / UNLIKE=WHITE
+   + V1045 FIX DA - Like Button ku data-liked + aria-pressed Add Panniten da - like.js Correct Ah Pudikkum da
+   + V1045 FIX DA - Like Button ku data-action Illa da - onclick Illa da - feed.js Like Panna Maattaathu da
    ===================================================== */
 
 (function () {
@@ -204,7 +205,10 @@ async function loadPixoroFeed() {
             ${isVideo ? `<video class="main" src="${esc(media)}" style="width:100%;aspect-ratio:4/5;object-fit:cover;background:#111" playsinline preload="metadata"></video>` : `<img class="main" src="${esc(media)}" style="width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#111">`}
           </div>` : ""}
         <div style="display:flex;gap:18px;padding:10px 12px;align-items:center">
-          <button class="like-btn" data-like-btn="true" data-post-id="${esc(id)}" style="background:none;border:0;cursor:pointer;display:flex;align-items:center;gap:6px">
+          <!-- ✅ V1045 - LIKE BUTTON - FEED.JS LIKE PANNAATHU DA - like.js MATTUM THAAN DA -->
+          <!-- ✅ NO data-action da - NO onclick da - feed.js [data-action] Loop la Varathu da -->
+          <!-- ✅ data-like-btn + data-post-id + data-liked + aria-pressed - like.js Idha Tha Pudikkum da -->
+          <button class="like-btn" data-like-btn="true" data-post-id="${esc(id)}" data-liked="false" aria-pressed="false" type="button" style="background:none;border:0;cursor:pointer;display:flex;align-items:center;gap:6px">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
             <span class="rCount like-count" data-like-count="true" style="color:white;font-size:14px">${likes}</span>
           </button>
@@ -232,7 +236,7 @@ async function loadPixoroFeed() {
         if (action === "share") { if (typeof window.openShareModal === "function") window.openShareModal(id); else if (typeof window.openShare === "function") window.openShare(id); }
         if (action === "save") await window.savePostFeed(id, btn);
         if (action === "menu") window.openPostMenu(id, btn.dataset.owner, btn.dataset.username);
-        /* LIKE IS HANDLED BY like.js ONLY - Inga Like Panna Koodathu da */
+        /* ✅ V1045 - LIKE IS HANDLED BY like.js ONLY DA - Inga Like Panna Koodathu da - Like Button ku data-action Illa da */
       });
     });
 
@@ -240,7 +244,7 @@ async function loadPixoroFeed() {
       el.addEventListener("click", () => { location.href = "./profile.html?u=" + encodeURIComponent(el.dataset.profileOwner); });
     });
 
-    /* ✅ V1041 - DOUBLE TAP INGA ILLA DA - like.js MATTUM THAAN PAARKKUM DA - NARIYA HEART VARAATHU DA */
+    /* ✅ V1045 - DOUBLE TAP INGA ILLA DA - like.js MATTUM THAAN PAARKKUM DA - NARIYA HEART VARAATHU DA */
 
     if (window.pixoroLoadAvatars) window.pixoroLoadAvatars();
     if (window.pixoroPaintAllFollowBtns) window.pixoroPaintAllFollowBtns();
@@ -248,6 +252,8 @@ async function loadPixoroFeed() {
     if (myId) pixoroSyncMyAvatar(myId);
     window.dispatchEvent(new Event("pixoro-feed-rendered"));
     if (window.pixoroPaintAllLikes) setTimeout(() => window.pixoroPaintAllLikes(), 100);
+    // ✅ V1045 - like.js Sync ah Koopiduren da - Like Count + Red Heart Correct Ah Varum da
+    if (window.pixoroSyncLikes) setTimeout(() => window.pixoroSyncLikes(), 150);
     retryCount = 0;
   } catch (e) {
     console.error("PIXORO FEED ERROR:", e);
@@ -270,10 +276,6 @@ window.closeComment = function() {
   const modal = document.getElementById("commentModal");
   if (modal) modal.style.display = "none";
 };
-
-/* ✅ v1043 - COMMENT LIKE GUARD REMOVE DA - Idha Thookiten da */
-/* Karanam: Inga stopPropagation() Pottu - Comment Heart ku Click Poga Vida Maatten da - Adhu Tha Perusa Thudikuthu da */
-/* like.js V72 la Already Guard Irukku da - Adhu Pothum da - feed.js la Guard Venaam da */
 
 window.__pixoroCommentLikeGuard = true;
 
@@ -309,7 +311,7 @@ window.savePostFeed = async function(id, btn) {
   } catch (e) { console.error("SAVE ERROR:", e); }
 };
 
-/* FEED TABS - ✅ v1044 CORRECT - tabIds[mode] da - Pazhaya la tabIds Full Object ah Potten da */
+/* FEED TABS - ✅ v1044 CORRECT - tabIds[mode] da */
 window.setFeedMode = function(mode) {
   window.PIXORO_FEED_MODE = mode || "foryou";
   document.querySelectorAll(".feedTab").forEach(tab => tab.classList.remove("active"));
