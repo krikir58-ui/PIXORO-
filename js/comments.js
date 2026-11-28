@@ -1,18 +1,19 @@
 /* =========================================
-   PIXORO COMMENTS V60 FINAL CORRECT DA
+   PIXORO COMMENTS V61 FINAL CORRECT DA
    ✅ ID + Time Mela, Msg Naduvula, Reply Keezha, Heart Valathu da
    ✅ THREAD REPLY DA - Reply Romba Chinna da - View Romba Chinna da
    ✅ Full Black da - Delete Full Black da
    ✅ SAFETY DA - Makkal Pudichu Vacha Tha Option Varum da - 0.2 Sec Hold da
    ✅ Confirm + Undo 5 Sec da - Bad Words + Spam Block da
    ✅ Hide / Report / Block da
-   ✅ MINI VIDEO COMMENT DA - 10 Sec Mattum da - 160 x 220 da - Photo Mini da - Server Safe da
+   ✅ MINI VIDEO COMMENT DA - 10 Sec Mattum da - 160 x 220 da - Photo Mini da
+   ✅ BUCKET FIX DA - Bucket Illana Theliva Sollum da - Comment Pogaathu da
    ========================================= */
 (() => {
   "use strict";
-  if (window.PIXORO_COMMENTS_V60) return;
+  if (window.PIXORO_COMMENTS_V61) return;
+  window.PIXORO_COMMENTS_V61 = true;
   window.PIXORO_COMMENTS_V60 = true;
-  window.PIXORO_COMMENTS_V59 = true;
 
   const TABLE = "comments";
   const TABLE_LIKES = "comment_likes";
@@ -29,7 +30,7 @@
   let selectedMediaFile = null, selectedMediaType = null, selectedMediaURL = null, selectedMediaDuration = 0;
 
   const BAD_WORDS = ["poriki","loosu","kena","number kudu","photo anuppu","call pannu"];
-  const HOLD_MS = 200; // ✅ 0.2 Sec da - Alluthu Pudicha Udane Option Varum da
+  const HOLD_MS = 200;
   const MAX_VIDEO_SEC = 10;
   const MAX_VIDEO_MB = 5;
 
@@ -160,18 +161,28 @@
       img.onerror=()=>res(file); img.src=URL.createObjectURL(file);
     });
   }
+
+  // ✅ V61 - BUCKET FIX DA - Idhu Tha Mukkiyam da
   async function uploadMedia(userId){
     if(!selectedMediaFile) return null;
-    const s=getSupa(); if(!s) return null;
+    const s=getSupa(); if(!s) throw new Error("Supabase connect aagala da");
     let fileToUpload = selectedMediaFile;
     let ext = selectedMediaType==="video" ? "mp4" : "jpg";
     if(selectedMediaType==="photo") fileToUpload = await compressPhoto(selectedMediaFile);
     const name = `${userId}/${Date.now()}.${ext}`;
     const {error} = await s.storage.from(BUCKET).upload(name, fileToUpload, {contentType: selectedMediaType==="video"?"video/mp4":"image/jpeg", upsert:true});
-    if(error) throw error;
+    if(error){
+      const msg = String(error.message||"").toLowerCase();
+      if(msg.includes("bucket not found")) throw new Error("Bucket not found da - Supabase Storage la comment-media nu Bucket Create Pannu da");
+      if(msg.includes("row-level") || msg.includes("policy") || msg.includes("violates")) throw new Error("Storage Policy illa da - Supabase SQL la Policy Run Pannu da");
+      if(msg.includes("payload too large") || msg.includes("too large")) throw new Error("File romba perusu da - 5MB ku ulla podu da");
+      throw error;
+    }
     const {data} = s.storage.from(BUCKET).getPublicUrl(name);
+    if(!data?.publicUrl) throw new Error("Public URL kedaikala da - Bucket ah Public la Vei da");
     return {url: data.publicUrl, type: selectedMediaType, duration: Math.round(selectedMediaDuration)};
   }
+
   async function handleMediaSelect(file){
     if(!file) return;
     const isVideo = file.type.startsWith("video/");
@@ -297,6 +308,7 @@
     try{ const ids=commentsCache.map((c)=>String(c.id)); let all=[]; let from=0; while(true){ const {data, error}=await s.from(TABLE_LIKES).select("comment_id,user_id").in("comment_id", ids).range(from, from+999); if(error) throw error; const rows=data||[]; all=all.concat(rows); if(rows.length<1000) break; from+=1000; } const counts={}; const liked=new Set(); ids.forEach((id)=>counts[id]=0); all.forEach((r)=>{ const id=String(r.comment_id); counts[id]=(counts[id]||0)+1; if(String(r.user_id)===String(userId)) liked.add(id); }); window.FEED_COMMENT_COUNTS=counts; window.FEED_COMMENT_LIKES=liked; renderComments(); }catch(e){}
   }
 
+  // ✅ V61 - addComment la Bucket Error vandha - Text Comment Mattum Save Aagum da - Video Pogaathu nu Alert Varum da
   async function addComment(){
     if(isSending) return;
     const inp=getInput(); inputEl=inp; const text=inp?.value?.trim()||"";
@@ -329,7 +341,18 @@
     isSending=true;
     try{
       let media = null;
-      if(mediaToUpload){ selectedMediaFile=mediaToUpload.file; selectedMediaType=mediaToUpload.type; selectedMediaDuration=mediaToUpload.duration; media = await uploadMedia(userId); selectedMediaFile=null; }
+      if(mediaToUpload){
+        selectedMediaFile=mediaToUpload.file; selectedMediaType=mediaToUpload.type; selectedMediaDuration=mediaToUpload.duration;
+        try{ media = await uploadMedia(userId); }
+        catch(uploadErr){
+          // ✅ Bucket Illana - Temp Comment ah Remove Panni - Theliva Sollu da
+          commentsCache=commentsCache.filter(c=>String(c.id)!==tempId);
+          renderComments(); syncFeedCommentCount(postId);
+          alert(uploadErr.message||"Upload failed da");
+          return;
+        }
+        selectedMediaFile=null;
+      }
       const insertObj={ post_id:postId, user_id:userId, text:saveText };
       if(parentId) insertObj.parent_id = parentId;
       if(media){ insertObj.media_url=media.url; insertObj.media_type=media.type; insertObj.media_duration=media.duration; }
@@ -412,7 +435,6 @@
     if(opt==="block"){ if(currentCommentUserId){ blockedIds.add(String(currentCommentUserId)); localStorage.setItem("pixoro_blocked", JSON.stringify([...blockedIds])); } alert("User blocked da"); closeCommentOptions(); renderComments(); return; }
   }
 
-  // ✅ V60 - 0.2 SEC HOLD + SCROLL SAFE DA
   function bindHoldOption(){
     const list = document.querySelector("#cmtList");
     if(!list || list.dataset.holdBound) return;
@@ -527,5 +549,5 @@
   window.addEventListener("pixoro:login", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro:logout", ()=>{ closeCommentModal(); });
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", startComments, {once:true}); } else { startComments(); }
-  console.log("PIXORO COMMENTS V60 READY 💬");
+  console.log("PIXORO COMMENTS V61 READY 💬");
 })();
