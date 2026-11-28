@@ -1,16 +1,15 @@
 /* =========================================
-   PIXORO COMMENTS V50 FINAL FIX DA
-   ✅ parent_id ILLA da - Save 100% Aagum da
-   ✅ Error Vantha Temp Thookidum da
-   ✅ Veliya Feed Count Update Aagum da
-   ✅ user_id Vachu Name + Photo Varum da
-   ✅ @gmail.com Cut Aagum da
+   PIXORO COMMENTS V51 - V50 + PERMANENT USER_ID DA
+   ✅ comments la - post_id + user_id + text Mattum da
+   ✅ username / avatar - comments la Illa da
+   ✅ Kaattum Podhu - user_id Vachu profiles la Edukkum da
+   ✅ V50 Features Ellaame Same da - Reply / Like / Delete / Profile
    ========================================= */
 (() => {
   "use strict";
-  if (window.PIXORO_COMMENTS_V50) return;
+  if (window.PIXORO_COMMENTS_V51) return;
+  window.PIXORO_COMMENTS_V51 = true;
   window.PIXORO_COMMENTS_V50 = true;
-  window.PIXORO_COMMENTS_V49 = true;
 
   const TABLE = "comments";
   const TABLE_LIKES = "comment_likes";
@@ -19,6 +18,8 @@
   let openPostId = null, replyTo = null, commentsCache = [];
   let currentCommentId = null, currentCommentUserId = null;
   let isSending = false;
+  // ✅ V51 - user_id -> { username, avatar_url } Map da
+  let profileMap = {};
 
   const ICON_HEART = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   const ICON_HEART_FILLED = '<svg width="28" height="28" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
@@ -27,42 +28,28 @@
   function getSupa(){ if(supa) return supa; supa = window.getSupa?.() || window.supa || window.supabaseClient || null; return supa; }
   async function getUserId(){ const s=getSupa(); if(!s) return window.ME_ID||null; try{ const {data}=await s.auth.getSession(); const id=data?.session?.user?.id||null; if(id) window.ME_ID=id; return id; }catch(e){ return window.ME_ID||null; } }
 
-  // ✅ V50 - @gmail.com Vantha Cut Pannidu da - krikir58@gamil.com -> krikir58 da
   function cleanName(name){
     let n = String(name || "").trim().replace(/^@+/,"");
     if(n.includes("@")) n = n.split("@")[0];
     if(!n || n.toLowerCase()==="user") return "";
-    const half = Math.floor(n.length/2);
-    if(n.length>3 && n.slice(0,half).trim()===n.slice(half).trim()) n=n.slice(0,half).trim();
-    n=n.replace(/^(\S+)\s+\1$/i,"$1");
-    return n || "";
+    return n;
   }
-  function cleanAvatar(c){ return c?.avatar_url || c?.avatar || c?.profile_pic || c?.photo_url || c?.photo || ""; }
+  function cleanAvatar(p){ return p?.avatar_url || p?.photo_url || p?.pfp || ""; }
 
-  async function getUserById(userId, fallbackName = "", fallbackAvatar = ""){
-    const fbName = cleanName(fallbackName);
-    const fbAv = fallbackAvatar || "";
-    if(!userId) return { username: fbName || "user", avatar_url: fbAv };
-    const s=getSupa(); if(!s) return { username: fbName || "user", avatar_url: fbAv };
-    try{
-      const {data} = await s.from("profiles").select("id,username,avatar_url,photo_url,pfp").eq("id", userId).maybeSingle();
-      if(data?.username && cleanName(data.username)) return { username: cleanName(data.username), avatar_url: data.avatar_url || data.photo_url || data.pfp || fbAv };
-      return { username: fbName || "user", avatar_url: fbAv };
-    }catch(e){ return { username: fbName || "user", avatar_url: fbAv }; }
+  // ✅ V51 CORE - user_id Vachu profiles la Edu da
+  async function fetchProfiles(userIds){
+    const s=getSupa(); if(!s) return profileMap;
+    const ids=[...new Set((userIds||[]).map(id=>String(id)).filter(Boolean))].filter(id=>!profileMap[id]);
+    if(ids.length){
+      const {data}=await s.from("profiles").select("id,username,avatar_url,photo_url,pfp").in("id", ids);
+      (data||[]).forEach(p=>{ profileMap[String(p.id)]={ username: cleanName(p.username)||"user", avatar_url: cleanAvatar(p) }; });
+    }
+    return profileMap;
   }
-
-  async function getMyIdentity(){
-    const userId=await getUserId();
-    const u=await getUserById(userId, "", window.MY_PFP || localStorage.getItem("pixoro_avatar") || "");
-    if(u.username && u.username !== "user"){ window.MY_USERNAME=u.username; return u; }
-    const ls = cleanName(localStorage.getItem("pixoro_username") || localStorage.getItem("pixoro_user") || window.MY_USERNAME || window.PIXORO_USERNAME || "");
-    if(ls){ const av = window.MY_PFP || localStorage.getItem("pixoro_avatar") || localStorage.getItem("pixoro_pfp") || ""; window.MY_USERNAME=ls; return { username: ls, avatar_url: av }; }
-    try{
-      const s=getSupa(); const {data}=await s.auth.getUser(); const meta=data?.user?.user_metadata||{};
-      if(meta.username && cleanName(meta.username)) return { username: cleanName(meta.username), avatar_url: meta.avatar_url || meta.picture || "" };
-      if(data?.user?.email) return { username: cleanName(data.user.email.split("@")[0]), avatar_url: "" };
-    }catch(e){}
-    return { username: "user", avatar_url: window.MY_PFP || localStorage.getItem("pixoro_avatar") || "" };
+  function getProfile(userId){ return profileMap[String(userId)] || { username:"user", avatar_url:"" }; }
+  async function getUserById(userId){
+    await fetchProfiles([userId]);
+    return getProfile(userId);
   }
 
   function escapeHtml(str){ return String(str ?? "").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
@@ -74,7 +61,6 @@
   function getList(){ return document.querySelector("#commentModal #cmtList") || listEl; }
   function getPostId(){ const modal=getCommentModal(); return openPostId || modal?.dataset?.postId || window.PIXORO_OPEN_POST_ID || window.__pixoroLastCommentPostId || ""; }
 
-  // ✅ V50 NEW DA - Veliya Feed Count Update Pannum da
   function syncFeedCommentCount(postId){
     if(!postId) return;
     const count = commentsCache.filter(c=>String(c.post_id)===String(postId)).length;
@@ -82,7 +68,6 @@
       const el = post.querySelector("[data-comment-count], .comment-count, .commentCount, .cmtCount");
       if(el) el.textContent = count;
     });
-    // ✅ Feed la Comment Button ku Pakkathula Irukkura Count um Maathu da
     const allPosts = document.querySelectorAll("article.post, .post");
     allPosts.forEach(p=>{
       if(String(p.dataset?.postId||"")===String(postId)){
@@ -103,7 +88,7 @@
   function focusInput(){ const inp=getInput(); if(!inp) return; try{ inp.focus({preventScroll:true}); }catch(e){ inp.focus(); } }
   function setReplyTo(comment){
     replyTo=comment||null; const tag=document.getElementById("replyTag"); const tagName=document.getElementById("replyTagName"); if(!tag) return;
-    if(replyTo){ tag.style.display="flex"; if(tagName) tagName.textContent="Replying to "+(cleanName(replyTo.username)||"user"); } else tag.style.display="none";
+    if(replyTo){ tag.style.display="flex"; if(tagName) tagName.textContent="Replying to "+(cleanName(getProfile(replyTo.user_id).username)||"user"); } else tag.style.display="none";
   }
   function focusReply(comment){ setReplyTo(comment); focusInput(); }
   function getPostUsername(postId){
@@ -111,48 +96,40 @@
     const el=post.querySelector(".post-user, .pUser, .post-username, [data-username], .username"); return cleanName(el?.textContent?.trim()||"")||"";
   }
 
+  // ✅ V51 LOAD - comments la user_id + text Mattum Edu da
   async function loadComments(postId){
     const s=getSupa(); if(!s) return;
     try{
-      const {data, error}=await s.from(TABLE).select("*").eq("post_id", postId).order("created_at", {ascending:true});
-      if(error) throw error; commentsCache=data||[];
-      try{
-        const ids=[...new Set(commentsCache.map(c=>String(c.user_id)).filter(Boolean))];
-        if(ids.length){
-          const {data:profs}=await s.from("profiles").select("id,username,avatar_url,photo_url").in("id", ids);
-          const map={}; (profs||[]).forEach(p=>map[String(p.id)]=p);
-          commentsCache.forEach(c=>{
-            const p=map[String(c.user_id)];
-            if(p?.username && cleanName(p.username)) c.username=cleanName(p.username);
-            if(p?.avatar_url || p?.photo_url) c.avatar_url=p.avatar_url||p.photo_url;
-          });
-        }
-      }catch(e){}
+      const {data, error}=await s.from(TABLE).select("id,post_id,user_id,text,created_at").eq("post_id", postId).order("created_at", {ascending:true});
+      if(error) throw error;
+      commentsCache=data||[];
+      await fetchProfiles(commentsCache.map(c=>c.user_id));
       renderComments(); syncFeedCommentCount(postId); syncCommentLikes();
     }catch(e){ console.error("PIXORO COMMENTS LOAD:", e); }
   }
 
+  // ✅ V51 RENDER - Name + Photo - profileMap la Irundhu da
   function renderComments(){
     const list=getList(); if(!list) return; listEl=list;
     if(!commentsCache.length){ list.innerHTML='<div style="text-align:center;color:#777;padding:30px 10px;font-size:13px">No comments yet.<br>Be the first to comment.</div>'; return; }
     const me=window.ME_ID;
     list.innerHTML=commentsCache.map((c)=>{
+      const prof=getProfile(c.user_id);
+      const name=cleanName(prof.username)||"user";
+      const av=prof.avatar_url;
       const liked=(window.FEED_COMMENT_LIKES||new Set()).has(String(c.id)); const count=Number(window.FEED_COMMENT_COUNTS?.[c.id]||0); const isMine=me && String(c.user_id)===String(me);
-      const name=cleanName(c.username)||"user";
-      const av=cleanAvatar(c);
       const uid=escapeHtml(c.user_id||"");
       const avatarHtml = av ? `<img src="${escapeHtml(av)}" onerror="this.style.display='none'">` : escapeHtml(getAvatarInitial(name));
-      return `<div class="cmtRow" data-comment-id="${escapeHtml(c.id)}" data-user-id="${uid}"><div class="cmtAvatar cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${avatarHtml}</div><div class="cmtContent"><div class="cmtTextLine"><b class="cmtUser cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${escapeHtml(name)}</b> <span class="cmtText">${escapeHtml(c.text||"")}</span></div><div class="cmtMeta"><span>${timeAgo(c.created_at)}</span><span class="cmtReplyBtn" data-reply="${escapeHtml(c.id)}">Reply</span>${isMine?`<span class="cmtDeleteBtn" data-delete="${escapeHtml(c.id)}" style="color:#ff5555">Delete</span>`:""}</div></div><button class="cmtLike ${liked?"liked":""}" data-like="${escapeHtml(c.id)}" aria-label="Like comment">${liked?ICON_HEART_FILLED:ICON_HEART}<span class="cmtLikeCount">${count}</span></button></div>`;
+      return `<div class="cmtRow" data-comment-id="${escapeHtml(c.id)}" data-user-id="${uid}"><div class="cmtAvatar cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${avatarHtml}</div><div class="cmtContent"><div class="cmtTextLine"><b class="cmtUser cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${escapeHtml(name)}</b> <span class="cmtText">${escapeHtml(c.text||"")}</span></div><div class="cmtMeta"><span>${timeAgo(c.created_at)}</span><span class="cmtReplyBtn" data-reply="${escapeHtml(c.id)}">Reply</span>${isMine?`<span class="cmtDeleteBtn" data-delete="${escapeHtml(c.id)}" style="color:#ff5555">Delete</span>`:""}</div></div><button class="cmtLike ${liked?"liked":""}" data-like="${escapeHtml(c.id)}">${liked?ICON_HEART_FILLED:ICON_HEART}<span class="cmtLikeCount">${count}</span></button></div>`;
     }).join("");
     list.scrollTop=list.scrollHeight;
   }
 
   function goToProfile(userId, userName){
-    if(!userId) return;
-    closeCommentModal();
+    if(!userId) return; closeCommentModal();
     const me=window.ME_ID;
-    if(String(userId)===String(me)){ location.href='./profile.html'; }
-    else{ location.href='./profile.html?user_id='+encodeURIComponent(userId)+'&username='+encodeURIComponent(userName||''); }
+    if(String(userId)===String(me)) location.href='./profile.html';
+    else location.href='./profile.html?user_id='+encodeURIComponent(userId)+'&username='+encodeURIComponent(userName||'');
   }
 
   function toggleCommentLike(commentId, btn){
@@ -165,36 +142,33 @@
   const pendingLikeSaves=new Map();
   function queueCommentLikeSave(commentId, willLike, btn, prevLiked, prevCount){
     const prev=pendingLikeSaves.get(commentId)||Promise.resolve();
-    const next=prev.catch(()=>{}).then(async()=>{ const s=getSupa(); const userId=await getUserId(); if(!s||!userId) throw new Error("Login first"); if(willLike){ const {error}=await s.from(TABLE_LIKES).upsert({comment_id:commentId, user_id:userId},{onConflict:"comment_id,user_id", ignoreDuplicates:true}); if(error) throw error; } else { const {error}=await s.from(TABLE_LIKES).delete().eq("comment_id", commentId).eq("user_id", userId); if(error) throw error; } }).catch((e)=>{ console.error("PIXORO COMMENT LIKE SAVE:", e); btn.classList.toggle("liked", prevLiked); btn.innerHTML=(prevLiked?ICON_HEART_FILLED:ICON_HEART)+`<span class="cmtLikeCount">${prevCount}</span>`; window.FEED_COMMENT_COUNTS[commentId]=prevCount; if(prevLiked) window.FEED_COMMENT_LIKES.add(String(commentId)); else window.FEED_COMMENT_LIKES.delete(String(commentId)); });
+    const next=prev.catch(()=>{}).then(async()=>{ const s=getSupa(); const userId=await getUserId(); if(!s||!userId) throw new Error("Login first"); if(willLike){ const {error}=await s.from(TABLE_LIKES).upsert({comment_id:commentId, user_id:userId},{onConflict:"comment_id,user_id", ignoreDuplicates:true}); if(error) throw error; } else { const {error}=await s.from(TABLE_LIKES).delete().eq("comment_id", commentId).eq("user_id", userId); if(error) throw error; } }).catch((e)=>{ console.error("LIKE SAVE:", e); btn.classList.toggle("liked", prevLiked); btn.innerHTML=(prevLiked?ICON_HEART_FILLED:ICON_HEART)+`<span class="cmtLikeCount">${prevCount}</span>`; window.FEED_COMMENT_COUNTS[commentId]=prevCount; if(prevLiked) window.FEED_COMMENT_LIKES.add(String(commentId)); else window.FEED_COMMENT_LIKES.delete(String(commentId)); });
     pendingLikeSaves.set(commentId, next);
   }
-
   async function syncCommentLikes(){
     const s=getSupa(); const userId=await getUserId(); if(!s||!userId||!commentsCache.length) return;
-    try{ const ids=commentsCache.map((c)=>String(c.id)); let all=[]; let from=0; while(true){ const {data, error}=await s.from(TABLE_LIKES).select("comment_id,user_id").in("comment_id", ids).range(from, from+999); if(error) throw error; const rows=data||[]; all=all.concat(rows); if(rows.length<1000) break; from+=1000; } const counts={}; const liked=new Set(); ids.forEach((id)=>counts[id]=0); all.forEach((r)=>{ const id=String(r.comment_id); counts[id]=(counts[id]||0)+1; if(String(r.user_id)===String(userId)) liked.add(id); }); window.FEED_COMMENT_COUNTS=counts; window.FEED_COMMENT_LIKES=liked; renderComments(); }catch(e){ console.error("PIXORO COMMENT LIKE SYNC:", e); }
+    try{ const ids=commentsCache.map((c)=>String(c.id)); let all=[]; let from=0; while(true){ const {data, error}=await s.from(TABLE_LIKES).select("comment_id,user_id").in("comment_id", ids).range(from, from+999); if(error) throw error; const rows=data||[]; all=all.concat(rows); if(rows.length<1000) break; from+=1000; } const counts={}; const liked=new Set(); ids.forEach((id)=>counts[id]=0); all.forEach((r)=>{ const id=String(r.comment_id); counts[id]=(counts[id]||0)+1; if(String(r.user_id)===String(userId)) liked.add(id); }); window.FEED_COMMENT_COUNTS=counts; window.FEED_COMMENT_LIKES=liked; renderComments(); }catch(e){}
   }
 
-  // ✅ V50 CORRECT ADD DA - parent_id ILLA da - Temp Error Vantha Thookidum da
+  // ✅ V51 ADD - Save la user_id + text Mattum da
   async function addComment(){
     if(isSending) return;
     const inp=getInput(); inputEl=inp; const text=inp?.value?.trim()||""; if(!text) return;
-    const postId=String(getPostId()||""); if(!postId){ alert("Post ID kedaikala da - Comment Button ah Thirumba Thodu da"); return; }
+    const postId=String(getPostId()||""); if(!postId){ alert("Post ID kedaikala da"); return; }
     openPostId=postId; window.PIXORO_OPEN_POST_ID=postId;
     const s=getSupa(); const userId=await getUserId(); if(!s||!userId){ alert("Please login first"); return; }
-    const me=await getMyIdentity(); const username=me.username;
-    const avatarUrl = me.avatar_url || window.MY_PFP || localStorage.getItem("pixoro_avatar") || localStorage.getItem("pixoro_pfp") || "";
+    await fetchProfiles([userId]);
     const tempId="temp-"+Date.now();
-    const temp={id:tempId, post_id:postId, user_id:userId, username, avatar_url:avatarUrl, text, created_at:new Date().toISOString()};
+    const temp={id:tempId, post_id:postId, user_id:userId, text, created_at:new Date().toISOString()};
     commentsCache.push(temp); renderComments(); syncFeedCommentCount(postId); if(inp) inp.value=""; setReplyTo(null); updateSendState();
     isSending=true;
     try{
-      const {data, error}=await s.from(TABLE).insert({post_id:postId, user_id:userId, username, avatar_url:avatarUrl, text}).select().single();
+      const {data, error}=await s.from(TABLE).insert({post_id:postId, user_id:userId, text}).select("id,post_id,user_id,text,created_at").single();
       if(error) throw error;
       const idx=commentsCache.findIndex((c)=>String(c.id)===tempId); if(idx>=0 && data) commentsCache[idx]=data;
       renderComments(); syncFeedCommentCount(postId);
     }catch(e){
       console.error("PIXORO COMMENT ADD:", e);
-      // ✅ Save Aagala na - Temp ah Thookidu da
       commentsCache=commentsCache.filter(c=>String(c.id)!==tempId);
       renderComments(); syncFeedCommentCount(postId);
       alert("Failed: "+(e.message||"Check Supabase RLS da"));
@@ -205,7 +179,7 @@
     if(!commentId) return;
     const postId = String(getPostId()||openPostId||"");
     commentsCache=commentsCache.filter((c)=>String(c.id)!==String(commentId)); renderComments(); syncFeedCommentCount(postId); closeCommentOptions();
-    try{ const s=getSupa(); const userId=await getUserId(); if(!s||!userId) throw new Error("Login first"); const {error}=await s.from(TABLE).delete().eq("id", commentId).eq("user_id", userId); if(error) throw error; }catch(e){ console.error("PIXORO COMMENT DELETE:", e); }
+    try{ const s=getSupa(); const userId=await getUserId(); if(!s||!userId) throw new Error("Login first"); const {error}=await s.from(TABLE).delete().eq("id", commentId).eq("user_id", userId); if(error) throw error; }catch(e){ console.error(e); }
   }
 
   function openCommentModal(postId){
@@ -236,7 +210,7 @@
     const s=getSupa(); if(!s) return; unsubscribeRealtime();
     try{
       commentChannel=s.channel("pixoro-comments-"+postId).on("postgres_changes",{event:"*", schema:"public", table:TABLE, filter:`post_id=eq.${postId}`}, async (payload)=>{
-        if(payload.eventType==="INSERT"){ const row=payload.new; const u=await getUserById(row.user_id, row.username, row.avatar_url); row.username=u.username; row.avatar_url=u.avatar_url; if(!commentsCache.some((c)=>String(c.id)===String(row.id))){ commentsCache.push(row); renderComments(); syncFeedCommentCount(postId); } }
+        if(payload.eventType==="INSERT"){ const row=payload.new; await fetchProfiles([row.user_id]); if(!commentsCache.some((c)=>String(c.id)===String(row.id))){ commentsCache.push(row); renderComments(); syncFeedCommentCount(postId); } }
         if(payload.eventType==="DELETE"){ commentsCache=commentsCache.filter((c)=>String(c.id)!==String(payload.old.id)); renderComments(); syncFeedCommentCount(postId); }
         if(payload.eventType==="UPDATE"){ const idx=commentsCache.findIndex((c)=>String(c.id)===String(payload.new.id)); if(idx>=0){ commentsCache[idx]=payload.new; renderComments(); } }
       }).subscribe();
@@ -258,7 +232,7 @@
           <div class="cmtBox">
             <div class="cmtAvatar" style="width:32px;height:32px;flex-shrink:0">😊</div>
             <input id="commentInput" type="text" placeholder="Add a comment..." autocomplete="off" />
-            <button class="sendBtn pixoro-c-send-arrow" id="cmtSendBtn" type="button" aria-label="Send" style="display:none">${ICON_SEND}</button>
+            <button class="sendBtn pixoro-c-send-arrow" id="cmtSendBtn" type="button" style="display:none">${ICON_SEND}</button>
           </div>
         </div>
       </div>
@@ -279,7 +253,6 @@
     modal.querySelector("#cmtOptContent")?.addEventListener("click", (e)=>{ const b=e.target.closest("[data-opt]"); if(b) handleOption(b.dataset.opt); });
     updateSendState();
   }
-
   document.addEventListener("click", (e)=>{
     const btn=e.target.closest("[data-comment-btn], .comment-btn, .cmt-open, [data-open-comments], .commentBtn");
     if(btn){ const post=btn.closest("article.post[data-post-id], .post[data-post-id]"); const pid=post?.dataset?.postId || post?.dataset?.id || btn.dataset?.postId || ""; if(pid){ window.__pixoroLastCommentPostId=String(pid); window.PIXORO_OPEN_POST_ID=String(pid); openPostId=String(pid); const m=getCommentModal(); if(m) m.dataset.postId=String(pid); } }
@@ -306,5 +279,5 @@
   window.addEventListener("pixoro:login", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro:logout", ()=>{ closeCommentModal(); });
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", startComments, {once:true}); } else { startComments(); }
-  console.log("PIXORO COMMENTS V50 READY 💬");
+  console.log("PIXORO COMMENTS V51 READY 💬");
 })();
