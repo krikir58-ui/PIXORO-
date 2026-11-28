@@ -1,5 +1,6 @@
 /* =========================================
-   PIXORO COMMENTS V52 FINAL CORRECT DA
+   PIXORO COMMENTS V55 FINAL CORRECT DA
+   ✅ ID + Time Mela, Msg Naduvula, Reply/Delete Keezha, Heart Valathu da
    ✅ comments la - post_id + user_id + text Mattum da
    ✅ Name + Photo - user_id Vachu profiles la Irundhu da
    ✅ profiles la Row Illana - Thanaave Create Pannum da
@@ -8,9 +9,9 @@
    ========================================= */
 (() => {
   "use strict";
-  if (window.PIXORO_COMMENTS_V52) return;
+  if (window.PIXORO_COMMENTS_V55) return;
+  window.PIXORO_COMMENTS_V55 = true;
   window.PIXORO_COMMENTS_V52 = true;
-  window.PIXORO_COMMENTS_V51 = true;
 
   const TABLE = "comments";
   const TABLE_LIKES = "comment_likes";
@@ -21,8 +22,8 @@
   let isSending = false;
   let profileMap = {};
 
-  const ICON_HEART = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
-  const ICON_HEART_FILLED = '<svg width="28" height="28" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  const ICON_HEART = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  const ICON_HEART_FILLED = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   const ICON_SEND = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
 
   function getSupa(){ if(supa) return supa; supa = window.getSupa?.() || window.supa || window.supabaseClient || null; return supa; }
@@ -35,11 +36,8 @@
     return n;
   }
   function cleanAvatar(p){ return p?.avatar_url || p?.photo_url || p?.pfp || p?.photo || p?.picture || ""; }
-  function pickName(p){
-    return cleanName(p?.username || p?.name || p?.display_name || p?.full_name || p?.user_name || "");
-  }
+  function pickName(p){ return cleanName(p?.username || p?.name || p?.display_name || p?.full_name || p?.user_name || ""); }
 
-  // ✅ V52 - En Profile Illana Thanaave Create Pannu da
   async function ensureMyProfile(){
     const s=getSupa(); const userId=await getUserId(); if(!s||!userId) return;
     try{
@@ -53,7 +51,6 @@
     }catch(e){}
   }
 
-  // ✅ V52 CORE - user_id Vachu profiles la Edu da
   async function fetchProfiles(userIds){
     const s=getSupa(); if(!s) return profileMap;
     await ensureMyProfile();
@@ -137,6 +134,7 @@
     }catch(e){ console.error("PIXORO COMMENTS LOAD:", e); }
   }
 
+  // ✅ V55 - PIXORO LAYOUT DA - ID + Time Mela, Msg Naduvula, Reply/Delete Keezha, Heart Valathu da
   function renderComments(){
     const list=getList(); if(!list) return; listEl=list;
     if(!commentsCache.length){ list.innerHTML='<div style="text-align:center;color:#777;padding:30px 10px;font-size:13px">No comments yet.<br>Be the first to comment.</div>'; return; }
@@ -145,10 +143,20 @@
       const prof=getProfile(c.user_id);
       const name=cleanName(prof.username)||"user";
       const av=prof.avatar_url;
-      const liked=(window.FEED_COMMENT_LIKES||new Set()).has(String(c.id)); const count=Number(window.FEED_COMMENT_COUNTS?.[c.id]||0); const isMine=me && String(c.user_id)===String(me);
+      const liked=(window.FEED_COMMENT_LIKES||new Set()).has(String(c.id));
+      const count=Number(window.FEED_COMMENT_COUNTS?.[c.id]||0);
+      const isMine=me && String(c.user_id)===String(me);
       const uid=escapeHtml(c.user_id||"");
       const avatarHtml = av ? `<img src="${escapeHtml(av)}" onerror="this.style.display='none'">` : escapeHtml(getAvatarInitial(name));
-      return `<div class="cmtRow" data-comment-id="${escapeHtml(c.id)}" data-user-id="${uid}"><div class="cmtAvatar cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${avatarHtml}</div><div class="cmtContent"><div class="cmtTextLine"><b class="cmtUser cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${escapeHtml(name)}</b> <span class="cmtText">${escapeHtml(c.text||"")}</span></div><div class="cmtMeta"><span>${timeAgo(c.created_at)}</span><span class="cmtReplyBtn" data-reply="${escapeHtml(c.id)}">Reply</span>${isMine?`<span class="cmtDeleteBtn" data-delete="${escapeHtml(c.id)}" style="color:#ff5555">Delete</span>`:""}</div></div><button class="cmtLike ${liked?"liked":""}" data-like="${escapeHtml(c.id)}">${liked?ICON_HEART_FILLED:ICON_HEART}<span class="cmtLikeCount">${count}</span></button></div>`;
+      return `<div class="cmtRow" data-comment-id="${escapeHtml(c.id)}" data-user-id="${uid}">
+        <div class="cmtAvatar cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${avatarHtml}</div>
+        <div class="cmtContent">
+          <div class="cmtTop"><b class="cmtUser cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${escapeHtml(name)}</b><span class="cmtTime">${timeAgo(c.created_at)}</span></div>
+          <div class="cmtText">${escapeHtml(c.text||"")}</div>
+          <div class="cmtMeta"><span class="cmtReplyBtn" data-reply="${escapeHtml(c.id)}">Reply</span>${isMine?`<span class="cmtDeleteBtn" data-delete="${escapeHtml(c.id)}">Delete</span>`:""}</div>
+        </div>
+        <button class="cmtLike ${liked?"liked":""}" data-like="${escapeHtml(c.id)}">${liked?ICON_HEART_FILLED:ICON_HEART}<span class="cmtLikeCount">${count>0?count:""}</span></button>
+      </div>`;
     }).join("");
     list.scrollTop=list.scrollHeight;
   }
@@ -162,7 +170,7 @@
 
   function toggleCommentLike(commentId, btn){
     if(!commentId||!btn) return; const liked=btn.classList.contains("liked"); const willLike=!liked; const prevCount=Number(window.FEED_COMMENT_COUNTS?.[commentId]||0); const newCount=willLike?prevCount+1:Math.max(0,prevCount-1);
-    btn.classList.toggle("liked", willLike); btn.innerHTML=(willLike?ICON_HEART_FILLED:ICON_HEART)+`<span class="cmtLikeCount">${newCount}</span>`;
+    btn.classList.toggle("liked", willLike); btn.innerHTML=(willLike?ICON_HEART_FILLED:ICON_HEART)+`<span class="cmtLikeCount">${newCount>0?newCount:""}</span>`;
     window.FEED_COMMENT_COUNTS=window.FEED_COMMENT_COUNTS||{}; window.FEED_COMMENT_COUNTS[commentId]=newCount; window.FEED_COMMENT_LIKES=window.FEED_COMMENT_LIKES||new Set();
     if(willLike) window.FEED_COMMENT_LIKES.add(String(commentId)); else window.FEED_COMMENT_LIKES.delete(String(commentId));
     queueCommentLikeSave(commentId, willLike, btn, liked, prevCount);
@@ -170,7 +178,7 @@
   const pendingLikeSaves=new Map();
   function queueCommentLikeSave(commentId, willLike, btn, prevLiked, prevCount){
     const prev=pendingLikeSaves.get(commentId)||Promise.resolve();
-    const next=prev.catch(()=>{}).then(async()=>{ const s=getSupa(); const userId=await getUserId(); if(!s||!userId) throw new Error("Login first"); if(willLike){ const {error}=await s.from(TABLE_LIKES).upsert({comment_id:commentId, user_id:userId},{onConflict:"comment_id,user_id", ignoreDuplicates:true}); if(error) throw error; } else { const {error}=await s.from(TABLE_LIKES).delete().eq("comment_id", commentId).eq("user_id", userId); if(error) throw error; } }).catch((e)=>{ console.error("LIKE SAVE:", e); btn.classList.toggle("liked", prevLiked); btn.innerHTML=(prevLiked?ICON_HEART_FILLED:ICON_HEART)+`<span class="cmtLikeCount">${prevCount}</span>`; window.FEED_COMMENT_COUNTS[commentId]=prevCount; if(prevLiked) window.FEED_COMMENT_LIKES.add(String(commentId)); else window.FEED_COMMENT_LIKES.delete(String(commentId)); });
+    const next=prev.catch(()=>{}).then(async()=>{ const s=getSupa(); const userId=await getUserId(); if(!s||!userId) throw new Error("Login first"); if(willLike){ const {error}=await s.from(TABLE_LIKES).upsert({comment_id:commentId, user_id:userId},{onConflict:"comment_id,user_id", ignoreDuplicates:true}); if(error) throw error; } else { const {error}=await s.from(TABLE_LIKES).delete().eq("comment_id", commentId).eq("user_id", userId); if(error) throw error; } }).catch((e)=>{ console.error("LIKE SAVE:", e); btn.classList.toggle("liked", prevLiked); btn.innerHTML=(prevLiked?ICON_HEART_FILLED:ICON_HEART)+`<span class="cmtLikeCount">${prevCount>0?prevCount:""}</span>`; window.FEED_COMMENT_COUNTS[commentId]=prevCount; if(prevLiked) window.FEED_COMMENT_LIKES.add(String(commentId)); else window.FEED_COMMENT_LIKES.delete(String(commentId)); });
     pendingLikeSaves.set(commentId, next);
   }
   async function syncCommentLikes(){
@@ -307,5 +315,5 @@
   window.addEventListener("pixoro:login", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro:logout", ()=>{ closeCommentModal(); });
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", startComments, {once:true}); } else { startComments(); }
-  console.log("PIXORO COMMENTS V52 READY 💬");
+  console.log("PIXORO COMMENTS V55 READY 💬");
 })();
