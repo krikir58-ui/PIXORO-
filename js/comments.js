@@ -1,17 +1,17 @@
 /* =========================================
-   PIXORO COMMENTS V57 FINAL CORRECT DA
-   ✅ ID + Time Mela, Msg Naduvula, Reply/Delete Keezha, Heart Valathu da
-   ✅ THREAD REPLY DA - Reply Romba Chinna da - Ulla Thalli Varum da - View Romba Chinna da
+   PIXORO COMMENTS V58 FINAL CORRECT DA
+   ✅ ID + Time Mela, Msg Naduvula, Reply Keezha, Heart Valathu da
+   ✅ THREAD REPLY DA - Reply Romba Chinna da - View Romba Chinna da
    ✅ Full Black da - Delete Full Black da
-   ✅ parent_id - bigint da - comments.id bigint ku Match Aagum da
-   ✅ Name + Photo - user_id Vachu profiles la Irundhu da
-   ✅ user nu Varaathu da
+   ✅ SAFETY DA - Makkal Pudichu Vacha Tha Option Varum da - 2 Sec Hold da
+   ✅ Confirm + Undo 5 Sec da - Bad Words + Spam Block da
+   ✅ Hide / Report / Block da
    ========================================= */
 (() => {
   "use strict";
-  if (window.PIXORO_COMMENTS_V57) return;
+  if (window.PIXORO_COMMENTS_V58) return;
+  window.PIXORO_COMMENTS_V58 = true;
   window.PIXORO_COMMENTS_V57 = true;
-  window.PIXORO_COMMENTS_V56 = true;
 
   const TABLE = "comments";
   const TABLE_LIKES = "comment_likes";
@@ -21,6 +21,13 @@
   let currentCommentId = null, currentCommentUserId = null;
   let isSending = false;
   let profileMap = {};
+  let holdTimer = null, holdFired = false, undoTimer = null;
+  let hiddenIds = new Set(JSON.parse(localStorage.getItem("pixoro_hidden_cmt")||"[]"));
+  let blockedIds = new Set(JSON.parse(localStorage.getItem("pixoro_blocked")||"[]"));
+
+  // ✅ V58 - SAFETY LIST DA - Idha Ne Venumna Maathu da
+  const BAD_WORDS = ["poriki","loosu","kena","number kudu","photo anuppu","call pannu"];
+  const HOLD_MS = 2000; // 2 Sec da - 1000 na 1 Sec da
 
   const ICON_HEART = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   const ICON_HEART_FILLED = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
@@ -133,13 +140,13 @@
     }catch(e){ console.error("PIXORO COMMENTS LOAD:", e); }
   }
 
-  // ✅ V57 - THREAD REPLY DA - Reply Romba Chinna da - View Romba Chinna da
   function renderComments(){
     const list=getList(); if(!list) return; listEl=list;
-    if(!commentsCache.length){ list.innerHTML='<div style="text-align:center;color:#777;padding:30px 10px;font-size:13px">No comments yet.<br>Be the first to comment.</div>'; return; }
+    const visible = commentsCache.filter(c=>!hiddenIds.has(String(c.id)) && !blockedIds.has(String(c.user_id)));
+    if(!visible.length){ list.innerHTML='<div style="text-align:center;color:#777;padding:30px 10px;font-size:13px">No comments yet.<br>Be the first to comment.</div>'; return; }
     const me=window.ME_ID;
-    const parents = commentsCache.filter(c=>!c.parent_id);
-    const childs = commentsCache.filter(c=>c.parent_id);
+    const parents = visible.filter(c=>!c.parent_id);
+    const childs = visible.filter(c=>c.parent_id);
 
     function oneRow(c, isReply){
       const prof=getProfile(c.user_id);
@@ -147,15 +154,15 @@
       const av=prof.avatar_url;
       const liked=(window.FEED_COMMENT_LIKES||new Set()).has(String(c.id));
       const count=Number(window.FEED_COMMENT_COUNTS?.[c.id]||0);
-      const isMine=me && String(c.user_id)===String(me);
       const uid=escapeHtml(c.user_id||"");
       const avatarHtml = av ? `<img src="${escapeHtml(av)}" onerror="this.style.display='none'">` : escapeHtml(getAvatarInitial(name));
+      // ✅ V58 - Inline Delete Illa da - Reply Mattum Tha da - Delete Hold Panna Tha Varum da
       return `<div class="cmtRow ${isReply?"cmtReplyRow":""}" data-comment-id="${escapeHtml(c.id)}" data-user-id="${uid}">
         <div class="cmtAvatar cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${avatarHtml}</div>
         <div class="cmtContent">
           <div class="cmtTop"><b class="cmtUser cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${escapeHtml(name)}</b><span class="cmtTime">${timeAgo(c.created_at)}</span></div>
           <div class="cmtText">${escapeHtml(c.text||"")}</div>
-          <div class="cmtMeta"><span class="cmtReplyBtn" data-reply="${escapeHtml(c.id)}">Reply</span>${isMine?`<span class="cmtDeleteBtn" data-delete="${escapeHtml(c.id)}">Delete</span>`:""}</div>
+          <div class="cmtMeta"><span class="cmtReplyBtn" data-reply="${escapeHtml(c.id)}">Reply</span></div>
         </div>
         <button class="cmtLike ${liked?"liked":""}" data-like="${escapeHtml(c.id)}">${liked?ICON_HEART_FILLED:ICON_HEART}<span class="cmtLikeCount">${count>0?count:""}</span></button>
       </div>`;
@@ -168,7 +175,6 @@
       const reps = childs.filter(ch=>String(ch.parent_id)===String(p.id));
       let html = oneRow(p, false);
       if(reps.length){
-        // ✅ V57 - View X more replies - Chinna Tha Varum da
         html += `<div class="cmtViewReplies" data-view-replies="${escapeHtml(p.id)}" data-reply-count="${reps.length}">— View ${reps.length} more repl${reps.length>1?"ies":"y"}</div><div class="cmtReplyBox" id="replies-${escapeHtml(p.id)}" style="display:none">${reps.map(r=>oneRow(r,true)).join("")}</div>`;
       }
       return `<div class="cmtThread">${html}</div>`;
@@ -212,9 +218,15 @@
     try{ const ids=commentsCache.map((c)=>String(c.id)); let all=[]; let from=0; while(true){ const {data, error}=await s.from(TABLE_LIKES).select("comment_id,user_id").in("comment_id", ids).range(from, from+999); if(error) throw error; const rows=data||[]; all=all.concat(rows); if(rows.length<1000) break; from+=1000; } const counts={}; const liked=new Set(); ids.forEach((id)=>counts[id]=0); all.forEach((r)=>{ const id=String(r.comment_id); counts[id]=(counts[id]||0)+1; if(String(r.user_id)===String(userId)) liked.add(id); }); window.FEED_COMMENT_COUNTS=counts; window.FEED_COMMENT_LIKES=liked; renderComments(); }catch(e){}
   }
 
+  // ✅ V58 - SAFETY ADD COMMENT DA
   async function addComment(){
     if(isSending) return;
     const inp=getInput(); inputEl=inp; const text=inp?.value?.trim()||""; if(!text) return;
+    if(text.length > 500){ alert("Comment romba perusu da - 500 letter ku ulla podu da"); return; }
+    if(Date.now() - (window.__pixoroLastCmtTime||0) < 5000){ alert("Konjam wait pannu da - 5 sec ku 1 comment tha da"); return; }
+    const low = text.toLowerCase();
+    if(BAD_WORDS.some(w=>low.includes(w))){ alert("Idha use panna mudiyaathu da - Vera vaarthai podu da"); return; }
+    window.__pixoroLastCmtTime = Date.now();
     const postId=String(getPostId()||""); if(!postId){ alert("Post ID kedaikala da"); return; }
     openPostId=postId; window.PIXORO_OPEN_POST_ID=postId;
     const s=getSupa(); const userId=await getUserId(); if(!s||!userId){ alert("Please login first"); return; }
@@ -249,11 +261,35 @@
     }finally{ isSending=false; }
   }
 
+  // ✅ V58 - SAFETY DELETE DA - Confirm + Undo 5 Sec da
   async function deleteComment(commentId){
     if(!commentId) return;
+    const comment = commentsCache.find(c=>String(c.id)===String(commentId));
+    if(!comment) return;
+    if(!confirm("Delete this comment?")) return;
     const postId = String(getPostId()||openPostId||"");
-    commentsCache=commentsCache.filter((c)=>String(c.id)!==String(commentId)); renderComments(); syncFeedCommentCount(postId); closeCommentOptions();
-    try{ const s=getSupa(); const userId=await getUserId(); if(!s||!userId) throw new Error("Login first"); const {error}=await s.from(TABLE).delete().eq("id", commentId).eq("user_id", userId); if(error) throw error; }catch(e){ console.error(e); }
+    const backup = {...comment};
+    const backupIdx = commentsCache.findIndex(c=>String(c.id)===String(commentId));
+    commentsCache = commentsCache.filter(c=>String(c.id)!==String(commentId));
+    renderComments(); syncFeedCommentCount(postId); closeCommentOptions();
+    let toast = document.getElementById("cmtUndoToast");
+    if(!toast){
+      toast = document.createElement("div");
+      toast.id = "cmtUndoToast"; toast.className = "cmtUndoToast";
+      document.getElementById("commentSheet")?.appendChild(toast);
+    }
+    toast.innerHTML = `Comment deleted <button id="cmtUndoBtn">Undo</button>`;
+    toast.style.display = "flex";
+    document.getElementById("cmtUndoBtn").onclick = ()=>{
+      clearTimeout(undoTimer); toast.style.display="none";
+      commentsCache.splice(backupIdx>=0?backupIdx:0, 0, backup);
+      renderComments(); syncFeedCommentCount(postId);
+    };
+    clearTimeout(undoTimer);
+    undoTimer = setTimeout(async ()=>{
+      toast.style.display="none";
+      try{ const s=getSupa(); const userId=await getUserId(); const {error}=await s.from(TABLE).delete().eq("id", commentId).eq("user_id", userId); if(error) throw error; }catch(e){ console.error(e); }
+    }, 5000);
   }
 
   function openCommentModal(postId){
@@ -266,19 +302,58 @@
     openPostId=null; replyTo=null; const modal=getCommentModal(); if(modal) modal.style.display="none"; document.body.style.overflow=""; unsubscribeRealtime();
     const inp=getInput(); if(inp) inp.value=""; setReplyTo(null); updateSendState();
   }
-  // ✅ V57 - Delete Option - Full Black da
+
+  // ✅ V58 - HOLD OPTION DA - Full Black da
   function openCommentOptions(commentId, userId){
     currentCommentId=String(commentId); currentCommentUserId=String(userId||""); const modal=document.getElementById("cmtOptionModal"); const content=document.getElementById("cmtOptContent"); if(!modal||!content) return;
     const me=window.ME_ID; const isMine=me && String(userId)===String(me);
-    content.innerHTML=`<button data-opt="share" style="background:#000">Share Comment</button><button data-opt="copy" style="background:#000">Copy Text</button><button data-opt="report" style="background:#000">Report</button>${isMine?`<button data-opt="delete" style="color:#ff5a5a;background:#000">Delete</button>`:""}<button data-opt="cancel" style="color:#aaa;background:#000">Cancel</button>`; modal.style.display="flex";
+    content.innerHTML=`
+      <button data-opt="reply" style="background:#000">Reply</button>
+      <button data-opt="copy" style="background:#000">Copy Text</button>
+      <button data-opt="share" style="background:#000">Share</button>
+      <button data-opt="hide" style="background:#000">Hide Comment</button>
+      <button data-opt="report" style="background:#000">Report</button>
+      ${isMine?`<button data-opt="delete" style="color:#ff5a5a;background:#000">Delete</button>`:`<button data-opt="block" style="color:#ff5a5a;background:#000">Block User</button>`}
+      <button data-opt="cancel" style="color:#aaa;background:#000">Cancel</button>`;
+    modal.style.display="flex";
   }
   function closeCommentOptions(){ const modal=document.getElementById("cmtOptionModal"); if(modal) modal.style.display="none"; currentCommentId=null; currentCommentUserId=null; }
   async function handleOption(opt){
     if(!currentCommentId) return; const comment=commentsCache.find((c)=>String(c.id)===String(currentCommentId));
-    if(opt==="cancel"){ closeCommentOptions(); return; } if(opt==="delete"){ await deleteComment(currentCommentId); return; }
+    if(opt==="cancel"){ closeCommentOptions(); return; }
+    if(opt==="delete"){ await deleteComment(currentCommentId); return; }
+    if(opt==="reply"){ const c=comment; closeCommentOptions(); if(c) focusReply(c); return; }
     if(opt==="copy"){ if(comment?.text){ try{ await navigator.clipboard.writeText(comment.text); }catch(e){} } closeCommentOptions(); return; }
     if(opt==="share"){ const text=comment?.text||""; const url=location.origin+location.pathname+"#comment-"+currentCommentId; try{ if(navigator.share) await navigator.share({title:"Pixoro Comment", text, url}); else if(navigator.clipboard) await navigator.clipboard.writeText(url); }catch(e){} closeCommentOptions(); return; }
+    if(opt==="hide"){ hiddenIds.add(String(currentCommentId)); localStorage.setItem("pixoro_hidden_cmt", JSON.stringify([...hiddenIds])); closeCommentOptions(); renderComments(); return; }
     if(opt==="report"){ alert("Thanks. This comment was reported."); closeCommentOptions(); return; }
+    if(opt==="block"){ if(currentCommentUserId){ blockedIds.add(String(currentCommentUserId)); localStorage.setItem("pixoro_blocked", JSON.stringify([...blockedIds])); } alert("User blocked da"); closeCommentOptions(); renderComments(); return; }
+  }
+
+  // ✅ V58 - 2 SEC HOLD LOGIC DA - Makkal Pudichu Vacha Tha Option Varum da
+  function bindHoldOption(){
+    const list = document.querySelector("#cmtList");
+    if(!list || list.dataset.holdBound) return;
+    list.dataset.holdBound = "1";
+    list.addEventListener("pointerdown", (e)=>{
+      if(e.target.closest("[data-like]") || e.target.closest("[data-reply]") || e.target.closest("[data-view-replies]") || e.target.closest("[data-go-profile]")) return;
+      const row = e.target.closest(".cmtRow"); if(!row) return;
+      holdFired = false;
+      row.classList.add("cmtHolding");
+      clearTimeout(holdTimer);
+      holdTimer = setTimeout(()=>{
+        holdFired = true;
+        row.classList.remove("cmtHolding");
+        try{ navigator.vibrate?.(50); }catch(err){}
+        openCommentOptions(row.dataset.commentId, row.dataset.userId);
+      }, HOLD_MS);
+    });
+    ["pointerup","pointerleave","pointercancel","touchend","touchcancel"].forEach(ev=>{
+      list.addEventListener(ev, ()=>{ clearTimeout(holdTimer); document.querySelectorAll(".cmtHolding").forEach(r=>r.classList.remove("cmtHolding")); });
+    });
+    list.addEventListener("click", (e)=>{
+      if(holdFired){ e.stopPropagation(); e.preventDefault(); holdFired=false; }
+    }, true);
   }
 
   function subscribeRealtime(postId){
@@ -296,7 +371,7 @@
 
   function layout(){
     const modal=getCommentModal(); if(!modal) return;
-    if(modal.dataset.pixoroBuilt){ inputEl=getInput(); sendBtnEl=getSendBtn(); listEl=getList(); updateSendState(); return; }
+    if(modal.dataset.pixoroBuilt){ inputEl=getInput(); sendBtnEl=getSendBtn(); listEl=getList(); bindHoldOption(); updateSendState(); return; }
     modal.dataset.pixoroBuilt="1";
     modal.innerHTML=`
       <div id="commentSheet">
@@ -318,14 +393,14 @@
     modal.querySelector("#replyTagCancel")?.addEventListener("click", ()=>setReplyTo(null));
     modal.addEventListener("click", (e)=>{ if(e.target===modal) closeCommentModal(); });
     modal.querySelector("#cmtOptionModal")?.addEventListener("click", (e)=>{ if(e.target.id==="cmtOptionModal") closeCommentOptions(); });
+    // ✅ V58 - Pazhaya Row Click Option Thookiten da - Hold Mattum Tha da
     modal.addEventListener("click", (e)=>{
       const goBtn=e.target.closest("[data-go-profile]"); if(goBtn){ e.stopPropagation(); goToProfile(goBtn.dataset.goProfile, goBtn.dataset.goName); return; }
       const likeBtn=e.target.closest("[data-like]"); if(likeBtn){ e.stopPropagation(); toggleCommentLike(likeBtn.dataset.like, likeBtn); return; }
       const replyBtn=e.target.closest("[data-reply]"); if(replyBtn){ const c=commentsCache.find((x)=>String(x.id)===String(replyBtn.dataset.reply)); if(c) focusReply(c); return; }
-      const delBtn=e.target.closest("[data-delete]"); if(delBtn){ deleteComment(delBtn.dataset.delete); return; }
-      const row=e.target.closest(".cmtRow"); if(row && !e.target.closest(".cmtLike") && !e.target.closest("[data-view-replies]")) openCommentOptions(row.dataset.commentId, row.dataset.userId);
     });
     modal.querySelector("#cmtOptContent")?.addEventListener("click", (e)=>{ const b=e.target.closest("[data-opt]"); if(b) handleOption(b.dataset.opt); });
+    bindHoldOption();
     updateSendState();
   }
   document.addEventListener("click", (e)=>{
@@ -354,5 +429,5 @@
   window.addEventListener("pixoro:login", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro:logout", ()=>{ closeCommentModal(); });
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", startComments, {once:true}); } else { startComments(); }
-  console.log("PIXORO COMMENTS V57 READY 💬");
+  console.log("PIXORO COMMENTS V58 READY 💬");
 })();
