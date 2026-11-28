@@ -1,18 +1,17 @@
 /* =========================================
-   PIXORO COMMENTS V56 FINAL CORRECT DA
+   PIXORO COMMENTS V57 FINAL CORRECT DA
    ✅ ID + Time Mela, Msg Naduvula, Reply/Delete Keezha, Heart Valathu da
-   ✅ THREAD REPLY DA - Reply Ulla Chinna Tha Varum da - View replies nu Varum da
+   ✅ THREAD REPLY DA - Reply Romba Chinna da - Ulla Thalli Varum da - View Romba Chinna da
+   ✅ Full Black da - Delete Full Black da
    ✅ parent_id - bigint da - comments.id bigint ku Match Aagum da
-   ✅ comments la - post_id + user_id + text Mattum da
    ✅ Name + Photo - user_id Vachu profiles la Irundhu da
-   ✅ profiles la Row Illana - Thanaave Create Pannum da
    ✅ user nu Varaathu da
    ========================================= */
 (() => {
   "use strict";
-  if (window.PIXORO_COMMENTS_V56) return;
+  if (window.PIXORO_COMMENTS_V57) return;
+  window.PIXORO_COMMENTS_V57 = true;
   window.PIXORO_COMMENTS_V56 = true;
-  window.PIXORO_COMMENTS_V55 = true;
 
   const TABLE = "comments";
   const TABLE_LIKES = "comment_likes";
@@ -123,7 +122,6 @@
     const el=post.querySelector(".post-user, .pUser, .post-username, [data-username], .username"); return cleanName(el?.textContent?.trim()||"")||"";
   }
 
-  // ✅ V56 - parent_id yum Edu da
   async function loadComments(postId){
     const s=getSupa(); if(!s) return;
     try{
@@ -135,7 +133,7 @@
     }catch(e){ console.error("PIXORO COMMENTS LOAD:", e); }
   }
 
-  // ✅ V56 - THREAD REPLY DA - Reply Ulla Chinna Tha Varum da
+  // ✅ V57 - THREAD REPLY DA - Reply Romba Chinna da - View Romba Chinna da
   function renderComments(){
     const list=getList(); if(!list) return; listEl=list;
     if(!commentsCache.length){ list.innerHTML='<div style="text-align:center;color:#777;padding:30px 10px;font-size:13px">No comments yet.<br>Be the first to comment.</div>'; return; }
@@ -163,7 +161,6 @@
       </div>`;
     }
 
-    // Orphan Reply Irundha - Adhayum Parent Maari Kaattu da - Kaanama Poga Koodaathu da
     const orphan = childs.filter(ch=>!parents.some(p=>String(p.id)===String(ch.parent_id)));
     const allParents = [...parents, ...orphan];
 
@@ -171,7 +168,8 @@
       const reps = childs.filter(ch=>String(ch.parent_id)===String(p.id));
       let html = oneRow(p, false);
       if(reps.length){
-        html += `<div class="cmtViewReplies" data-view-replies="${escapeHtml(p.id)}">— View ${reps.length} repl${reps.length>1?"ies":"y"}</div><div class="cmtReplyBox" id="replies-${escapeHtml(p.id)}" style="display:none">${reps.map(r=>oneRow(r,true)).join("")}</div>`;
+        // ✅ V57 - View X more replies - Chinna Tha Varum da
+        html += `<div class="cmtViewReplies" data-view-replies="${escapeHtml(p.id)}" data-reply-count="${reps.length}">— View ${reps.length} more repl${reps.length>1?"ies":"y"}</div><div class="cmtReplyBox" id="replies-${escapeHtml(p.id)}" style="display:none">${reps.map(r=>oneRow(r,true)).join("")}</div>`;
       }
       return `<div class="cmtThread">${html}</div>`;
     }).join("");
@@ -181,9 +179,10 @@
         e.stopPropagation();
         const box = document.getElementById("replies-"+btn.dataset.viewReplies);
         if(!box) return;
+        const n = Number(btn.dataset.replyCount||0);
         const isOpen = box.style.display!=="none";
         box.style.display = isOpen?"none":"block";
-        btn.textContent = isOpen ? btn.textContent.replace("Hide","View") : btn.textContent.replace("View","Hide");
+        btn.textContent = isOpen ? `— View ${n} more repl${n>1?"ies":"y"}` : `— Hide ${n} repl${n>1?"ies":"y"}`;
       });
     });
   }
@@ -213,7 +212,6 @@
     try{ const ids=commentsCache.map((c)=>String(c.id)); let all=[]; let from=0; while(true){ const {data, error}=await s.from(TABLE_LIKES).select("comment_id,user_id").in("comment_id", ids).range(from, from+999); if(error) throw error; const rows=data||[]; all=all.concat(rows); if(rows.length<1000) break; from+=1000; } const counts={}; const liked=new Set(); ids.forEach((id)=>counts[id]=0); all.forEach((r)=>{ const id=String(r.comment_id); counts[id]=(counts[id]||0)+1; if(String(r.user_id)===String(userId)) liked.add(id); }); window.FEED_COMMENT_COUNTS=counts; window.FEED_COMMENT_LIKES=liked; renderComments(); }catch(e){}
   }
 
-  // ✅ V56 - Reply na parent_id + @name Auto Podu da
   async function addComment(){
     if(isSending) return;
     const inp=getInput(); inputEl=inp; const text=inp?.value?.trim()||""; if(!text) return;
@@ -222,8 +220,6 @@
     const s=getSupa(); const userId=await getUserId(); if(!s||!userId){ alert("Please login first"); return; }
     await ensureMyProfile();
     await fetchProfiles([userId]);
-
-    // Reply ku - Parent Comment oda ID da - bigint ku Number ah Anuppu da
     let parentId = null;
     let saveText = text;
     if(replyTo){
@@ -234,7 +230,6 @@
         saveText = "@"+rName+" "+text;
       }
     }
-
     const tempId="temp-"+Date.now();
     const temp={id:tempId, post_id:postId, user_id:userId, parent_id:parentId, text:saveText, created_at:new Date().toISOString()};
     commentsCache.push(temp); renderComments(); syncFeedCommentCount(postId); if(inp) inp.value=""; setReplyTo(null); updateSendState();
@@ -271,10 +266,11 @@
     openPostId=null; replyTo=null; const modal=getCommentModal(); if(modal) modal.style.display="none"; document.body.style.overflow=""; unsubscribeRealtime();
     const inp=getInput(); if(inp) inp.value=""; setReplyTo(null); updateSendState();
   }
+  // ✅ V57 - Delete Option - Full Black da
   function openCommentOptions(commentId, userId){
     currentCommentId=String(commentId); currentCommentUserId=String(userId||""); const modal=document.getElementById("cmtOptionModal"); const content=document.getElementById("cmtOptContent"); if(!modal||!content) return;
     const me=window.ME_ID; const isMine=me && String(userId)===String(me);
-    content.innerHTML=`<button data-opt="share">Share Comment</button><button data-opt="copy">Copy Text</button><button data-opt="report">Report</button>${isMine?`<button data-opt="delete" style="color:#ff5555">Delete</button>`:""}<button data-opt="cancel" style="color:#aaa">Cancel</button>`; modal.style.display="flex";
+    content.innerHTML=`<button data-opt="share" style="background:#000">Share Comment</button><button data-opt="copy" style="background:#000">Copy Text</button><button data-opt="report" style="background:#000">Report</button>${isMine?`<button data-opt="delete" style="color:#ff5a5a;background:#000">Delete</button>`:""}<button data-opt="cancel" style="color:#aaa;background:#000">Cancel</button>`; modal.style.display="flex";
   }
   function closeCommentOptions(){ const modal=document.getElementById("cmtOptionModal"); if(modal) modal.style.display="none"; currentCommentId=null; currentCommentUserId=null; }
   async function handleOption(opt){
@@ -358,5 +354,5 @@
   window.addEventListener("pixoro:login", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro:logout", ()=>{ closeCommentModal(); });
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", startComments, {once:true}); } else { startComments(); }
-  console.log("PIXORO COMMENTS V56 READY 💬");
+  console.log("PIXORO COMMENTS V57 READY 💬");
 })();
