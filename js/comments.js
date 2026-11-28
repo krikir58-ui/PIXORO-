@@ -1,17 +1,18 @@
 /* =========================================
-   PIXORO COMMENTS V55 FINAL CORRECT DA
+   PIXORO COMMENTS V56 FINAL CORRECT DA
    ✅ ID + Time Mela, Msg Naduvula, Reply/Delete Keezha, Heart Valathu da
+   ✅ THREAD REPLY DA - Reply Ulla Chinna Tha Varum da - View replies nu Varum da
+   ✅ parent_id - bigint da - comments.id bigint ku Match Aagum da
    ✅ comments la - post_id + user_id + text Mattum da
    ✅ Name + Photo - user_id Vachu profiles la Irundhu da
    ✅ profiles la Row Illana - Thanaave Create Pannum da
-   ✅ username / name / display_name - Edhu Irundhaalum Edukkum da
    ✅ user nu Varaathu da
    ========================================= */
 (() => {
   "use strict";
-  if (window.PIXORO_COMMENTS_V55) return;
+  if (window.PIXORO_COMMENTS_V56) return;
+  window.PIXORO_COMMENTS_V56 = true;
   window.PIXORO_COMMENTS_V55 = true;
-  window.PIXORO_COMMENTS_V52 = true;
 
   const TABLE = "comments";
   const TABLE_LIKES = "comment_likes";
@@ -57,7 +58,6 @@
     const ids=[...new Set((userIds||[]).map(id=>String(id)).filter(Boolean))].filter(id=>!profileMap[id]);
     if(ids.length){
       const {data, error}=await s.from("profiles").select("*").in("id", ids);
-      console.log("PROFILE FETCH:", ids, data, error);
       (data||[]).forEach(p=>{
         const nm = pickName(p);
         profileMap[String(p.id)]={ username: nm || "user", avatar_url: cleanAvatar(p) };
@@ -123,10 +123,11 @@
     const el=post.querySelector(".post-user, .pUser, .post-username, [data-username], .username"); return cleanName(el?.textContent?.trim()||"")||"";
   }
 
+  // ✅ V56 - parent_id yum Edu da
   async function loadComments(postId){
     const s=getSupa(); if(!s) return;
     try{
-      const {data, error}=await s.from(TABLE).select("id,post_id,user_id,text,created_at").eq("post_id", postId).order("created_at", {ascending:true});
+      const {data, error}=await s.from(TABLE).select("id,post_id,user_id,parent_id,text,created_at").eq("post_id", postId).order("created_at", {ascending:true});
       if(error) throw error;
       commentsCache=data||[];
       await fetchProfiles(commentsCache.map(c=>c.user_id));
@@ -134,12 +135,15 @@
     }catch(e){ console.error("PIXORO COMMENTS LOAD:", e); }
   }
 
-  // ✅ V55 - PIXORO LAYOUT DA - ID + Time Mela, Msg Naduvula, Reply/Delete Keezha, Heart Valathu da
+  // ✅ V56 - THREAD REPLY DA - Reply Ulla Chinna Tha Varum da
   function renderComments(){
     const list=getList(); if(!list) return; listEl=list;
     if(!commentsCache.length){ list.innerHTML='<div style="text-align:center;color:#777;padding:30px 10px;font-size:13px">No comments yet.<br>Be the first to comment.</div>'; return; }
     const me=window.ME_ID;
-    list.innerHTML=commentsCache.map((c)=>{
+    const parents = commentsCache.filter(c=>!c.parent_id);
+    const childs = commentsCache.filter(c=>c.parent_id);
+
+    function oneRow(c, isReply){
       const prof=getProfile(c.user_id);
       const name=cleanName(prof.username)||"user";
       const av=prof.avatar_url;
@@ -148,7 +152,7 @@
       const isMine=me && String(c.user_id)===String(me);
       const uid=escapeHtml(c.user_id||"");
       const avatarHtml = av ? `<img src="${escapeHtml(av)}" onerror="this.style.display='none'">` : escapeHtml(getAvatarInitial(name));
-      return `<div class="cmtRow" data-comment-id="${escapeHtml(c.id)}" data-user-id="${uid}">
+      return `<div class="cmtRow ${isReply?"cmtReplyRow":""}" data-comment-id="${escapeHtml(c.id)}" data-user-id="${uid}">
         <div class="cmtAvatar cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${avatarHtml}</div>
         <div class="cmtContent">
           <div class="cmtTop"><b class="cmtUser cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${escapeHtml(name)}</b><span class="cmtTime">${timeAgo(c.created_at)}</span></div>
@@ -157,8 +161,31 @@
         </div>
         <button class="cmtLike ${liked?"liked":""}" data-like="${escapeHtml(c.id)}">${liked?ICON_HEART_FILLED:ICON_HEART}<span class="cmtLikeCount">${count>0?count:""}</span></button>
       </div>`;
+    }
+
+    // Orphan Reply Irundha - Adhayum Parent Maari Kaattu da - Kaanama Poga Koodaathu da
+    const orphan = childs.filter(ch=>!parents.some(p=>String(p.id)===String(ch.parent_id)));
+    const allParents = [...parents, ...orphan];
+
+    list.innerHTML = allParents.map(p=>{
+      const reps = childs.filter(ch=>String(ch.parent_id)===String(p.id));
+      let html = oneRow(p, false);
+      if(reps.length){
+        html += `<div class="cmtViewReplies" data-view-replies="${escapeHtml(p.id)}">— View ${reps.length} repl${reps.length>1?"ies":"y"}</div><div class="cmtReplyBox" id="replies-${escapeHtml(p.id)}" style="display:none">${reps.map(r=>oneRow(r,true)).join("")}</div>`;
+      }
+      return `<div class="cmtThread">${html}</div>`;
     }).join("");
-    list.scrollTop=list.scrollHeight;
+
+    list.querySelectorAll("[data-view-replies]").forEach(btn=>{
+      btn.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        const box = document.getElementById("replies-"+btn.dataset.viewReplies);
+        if(!box) return;
+        const isOpen = box.style.display!=="none";
+        box.style.display = isOpen?"none":"block";
+        btn.textContent = isOpen ? btn.textContent.replace("Hide","View") : btn.textContent.replace("View","Hide");
+      });
+    });
   }
 
   function goToProfile(userId, userName){
@@ -186,6 +213,7 @@
     try{ const ids=commentsCache.map((c)=>String(c.id)); let all=[]; let from=0; while(true){ const {data, error}=await s.from(TABLE_LIKES).select("comment_id,user_id").in("comment_id", ids).range(from, from+999); if(error) throw error; const rows=data||[]; all=all.concat(rows); if(rows.length<1000) break; from+=1000; } const counts={}; const liked=new Set(); ids.forEach((id)=>counts[id]=0); all.forEach((r)=>{ const id=String(r.comment_id); counts[id]=(counts[id]||0)+1; if(String(r.user_id)===String(userId)) liked.add(id); }); window.FEED_COMMENT_COUNTS=counts; window.FEED_COMMENT_LIKES=liked; renderComments(); }catch(e){}
   }
 
+  // ✅ V56 - Reply na parent_id + @name Auto Podu da
   async function addComment(){
     if(isSending) return;
     const inp=getInput(); inputEl=inp; const text=inp?.value?.trim()||""; if(!text) return;
@@ -194,12 +222,27 @@
     const s=getSupa(); const userId=await getUserId(); if(!s||!userId){ alert("Please login first"); return; }
     await ensureMyProfile();
     await fetchProfiles([userId]);
+
+    // Reply ku - Parent Comment oda ID da - bigint ku Number ah Anuppu da
+    let parentId = null;
+    let saveText = text;
+    if(replyTo){
+      const rawId = replyTo.id;
+      parentId = isNaN(Number(rawId)) ? rawId : Number(rawId);
+      if(!text.startsWith("@")){
+        const rName = cleanName(getProfile(replyTo.user_id).username)||"user";
+        saveText = "@"+rName+" "+text;
+      }
+    }
+
     const tempId="temp-"+Date.now();
-    const temp={id:tempId, post_id:postId, user_id:userId, text, created_at:new Date().toISOString()};
+    const temp={id:tempId, post_id:postId, user_id:userId, parent_id:parentId, text:saveText, created_at:new Date().toISOString()};
     commentsCache.push(temp); renderComments(); syncFeedCommentCount(postId); if(inp) inp.value=""; setReplyTo(null); updateSendState();
     isSending=true;
     try{
-      const {data, error}=await s.from(TABLE).insert({post_id:postId, user_id:userId, text}).select("id,post_id,user_id,text,created_at").single();
+      const insertObj={ post_id:postId, user_id:userId, text:saveText };
+      if(parentId) insertObj.parent_id = parentId;
+      const {data, error}=await s.from(TABLE).insert(insertObj).select("id,post_id,user_id,parent_id,text,created_at").single();
       if(error) throw error;
       const idx=commentsCache.findIndex((c)=>String(c.id)===tempId); if(idx>=0 && data) commentsCache[idx]=data;
       renderComments(); syncFeedCommentCount(postId);
@@ -284,7 +327,7 @@
       const likeBtn=e.target.closest("[data-like]"); if(likeBtn){ e.stopPropagation(); toggleCommentLike(likeBtn.dataset.like, likeBtn); return; }
       const replyBtn=e.target.closest("[data-reply]"); if(replyBtn){ const c=commentsCache.find((x)=>String(x.id)===String(replyBtn.dataset.reply)); if(c) focusReply(c); return; }
       const delBtn=e.target.closest("[data-delete]"); if(delBtn){ deleteComment(delBtn.dataset.delete); return; }
-      const row=e.target.closest(".cmtRow"); if(row && !e.target.closest(".cmtLike")) openCommentOptions(row.dataset.commentId, row.dataset.userId);
+      const row=e.target.closest(".cmtRow"); if(row && !e.target.closest(".cmtLike") && !e.target.closest("[data-view-replies]")) openCommentOptions(row.dataset.commentId, row.dataset.userId);
     });
     modal.querySelector("#cmtOptContent")?.addEventListener("click", (e)=>{ const b=e.target.closest("[data-opt]"); if(b) handleOption(b.dataset.opt); });
     updateSendState();
@@ -315,5 +358,5 @@
   window.addEventListener("pixoro:login", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro:logout", ()=>{ closeCommentModal(); });
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", startComments, {once:true}); } else { startComments(); }
-  console.log("PIXORO COMMENTS V55 READY 💬");
+  console.log("PIXORO COMMENTS V56 READY 💬");
 })();
