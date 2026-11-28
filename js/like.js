@@ -1,23 +1,23 @@
 /* =====================================================
-   PIXORO LIKE V90
+   PIXORO LIKE V92
    LIKE BUTTON  = LIKE / UNLIKE - SMOOTH DA
    PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
    SUPABASE = SERVER SAVE
-   + V90 FIX DA - Like Aana Odane Heart Varum da - toggleLike kulla Ye Heart Pottuten da
-   + V90 FIX DA - pointerdown ah Namba Maatten da - Click Miss Aana Kooda Heart Varum da
-   + V90 FIX DA - Home Pink Heart Illa da - Reels Heart Tha Home kum da - 52px da
-   + V90 FIX DA - Flying Heart Illa da - Naduvula POP Heart Tha da
+   + V92 FIX DA - Instagram Mari Illa da - Simple POP Mattum Tha da
+   + V92 FIX DA - Like Button Thotta - Button Ye POP Aagum da + Naduvula Heart POP Aagum da
+   + V92 FIX DA - Heart Mela Pogathu da - Naduvula Ye POP Aagi Maraiyum da - 72px Red da
+   + V92 FIX DA - Like Aana Odane Heart Varum da - toggleLike kulla Ye Heart Irukku da
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V90) return;
-  window.PIXORO_LIKE_V90 = true;
+  if (window.PIXORO_LIKE_V92) return;
+  window.PIXORO_LIKE_V92 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
-  const HEART_DURATION = 1000;
+  const HEART_DURATION = 700;
 
   const lastTap = new Map();
   const pending = new Map();
@@ -125,7 +125,7 @@
     });
   }
 
-  /* ✅ V90 - POP Heart - Media Illana Kooda Viewport Center la Varum da - Return Panna Maatten da */
+  /* ✅ V92 - Simple POP Heart da - Instagram Mari Illa da - Gradient Illa da - Periya Heart Illa da */
   function showBigHeart(media, x, y) {
     let px = Number.isFinite(x) ? x : null;
     let py = Number.isFinite(y) ? y : null;
@@ -137,15 +137,16 @@
     if (py === null) py = window.innerHeight / 2;
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
-    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${px}px;top:${py}px;width:52px;height:52px;transform:translate(-50%,-50%) scale(0);opacity:0;`;
-    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 8px 18px rgba(255,48,64,.55))"><path fill="#FF3040" stroke="#FFFFFF" stroke-width="1.2" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+    heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${px}px;top:${py}px;width:72px;height:72px;transform:translate(-50%,-50%) scale(0);opacity:0;`;
+    heart.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;filter:drop-shadow(0 6px 14px rgba(255,48,64,.45))"><path fill="#FF3040" stroke="#FFFFFF" stroke-width="1.2" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
     document.body.appendChild(heart);
+    // ✅ V92 - Naduvula Ye POP da - Mela Pogathu da - translate(-50%,-50%) Apdiye Irukkum da
     const anim = heart.animate([
       { transform: "translate(-50%,-50%) scale(0)", opacity: 0 },
-      { transform: "translate(-50%,-50%) scale(1.4)", opacity: 1, offset: .18 },
-      { transform: "translate(-50%,-50%) scale(1)", opacity: 1, offset: .42 },
-      { transform: "translate(-50%,-65%) scale(1.05)", opacity: 1, offset: .70 },
-      { transform: "translate(-50%,-120%) scale(.8)", opacity: 0 }
+      { transform: "translate(-50%,-50%) scale(1.3)", opacity: 1, offset: .25 },
+      { transform: "translate(-50%,-50%) scale(1)", opacity: 1, offset: .45 },
+      { transform: "translate(-50%,-50%) scale(1)", opacity: 1, offset: .70 },
+      { transform: "translate(-50%,-50%) scale(0.9)", opacity: 0 }
     ], { duration: HEART_DURATION, easing: "ease-out", fill: "forwards" });
     anim.onfinish = () => heart.remove();
   }
@@ -153,7 +154,7 @@
   window.pixoroShowHeartDance = showBigHeart;
   window.showBigHeart = showBigHeart;
 
-  /* ✅ V90 KEY - Post ku POP Heart - Media Kedaikala na - Post Center - Adhuvum Illana - Screen Center da */
+  /* ✅ V92 KEY - Post ku POP Heart - Media Kedaikala na - Post Center - Adhuvum Illana - Screen Center da */
   function popHeartForPost(post) {
     const now = Date.now();
     if (now - lastPopAt < 350) return; // ✅ Double Heart Varathu da
@@ -171,15 +172,29 @@
 
   function showUnlikeHeart(button) { return; }
 
+  /* ✅ V92 - Like Button POP da - Button Ye Thullum da - 1 -> 1.45 -> 0.92 -> 1 da */
   function buttonAnimation(post) {
-    const icon = getLikeButton(post)?.querySelector("svg");
-    if (!icon) return;
-    icon.getAnimations().forEach(a => a.cancel());
-    icon.animate([
+    const btn = getLikeButton(post);
+    const icon = btn?.querySelector("svg");
+    if (!btn && !icon) return;
+    const el = icon || btn;
+    el.getAnimations().forEach(a => a.cancel());
+    el.animate([
       { transform: "scale(1)" },
-      { transform: "scale(1.06)", offset: .4 },
+      { transform: "scale(1.45)", offset: .35 },
+      { transform: "scale(0.92)", offset: .65 },
       { transform: "scale(1)" }
-    ], { duration: 150, easing: "ease-out" });
+    ], { duration: 350, easing: "ease-out" });
+    // ✅ Button Full Ah POP Aaganum da - SVG Mattum Illa da
+    if (icon && btn !== icon) {
+      btn.getAnimations().forEach(a => a.cancel());
+      btn.animate([
+        { transform: "scale(1)" },
+        { transform: "scale(1.25)", offset: .35 },
+        { transform: "scale(0.95)", offset: .65 },
+        { transform: "scale(1)" }
+      ], { duration: 350, easing: "ease-out" });
+    }
   }
 
   async function serverSave(postId, liked) {
@@ -234,10 +249,13 @@
     paintLike(post, willLike);
     paintCount(post, newCount);
 
-    /* ✅ V90 KEY FIX DA - Like Aacha - Inga Ye Heart da - pointerdown / click ah Namba Vendaam da */
-    /* ✅ Like Button Thotta - toggleLike Odum da - Adhaan Heart Kandippa Varum da */
-    /* ✅ Unlike na Heart Varathu da - Like na Mattum Tha da */
-    if (willLike) popHeartForPost(post);
+    /* ✅ V92 KEY FIX DA - Like Aacha - Inga Ye POP da */
+    /* ✅ Like Button Thotta - toggleLike Odum da - Adhaan POP Kandippa Varum da */
+    /* ✅ Unlike na POP Varathu da - Like na Mattum Tha da */
+    if (willLike) {
+      buttonAnimation(post); // ✅ Button Ye POP Aagum da
+      popHeartForPost(post); // ✅ Naduvula Heart POP Aagum da
+    }
 
     queueServerSave(postId, willLike, revision, previousLiked, previousCount, post);
     return willLike;
@@ -249,7 +267,7 @@
 
   function handleDoubleTap(media, postId, post, x, y) {
     suppressMediaClickUntil = Date.now() + 500;
-    // ✅ V90 - Double Tap la Thani Heart Vendaam da - toggleLike la Ye Heart Varum da - Double Varathu da
+    // ✅ V92 - Double Tap la Thani Heart Vendaam da - toggleLike la Ye POP Varum da - Double Varathu da
     toggleLike(postId, post, true);
   }
 
@@ -282,7 +300,7 @@
       const post = getPost(button);
       const postId = getPostId(button);
       if (!post || !postId) return;
-      buttonAnimation(post);
+      // ✅ V92 - Click la Button POP Vendaam da - toggleLike la Ye POP Irukku da - Double Varathu da
       toggleLike(postId, post, false);
       return;
     }
@@ -348,7 +366,7 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true });
   else start();
 
-  console.log("PIXORO LIKE V90 READY ❤️");
+  console.log("PIXORO LIKE V92 READY ❤️");
 
   (function pixoroKillOldHeart(){
     var obs = new MutationObserver(function(){
@@ -357,5 +375,5 @@
     obs.observe(document.body, { childList:true, subtree:true });
   })();
 
-  /* ✅ V90 - Thani pointerdown Heart Illa da - toggleLike la Ye Heart Irukku da - Double Varathu da */
+  /* ✅ V92 - Thani pointerdown Heart Illa da - toggleLike la Ye POP Irukku da - Double Varathu da */
 })();
