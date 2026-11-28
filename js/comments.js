@@ -1,21 +1,16 @@
 /* =========================================
-   PIXORO COMMENTS V49 FINAL FIX DA
-   ✅ user nu Varaathu da - Fallback Chain da
-   ✅ user_id Vachu Automatic da - profiles -> comments -> localStorage -> auth da
-   ✅ Yaru Comment Pannaalum - Avanga user_id Vachu Name + Photo Varum da
-   ✅ @ ELLAM REMOVE da - Reply Name Text la Illa da
-   ✅ Photo Varum da - Heart Keezha 0 / 1 Count Varum da
-   ✅ Pixoro Style Layout da - Username + Text Oru Line la da
-   ✅ ID / Photo Thotta Profile ku Pogum da
-   ✅ Send = Document Delegate da
+   PIXORO COMMENTS V50 FINAL FIX DA
+   ✅ parent_id ILLA da - Save 100% Aagum da
+   ✅ Error Vantha Temp Thookidum da
+   ✅ Veliya Feed Count Update Aagum da
+   ✅ user_id Vachu Name + Photo Varum da
+   ✅ @gmail.com Cut Aagum da
    ========================================= */
 (() => {
   "use strict";
-  if (window.PIXORO_COMMENTS_V49) return;
+  if (window.PIXORO_COMMENTS_V50) return;
+  window.PIXORO_COMMENTS_V50 = true;
   window.PIXORO_COMMENTS_V49 = true;
-  window.PIXORO_COMMENTS_V48 = true;
-  window.PIXORO_COMMENTS_V46 = true;
-  window.PIXORO_COMMENTS_V41 = true;
 
   const TABLE = "comments";
   const TABLE_LIKES = "comment_likes";
@@ -31,8 +26,11 @@
 
   function getSupa(){ if(supa) return supa; supa = window.getSupa?.() || window.supa || window.supabaseClient || null; return supa; }
   async function getUserId(){ const s=getSupa(); if(!s) return window.ME_ID||null; try{ const {data}=await s.auth.getSession(); const id=data?.session?.user?.id||null; if(id) window.ME_ID=id; return id; }catch(e){ return window.ME_ID||null; } }
+
+  // ✅ V50 - @gmail.com Vantha Cut Pannidu da - krikir58@gamil.com -> krikir58 da
   function cleanName(name){
     let n = String(name || "").trim().replace(/^@+/,"");
+    if(n.includes("@")) n = n.split("@")[0];
     if(!n || n.toLowerCase()==="user") return "";
     const half = Math.floor(n.length/2);
     if(n.length>3 && n.slice(0,half).trim()===n.slice(half).trim()) n=n.slice(0,half).trim();
@@ -40,7 +38,7 @@
     return n || "";
   }
   function cleanAvatar(c){ return c?.avatar_url || c?.avatar || c?.profile_pic || c?.photo_url || c?.photo || ""; }
-  // ✅ V49 FIX DA - user_id Vachu Edu da - Kedaikala na Fallback Name ah Thooka Koodaathu da
+
   async function getUserById(userId, fallbackName = "", fallbackAvatar = ""){
     const fbName = cleanName(fallbackName);
     const fbAv = fallbackAvatar || "";
@@ -52,16 +50,13 @@
       return { username: fbName || "user", avatar_url: fbAv };
     }catch(e){ return { username: fbName || "user", avatar_url: fbAv }; }
   }
-  // ✅ V49 FIX DA - getMyIdentity - Fallback Chain da - user nu Vara Koodaathu da
+
   async function getMyIdentity(){
     const userId=await getUserId();
-    // 1. profiles la Paaru da - user_id Vachu da
     const u=await getUserById(userId, "", window.MY_PFP || localStorage.getItem("pixoro_avatar") || "");
     if(u.username && u.username !== "user"){ window.MY_USERNAME=u.username; return u; }
-    // 2. localStorage la Paaru da
     const ls = cleanName(localStorage.getItem("pixoro_username") || localStorage.getItem("pixoro_user") || window.MY_USERNAME || window.PIXORO_USERNAME || "");
     if(ls){ const av = window.MY_PFP || localStorage.getItem("pixoro_avatar") || localStorage.getItem("pixoro_pfp") || ""; window.MY_USERNAME=ls; return { username: ls, avatar_url: av }; }
-    // 3. auth metadata la Paaru da
     try{
       const s=getSupa(); const {data}=await s.auth.getUser(); const meta=data?.user?.user_metadata||{};
       if(meta.username && cleanName(meta.username)) return { username: cleanName(meta.username), avatar_url: meta.avatar_url || meta.picture || "" };
@@ -69,7 +64,7 @@
     }catch(e){}
     return { username: "user", avatar_url: window.MY_PFP || localStorage.getItem("pixoro_avatar") || "" };
   }
-  async function getMyName(){ const m=await getMyIdentity(); return m.username; }
+
   function escapeHtml(str){ return String(str ?? "").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
   function timeAgo(ts){ if(!ts) return "now"; const t=new Date(ts).getTime(); if(!t) return "now"; const s=Math.floor((Date.now()-t)/1000); if(s<5) return "now"; if(s<60) return s+"s"; if(s<3600) return Math.floor(s/60)+"m"; if(s<86400) return Math.floor(s/3600)+"h"; if(s<604800) return Math.floor(s/86400)+"d"; return Math.floor(s/604800)+"w"; }
   function getAvatarInitial(name){ const n=cleanName(name)||"U"; return n.trim().charAt(0).toUpperCase()||"U"; }
@@ -78,6 +73,26 @@
   function getSendBtn(){ return document.querySelector("#commentModal #cmtSendBtn, #commentModal .sendBtn"); }
   function getList(){ return document.querySelector("#commentModal #cmtList") || listEl; }
   function getPostId(){ const modal=getCommentModal(); return openPostId || modal?.dataset?.postId || window.PIXORO_OPEN_POST_ID || window.__pixoroLastCommentPostId || ""; }
+
+  // ✅ V50 NEW DA - Veliya Feed Count Update Pannum da
+  function syncFeedCommentCount(postId){
+    if(!postId) return;
+    const count = commentsCache.filter(c=>String(c.post_id)===String(postId)).length;
+    document.querySelectorAll(`[data-post-id="${postId}"]`).forEach(post=>{
+      const el = post.querySelector("[data-comment-count], .comment-count, .commentCount, .cmtCount");
+      if(el) el.textContent = count;
+    });
+    // ✅ Feed la Comment Button ku Pakkathula Irukkura Count um Maathu da
+    const allPosts = document.querySelectorAll("article.post, .post");
+    allPosts.forEach(p=>{
+      if(String(p.dataset?.postId||"")===String(postId)){
+        const btn = p.querySelector("[data-comment-btn], .comment-btn, .cmt-open");
+        if(btn){ const s = btn.querySelector("span"); if(s && !isNaN(Number(s.textContent))) s.textContent = count; }
+      }
+    });
+    window.PIXORO_COMMENT_COUNTS = window.PIXORO_COMMENT_COUNTS || {};
+    window.PIXORO_COMMENT_COUNTS[postId] = count;
+  }
 
   function updateSendState(){
     const inp=getInput(); const btn=getSendBtn(); if(!inp||!btn) return; inputEl=inp; sendBtnEl=btn;
@@ -95,7 +110,7 @@
     const post=document.querySelector(`article.post[data-post-id="${postId}"], .post[data-post-id="${postId}"]`); if(!post) return "";
     const el=post.querySelector(".post-user, .pUser, .post-username, [data-username], .username"); return cleanName(el?.textContent?.trim()||"")||"";
   }
-  // ✅ V49 - Yaru Comment Pannaalum - Avanga user_id Vachu Name + Photo Varum da - Illana Pazhaya Name Ve Irukkum da
+
   async function loadComments(postId){
     const s=getSupa(); if(!s) return;
     try{
@@ -109,15 +124,14 @@
           commentsCache.forEach(c=>{
             const p=map[String(c.user_id)];
             if(p?.username && cleanName(p.username)) c.username=cleanName(p.username);
-            // ✅ p Illana - c.username ah Thodave Koodaathu da - Pazhaya krikir58 Ve Irukkum da
             if(p?.avatar_url || p?.photo_url) c.avatar_url=p.avatar_url||p.photo_url;
           });
         }
       }catch(e){}
-      renderComments(); syncCommentLikes();
+      renderComments(); syncFeedCommentCount(postId); syncCommentLikes();
     }catch(e){ console.error("PIXORO COMMENTS LOAD:", e); }
   }
-  // ✅ V49 - Pixoro Style Render da - ID / Photo Thotta Profile ku Pogum da
+
   function renderComments(){
     const list=getList(); if(!list) return; listEl=list;
     if(!commentsCache.length){ list.innerHTML='<div style="text-align:center;color:#777;padding:30px 10px;font-size:13px">No comments yet.<br>Be the first to comment.</div>'; return; }
@@ -132,7 +146,7 @@
     }).join("");
     list.scrollTop=list.scrollHeight;
   }
-  // ✅ V49 - ID Thotta - user_id Vachu Profile ku Pogum da
+
   function goToProfile(userId, userName){
     if(!userId) return;
     closeCommentModal();
@@ -140,6 +154,7 @@
     if(String(userId)===String(me)){ location.href='./profile.html'; }
     else{ location.href='./profile.html?user_id='+encodeURIComponent(userId)+'&username='+encodeURIComponent(userName||''); }
   }
+
   function toggleCommentLike(commentId, btn){
     if(!commentId||!btn) return; const liked=btn.classList.contains("liked"); const willLike=!liked; const prevCount=Number(window.FEED_COMMENT_COUNTS?.[commentId]||0); const newCount=willLike?prevCount+1:Math.max(0,prevCount-1);
     btn.classList.toggle("liked", willLike); btn.innerHTML=(willLike?ICON_HEART_FILLED:ICON_HEART)+`<span class="cmtLikeCount">${newCount}</span>`;
@@ -153,10 +168,13 @@
     const next=prev.catch(()=>{}).then(async()=>{ const s=getSupa(); const userId=await getUserId(); if(!s||!userId) throw new Error("Login first"); if(willLike){ const {error}=await s.from(TABLE_LIKES).upsert({comment_id:commentId, user_id:userId},{onConflict:"comment_id,user_id", ignoreDuplicates:true}); if(error) throw error; } else { const {error}=await s.from(TABLE_LIKES).delete().eq("comment_id", commentId).eq("user_id", userId); if(error) throw error; } }).catch((e)=>{ console.error("PIXORO COMMENT LIKE SAVE:", e); btn.classList.toggle("liked", prevLiked); btn.innerHTML=(prevLiked?ICON_HEART_FILLED:ICON_HEART)+`<span class="cmtLikeCount">${prevCount}</span>`; window.FEED_COMMENT_COUNTS[commentId]=prevCount; if(prevLiked) window.FEED_COMMENT_LIKES.add(String(commentId)); else window.FEED_COMMENT_LIKES.delete(String(commentId)); });
     pendingLikeSaves.set(commentId, next);
   }
+
   async function syncCommentLikes(){
     const s=getSupa(); const userId=await getUserId(); if(!s||!userId||!commentsCache.length) return;
     try{ const ids=commentsCache.map((c)=>String(c.id)); let all=[]; let from=0; while(true){ const {data, error}=await s.from(TABLE_LIKES).select("comment_id,user_id").in("comment_id", ids).range(from, from+999); if(error) throw error; const rows=data||[]; all=all.concat(rows); if(rows.length<1000) break; from+=1000; } const counts={}; const liked=new Set(); ids.forEach((id)=>counts[id]=0); all.forEach((r)=>{ const id=String(r.comment_id); counts[id]=(counts[id]||0)+1; if(String(r.user_id)===String(userId)) liked.add(id); }); window.FEED_COMMENT_COUNTS=counts; window.FEED_COMMENT_LIKES=liked; renderComments(); }catch(e){ console.error("PIXORO COMMENT LIKE SYNC:", e); }
   }
+
+  // ✅ V50 CORRECT ADD DA - parent_id ILLA da - Temp Error Vantha Thookidum da
   async function addComment(){
     if(isSending) return;
     const inp=getInput(); inputEl=inp; const text=inp?.value?.trim()||""; if(!text) return;
@@ -165,19 +183,31 @@
     const s=getSupa(); const userId=await getUserId(); if(!s||!userId){ alert("Please login first"); return; }
     const me=await getMyIdentity(); const username=me.username;
     const avatarUrl = me.avatar_url || window.MY_PFP || localStorage.getItem("pixoro_avatar") || localStorage.getItem("pixoro_pfp") || "";
-    const parentId=replyTo?.id||null; const tempId="temp-"+Date.now();
-    const temp={id:tempId, post_id:postId, user_id:userId, username, avatar_url:avatarUrl, text, parent_id:parentId, created_at:new Date().toISOString()};
-    commentsCache.push(temp); renderComments(); if(inp) inp.value=""; setReplyTo(null); updateSendState();
+    const tempId="temp-"+Date.now();
+    const temp={id:tempId, post_id:postId, user_id:userId, username, avatar_url:avatarUrl, text, created_at:new Date().toISOString()};
+    commentsCache.push(temp); renderComments(); syncFeedCommentCount(postId); if(inp) inp.value=""; setReplyTo(null); updateSendState();
     isSending=true;
     try{
-      const {data, error}=await s.from(TABLE).insert({post_id:postId, user_id:userId, username, avatar_url:avatarUrl, text, parent_id:parentId}).select().single();
-      if(error) throw error; const idx=commentsCache.findIndex((c)=>String(c.id)===tempId); if(idx>=0 && data) commentsCache[idx]=data; renderComments();
-    }catch(e){ console.error("PIXORO COMMENT ADD:", e); alert("Failed: "+(e.message||"Check Supabase RLS / parent_id column da")); }finally{ isSending=false; }
+      const {data, error}=await s.from(TABLE).insert({post_id:postId, user_id:userId, username, avatar_url:avatarUrl, text}).select().single();
+      if(error) throw error;
+      const idx=commentsCache.findIndex((c)=>String(c.id)===tempId); if(idx>=0 && data) commentsCache[idx]=data;
+      renderComments(); syncFeedCommentCount(postId);
+    }catch(e){
+      console.error("PIXORO COMMENT ADD:", e);
+      // ✅ Save Aagala na - Temp ah Thookidu da
+      commentsCache=commentsCache.filter(c=>String(c.id)!==tempId);
+      renderComments(); syncFeedCommentCount(postId);
+      alert("Failed: "+(e.message||"Check Supabase RLS da"));
+    }finally{ isSending=false; }
   }
+
   async function deleteComment(commentId){
-    if(!commentId) return; commentsCache=commentsCache.filter((c)=>String(c.id)!==String(commentId)); renderComments(); closeCommentOptions();
-    try{ const s=getSupa(); const userId=await getUserId(); if(!s||!userId) throw new Error("Login first"); const {error}=await s.from(TABLE).delete().eq("id", commentId).eq("user_id", userId); if(error) throw error; }catch(e){ console.error("PIXORO COMMENT DELETE:", e); commentsCache=commentsCache.filter((c)=>String(c.id)!==String(commentId)); renderComments(); }
+    if(!commentId) return;
+    const postId = String(getPostId()||openPostId||"");
+    commentsCache=commentsCache.filter((c)=>String(c.id)!==String(commentId)); renderComments(); syncFeedCommentCount(postId); closeCommentOptions();
+    try{ const s=getSupa(); const userId=await getUserId(); if(!s||!userId) throw new Error("Login first"); const {error}=await s.from(TABLE).delete().eq("id", commentId).eq("user_id", userId); if(error) throw error; }catch(e){ console.error("PIXORO COMMENT DELETE:", e); }
   }
+
   function openCommentModal(postId){
     openPostId=String(postId); window.PIXORO_OPEN_POST_ID=String(postId); window.__pixoroLastCommentPostId=String(postId);
     const modal=getCommentModal(); if(!modal) return; modal.dataset.postId=String(postId); modal.style.display="flex"; document.body.style.overflow="hidden";
@@ -201,18 +231,20 @@
     if(opt==="share"){ const text=comment?.text||""; const url=location.origin+location.pathname+"#comment-"+currentCommentId; try{ if(navigator.share) await navigator.share({title:"Pixoro Comment", text, url}); else if(navigator.clipboard) await navigator.clipboard.writeText(url); }catch(e){} closeCommentOptions(); return; }
     if(opt==="report"){ alert("Thanks. This comment was reported."); closeCommentOptions(); return; }
   }
+
   function subscribeRealtime(postId){
     const s=getSupa(); if(!s) return; unsubscribeRealtime();
     try{
       commentChannel=s.channel("pixoro-comments-"+postId).on("postgres_changes",{event:"*", schema:"public", table:TABLE, filter:`post_id=eq.${postId}`}, async (payload)=>{
-        if(payload.eventType==="INSERT"){ const row=payload.new; const u=await getUserById(row.user_id, row.username, row.avatar_url); row.username=u.username; row.avatar_url=u.avatar_url; if(!commentsCache.some((c)=>String(c.id)===String(row.id))){ commentsCache.push(row); renderComments(); } }
-        if(payload.eventType==="DELETE"){ commentsCache=commentsCache.filter((c)=>String(c.id)!==String(payload.old.id)); renderComments(); }
+        if(payload.eventType==="INSERT"){ const row=payload.new; const u=await getUserById(row.user_id, row.username, row.avatar_url); row.username=u.username; row.avatar_url=u.avatar_url; if(!commentsCache.some((c)=>String(c.id)===String(row.id))){ commentsCache.push(row); renderComments(); syncFeedCommentCount(postId); } }
+        if(payload.eventType==="DELETE"){ commentsCache=commentsCache.filter((c)=>String(c.id)!==String(payload.old.id)); renderComments(); syncFeedCommentCount(postId); }
         if(payload.eventType==="UPDATE"){ const idx=commentsCache.findIndex((c)=>String(c.id)===String(payload.new.id)); if(idx>=0){ commentsCache[idx]=payload.new; renderComments(); } }
       }).subscribe();
       likeChannel=s.channel("pixoro-comment-likes-"+postId).on("postgres_changes",{event:"*", schema:"public", table:TABLE_LIKES},()=>{ syncCommentLikes(); }).subscribe();
     }catch(e){ console.error("PIXORO COMMENT REALTIME:", e); }
   }
   function unsubscribeRealtime(){ try{ if(commentChannel) getSupa()?.removeChannel(commentChannel); }catch(e){} try{ if(likeChannel) getSupa()?.removeChannel(likeChannel); }catch(e){} commentChannel=null; likeChannel=null; }
+
   function layout(){
     const modal=getCommentModal(); if(!modal) return;
     if(modal.dataset.pixoroBuilt){ inputEl=getInput(); sendBtnEl=getSendBtn(); listEl=getList(); updateSendState(); return; }
@@ -247,6 +279,7 @@
     modal.querySelector("#cmtOptContent")?.addEventListener("click", (e)=>{ const b=e.target.closest("[data-opt]"); if(b) handleOption(b.dataset.opt); });
     updateSendState();
   }
+
   document.addEventListener("click", (e)=>{
     const btn=e.target.closest("[data-comment-btn], .comment-btn, .cmt-open, [data-open-comments], .commentBtn");
     if(btn){ const post=btn.closest("article.post[data-post-id], .post[data-post-id]"); const pid=post?.dataset?.postId || post?.dataset?.id || btn.dataset?.postId || ""; if(pid){ window.__pixoroLastCommentPostId=String(pid); window.PIXORO_OPEN_POST_ID=String(pid); openPostId=String(pid); const m=getCommentModal(); if(m) m.dataset.postId=String(pid); } }
@@ -273,5 +306,5 @@
   window.addEventListener("pixoro:login", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro:logout", ()=>{ closeCommentModal(); });
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", startComments, {once:true}); } else { startComments(); }
-  console.log("PIXORO COMMENTS V49 READY 💬");
+  console.log("PIXORO COMMENTS V50 READY 💬");
 })();
