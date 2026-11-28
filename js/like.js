@@ -1,19 +1,20 @@
 /* =====================================================
-   PIXORO LIKE V81
+   PIXORO LIKE V82
    LIKE BUTTON  = LIKE / UNLIKE - SMOOTH DA - Comment Mari da
    PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
    SUPABASE = SERVER SAVE
    + COMMENT MODAL GUARD DA - Comment Like ah like.js Thodathu da
    + COMMENT LIKE CHINNA DA - Perusa Heart Parakkaathu da
-   + V81 BEST DA - Like CSS Thani File da - css/like.css la Tha Irukku da - Like.js la CSS Illa da
-   + V81 FIX DA - Like / Unlike Panna Photo NADUVULA 38px Heart Vanthu Mella Poi Maraiyum da - 1500ms da - Button Kitta Illa da
+   + V82 BEST DA - Like CSS Thani File da - css/like.css la Tha Irukku da - Like.js la CSS Illa da
+   + V82 FIX DA - Like / Unlike Panna Photo NADUVULA 38px Heart Vanthu Mella Poi Maraiyum da - 1500ms da - Button Kitta Illa da
+   + V82 ADD ONLY DA - Naduvula Vera Heart Kooda Varum da - Pazhaya Heart ku Pathilla da - 72px Red + White da
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V81) return;
-  window.PIXORO_LIKE_V81 = true;
+  if (window.PIXORO_LIKE_V82) return;
+  window.PIXORO_LIKE_V82 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
@@ -690,7 +691,7 @@
     start();
   }
 
-  console.log("PIXORO LIKE V81 READY ❤️");
+  console.log("PIXORO LIKE V82 READY ❤️");
 
   /* ===== ✅ V81 FIX DA - Like / Unlike Panna Photo NADUVULA 38px Heart Vanthu Mella Poi Maraiyum da - Button Kitta Illa da ===== */
   (function pixoroCenterPopADD(){
@@ -758,5 +759,55 @@
       document.querySelectorAll(".pixoro-slow-float, .pixoro-soft-float").forEach(function(el){ el.remove(); });
     });
     obs.observe(document.body, { childList:true, subtree:true });
+  })();
+
+  /* ===== ✅ V82 ADD ONLY DA - Ithula Mattum Add Pannen da - Mela Edhuvum Maathala da ===== */
+  /* ✅ Naduvula Vera Heart da - Pazhaya 38px Heart ku Pathilla da - Idhu Pudhu Heart Mattum da */
+  (function pixoroReelCenterHeartADD(){
+    var lastTouch2 = new WeakMap();
+    document.addEventListener("pointerdown", function(e){
+      var btn = e.target.closest ? e.target.closest("[data-like-btn], .like-btn, .like-button") : null;
+      if(!btn || btn.closest("#commentModal")) return;
+      lastTouch2.set(btn, Date.now());
+    }, true);
+    function reelHeart(btn){
+      if(!btn || btn.closest("#commentModal")) return;
+      var post = btn.closest("article.post, .post, .reel, .reel-item, [data-post-id]");
+      var media = post ? post.querySelector(".postMedia, .post-media, .post-media-wrap, .reel-media, video, img.main") : null;
+      if(!media) media = document.querySelector("video");
+      if(!media) return;
+      var r = media.getBoundingClientRect();
+      if(!r.width) return;
+      var d = document.createElement("div");
+      d.className = "pixoro-reel-center-heart";
+      d.style.left = (r.left + r.width / 2) + "px";
+      d.style.top = (r.top + r.height / 2) + "px";
+      d.innerHTML = '<svg viewBox="0 0 24 24" style="filter:drop-shadow(0 8px 18px rgba(255,48,64,.55))"><path fill="#FF3040" stroke="#FFFFFF" stroke-width="1.2" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+      document.body.appendChild(d);
+      var anim = d.animate([
+        { transform:"translate(-50%,-50%) scale(0)", opacity:0 },
+        { transform:"translate(-50%,-50%) scale(1.25)", opacity:1, offset:0.18 },
+        { transform:"translate(-50%,-50%) scale(1)", opacity:1, offset:0.32 },
+        { transform:"translate(-50%,-50%) scale(1)", opacity:1, offset:0.55 },
+        { transform:"translate(-50%,-60%) scale(1)", opacity:1, offset:0.70 },
+        { transform:"translate(-50%,-85%) scale(0.95)", opacity:0.5, offset:0.85 },
+        { transform:"translate(-50%,-110%) scale(0.85)", opacity:0 }
+      ], { duration:1200, easing:"cubic-bezier(.2,.8,.3,1)", fill:"forwards" });
+      anim.onfinish = function(){ d.remove(); };
+    }
+    var prev2 = new WeakMap();
+    var obs2 = new MutationObserver(function(muts){
+      muts.forEach(function(m){
+        var btn = m.target;
+        if(!btn.matches || !btn.matches("[data-like-btn], .like-btn, .like-button")) return;
+        if(btn.closest("#commentModal")) return;
+        if(Date.now() - (lastTouch2.get(btn) || 0) > 600) return;
+        var nowLiked = btn.classList.contains("liked");
+        if(prev2.get(btn) === nowLiked) return;
+        prev2.set(btn, nowLiked);
+        if(nowLiked) reelHeart(btn);
+      });
+    });
+    obs2.observe(document.documentElement, { attributes:true, attributeFilter:["class"], subtree:true });
   })();
 })();
