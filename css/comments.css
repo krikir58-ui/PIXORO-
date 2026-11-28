@@ -1,76 +1,62 @@
+/* ===== PIXORO COMMENTS.CSS - V7 FINAL DA ===== */
+/* ✅ V7 - Comment Mattum Tha da - Feed / Like ah Thodala da */
 #commentModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:flex-end;justify-content:center}
-#commentSheet{background:#121212;width:100%;max-width:450px;height:82vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;animation:slideUp 0.3s ease}
-.cmtHeader{padding:14px;text-align:center;border-bottom:1px solid #222;font-weight:bold;position:relative}
+#commentModal.open, #commentModal.show{display:flex!important}
+#commentSheet{background:#121212;width:100%;max-width:450px;height:82vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;animation:slideUp 0.3s ease;overflow:hidden}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.cmtHeader{padding:8px 14px 12px;text-align:center;border-bottom:1px solid #222;font-weight:800;font-size:15px;position:relative}
+.cmtHeader::before{content:"";display:block;width:38px;height:4px;border-radius:10px;background:#333;margin:0 auto 10px}
 .cmtList{flex:1;overflow-y:auto;padding:10px 12px}
+.cmtList:empty::after{content:"No comments yet ✨\A Be the first to comment!";white-space:pre;text-align:center;display:block;padding:60px 20px;color:#888;font-size:14px;line-height:1.6}
 .cmtRow{display:flex;gap:10px;margin:14px 0;cursor:pointer}
-.cmtAvatar{width:32px;height:32px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-weight:bold}
-.cmtContent{flex:1}.cmtUser{font-size:13px;font-weight:600}.cmtText{font-size:14px;margin:2px 0;word-break:break-word}
-.cmtMeta{display:flex;gap:14px;margin-top:4px;font-size:12px;color:#aaa}
+.cmtAvatar{width:34px;height:34px;min-width:34px;border-radius:50%;background:linear-gradient(135deg,#ff5ea8,#ff7a00);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;overflow:hidden}
+.cmtAvatar img{width:100%;height:100%;object-fit:cover}
+.cmtContent{flex:1;min-width:0}
+.cmtUser{font-size:13px;font-weight:700;color:#fff}
+.cmtUser::before{content:"@";color:#888;font-weight:400}
+.cmtText{font-size:14px;margin:3px 0;word-break:break-word;line-height:1.45;color:#eee}
 
-/* ===== ✅ v2 - COMMENT HEART 38px DA - 20px -> 38px da - Perusa da ===== */
-.cmtLike{
-  width:38px!important; height:38px!important; min-width:38px!important; min-height:38px!important;
-  padding-top:0!important; font-size:38px!important; line-height:1!important;
-  display:flex!important; align-items:center!important; justify-content:center!important;
-  flex-shrink:0!important; cursor:pointer!important; background:none!important; border:none!important;
-}
-.cmtLike svg{
-  width:38px!important; height:38px!important; min-width:38px!important; min-height:38px!important;
-  fill:none!important; stroke:#fff!important; stroke-width:1.5!important;
-}
-.cmtLike.liked svg, .cmtLike.liked svg path{
-  fill:#FF2D95!important; stroke:#FF2D95!important;
-}
-.cmtLike:active{ transform:scale(1.1)!important; }
+/* ✅ V7 - REPLY / DELETE / LIKE META DA */
+.cmtMeta{display:flex;gap:16px;margin-top:6px;font-size:12px;color:#888;align-items:center}
+.cmtMeta button,.cmtReplyBtn,.cmtDeleteBtn{background:none!important;border:0!important;color:#888!important;font-size:12px!important;font-weight:600!important;cursor:pointer!important;padding:0!important}
+.cmtMeta button:active,.cmtReplyBtn:active{color:#fff!important}
+.cmtDeleteBtn{color:#ff5a5a!important}
+.cmtMeta .cmtLikeCount{font-size:12px!important;color:#888!important;font-weight:600!important}
+.cmtMeta .cmtLikeCount.liked{color:#FF2D95!important}
+
+/* ✅ V7 - COMMENT HEART - CHINNA DA - 38px -> 18px SVG da */
+.cmtLike{width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0!important;cursor:pointer!important;background:none!important;border:none!important}
+.cmtLike svg{width:18px!important;height:18px!important;fill:none!important;stroke:#fff!important;stroke-width:1.5!important;transition:.15s}
+.cmtLike.liked svg,.cmtLike.liked svg path{fill:#FF2D95!important;stroke:#FF2D95!important}
+.cmtLike:active{transform:scale(1.15)!important}
 
 .cmtInputArea{background:#121212;border-top:1px solid #222;padding:8px 10px}
-.replyTag{font-size:12px;color:#aaa;padding:6px 10px;display:flex;justify-content:space-between;background:#1a1a1a}
+.replyTag{font-size:12px;color:#aaa;padding:6px 10px;display:flex;justify-content:space-between;background:#1a1a1a;border-radius:10px;margin-bottom:8px}
+.emojiBar{display:none!important;visibility:hidden!important;width:0!important;height:0!important;padding:0!important;margin:0!important;overflow:hidden!important}
 
-/* ===== ✅ v2 - EMOJI BAR THOOKITEN DA - Comment Killa Clean da ===== */
-.emojiBar{display:none!important; visibility:hidden!important; width:0!important; height:0!important; padding:0!important; margin:0!important; overflow:hidden!important; }
+.cmtBox{display:flex;gap:6px;align-items:center}
+.cmtBox input{flex:1;background:#222;border:1px solid #333;border-radius:20px;padding:10px 14px;color:#fff;outline:none;font-size:14px}
+.cmtBox input:focus{border-color:#444}
+.cmtBox .emojiBtn,.cmtEmojiBtn{width:38px;height:38px;min-width:38px;border-radius:50%;background:#222;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;flex-shrink:0}
 
-.cmtBox{display:flex;gap:8px;align-items:center}
-.cmtBox input{flex:1;background:#222;border:1px solid #333;border-radius:20px;padding:10px 14px;color:#fff;outline:none}
-
-/* ===== ✅ v2 - SEND BUTTON - Aarmbathula Varathu da - Type Panna Mattum Varum da ===== */
+/* ✅ V7 - SEND = AMBU KURI CHINNA DA - TYPE PANNA THICKNESS DA */
 .sendBtn{
-  display:none!important; /* ✅ Aarmbathula Maraivu da */
-  background:#0095f6;color:#fff;border:0;width:38px;height:38px;min-width:38px;border-radius:50%;font-weight:bold;cursor:pointer;
-  align-items:center;justify-content:center;
+  background:none!important;background-color:transparent!important;border:none!important;box-shadow:none!important;border-radius:0!important;
+  width:30px!important;height:30px!important;min-width:30px!important;
+  padding:0!important;margin:0!important;cursor:pointer!important;color:transparent!important;font-size:0!important;line-height:0!important;
+  display:none!important;align-items:center!important;justify-content:center!important;
 }
-/* ✅ Type Panna Mattum - Input la Text Irundha Mattum Send Varum da */
-.cmtBox:has(input:not(:placeholder-shown)) .sendBtn{
-  display:flex!important;
-}
-.cmtBox.has-text .sendBtn, .sendBtn.show{
-  display:flex!important;
-}
-
-#cmtOptionModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:10000;align-items:flex-end;justify-content:center}
-#cmtOptBox{background:#222;width:100%;max-width:450px;border-radius:20px 20px 0 0;padding:10px}
-#cmtOptContent button{padding:16px;background:none;border:0;border-top:1px solid #333;color:#fff;text-align:left;font-size:15px;cursor:pointer;width:100%}
-
-/* ===== ✅ ADD MATTUM DA - Pazhaya Code Thodala da - SEND = OUTLINE SVG MATTUM DA - CORRECT ADD DA ===== */
-.sendBtn{
-  background:none!important; background-color:transparent!important;
-  border:none!important; box-shadow:none!important; border-radius:0!important;
-  width:38px!important; height:38px!important; min-width:38px!important;
-  padding:0!important; margin:0!important; cursor:pointer!important;
-  color:transparent!important; font-size:0!important; line-height:0!important;
-  display:none!important; align-items:center!important; justify-content:center!important;
-}
-.sendBtn svg{
-  width:24px!important; height:24px!important; display:block!important;
-  fill:none!important; stroke:#fff!important; stroke-width:1.8!important;
-  background:none!important; flex-shrink:0!important;
-}
-.sendBtn svg *{
-  fill:none!important; stroke:#fff!important;
-}
-/* ✅ Type Panna Mattum Varum da - Blue Circle Illa da - Outline Mattum da */
+.sendBtn svg{width:20px!important;height:20px!important;display:block!important;fill:none!important;stroke:#888!important;stroke-width:1.6!important;background:none!important;flex-shrink:0!important;transition:.15s!important}
+.sendBtn svg *{fill:none!important;stroke:inherit!important}
+/* ✅ Type Panna Mattum Varum da - Thickness + White da */
 .cmtBox:has(input:not(:placeholder-shown)) .sendBtn,
 .cmtBox.has-text .sendBtn,
-.sendBtn.show{
-  display:flex!important;
-  background:none!important; background-color:transparent!important;
-}
+.sendBtn.show{display:flex!important;background:none!important}
+.cmtBox:has(input:not(:placeholder-shown)) .sendBtn svg,
+.cmtBox.has-text .sendBtn svg,
+.sendBtn.show svg{stroke:#fff!important;stroke-width:2.6!important;transform:translateX(1px) scale(1.1)!important}
+
+#cmtOptionModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:10000;align-items:flex-end;justify-content:center}
+#cmtOptionModal.open,#cmtOptionModal.show{display:flex!important}
+#cmtOptBox{background:#222;width:100%;max-width:450px;border-radius:20px 20px 0 0;padding:10px}
+#cmtOptContent button{padding:16px;background:none;border:0;border-top:1px solid #333;color:#fff;text-align:left;font-size:15px;cursor:pointer;width:100%}
