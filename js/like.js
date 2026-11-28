@@ -1,19 +1,21 @@
 /* =====================================================
-   PIXORO LIKE V84
+   PIXORO LIKE V87
    LIKE BUTTON  = LIKE / UNLIKE - SMOOTH DA - Comment Mari da
    PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
    SUPABASE = SERVER SAVE
    + COMMENT MODAL GUARD DA - Comment Like ah like.js Thodathu da
    + COMMENT LIKE CHINNA DA - Perusa Heart Parakkaathu da
-   + V84 BEST DA - Like CSS Thani File da - css/like.css la Tha Irukku da - Like.js la CSS Illa da
-   + V84 FIX DA - Home Pink Heart Illa da - Reels Heart Athe Design Tha Home kum da - Chinna Size 52px da
+   + V87 BEST DA - Like CSS Thani File da - css/like.css la Tha Irukku da - Like.js la CSS Illa da
+   + V87 FIX DA - Home Pink Heart Illa da - Reels Heart Athe Design Tha Home kum da - Chinna Size 52px da
+   + V87 FIX DA - Like Button Thotta Odane Heart Varum da - Double Click Mattum Illa da - feed.js Like Panna Kooda Varum da
+   + V87 FIX DA - Heart Like Button la Irundhu NERRA Mella Naduvukku Varum da - Straight Line Tha da
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V84) return;
-  window.PIXORO_LIKE_V84 = true;
+  if (window.PIXORO_LIKE_V87) return;
+  window.PIXORO_LIKE_V87 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
@@ -185,7 +187,7 @@
   }
 
   /* POP HEART - DOUBLE TAP MATTUM DA - PHOTO NADUVULA DA */
-  /* ✅ V84 FIX DA - Double Tap Heart Kooda Reels Design Tha da - Pink Gradient Illa da - Chinna Size da */
+  /* ✅ V87 FIX DA - Double Tap Heart Kooda Reels Design Tha da - Pink Gradient Illa da - Chinna Size da */
 
   function showBigHeart(media, x, y) {
     if (!media) return;
@@ -202,7 +204,6 @@
       : rect.top + rect.height / 2;
 
     const heart = document.createElement("div");
-    const gid = "pixoroV70Heart" + (++heartId);
 
     heart.className = "pixoro-big-heart";
 
@@ -269,7 +270,6 @@
   window.pixoroShowHeartDance = showBigHeart;
   window.showBigHeart = showBigHeart;
 
-  /* ✅ V84 - Pazhaya Unlike Heart Function ah Kolli da - Ippo Adhu Theva Illa da - Naduvula Heart Tha Venum da */
   function showUnlikeHeart(button) {
     return;
   }
@@ -282,7 +282,6 @@
 
     icon.getAnimations().forEach(a => a.cancel());
 
-    /* ✅ V84 CORRECT - 1.06x / 150ms da - Perusa Thudikkaathu da */
     icon.animate([
       { transform: "scale(1)" },
       { transform: "scale(1.06)", offset: .4 },
@@ -450,7 +449,6 @@
   }
 
   document.addEventListener("pointerdown", event => {
-    // ✅ V72 ADD - Comment Modal / Comment Like na like.js Thodave Koodathu da
     if (event.target.closest && (event.target.closest("#commentModal") || event.target.closest("[data-comment-like]") || event.target.closest("[data-like]"))) return;
     if (event.target.closest(
       "button, a, input, textarea, select, .like-btn, .like-button, [data-like-btn]"
@@ -490,10 +488,9 @@
     }
   }, true);
 
-  /* LIKE BUTTON CLICK */
+  /* LIKE BUTTON CLICK - like.js Button ku Mattum da */
 
   document.addEventListener("click", event => {
-    // ✅ V72 ADD - Comment Modal / Comment Like na like.js Thodave Koodathu da
     if (event.target.closest && (event.target.closest("#commentModal") || event.target.closest("[data-comment-like]") || event.target.closest("[data-like]"))) return;
     const button = event.target.closest(
       "[data-like-btn], .like-btn, .like-button"
@@ -560,7 +557,6 @@
 
     syncRunning = true;
 
-    // Protect local clicks made while the server query is running.
     const startingRevisions = new Map();
 
     ids.forEach(id => {
@@ -605,7 +601,6 @@
       });
 
       ids.forEach(id => {
-        // Do not overwrite a newer local click.
         if (
           (revisions.get(id) || 0) !==
           startingRevisions.get(id)
@@ -639,8 +634,6 @@
 
   window.pixoroSyncLikes = syncVisiblePosts;
   window.pixoroPaintAllLikes = paintAll;
-
-  /* ✅ V84 - LIKE CSS THOOKITEN DA - CSS Inime css/like.css la Tha Irukku da - Like.js la CSS Illa da */
 
   /* EVENTS */
 
@@ -684,11 +677,7 @@
     start();
   }
 
-  console.log("PIXORO LIKE V84 READY ❤️");
-
-  /* ✅ V84 FIX DA - Home Pink Heart Function FULL Delete Panniten da ❌ */
-  /* ✅ Pazhaya pixoroCenterPopADD() Illa da - 38px Pink #FF2D95 Heart Inime Varathu da */
-  /* ✅ Home kum Reels kum - Kezha Irukka Reels Heart Tha Varum da */
+  console.log("PIXORO LIKE V87 READY ❤️");
 
   /* ===== ✅ V81 KILL SWITCH DA - Pazhaya Slow Heart Vantha Udane Delete Pannidum da ===== */
   (function pixoroKillOldHeart(){
@@ -698,52 +687,111 @@
     obs.observe(document.body, { childList:true, subtree:true });
   })();
 
-  /* ===== ✅ V84 - Reels Heart Tha Home kum da - Athe Design Athe Heart da - Chinna Size da ===== */
+  /* ===== ✅ V87 FIX DA - Like Button Thotta Odane Heart Varum da - feed.js Like Panna Kooda Varum da ===== */
+  /* ✅ MutationObserver Illa da - Click la Ye Direct Ah Pudikkuren da */
+  /* ✅ Home la Like Button `act` nu Irukkum da - Adha Kooda Pudikkuren da */
+  /* ✅ Heart Like Button la Irundhu NERRA Mella Naduvukku Varum da - Straight Line Tha da */
   (function pixoroReelCenterHeartADD(){
-    var lastTouch2 = new WeakMap();
-    document.addEventListener("pointerdown", function(e){
-      var btn = e.target.closest ? e.target.closest("[data-like-btn], .like-btn, .like-button") : null;
-      if(!btn || btn.closest("#commentModal")) return;
-      lastTouch2.set(btn, Date.now());
-    }, true);
+    // ✅ Button Ippo Like Ah Illaya nu Check Pannu da - feed.js Enna Class Pottu Irundhalum Paathudum da
+    function isLikedNow(btn){
+      if(!btn) return false;
+      if(btn.classList.contains("liked") || btn.classList.contains("is-liked") || btn.classList.contains("active")) return true;
+      if(btn.dataset && (btn.dataset.liked === "true" || btn.dataset.like === "1")) return true;
+      if(btn.getAttribute("aria-pressed") === "true") return true;
+      // ✅ feed.js Red Heart na Like Tha da
+      var svg = btn.querySelector("svg");
+      if(svg){
+        var f = (svg.getAttribute("fill") || "") + " " + (svg.style.fill || "") + " " + (btn.style.color || "");
+        if(f.indexOf("FF3040") !== -1 || f.indexOf("255,48,64") !== -1 || f.indexOf("rgb(255") !== -1) return true;
+        var path = svg.querySelector("path");
+        if(path){
+          var pf = (path.getAttribute("fill") || "") + " " + (path.style.fill || "");
+          if(pf.indexOf("FF3040") !== -1) return true;
+        }
+      }
+      return false;
+    }
+    function isLikeButton(btn){
+      if(!btn) return false;
+      if(btn.closest("#commentModal")) return false;
+      if(btn.matches("[data-like-btn], .like-btn, .like-button")) return true;
+      // ✅ Home Feed - First `act` Tha Heart da - Comment / Share Illa da
+      if(btn.classList.contains("act")){
+        var parent = btn.parentElement;
+        if(parent){
+          var acts = parent.querySelectorAll(".act");
+          if(acts.length && acts[0] === btn) return true;
+        }
+        var wrap = btn.closest(".rActions, .actions, .post-actions, .left");
+        if(wrap){
+          var first = wrap.querySelector(".act");
+          if(first === btn) return true;
+        }
+      }
+      // ✅ Reels / Feed la Button ku Ulla Heart SVG Irundha - Like Button Tha da
+      if(btn.matches("button, .rBtn, [onclick*='like'], [onclick*='Like']")) return true;
+      return false;
+    }
     function reelHeart(btn){
       if(!btn || btn.closest("#commentModal")) return;
       var post = btn.closest("article.post, .post, .reel, .reel-item, [data-post-id]");
       var media = post ? post.querySelector(".postMedia, .post-media, .post-media-wrap, .reel-media, video, img.main") : null;
       if(!media) media = document.querySelector("video");
       if(!media) return;
+      var br = btn.getBoundingClientRect();
+      var startX = br.left + br.width / 2;
+      var startY = br.top + br.height / 2;
       var r = media.getBoundingClientRect();
       if(!r.width) return;
+      var centerX = r.left + r.width / 2;
+      var centerY = r.top + r.height / 2;
+      var dx = centerX - startX;
+      var dy = centerY - startY;
       var d = document.createElement("div");
       d.className = "pixoro-reel-center-heart";
-      d.style.left = (r.left + r.width / 2) + "px";
-      d.style.top = (r.top + r.height / 2) + "px";
+      d.style.left = startX + "px";
+      d.style.top = startY + "px";
       d.innerHTML = '<svg viewBox="0 0 24 24" style="filter:drop-shadow(0 8px 18px rgba(255,48,64,.55))"><path fill="#FF3040" stroke="#FFFFFF" stroke-width="1.2" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
       document.body.appendChild(d);
       var anim = d.animate([
-        { transform:"translate(-50%,-50%) scale(0)", opacity:0 },
-        { transform:"translate(-50%,-50%) scale(1.25)", opacity:1, offset:0.18 },
-        { transform:"translate(-50%,-50%) scale(1)", opacity:1, offset:0.32 },
-        { transform:"translate(-50%,-50%) scale(1)", opacity:1, offset:0.55 },
-        { transform:"translate(-50%,-60%) scale(1)", opacity:1, offset:0.70 },
-        { transform:"translate(-50%,-85%) scale(0.95)", opacity:0.5, offset:0.85 },
-        { transform:"translate(-50%,-110%) scale(0.85)", opacity:0 }
-      ], { duration:1200, easing:"cubic-bezier(.2,.8,.3,1)", fill:"forwards" });
+        { transform:"translate(-50%,-50%) scale(0.4)", opacity:0 },
+        { transform:"translate(calc(-50% + " + (dx * 0.15) + "px), calc(-50% + " + (dy * 0.15) + "px)) scale(0.7)", opacity:1, offset:0.15 },
+        { transform:"translate(calc(-50% + " + (dx * 0.35) + "px), calc(-50% + " + (dy * 0.35) + "px)) scale(0.9)", opacity:1, offset:0.35 },
+        { transform:"translate(calc(-50% + " + (dx * 0.55) + "px), calc(-50% + " + (dy * 0.55) + "px)) scale(1)", opacity:1, offset:0.55 },
+        { transform:"translate(calc(-50% + " + (dx * 0.75) + "px), calc(-50% + " + (dy * 0.75) + "px)) scale(1.05)", opacity:1, offset:0.75 },
+        { transform:"translate(calc(-50% + " + dx + "px), calc(-50% + " + dy + "px)) scale(1.1)", opacity:1, offset:0.90 },
+        { transform:"translate(calc(-50% + " + dx + "px), calc(-50% + " + dy + "px)) scale(1)", opacity:0 }
+      ], { duration:1600, easing:"linear", fill:"forwards" });
       anim.onfinish = function(){ d.remove(); };
     }
-    var prev2 = new WeakMap();
-    var obs2 = new MutationObserver(function(muts){
-      muts.forEach(function(m){
-        var btn = m.target;
-        if(!btn.matches || !btn.matches("[data-like-btn], .like-btn, .like-button")) return;
-        if(btn.closest("#commentModal")) return;
-        if(Date.now() - (lastTouch2.get(btn) || 0) > 600) return;
-        var nowLiked = btn.classList.contains("liked");
-        if(prev2.get(btn) === nowLiked) return;
-        prev2.set(btn, nowLiked);
-        if(nowLiked) reelHeart(btn);
-      });
-    });
-    obs2.observe(document.documentElement, { attributes:true, attributeFilter:["class"], subtree:true });
+
+    // ✅ V87 KEY FIX DA - pointerdown la WasLiked ah Save Pannikuren da
+    // ✅ feed.js Click ah Stop Panna Kooda - Naan Already Save Panniten da - Adhaan Heart Varum da
+    var wasLikedMap = new WeakMap();
+    document.addEventListener("pointerdown", function(e){
+      var btn = e.target.closest ? e.target.closest("[data-like-btn], .like-btn, .like-button, .act, button") : null;
+      if(!isLikeButton(btn)) return;
+      wasLikedMap.set(btn, isLikedNow(btn));
+    }, true);
+
+    // ✅ Click la - WasLiked False na - Ippo Like Panna Poran nu Artham da - Heart Kaattidu da
+    // ✅ Capture la Poduren da - feed.js Stop Panna Munnaadi Odidum da
+    document.addEventListener("click", function(e){
+      if(e.target.closest && e.target.closest("#commentModal")) return;
+      var btn = e.target.closest ? e.target.closest("[data-like-btn], .like-btn, .like-button, .act, button") : null;
+      if(!isLikeButton(btn)) return;
+      var wasLiked = wasLikedMap.get(btn);
+      // ✅ pointerdown Miss Aana - Ippo Check Pannu da - Double Tap la Irundhu Vantha Click ah Thallidu da
+      if(wasLiked === undefined){
+        // ✅ Double Tap Heart Already Varum da - Inga Vera Heart Vendaam da
+        if(Date.now() < suppressMediaClickUntil) return;
+        wasLiked = isLikedNow(btn);
+        // ✅ Ippo Already Liked na - Unlike Panna Poran da - Heart Vendaam da
+        if(wasLiked) return;
+      }
+      if(wasLiked) return; // ✅ Unlike Panna Heart Varathu da
+      // ✅ Like Panna Poran da - Heart Kaattidu da
+      reelHeart(btn);
+    }, true);
   })();
 })();
