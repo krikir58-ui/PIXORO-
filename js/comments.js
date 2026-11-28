@@ -1,14 +1,17 @@
 /* =========================================
-   PIXORO COMMENTS V46 CORRECTED DA
-   ✅ Correct ID da - profiles.username Tha da
+   PIXORO COMMENTS V48 AUTOMATIC DA
+   ✅ Edhuvum Maatha Koodaathu da - user_id Vachu Automatic da
+   ✅ Yaru Comment Pannaalum - Avanga user_id Vachu Name + Photo Varum da
    ✅ @ ELLAM REMOVE da - Reply Name Text la Illa da
    ✅ Photo Varum da - Heart Keezha 0 / 1 Count Varum da
    ✅ Pixoro Style Layout da - Username + Text Oru Line la da
+   ✅ ID / Photo Thotta Profile ku Pogum da
    ✅ Send = Document Delegate da
    ========================================= */
 (() => {
   "use strict";
-  if (window.PIXORO_COMMENTS_V46) return;
+  if (window.PIXORO_COMMENTS_V48) return;
+  window.PIXORO_COMMENTS_V48 = true;
   window.PIXORO_COMMENTS_V46 = true;
   window.PIXORO_COMMENTS_V41 = true;
 
@@ -34,33 +37,21 @@
     return n || "user";
   }
   function cleanAvatar(c){ return c?.avatar_url || c?.avatar || c?.profile_pic || c?.photo_url || c?.photo || ""; }
-  // ✅ V46 - Correct ID da - profiles.username Tha da
-  let __myIdentity = null;
-  async function getMyIdentity(){
-    if(__myIdentity) return __myIdentity;
-    const s=getSupa(); const userId=await getUserId();
-    let username="", avatar="";
+  // ✅ V48 - user_id Vachu Oru Aalu oda Name + Photo Edu da - Idhu Tha Secret da
+  async function getUserById(userId){
+    if(!userId) return { username: "user", avatar_url: "" };
+    const s=getSupa(); if(!s) return { username: "user", avatar_url: "" };
     try{
-      if(s && userId){
-        const {data}=await s.from("profiles").select("username,avatar_url,photo_url,pfp").eq("id", userId).maybeSingle();
-        if(data?.username) username=data.username;
-        avatar=data?.avatar_url || data?.photo_url || data?.pfp || "";
-      }
-    }catch(e){}
-    if(!username) username=localStorage.getItem("pixoro_username") || localStorage.getItem("pixoro_user") || window.PIXORO_USERNAME || window.MY_USERNAME || "";
-    if(!avatar) avatar=window.MY_PFP || localStorage.getItem("pixoro_avatar") || localStorage.getItem("pixoro_pfp") || "";
-    if(!username || username.includes(" ")){
-      try{
-        const {data}=await s.auth.getUser(); const u=data?.user;
-        const cand=u?.user_metadata?.username||"";
-        if(cand && !cand.includes(" ")) username=cand;
-        else if(!username) username=u?.email?.split("@")[0]||"user";
-      }catch(e){}
-    }
-    username=cleanName(username);
-    __myIdentity={username, avatar_url:avatar};
-    window.MY_USERNAME=username;
-    return __myIdentity;
+      const {data} = await s.from("profiles").select("id,username,avatar_url,photo_url,pfp").eq("id", userId).maybeSingle();
+      if(!data) return { username: "user", avatar_url: "" };
+      return { username: cleanName(data.username || "user"), avatar_url: data.avatar_url || data.photo_url || data.pfp || "" };
+    }catch(e){ return { username: "user", avatar_url: "" }; }
+  }
+  async function getMyIdentity(){
+    const userId=await getUserId();
+    const u=await getUserById(userId);
+    window.MY_USERNAME=u.username;
+    return u;
   }
   async function getMyName(){ const m=await getMyIdentity(); return m.username; }
   function escapeHtml(str){ return String(str ?? "").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
@@ -88,7 +79,7 @@
     const post=document.querySelector(`article.post[data-post-id="${postId}"], .post[data-post-id="${postId}"]`); if(!post) return "";
     const el=post.querySelector(".post-user, .pUser, .post-username, [data-username], .username"); return cleanName(el?.textContent?.trim()||"");
   }
-  // ✅ V46 - Vera Aalu Comment Pannaalum Avanga Correct ID + Photo Varum da
+  // ✅ V48 - Yaru Comment Pannaalum - Avanga user_id Vachu Name + Photo Varum da
   async function loadComments(postId){
     const s=getSupa(); if(!s) return;
     try{
@@ -109,7 +100,7 @@
       renderComments(); syncCommentLikes();
     }catch(e){ console.error("PIXORO COMMENTS LOAD:", e); }
   }
-  // ✅ V46 - Pixoro Style Render da - Username + Text Oru Line la - Reply Name Text la Illa da
+  // ✅ V48 - Pixoro Style Render da - ID / Photo Thotta Profile ku Pogum da
   function renderComments(){
     const list=getList(); if(!list) return; listEl=list;
     if(!commentsCache.length){ list.innerHTML='<div style="text-align:center;color:#777;padding:30px 10px;font-size:13px">No comments yet.<br>Be the first to comment.</div>'; return; }
@@ -118,10 +109,19 @@
       const liked=(window.FEED_COMMENT_LIKES||new Set()).has(String(c.id)); const count=Number(window.FEED_COMMENT_COUNTS?.[c.id]||0); const isMine=me && String(c.user_id)===String(me);
       const name=cleanName(c.username);
       const av=cleanAvatar(c);
+      const uid=escapeHtml(c.user_id||"");
       const avatarHtml = av ? `<img src="${escapeHtml(av)}" onerror="this.style.display='none'">` : escapeHtml(getAvatarInitial(name));
-      return `<div class="cmtRow" data-comment-id="${escapeHtml(c.id)}" data-user-id="${escapeHtml(c.user_id||"")}"><div class="cmtAvatar">${avatarHtml}</div><div class="cmtContent"><div class="cmtTextLine"><b class="cmtUser">${escapeHtml(name)}</b> <span class="cmtText">${escapeHtml(c.text||"")}</span></div><div class="cmtMeta"><span>${timeAgo(c.created_at)}</span><span class="cmtReplyBtn" data-reply="${escapeHtml(c.id)}">Reply</span>${isMine?`<span class="cmtDeleteBtn" data-delete="${escapeHtml(c.id)}" style="color:#ff5555">Delete</span>`:""}</div></div><button class="cmtLike ${liked?"liked":""}" data-like="${escapeHtml(c.id)}" aria-label="Like comment">${liked?ICON_HEART_FILLED:ICON_HEART}<span class="cmtLikeCount">${count}</span></button></div>`;
+      return `<div class="cmtRow" data-comment-id="${escapeHtml(c.id)}" data-user-id="${uid}"><div class="cmtAvatar cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${avatarHtml}</div><div class="cmtContent"><div class="cmtTextLine"><b class="cmtUser cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${escapeHtml(name)}</b> <span class="cmtText">${escapeHtml(c.text||"")}</span></div><div class="cmtMeta"><span>${timeAgo(c.created_at)}</span><span class="cmtReplyBtn" data-reply="${escapeHtml(c.id)}">Reply</span>${isMine?`<span class="cmtDeleteBtn" data-delete="${escapeHtml(c.id)}" style="color:#ff5555">Delete</span>`:""}</div></div><button class="cmtLike ${liked?"liked":""}" data-like="${escapeHtml(c.id)}" aria-label="Like comment">${liked?ICON_HEART_FILLED:ICON_HEART}<span class="cmtLikeCount">${count}</span></button></div>`;
     }).join("");
     list.scrollTop=list.scrollHeight;
+  }
+  // ✅ V48 - ID Thotta - user_id Vachu Profile ku Pogum da
+  function goToProfile(userId, userName){
+    if(!userId) return;
+    closeCommentModal();
+    const me=window.ME_ID;
+    if(String(userId)===String(me)){ location.href='./profile.html'; }
+    else{ location.href='./profile.html?user_id='+encodeURIComponent(userId)+'&username='+encodeURIComponent(userName||''); }
   }
   function toggleCommentLike(commentId, btn){
     if(!commentId||!btn) return; const liked=btn.classList.contains("liked"); const willLike=!liked; const prevCount=Number(window.FEED_COMMENT_COUNTS?.[commentId]||0); const newCount=willLike?prevCount+1:Math.max(0,prevCount-1);
@@ -146,7 +146,7 @@
     const postId=String(getPostId()||""); if(!postId){ alert("Post ID kedaikala da - Comment Button ah Thirumba Thodu da"); return; }
     openPostId=postId; window.PIXORO_OPEN_POST_ID=postId;
     const s=getSupa(); const userId=await getUserId(); if(!s||!userId){ alert("Please login first"); return; }
-    const me=await getMyIdentity(); const username=me.username;
+    const me=await getUserById(userId); const username=me.username;
     const avatarUrl = me.avatar_url || window.MY_PFP || localStorage.getItem("pixoro_avatar") || localStorage.getItem("pixoro_pfp") || "";
     const parentId=replyTo?.id||null; const tempId="temp-"+Date.now();
     const temp={id:tempId, post_id:postId, user_id:userId, username, avatar_url:avatarUrl, text, parent_id:parentId, created_at:new Date().toISOString()};
@@ -187,8 +187,8 @@
   function subscribeRealtime(postId){
     const s=getSupa(); if(!s) return; unsubscribeRealtime();
     try{
-      commentChannel=s.channel("pixoro-comments-"+postId).on("postgres_changes",{event:"*", schema:"public", table:TABLE, filter:`post_id=eq.${postId}`},(payload)=>{
-        if(payload.eventType==="INSERT"){ const row=payload.new; if(!commentsCache.some((c)=>String(c.id)===String(row.id))){ commentsCache.push(row); renderComments(); } }
+      commentChannel=s.channel("pixoro-comments-"+postId).on("postgres_changes",{event:"*", schema:"public", table:TABLE, filter:`post_id=eq.${postId}`}, async (payload)=>{
+        if(payload.eventType==="INSERT"){ const row=payload.new; const u=await getUserById(row.user_id); row.username=u.username; row.avatar_url=u.avatar_url; if(!commentsCache.some((c)=>String(c.id)===String(row.id))){ commentsCache.push(row); renderComments(); } }
         if(payload.eventType==="DELETE"){ commentsCache=commentsCache.filter((c)=>String(c.id)!==String(payload.old.id)); renderComments(); }
         if(payload.eventType==="UPDATE"){ const idx=commentsCache.findIndex((c)=>String(c.id)===String(payload.new.id)); if(idx>=0){ commentsCache[idx]=payload.new; renderComments(); } }
       }).subscribe();
@@ -221,6 +221,7 @@
     modal.addEventListener("click", (e)=>{ if(e.target===modal) closeCommentModal(); });
     modal.querySelector("#cmtOptionModal")?.addEventListener("click", (e)=>{ if(e.target.id==="cmtOptionModal") closeCommentOptions(); });
     modal.addEventListener("click", (e)=>{
+      const goBtn=e.target.closest("[data-go-profile]"); if(goBtn){ e.stopPropagation(); goToProfile(goBtn.dataset.goProfile, goBtn.dataset.goName); return; }
       const likeBtn=e.target.closest("[data-like]"); if(likeBtn){ e.stopPropagation(); toggleCommentLike(likeBtn.dataset.like, likeBtn); return; }
       const replyBtn=e.target.closest("[data-reply]"); if(replyBtn){ const c=commentsCache.find((x)=>String(x.id)===String(replyBtn.dataset.reply)); if(c) focusReply(c); return; }
       const delBtn=e.target.closest("[data-delete]"); if(delBtn){ deleteComment(delBtn.dataset.delete); return; }
@@ -248,11 +249,12 @@
   window.openCommentModal=openCommentModal; window.closeCommentModal=closeCommentModal; window.closeComment=closeCommentModal;
   window.addComment=addComment; window.pixoroFocusReply=focusReply; window.pixoroSetReplyTo=setReplyTo;
   window.pixoroCloseComments=closeCommentModal; window.pixoroOpenComments=openCommentModal; window.pixoroAddComment=addComment;
+  window.pixoroGoToProfile=goToProfile; window.pixoroGetUserById=getUserById;
   function startComments(){ layout(); bindOpenButtons(); }
   window.addEventListener("pixoro-feed-rendered", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro-supa-ready", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro:login", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro:logout", ()=>{ closeCommentModal(); });
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", startComments, {once:true}); } else { startComments(); }
-  console.log("PIXORO COMMENTS V46 READY 💬");
+  console.log("PIXORO COMMENTS V48 READY 💬");
 })();
