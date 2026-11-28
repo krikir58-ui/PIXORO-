@@ -1,20 +1,19 @@
 /* =====================================================
-   PIXORO LIKE V89
+   PIXORO LIKE V90
    LIKE BUTTON  = LIKE / UNLIKE - SMOOTH DA
    PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
    SUPABASE = SERVER SAVE
-   + COMMENT MODAL GUARD DA
-   + V89 FIX DA - Home Pink Heart Illa da - Reels Heart Tha Home kum da - 52px da
-   + V89 FIX DA - Like Button Thotta - Double Tap Mari Ye - Naduvula POP Heart Varum da
-   + V89 FIX DA - Flying Heart FULL Thookiten da - Button la Irundhu Parakka Vendaam da
-   + V89 FIX DA - pointerdown la Pudikkuren da - feed.js Stop Panna Mudiyaathu da
+   + V90 FIX DA - Like Aana Odane Heart Varum da - toggleLike kulla Ye Heart Pottuten da
+   + V90 FIX DA - pointerdown ah Namba Maatten da - Click Miss Aana Kooda Heart Varum da
+   + V90 FIX DA - Home Pink Heart Illa da - Reels Heart Tha Home kum da - 52px da
+   + V90 FIX DA - Flying Heart Illa da - Naduvula POP Heart Tha da
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V89) return;
-  window.PIXORO_LIKE_V89 = true;
+  if (window.PIXORO_LIKE_V90) return;
+  window.PIXORO_LIKE_V90 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
@@ -25,9 +24,9 @@
   const revisions = new Map();
 
   let suppressMediaClickUntil = 0;
-  let heartId = 0;
   let syncRunning = false;
   let syncAgain = false;
+  let lastPopAt = 0;
 
   function getSupa() {
     return window.getSupa?.() ||
@@ -126,12 +125,16 @@
     });
   }
 
+  /* ✅ V90 - POP Heart - Media Illana Kooda Viewport Center la Varum da - Return Panna Maatten da */
   function showBigHeart(media, x, y) {
-    if (!media) return;
-    const rect = media.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
-    const px = Number.isFinite(x) ? x : rect.left + rect.width / 2;
-    const py = Number.isFinite(y) ? y : rect.top + rect.height / 2;
+    let px = Number.isFinite(x) ? x : null;
+    let py = Number.isFinite(y) ? y : null;
+    if ((px === null || py === null) && media) {
+      const rect = media.getBoundingClientRect();
+      if (rect.width) { px = rect.left + rect.width / 2; py = rect.top + rect.height / 2; }
+    }
+    if (px === null) px = window.innerWidth / 2;
+    if (py === null) py = window.innerHeight / 2;
     const heart = document.createElement("div");
     heart.className = "pixoro-big-heart";
     heart.style.cssText = `position:fixed;z-index:999999;pointer-events:none;left:${px}px;top:${py}px;width:52px;height:52px;transform:translate(-50%,-50%) scale(0);opacity:0;`;
@@ -149,6 +152,22 @@
 
   window.pixoroShowHeartDance = showBigHeart;
   window.showBigHeart = showBigHeart;
+
+  /* ✅ V90 KEY - Post ku POP Heart - Media Kedaikala na - Post Center - Adhuvum Illana - Screen Center da */
+  function popHeartForPost(post) {
+    const now = Date.now();
+    if (now - lastPopAt < 350) return; // ✅ Double Heart Varathu da
+    lastPopAt = now;
+    if (!post) { showBigHeart(null, window.innerWidth / 2, window.innerHeight / 2); return; }
+    const media = post.querySelector(".postMedia, .post-media, .post-media-wrap, .reel-media, video, img.main");
+    if (media) {
+      const r = media.getBoundingClientRect();
+      if (r.width) { showBigHeart(media, r.left + r.width / 2, r.top + r.height / 2); return; }
+    }
+    const pr = post.getBoundingClientRect();
+    if (pr.width) { showBigHeart(null, pr.left + pr.width / 2, pr.top + pr.height / 2); return; }
+    showBigHeart(null, window.innerWidth / 2, window.innerHeight / 2);
+  }
 
   function showUnlikeHeart(button) { return; }
 
@@ -214,6 +233,12 @@
     saveLocal();
     paintLike(post, willLike);
     paintCount(post, newCount);
+
+    /* ✅ V90 KEY FIX DA - Like Aacha - Inga Ye Heart da - pointerdown / click ah Namba Vendaam da */
+    /* ✅ Like Button Thotta - toggleLike Odum da - Adhaan Heart Kandippa Varum da */
+    /* ✅ Unlike na Heart Varathu da - Like na Mattum Tha da */
+    if (willLike) popHeartForPost(post);
+
     queueServerSave(postId, willLike, revision, previousLiked, previousCount, post);
     return willLike;
   }
@@ -224,7 +249,7 @@
 
   function handleDoubleTap(media, postId, post, x, y) {
     suppressMediaClickUntil = Date.now() + 500;
-    showBigHeart(media, x, y);
+    // ✅ V90 - Double Tap la Thani Heart Vendaam da - toggleLike la Ye Heart Varum da - Double Varathu da
     toggleLike(postId, post, true);
   }
 
@@ -323,7 +348,7 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true });
   else start();
 
-  console.log("PIXORO LIKE V89 READY ❤️");
+  console.log("PIXORO LIKE V90 READY ❤️");
 
   (function pixoroKillOldHeart(){
     var obs = new MutationObserver(function(){
@@ -332,56 +357,5 @@
     obs.observe(document.body, { childList:true, subtree:true });
   })();
 
-  /* ===== ✅ V89 - Like Button Thotta - Double Tap Mari Ye - Naduvula POP Heart da ===== */
-  /* ✅ Flying Heart Illa da - dx / dy / calc() / left !important Ellam Illa da */
-  (function pixoroLikeButtonPopHeart(){
-    function isLikedNow(btn){
-      if(!btn) return false;
-      if(btn.classList.contains("liked") || btn.classList.contains("is-liked")) return true;
-      if(btn.dataset && btn.dataset.liked === "true") return true;
-      if(btn.getAttribute("aria-pressed") === "true") return true;
-      var svg = btn.querySelector("svg");
-      if(svg){
-        var f = (svg.getAttribute("fill") || "") + " " + (svg.style.fill || "") + " " + (btn.style.color || "");
-        if(f.indexOf("FF3040") !== -1) return true;
-        var path = svg.querySelector("path");
-        if(path && (path.getAttribute("fill") || "").indexOf("FF3040") !== -1) return true;
-      }
-      return false;
-    }
-    function isLikeButton(btn){
-      if(!btn) return false;
-      if(btn.closest("#commentModal")) return false;
-      if(btn.matches("[data-like-btn], .like-btn, .like-button")) return true;
-      // ✅ Home - First `act` Mattum Tha Heart da - Comment / Share / Save Illa da
-      if(btn.classList.contains("act")){
-        var parent = btn.parentElement;
-        if(parent){
-          var acts = parent.querySelectorAll(".act");
-          if(acts.length && acts[0] === btn) return true;
-        }
-        var wrap = btn.closest(".rActions, .actions, .post-actions, .left");
-        if(wrap && wrap.querySelector(".act") === btn) return true;
-        return false;
-      }
-      return false;
-    }
-    // ✅ V89 KEY - pointerdown la Ye POP da - click ku Kaathula Illa da - feed.js Stop Panna Mudiyaathu da
-    document.addEventListener("pointerdown", function(e){
-      if(e.target.closest && e.target.closest("#commentModal")) return;
-      var btn = e.target.closest ? e.target.closest("[data-like-btn], .like-btn, .like-button, .act") : null;
-      if(!isLikeButton(btn)) return;
-      if(isLikedNow(btn)) return; // ✅ Unlike na Heart Vendaam da
-      var post = btn.closest("article.post, .post, .reel, .reel-item, [data-post-id]");
-      var media = post ? post.querySelector(".postMedia, .post-media, .post-media-wrap, .reel-media, video, img.main") : null;
-      if(!media) media = document.querySelector("video");
-      if(!media) return;
-      // ✅ Double Tap Mari Ye - Naduvula POP da - Flying Illa da - Orey Idathula Nikkathu da
-      var r = media.getBoundingClientRect();
-      if(!r.width) return;
-      var cx = r.left + r.width / 2;
-      var cy = r.top + r.height / 2;
-      showBigHeart(media, cx, cy);
-    }, true);
-  })();
+  /* ✅ V90 - Thani pointerdown Heart Illa da - toggleLike la Ye Heart Irukku da - Double Varathu da */
 })();
