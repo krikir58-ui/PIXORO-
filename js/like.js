@@ -1,19 +1,19 @@
 /* =====================================================
-   PIXORO LIKE V79
+   PIXORO LIKE V80
    LIKE BUTTON  = LIKE / UNLIKE - SMOOTH DA - Comment Mari da
    PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
    SUPABASE = SERVER SAVE
    + COMMENT MODAL GUARD DA - Comment Like ah like.js Thodathu da
    + COMMENT LIKE CHINNA DA - Perusa Heart Parakkaathu da
-   + V79 BEST DA - Like CSS Thani File da - css/like.css la Tha Irukku da - Like.js la CSS Illa da
-   + V79 ADD DA - Like / Unlike Panna Photo NADUVULA Heart POP Aagum da - Double Tap Mari da - 1500ms Mella Poi Maraiyum da - Button Kitta Heart Varaathu da
+   + V80 BEST DA - Like CSS Thani File da - css/like.css la Tha Irukku da - Like.js la CSS Illa da
+   + V80 FIX DA - Like / Unlike Panna Button Kitta Irundhu Heart Mella Mela Poi Maraiyum da - 1500ms da - Photo Naduvula Illa da
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V79) return;
-  window.PIXORO_LIKE_V79 = true;
+  if (window.PIXORO_LIKE_V80) return;
+  window.PIXORO_LIKE_V80 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
@@ -184,7 +184,7 @@
     });
   }
 
-  /* POP HEART */
+  /* POP HEART - DOUBLE TAP MATTUM DA - PHOTO NADUVULA DA */
 
   function showBigHeart(media, x, y) {
     if (!media) return;
@@ -275,7 +275,7 @@
   window.pixoroShowHeartDance = showBigHeart;
   window.showBigHeart = showBigHeart;
 
-  /* ✅ V79 - Pazhaya Unlike Heart Function ah Kolli da - Ippo Adhu Theva Illa da - Naduvula POP Tha Venum da */
+  /* ✅ V80 - Pazhaya Unlike Heart Function ah Kolli da - Ippo Adhu Theva Illa da - Float Heart Tha Venum da */
   function showUnlikeHeart(button) {
     return;
   }
@@ -288,7 +288,7 @@
 
     icon.getAnimations().forEach(a => a.cancel());
 
-    /* ✅ V79 CORRECT - 1.06x / 150ms da - Perusa Thudikkaathu da */
+    /* ✅ V80 CORRECT - 1.06x / 150ms da - Perusa Thudikkaathu da */
     icon.animate([
       { transform: "scale(1)" },
       { transform: "scale(1.06)", offset: .4 },
@@ -515,9 +515,6 @@
 
       if (!post || !postId) return;
 
-      /* ✅ V73 CORRECTED DA - Like Button Click la Mela Heart Parakka Koodathu da - showUnlikeHeart Call ah Thookiten da */
-      /* showUnlikeHeart(button); */
-
       buttonAnimation(post);
       toggleLike(postId, post, false);
       return;
@@ -649,8 +646,7 @@
   window.pixoroSyncLikes = syncVisiblePosts;
   window.pixoroPaintAllLikes = paintAll;
 
-  /* ✅ V79 - LIKE CSS THOOKITEN DA - CSS Inime css/like.css la Tha Irukku da - Like.js la CSS Illa da */
-  /* ✅ addStyles() Function ah Full Ah Thookiten da - start() la addStyles() Call ah Thookiten da */
+  /* ✅ V80 - LIKE CSS THOOKITEN DA - CSS Inime css/like.css la Tha Irukku da - Like.js la CSS Illa da */
 
   /* EVENTS */
 
@@ -694,10 +690,9 @@
     start();
   }
 
-  console.log("PIXORO LIKE V79 READY ❤️");
+  console.log("PIXORO LIKE V80 READY ❤️");
 
-  /* ===== ✅ V79 CORRECT ADD DA - Like / Unlike Panna Photo NADUVULA Heart POP + Mella Maraiyum da - Button Kitta Heart Varaathu da ===== */
-  /* ✅ V79 - Center Pop addStyle() Thookiten da - CSS Inime css/like.css la Tha Irukku da */
+  /* ===== ✅ V80 FIX DA - Like / Unlike Panna Button Kitta Irundhu Heart Mella Mela Poi Maraiyum da - Photo Naduvula Illa da ===== */
   (function pixoroCenterPopADD(){
     var lastTouch = new WeakMap();
     document.addEventListener("pointerdown", function(e){
@@ -705,26 +700,26 @@
       if(!btn || btn.closest("#commentModal")) return;
       lastTouch.set(btn, Date.now());
     }, true);
-    function centerPop(btn){
+    function centerPop(btn, isLiked){
       if(!btn || btn.closest("#commentModal")) return;
-      var post = btn.closest("article.post, .post");
-      var media = post ? post.querySelector(".postMedia, .post-media, .post-media-wrap, img.main, video.main") : null;
-      if(!media) return;
-      var r = media.getBoundingClientRect();
+      // ✅ V80 FIX - Photo Naduvula Illa da - Button Kitta Irundhu Tha Start Aagum da
+      var r = btn.getBoundingClientRect();
       if(!r.width) return;
       var d = document.createElement("div");
-      d.className = "pixoro-center-pop";
-      d.style.left = (r.left + r.width / 2) + "px";
-      d.style.top = (r.top + r.height / 2) + "px";
+      d.className = "pixoro-center-pop" + (isLiked ? "" : " is-unlike");
+      // ✅ Button ku Mela Konjam - Left Side la Start Aagum da - Video la Varra Mari da
+      d.style.left = (r.left + 22) + "px";
+      d.style.top = (r.top - 6) + "px";
       d.innerHTML = '<svg viewBox="0 0 24 24" style="filter:drop-shadow(0 8px 18px rgba(255,45,149,.6))"><path fill="#FF2D95" stroke="#FFFFFF" stroke-width="0.6" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
       document.body.appendChild(d);
+      // ✅ V80 - Mella Mela Poi Maraiyum da - 1500ms da - Vegama Maraiyaathu da
       var anim = d.animate([
-        { transform:"translate(-50%,-50%) scale(0)", opacity:0 },
-        { transform:"translate(-50%,-50%) scale(1.4)", opacity:1, offset:0.15 },
-        { transform:"translate(-50%,-50%) scale(1)", opacity:1, offset:0.30 },
-        { transform:"translate(-50%,-55%) scale(1.05)", opacity:1, offset:0.55 },
-        { transform:"translate(-50%,-80%) scale(1)", opacity:0.8, offset:0.75 },
-        { transform:"translate(-50%,-130%) scale(0.8)", opacity:0 }
+        { transform:"translate(-50%,-50%) scale(0.6)", opacity:0 },
+        { transform:"translate(-50%,-50%) scale(1.1)", opacity:1, offset:0.15 },
+        { transform:"translate(-50%,-50%) scale(1)", opacity:1, offset:0.25 },
+        { transform:"translate(-50%,-90%) scale(1)", opacity:1, offset:0.55 },
+        { transform:"translate(-45%,-160%) scale(0.95)", opacity:0.6, offset:0.80 },
+        { transform:"translate(-40%,-230%) scale(0.8)", opacity:0 }
       ], { duration:1500, easing:"ease-out", fill:"forwards" });
       anim.onfinish = function(){ d.remove(); };
     }
@@ -738,7 +733,8 @@
         var nowLiked = btn.classList.contains("liked");
         if(prevLiked.get(btn) === nowLiked) return;
         prevLiked.set(btn, nowLiked);
-        centerPop(btn);
+        // ✅ Like / Unlike Rendum - Heart Mela Pogum da
+        centerPop(btn, nowLiked);
         var svg = btn.querySelector("svg");
         if(svg){
           svg.getAnimations().forEach(function(a){ a.cancel(); });
@@ -753,7 +749,7 @@
     obs.observe(document.documentElement, { attributes:true, attributeFilter:["class"], subtree:true });
   })();
 
-  /* ===== ✅ V79 KILL SWITCH DA - Pazhaya Slow Heart Vantha Udane Delete Pannidum da ===== */
+  /* ===== ✅ V80 KILL SWITCH DA - Pazhaya Slow Heart Vantha Udane Delete Pannidum da ===== */
   (function pixoroKillOldHeart(){
     var obs = new MutationObserver(function(){
       document.querySelectorAll(".pixoro-slow-float, .pixoro-soft-float").forEach(function(el){ el.remove(); });
