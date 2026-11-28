@@ -1,19 +1,20 @@
 /* =========================================
-   PIXORO COMMENTS V61 FINAL CORRECT DA
+   PIXORO COMMENTS V62 FINAL CORRECT DA
    ✅ ID + Time Mela, Msg Naduvula, Reply Keezha, Heart Valathu da
    ✅ THREAD REPLY DA - Reply Romba Chinna da - View Romba Chinna da
    ✅ Full Black da - Delete Full Black da
-   ✅ SAFETY DA - Makkal Pudichu Vacha Tha Option Varum da - 0.2 Sec Hold da
-   ✅ Confirm + Undo 5 Sec da - Bad Words + Spam Block da
+   ✅ SAFETY DA - 0.2 Sec Hold da - Confirm + Undo 5 Sec da - Bad Words + Spam Block da
    ✅ Hide / Report / Block da
    ✅ MINI VIDEO COMMENT DA - 10 Sec Mattum da - 160 x 220 da - Photo Mini da
-   ✅ BUCKET FIX DA - Bucket Illana Theliva Sollum da - Comment Pogaathu da
+   ✅ BUCKET FIX DA
+   ✅ OUTLINE SVG DA - Emoji Illa da - Gallery / Play / Sound Ellam Outline SVG da
+   ✅ IMAGE / VIDEO THOTTA - Full Viewer + Pixoro Sticker Varum da
    ========================================= */
 (() => {
   "use strict";
-  if (window.PIXORO_COMMENTS_V61) return;
+  if (window.PIXORO_COMMENTS_V62) return;
+  window.PIXORO_COMMENTS_V62 = true;
   window.PIXORO_COMMENTS_V61 = true;
-  window.PIXORO_COMMENTS_V60 = true;
 
   const TABLE = "comments";
   const TABLE_LIKES = "comment_likes";
@@ -37,6 +38,12 @@
   const ICON_HEART = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   const ICON_HEART_FILLED = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   const ICON_SEND = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+  // ✅ V62 - OUTLINE SVG DA - Emoji Illa da
+  const ICON_GALLERY = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>';
+  const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4V8z" fill="#fff" stroke="none"/></svg>';
+  const ICON_SOUND_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+  const ICON_SOUND_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
+  const ICON_SMILE = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>';
 
   function getSupa(){ if(supa) return supa; supa = window.getSupa?.() || window.supa || window.supabaseClient || null; return supa; }
   async function getUserId(){ const s=getSupa(); if(!s) return window.ME_ID||null; try{ const {data}=await s.auth.getSession(); const id=data?.session?.user?.id||null; if(id) window.ME_ID=id; return id; }catch(e){ return window.ME_ID||null; } }
@@ -161,8 +168,6 @@
       img.onerror=()=>res(file); img.src=URL.createObjectURL(file);
     });
   }
-
-  // ✅ V61 - BUCKET FIX DA - Idhu Tha Mukkiyam da
   async function uploadMedia(userId){
     if(!selectedMediaFile) return null;
     const s=getSupa(); if(!s) throw new Error("Supabase connect aagala da");
@@ -182,7 +187,6 @@
     if(!data?.publicUrl) throw new Error("Public URL kedaikala da - Bucket ah Public la Vei da");
     return {url: data.publicUrl, type: selectedMediaType, duration: Math.round(selectedMediaDuration)};
   }
-
   async function handleMediaSelect(file){
     if(!file) return;
     const isVideo = file.type.startsWith("video/");
@@ -206,6 +210,36 @@
     updateSendState();
   }
 
+  // ✅ V62 - VIEWER + STICKER DA
+  function openMediaViewer(url, type, caption){
+    let viewer = document.getElementById("cmtMediaViewer");
+    if(!viewer){
+      viewer = document.createElement("div");
+      viewer.id = "cmtMediaViewer";
+      viewer.innerHTML = `
+        <button id="cmtMediaClose" type="button">×</button>
+        <div id="cmtMediaSticker"><i></i> Pixoro • @pixoro</div>
+        <div id="cmtMediaHolder" style="position:relative"></div>
+        <div id="cmtMediaCaption"></div>`;
+      document.body.appendChild(viewer);
+      viewer.querySelector("#cmtMediaClose").onclick = closeMediaViewer;
+      viewer.addEventListener("click", (e)=>{ if(e.target===viewer) closeMediaViewer(); });
+    }
+    const holder = viewer.querySelector("#cmtMediaHolder");
+    holder.innerHTML = type==="video"
+      ? `<video src="${escapeHtml(url)}" controls autoplay playsinline style="max-width:92vw;max-height:78vh;border-radius:16px"></video>`
+      : `<img src="${escapeHtml(url)}" style="max-width:92vw;max-height:78vh;border-radius:16px">`;
+    viewer.querySelector("#cmtMediaCaption").textContent = caption||"";
+    viewer.classList.add("open"); viewer.style.display="flex";
+    document.body.style.overflow="hidden";
+  }
+  function closeMediaViewer(){
+    const viewer = document.getElementById("cmtMediaViewer"); if(!viewer) return;
+    viewer.classList.remove("open"); viewer.style.display="none";
+    viewer.querySelector("#cmtMediaHolder").innerHTML="";
+    document.body.style.overflow="";
+  }
+
   async function loadComments(postId){
     const s=getSupa(); if(!s) return;
     try{
@@ -227,9 +261,14 @@
       if(!c.media_url) return "";
       if(c.media_type==="video" || c.media_url.match(/\.(mp4|webm|mov)(\?|$)/i)){
         const d = c.media_duration ? `0:${String(Math.round(c.media_duration)).padStart(2,"0")}` : "0:10";
-        return `<div class="cmtVideoWrap" data-video-wrap><video class="cmtVideo" src="${escapeHtml(c.media_url)}" muted playsinline loop preload="none" data-cmt-video></video><div class="cmtVideoPlay" data-play-icon>▶️</div><div class="cmtVideoTime">${d}</div><div class="cmtVideoMute" data-mute-btn>🔇</div></div>`;
+        return `<div class="cmtVideoWrap" data-video-wrap data-media-url="${escapeHtml(c.media_url)}" data-media-type="video" data-media-text="${escapeHtml(c.text||"")}">
+          <video class="cmtVideo" src="${escapeHtml(c.media_url)}" muted playsinline loop preload="none" data-cmt-video></video>
+          <div class="cmtVideoPlay" data-play-icon>${ICON_PLAY}</div>
+          <div class="cmtVideoTime">${d}</div>
+          <div class="cmtVideoMute" data-mute-btn>${ICON_SOUND_OFF}</div>
+        </div>`;
       }
-      return `<img class="cmtPhoto" src="${escapeHtml(c.media_url)}" loading="lazy" onerror="this.style.display='none'">`;
+      return `<img class="cmtPhoto" src="${escapeHtml(c.media_url)}" loading="lazy" data-photo-view data-media-url="${escapeHtml(c.media_url)}" data-media-text="${escapeHtml(c.text||"")}" onerror="this.style.display='none'">`;
     }
     function oneRow(c, isReply){
       const prof=getProfile(c.user_id);
@@ -276,10 +315,14 @@
         e.stopPropagation();
         const v = wrap.querySelector("[data-cmt-video]"); if(!v) return;
         const muteBtn = wrap.querySelector("[data-mute-btn]");
-        if(e.target.closest("[data-mute-btn]")){ v.muted=!v.muted; muteBtn.textContent=v.muted?"🔇":"🔊"; return; }
+        if(e.target.closest("[data-mute-btn]")){ v.muted=!v.muted; muteBtn.innerHTML = v.muted ? ICON_SOUND_OFF : ICON_SOUND_ON; return; }
         if(v.paused){ document.querySelectorAll("[data-cmt-video]").forEach(o=>{ if(o!==v){ o.pause(); o.closest("[data-video-wrap]")?.querySelector("[data-play-icon]")?.classList.remove("hidden"); } }); v.play(); wrap.querySelector("[data-play-icon]")?.classList.add("hidden"); }
         else { v.pause(); wrap.querySelector("[data-play-icon]")?.classList.remove("hidden"); }
       });
+      wrap.addEventListener("dblclick", (e)=>{ e.stopPropagation(); openMediaViewer(wrap.dataset.mediaUrl, "video", wrap.dataset.mediaText); });
+    });
+    list.querySelectorAll("[data-photo-view]").forEach(img=>{
+      img.addEventListener("click", (e)=>{ e.stopPropagation(); openMediaViewer(img.dataset.mediaUrl, "photo", img.dataset.mediaText); });
     });
   }
 
@@ -308,7 +351,6 @@
     try{ const ids=commentsCache.map((c)=>String(c.id)); let all=[]; let from=0; while(true){ const {data, error}=await s.from(TABLE_LIKES).select("comment_id,user_id").in("comment_id", ids).range(from, from+999); if(error) throw error; const rows=data||[]; all=all.concat(rows); if(rows.length<1000) break; from+=1000; } const counts={}; const liked=new Set(); ids.forEach((id)=>counts[id]=0); all.forEach((r)=>{ const id=String(r.comment_id); counts[id]=(counts[id]||0)+1; if(String(r.user_id)===String(userId)) liked.add(id); }); window.FEED_COMMENT_COUNTS=counts; window.FEED_COMMENT_LIKES=liked; renderComments(); }catch(e){}
   }
 
-  // ✅ V61 - addComment la Bucket Error vandha - Text Comment Mattum Save Aagum da - Video Pogaathu nu Alert Varum da
   async function addComment(){
     if(isSending) return;
     const inp=getInput(); inputEl=inp; const text=inp?.value?.trim()||"";
@@ -345,7 +387,6 @@
         selectedMediaFile=mediaToUpload.file; selectedMediaType=mediaToUpload.type; selectedMediaDuration=mediaToUpload.duration;
         try{ media = await uploadMedia(userId); }
         catch(uploadErr){
-          // ✅ Bucket Illana - Temp Comment ah Remove Panni - Theliva Sollu da
           commentsCache=commentsCache.filter(c=>String(c.id)!==tempId);
           renderComments(); syncFeedCommentCount(postId);
           alert(uploadErr.message||"Upload failed da");
@@ -441,7 +482,7 @@
     list.dataset.holdBound = "1";
     let startX = 0, startY = 0, moved = false;
     list.addEventListener("pointerdown", (e)=>{
-      if(e.target.closest("[data-like]") || e.target.closest("[data-reply]") || e.target.closest("[data-view-replies]") || e.target.closest("[data-go-profile]") || e.target.closest("[data-video-wrap]")) return;
+      if(e.target.closest("[data-like]") || e.target.closest("[data-reply]") || e.target.closest("[data-view-replies]") || e.target.closest("[data-go-profile]") || e.target.closest("[data-video-wrap]") || e.target.closest("[data-photo-view]")) return;
       const row = e.target.closest(".cmtRow"); if(!row) return;
       holdFired = false; moved = false;
       startX = e.clientX; startY = e.clientY;
@@ -498,9 +539,9 @@
           <div id="replyTag" class="replyTag" style="display:none"><span id="replyTagName"></span><button id="replyTagCancel" style="background:none;border:none;color:#fff;cursor:pointer">×</button></div>
           <div id="cmtVideoPreview"></div>
           <div class="cmtBox">
-            <div class="cmtAvatar" style="width:32px;height:32px;flex-shrink:0">😊</div>
+            <div class="cmtAvatar" style="width:32px;height:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center">${ICON_SMILE}</div>
             <input id="commentInput" type="text" placeholder="Add a comment..." autocomplete="off" />
-            <label class="cmtVideoBtn" for="cmtMediaInput">🎬</label>
+            <label class="cmtVideoBtn" for="cmtMediaInput">${ICON_GALLERY}</label>
             <input id="cmtMediaInput" type="file" accept="image/*,video/*" style="display:none" />
             <button class="sendBtn pixoro-c-send-arrow" id="cmtSendBtn" type="button" style="display:none">${ICON_SEND}</button>
           </div>
@@ -543,11 +584,12 @@
   window.addComment=addComment; window.pixoroFocusReply=focusReply; window.pixoroSetReplyTo=setReplyTo;
   window.pixoroCloseComments=closeCommentModal; window.pixoroOpenComments=openCommentModal; window.pixoroAddComment=addComment;
   window.pixoroGoToProfile=goToProfile; window.pixoroGetUserById=getUserById;
+  window.pixoroOpenMediaViewer=openMediaViewer; window.pixoroCloseMediaViewer=closeMediaViewer;
   function startComments(){ layout(); bindOpenButtons(); }
   window.addEventListener("pixoro-feed-rendered", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro-supa-ready", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro:login", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro:logout", ()=>{ closeCommentModal(); });
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", startComments, {once:true}); } else { startComments(); }
-  console.log("PIXORO COMMENTS V61 READY 💬");
+  console.log("PIXORO COMMENTS V62 READY 💬");
 })();
