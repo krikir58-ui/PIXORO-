@@ -1,20 +1,22 @@
 /* =========================================
-   PIXORO COMMENTS V58 FINAL CORRECT DA
+   PIXORO COMMENTS V60 FINAL CORRECT DA
    ✅ ID + Time Mela, Msg Naduvula, Reply Keezha, Heart Valathu da
    ✅ THREAD REPLY DA - Reply Romba Chinna da - View Romba Chinna da
    ✅ Full Black da - Delete Full Black da
-   ✅ SAFETY DA - Makkal Pudichu Vacha Tha Option Varum da - 2 Sec Hold da
+   ✅ SAFETY DA - Makkal Pudichu Vacha Tha Option Varum da - 0.2 Sec Hold da
    ✅ Confirm + Undo 5 Sec da - Bad Words + Spam Block da
    ✅ Hide / Report / Block da
+   ✅ MINI VIDEO COMMENT DA - 10 Sec Mattum da - 160 x 220 da - Photo Mini da - Server Safe da
    ========================================= */
 (() => {
   "use strict";
-  if (window.PIXORO_COMMENTS_V58) return;
-  window.PIXORO_COMMENTS_V58 = true;
-  window.PIXORO_COMMENTS_V57 = true;
+  if (window.PIXORO_COMMENTS_V60) return;
+  window.PIXORO_COMMENTS_V60 = true;
+  window.PIXORO_COMMENTS_V59 = true;
 
   const TABLE = "comments";
   const TABLE_LIKES = "comment_likes";
+  const BUCKET = "comment-media";
   let supa = null, commentChannel = null, likeChannel = null;
   let inputEl = null, sendBtnEl = null, listEl = null;
   let openPostId = null, replyTo = null, commentsCache = [];
@@ -24,10 +26,12 @@
   let holdTimer = null, holdFired = false, undoTimer = null;
   let hiddenIds = new Set(JSON.parse(localStorage.getItem("pixoro_hidden_cmt")||"[]"));
   let blockedIds = new Set(JSON.parse(localStorage.getItem("pixoro_blocked")||"[]"));
+  let selectedMediaFile = null, selectedMediaType = null, selectedMediaURL = null, selectedMediaDuration = 0;
 
-  // ✅ V58 - SAFETY LIST DA - Idha Ne Venumna Maathu da
   const BAD_WORDS = ["poriki","loosu","kena","number kudu","photo anuppu","call pannu"];
-  const HOLD_MS = 2000; // 2 Sec da - 1000 na 1 Sec da
+  const HOLD_MS = 200; // ✅ 0.2 Sec da - Alluthu Pudicha Udane Option Varum da
+  const MAX_VIDEO_SEC = 10;
+  const MAX_VIDEO_MB = 5;
 
   const ICON_HEART = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   const ICON_HEART_FILLED = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#FF2D95" stroke="#FF2D95" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
@@ -114,7 +118,7 @@
 
   function updateSendState(){
     const inp=getInput(); const btn=getSendBtn(); if(!inp||!btn) return; inputEl=inp; sendBtnEl=btn;
-    const has=inp.value.trim().length>0; btn.classList.toggle("show",has); btn.style.display=has?"flex":"none"; btn.style.pointerEvents=has?"auto":"none";
+    const has=inp.value.trim().length>0 || !!selectedMediaFile; btn.classList.toggle("show",has); btn.style.display=has?"flex":"none"; btn.style.pointerEvents=has?"auto":"none";
     const box=document.querySelector("#commentModal .cmtBox"); if(box) box.classList.toggle("has-text",has);
     const area=document.querySelector("#commentModal .cmtInputArea"); if(area) area.classList.toggle("has-text",has);
   }
@@ -129,10 +133,72 @@
     const el=post.querySelector(".post-user, .pUser, .post-username, [data-username], .username"); return cleanName(el?.textContent?.trim()||"")||"";
   }
 
+  function clearMedia(){
+    selectedMediaFile=null; selectedMediaType=null; selectedMediaDuration=0;
+    if(selectedMediaURL) URL.revokeObjectURL(selectedMediaURL); selectedMediaURL=null;
+    const prev=document.getElementById("cmtVideoPreview"); if(prev){ prev.style.display="none"; prev.classList.remove("show"); prev.innerHTML=""; }
+    const inp=document.getElementById("cmtMediaInput"); if(inp) inp.value="";
+    updateSendState();
+  }
+  function getVideoDuration(file){
+    return new Promise((res)=>{
+      const v=document.createElement("video"); v.preload="metadata"; v.muted=true; v.playsInline=true;
+      v.onloadedmetadata=()=>{ URL.revokeObjectURL(v.src); res(v.duration||0); };
+      v.onerror=()=>res(0); v.src=URL.createObjectURL(file);
+    });
+  }
+  async function compressPhoto(file){
+    return new Promise((res)=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement("canvas"); canvas.width=480; canvas.height=640;
+        const ctx=canvas.getContext("2d"); ctx.fillStyle="#000"; ctx.fillRect(0,0,480,640);
+        const r=Math.max(480/img.width, 640/img.height); const w=img.width*r, h=img.height*r;
+        ctx.drawImage(img, (480-w)/2, (640-h)/2, w, h);
+        canvas.toBlob(b=>res(b||file), "image/jpeg", 0.7);
+      };
+      img.onerror=()=>res(file); img.src=URL.createObjectURL(file);
+    });
+  }
+  async function uploadMedia(userId){
+    if(!selectedMediaFile) return null;
+    const s=getSupa(); if(!s) return null;
+    let fileToUpload = selectedMediaFile;
+    let ext = selectedMediaType==="video" ? "mp4" : "jpg";
+    if(selectedMediaType==="photo") fileToUpload = await compressPhoto(selectedMediaFile);
+    const name = `${userId}/${Date.now()}.${ext}`;
+    const {error} = await s.storage.from(BUCKET).upload(name, fileToUpload, {contentType: selectedMediaType==="video"?"video/mp4":"image/jpeg", upsert:true});
+    if(error) throw error;
+    const {data} = s.storage.from(BUCKET).getPublicUrl(name);
+    return {url: data.publicUrl, type: selectedMediaType, duration: Math.round(selectedMediaDuration)};
+  }
+  async function handleMediaSelect(file){
+    if(!file) return;
+    const isVideo = file.type.startsWith("video/");
+    const isPhoto = file.type.startsWith("image/");
+    if(!isVideo && !isPhoto){ alert("Photo / Video mattum podu da"); return; }
+    if(isVideo && file.size > MAX_VIDEO_MB*1024*1024){ alert("Video romba perusu da - 5MB ku ulla podu da"); return; }
+    if(isPhoto && file.size > 8*1024*1024){ alert("Photo romba perusu da - 8MB ku ulla podu da"); return; }
+    let dur = 0;
+    if(isVideo){
+      dur = await getVideoDuration(file);
+      if(dur > MAX_VIDEO_SEC){ alert("Video 10 sec ku mela irukku da - 10 sec ku ulla video podu da"); return; }
+      if(dur === 0){ alert("Video open aagala da - Vera video podu da"); return; }
+    }
+    selectedMediaFile=file; selectedMediaType=isVideo?"video":"photo"; selectedMediaDuration=dur;
+    if(selectedMediaURL) URL.revokeObjectURL(selectedMediaURL); selectedMediaURL=URL.createObjectURL(file);
+    const prev=document.getElementById("cmtVideoPreview"); if(!prev) return;
+    prev.style.display="flex"; prev.classList.add("show");
+    if(isVideo) prev.innerHTML=`<video src="${selectedMediaURL}" muted playsinline></video><span id="cmtVideoTimeLabel">0:${String(Math.round(dur)).padStart(2,"0")}</span><button id="cmtVideoCancel" type="button">×</button>`;
+    else prev.innerHTML=`<img src="${selectedMediaURL}"><button id="cmtVideoCancel" type="button">×</button>`;
+    document.getElementById("cmtVideoCancel").onclick=clearMedia;
+    updateSendState();
+  }
+
   async function loadComments(postId){
     const s=getSupa(); if(!s) return;
     try{
-      const {data, error}=await s.from(TABLE).select("id,post_id,user_id,parent_id,text,created_at").eq("post_id", postId).order("created_at", {ascending:true});
+      const {data, error}=await s.from(TABLE).select("id,post_id,user_id,parent_id,text,media_url,media_type,media_duration,created_at").eq("post_id", postId).order("created_at", {ascending:true});
       if(error) throw error;
       commentsCache=data||[];
       await fetchProfiles(commentsCache.map(c=>c.user_id));
@@ -144,10 +210,16 @@
     const list=getList(); if(!list) return; listEl=list;
     const visible = commentsCache.filter(c=>!hiddenIds.has(String(c.id)) && !blockedIds.has(String(c.user_id)));
     if(!visible.length){ list.innerHTML='<div style="text-align:center;color:#777;padding:30px 10px;font-size:13px">No comments yet.<br>Be the first to comment.</div>'; return; }
-    const me=window.ME_ID;
     const parents = visible.filter(c=>!c.parent_id);
     const childs = visible.filter(c=>c.parent_id);
-
+    function mediaHtml(c){
+      if(!c.media_url) return "";
+      if(c.media_type==="video" || c.media_url.match(/\.(mp4|webm|mov)(\?|$)/i)){
+        const d = c.media_duration ? `0:${String(Math.round(c.media_duration)).padStart(2,"0")}` : "0:10";
+        return `<div class="cmtVideoWrap" data-video-wrap><video class="cmtVideo" src="${escapeHtml(c.media_url)}" muted playsinline loop preload="none" data-cmt-video></video><div class="cmtVideoPlay" data-play-icon>▶️</div><div class="cmtVideoTime">${d}</div><div class="cmtVideoMute" data-mute-btn>🔇</div></div>`;
+      }
+      return `<img class="cmtPhoto" src="${escapeHtml(c.media_url)}" loading="lazy" onerror="this.style.display='none'">`;
+    }
     function oneRow(c, isReply){
       const prof=getProfile(c.user_id);
       const name=cleanName(prof.username)||"user";
@@ -156,21 +228,19 @@
       const count=Number(window.FEED_COMMENT_COUNTS?.[c.id]||0);
       const uid=escapeHtml(c.user_id||"");
       const avatarHtml = av ? `<img src="${escapeHtml(av)}" onerror="this.style.display='none'">` : escapeHtml(getAvatarInitial(name));
-      // ✅ V58 - Inline Delete Illa da - Reply Mattum Tha da - Delete Hold Panna Tha Varum da
       return `<div class="cmtRow ${isReply?"cmtReplyRow":""}" data-comment-id="${escapeHtml(c.id)}" data-user-id="${uid}">
         <div class="cmtAvatar cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${avatarHtml}</div>
         <div class="cmtContent">
           <div class="cmtTop"><b class="cmtUser cmtGoProfile" data-go-profile="${uid}" data-go-name="${escapeHtml(name)}">${escapeHtml(name)}</b><span class="cmtTime">${timeAgo(c.created_at)}</span></div>
-          <div class="cmtText">${escapeHtml(c.text||"")}</div>
+          ${c.text?`<div class="cmtText">${escapeHtml(c.text||"")}</div>`:""}
+          ${mediaHtml(c)}
           <div class="cmtMeta"><span class="cmtReplyBtn" data-reply="${escapeHtml(c.id)}">Reply</span></div>
         </div>
         <button class="cmtLike ${liked?"liked":""}" data-like="${escapeHtml(c.id)}">${liked?ICON_HEART_FILLED:ICON_HEART}<span class="cmtLikeCount">${count>0?count:""}</span></button>
       </div>`;
     }
-
     const orphan = childs.filter(ch=>!parents.some(p=>String(p.id)===String(ch.parent_id)));
     const allParents = [...parents, ...orphan];
-
     list.innerHTML = allParents.map(p=>{
       const reps = childs.filter(ch=>String(ch.parent_id)===String(p.id));
       let html = oneRow(p, false);
@@ -179,7 +249,6 @@
       }
       return `<div class="cmtThread">${html}</div>`;
     }).join("");
-
     list.querySelectorAll("[data-view-replies]").forEach(btn=>{
       btn.addEventListener("click", (e)=>{
         e.stopPropagation();
@@ -189,6 +258,16 @@
         const isOpen = box.style.display!=="none";
         box.style.display = isOpen?"none":"block";
         btn.textContent = isOpen ? `— View ${n} more repl${n>1?"ies":"y"}` : `— Hide ${n} repl${n>1?"ies":"y"}`;
+      });
+    });
+    list.querySelectorAll("[data-video-wrap]").forEach(wrap=>{
+      wrap.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        const v = wrap.querySelector("[data-cmt-video]"); if(!v) return;
+        const muteBtn = wrap.querySelector("[data-mute-btn]");
+        if(e.target.closest("[data-mute-btn]")){ v.muted=!v.muted; muteBtn.textContent=v.muted?"🔇":"🔊"; return; }
+        if(v.paused){ document.querySelectorAll("[data-cmt-video]").forEach(o=>{ if(o!==v){ o.pause(); o.closest("[data-video-wrap]")?.querySelector("[data-play-icon]")?.classList.remove("hidden"); } }); v.play(); wrap.querySelector("[data-play-icon]")?.classList.add("hidden"); }
+        else { v.pause(); wrap.querySelector("[data-play-icon]")?.classList.remove("hidden"); }
       });
     });
   }
@@ -218,10 +297,10 @@
     try{ const ids=commentsCache.map((c)=>String(c.id)); let all=[]; let from=0; while(true){ const {data, error}=await s.from(TABLE_LIKES).select("comment_id,user_id").in("comment_id", ids).range(from, from+999); if(error) throw error; const rows=data||[]; all=all.concat(rows); if(rows.length<1000) break; from+=1000; } const counts={}; const liked=new Set(); ids.forEach((id)=>counts[id]=0); all.forEach((r)=>{ const id=String(r.comment_id); counts[id]=(counts[id]||0)+1; if(String(r.user_id)===String(userId)) liked.add(id); }); window.FEED_COMMENT_COUNTS=counts; window.FEED_COMMENT_LIKES=liked; renderComments(); }catch(e){}
   }
 
-  // ✅ V58 - SAFETY ADD COMMENT DA
   async function addComment(){
     if(isSending) return;
-    const inp=getInput(); inputEl=inp; const text=inp?.value?.trim()||""; if(!text) return;
+    const inp=getInput(); inputEl=inp; const text=inp?.value?.trim()||"";
+    if(!text && !selectedMediaFile) return;
     if(text.length > 500){ alert("Comment romba perusu da - 500 letter ku ulla podu da"); return; }
     if(Date.now() - (window.__pixoroLastCmtTime||0) < 5000){ alert("Konjam wait pannu da - 5 sec ku 1 comment tha da"); return; }
     const low = text.toLowerCase();
@@ -237,19 +316,24 @@
     if(replyTo){
       const rawId = replyTo.id;
       parentId = isNaN(Number(rawId)) ? rawId : Number(rawId);
-      if(!text.startsWith("@")){
+      if(text && !text.startsWith("@")){
         const rName = cleanName(getProfile(replyTo.user_id).username)||"user";
         saveText = "@"+rName+" "+text;
       }
     }
     const tempId="temp-"+Date.now();
-    const temp={id:tempId, post_id:postId, user_id:userId, parent_id:parentId, text:saveText, created_at:new Date().toISOString()};
-    commentsCache.push(temp); renderComments(); syncFeedCommentCount(postId); if(inp) inp.value=""; setReplyTo(null); updateSendState();
+    const temp={id:tempId, post_id:postId, user_id:userId, parent_id:parentId, text:saveText, media_url: selectedMediaURL||"", media_type: selectedMediaType||"", media_duration: selectedMediaDuration, created_at:new Date().toISOString()};
+    commentsCache.push(temp); renderComments(); syncFeedCommentCount(postId); if(inp) inp.value=""; setReplyTo(null);
+    const mediaToUpload = selectedMediaFile ? {file:selectedMediaFile, type:selectedMediaType, duration:selectedMediaDuration} : null;
+    clearMedia(); updateSendState();
     isSending=true;
     try{
+      let media = null;
+      if(mediaToUpload){ selectedMediaFile=mediaToUpload.file; selectedMediaType=mediaToUpload.type; selectedMediaDuration=mediaToUpload.duration; media = await uploadMedia(userId); selectedMediaFile=null; }
       const insertObj={ post_id:postId, user_id:userId, text:saveText };
       if(parentId) insertObj.parent_id = parentId;
-      const {data, error}=await s.from(TABLE).insert(insertObj).select("id,post_id,user_id,parent_id,text,created_at").single();
+      if(media){ insertObj.media_url=media.url; insertObj.media_type=media.type; insertObj.media_duration=media.duration; }
+      const {data, error}=await s.from(TABLE).insert(insertObj).select("id,post_id,user_id,parent_id,text,media_url,media_type,media_duration,created_at").single();
       if(error) throw error;
       const idx=commentsCache.findIndex((c)=>String(c.id)===tempId); if(idx>=0 && data) commentsCache[idx]=data;
       renderComments(); syncFeedCommentCount(postId);
@@ -257,11 +341,10 @@
       console.error("PIXORO COMMENT ADD:", e);
       commentsCache=commentsCache.filter(c=>String(c.id)!==tempId);
       renderComments(); syncFeedCommentCount(postId);
-      alert("Failed: "+(e.message||"Check Supabase RLS da"));
-    }finally{ isSending=false; }
+      alert("Failed: "+(e.message||"Check Supabase RLS / Bucket da"));
+    }finally{ isSending=false; selectedMediaFile=null; }
   }
 
-  // ✅ V58 - SAFETY DELETE DA - Confirm + Undo 5 Sec da
   async function deleteComment(commentId){
     if(!commentId) return;
     const comment = commentsCache.find(c=>String(c.id)===String(commentId));
@@ -300,10 +383,9 @@
   }
   function closeCommentModal(){
     openPostId=null; replyTo=null; const modal=getCommentModal(); if(modal) modal.style.display="none"; document.body.style.overflow=""; unsubscribeRealtime();
-    const inp=getInput(); if(inp) inp.value=""; setReplyTo(null); updateSendState();
+    const inp=getInput(); if(inp) inp.value=""; setReplyTo(null); clearMedia(); updateSendState();
   }
 
-  // ✅ V58 - HOLD OPTION DA - Full Black da
   function openCommentOptions(commentId, userId){
     currentCommentId=String(commentId); currentCommentUserId=String(userId||""); const modal=document.getElementById("cmtOptionModal"); const content=document.getElementById("cmtOptContent"); if(!modal||!content) return;
     const me=window.ME_ID; const isMine=me && String(userId)===String(me);
@@ -330,24 +412,37 @@
     if(opt==="block"){ if(currentCommentUserId){ blockedIds.add(String(currentCommentUserId)); localStorage.setItem("pixoro_blocked", JSON.stringify([...blockedIds])); } alert("User blocked da"); closeCommentOptions(); renderComments(); return; }
   }
 
-  // ✅ V58 - 2 SEC HOLD LOGIC DA - Makkal Pudichu Vacha Tha Option Varum da
+  // ✅ V60 - 0.2 SEC HOLD + SCROLL SAFE DA
   function bindHoldOption(){
     const list = document.querySelector("#cmtList");
     if(!list || list.dataset.holdBound) return;
     list.dataset.holdBound = "1";
+    let startX = 0, startY = 0, moved = false;
     list.addEventListener("pointerdown", (e)=>{
-      if(e.target.closest("[data-like]") || e.target.closest("[data-reply]") || e.target.closest("[data-view-replies]") || e.target.closest("[data-go-profile]")) return;
+      if(e.target.closest("[data-like]") || e.target.closest("[data-reply]") || e.target.closest("[data-view-replies]") || e.target.closest("[data-go-profile]") || e.target.closest("[data-video-wrap]")) return;
       const row = e.target.closest(".cmtRow"); if(!row) return;
-      holdFired = false;
+      holdFired = false; moved = false;
+      startX = e.clientX; startY = e.clientY;
       row.classList.add("cmtHolding");
       clearTimeout(holdTimer);
       holdTimer = setTimeout(()=>{
+        if(moved) return;
         holdFired = true;
         row.classList.remove("cmtHolding");
         try{ navigator.vibrate?.(50); }catch(err){}
         openCommentOptions(row.dataset.commentId, row.dataset.userId);
       }, HOLD_MS);
     });
+    list.addEventListener("pointermove", (e)=>{
+      if(Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8){
+        moved = true; clearTimeout(holdTimer);
+        document.querySelectorAll(".cmtHolding").forEach(r=>r.classList.remove("cmtHolding"));
+      }
+    }, {passive:true});
+    list.addEventListener("touchmove", ()=>{
+      moved = true; clearTimeout(holdTimer);
+      document.querySelectorAll(".cmtHolding").forEach(r=>r.classList.remove("cmtHolding"));
+    }, {passive:true});
     ["pointerup","pointerleave","pointercancel","touchend","touchcancel"].forEach(ev=>{
       list.addEventListener(ev, ()=>{ clearTimeout(holdTimer); document.querySelectorAll(".cmtHolding").forEach(r=>r.classList.remove("cmtHolding")); });
     });
@@ -379,9 +474,12 @@
         <div id="cmtList" class="cmtList"></div>
         <div class="cmtInputArea">
           <div id="replyTag" class="replyTag" style="display:none"><span id="replyTagName"></span><button id="replyTagCancel" style="background:none;border:none;color:#fff;cursor:pointer">×</button></div>
+          <div id="cmtVideoPreview"></div>
           <div class="cmtBox">
             <div class="cmtAvatar" style="width:32px;height:32px;flex-shrink:0">😊</div>
             <input id="commentInput" type="text" placeholder="Add a comment..." autocomplete="off" />
+            <label class="cmtVideoBtn" for="cmtMediaInput">🎬</label>
+            <input id="cmtMediaInput" type="file" accept="image/*,video/*" style="display:none" />
             <button class="sendBtn pixoro-c-send-arrow" id="cmtSendBtn" type="button" style="display:none">${ICON_SEND}</button>
           </div>
         </div>
@@ -393,13 +491,13 @@
     modal.querySelector("#replyTagCancel")?.addEventListener("click", ()=>setReplyTo(null));
     modal.addEventListener("click", (e)=>{ if(e.target===modal) closeCommentModal(); });
     modal.querySelector("#cmtOptionModal")?.addEventListener("click", (e)=>{ if(e.target.id==="cmtOptionModal") closeCommentOptions(); });
-    // ✅ V58 - Pazhaya Row Click Option Thookiten da - Hold Mattum Tha da
     modal.addEventListener("click", (e)=>{
       const goBtn=e.target.closest("[data-go-profile]"); if(goBtn){ e.stopPropagation(); goToProfile(goBtn.dataset.goProfile, goBtn.dataset.goName); return; }
       const likeBtn=e.target.closest("[data-like]"); if(likeBtn){ e.stopPropagation(); toggleCommentLike(likeBtn.dataset.like, likeBtn); return; }
       const replyBtn=e.target.closest("[data-reply]"); if(replyBtn){ const c=commentsCache.find((x)=>String(x.id)===String(replyBtn.dataset.reply)); if(c) focusReply(c); return; }
     });
     modal.querySelector("#cmtOptContent")?.addEventListener("click", (e)=>{ const b=e.target.closest("[data-opt]"); if(b) handleOption(b.dataset.opt); });
+    modal.querySelector("#cmtMediaInput")?.addEventListener("change", (e)=>{ handleMediaSelect(e.target.files[0]); });
     bindHoldOption();
     updateSendState();
   }
@@ -429,5 +527,5 @@
   window.addEventListener("pixoro:login", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro:logout", ()=>{ closeCommentModal(); });
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", startComments, {once:true}); } else { startComments(); }
-  console.log("PIXORO COMMENTS V58 READY 💬");
+  console.log("PIXORO COMMENTS V60 READY 💬");
 })();
