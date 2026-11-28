@@ -1,15 +1,16 @@
 /* =========================================
-   PIXORO COMMENTS V51 - V50 + PERMANENT USER_ID DA
+   PIXORO COMMENTS V52 FINAL CORRECT DA
    ✅ comments la - post_id + user_id + text Mattum da
-   ✅ username / avatar - comments la Illa da
-   ✅ Kaattum Podhu - user_id Vachu profiles la Edukkum da
-   ✅ V50 Features Ellaame Same da - Reply / Like / Delete / Profile
+   ✅ Name + Photo - user_id Vachu profiles la Irundhu da
+   ✅ profiles la Row Illana - Thanaave Create Pannum da
+   ✅ username / name / display_name - Edhu Irundhaalum Edukkum da
+   ✅ user nu Varaathu da
    ========================================= */
 (() => {
   "use strict";
-  if (window.PIXORO_COMMENTS_V51) return;
+  if (window.PIXORO_COMMENTS_V52) return;
+  window.PIXORO_COMMENTS_V52 = true;
   window.PIXORO_COMMENTS_V51 = true;
-  window.PIXORO_COMMENTS_V50 = true;
 
   const TABLE = "comments";
   const TABLE_LIKES = "comment_likes";
@@ -18,7 +19,6 @@
   let openPostId = null, replyTo = null, commentsCache = [];
   let currentCommentId = null, currentCommentUserId = null;
   let isSending = false;
-  // ✅ V51 - user_id -> { username, avatar_url } Map da
   let profileMap = {};
 
   const ICON_HEART = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
@@ -34,23 +34,53 @@
     if(!n || n.toLowerCase()==="user") return "";
     return n;
   }
-  function cleanAvatar(p){ return p?.avatar_url || p?.photo_url || p?.pfp || ""; }
+  function cleanAvatar(p){ return p?.avatar_url || p?.photo_url || p?.pfp || p?.photo || p?.picture || ""; }
+  function pickName(p){
+    return cleanName(p?.username || p?.name || p?.display_name || p?.full_name || p?.user_name || "");
+  }
 
-  // ✅ V51 CORE - user_id Vachu profiles la Edu da
+  // ✅ V52 - En Profile Illana Thanaave Create Pannu da
+  async function ensureMyProfile(){
+    const s=getSupa(); const userId=await getUserId(); if(!s||!userId) return;
+    try{
+      const {data} = await s.from("profiles").select("id").eq("id", userId).maybeSingle();
+      if(data) return;
+      const {data:u} = await s.auth.getUser();
+      const meta = u?.user?.user_metadata || {};
+      const fallback = cleanName(meta.username || meta.name || meta.display_name || meta.full_name || u?.user?.email?.split("@")[0]);
+      if(!fallback) return;
+      await s.from("profiles").insert({ id: userId, username: fallback, avatar_url: meta.avatar_url || meta.picture || "", email: u?.user?.email || "" });
+    }catch(e){}
+  }
+
+  // ✅ V52 CORE - user_id Vachu profiles la Edu da
   async function fetchProfiles(userIds){
     const s=getSupa(); if(!s) return profileMap;
+    await ensureMyProfile();
     const ids=[...new Set((userIds||[]).map(id=>String(id)).filter(Boolean))].filter(id=>!profileMap[id]);
     if(ids.length){
-      const {data}=await s.from("profiles").select("id,username,avatar_url,photo_url,pfp").in("id", ids);
-      (data||[]).forEach(p=>{ profileMap[String(p.id)]={ username: cleanName(p.username)||"user", avatar_url: cleanAvatar(p) }; });
+      const {data, error}=await s.from("profiles").select("*").in("id", ids);
+      console.log("PROFILE FETCH:", ids, data, error);
+      (data||[]).forEach(p=>{
+        const nm = pickName(p);
+        profileMap[String(p.id)]={ username: nm || "user", avatar_url: cleanAvatar(p) };
+      });
+      const missing = ids.filter(id=>!profileMap[id]);
+      if(missing.length){
+        try{
+          const {data:u}=await s.auth.getUser();
+          if(u?.user?.id && missing.includes(String(u.user.id))){
+            const meta=u.user.user_metadata||{};
+            const fb = cleanName(meta.username || meta.name || meta.display_name || meta.full_name || u.user.email?.split("@")[0]);
+            if(fb) profileMap[String(u.user.id)]={ username: fb, avatar_url: meta.avatar_url || meta.picture || "" };
+          }
+        }catch(e){}
+      }
     }
     return profileMap;
   }
   function getProfile(userId){ return profileMap[String(userId)] || { username:"user", avatar_url:"" }; }
-  async function getUserById(userId){
-    await fetchProfiles([userId]);
-    return getProfile(userId);
-  }
+  async function getUserById(userId){ await fetchProfiles([userId]); return getProfile(userId); }
 
   function escapeHtml(str){ return String(str ?? "").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
   function timeAgo(ts){ if(!ts) return "now"; const t=new Date(ts).getTime(); if(!t) return "now"; const s=Math.floor((Date.now()-t)/1000); if(s<5) return "now"; if(s<60) return s+"s"; if(s<3600) return Math.floor(s/60)+"m"; if(s<86400) return Math.floor(s/3600)+"h"; if(s<604800) return Math.floor(s/86400)+"d"; return Math.floor(s/604800)+"w"; }
@@ -96,7 +126,6 @@
     const el=post.querySelector(".post-user, .pUser, .post-username, [data-username], .username"); return cleanName(el?.textContent?.trim()||"")||"";
   }
 
-  // ✅ V51 LOAD - comments la user_id + text Mattum Edu da
   async function loadComments(postId){
     const s=getSupa(); if(!s) return;
     try{
@@ -108,7 +137,6 @@
     }catch(e){ console.error("PIXORO COMMENTS LOAD:", e); }
   }
 
-  // ✅ V51 RENDER - Name + Photo - profileMap la Irundhu da
   function renderComments(){
     const list=getList(); if(!list) return; listEl=list;
     if(!commentsCache.length){ list.innerHTML='<div style="text-align:center;color:#777;padding:30px 10px;font-size:13px">No comments yet.<br>Be the first to comment.</div>'; return; }
@@ -150,13 +178,13 @@
     try{ const ids=commentsCache.map((c)=>String(c.id)); let all=[]; let from=0; while(true){ const {data, error}=await s.from(TABLE_LIKES).select("comment_id,user_id").in("comment_id", ids).range(from, from+999); if(error) throw error; const rows=data||[]; all=all.concat(rows); if(rows.length<1000) break; from+=1000; } const counts={}; const liked=new Set(); ids.forEach((id)=>counts[id]=0); all.forEach((r)=>{ const id=String(r.comment_id); counts[id]=(counts[id]||0)+1; if(String(r.user_id)===String(userId)) liked.add(id); }); window.FEED_COMMENT_COUNTS=counts; window.FEED_COMMENT_LIKES=liked; renderComments(); }catch(e){}
   }
 
-  // ✅ V51 ADD - Save la user_id + text Mattum da
   async function addComment(){
     if(isSending) return;
     const inp=getInput(); inputEl=inp; const text=inp?.value?.trim()||""; if(!text) return;
     const postId=String(getPostId()||""); if(!postId){ alert("Post ID kedaikala da"); return; }
     openPostId=postId; window.PIXORO_OPEN_POST_ID=postId;
     const s=getSupa(); const userId=await getUserId(); if(!s||!userId){ alert("Please login first"); return; }
+    await ensureMyProfile();
     await fetchProfiles([userId]);
     const tempId="temp-"+Date.now();
     const temp={id:tempId, post_id:postId, user_id:userId, text, created_at:new Date().toISOString()};
@@ -279,5 +307,5 @@
   window.addEventListener("pixoro:login", ()=>{ setTimeout(layout, 100); });
   window.addEventListener("pixoro:logout", ()=>{ closeCommentModal(); });
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", startComments, {once:true}); } else { startComments(); }
-  console.log("PIXORO COMMENTS V51 READY 💬");
+  console.log("PIXORO COMMENTS V52 READY 💬");
 })();
