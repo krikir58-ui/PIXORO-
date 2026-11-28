@@ -1,19 +1,19 @@
 /* =====================================================
-   PIXORO LIKE V78
+   PIXORO LIKE V79
    LIKE BUTTON  = LIKE / UNLIKE - SMOOTH DA - Comment Mari da
    PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
    SUPABASE = SERVER SAVE
    + COMMENT MODAL GUARD DA - Comment Like ah like.js Thodathu da
    + COMMENT LIKE CHINNA DA - Perusa Heart Parakkaathu da
-   + V78 BEST DA - Like CSS Ellam Like.js Kulla Tha da - Feed.css la Like CSS Illa da
-   + V78 ADD DA - Like / Unlike Panna Photo NADUVULA Heart POP Aagum da - Double Tap Mari da - 1500ms Mella Poi Maraiyum da - Button Kitta Heart Varaathu da
+   + V79 BEST DA - Like CSS Thani File da - css/like.css la Tha Irukku da - Like.js la CSS Illa da
+   + V79 ADD DA - Like / Unlike Panna Photo NADUVULA Heart POP Aagum da - Double Tap Mari da - 1500ms Mella Poi Maraiyum da - Button Kitta Heart Varaathu da
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V78) return;
-  window.PIXORO_LIKE_V78 = true;
+  if (window.PIXORO_LIKE_V79) return;
+  window.PIXORO_LIKE_V79 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
@@ -275,7 +275,7 @@
   window.pixoroShowHeartDance = showBigHeart;
   window.showBigHeart = showBigHeart;
 
-  /* ✅ V78 - Pazhaya Unlike Heart Function ah Kolli da - Ippo Adhu Theva Illa da - Naduvula POP Tha Venum da */
+  /* ✅ V79 - Pazhaya Unlike Heart Function ah Kolli da - Ippo Adhu Theva Illa da - Naduvula POP Tha Venum da */
   function showUnlikeHeart(button) {
     return;
   }
@@ -288,7 +288,7 @@
 
     icon.getAnimations().forEach(a => a.cancel());
 
-    /* ✅ V78 CORRECT - 1.15x / 180ms -> 1.06x / 150ms da - Like.js Kulla CSS Kooda Idhe Tha da - Perusa Thudikkaathu da */
+    /* ✅ V79 CORRECT - 1.06x / 150ms da - Perusa Thudikkaathu da */
     icon.animate([
       { transform: "scale(1)" },
       { transform: "scale(1.06)", offset: .4 },
@@ -649,136 +649,12 @@
   window.pixoroSyncLikes = syncVisiblePosts;
   window.pixoroPaintAllLikes = paintAll;
 
-  /* ===== ✅ V78 - LIKE CSS ELLAM LIKE.JS KULLA THA DA - FEED.CSS LA LIKE CSS ILLA DA ===== */
-
-  function addStyles() {
-    if (document.getElementById("pixoro-like-v78-css")) return;
-
-    const style = document.createElement("style");
-    style.id = "pixoro-like-v78-css";
-
-    style.textContent = `
-      /* ✅ Like Button Base da - Feed.css la Irundha Like CSS Ippo Inga Tha da */
-      .like-btn,
-      .like-button,
-      [data-like-btn] {
-        background: transparent !important;
-        border: none !important;
-        outline: none !important;
-        box-shadow: none !important;
-        overflow: visible !important;
-        cursor: pointer !important;
-        -webkit-tap-highlight-color: transparent !important;
-        min-width: 40px !important;
-        min-height: 40px !important;
-        padding: 5px !important;
-        margin-left: 2px !important;
-        flex-shrink: 0 !important;
-      }
-
-      .like-btn svg,
-      .like-button svg,
-      [data-like-btn] svg {
-        transform-origin: center !important;
-        flex-shrink: 0 !important;
-        overflow: visible !important;
-        width: 28px !important;
-        height: 28px !important;
-      }
-
-      .like-btn.liked,
-      .like-button.liked,
-      [data-like-btn].liked {
-        color: #FF3040 !important;
-      }
-
-      .like-btn.liked svg,
-      .like-button.liked svg,
-      [data-like-btn].liked svg,
-      .like-btn.liked svg *,
-      .like-button.liked svg * {
-        fill: #FF3040 !important;
-        stroke: #FF3040 !important;
-      }
-
-      .like-btn:not(.liked) svg,
-      .like-button:not(.liked) svg,
-      [data-like-btn]:not(.liked) svg {
-        fill: none !important;
-        stroke: #FFFFFF !important;
-      }
-
-      /* ✅ Beat - Feed.css la Irundha beat Ippo Inga Tha da - 1.06x Chinna Beat Mattum da */
-      @keyframes beat{ 0%{transform:scale(1)} 40%{transform:scale(1.06)} 100%{transform:scale(1)} }
-      .like-btn.liked svg, .like-btn.liked svg path, .act.liked svg, .act.liked svg path{
-        animation:beat .15s ease-out!important;
-      }
-
-      /* ✅ Double Tap Big Heart da */
-      .pixoro-big-heart {
-        pointer-events: none !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-      }
-
-      /* ✅ Center Pop Heart da - Photo Naduvula POP Aagum da - Feed.css la Irundha CSS Ippo Inga Tha da */
-      .pixoro-center-pop{
-        display:block!important; visibility:visible!important; opacity:1!important;
-        position:fixed!important; z-index:999999!important; pointer-events:none!important;
-        width:84px!important; height:84px!important;
-        transform:translate(-50%,-50%) scale(0)!important;
-        background:transparent!important; border:none!important; box-shadow:none!important;
-        overflow:visible!important;
-      }
-      .pixoro-center-pop svg, .pixoro-center-pop svg path{
-        width:84px!important; height:84px!important; display:block!important;
-        visibility:visible!important; opacity:1!important;
-        fill:#FF2D95!important; stroke:#FFFFFF!important;
-      }
-
-      /* ✅ Pazhaya Heart Ellam Kill da - Video la Varra Heart Idhu Tha da */
-      .pixoro-slow-float, .pixoro-soft-float, .pixoro-unlike-heart, .big-heart, .bigHeart, .heart-burst{
-        display:none!important; visibility:hidden!important; opacity:0!important;
-        width:0!important; height:0!important;
-      }
-      .pixoro-slow-float svg, .pixoro-soft-float svg, .pixoro-unlike-heart svg{
-        display:none!important;
-      }
-
-      /* ✅ Comment Like - Like.js Thodathu da - Comment.css Tha Paathukkum da */
-      #commentModal .pixoro-c-heart,
-      #commentModal .pixoro-c-heart svg{
-        width:24px!important; height:24px!important;
-        margin-right:12px!important;
-        animation:none!important; transform:none!important;
-      }
-      #commentModal .pixoro-c-heart:active{ transform:scale(1.1)!important; }
-      #commentModal .pixoro-unlike-heart,
-      #commentModal .pixoro-big-heart,
-      #commentModal .pixoro-center-pop{ display:none!important; }
-
-      /* ✅ Like Button Cut Aagaama - Parent Clip Panna Vidaama da */
-      .post-actions, .post-footer, .actions, .post-action-bar, .rActions, .post-actions-row {
-        overflow: visible !important;
-        padding-left: 10px !important;
-        padding-right: 6px !important;
-      }
-
-      [data-like-count],
-      .like-count,
-      .likes-count {
-        flex-shrink: 0 !important;
-      }
-    `;
-
-    document.head.appendChild(style);
-  }
+  /* ✅ V79 - LIKE CSS THOOKITEN DA - CSS Inime css/like.css la Tha Irukku da - Like.js la CSS Illa da */
+  /* ✅ addStyles() Function ah Full Ah Thookiten da - start() la addStyles() Call ah Thookiten da */
 
   /* EVENTS */
 
   function start() {
-    addStyles();
     paintAll();
     syncVisiblePosts();
   }
@@ -818,25 +694,11 @@
     start();
   }
 
-  console.log("PIXORO LIKE V78 READY ❤️");
+  console.log("PIXORO LIKE V79 READY ❤️");
 
-  /* ===== ✅ V78 CORRECT ADD DA - Like / Unlike Panna Photo NADUVULA Heart POP + Mella Maraiyum da - Button Kitta Heart Varaathu da ===== */
+  /* ===== ✅ V79 CORRECT ADD DA - Like / Unlike Panna Photo NADUVULA Heart POP + Mella Maraiyum da - Button Kitta Heart Varaathu da ===== */
+  /* ✅ V79 - Center Pop addStyle() Thookiten da - CSS Inime css/like.css la Tha Irukku da */
   (function pixoroCenterPopADD(){
-    function addStyle(){
-      if(document.getElementById("pixoro-center-pop")) return;
-      var st = document.createElement("style");
-      st.id = "pixoro-center-pop";
-      st.textContent = `
-        .pixoro-center-pop{
-          position:fixed!important; z-index:999999!important; pointer-events:none!important;
-          width:84px!important; height:84px!important;
-          transform:translate(-50%,-50%) scale(0)!important; opacity:0!important;
-        }
-        .pixoro-center-pop svg{ width:84px!important; height:84px!important; display:block!important; }
-      `;
-      document.head.appendChild(st);
-    }
-    addStyle();
     var lastTouch = new WeakMap();
     document.addEventListener("pointerdown", function(e){
       var btn = e.target.closest ? e.target.closest("[data-like-btn], .like-btn, .like-button") : null;
@@ -891,7 +753,7 @@
     obs.observe(document.documentElement, { attributes:true, attributeFilter:["class"], subtree:true });
   })();
 
-  /* ===== ✅ V78 KILL SWITCH DA - Pazhaya Slow Heart Vantha Udane Delete Pannidum da ===== */
+  /* ===== ✅ V79 KILL SWITCH DA - Pazhaya Slow Heart Vantha Udane Delete Pannidum da ===== */
   (function pixoroKillOldHeart(){
     var obs = new MutationObserver(function(){
       document.querySelectorAll(".pixoro-slow-float, .pixoro-soft-float").forEach(function(el){ el.remove(); });
