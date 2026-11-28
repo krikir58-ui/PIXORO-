@@ -1,19 +1,19 @@
 /* =====================================================
-   PIXORO LIKE V80
+   PIXORO LIKE V81
    LIKE BUTTON  = LIKE / UNLIKE - SMOOTH DA - Comment Mari da
    PHOTO DOUBLE TAP = POP HEART + LIKE ONLY
    SUPABASE = SERVER SAVE
    + COMMENT MODAL GUARD DA - Comment Like ah like.js Thodathu da
    + COMMENT LIKE CHINNA DA - Perusa Heart Parakkaathu da
-   + V80 BEST DA - Like CSS Thani File da - css/like.css la Tha Irukku da - Like.js la CSS Illa da
-   + V80 FIX DA - Like / Unlike Panna Button Kitta Irundhu Heart Mella Mela Poi Maraiyum da - 1500ms da - Photo Naduvula Illa da
+   + V81 BEST DA - Like CSS Thani File da - css/like.css la Tha Irukku da - Like.js la CSS Illa da
+   + V81 FIX DA - Like / Unlike Panna Photo NADUVULA 38px Heart Vanthu Mella Poi Maraiyum da - 1500ms da - Button Kitta Illa da
    ===================================================== */
 
 (() => {
   "use strict";
 
-  if (window.PIXORO_LIKE_V80) return;
-  window.PIXORO_LIKE_V80 = true;
+  if (window.PIXORO_LIKE_V81) return;
+  window.PIXORO_LIKE_V81 = true;
 
   const TABLE = "likes";
   const DOUBLE_TAP_DELAY = 300;
@@ -275,7 +275,7 @@
   window.pixoroShowHeartDance = showBigHeart;
   window.showBigHeart = showBigHeart;
 
-  /* ✅ V80 - Pazhaya Unlike Heart Function ah Kolli da - Ippo Adhu Theva Illa da - Float Heart Tha Venum da */
+  /* ✅ V81 - Pazhaya Unlike Heart Function ah Kolli da - Ippo Adhu Theva Illa da - Naduvula Heart Tha Venum da */
   function showUnlikeHeart(button) {
     return;
   }
@@ -288,7 +288,7 @@
 
     icon.getAnimations().forEach(a => a.cancel());
 
-    /* ✅ V80 CORRECT - 1.06x / 150ms da - Perusa Thudikkaathu da */
+    /* ✅ V81 CORRECT - 1.06x / 150ms da - Perusa Thudikkaathu da */
     icon.animate([
       { transform: "scale(1)" },
       { transform: "scale(1.06)", offset: .4 },
@@ -646,7 +646,7 @@
   window.pixoroSyncLikes = syncVisiblePosts;
   window.pixoroPaintAllLikes = paintAll;
 
-  /* ✅ V80 - LIKE CSS THOOKITEN DA - CSS Inime css/like.css la Tha Irukku da - Like.js la CSS Illa da */
+  /* ✅ V81 - LIKE CSS THOOKITEN DA - CSS Inime css/like.css la Tha Irukku da - Like.js la CSS Illa da */
 
   /* EVENTS */
 
@@ -690,9 +690,9 @@
     start();
   }
 
-  console.log("PIXORO LIKE V80 READY ❤️");
+  console.log("PIXORO LIKE V81 READY ❤️");
 
-  /* ===== ✅ V80 FIX DA - Like / Unlike Panna Button Kitta Irundhu Heart Mella Mela Poi Maraiyum da - Photo Naduvula Illa da ===== */
+  /* ===== ✅ V81 FIX DA - Like / Unlike Panna Photo NADUVULA 38px Heart Vanthu Mella Poi Maraiyum da - Button Kitta Illa da ===== */
   (function pixoroCenterPopADD(){
     var lastTouch = new WeakMap();
     document.addEventListener("pointerdown", function(e){
@@ -702,24 +702,27 @@
     }, true);
     function centerPop(btn, isLiked){
       if(!btn || btn.closest("#commentModal")) return;
-      // ✅ V80 FIX - Photo Naduvula Illa da - Button Kitta Irundhu Tha Start Aagum da
-      var r = btn.getBoundingClientRect();
+      // ✅ V81 FIX - Button Kitta Illa da - Photo NADUVULA Tha da - Video Mari da
+      var post = btn.closest("article.post, .post");
+      var media = post ? post.querySelector(".postMedia, .post-media, .post-media-wrap, img.main, video.main") : null;
+      if(!media) return;
+      var r = media.getBoundingClientRect();
       if(!r.width) return;
       var d = document.createElement("div");
       d.className = "pixoro-center-pop" + (isLiked ? "" : " is-unlike");
-      // ✅ Button ku Mela Konjam - Left Side la Start Aagum da - Video la Varra Mari da
-      d.style.left = (r.left + 22) + "px";
-      d.style.top = (r.top - 6) + "px";
+      // ✅ Photo Naduvula Tha da - 38px Heart da
+      d.style.left = (r.left + r.width / 2) + "px";
+      d.style.top = (r.top + r.height / 2) + "px";
       d.innerHTML = '<svg viewBox="0 0 24 24" style="filter:drop-shadow(0 8px 18px rgba(255,45,149,.6))"><path fill="#FF2D95" stroke="#FFFFFF" stroke-width="0.6" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
       document.body.appendChild(d);
-      // ✅ V80 - Mella Mela Poi Maraiyum da - 1500ms da - Vegama Maraiyaathu da
+      // ✅ V81 - Naduvula Vanthu - Konjam Ninnu - Mella Mela Poi Maraiyum da - 1500ms da
       var anim = d.animate([
-        { transform:"translate(-50%,-50%) scale(0.6)", opacity:0 },
-        { transform:"translate(-50%,-50%) scale(1.1)", opacity:1, offset:0.15 },
-        { transform:"translate(-50%,-50%) scale(1)", opacity:1, offset:0.25 },
-        { transform:"translate(-50%,-90%) scale(1)", opacity:1, offset:0.55 },
-        { transform:"translate(-45%,-160%) scale(0.95)", opacity:0.6, offset:0.80 },
-        { transform:"translate(-40%,-230%) scale(0.8)", opacity:0 }
+        { transform:"translate(-50%,-50%) scale(0)", opacity:0 },
+        { transform:"translate(-50%,-50%) scale(1.2)", opacity:1, offset:0.15 },
+        { transform:"translate(-50%,-50%) scale(1)", opacity:1, offset:0.30 },
+        { transform:"translate(-50%,-55%) scale(1)", opacity:1, offset:0.55 },
+        { transform:"translate(-50%,-80%) scale(0.95)", opacity:0.6, offset:0.80 },
+        { transform:"translate(-50%,-110%) scale(0.85)", opacity:0 }
       ], { duration:1500, easing:"ease-out", fill:"forwards" });
       anim.onfinish = function(){ d.remove(); };
     }
@@ -733,7 +736,7 @@
         var nowLiked = btn.classList.contains("liked");
         if(prevLiked.get(btn) === nowLiked) return;
         prevLiked.set(btn, nowLiked);
-        // ✅ Like / Unlike Rendum - Heart Mela Pogum da
+        // ✅ Like / Unlike Rendum - Naduvula Heart Varum da
         centerPop(btn, nowLiked);
         var svg = btn.querySelector("svg");
         if(svg){
@@ -749,7 +752,7 @@
     obs.observe(document.documentElement, { attributes:true, attributeFilter:["class"], subtree:true });
   })();
 
-  /* ===== ✅ V80 KILL SWITCH DA - Pazhaya Slow Heart Vantha Udane Delete Pannidum da ===== */
+  /* ===== ✅ V81 KILL SWITCH DA - Pazhaya Slow Heart Vantha Udane Delete Pannidum da ===== */
   (function pixoroKillOldHeart(){
     var obs = new MutationObserver(function(){
       document.querySelectorAll(".pixoro-slow-float, .pixoro-soft-float").forEach(function(el){ el.remove(); });
