@@ -4,24 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Pixoro - Final Mass Killa</title>
-<!-- ✅ CORRECT - Ellam Correct Version da - Vera Vera Version Illa da -->
+<!-- ✅ CORRECT - Ellam Correct Version da -->
 <link rel="stylesheet" href="style.css?v=1054">
-<link rel="stylesheet" href="css/comments.css?v=65">
+<link rel="stylesheet" href="css/comments.css?v=7">
 <link rel="stylesheet" href="css/pixoro-style.css?v=1054">
 <link rel="stylesheet" href="css/top-plus.css?v=1054">
 <link rel="stylesheet" href="css/feed.css?v=1045">
 <link rel="stylesheet" href="css/top-fix.css?v=1054">
-<!-- ✅ V1054 FIX - feed-fix.css ah Kadasiya Podu da - Ithu Thaan Jeyikkum da - Avatar 42px + Bottom Nav Flex + Post Photo Rectangle -->
+<!-- ✅ V1054 FIX - feed-fix.css ah Kadasiya Podu da -->
 <link rel="stylesheet" href="css/feed-fix.css?v=1054">
-<!-- ✅ V92 FIX DA - like.css v92 Tha da - Simple POP Mattum Tha da - Instagram Mari Illa da - Gradient Illa da - 72px Red Heart da - Like Button Thotta Button Ye POP Aagum da -->
+<!-- ✅ V93 FIX DA - like.css v93 Tha da -->
 <link rel="stylesheet" href="css/like.css?v=93">
-<!-- ❌ V1054 FIX - like-heart.css ah Delete Panniten da - Athula 110px Heart Irukku da - Like.js 46px ah Kolla Pannuthu da -->
 <style>
 /* ✅ V1054 - Trend Bar + Top Banner + Loading Text Full Hide da */
 #trendBar, .trendBar, #pixoroTopNote{ display:none!important; }
 #feedError{ display:none!important; }
-/* ✅ V92 FIX DA - Inline Heart CSS Illa da - like.css v92 Tha Jeyikkum da */
-/* ✅ Pazhaya Pink / Gradient Heart ah Inga Podatha da */
 </style>
 <script>
   try{
@@ -48,7 +45,6 @@
 
 <div class="feedTabs"><div class="feedTab active" id="tabForYou" onclick="setFeedMode('foryou')">For You</div><div class="feedTab" id="tabFollowing" onclick="setFeedMode('following')">Following</div><div class="feedTab" id="tabLatest" onclick="setFeedMode('latest')">Latest</div></div>
 <div id="trendBar" class="trendBar" style="display:none"></div>
-<!-- ✅ V1054 FIX - feedList Id ah Add Panniten da - Feed.js Itha Thaan Theduthu da - #feed Mattum Irundha Feed Load Aagaathu da -->
 <div id="feed"><div id="feedList"><div class="skel"></div><div class="skel"></div></div></div>
 <div id="feedError" style="display:none"></div>
 <div id="toast" class="toast"></div>
@@ -67,7 +63,8 @@
 <a href="./profile.html"><img class="navPfp myPfp" id="navPfp" src=""><span>Profile</span></a>
 </div>
 
-<div id="commentModal"><div><div><b>Comments</b><span onclick="closeComment()">X</span></div><div id="commentList"></div><div><div id="myCommentPfpWrap"></div><input id="commentInput" placeholder="Add comment..."><button onclick="addComment()">Post</button></div></div></div>
+<!-- ✅ V1055 CORRECT DA - Empty Vaikkum da - comments.js V39 Tha Build Pannum da - Pazhaya #commentList / Post Button / closeComment() HTML ah Thookiten da -->
+<div id="commentModal"></div>
 <div id="postMenu" class="postMenuSheet" onclick="if(event.target==this)closePostMenu()"><div class="postMenuBox" id="postMenuBox"></div></div>
 
 <div id="storyViewer">
@@ -90,16 +87,17 @@
 <script src="js/pixoro-core.js?v=1054"></script>
 <script src="js/avatar.js?v=1054"></script>
 <script src="js/follow.js?v=1054"></script>
-<script src="js/comments.js?v=40"></script>
+<script src="js/comments.js?v=39"></script>
 <script src="js/share.js?v=1054"></script>
 <script src="js/save.js?v=1054"></script>
 <script src="js/story.js?v=1054"></script>
-<!-- ✅ V92 FIX - like.js V92 Tha da - Simple POP Mattum Tha da - Instagram Mari Illa da - Like Button Thotta Button Ye POP Aagum da + Naduvula Heart POP Aagum da - Feed ku Munnaadi Podu da -->
 <script src="js/like.js?v=93"></script>
-<!-- ✅ CORRECT - feed.js V1045 da - Double Tap ah Feed la Vekka Koodathu da - like.js Thaan Like Pannum da -->
 <script src="js/feed.js?v=1045"></script>
 <script>
 window.PIXORO_FEED_MODE = 'foryou';
+// ✅ V1055 ADD DA - Pazhaya closeComment() / closeCommentModal() Alias da - Yenga Irundhaalum Work Aagum da
+window.closeComment = function(){ if(window.closeCommentModal) return window.closeCommentModal(); };
+window.closeComments = window.closeComment;
 (function(){
   try{
     var p = window.MY_PFP || localStorage.getItem("pixoro_avatar") || "";
